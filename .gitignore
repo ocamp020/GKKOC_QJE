@@ -10,7 +10,7 @@
 *.fig
 *.lyx
 Sim_*
+Bench_Files
 Exp_Files
 CE_Files
-Simul
 Exp_results*
