@@ -9,3 +9,8 @@
 *.zip
 *.fig
 *.lyx
+Sim_*
+Exp_Files
+CE_Files
+Simul
+Exp_results*
