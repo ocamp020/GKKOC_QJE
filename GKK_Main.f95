@@ -32,9 +32,14 @@ PROGRAM main
 		INTEGER  :: read_write_bench
 
 	! Switch for solving benchmark or just reading resutls
-	! If read_write_bench==1 then just read resutls
-	! If read_write_bench==0 then solve for benchmark and store results
+		! If read_write_bench==1 then just read resutls
+		! If read_write_bench==0 then solve for benchmark and store results
 		read_write_bench = 1
+
+	! Switch for separable and non-separable utility
+		! If Utility_Switch==1 then do non-separable utility
+		! If Utility_Switch==0 then do separable utility
+		Utility_Switch = 1	
 
 	! Set Parameters 
 		Params =[ 0.9436, 0.00, 0.50, 0.70444445, 0.34, 0.4494 ] ! tauL=0.224, tauC=0.075 calibration
@@ -73,6 +78,9 @@ PROGRAM main
 		else if ((TauPL.ne.0.0_dp).and.(sigma.eq.1.0_dp)) then 
 			Result_Folder = './SU_PT_Results/Factor_'//trim(Result_Folder)//'/'
 		end if 
+
+		write(Result_Folder,'(f4.2)') Threshold_Factor
+		Result_Folder = './Test_Run/Factor_'//trim(Result_Folder)//'/'
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )

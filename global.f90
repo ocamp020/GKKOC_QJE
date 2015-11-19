@@ -1,6 +1,9 @@
 MODULE global
     USE parameters
 
+    ! Switch for non-separable vs separable utility
+    integer :: Utility_Switch
+
     ! Foder to store results
     character(100) :: Result_Folder
 
