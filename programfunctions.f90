@@ -296,17 +296,18 @@ end Subroutine Asset_Grid_Threshold
 		! Set auxiliary variable for FOC_HA
 		ain   = aprimet
 		! Solve for hours choice by solving the FOC for labor
-			if (Utility_Switch.eq.1) then
-				c_foc = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
-			else 
-				c_foc = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
-			end if 
-			c_budget = YGRID_t(ai,zi) - aprimet   
-			if (c_budget.ge.c_foc) then
-				ntemp = 0.0_dp
-			else
-				brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp)  
-			end if 
+			brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp)  
+				! 			if (Utility_Switch.eq.1) then
+				! 				c_foc = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
+				! 			else 
+				! 				c_foc = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
+				! 			end if 
+				! 			c_budget = YGRID_t(ai,zi) - aprimet   
+				! 			if (c_budget.ge.c_foc) then
+				! 				ntemp = 0.0_dp
+				! 			else
+				! 				brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp)  
+				! 			end if 
 		! Current consumption given ntemp
 			ctemp   = YGRID_t(ai,zi)+  Y_h(ntemp,age,lambdai,ei,wage) - aprimet   
 
