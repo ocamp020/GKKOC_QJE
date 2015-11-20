@@ -1391,6 +1391,8 @@ SUBROUTINE COMPUTE_STATS()
 	INTEGER :: prctile
 	REAL(DP), DIMENSION(nz) :: cdf_Gz_DBN 
 	REAL(dp), DIMENSION(na,nz) :: DBN_az, wealth
+	REAL(DP):: MeanATReturn, StdATReturn, VarATReturn , VarReturn
+	REAL(DP), DIMENSION(nz):: MeanATReturn_by_z, MeanReturn_by_z, size_by_z, Wealth_by_z
 
 	DO zi=1,nz
 	    cdf_Gz_DBN(zi) = sum(DBN1(:,:,zi,:,:))
@@ -1431,6 +1433,9 @@ SUBROUTINE COMPUTE_STATS()
 	print*,''
 	prct1_wealth  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
 	prct10_wealth = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
+	prct20_wealth =  1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
+	prct40_wealth =  1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
+
 
 	! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
 	! COMPUTE VARIANCE OF LOG EARNINGS FOR 25-60 FOR THOSE WHO WORK MORE THAN 260 HOURS
@@ -1478,51 +1483,78 @@ SUBROUTINE COMPUTE_STATS()
 	Var_Log_Earnings_25_60 = Var_Log_Earnings_25_60 / pop_pos_earn_25_60
 	Std_Log_Earnings_25_60 = Var_Log_Earnings_25_60 ** 0.5_DP
 
-	MeanWealth = 0.0_DP
-	MeanReturn = 0.0_DP
+	MeanWealth 	 = 0.0_DP
+	MeanATReturn = 0.0_DP
+	MeanReturn 	 = 0.0_DP
+	MeanCons  	 = 0.0_DP
+	
 	DO age=1,MaxAge
 	DO zi=1,nz
 	DO ai=1,na
 	DO lambdai=1,nlambda
 	DO ei=1, ne
-	     MeanWealth = MeanWealth  +   DBN1(age, ai, zi, lambdai, ei) * agrid(ai)         
-	     MeanReturn = MeanReturn  +   DBN1(age, ai, zi, lambdai, ei) * (MB_a(agrid(ai),zgrid(zi))-1.0_DP)
+	    MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei)*agrid(ai)         
+     	MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei)*(MBGRID(ai,zi)-1.0_DP)
+     	MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei)*agrid(ai)*(rr*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate)
+     	MeanCons     = MeanCons     + DBN1(age, ai, zi, lambdai, ei)*cons(age, ai, zi, lambdai, ei)
 	ENDDO
 	ENDDO
 	ENDDO    
 	ENDDO    
 	ENDDO    
 	Wealth_Output = MeanWealth/YBAR 
+	MeanReturn    = MeanReturn/MeanWealth
 
-	VarReturn = 0.0_DP
+	Bequest_Wealth=0.0_DP
+	DO zi=1,nz
+	DO ai=1,na
+	DO lambdai=1,nlambda
+	DO ei=1, ne
+	     Bequest_Wealth = Bequest_Wealth  +   DBN1(1, ai, zi, lambdai, ei) * agrid(ai)         
+	ENDDO
+	ENDDO
+	ENDDO    
+	ENDDO  
+	Bequest_Wealth =Bequest_Wealth/MeanWealth
+
+	VarATReturn = 0.0_DP
+	VarReturn 	= 0.0_DP
 	DO age=1,MaxAge
 	DO zi=1,nz
 	DO ai=1,na
 	DO lambdai=1,nlambda
 	DO ei=1, ne      
-	     VarReturn = VarReturn  +   DBN1(age, ai, zi, lambdai, ei) * (MB_a(agrid(ai),zgrid(zi))-1.0_DP-MeanReturn)**2.0_DP 
+	    VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP-MeanATReturn)**2.0_DP 
+     	VarReturn   = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai) / MeanWealth * &
+     	              & ((rr*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate) -MeanReturn)**2.0_DP 
 	ENDDO
 	ENDDO
 	ENDDO    
 	ENDDO    
 	ENDDO  
-	StdReturn=VarReturn**0.5_DP
+	StdATReturn = VarATReturn**0.5_DP
+	StdReturn   = VarReturn**0.5_DP
 
-	MeanReturn_by_z=0.0_DP
-	size_by_z = 0.0_DP
+	MeanATReturn_by_z = 0.0_DP
+	MeanReturn_by_z   = 0.0_DP
+	size_by_z         = 0.0_DP
 	DO age=1,MaxAge
 	DO zi=1,nz
 	DO ai=1,na
 	DO lambdai=1,nlambda
 	DO ei=1, ne
-	     MeanReturn_by_z(zi) = MeanReturn_by_z(zi)  +   DBN1(age, ai, zi, lambdai, ei) * (MB_a(agrid(ai),zgrid(zi))-1.0_DP)
-	     size_by_z(zi)       = size_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) 
+	     MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)
+	     MeanReturn_by_z(zi)   = MeanReturn_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * &
+	                                        & * (rr*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate)
+	     size_by_z(zi)         = size_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) 
+	     Wealth_by_z(zi) 	   = Wealth_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)
 	ENDDO
 	ENDDO
 	ENDDO    
 	ENDDO    
 	ENDDO    
-	MeanReturn_by_z = MeanReturn_by_z / size_by_z
+	MeanATReturn_by_z = MeanATReturn_by_z / size_by_z
+    MeanReturn_by_z   = MeanReturn_by_z   / Wealth_by_z
 
 	! Percentage of the population above threshold
 		! Compute distribution of agents by (a,z)
@@ -1542,8 +1574,9 @@ SUBROUTINE COMPUTE_STATS()
 	!print*, 'MeanReturn=',MeanReturn, 'StdReturn=', StdReturn
 	!print*,'MeanReturn_by_z=',MeanReturn_by_z
 
-	SSE_Moments = (Wealth_Output-3.0_DP)**2.0_DP + (prct1_wealth-0.35_DP)**2.0_DP  + (prct10_wealth-0.75_DP)**2.0_DP &
-	                   & + (Std_Log_Earnings_25_60 -0.8_DP)**2.0_DP + (meanhours_25_60-0.4_DP)**2.0_DP
+	SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP  + (1.0_DP-prct1_wealth/0.34_DP)**2.0_DP  + (prct10_wealth-0.71_DP)**2.0_DP &
+                   & + (1.0_DP-Std_Log_Earnings_25_60 / 0.8_DP)**2.0_DP + (1.0_DP-meanhours_25_60/0.4_DP)**2.0_DP &
+                   & + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
 	!print*,''
 	!print*,"Current parameters"
 	!print*,'beta',beta,'rho_z',rho_z,'sigma_z',sigma_z_eps,'sigma_lam',sigma_lambda_eps,'phi',phi
@@ -1563,8 +1596,6 @@ SUBROUTINE COMPUTE_STATS()
 	end if 
 		CLOSE(Unit=19)
 
-
-	
 
 END SUBROUTINE COMPUTE_STATS
 
@@ -2490,6 +2521,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'NBAR'	, NBAR
 			WRITE(UNIT=19, FMT=*) 'EBAR'	, EBAR
 			WRITE(UNIT=19, FMT=*) 'Y'		, YBAR
+			WRITE(UNIT=19, FMT=*) 'Cons'    , MeanCons
 			WRITE(UNIT=19, FMT=*) 'rr'		, rr
 			WRITE(UNIT=19, FMT=*) 'wage'	, wage
 			WRITE(UNIT=19, FMT=*) ' '
@@ -2497,8 +2529,11 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) " "
 			WRITE(UNIT=19, FMT=*) "Wealth_Output"		  	, Wealth_Output
 			WRITE(UNIT=19, FMT=*) "Mean_Assets"				, MeanWealth
+			WRITE(UNIT=19, FMT=*) "Bequest_Wealth/Wealth"	, Bequest_Wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_1%' 	, prct1_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_10%'	, prct10_wealth
+			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_20%'	, prct20_wealth
+			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_40%'	, prct40_wealth
 			WRITE(UNIT=19, FMT=*) 'p90-p10_Assets'			, prctile_ai(90)-prctile_ai(10)
 			WRITE(UNIT=19, FMT=*) 'Mean_Labor_Earnings'	  	, mean_log_earnings_25_60
 			WRITE(UNIT=19, FMT=*) 'STD_Labor_Earnings'	  	, Std_Log_Earnings_25_60
