@@ -281,81 +281,85 @@ end Subroutine Asset_Grid_Threshold
 	FUNCTION FOC_WH(aprimet)
 		IMPLICIT NONE   
 		real(DP), intent(in) :: aprimet
-		real(DP)             :: ntemp, MBaprime, FOC_WH,  yprime, exp1overcprime
-		REAL(DP)             :: brentvaluet
-		integer              :: epindx
-		real(DP), dimension(ne):: cprime
-		
-
-		! Set auxiliary variable for FOC_HA
-		ain=aprimet
-		! Solve for hours choice by solving the FOC for labor
-		brentvaluet = brent(0.000001_DP, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp)           
-		
-		! Compute marginal benefit of next period at a' (given zi)
-		MBaprime = MB_a(aprimet,zgrid(zi))
-		 
-		! Compute asset income of next period at a' (given zi)
-		yprime   = Y_a(aprimet,zgrid(zi))
-
-		! I have to evaluate the FOC in expectation over eindx prime given eindx
-		! Compute c' for each value of e'
-		DO epindx=1,ne
-		    cprime(epindx) = Linear_Int(Ygrid_t(:,zi),Cons_t(age+1,:,zi,lambdai,epindx), na_t, yprime  )
-		ENDDO
-		! Compute the expected value of 1/c' conditional on current ei
-		exp1overcprime = SUM( pr_e(ei,:) / cprime )
-
-		! Evaluate the squared residual of the Euler equation for working period
-		FOC_WH   = (1.0_DP / (YGRID_t(ai,zi)  + Y_h(ntemp,age,lambdai,ei,wage) - aprimet )  &
-		           & - beta *  survP(age) *MBaprime* exp1overcprime) **2.0_DP 
-
-	END  FUNCTION FOC_WH
-
-	FUNCTION FOC_WH_NSU(aprimet)
-		IMPLICIT NONE   
-		real(DP), intent(in) :: aprimet
-		real(DP)             :: ntemp, ctemp, MB_aprime, FOC_WH_NSU, yprime, exp1overcprime
-		REAL(DP)             :: brentvaluet, consin
+		real(DP)             :: ctemp, ntemp, yprime, MB_aprime, FOC_WH, exp1overcprime, E_MU_cp
+		REAL(DP)             :: brentvaluet, consin, H_min, c_foc, c_budget, cp, hp
 		integer              :: ep_ind
-		real(DP)			 :: cprime, hprime, c_foc, MU_cp(ne), E_MU_cp, H_min
-
+		real(DP), dimension(ne):: cprime, MU_cp
+		
 		H_min = 0.000001 
 
-		! Set auxiliary variable for FOC_HA
-		ain=aprimet
-		! Solve for hours choice by solving the FOC for labor
-		brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp) 
-		! Current consumption
-		ctemp   = YGRID_t(ai,zi)+  Y_h(ntemp,age,lambdai,ei,wage) - aprimet          
-		
 		! Compute marginal benefit of next period at a' (given zi)
 		MB_aprime = MB_a(aprimet,zgrid(zi))
-		 
 		! Compute asset income of next period at a' (given zi)
 		yprime   = Y_a(aprimet,zgrid(zi))
 
-		! I have to evaluate the FOC in expectation over eindx prime given eindx
-		! Compute consumption and labor for eachvalue of eindx prime
-		DO ep_ind=1,ne
-		    cprime = Linear_Int(Ygrid_t(:,zi),Cons_t(age+1,:,zi,lambdai,ep_ind), na_t, yprime  )
-			c_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
-				if (cprime.ge.c_foc) then
-					hprime = 0.0_dp
-				else
-					consin = cprime
-					brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, hprime ) 
-				end if 
-		    MU_cp(ep_ind) = cprime**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hprime)**((1.0_dp-sigma)*(1.0_dp-gamma))
-		END DO
-		! Compute the expected value of 1/c' conditional on current ei
-		E_MU_cp = SUM( pr_e(ei,:) * MU_cp )
+		! Set auxiliary variable for FOC_HA
+		ain   = aprimet
+		! Solve for hours choice by solving the FOC for labor
+			brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp)  
+				! 			if (Utility_Switch.eq.1) then
+				! 				c_foc = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
+				! 			else 
+				! 				c_foc = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
+				! 			end if 
+				! 			c_budget = YGRID_t(ai,zi) - aprimet   
+				! 			if (c_budget.ge.c_foc) then
+				! 				ntemp = 0.0_dp
+				! 			else
+				! 				brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp)  
+				! 			end if 
+		! Current consumption given ntemp
+			ctemp   = YGRID_t(ai,zi)+  Y_h(ntemp,age,lambdai,ei,wage) - aprimet   
 
-		! Evaluate the squared residual of the Euler equation for working period
-		FOC_WH_NSU = ( ctemp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-ntemp)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
-			         & - beta*survP(age)*MB_aprime*E_MU_cp  )**2.0_DP
+		if (Utility_Switch.eq.1) then
+			! Non-Separable Utility
+			if (sigma.eq.1) then
+				! I have to evaluate the FOC in expectation over eindx prime given eindx
+				! Compute c' for each value of e'
+				DO ep_ind=1,ne
+				    cprime(ep_ind) = Linear_Int(Ygrid_t(:,zi),Cons_t(age+1,:,zi,lambdai,ep_ind), na_t, yprime  )
+				ENDDO
+				! Compute the expected value of 1/c' conditional on current ei
+				E_MU_cp = SUM( pr_e(ei,:) / cprime )
 
-	END  FUNCTION FOC_WH_NSU
+				! Evaluate the squared residual of the Euler equation for working period
+				FOC_WH   = ( (1.0_dp/ctemp)  - beta * survP(age) * MB_aprime * E_MU_cp ) **2.0_DP 
+			else
+				! I have to evaluate the FOC in expectation over eindx prime given eindx
+				! Compute consumption and labor for eachvalue of eindx prime
+				DO ep_ind=1,ne
+				    cp     = Linear_Int(Ygrid_t(:,zi),Cons_t(age+1,:,zi,lambdai,ep_ind), na_t, yprime  )
+					c_foc  = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
+						if (cp.ge.c_foc) then
+							hp = 0.0_dp
+						else
+							consin = cp
+							brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, hp ) 
+						end if 
+				    MU_cp(ep_ind) = cp*((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hp)**((1.0_dp-sigma)*(1.0_dp-gamma))
+				END DO
+				! Compute the expected value of 1/c' conditional on current ei
+				E_MU_cp = SUM( pr_e(ei,:) * MU_cp )
+
+				! Evaluate the squared residual of the Euler equation for working period
+				FOC_WH = ( ctemp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-ntemp)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
+					         & - beta*survP(age)*MB_aprime*E_MU_cp  )**2.0_DP
+			end if 
+		else 
+			! Separable Utility
+				! I have to evaluate the FOC in expectation over eindx prime given eindx
+				! Compute c' for each value of e'
+				DO ep_ind=1,ne
+				    cprime(ep_ind) = Linear_Int(Ygrid_t(:,zi),Cons_t(age+1,:,zi,lambdai,ep_ind), na_t, yprime  )
+				ENDDO
+				! Compute the expected value of 1/c' conditional on current ei
+				E_MU_cp = SUM( pr_e(ei,:) / cprime**sigma )
+
+				! Evaluate the squared residual of the Euler equation for working period
+				FOC_WH   = (ctemp - 1.0_dp/(beta*survP(age)*MB_aprime*E_MU_cp)**(1.0_dp/sigma)) **2.0_DP 
+		end if 
+
+	END  FUNCTION FOC_WH
 
 !========================================================================================
 !========================================================================================
@@ -1948,15 +1952,9 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
         DO WHILE ( YGRID_t(ai,zi) .lt. EndoYgrid(1) )
         	! print*, ' Extrapolation between YGRID and EndoYgrid!!!!'
 	        ! Solve for the Euler equation directly
-	        if (sigma.eq.1.0_dp) then          
 			brentvalue = brent( min(amin,YGRID_t(ai,zi))   ,  (amin+YGRID_t(ai,zi))/2.0_DP  ,  &
                              	& YGRID_t(ai,zi)  + psi * ( yh(age, lambdai,ei)*0.95_DP )**(1.0_DP-tauPL)  ,  &
 	                             & FOC_WH, brent_tol, Aprime_t(age, ai, zi, lambdai,ei) )
-			else 
-			brentvalue = brent( min(amin,YGRID_t(ai,zi))   ,  (amin+YGRID_t(ai,zi))/2.0_DP  ,  &
-                             	& YGRID_t(ai,zi)  + psi * ( yh(age, lambdai,ei)*0.95_DP )**(1.0_DP-tauPL)  ,  &
-	                             & FOC_WH_NSU, brent_tol, Aprime_t(age, ai, zi, lambdai,ei) )
-			end if 
 
 			!compute  hours using FOC_HA                              
 			ain = Aprime_t(age, ai, zi, lambdai,ei)
