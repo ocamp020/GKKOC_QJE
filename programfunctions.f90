@@ -2210,7 +2210,7 @@ SUBROUTINE  INITIALIZE()
 		CALL tauchen(mtauchen,rho_lambda,sigma_lambda_eps,nlambda,lambdagrid,pr_lambda,Glambda)
 
 		! Tauchen gives grids for the log of the variables. Exponentiate to adjust
-		zgrid      = exp(zgrid)
+		zgrid      = exp(zgrid) + mu_z
 		egrid      = exp(egrid)
 		lambdagrid = exp(lambdagrid) 
 
