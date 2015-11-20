@@ -383,10 +383,12 @@ end Subroutine Asset_Grid_Threshold
 		real(DP), intent(in) 	:: hoursin
 		real(DP)             	:: FOC_H
 
-		if (sigma.eq.1.0_dp) then 
-			FOC_H = ( MB_h(hoursin,age,lambdai,ei,wage) * (1.0_DP-hoursin) - ((1.0_dp-gamma)/gamma)*consin )**2.0_DP	
-		else 
+		if (Utility_Switch.eq.1) then 
+			! Non-Separable Utility 
 			FOC_H = ( consin - (gamma/(1.0_dp-gamma))*(1.0_dp-hoursin)*MB_h(hoursin,age,lambdai,ei,wage) )**2.0_DP 
+		else 
+			! Separable Utility 
+			FOC_H = ( MB_h(hoursin,age,lambdai,ei,wage)*(1.0_dp-hoursin)**(gamma) - phi*consin**(sigma) )**2.0_DP 
 		end if 
 
 	END  FUNCTION FOC_H
