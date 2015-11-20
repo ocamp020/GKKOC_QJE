@@ -228,10 +228,19 @@ end Subroutine Asset_Grid_Threshold
 	FUNCTION FOC_R(aprimet)
 		IMPLICIT NONE   
 		real(DP), intent(in) :: aprimet
-		real(DP)             :: MBaprime, FOC_R, yprime, cprime
+		real(DP)             :: MB_aprime, FOC_R, yprime, cprime, euler_power
+
+		! Set the power used in the Euler equation for the retirement period
+		if (Utility_Switch.eq.1) then 
+			! Non-Separable Utility
+			euler_power = (1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
+		else 
+			! Separable Utility
+			euler_power = (-1.0_dp/sigma)
+		end if 
 
 		! Compute marginal benefit of next period at a' (given zi)
-		MBaprime = MB_a(aprimet,zgrid(zi))
+		MB_aprime = MB_a(aprimet,zgrid(zi))
 		 
 		! Compute asset income of next period at a' (given zi)
 		yprime   = Y_a(aprimet,zgrid(zi))
@@ -242,13 +251,8 @@ end Subroutine Asset_Grid_Threshold
 		cprime =   Linear_Int(Ygrid_t(:,zi), Cons_t(age+1,:,zi,lambdai,ei),na_t, yprime)    
 
 		! Evaluate square residual of Euler equation at current state (given by (ai,zi,lambdai,ei)) and savings given by a'
-		if (sigma.eq.1.0_dp) then
-			FOC_R   = (1.0_DP / (YGRID_t(ai,zi)  + RetY_lambda_e(lambdai,ei) - aprimet )  &
-			           & - beta *  survP(age) *  MBaprime /cprime ) **2.0_DP
-		else
-			FOC_R	= ( (YGRID_t(ai,zi)+RetY_lambda_e(lambdai,ei)-aprimet)    &
-			           & - (beta * survP(age) *  MBaprime)**(1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))  * cprime  ) ** 2.0_DP
-		end if
+		FOC_R	= ( (YGRID_t(ai,zi)+RetY_lambda_e(lambdai,ei)-aprimet)    &
+		           & - ((beta * survP(age) *  MB_aprime)**euler_power)  * cprime  ) ** 2.0_DP
 
 	END  FUNCTION FOC_R
 
