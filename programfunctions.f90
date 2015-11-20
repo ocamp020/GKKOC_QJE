@@ -432,15 +432,71 @@ end Subroutine Asset_Grid_Threshold
 		real(DP), intent(in) :: hoursin
 		real(DP)   			 :: FOC_HA, cons
 
-		if (sigma.eq.1.0_dp) then 
-			FOC_HA = ( (psi*(1.0_DP-tauPL)*yh(age, lambdai,ei)**(1.0_DP-tauPL) )* (1.0_DP-hoursin)*(hoursin**(-tauPL)) &
-			    &  - ((1.0_dp-gamma)/gamma)*( YGRID_t(ai,zi) + psi*(yh(age, lambdai,ei)*hoursin)**(1.0_DP-tauPL) - ain ) )**2.0_DP
-		else 
+		! Consumption given ain and hoursin
 			cons   = YGRID_t(ai,zi)+  Y_h(hoursin,age,lambdai,ei,wage) - ain
+		if (Utility_Switch.eq.1) then
+			! Non-Separable Utility 
 			FOC_HA = ( cons - (gamma/(1.0_dp-gamma))*(1.0_dp-hoursin)*MB_h(hoursin,age,lambdai,ei,wage) )**2.0_DP 
+		else
+			! Non-Separable Utility 
+			FOC_HA = ( MB_h(hoursin,age,lambdai,ei,wage)*(1.0_dp-hoursin)**(gamma) - phi*consin**(sigma) )**2.0_DP 
 		end if 
-		
 	END  FUNCTION FOC_HA
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+! Utility: Evaluate the utility at given consumption and hours
+!
+! Usage: U = Utility(c,h)
+!
+! Input: c   , real(dp), value of consumption
+!		 h   , real(dp), value of hours
+!
+! Output: U , real(dp), utility
+!
+	FUNCTION Utility(c,h)
+		IMPLICIT NONE   
+		real(DP), intent(in) :: c,h
+		real(DP)   			 :: Utility
+
+		if (Utility_Switch.eq.1) then 
+			if (sigma.eq.1.0_dp) then 
+				Utility = log(c) + (1.0_dp-gamma)/gamma*log(1.0_dp-h) 
+			else 
+				Utility = ( c**gamma * (1.0_dp-h)**(1.0_dp-gamma) )**(1.0_dp-sigma) / (1.0_dp-sigma)
+			end if 
+		else 
+			Utility = U_C(c) + U_H(h)
+		end if 
+
+	END FUNCTION Utility
+
+	FUNCTION U_C(c)
+		IMPLICIT NONE   
+		real(DP), intent(in) :: c
+		real(DP)   			 :: U_C
+
+		if (sigma.eq.1.0_dp) then
+			U_C = log(c)
+		else 
+			U_C = c**(1.0_dp-sigma)/(1.0_dp-sigma)
+		end if 
+
+	END FUNCTION U_C
+
+	FUNCTION U_H(h)
+		IMPLICIT NONE   
+		real(DP), intent(in) :: h
+		real(DP)   			 :: U_H
+
+		if (gamma.eq.1.0_dp) then
+			U_H = phi*log(1.0_dp-h)
+		else 
+			U_H = phi*(1.0_dp-h)**(1.0_dp-gamma)/(1.0_dp-gamma)
+		end if 
+
+	END FUNCTION U_H
 
 !========================================================================================
 !========================================================================================
@@ -808,93 +864,80 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE()
 	! Final age
 	age=MaxAge
 	DO ai=1,na    
-	    DO zi=1,nz
-	        DO lambdai=1,nlambda          
-	              DO ei=1,ne
-	              	if (sigma.eq.1.0_dp) then
-	                  	ValueFunction(age, ai, zi, lambdai, ei) = log(Cons(age, ai, zi, lambdai, ei)) 
-	                else 
-	                	ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
-                   		& * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) 
-	                end if 
-	                  ! print*,Cons(age, ai, zi, lambdai, ei),  ValueFunction(age, ai, zi, lambdai, ei) 
-	                  ! pause
-	              ENDDO ! ei          
-	        ENDDO ! lambdai
-	    ENDDO ! zi
+    DO zi=1,nz
+    DO lambdai=1,nlambda          
+	DO ei=1,ne
+      	ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age, ai, zi, lambdai, ei),Hours(age, ai, zi, lambdai, ei))
+		! print*,Cons(age, ai, zi, lambdai, ei),  ValueFunction(age, ai, zi, lambdai, ei) 
+		! pause
+	ENDDO ! ei          
+    ENDDO ! lambdai
+    ENDDO ! zi
 	ENDDO ! ai
 
 	! Retirement Period
 	DO age=MaxAge-1,RetAge,-1
-	    DO zi=1,nz
-	        DO lambdai=1,nlambda          
-	              DO ei=1,ne            
-	          		if (sigma.eq.1.0_dp) then
-	                    CALL spline( agrid, ValueFunction(age+1, :, zi, lambdai, ei) , na , &
-	                    & 1.0_DP/Cons(age+1, 1, zi, lambdai,ei) , 1.0_DP/Cons(age+1, na, zi, lambdai,ei) , ValueP2)  
-	                else 
-	                	CALL spline( agrid, ValueFunction(age+1, :, zi, lambdai, ei) , na , &
-                  			& gamma*MBGRID(1,zi) *Cons(age+1, 1, zi, lambdai, ei) **((1.0_DP-sigma)*gamma-1.0_DP)/(1_DP+tauC), &
-                    		& gamma*MBGRID(na,zi)*Cons(age+1, na, zi, lambdai, ei)**((1.0_DP-sigma)*gamma-1.0_DP)/(1_DP+tauC), ValueP2)  
-                  	end if 
+	DO zi=1,nz
+	DO lambdai=1,nlambda          
+	DO ei=1,ne            
+  		if (Utility_Switch.eq.1) then
+            CALL spline( agrid, ValueFunction(age+1, :, zi, lambdai, ei) , na , &
+      			& gamma*MBGRID(1,zi) *Cons(age+1, 1, zi, lambdai, ei) **((1.0_DP-sigma)*gamma-1.0_DP)/(1_DP+tauC), &
+        		& gamma*MBGRID(na,zi)*Cons(age+1, na, zi, lambdai, ei)**((1.0_DP-sigma)*gamma-1.0_DP)/(1_DP+tauC), ValueP2)  
+        else 
+        	CALL spline( agrid, ValueFunction(age+1, :, zi, lambdai, ei) , na , &
+      			& gamma*MBGRID(1,zi) /Cons(age+1, 1, zi, lambdai, ei) **(sigma)/(1_DP+tauC), &
+        		& gamma*MBGRID(na,zi)/Cons(age+1, na, zi, lambdai, ei)**(sigma)/(1_DP+tauC), ValueP2)  
+      	end if 
 	                  
-	                    DO ai=1,na    
-	                        call splint( agrid, ValueFunction(age+1, :, zi, lambdai, ei), &
-	                                & ValueP2, na, Aprime(age,ai,zi,lambdai, ei), ValueP(ai))   
-	    					if (sigma.eq.1.0_dp) then
-	                        ValueFunction(age, ai, zi, lambdai, ei) = log(Cons(age, ai, zi, lambdai, ei)) &
-	                            & + beta*survP(age)* ValueP(ai)
-	                        else 
-	                        ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
-                           		& * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
-                           		& + beta*survP(age)* ValueP(ai)
-                           	end if
-	                    ENDDO ! ai
+        DO ai=1,na    
+            call splint( agrid, ValueFunction(age+1, :, zi, lambdai, ei), &
+                    & ValueP2, na, Aprime(age,ai,zi,lambdai, ei), ValueP(ai))  
+
+            ValueFunction(age,ai,zi,lambdai,ei) = Utility(Cons(age,ai,zi,lambdai,ei),Hours(age,ai,zi,lambdai,ei)) &
+              										& + beta*survP(age)* ValueP(ai)      
+        ENDDO ! ai
 	              
-	            ENDDO ! ei          
-	        ENDDO ! lambdai
-	    ENDDO ! zi
+    ENDDO ! ei          
+	ENDDO ! lambdai
+    ENDDO ! zi
 	ENDDO ! age
    
 
 	! Working Period
 	DO age=RetAge-1,1,-1
-	    DO zi=1,nz
-	        DO lambdai=1,nlambda          
-	              DO ei=1,ne
-	                    DO ai=1,na    
-	                          ExpValueP(ai) = sum(ValueFunction(age+1, ai, zi, lambdai, :) * pr_e(ei,:))
-	                    ENDDO
+    DO zi=1,nz
+    DO lambdai=1,nlambda          
+	DO ei=1,ne
+        DO ai=1,na    
+              ExpValueP(ai) = sum(ValueFunction(age+1, ai, zi, lambdai, :) * pr_e(ei,:))
+        ENDDO
 
-	                    if (sigma.eq.1.0_dp) then 
-	                    CALL spline( agrid, ExpValueP , na , &
-	                    & sum(pr_e(ei,:)/Cons(age+1, 1, zi, lambdai,:)) , sum(pr_e(ei,:)/Cons(age+1, na, zi, lambdai,:)) , ValueP2)  
-	                    else 
-	                    CALL spline( agrid, ExpValueP , na , &
-		                    & (gamma*MBGRID(1,zi)/(1.0_DP+tauC)) * sum(pr_e(ei,:)* &
-		                    & Cons(age+1, 1, zi, lambdai, :)**((1.0_DP-sigma)*gamma-1.0_DP) * &
-		                    & (1.0_DP-Hours(age+1,1,zi,lambdai,:))**((1.0_DP-gamma)*(1.0_DP-sigma))),&                    
-		                    & (gamma*MBGRID(na,zi)/(1.0_DP+tauC)) * sum(pr_e(ei,:)* &
-		                    & Cons(age+1, na, zi, lambdai, :)**((1.0_DP-sigma)*gamma-1.0_DP) * &
-		                    & (1.0_DP-Hours(age+1,na,zi,lambdai,:))**((1.0_DP-gamma)*(1.0_DP-sigma))),&
-		                    & ValueP2)  
-	                    end if 
+        if (Utility_Switch.eq.1) then
+        	CALL spline( agrid, ExpValueP , na , &
+		            & (gamma*MBGRID(1,zi)/(1.0_DP+tauC)) * sum(pr_e(ei,:)* &
+		            & Cons(age+1, 1, zi, lambdai, :)**((1.0_DP-sigma)*gamma-1.0_DP) * &
+		            & (1.0_DP-Hours(age+1,1,zi,lambdai,:))**((1.0_DP-gamma)*(1.0_DP-sigma))),& 
+		            & (gamma*MBGRID(na,zi)/(1.0_DP+tauC)) * sum(pr_e(ei,:)* &
+		            & Cons(age+1, na, zi, lambdai, :)**((1.0_DP-sigma)*gamma-1.0_DP) * &
+		            & (1.0_DP-Hours(age+1,na,zi,lambdai,:))**((1.0_DP-gamma)*(1.0_DP-sigma))),&
+		            & ValueP2)   
+        else 
+	        CALL spline( agrid, ExpValueP , na , &
+		            & (gamma*MBGRID(1,zi)/(1.0_DP+tauC))  * sum(pr_e(ei,:) / Cons(age+1,  1, zi, lambdai, :)**(sigma) ) ,&
+		            & (gamma*MBGRID(na,zi)/(1.0_DP+tauC)) * sum(pr_e(ei,:) / Cons(age+1, na, zi, lambdai, :)**(sigma) ) ,&
+		            & ValueP2)  
+        end if 
 
-	                    DO ai=1,na 
-	                    	if (sigma.eq.1.0_dp)then 
-	                         call splint( agrid, ExpValueP, ValueP2, na, Aprime(age,ai,zi,lambdai, ei), ValueP(ai))   
-	                         ValueFunction(age, ai, zi, lambdai, ei) = log(Cons(age, ai, zi, lambdai, ei)) &
-	                            & + ((1.0_dp-gamma)/gamma) * log(1.0_DP-Hours(age, ai, zi, lambdai, ei)) + beta*survP(age)*ValueP(ai)
-	                        else 
-	                          call splint( agrid, ExpValueP, ValueP2, na, Aprime(age,ai,zi,lambdai, ei), ValueP(ai))   
-		                         ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
-		                           & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
-		                           & + beta*survP(age)* ValueP(ai)
-	                        end if 
-	                    ENDDO ! ai
-	               ENDDO ! ei          
-	        ENDDO ! lambdai
-	    ENDDO ! zi
+        DO ai=1,na 
+        	call splint( agrid, ExpValueP, ValueP2, na, Aprime(age,ai,zi,lambdai, ei), ValueP(ai))   
+        
+        	ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age,ai,zi,lambdai,ei),Hours(age,ai,zi,lambdai,ei)) &
+        	                                         & + beta*survP(age)*ValueP(ai)
+		ENDDO ! ai
+	ENDDO ! ei          
+    ENDDO ! lambdai
+    ENDDO ! zi
 	ENDDO ! age
 
 END SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE 
@@ -914,20 +957,15 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
 
 	age=MaxAge
 	DO ai=1,na    
-	    DO zi=1,nz
-	        DO lambdai=1,nlambda          
-	              DO ei=1,ne
-	              	if (sigma.eq.1.0_dp) then
-	                  	ValueFunction(age, ai, zi, lambdai, ei) = log(Cons(age, ai, zi, lambdai, ei)) 
-	                else 
-	              		ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
-                   			& * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma)  
-	                end if 
-	!                  print*,Cons(age, ai, zi, lambdai, ei),  ValueFunction(age, ai, zi, lambdai, ei) 
-	!                  pause
-	              ENDDO ! ei          
-	        ENDDO ! lambdai
-	    ENDDO ! zi
+    DO zi=1,nz
+    DO lambdai=1,nlambda          
+	DO ei=1,ne
+      	ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age, ai, zi, lambdai, ei),Hours(age, ai, zi, lambdai, ei))
+		! print*,Cons(age, ai, zi, lambdai, ei),  ValueFunction(age, ai, zi, lambdai, ei) 
+		! pause
+	ENDDO ! ei          
+    ENDDO ! lambdai
+    ENDDO ! zi
 	ENDDO ! ai
 
 	! Retirement Period
@@ -951,16 +989,9 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
 		PrAprimehi(age,ai,zi,lambdai, ei) = min (PrAprimehi(age,ai,zi,lambdai, ei), 1.0_DP)
 		PrAprimehi(age,ai,zi,lambdai, ei) = max(PrAprimehi(age,ai,zi,lambdai, ei), 0.0_DP)    
 
-		if (sigma.eq.1.0_dp) then 
-			ValueFunction(age, ai, zi, lambdai, ei) = log(Cons(age, ai, zi, lambdai, ei)) &
+		ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age,ai,zi,lambdai,ei),Hours(age,ai,zi,lambdai,ei)) &
 			  & + beta*survP(age)* (PrAprimelo(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tklo, zi, lambdai, ei)&
 			  & +  PrAprimehi(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tkhi, zi, lambdai, ei))
-		else 
-			ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
-	          & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
-	          & + beta*survP(age)* (PrAprimelo(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tklo, zi, lambdai, ei)&
-	          & +                   PrAprimehi(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tkhi, zi, lambdai, ei))
-		end if 
 	ENDDO ! ei          
     ENDDO ! lambdai
     ENDDO ! zi
@@ -991,17 +1022,9 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
 		PrAprimehi(age,ai,zi,lambdai, ei) = min (PrAprimehi(age,ai,zi,lambdai, ei), 1.0_DP)
 		PrAprimehi(age,ai,zi,lambdai, ei) = max(PrAprimehi(age,ai,zi,lambdai, ei), 0.0_DP)    
 
-		if (sigma.eq.1.0_dp) then 
-		ValueFunction(age, ai, zi, lambdai, ei) = log(Cons(age, ai, zi, lambdai, ei)) &
-		   & + ((1.0_dp-gamma)/gamma) * log(1.0_DP-Hours(age, ai, zi, lambdai, ei))  &
+		ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age,ai,zi,lambdai,ei),Hours(age,ai,zi,lambdai,ei))  &
 		   & + beta*survP(age)* sum( ( PrAprimelo(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tklo, zi, lambdai,:)  &
 		   & + PrAprimehi(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tkhi, zi, lambdai,:)) * pr_e(ei,:) )
-		else 
-		ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
-           & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
-           & + beta*survP(age)* sum( ( PrAprimelo(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tklo, zi, lambdai,:)  &
-           & + PrAprimehi(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tkhi, zi, lambdai,:)) * pr_e(ei,:) )
-		end if 
 		if ( ValueFunction(age, ai, zi, lambdai, ei) .lt. (-100.0_DP) ) then
 		   print*,'ValueFunction(age, ai, zi, lambdai, ei)=',ValueFunction(age, ai, zi, lambdai, ei)
 		endif
@@ -1012,7 +1035,6 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
 	ENDDO ! age
 
 END SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR 
-
 
 !========================================================================================
 !========================================================================================
