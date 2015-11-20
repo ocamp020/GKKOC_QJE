@@ -1527,7 +1527,8 @@ SUBROUTINE COMPUTE_STATS()
 	DO ei=1, ne
 	    MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei)*agrid(ai)         
      	MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei)*(MBGRID(ai,zi)-1.0_DP)
-     	MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei)*agrid(ai)*(rr*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate)
+     	MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei)*agrid(ai)* &
+     	                            & (rr*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate)
      	MeanCons     = MeanCons     + DBN1(age, ai, zi, lambdai, ei)*cons(age, ai, zi, lambdai, ei)
 	ENDDO
 	ENDDO
@@ -1577,7 +1578,7 @@ SUBROUTINE COMPUTE_STATS()
 	DO ei=1, ne
 	     MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)
 	     MeanReturn_by_z(zi)   = MeanReturn_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * &
-	                                        & * (rr*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate)
+	                                                   & (rr*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate)
 	     size_by_z(zi)         = size_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) 
 	     Wealth_by_z(zi) 	   = Wealth_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)
 	ENDDO
@@ -2693,7 +2694,7 @@ END SUBROUTINE Write_Benchmark_Results
 
 SUBROUTINE Write_Experimental_Results()
 	IMPLICIT NONE
-	call system( 'mkdir -p ' // trim(bench_folder) // 'Exp_Files/' )
+	call system( 'mkdir -p ' // trim(Result_Folder) // 'Exp_Files/' )
 
 	OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_cons'  , STATUS='replace')
 	WRITE (UNIT=1,  FMT=*) cons
