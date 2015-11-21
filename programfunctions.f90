@@ -1648,11 +1648,20 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	REAL(DP), DIMENSION(na_t+1) :: EndoCons, EndoYgrid, EndoHours
 	INTEGER , DIMENSION(na_t+1) :: sort_ind 
 	INTEGER  :: sw 
-	REAL(DP) :: Wealth, C_euler, C_foc, H_min
+	REAL(DP) :: Wealth, C_euler, C_foc, H_min, euler_power
 
 
 	! Set a minimum value for labor to check in the FOC
 		H_min = 0.000001_dp
+
+	! Set the power used in the Euler equation for the retirement period
+		if (Utility_Switch.eq.1) then 
+			! Non-Separable Utility
+				euler_power = (1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
+		else 
+			! Separable Utility
+				euler_power = (-1.0_dp/sigma)
+		end if 
 
 		!! print*, 'R=',rr, 'W=',wage, 'na=', na, 'na_t=', na_t
 	!========================================================================================
@@ -1687,31 +1696,17 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
     	Wealth = agrid_t(ai)+(rr*(zgrid(zi)*agrid_t(ai))**mu-DepRate*agrid_t(ai))*(1.0_DP-tauK)
 		if (abs(Wealth-Y_a_threshold).lt.1e-8) then 
     		! Consumption on endogenous grid and implied asset income under tauW_bt
-    		if (sigma.eq.1.0_dp) then
-	        	EndoCons(ai) = Cons_t(age+1, ai, zi, lambdai,ei)/( beta*survP(age)*MB_a_bt(agrid_t(ai),zgrid(zi)))    
-        	else 
-        		EndoCons(ai) = Cons_t(age+1,ai,zi,lambdai,ei)*    &
-        		               & ( beta*survP(age)*MB_a_bt(agrid_t(ai),zgrid(zi)))**(1/((1.0_dp-sigma)*gamma-1.0_dp))
-        	end if
-	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai)   - RetY_lambda_e(lambdai,ei)
+    		EndoCons(ai)  = Cons_t(age+1,ai,zi,lambdai,ei) * (beta*survP(age)*MB_a_bt(agrid_t(ai),zgrid(zi)))**euler_power
+	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! Consumption on endogenous grid and implied asset income under tauW_at
-	        if (sigma.eq.1.0_dp) then
-	    		EndoCons(na_t+1) = Cons_t(age+1, ai, zi, lambdai,ei)/( beta*survP(age)*MB_a_at(agrid_t(ai),zgrid(zi)) )
-	    	else 
-	    		EndoCons(na_t+1) = Cons_t(age+1, ai, zi, lambdai,ei)* &
-	    		                  &  ( beta*survP(age)*MB_a_at(agrid_t(ai),zgrid(zi)))**(1/((1.0_dp-sigma)*gamma-1.0_dp))
-        	end if
-	    	EndoYgrid(na_t+1) = agrid_t(ai) +  EndoCons(na_t+1)   - RetY_lambda_e(lambdai,ei)
+	        EndoCons(na_t+1)  = Cons_t(age+1,ai,zi,lambdai,ei) * (beta*survP(age)*MB_a_at(agrid_t(ai),zgrid(zi)))**euler_power
+	    	EndoYgrid(na_t+1) = agrid_t(ai) +  EndoCons(na_t+1) - RetY_lambda_e(lambdai,ei)
 	    	! Set the flag!
 	    	sw                = 1 
 	    else 
 	    	! Consumption on endogenous grid and implied asset income
-	    	if (sigma.eq.1.0_dp) then
-	        	EndoCons(ai) = Cons_t(age+1, ai, zi, lambdai,ei)/( beta*survP(age)*MBGRID_t(ai,zi))    
-	        else 
-        		EndoCons(ai) = Cons_t(age+1, ai, zi, lambdai,ei)*( beta*survP(age)*MBGRID_t(ai,zi))**(1/((1.0_dp-sigma)*gamma-1.0_dp))
-        	end if
-	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai)   - RetY_lambda_e(lambdai,ei)
+	    	EndoCons(ai)  = Cons_t(age+1,ai,zi,lambdai,ei) * (beta*survP(age)*MBGRID_t(ai,zi))**euler_power
+	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	    end if 
 	ENDDO ! ai
 	
