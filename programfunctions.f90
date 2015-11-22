@@ -1778,99 +1778,154 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    EndoYgrid = big_p 
 	    EndoHours = big_p 
 	    sw 		  = 0                    
-    DO ai=1,na_t
+        DO ai=1,na_t
     	Wealth = agrid_t(ai)+(rr*(zgrid(zi)*agrid_t(ai))**mu-DepRate*agrid_t(ai))*(1.0_DP-tauK)
 		if (abs(Wealth-Y_a_threshold).lt.1e-8) then 
 	    	
 			! Below threshold
-				if (sigma.eq.1.0_dp) then
-			    	! Consumption on endogenous grid and implied asset income under tauW_bt
-					EndoCons(ai) = 1.0_DP/( beta*survP(age)*MB_a_bt(agrid_t(ai),zgrid(zi))*SUM(pr_e(ei,:)/Cons_t(age+1,ai,zi,lambdai,:)))    
-					! Auxiliary consumption variable for FOC_H        
-					consin =  EndoCons(ai)     
-					! Solution of Labor FOC for hours
-					brentvalue = brent(0.000001_DP, 0.4_DP, 0.99_DP, FOC_H, brent_tol, EndoHours(ai) ) 
+			if (Utility_Switch.eq.1)then 
+				! Non-Separable Utility
+				C_euler = ( (beta*survP(age)*MB_a_bt(agrid_t(ai),zgrid(zi))) * SUM(pr_e(ei,:) * &
+				   			& Cons_t(age+1,ai,zi,lambdai,:)**((1.0_dp-sigma)*gamma-1.0_dp)    * &
+				   			& (1.0_dp-Hours_t(age+1,ai,zi,lambdai,:))**((1.0_dp-sigma)*(1.0_dp-gamma))  )  ) **euler_power
+				C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
+
+				if (C_euler.ge.C_foc) then
+					EndoCons(ai)  = C_euler 
+					EndoHours(ai) = 0.0_dp
 				else 
-					!C_euler = Cons_t(age+1, ai, zi, lambdai,ei)  &
-					!          & *( beta*survP(age)*MB_a_bt(agrid_t(ai),zgrid(zi)))**(1/((1.0_dp-sigma)*gamma-1.0_dp))
-					C_euler = ( (beta*survP(age)*MB_a_bt(agrid_t(ai),zgrid(zi))) * SUM(pr_e(ei,:) * &
-					   			& Cons_t(age+1,ai,zi,lambdai,:)**((1.0_dp-sigma)*gamma-1.0_dp)    * &
-					   			& (1.0_dp-Hours_t(age+1,ai,zi,lambdai,:))**((1.0_dp-sigma)*(1.0_dp-gamma))  )  ) **euler_power
-					C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
-					if (C_euler.ge.C_foc) then
-						EndoCons(ai)  = C_euler 
-						EndoHours(ai) = 0.0_dp
-					else
+					if (sigma.eq.1.0_dp) then
+						! Auxiliary consumption variable for FOC_H        
+						consin = C_euler
+						! Solution for hours from Euler or FOC  equation according to sigma 
+						brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, EndoHours(ai) ) 
+						EndoCons(ai) = C_euler
+					else 
 						! Set Marginal benefit of assets to the below threshold level
 						MB_a_in = MB_a_bt(agrid_t(ai),zgrid(zi))
-						! Solution for hours from Euler equation
+						! Solution for hours from Euler or FOC  equation according to sigma 
 						brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H_NSU, brent_tol, EndoHours(ai) ) 
 						! Implied consumption by hours from Labor FOC
 						EndoCons(ai) = (gamma/(1.0_dp-gamma))*(1.0_dp-EndoHours(ai))*MB_h(EndoHours(ai),age,lambdai,ei,wage)
-					end if
+					end if 
 				end if 
-				! Endogenous grid for asset income
-				EndoYgrid(ai) = agrid_t(ai) + EndoCons(ai) - Y_h(EndoHours(ai),age,lambdai,ei,wage)
-			! Above threshold
-				if (sigma.eq.1.0_dp) then 
-			    	! Consumption, hours and asset income in endogenous grid with above threshold tax
-			    	EndoCons(na_t+1) = 1.0_DP/( beta*survP(age)*MB_a_at(agrid_t(ai),zgrid(zi))*SUM(pr_e(ei,:)/Cons_t(age+1,ai,zi,lambdai,:)))   
-			    	! Auxiliary consumption variable for FOC_H        
-					consin =  EndoCons(na_t+1)     
-					! Solution of Labor FOC for hours
-					brentvalue = brent(0.000001_DP, 0.4_DP, 0.99_DP, FOC_H, brent_tol, EndoHours(na_t+1) )           
+
+			else 
+				! Separable Utility
+				EndoCons(ai) = ( (beta*survP(age)*MB_a_bt(agrid_t(ai),zgrid(zi))) * SUM(pr_e(ei,:) * &
+					   			& Cons_t(age+1,ai,zi,lambdai,:)**(-sigma) )  ) **euler_power
+				C_foc        = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
+
+				if (EndoCons(ai).ge.C_foc) then
+					EndoHours(ai) = 0.0_dp
 				else 
-					C_euler = ( (beta*survP(age)*MB_a_at(agrid_t(ai),zgrid(zi))) * SUM(pr_e(ei,:) * &
-					   			& Cons_t(age+1,ai,zi,lambdai,:)**((1.0_dp-sigma)*gamma-1.0_dp)    * &
-					   			& (1.0_dp-Hours_t(age+1,ai,zi,lambdai,:))**((1.0_dp-sigma)*(1.0_dp-gamma))  )  ) **euler_power
-					C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
-					if (C_euler.ge.C_foc) then
-						EndoCons(na_t+1)  = C_euler 
-						EndoHours(na_t+1) = 0.0_dp
-					else
+					! Auxiliary consumption variable for FOC_H        
+					consin = EndoCons(ai)
+					! Solution for hours from Euler or FOC  equation according to sigma 
+					brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, EndoHours(ai) ) 
+				end if 	
+
+			end if 
+			! Endogenous grid for asset income
+			EndoYgrid(ai) = agrid_t(ai) + EndoCons(ai) - Y_h(EndoHours(ai),age,lambdai,ei,wage)
+			
+			! Above threshold
+			if (Utility_Switch.eq.1)then 
+				! Non-Separable Utility
+				C_euler = ( (beta*survP(age)*MB_a_at(agrid_t(ai),zgrid(zi))) * SUM(pr_e(ei,:) * &
+				   			& Cons_t(age+1,ai,zi,lambdai,:)**((1.0_dp-sigma)*gamma-1.0_dp)    * &
+				   			& (1.0_dp-Hours_t(age+1,ai,zi,lambdai,:))**((1.0_dp-sigma)*(1.0_dp-gamma))  )  ) **euler_power
+				C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
+
+				if (C_euler.ge.C_foc) then
+					EndoCons(na_t+1)  = C_euler 
+					EndoHours(na_t+1) = 0.0_dp
+				else 
+					if (sigma.eq.1.0_dp) then
+						! Auxiliary consumption variable for FOC_H        
+						consin = C_euler
+						! Solution for hours from Euler or FOC  equation according to sigma 
+						brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, EndoHours(na_t+1) ) 
+						EndoCons(na_t+1) = C_euler
+					else 
 						! Set Marginal benefit of assets to the below threshold level
 						MB_a_in = MB_a_at(agrid_t(ai),zgrid(zi))
-						! Solution for hours from Euler equation
+						! Solution for hours from Euler or FOC  equation according to sigma 
 						brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H_NSU, brent_tol, EndoHours(na_t+1) ) 
 						! Implied consumption by hours from Labor FOC
 						EndoCons(na_t+1) = (gamma/(1.0_dp-gamma))*(1.0_dp-EndoHours(na_t+1))*MB_h(EndoHours(na_t+1),age,lambdai,ei,wage)
-					end if
+					end if 
 				end if 
-				! Endogenous grid for asset income
-				EndoYgrid(na_t+1) = agrid_t(ai) + EndoCons(na_t+1) -  Y_h(EndoHours(na_t+1),age,lambdai,ei,wage)
+
+			else 
+				! Separable Utility
+				EndoCons(na_t+1) = ( (beta*survP(age)*MB_a_at(agrid_t(ai),zgrid(zi))) * SUM(pr_e(ei,:) * &
+					   			   & Cons_t(age+1,ai,zi,lambdai,:)**(-sigma) )  ) **euler_power
+				C_foc	         = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
+
+				if (EndoCons(ai).ge.C_foc) then
+					EndoHours(na_t+1) = 0.0_dp
+				else 
+					! Auxiliary consumption variable for FOC_H        
+					consin = EndoCons(na_t+1)
+					! Solution for hours from Euler or FOC  equation according to sigma 
+					brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, EndoHours(na_t+1) ) 
+				end if 	
+
+			end if 
+			! Endogenous grid for asset income
+			EndoYgrid(na_t+1) = agrid_t(ai) + EndoCons(na_t+1) - Y_h(EndoHours(na_t+1),age,lambdai,ei,wage)
 			! Set the flag!
 	    	sw                = 1 
 	    else 
-	    	if (sigma.eq.1.0_dp) then 
-		    	! Consumption, hours and asset income in endogenous grid
-				EndoCons(ai) =   1.0_DP /( beta*survP(age)*MBGRID_t(ai,zi)*SUM(pr_e(ei,:) /Cons_t(age+1,ai,zi,lambdai,:)))    
-				! Auxiliary consumption variable for FOC_H        
-				consin =  EndoCons(ai)     
-				! Solution of Labor FOC for hours
-				brentvalue = brent(0.000001_DP, 0.4_DP, 0.99_DP, FOC_H, brent_tol, EndoHours(ai) )           
-			else 
+			if (Utility_Switch.eq.1)then 
+				! Non-Separable Utility
 				C_euler = ( (beta*survP(age)*MBGRID_t(ai,zi)) * SUM(pr_e(ei,:) * &
-					   			& Cons_t(age+1,ai,zi,lambdai,:)**((1.0_dp-sigma)*gamma-1.0_dp)    * &
-					   			& (1.0_dp-Hours_t(age+1,ai,zi,lambdai,:))**((1.0_dp-sigma)*(1.0_dp-gamma))  )  ) **euler_power
+				   			& Cons_t(age+1,ai,zi,lambdai,:)**((1.0_dp-sigma)*gamma-1.0_dp)    * &
+				   			& (1.0_dp-Hours_t(age+1,ai,zi,lambdai,:))**((1.0_dp-sigma)*(1.0_dp-gamma))  )  ) **euler_power
 				C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
+
 				if (C_euler.ge.C_foc) then
-					!print*,'Corner solution',C_euler,C_foc
 					EndoCons(ai)  = C_euler 
 					EndoHours(ai) = 0.0_dp
-				else
-					!print*,'Interior solution',C_euler,C_foc
-					! Set Marginal benefit of assets to the below threshold level
-					MB_a_in = MBGRID_t(ai,zi)
-					! Solution for hours from Euler equation
-					brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H_NSU, brent_tol, EndoHours(ai) ) 
-					! Implied consumption by hours from Labor FOC
-					EndoCons(ai) = (gamma/(1.0_dp-gamma))*(1.0_dp-EndoHours(ai))*MB_h(EndoHours(ai),age,lambdai,ei,wage)
-				end if
-			end if
-			EndoYgrid(ai) = agrid_t(ai) + EndoCons(ai) -  Y_h(EndoHours(ai),age,lambdai,ei,wage)
-	    end if 
+				else 
+					if (sigma.eq.1.0_dp) then
+						! Auxiliary consumption variable for FOC_H        
+						consin = C_euler
+						! Solution for hours from Euler or FOC  equation according to sigma 
+						brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, EndoHours(ai) ) 
+						EndoCons(ai) = C_euler
+					else 
+						! Set Marginal benefit of assets to the below threshold level
+						MB_a_in = MBGRID_t(ai,zi)
+						! Solution for hours from Euler or FOC  equation according to sigma 
+						brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H_NSU, brent_tol, EndoHours(ai) ) 
+						! Implied consumption by hours from Labor FOC
+						EndoCons(ai) = (gamma/(1.0_dp-gamma))*(1.0_dp-EndoHours(ai))*MB_h(EndoHours(ai),age,lambdai,ei,wage)
+					end if 
+				end if 
 
-    ENDDO ! ai  
+			else 
+				! Separable Utility
+				EndoCons(ai) = ( (beta*survP(age)*MBGRID_t(ai,zi)) * SUM(pr_e(ei,:) * &
+					   			& Cons_t(age+1,ai,zi,lambdai,:)**(-sigma) )  ) **euler_power
+				C_foc        = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
+
+				if (EndoCons(ai).ge.C_foc) then
+					EndoHours(ai) = 0.0_dp
+				else 
+					! Auxiliary consumption variable for FOC_H        
+					consin = EndoCons(ai)
+					! Solution for hours from Euler or FOC  equation according to sigma 
+					brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, EndoHours(ai) ) 
+				end if 	
+
+			end if 
+			! Endogenous grid for asset income
+			EndoYgrid(ai) = agrid_t(ai) + EndoCons(ai) - Y_h(EndoHours(ai),age,lambdai,ei,wage)	    
+		end if 
+
+    ENDDO ! ai 
 
 	if (any(isnan(EndoCons))) then 
 		print*, "isnan - Consumption endogenous"
@@ -1902,26 +1957,27 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	                
 		! decision rules are obtained taking care of extrapolations
 		DO ai=tempai,na_t 
-			if (sigma.eq.1.0_dp) then               
-			    Cons_t(age, ai, zi, lambdai,ei)= Linear_Int(EndoYgrid(1:na_t+sw), EndoCons(1:na_t+sw),na_t+sw, YGRID_t(ai,zi))  
-			     
-			    consin = Cons_t(age, ai, zi, lambdai,ei)
-
-			    brentvalue = brent(0.000001_DP, 0.4_DP, 0.99_DP, FOC_H, brent_tol, Hours_t(age, ai, zi, lambdai,ei))           
-			else 
-				! Interpolate for value of consumption in exogenous grid
-				Cons_t(age,ai,zi,lambdai,ei) = Linear_Int(EndoYgrid(1:na_t+sw), EndoCons(1:na_t+sw),na_t+sw, YGRID_t(ai,zi))  
-				C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
+			! Interpolate for value of consumption in exogenous grid
+				Cons_t(age,ai,zi,lambdai,ei) = Linear_Int(EndoYgrid(1:na_t+sw), EndoCons(1:na_t+sw),na_t+sw, YGRID_t(ai,zi)) 
+				if (Utility_Switch.eq.1) then 
+					! Non-Separable Utility
+					C_foc = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
+				else
+					! Separable Utility
+					C_foc = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
+				end if 
+			! Hours
 				if (Cons_t(age,ai,zi,lambdai,ei).ge.C_foc) then
 					Hours_t(age,ai,zi,lambdai,ei) = 0.0_dp
 				else
-					consin = Cons_t(age,ai,zi,lambdai,ei)
-					! Solution for hours from labor FOC equation
+					! Auxiliary variables for solving FOC for hours 
+					consin = Cons_t(age, ai, zi, lambdai,ei)
+					! FOC
 					brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, Hours_t(age,ai,zi,lambdai,ei) ) 
-				end if 
-			end if     
-		    Aprime_t(age, ai, zi, lambdai,ei) = YGRID_t(ai,zi)  + Y_h(Hours_t(age, ai, zi, lambdai,ei),age,lambdai,ei,wage)  & 
-		                    					& - Cons_t(age, ai, zi, lambdai,ei)  
+				end if
+			! Savings 
+				Aprime_t(age, ai, zi, lambdai,ei) = YGRID_t(ai,zi)  + Y_h(Hours_t(age, ai, zi, lambdai,ei),age,lambdai,ei,wage)  & 
+		                    					& - Cons_t(age, ai, zi, lambdai,ei) 
 		                    
 		    If (Aprime_t(age, ai, zi, lambdai,ei)  .lt. amin) then
 
