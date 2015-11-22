@@ -1791,8 +1791,11 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 					! Solution of Labor FOC for hours
 					brentvalue = brent(0.000001_DP, 0.4_DP, 0.99_DP, FOC_H, brent_tol, EndoHours(ai) ) 
 				else 
-					C_euler = Cons_t(age+1, ai, zi, lambdai,ei)  &
-					          & *( beta*survP(age)*MB_a_bt(agrid_t(ai),zgrid(zi)))**(1/((1.0_dp-sigma)*gamma-1.0_dp))
+					!C_euler = Cons_t(age+1, ai, zi, lambdai,ei)  &
+					!          & *( beta*survP(age)*MB_a_bt(agrid_t(ai),zgrid(zi)))**(1/((1.0_dp-sigma)*gamma-1.0_dp))
+					C_euler = ( (beta*survP(age)*MB_a_bt(agrid_t(ai),zgrid(zi))) * SUM(pr_e(ei,:) * &
+					   			& Cons_t(age+1,ai,zi,lambdai,:)**((1.0_dp-sigma)*gamma-1.0_dp)    * &
+					   			& (1.0_dp-Hours_t(age+1,ai,zi,lambdai,:))**((1.0_dp-sigma)*(1.0_dp-gamma))  )  ) **euler_power
 					C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
 					if (C_euler.ge.C_foc) then
 						EndoCons(ai)  = C_euler 
@@ -1817,8 +1820,9 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 					! Solution of Labor FOC for hours
 					brentvalue = brent(0.000001_DP, 0.4_DP, 0.99_DP, FOC_H, brent_tol, EndoHours(na_t+1) )           
 				else 
-					C_euler = Cons_t(age+1, ai, zi, lambdai,ei)  &
-					          & *( beta*survP(age)*MB_a_at(agrid_t(ai),zgrid(zi)))**(1/((1.0_dp-sigma)*gamma-1.0_dp))
+					C_euler = ( (beta*survP(age)*MB_a_at(agrid_t(ai),zgrid(zi))) * SUM(pr_e(ei,:) * &
+					   			& Cons_t(age+1,ai,zi,lambdai,:)**((1.0_dp-sigma)*gamma-1.0_dp)    * &
+					   			& (1.0_dp-Hours_t(age+1,ai,zi,lambdai,:))**((1.0_dp-sigma)*(1.0_dp-gamma))  )  ) **euler_power
 					C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
 					if (C_euler.ge.C_foc) then
 						EndoCons(na_t+1)  = C_euler 
@@ -1845,8 +1849,9 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 				! Solution of Labor FOC for hours
 				brentvalue = brent(0.000001_DP, 0.4_DP, 0.99_DP, FOC_H, brent_tol, EndoHours(ai) )           
 			else 
-				C_euler = Cons_t(age+1, ai, zi, lambdai,ei)  &
-					          & *( beta*survP(age)*MBGRID_t(ai,zi))**(1/((1.0_dp-sigma)*gamma-1.0_dp))
+				C_euler = ( (beta*survP(age)*MBGRID_t(ai,zi)) * SUM(pr_e(ei,:) * &
+					   			& Cons_t(age+1,ai,zi,lambdai,:)**((1.0_dp-sigma)*gamma-1.0_dp)    * &
+					   			& (1.0_dp-Hours_t(age+1,ai,zi,lambdai,:))**((1.0_dp-sigma)*(1.0_dp-gamma))  )  ) **euler_power
 				C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
 				if (C_euler.ge.C_foc) then
 					!print*,'Corner solution',C_euler,C_foc
