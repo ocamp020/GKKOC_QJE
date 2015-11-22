@@ -1423,8 +1423,7 @@ SUBROUTINE COMPUTE_STATS()
 	INTEGER :: prctile
 	REAL(DP), DIMENSION(nz) :: cdf_Gz_DBN 
 	REAL(dp), DIMENSION(na,nz) :: DBN_az, wealth
-	REAL(DP):: MeanATReturn, StdATReturn, VarATReturn , VarReturn
-	REAL(DP), DIMENSION(nz):: MeanATReturn_by_z, MeanReturn_by_z, size_by_z, Wealth_by_z
+	REAL(DP):: MeanATReturn, StdATReturn, VarATReturn
 
 	DO zi=1,nz
 	    cdf_Gz_DBN(zi) = sum(DBN1(:,:,zi,:,:))

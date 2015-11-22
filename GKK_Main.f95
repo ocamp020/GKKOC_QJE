@@ -55,8 +55,8 @@ PROGRAM main
 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
 		tauWmin_bt=0.00_DP
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
-		tauWmin_at=0.012_DP
-		tauWinc_at=0.001_DP ! Minimum tax above threshold and increments
+		tauWmin_at=0.014_DP
+		tauWinc_at=0.002_DP ! Minimum tax above threshold and increments
 		Threshold_Factor = 0.00_dp 
 	! Consumption tax
 		tauC=0.075_DP

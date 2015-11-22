@@ -34,6 +34,7 @@ contains
         USE nrtype
         USE global
         use genericParams
+        use GKK_Calibration
         IMPLICIT NONE
 
         INTEGER, INTENT(IN)     :: n, mv
@@ -45,16 +46,8 @@ contains
         !Variables for sleep call
         integer(c_int) :: mytime, dur
 
-        !values(1)=0.7
-        !values(2)=0.2
-        !values(3)=12
-        !values(4)=0.87
 
-        !FORALL (i=1:mv) v_err(i)=(x(i)-values(i))/values(i)
-
-        v_err(1)=(SIN(3.141592653589793D0*x(1)*2.0D0)**2+1.0D0)*(x(2)-1.0D0)**2+ &
-               (SIN(3.141592653589793D0*x(2)*3.0D0)**2+1.0D0)*(x(1)-1.0D0)**2+ &
-                SIN(3.141592653589793D0*x(1)*3.0D0)**2 
+        v_err(1) = Moments_Objective(theta)
         
         mytime=1;
         !dur=myFortSleep(mytime);
