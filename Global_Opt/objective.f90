@@ -47,7 +47,7 @@ contains
         integer(c_int) :: mytime, dur
 
 
-        v_err(1) = Moments_Objective(theta)
+        v_err(1) = Moments_Objective(x)
         
         mytime=1;
         !dur=myFortSleep(mytime);

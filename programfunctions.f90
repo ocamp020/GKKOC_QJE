@@ -2602,8 +2602,8 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'QBAR'	, QBAR
 			WRITE(UNIT=19, FMT=*) 'NBAR'	, NBAR
 			WRITE(UNIT=19, FMT=*) 'EBAR'	, EBAR
-			WRITE(UNIT=19, FMT=*) 'Y'		, YBAR
-			WRITE(UNIT=19, FMT=*) 'Cons'    , MeanCons
+			WRITE(UNIT=19, FMT=*) 'YBAR'	, YBAR
+			WRITE(UNIT=19, FMT=*) 'CBAR'    , MeanCons
 			WRITE(UNIT=19, FMT=*) 'rr'		, rr
 			WRITE(UNIT=19, FMT=*) 'wage'	, wage
 			WRITE(UNIT=19, FMT=*) ' '
