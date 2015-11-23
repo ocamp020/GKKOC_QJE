@@ -2662,7 +2662,7 @@ SUBROUTINE Write_Benchmark_Results(read_write)
 		bench_folder = './SU_PT_Results/Bench_Files/'
 	end if 
 
-		bench_folder = './Test_NSU_s1/Bench_Files/'
+		bench_folder = './Test_SU_s1/Bench_Files/'
 
 		call system( 'mkdir -p ' // trim(bench_folder) )
 	
