@@ -32,7 +32,7 @@
 ! Note: If simply updating sobol points, then these values are ignored
 ! Do not separate these parameters with any comments
 0.92, 0.99
--5.0, 1.0
+0.0, 1.0
 0.20, 0.80
 0.50, 0.95
 0.20, 0.50
@@ -55,7 +55,7 @@
 ! Note: If simply updating sobol points, then these values are ignored
 ! Do not separate these parameters with any comments
 0.90, 0.999
--6.0, 2.0
+0.0, 2.0
 0.10, 0.90
 0.20, 1.00
 0.10, 0.70
