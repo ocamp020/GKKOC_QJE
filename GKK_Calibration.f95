@@ -20,7 +20,7 @@ Function Moments_Objective(theta)
 		Real(DP) :: Moments_Objective
 
 	! Resutls Folder
-		Result_Folder = './GKK_Files/'
+		Result_Folder = './'
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
