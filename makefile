@@ -76,4 +76,14 @@ GO_Calibration.a: $(GO_Folder)/GlobalSearch.f95 $(Objects_Main) $(Objects_GO)
 	# cd Calibration
 	# ../Compiled_Files/GO_Calibration.a 0 ../Global_Opt/config.txt b
 
+GKK_Calibration.a: $(GO_Folder)/GlobalSearch.f95 $(Objects_Main) $(Objects_GO)
+	gfortran -I$(Folder) $(GO_Folder)/GlobalSearch.f95 $(Objects_Main) $(Objects_GO) -o $(Folder)/GKK_Calibration.a
+	cd Calibration
+	nohup ../Compiled_Files/GKK_Calibration.a 0 ../Global_Opt/config.txt b >log_calibration.txt \
+	& nohup ../Compiled_Files/GKK_Calibration.a 1 ../Global_Opt/config.txt b \
+	& nohup ../Compiled_Files/GKK_Calibration.a 1 ../Global_Opt/config.txt b \
+	& nohup ../Compiled_Files/GKK_Calibration.a 1 ../Global_Opt/config.txt b \
+	& nohup ../Compiled_Files/GKK_Calibration.a 1 ../Global_Opt/config.txt b \
+	& nohup ../Compiled_Files/GKK_Calibration.a 1 ../Global_Opt/config.txt b \
+
 

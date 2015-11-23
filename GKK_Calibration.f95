@@ -22,7 +22,7 @@ Function Moments_Objective(theta)
 	! Resutls Folder
 		Result_Folder = './'
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
-		call system( 'mkdir -p ' // trim(Result_Folder) )
+		! call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	! Switch for separable and non-separable utility
 		! If Utility_Switch==1 then do non-separable utility

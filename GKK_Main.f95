@@ -64,10 +64,10 @@ PROGRAM main
 	! Consumption tax
 		tauC=0.075_DP
 	! Set Labor Tax Regime
-		!tauPL=0.185_DP
-		!psi=0.77_DP  
- 		tauPL=0.0_DP
- 		psi=0.776_DP  	
+		tauPL=0.185_DP
+		psi=0.77_DP  
+ 		!tauPL=0.0_DP
+ 		!psi=0.776_DP  	
 
 	! Resutls Folder
 		write(Result_Folder,'(f4.2)') Threshold_Factor
@@ -84,7 +84,7 @@ PROGRAM main
 
 		
 		write(Result_Folder,'(f4.2)') Threshold_Factor
-		Result_Folder = './Test_NSU_s4/Factor_'//trim(Result_Folder)//'/'
+		Result_Folder = './Test_NSU_pl/Factor_'//trim(Result_Folder)//'/'
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
