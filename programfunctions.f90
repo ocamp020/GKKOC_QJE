@@ -1410,8 +1410,6 @@ SUBROUTINE FIND_DBN_EQ()
 		!WRITE(unit=3, FMT=*) PrAprimehi(1, :, nz/2+1, nlambda/2+1, ne/2+1)
 		!CLOSE (unit=3)
 
-		MeanCons = 1.0_dp
-
 END SUBROUTINE FIND_DBN_EQ
 
 
@@ -1421,12 +1419,11 @@ END SUBROUTINE FIND_DBN_EQ
 
 
 SUBROUTINE COMPUTE_STATS()
-	use global
 	IMPLICIT NONE
 	INTEGER :: prctile
 	REAL(DP), DIMENSION(nz) :: cdf_Gz_DBN 
 	REAL(dp), DIMENSION(na,nz) :: DBN_az, wealth
-	REAL(DP):: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz)
+	REAL(DP):: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz), Wealth_by_z(nz)
 
 	DO zi=1,nz
 	    cdf_Gz_DBN(zi) = sum(DBN1(:,:,zi,:,:))
