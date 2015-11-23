@@ -1986,6 +1986,11 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 				print*, Cons_t(age,ai,zi,lambdai,ei), Hours_t(age,ai,zi,lambdai,ei) 
 				print*, " "
 				print*, EndoCons(1:na_t+sw)
+				print*, " "
+				print*, Linear_Int(EndoYgrid(1:na_t+sw), EndoCons(1:na_t+sw),na_t+sw, YGRID_t(ai,zi))
+				print*, " "
+				print*, YGRID_t(ai,zi) 
+				print*, EndoYgrid(1)
 				STOP 
 			end if 
 
