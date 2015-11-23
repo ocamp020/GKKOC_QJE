@@ -49,7 +49,9 @@ PROGRAM main
 		sigma_z_eps      =params(4)
 		sigma_lambda_eps = params(5)
 		gamma  = params(6)
-		sigma  = 4.0_dp
+		
+		sigma  = 1.0_dp
+		phi    = (1.0_dp-gamma)/gamma
 
 	! Taxes
 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
@@ -69,18 +71,18 @@ PROGRAM main
 	! Resutls Folder
 		write(Result_Folder,'(f4.2)') Threshold_Factor
 
-		if ((TauPL.eq.0.0_dp).and.(sigma.ne.1.0_dp)) then 
+		if ((TauPL.eq.0.0_dp).and.(Utility_Switch.ne.1)) then 
 			Result_Folder = './NSU_LT_Results/Factor_'//trim(Result_Folder)//'/'
-		else if ((TauPL.ne.0.0_dp).and.(sigma.ne.1.0_dp)) then 
+		else if ((TauPL.ne.0.0_dp).and.(Utility_Switch.ne.1)) then 
 			Result_Folder = './NSU_PT_Results/Factor_'//trim(Result_Folder)//'/'
-		else if ((TauPL.eq.0.0_dp).and.(sigma.eq.1.0_dp)) then 
+		else if ((TauPL.eq.0.0_dp).and.(Utility_Switch.eq.1)) then 
 			Result_Folder = './SU_LT_Results/Factor_'//trim(Result_Folder)//'/'
-		else if ((TauPL.ne.0.0_dp).and.(sigma.eq.1.0_dp)) then 
+		else if ((TauPL.ne.0.0_dp).and.(Utility_Switch.eq.1)) then 
 			Result_Folder = './SU_PT_Results/Factor_'//trim(Result_Folder)//'/'
 		end if 
 
-		!write(Result_Folder,'(f4.2)') Threshold_Factor
-		!Result_Folder = './Test_Run/Factor_'//trim(Result_Folder)//'/'
+		write(Result_Folder,'(f4.2)') Threshold_Factor
+		Result_Folder = './Test_NSU_s1/Factor_'//trim(Result_Folder)//'/'
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )

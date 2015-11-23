@@ -2651,15 +2651,18 @@ SUBROUTINE Write_Benchmark_Results(read_write)
 	integer :: read_write
 	character(100) :: bench_folder
 
-	if ((TauPL.eq.0.0_dp).and.(sigma.ne.1.0_dp)) then 
+	if ((TauPL.eq.0.0_dp).and.(Utility_Switch.ne.1)) then 
 		bench_folder = './NSU_LT_Results/Bench_Files/'
-	else if ((TauPL.ne.0.0_dp).and.(sigma.ne.1.0_dp)) then 
+	else if ((TauPL.ne.0.0_dp).and.(Utility_Switch.ne.1)) then 
 		bench_folder = './NSU_PT_Results/Bench_Files/'
-	else if ((TauPL.eq.0.0_dp).and.(sigma.eq.1.0_dp)) then 
+	else if ((TauPL.eq.0.0_dp).and.(Utility_Switch.eq.1)) then 
 		bench_folder = './SU_LT_Results/Bench_Files/'
-	else if ((TauPL.ne.0.0_dp).and.(sigma.eq.1.0_dp)) then 
+	else if ((TauPL.ne.0.0_dp).and.(Utility_Switch.eq.1) then 
 		bench_folder = './SU_PT_Results/Bench_Files/'
 	end if 
+
+		bench_folder = './Test_NSU_s1/Bench_Files/'
+
 		call system( 'mkdir -p ' // trim(bench_folder) )
 	
 	IF (read_write .eq. 0) then 
