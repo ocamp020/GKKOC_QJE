@@ -82,6 +82,7 @@ PROGRAM main
 			Result_Folder = './SU_PT_Results/Factor_'//trim(Result_Folder)//'/'
 		end if 
 
+		
 		write(Result_Folder,'(f4.2)') Threshold_Factor
 		Result_Folder = './Test_SU_s1/Factor_'//trim(Result_Folder)//'/'
 
