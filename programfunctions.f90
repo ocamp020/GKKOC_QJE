@@ -2008,6 +2008,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 		if (any(isnan(Cons_t))) then 
 			print*, "isnan - Consumption working 3"
 			print*, age,lambdai,ai,zi,ei
+			print*, na_t, tempai
 			print*, Cons_t(age,ai,zi,lambdai,ei), Hours_t(age,ai,zi,lambdai,ei) 
 			STOP 
 		end if                
