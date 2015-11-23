@@ -1410,6 +1410,8 @@ SUBROUTINE FIND_DBN_EQ()
 		!WRITE(unit=3, FMT=*) PrAprimehi(1, :, nz/2+1, nlambda/2+1, ne/2+1)
 		!CLOSE (unit=3)
 
+		MeanCons = 1.0_dp
+
 END SUBROUTINE FIND_DBN_EQ
 
 
