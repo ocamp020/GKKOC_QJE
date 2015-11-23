@@ -1989,8 +1989,8 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 				print*, " "
 				print*, Linear_Int(EndoYgrid(1:na_t+sw), EndoCons(1:na_t+sw),na_t+sw, YGRID_t(ai,zi))
 				print*, " "
-				print*, YGRID_t(ai,zi) 
-				print*, EndoYgrid(1)
+				print*, YGRID_t 
+				print*, YGRID
 				STOP 
 			end if 
 
