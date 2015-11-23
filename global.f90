@@ -138,5 +138,7 @@ MODULE global
     
     ! Seed for random number generator
     INTEGER :: newiseed
+
+    Bequest_Wealth = 0.0_dp
    
 END MODULE global
