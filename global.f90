@@ -1,6 +1,7 @@
 MODULE global
     USE parameters
 
+    REAL(DP) :: Bequest_Wealth, MeanCons
     ! Switch for non-separable vs separable utility
     integer :: Utility_Switch
 
@@ -122,7 +123,7 @@ MODULE global
 	    REAL(DP), DIMENSION(nz) :: MeanReturn_by_z(nz), size_by_z(nz), Wealth_by_z(nz)
 	    REAL(DP) :: prct1_wealth, prct10_wealth, prct20_wealth, prct40_wealth
 	    REAL(DP) :: SSE_Moments, Min_SSE_Moments
-	    REAL(DP) :: Bequest_Wealth, MeanCons
+	    
 	    ! Welfare measures
 	    REAL(DP) :: Welfare_Gain_Pop_bench, Welfare_Gain_Pop_exp, Welfare_Gain_NB_bench, Welfare_Gain_NB_exp
 	    REAL(DP) :: CE_NEWBORN
@@ -138,7 +139,5 @@ MODULE global
     
     ! Seed for random number generator
     INTEGER :: newiseed
-
-    Bequest_Wealth = 0.0_dp
    
 END MODULE global
