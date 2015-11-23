@@ -1944,7 +1944,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 ! 	print*, ' '
 
 		if (any(isnan(EndoCons)).or.any(isnan(EndoHours)).or.any(isnan(EndoYgrid))) then 
-			print*, "isnan - Consumption working 4"
+			print*, "isnan - Consumption working 5"
 			print*, age,lambdai,ai,zi,ei
 			STOP 
 		end if 
@@ -1978,7 +1978,14 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			! Savings 
 				Aprime_t(age, ai, zi, lambdai,ei) = YGRID_t(ai,zi)  + Y_h(Hours_t(age, ai, zi, lambdai,ei),age,lambdai,ei,wage)  & 
 		                    					& - Cons_t(age, ai, zi, lambdai,ei) 
-		                    
+		    
+		    if (any(isnan(Cons_t))) then 
+				print*, "isnan - Consumption working 4"
+				print*, age,lambdai,ai,zi,ei
+				print*, Cons_t(age,ai,zi,lambdai,ei), Hours_t(age,ai,zi,lambdai,ei) 
+				STOP 
+			end if 
+
 		    If (Aprime_t(age, ai, zi, lambdai,ei)  .lt. amin) then
 
 		    	print*, ' Aprime was below minimum!!!!'
