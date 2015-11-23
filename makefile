@@ -22,6 +22,9 @@ Objects_GO      = $(Folder)/GKK_Calibration.o \
 #----------------------------------------------------------------------------------
 
 # Compile all the modules in the main folder. Modules are saved as .f90 files. 
+$(Folder)/%.o: %.F90
+	gfortran -J$(Folder) -c $< -o $@
+
 $(Folder)/%.o: %.f90
 	gfortran -J$(Folder) -c $< -o $@
 
