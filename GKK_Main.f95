@@ -34,7 +34,7 @@ PROGRAM main
 	! Switch for solving benchmark or just reading resutls
 		! If read_write_bench==1 then just read resutls
 		! If read_write_bench==0 then solve for benchmark and store results
-		read_write_bench = 1
+		read_write_bench = 0
 
 	! Switch for separable and non-separable utility
 		! If Utility_Switch==1 then do non-separable utility
@@ -79,8 +79,8 @@ PROGRAM main
 			Result_Folder = './SU_PT_Results/Factor_'//trim(Result_Folder)//'/'
 		end if 
 
-		write(Result_Folder,'(f4.2)') Threshold_Factor
-		Result_Folder = './Test_Run/Factor_'//trim(Result_Folder)//'/'
+		!write(Result_Folder,'(f4.2)') Threshold_Factor
+		!Result_Folder = './Test_Run/Factor_'//trim(Result_Folder)//'/'
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
