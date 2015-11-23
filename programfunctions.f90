@@ -2657,7 +2657,7 @@ SUBROUTINE Write_Benchmark_Results(read_write)
 		bench_folder = './NSU_PT_Results/Bench_Files/'
 	else if ((TauPL.eq.0.0_dp).and.(Utility_Switch.eq.1)) then 
 		bench_folder = './SU_LT_Results/Bench_Files/'
-	else if ((TauPL.ne.0.0_dp).and.(Utility_Switch.eq.1) then 
+	else if ((TauPL.ne.0.0_dp).and.(Utility_Switch.eq.1)) then 
 		bench_folder = './SU_PT_Results/Bench_Files/'
 	end if 
 
