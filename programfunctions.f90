@@ -1570,7 +1570,7 @@ SUBROUTINE COMPUTE_STATS()
 	MeanATReturn_by_z = 0.0_DP
 	MeanReturn_by_z   = 0.0_DP
 	size_by_z         = 0.0_DP
-	Wealth_by_z         = 0.0_DP
+	Wealth_by_z       = 0.0_DP
 	DO age=1,MaxAge
 	DO zi=1,nz
 	DO ai=1,na

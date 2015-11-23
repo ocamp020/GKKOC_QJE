@@ -118,7 +118,8 @@ MODULE global
     	! Other stats
 	    REAL(DP) :: pop_25_60 , tothours_25_60, pop_pos_earn_25_60, tot_log_earnings_25_60, mean_log_earnings_25_60 
 	    REAL(DP) :: meanhours_25_60, Var_Log_Earnings_25_60, Std_Log_Earnings_25_60, MeanWealth, Wealth_Output
-	    REAL(DP) :: MeanReturn, StdReturn, VarReturn, MeanReturn_by_z(nz), size_by_z(nz), Wealth_by_z(nz)
+	    REAL(DP) :: MeanReturn, StdReturn, VarReturn
+	    REAL(DP), DIMENSION(nz) :: MeanReturn_by_z(nz), size_by_z(nz), Wealth_by_z(nz)
 	    REAL(DP) :: prct1_wealth, prct10_wealth, prct20_wealth, prct40_wealth
 	    REAL(DP) :: SSE_Moments, Min_SSE_Moments
 	    REAL(DP) :: Bequest_Wealth, MeanCons
