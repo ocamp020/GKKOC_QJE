@@ -1989,7 +1989,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 				print*, " "
 				print*, Linear_Int(EndoYgrid(1:na_t+sw), EndoCons(1:na_t+sw),na_t+sw, YGRID_t(ai,zi))
 				print*, " "
-				print*, YGRID_t 
+				!print*, YGRID_t 
 				print*, YGRID
 				STOP 
 			end if 
@@ -2200,11 +2200,11 @@ SUBROUTINE FORM_Y_MB_GRID(TYGRID, TMBGRID,TYGRID_t,TMBGRID_t)
 		ENDDO
 	ENDDO
 
-	!print *, "Grid for asset income"
-	!do ai=1,na
-	!	write(*,*) TMBGRID_t(ai,:)
- 	!end do
-	!pause
+	print *, "Grid for asset income"
+	do ai=1,na
+		write(*,*) TYGRID_t(ai,:)
+ 	end do
+	pause
 
 END SUBROUTINE FORM_Y_MB_GRID
 
