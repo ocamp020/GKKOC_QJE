@@ -50,7 +50,7 @@ PROGRAM main
 		sigma_lambda_eps = params(5)
 		gamma  = params(6)
 		
-		sigma  = 4.0_dp
+		sigma  = 1.0_dp
 		phi    = (1.0_dp-gamma)/gamma
 		!gamma  = 1.0_dp
 
@@ -84,7 +84,7 @@ PROGRAM main
 
 		
 		write(Result_Folder,'(f4.2)') Threshold_Factor
-		Result_Folder = './Test_NSU_s4/Factor_'//trim(Result_Folder)//'/'
+		Result_Folder = './Test_NSU_s1/Factor_'//trim(Result_Folder)//'/'
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )

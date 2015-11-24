@@ -313,7 +313,7 @@ end Subroutine Asset_Grid_Threshold
 
 		if (Utility_Switch.eq.1) then
 			! Non-Separable Utility
-			if (sigma.eq.1) then
+			if (sigma.eq.1.0_dp) then
 				! I have to evaluate the FOC in expectation over eindx prime given eindx
 				! Compute c' for each value of e'
 				DO ep_ind=1,ne
@@ -2584,7 +2584,8 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='replace') 
 			WRITE(UNIT=19, FMT=*) "Parameters"
 			WRITE(UNIT=19, FMT=*) params
-			WRITE(UNIT=19, FMT=*) "sigma",sigma,'gamma',gamma,'beta',beta
+			WRITE(UNIT=19, FMT=*) "Utility_Switch",Utility_Switch
+			WRITE(UNIT=19, FMT=*) "sigma",sigma,'gamma',gamma,'phi',phi,'beta',beta
 			WRITE(UNIT=19, FMT=*) 'TauC',TauC,'TauK',TauK,'TauPL',TauPL,'psi',psi
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) "Results for benchmark economy"
@@ -2672,7 +2673,7 @@ SUBROUTINE Write_Benchmark_Results(read_write)
 		bench_folder = './SU_PT_Results/Bench_Files/'
 	end if 
 
-		bench_folder = './Test_NSU_s4/Bench_Files/'
+		bench_folder = './Test_NSU_s1/Bench_Files/'
 
 
 		call system( 'mkdir -p ' // trim(bench_folder) )
