@@ -39,7 +39,7 @@ PROGRAM main
 	! Switch for separable and non-separable utility
 		! If Utility_Switch==1 then do non-separable utility
 		! If Utility_Switch==0 then do separable utility
-		Utility_Switch = 0	
+		Utility_Switch = 1
 
 	! Set Parameters 
 		Params =[ 0.9436, 0.00, 0.50, 0.70444445, 0.34, 0.4494 ] ! tauL=0.224, tauC=0.075 calibration

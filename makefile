@@ -4,6 +4,7 @@ GKK_Main_Server: GKK_Main_Server.a
 GKK_Opt_Taxes: GKK_Opt_Taxes.a
 GKK_Wealth_Tax: Sergio.a
 simple: Sergio_Simple.a
+.PHONY: clean
 
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
@@ -18,6 +19,8 @@ Objects_Opt_Tax = $(Folder)/Opt_Tax_Parameters.o $(Folder)/Opt_Tax_Functions.o
 Objects_GO      = $(Folder)/GKK_Calibration.o \
                   $(Folder)/stateControl.o $(Folder)/genericParams.o $(Folder)/utilities.o \
                   $(Folder)/simplex.o $(Folder)/objective.o $(Folder)/minimize.o
+
+Flags = -fbounds-check                  
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
@@ -79,6 +82,7 @@ GO_Calibration.a: $(GO_Folder)/GlobalSearch.f95 $(Objects_Main) $(Objects_GO)
 GKK_Calibration.a: $(GO_Folder)/GlobalSearch.f95 $(Objects_Main) $(Objects_GO)
 	gfortran -I$(Folder) $(GO_Folder)/GlobalSearch.f95 $(Objects_Main) $(Objects_GO) -o $(Folder)/GKK_Calibration.a
 	cd Calibration
+	rm -f log_calibration.txt
 	nohup ../Compiled_Files/GKK_Calibration.a 0 ../Global_Opt/config.txt b >log_calibration.txt \
 	& nohup ../Compiled_Files/GKK_Calibration.a 1 ../Global_Opt/config.txt b \
 	& nohup ../Compiled_Files/GKK_Calibration.a 1 ../Global_Opt/config.txt b \
@@ -86,4 +90,10 @@ GKK_Calibration.a: $(GO_Folder)/GlobalSearch.f95 $(Objects_Main) $(Objects_GO)
 	& nohup ../Compiled_Files/GKK_Calibration.a 1 ../Global_Opt/config.txt b \
 	& nohup ../Compiled_Files/GKK_Calibration.a 1 ../Global_Opt/config.txt b \
 
+#----------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------
 
+clean: 
+	cd $(Folder)
+	rm -f *.o *.mod *.a
