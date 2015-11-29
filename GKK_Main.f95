@@ -39,7 +39,7 @@ PROGRAM main
 	! Switch for separable and non-separable utility
 		! If Utility_Switch==1 then do non-separable utility
 		! If Utility_Switch==0 then do separable utility
-		Utility_Switch = 0
+		Utility_Switch = 1
 
 	! Set Parameters 
 		Params =[ 0.9436, 0.00, 0.50, 0.70444445, 0.34, 0.4494 ] ! tauL=0.224, tauC=0.075 calibration
@@ -50,9 +50,9 @@ PROGRAM main
 		sigma_lambda_eps = params(5)
 		gamma  = params(6)
 		
-		sigma  = 1.0_dp
+		sigma  = 4.0_dp
 		phi    = (1.0_dp-gamma)/gamma
-		gamma  = 1.0_dp
+		!gamma  = 1.0_dp
 
 	! Taxes
 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
@@ -64,27 +64,27 @@ PROGRAM main
 	! Consumption tax
 		tauC=0.075_DP
 	! Set Labor Tax Regime
-		!tauPL=0.185_DP
-		!psi=0.77_DP  
- 		tauPL=0.0_DP
- 		psi=0.776_DP  	
+		tauPL=0.185_DP
+		psi=0.776_DP  
+		!tauPL=0.0_DP
+ 		!psi=0.776_DP  	
 
 	! Resutls Folder
 		write(Result_Folder,'(f4.2)') Threshold_Factor
 
-		if ((TauPL.eq.0.0_dp).and.(Utility_Switch.ne.1)) then 
+		if ((TauPL.eq.0.0_dp).and.(Utility_Switch.eq.1)) then 
 			Result_Folder = './NSU_LT_Results/Factor_'//trim(Result_Folder)//'/'
-		else if ((TauPL.ne.0.0_dp).and.(Utility_Switch.ne.1)) then 
-			Result_Folder = './NSU_PT_Results/Factor_'//trim(Result_Folder)//'/'
-		else if ((TauPL.eq.0.0_dp).and.(Utility_Switch.eq.1)) then 
-			Result_Folder = './SU_LT_Results/Factor_'//trim(Result_Folder)//'/'
 		else if ((TauPL.ne.0.0_dp).and.(Utility_Switch.eq.1)) then 
+			Result_Folder = './NSU_PT_Results/Factor_'//trim(Result_Folder)//'/'
+		else if ((TauPL.eq.0.0_dp).and.(Utility_Switch.ne.1)) then 
+			Result_Folder = './SU_LT_Results/Factor_'//trim(Result_Folder)//'/'
+		else if ((TauPL.ne.0.0_dp).and.(Utility_Switch.ne.1)) then 
 			Result_Folder = './SU_PT_Results/Factor_'//trim(Result_Folder)//'/'
 		end if 
 
 		
 		write(Result_Folder,'(f4.2)') Threshold_Factor
-		Result_Folder = './Test_SU_s1/Factor_'//trim(Result_Folder)//'/'
+		Result_Folder = './Test_NSU_pl/Factor_'//trim(Result_Folder)//'/'
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )

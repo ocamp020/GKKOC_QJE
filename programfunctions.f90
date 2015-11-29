@@ -1207,7 +1207,7 @@ SUBROUTINE FIND_DBN_EQ()
 	iter_indx = 1
 	!print*, 'Computing Equilibrium Distribution'
 	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. ( simutime .le. MaxSimuTime ) )
-		! print*, 'Eq. Distribution difference=', DBN_dist
+		!print*, 'Eq. Distribution difference=', DBN_dist
 		!    print*, 'sum DBN1=', sum(DBN1)
 	    DBN2=0.0_DP
 
@@ -1570,7 +1570,7 @@ SUBROUTINE COMPUTE_STATS()
 	MeanATReturn_by_z = 0.0_DP
 	MeanReturn_by_z   = 0.0_DP
 	size_by_z         = 0.0_DP
-	Wealth_by_z       = 0.0_DP
+	Wealth_by_z 	  = 0.0_DP
 	DO age=1,MaxAge
 	DO zi=1,nz
 	DO ai=1,na
@@ -1663,7 +1663,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 				euler_power = (-1.0_dp/sigma)
 		end if 
 
-		!! print*, 'R=',rr, 'W=',wage, 'na=', na, 'na_t=', na_t
+		!print*, 'R=',rr, 'W=',wage, 'na=', na, 'na_t=', na_t
 	!========================================================================================
 	!------RETIREMENT PERIOD-----------------------------------------------------------------
 
@@ -1944,7 +1944,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 ! 	print*, ' '
 
 		if (any(isnan(EndoCons)).or.any(isnan(EndoHours)).or.any(isnan(EndoYgrid))) then 
-			print*, "isnan - Consumption working 5"
+			print*, "isnan - Consumption working 4"
 			print*, age,lambdai,ai,zi,ei
 			STOP 
 		end if 
@@ -1978,15 +1978,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			! Savings 
 				Aprime_t(age, ai, zi, lambdai,ei) = YGRID_t(ai,zi)  + Y_h(Hours_t(age, ai, zi, lambdai,ei),age,lambdai,ei,wage)  & 
 		                    					& - Cons_t(age, ai, zi, lambdai,ei) 
-		    
-		    if (any(isnan(Cons_t))) then 
-				print*, "isnan - Consumption working 4"
-				print*, age,lambdai,ai,zi,ei
-				print*, sw
-				print*, Cons_t(age,ai,zi,lambdai,ei), Hours_t(age,ai,zi,lambdai,ei) 
-				STOP 
-			end if 
-
+		                    
 		    If (Aprime_t(age, ai, zi, lambdai,ei)  .lt. amin) then
 
 		    	print*, ' Aprime was below minimum!!!!'
@@ -2009,7 +2001,6 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 		if (any(isnan(Cons_t))) then 
 			print*, "isnan - Consumption working 3"
 			print*, age,lambdai,ai,zi,ei
-			print*, na_t, tempai
 			print*, Cons_t(age,ai,zi,lambdai,ei), Hours_t(age,ai,zi,lambdai,ei) 
 			STOP 
 		end if                
@@ -2193,12 +2184,11 @@ SUBROUTINE FORM_Y_MB_GRID(TYGRID, TMBGRID,TYGRID_t,TMBGRID_t)
 		ENDDO
 	ENDDO
 
-	! 	print *, "Grid for asset income"
-	! 	print *, mu_z
-	! 	print *, " "
-	! 	do ai=1,na
-	! 		write(*,*) TYGRID_t(ai,:)
-	!  	end do
+	!print *, "Grid for asset income"
+	!do ai=1,na
+	!	write(*,*) TMBGRID_t(ai,:)
+ 	!end do
+	!pause
 
 END SUBROUTINE FORM_Y_MB_GRID
 
@@ -2585,7 +2575,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) "Parameters"
 			WRITE(UNIT=19, FMT=*) params
 			WRITE(UNIT=19, FMT=*) "Utility_Switch",Utility_Switch
-			WRITE(UNIT=19, FMT=*) "sigma",sigma,'gamma',gamma,'phi',phi,'beta',beta
+ 			WRITE(UNIT=19, FMT=*) "sigma",sigma,'gamma',gamma,'phi',phi,'beta',beta
 			WRITE(UNIT=19, FMT=*) 'TauC',TauC,'TauK',TauK,'TauPL',TauPL,'psi',psi
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) "Results for benchmark economy"
@@ -2663,18 +2653,17 @@ SUBROUTINE Write_Benchmark_Results(read_write)
 	integer :: read_write
 	character(100) :: bench_folder
 
-	if ((TauPL.eq.0.0_dp).and.(Utility_Switch.ne.1)) then 
+	if ((TauPL.eq.0.0_dp).and.(Utility_Switch.eq.1)) then 
 		bench_folder = './NSU_LT_Results/Bench_Files/'
-	else if ((TauPL.ne.0.0_dp).and.(Utility_Switch.ne.1)) then 
-		bench_folder = './NSU_PT_Results/Bench_Files/'
-	else if ((TauPL.eq.0.0_dp).and.(Utility_Switch.eq.1)) then 
-		bench_folder = './SU_LT_Results/Bench_Files/'
 	else if ((TauPL.ne.0.0_dp).and.(Utility_Switch.eq.1)) then 
+		bench_folder = './NSU_PT_Results/Bench_Files/'
+	else if ((TauPL.eq.0.0_dp).and.(Utility_Switch.ne.1)) then 
+		bench_folder = './SU_LT_Results/Bench_Files/'
+	else if ((TauPL.ne.0.0_dp).and.(Utility_Switch.ne.1)) then 
 		bench_folder = './SU_PT_Results/Bench_Files/'
 	end if 
 
-		bench_folder = './Test_SU_s1/Bench_Files/'
-
+		bench_folder = './Test_NSU_pl/Bench_Files/'
 
 		call system( 'mkdir -p ' // trim(bench_folder) )
 	
