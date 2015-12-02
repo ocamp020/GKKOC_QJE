@@ -2663,9 +2663,10 @@ SUBROUTINE Write_Benchmark_Results(read_write)
 		bench_folder = './SU_PT_Results/Bench_Files/'
 	end if 
 
-		bench_folder = './Test_NSU_pl/Bench_Files/'
+		bench_folder = './Test_SU_s1/Bench_Files/'
 
 		call system( 'mkdir -p ' // trim(bench_folder) )
+		print*, "Bench Files Folder:", bench_folder
 	
 	IF (read_write .eq. 0) then 
 		OPEN  (UNIT=1,  FILE=trim(bench_folder)//'cons'  , STATUS='replace')

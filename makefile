@@ -42,7 +42,7 @@ Sergio.a: GKK_Wealth_Tax_Sergio.f95 $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o $(Fold
 	$(Folder)/Sergio.a
 
 GKK_Main.a: GKK_Main.f95 $(Objects_Main)
-	gfortran -I$(Folder) GKK_Main.f95 $(Objects_Main) -o $(Folder)/GKK_Main.a
+	gfortran -O2 -I$(Folder) GKK_Main.f95 $(Objects_Main) -o $(Folder)/GKK_Main.a
 	$(Folder)/GKK_Main.a
 
 GKK_Main_Server.a: GKK_Main.f95 $(Objects_Main)
