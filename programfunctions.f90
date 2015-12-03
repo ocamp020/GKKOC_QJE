@@ -182,7 +182,9 @@ end Subroutine Asset_Grid_Threshold
 		IMPLICIT NONE   
 		real(DP), intent(in)  :: a_in, z_in
 		real(DP) 			  :: MB_a
-		real(DP) :: K, Pr, Y_a
+		real(DP) :: K, Pr, Y_a, tauW
+
+
 
 		! Capital demand 
 		K   = min( theta*a_in , (mu*P*z_in/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
@@ -190,34 +192,53 @@ end Subroutine Asset_Grid_Threshold
 		Pr  = P*(z_in*K)**mu - (R+DepRate)*K
 		! Before tax wealth
 		Y_a = ( a_in +  ( Pr + R*a_in ) *(1.0_DP-tauK) )
+		if (Y_a.le.Y_a_threshold) then 
+			tauW = tauW_bt 
+		else
+			tauW = tauW_at 
+		end if
 
 		! After tax marginal benefit of assets
-		if (Y_a.le.Y_a_threshold) then 
-			! Compute asset marginal benefit - tax free
-			MB_a = ( 1.0_DP + R*(1.0_DP-tauK) )*(1.0_DP-tauW_bt)
-		else
-			! Compute asset marginal benefit - subject to taxes
-			MB_a = ( 1.0_DP + R*(1.0_DP-tauK) )*(1.0_DP-tauW_at)
-		end if
+		if (K.lt.theta*a_in) then 
+			MB_a = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW) 
+		else 
+			MB_a = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW) &
+         		& + (P*mu*((theta*z_in)**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta)*(1.0_dp-tauK)*(1.0_dp-tauW)
+		endif 
+
 	END  FUNCTION MB_a
 
 	FUNCTION MB_a_at(a_in,z_in)
 		IMPLICIT NONE   
 		real(DP), intent(in)  :: a_in, z_in
-		real(DP)			  :: MB_a_at
+		real(DP)			  :: MB_a_at, K
 
+		! Capital demand 
+		K   = min( theta*a_in , (mu*P*z_in/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
-		MB_a_at = ( 1.0_DP + R*(1.0_DP-tauK) )*(1.0_DP-tauW_at)
+		if (K.lt.theta*a_in) then 
+			MB_a = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at) 
+		else 
+			MB_a = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at) &
+         		& + (P*mu*((theta*z_in)**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta)*(1.0_dp-tauK)*(1.0_dp-tauW_at)
+		endif 
 
 	END  FUNCTION MB_a_at
 
 	FUNCTION MB_a_bt(a_in,z_in)
 		IMPLICIT NONE   
 		real(DP), intent(in) :: a_in, z_in
-		real(DP)             :: MB_a_bt
+		real(DP)             :: MB_a_bt, K
 
+		! Capital demand 
+		K   = min( theta*a_in , (mu*P*z_in/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
-		MB_a_bt = ( 1.0_DP + R*(1.0_DP-tauK) )*(1.0_DP-tauW_bt)
+		if (K.lt.theta*a_in) then 
+			MB_a = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt) 
+		else 
+			MB_a = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt) &
+         		& + (P*mu*((theta*z_in)**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta)*(1.0_dp-tauK)*(1.0_dp-tauW_bt)
+		endif 
 
 	END  FUNCTION MB_a_bt
 
@@ -1689,29 +1710,14 @@ SUBROUTINE COMPUTE_STATS()
 	    MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei)*agrid(ai)
 	    MeanCons     = MeanCons     + DBN1(age, ai, zi, lambdai, ei)*cons(age, ai, zi, lambdai, ei)   
 
+	    MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)* agrid(ai)
+
 	    if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
-	      MeanReturn = MeanReturn   + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)
-	      if (Wealth(ai,zi).lt.Y_a_Threshold) then 
-	      	MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * ((1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt)-1.0_DP)* agrid(ai)
-	      else  
-	      	MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * ((1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at)-1.0_DP)* agrid(ai)
-	      endif 
-	   else
+	      MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)    
+	    else
 	      MeanReturn = MeanReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
-	       			& ( R + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP)-(R+DepRate))) 
-	      if (Wealth(ai,zi).lt.Y_a_Threshold) then 
-	      	MeanATReturn = MeanATReturn  +   DBN1(age, ai, zi, lambdai, ei) &
-		         & * ((1.0_DP+R*(1.0_DP-tauK))*(1.0_DP-tauW_bt) &
-		         & + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP) &
-		         & -(R+DepRate))*(1.0_DP-tauK)*(1.0_DP-tauW_bt) -1.0_DP)*agrid(ai) 
-		  else 
-		  	MeanATReturn = MeanATReturn  +   DBN1(age, ai, zi, lambdai, ei) &
-		         & * ((1.0_DP+R*(1.0_DP-tauK))*(1.0_DP-tauW_at) &
-		         & + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP) &
-		         & -(R+DepRate))*(1.0_DP-tauK)*(1.0_DP-tauW_at) -1.0_DP)*agrid(ai) 
-		  endif 
-	   endif      
-     	
+	       			& ( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) 
+	    endif      
 	ENDDO
 	ENDDO
 	ENDDO    
@@ -1738,30 +1744,15 @@ SUBROUTINE COMPUTE_STATS()
 	DO zi=1,nz
 	DO ai=1,na
 	DO lambdai=1,nlambda
-	DO ei=1, ne     
+	DO ei=1, ne   
+	    VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+	    				& ((MBGRID(ai,zi)-1.0_DP)-MeanATReturn)**2.0_dp
+
 	    if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
 		    VarReturn = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * (R-MeanReturn)**2.0_dp
-		    if (Wealth(ai,zi).lt.Y_a_Threshold) then 
-		    	VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
-		    				&  (((1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt)-1.0_DP) - MeanATReturn)**2.0_dp
-		    else  
-		      	VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
-		    				&  (((1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at)-1.0_DP) - MeanATReturn)**2.0_dp
-		   	endif 
 	   	else
 			VarReturn = VarReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * & 
-						& (( R + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP)-(R+DepRate))) -MeanReturn)**2.0_dp
-			if (Wealth(ai,zi).lt.Y_a_Threshold) then
-				VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
-						& (  ((1.0_DP+R*(1.0_DP-tauK))*(1.0_DP-tauW_bt) &
-						& + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP) &
-						& -(R+DepRate))*(1.0_DP-tauK)*(1.0_DP-tauW_bt) -1.0_DP) )**2.0_dp
-			else 
-				VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
-						& (  ((1.0_DP+R*(1.0_DP-tauK))*(1.0_DP-tauW_at) &
-						& + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP) &
-						& -(R+DepRate))*(1.0_DP-tauK)*(1.0_DP-tauW_at) -1.0_DP) )**2.0_dp
-			endif 
+						& (( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) -MeanReturn)**2.0_dp
 	   	endif  
 
 	ENDDO
@@ -1781,32 +1772,13 @@ SUBROUTINE COMPUTE_STATS()
 	DO ai=1,na
 	DO lambdai=1,nlambda
 	DO ei=1, ne
-	     MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)
-	     MeanReturn_by_z(zi)   = MeanReturn_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * &
-	                                                   & (P*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate)
+	    MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP) * agrid(ai)
+
 	    if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
 	      MeanReturn_by_z(zi) = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)
-	      if (Wealth(ai,zi).lt.Y_a_Threshold) then 
-	      	MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * agrid(ai) *  &
-	      	 						& ((1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt)-1.0_DP)
-	      else  
-	      	MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * agrid(ai) *  &
-	      	 						& ((1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at)-1.0_DP)
-	      endif 
 	    else
 	      MeanReturn_by_z(zi) = MeanReturn_by_z(zi)+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
 	       			& ( R + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP)-(R+DepRate))) 
-	      if (Wealth(ai,zi).lt.Y_a_Threshold) then 
-	      	MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi)  +   DBN1(age, ai, zi, lambdai, ei) &
-		         & * ((1.0_DP+R*(1.0_DP-tauK))*(1.0_DP-tauW_bt) &
-		         & + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP) &
-		         & -(R+DepRate))*(1.0_DP-tauK)*(1.0_DP-tauW_bt) -1.0_DP)*agrid(ai) 
-		  else 
-		  	MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi)  +   DBN1(age, ai, zi, lambdai, ei) &
-		         & * ((1.0_DP+R*(1.0_DP-tauK))*(1.0_DP-tauW_at) &
-		         & + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP) &
-		         & -(R+DepRate))*(1.0_DP-tauK)*(1.0_DP-tauW_at) -1.0_DP)*agrid(ai) 
-		  endif 
 	    endif 
 
 	     size_by_z(zi)         = size_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) 
@@ -1924,10 +1896,10 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
     DO ai=1,na_t
 		if (abs(Wealth(ai,zi)-Y_a_threshold).lt.1e-8) then 
     		! Consumption on endogenous grid and implied asset income under tauW_bt
-    		EndoCons(ai)  = Cons_t(age+1,ai,zi,lambdai,ei) * (beta*survP(age)*( 1.0_DP+R*(1.0_DP-tauK) )*(1.0_DP-tauW_bt))**euler_power
+    		EndoCons(ai)  = Cons_t(age+1,ai,zi,lambdai,ei) * (beta*survP(age)*MB_a_bt(agrid(ai),zgrid(zi)) )**euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! Consumption on endogenous grid and implied asset income under tauW_at
-	        EndoCons(na_t+1)  = Cons_t(age+1,ai,zi,lambdai,ei)*(beta*survP(age)*(1.0_DP+R*(1.0_DP-tauK))*(1.0_DP-tauW_bt))**euler_power
+	        EndoCons(na_t+1)  = Cons_t(age+1,ai,zi,lambdai,ei)*(beta*survP(age)*MB_a_at(agrid(ai),zgrid(zi)))**euler_power
 	    	EndoYgrid(na_t+1) = agrid_t(ai) +  EndoCons(na_t+1) - RetY_lambda_e(lambdai,ei)
 	    	! Set the flag!
 	    	sw                = 1 
@@ -2009,11 +1981,11 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
         DO ai=1,na_t
 		if (abs(Wealth(ai,zi)-Y_a_threshold).lt.1e-8) then 
 	    	! Below threshold
-			call EGM_Working_Period( ( 1.0_DP+R*(1.0_DP-tauK) )*(1.0_DP-tauW_bt) , H_min , & 
+			call EGM_Working_Period( MB_a_bt(agrid(ai),zgrid(zi)) , H_min , & 
 			      & EndoCons(ai), EndoHours(ai) , EndoYgrid(ai)  )
 			
 			! Above threshold
-			call EGM_Working_Period(( 1.0_DP+R*(1.0_DP-tauK) )*(1.0_DP-tauW_at) , H_min , & 
+			call EGM_Working_Period( MB_a_at(agrid(ai),zgrid(zi)) , H_min , & 
 			      & EndoCons(na_t+1), EndoHours(na_t+1) , EndoYgrid(na_t+1)  )
 
 			! Set the flag!
