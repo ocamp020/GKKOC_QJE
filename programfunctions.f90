@@ -1650,7 +1650,7 @@ SUBROUTINE COMPUTE_STATS()
 	DO lambdai=1,nlambda
 	DO ei=1, ne
 	    MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei)*agrid(ai)         
-     	MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei)*(MBGRID(ai,zi)-1.0_DP)
+     	MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei)*agrid(ai)*(MBGRID(ai,zi)-1.0_DP)
      	MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei)*agrid(ai)* &
      	                            & (rr*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate)
      	MeanCons     = MeanCons     + DBN1(age, ai, zi, lambdai, ei)*cons(age, ai, zi, lambdai, ei)
@@ -1661,6 +1661,7 @@ SUBROUTINE COMPUTE_STATS()
 	ENDDO    
 	Wealth_Output = MeanWealth/YBAR 
 	MeanReturn    = MeanReturn/MeanWealth
+	MeanATReturn  = MeanATReturn/MeanWealth
 
 	Bequest_Wealth=0.0_DP
 	DO zi=1,nz
@@ -1681,8 +1682,9 @@ SUBROUTINE COMPUTE_STATS()
 	DO ai=1,na
 	DO lambdai=1,nlambda
 	DO ei=1, ne      
-	    VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP-MeanATReturn)**2.0_DP 
-     	VarReturn   = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai) / MeanWealth * &
+	    VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+	    			  & (MBGRID(ai,zi)-1.0_DP-MeanATReturn)**2.0_DP 
+     	VarReturn   = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
      	              & ((rr*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate) -MeanReturn)**2.0_DP 
 	ENDDO
 	ENDDO
@@ -1701,7 +1703,7 @@ SUBROUTINE COMPUTE_STATS()
 	DO ai=1,na
 	DO lambdai=1,nlambda
 	DO ei=1, ne
-	     MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)
+	     MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * agrid(ai) *(MBGRID(ai,zi)-1.0_DP)
 	     MeanReturn_by_z(zi)   = MeanReturn_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * &
 	                                                   & (rr*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate)
 	     size_by_z(zi)         = size_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) 
@@ -1711,7 +1713,7 @@ SUBROUTINE COMPUTE_STATS()
 	ENDDO    
 	ENDDO    
 	ENDDO    
-	MeanATReturn_by_z = MeanATReturn_by_z / size_by_z
+	MeanATReturn_by_z = MeanATReturn_by_z / Wealth_by_z
     MeanReturn_by_z   = MeanReturn_by_z   / Wealth_by_z
 
 	! Percentage of the population above threshold
