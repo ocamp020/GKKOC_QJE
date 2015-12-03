@@ -29,17 +29,27 @@ PROGRAM main
 	! Variables to measure running time
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
-		INTEGER  :: read_write_bench
+		logical  :: read_write_bench
 
 	! Switch for solving benchmark or just reading resutls
-		! If read_write_bench==1 then just read resutls
-		! If read_write_bench==0 then solve for benchmark and store results
-		read_write_bench = 0
+		! If read_write_bench==.true. then just read resutls
+		! If read_write_bench==.false. then solve for benchmark and store results
+		read_write_bench = .false.
 
 	! Switch for separable and non-separable utility
-		! If Utility_Switch==1 then do non-separable utility
-		! If Utility_Switch==0 then do separable utility
-		Utility_Switch = 0
+		! If NSU_Switch==.true. then do non-separable utility
+		! If NSU_Switch==.false. then do separable utility
+		NSU_Switch = .true.
+
+	! Switch for log utility 
+		! If Log_Switch==.true. then utility is log
+		! If Log_Switch==.false. then utility is not log
+		Log_Switch = .false.
+
+	! Switch for labor taxes
+		! If Progressive_Tax_Switch==.true. then use progressive taxes
+		! If Progressive_Tax_Switch==.false. then use linear taxes
+		Progressive_Tax_Switch = .false.
 
 	! Set Parameters 
 		Params =[ 0.9436, 0.00, 0.50, 0.70444445, 0.34, 0.4494 ] ! tauL=0.224, tauC=0.075 calibration
@@ -50,9 +60,15 @@ PROGRAM main
 		sigma_lambda_eps = params(5)
 		gamma  = params(6)
 		
-		sigma  = 1.0_dp
+		sigma  = 4.0_dp
 		phi    = (1.0_dp-gamma)/gamma
-		gamma  = 1.0_dp
+
+		if (Log_Switch.eqv..true.) then
+				sigma = 1.0_dp
+			if (NSU_Switch.eqv..false.) then 
+				gamma = 1.0_dp 
+			endif 
+		endif 
 
 	! Taxes
 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
@@ -64,33 +80,36 @@ PROGRAM main
 	! Consumption tax
 		tauC=0.075_DP
 	! Set Labor Tax Regime
-		!tauPL=0.185_DP
-		!psi=0.776_DP  
-		tauPL=0.0_DP
- 		psi=0.776_DP  	
+		if (Progressive_Tax_Switch.eqv..true.) then 
+			tauPL = 0.185_DP
+			psi   = 0.776_DP  
+		else 
+			tauPL = 0.0_DP
+	 		psi   = 0.776_DP  	
+	 	endif 
 
 	! Resutls Folder
 		write(Result_Folder,'(f4.2)') Threshold_Factor
 
-		if ((TauPL.eq.0.0_dp).and.(Utility_Switch.eq.1)) then 
+		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './NSU_LT_Results/Factor_'//trim(Result_Folder)//'/'
-		else if ((TauPL.ne.0.0_dp).and.(Utility_Switch.eq.1)) then 
+		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './NSU_PT_Results/Factor_'//trim(Result_Folder)//'/'
-		else if ((TauPL.eq.0.0_dp).and.(Utility_Switch.ne.1)) then 
+		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
 			Result_Folder = './SU_LT_Results/Factor_'//trim(Result_Folder)//'/'
-		else if ((TauPL.ne.0.0_dp).and.(Utility_Switch.ne.1)) then 
+		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
 			Result_Folder = './SU_PT_Results/Factor_'//trim(Result_Folder)//'/'
 		end if 
 
 		
 		write(Result_Folder,'(f4.2)') Threshold_Factor
-		Result_Folder = './Test_SU_s1/Factor_'//trim(Result_Folder)//'/'
+		Result_Folder = './Test_NSU_s4/Factor_'//trim(Result_Folder)//'/'
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 		print*, "Results are stored in directory: ", Result_Folder
 		print*,'na=',na,'update_period=',update_period
-		print*, "Utility_Switch=",Utility_Switch,'sigma=',sigma,'gamma=',gamma,'phi',phi
+		print*, "NSU_Switch=",NSU_Switch,'sigma=',sigma,'gamma=',gamma,'phi',phi
 		print*,'Labor Taxes: tauPl=',tauPl,'psi',psi
 
 
@@ -132,7 +151,7 @@ PROGRAM main
 	! Solve for the model and compute stats
 	print*,"	Initializing program"
 		CALL INITIALIZE
-	if (read_write_bench.eq.0) then
+	if (read_write_bench.eqv..false.) then
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
 		print*,"	Computing government spending"

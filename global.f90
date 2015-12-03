@@ -2,7 +2,10 @@ MODULE global
     USE parameters
 
     ! Switch for non-separable vs separable utility
-    integer :: Utility_Switch
+    logical :: NSU_Switch, Log_Switch
+
+    ! Switch for progressive vs linear labor income taxes
+    logical :: Progressive_Tax_Switch
 
     ! Foder to store results
     character(100) :: Result_Folder
