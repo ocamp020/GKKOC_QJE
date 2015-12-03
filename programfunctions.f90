@@ -217,9 +217,9 @@ end Subroutine Asset_Grid_Threshold
 		K   = min( theta*a_in , (mu*P*z_in/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
 		if (K.lt.theta*a_in) then 
-			MB_a = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at) 
+			MB_a_at = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at) 
 		else 
-			MB_a = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at) &
+			MB_a_at = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at) &
          		& + (P*mu*((theta*z_in)**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta)*(1.0_dp-tauK)*(1.0_dp-tauW_at)
 		endif 
 
@@ -234,9 +234,9 @@ end Subroutine Asset_Grid_Threshold
 		K   = min( theta*a_in , (mu*P*z_in/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
 		if (K.lt.theta*a_in) then 
-			MB_a = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt) 
+			MB_a_bt = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt) 
 		else 
-			MB_a = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt) &
+			MB_a_bt = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt) &
          		& + (P*mu*((theta*z_in)**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta)*(1.0_dp-tauK)*(1.0_dp-tauW_bt)
 		endif 
 
