@@ -40,6 +40,8 @@ MODULE parameters
 		REAL(DP), PARAMETER  :: mu=0.9_DP
 		! Depreciation rate
 		REAL(DP), PARAMETER  :: DepRate=0.0_DP
+		! Financial constraints
+		REAL(DP), PARAMETER  :: theta=1.0_dp
 	
 
 	! Life cycle: retirement age, maximum age

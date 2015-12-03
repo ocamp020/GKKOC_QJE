@@ -32,22 +32,23 @@ Subroutine Asset_Grid_Threshold(Y_a_threshold_in,agrid_t,na_t)
 	real(dp), dimension(nz) :: a_aux
 	integer                 :: a_ind
 	integer , dimension(:), allocatable :: agrid_t_ind
-	real(dp), dimension(:), allocatable :: p
-	!real(dp), dimension(2)  :: p
-	real(dp)                :: max_wealth
+	real(dp), dimension(:), allocatable :: par
+	!real(dp), dimension(2)  :: par
+	real(dp)                :: max_wealth, K
 
-	allocate( p(2) )
+	allocate( par(2) )
 	a_ind = 0
 	! If the threshold for wealth taxes is positive then agrid is adjusted
 	if (Y_a_threshold_in.gt.0.0_dp) then 
-		p(1) = Y_a_threshold_in
+		par(1) = Y_a_threshold_in
  		do zi=1,nz 
 			! New points are added to agrid if there is an "a" st Y(a,z))=Y_threshold
-			max_wealth = (1.0_dp-DepRate)*agrid(na)+rr*(agrid(na)*zgrid(zi))**mu
+			K = min( theta*agrid(na) , (mu*P*zgrid(zi)/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+			max_wealth = (1.0_dp+R)*agrid(na) + P*(zgrid(zi)*K)**mu - (R+DepRate)*K 
 			if (Y_a_threshold_in.lt.max_wealth) then
 				a_ind		 = a_ind + 1 
-				p(2)         = zgrid(zi)
-				a_aux(a_ind) = zbrent_p(Y_a_res,0.0_dp,agrid(na),brent_tol,p) 
+				par(2)       = zgrid(zi)
+				a_aux(a_ind) = zbrent_p(Y_a_res,0.0_dp,agrid(na),brent_tol,par) 
 				!a_aux(a_ind) = zbrent(Y_a_res,0.0_dp,agrid(na),brent_tol)
 			else 
 				print*, 'Error in forming a grid with threshold'
@@ -80,18 +81,21 @@ Subroutine Asset_Grid_Threshold(Y_a_threshold_in,agrid_t,na_t)
 		
 end Subroutine Asset_Grid_Threshold
 
-	function Y_a_res(a_in,p)
+	function Y_a_res(a_in,par)
 	!function Y_a_res(a_in)
 		IMPLICIT NONE
 		real(dp), intent(in)  :: a_in
-		real(dp), dimension(:), allocatable, intent(in) :: p
+		real(dp), dimension(:), allocatable, intent(in) :: par
 		real(dp) :: Y_a_res
-		real(dp) :: Y_a_th, z_in
+		real(dp) :: Y_a_th, z_in, K
 
-		Y_a_th = p(1)
-		z_in   = p(2)
+		Y_a_th = par(1)
+		z_in   = par(2)
 
-		Y_a_res = ( a_in + ( rr * (z_in * a_in )**mu - DepRate*a_in ) ) - Y_a_th
+		K = min( theta*a_in , (mu*P*z_in/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+
+		Y_a_res = (1.0_dp+R)*a_in + P*(z_in*K)**mu - (R+DepRate)*K  - Y_a_th
+
 	end function Y_a_res
 
 
@@ -145,10 +149,14 @@ end Subroutine Asset_Grid_Threshold
 	FUNCTION Y_a(a_in,z_in)
 		IMPLICIT NONE   
 		real(DP), intent(in)  :: a_in, z_in
-		real(DP)              :: Y_a
+		real(DP)              :: Y_a, K, Pr
 
+		! Capital demand 
+		K   = min( theta*a_in , (mu*P*z_in/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		! Profits 
+		Pr  = P*(z_in*K)**mu - (R+DepRate)*K
 		! Before tax wealth
-		Y_a = ( a_in + ( rr * (z_in * a_in )**mu - DepRate*a_in ) *(1.0_DP-tauK) )
+		Y_a = ( a_in +  ( Pr + R*a_in ) *(1.0_DP-tauK) )
 
 		! Compute after tax wealth according to threshold
 		if (Y_a.le.Y_a_threshold) then 
@@ -174,18 +182,22 @@ end Subroutine Asset_Grid_Threshold
 		IMPLICIT NONE   
 		real(DP), intent(in)  :: a_in, z_in
 		real(DP) 			  :: MB_a
-		real(DP) ::Y_a
+		real(DP) :: K, Pr, Y_a
 
+		! Capital demand 
+		K   = min( theta*a_in , (mu*P*z_in/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		! Profits 
+		Pr  = P*(z_in*K)**mu - (R+DepRate)*K
 		! Before tax wealth
-		Y_a = ( a_in + ( rr * (z_in * a_in )**mu - DepRate*a_in ) *(1.0_DP-tauK) )
+		Y_a = ( a_in +  ( Pr + R*a_in ) *(1.0_DP-tauK) )
 
 		! After tax marginal benefit of assets
 		if (Y_a.le.Y_a_threshold) then 
 			! Compute asset marginal benefit - tax free
-			MB_a = ( 1.0_DP + ( rr *mu* (z_in**mu) * (a_in**(mu-1.0_DP)) - DepRate ) *(1.0_DP-tauK) )*(1.0_DP-tauW_bt)
+			MB_a = ( 1.0_DP + R*(1.0_DP-tauK) )*(1.0_DP-tauW_bt)
 		else
 			! Compute asset marginal benefit - subject to taxes
-			MB_a = ( 1.0_DP + ( rr *mu* (z_in**mu) * (a_in**(mu-1.0_DP)) - DepRate ) *(1.0_DP-tauK) )*(1.0_DP-tauW_at)
+			MB_a = ( 1.0_DP + R*(1.0_DP-tauK) )*(1.0_DP-tauW_at)
 		end if
 	END  FUNCTION MB_a
 
@@ -195,7 +207,7 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)			  :: MB_a_at
 
 		! Compute asset marginal benefit - subject to taxes
-		MB_a_at = ( 1.0_DP + ( rr *mu* (z_in**mu) * (a_in**(mu-1.0_DP)) - DepRate ) *(1.0_DP-tauK) )*(1.0_DP-tauW_at)
+		MB_a_at = ( 1.0_DP + R*(1.0_DP-tauK) )*(1.0_DP-tauW_at)
 
 	END  FUNCTION MB_a_at
 
@@ -205,7 +217,7 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)             :: MB_a_bt
 
 		! Compute asset marginal benefit - subject to taxes
-		MB_a_bt = ( 1.0_DP + ( rr *mu* (z_in**mu) * (a_in**(mu-1.0_DP)) - DepRate ) *(1.0_DP-tauK) )*(1.0_DP-tauW_bt)
+		MB_a_bt = ( 1.0_DP + R*(1.0_DP-tauK) )*(1.0_DP-tauW_bt)
 
 	END  FUNCTION MB_a_bt
 
@@ -667,7 +679,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	! Solve for the benchmark economy 
 		solving_bench = 1
 		tauK    = tauK_bench
-		rr      = rr_bench
+		R       = R_bench
+		P       = P_bench
 		wage    = wage_bench
 		Ebar    = Ebar_bench
 		tauW_bt = tauW_bt_bench
@@ -680,7 +693,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		Hours  = Hours_bench
 		Aprime = Aprime_bench
 
-		!print*,'BENCH: rr=',rr,'wage=',wage,'Ebar=',Ebar
+		!print*,'BENCH: P=',P,'wage=',wage,'Ebar=',Ebar
 		!CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		!CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
 		!CALL ComputeLaborUnits(Ebar, wage) 
@@ -772,14 +785,15 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	!=========================================== SOLVING EXP NEXT =================================
 	! Solve the experimental economy  
 		solving_bench = 0  
-		tauK  = tauK_exp
-		rr    = rr_exp
-		wage  = wage_exp
-		Ebar  = Ebar_exp
-		tauW_bt  = tauW_bt_exp
-		tauW_at  = tauW_at_exp
-		psi   = psi_exp
-		tauPL = tauPL_exp
+		tauK    = tauK_exp
+		R       = R_exp
+		P       = P_exp
+		wage    = wage_exp
+		Ebar    = Ebar_exp
+		tauW_bt = tauW_bt_exp
+		tauW_at = tauW_at_exp
+		psi     = psi_exp
+		tauPL   = tauPL_exp
 		Y_a_threshold = Y_a_threshold_exp
 
 		Cons   = Cons_exp
@@ -787,7 +801,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		Aprime = Aprime_exp
 		DBN1   = DBN_exp 
 
-		!print*,' EXP: rr=',rr,'wage=',wage,'Ebar=',Ebar
+		!print*,' EXP: P=',P,'wage=',wage,'Ebar=',Ebar
 		!CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		!CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
 		!CALL ComputeLaborUnits(Ebar, wage) 
@@ -804,9 +818,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		OPEN (UNIT=90, FILE=trim(Result_Folder)//'dbn_by_age_z_exp', STATUS='replace')   
 		DO age=1,MaxAge 
 		    DO zi=1,nz
-		          temp_cons_by_z(zi)       = sum(Cons(age,:,zi,:,:)*DBN1(age,:,zi,:,:))/sum(DBN1(age,:,zi,:,:))
-		          temp_leisure_by_z(zi)    = sum((1.0_DP-HOURS(age,:,zi,:,:))*DBN1(age,:,zi,:,:))/sum(DBN1(age,:,zi,:,:))
-		          size_by_age_z_exp(age, zi)         = sum(DBN1(age,:,zi,:,:))
+		          temp_cons_by_z(zi)         = sum(Cons(age,:,zi,:,:)*DBN1(age,:,zi,:,:))/sum(DBN1(age,:,zi,:,:))
+		          temp_leisure_by_z(zi)      = sum((1.0_DP-HOURS(age,:,zi,:,:))*DBN1(age,:,zi,:,:))/sum(DBN1(age,:,zi,:,:))
+		          size_by_age_z_exp(age, zi) = sum(DBN1(age,:,zi,:,:))
 		    ENDDO ! zi
 		    WRITE  (UNIT=70, FMT=*) temp_cons_by_z
 		    WRITE  (UNIT=80, FMT=*) temp_leisure_by_z
@@ -1197,9 +1211,8 @@ SUBROUTINE GOVNT_BUDGET()
 	DO zi=1,nz
 	DO lambdai=1,nlambda
 	DO ei=1,ne
-	    GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei) * ( tauK*( rr*(agrid(ai)*zgrid(zi))**mu-DepRate*agrid(ai) )  	&
-	          & + (agrid(ai) + ( rr * (zgrid(zi) * agrid(ai) )**mu - DepRate*agrid(ai) ) *(1.0_DP-tauK)  )		&
-	          & - Y_a(agrid(ai),zgrid(zi)) 																		&	
+	    GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei) * ( tauK*( R*agrid(ai) + Pr_mat(ai,zi) )  	     &
+	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi) &	
 	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei)  												&
 	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei))**(1.0_DP-tauPL)  					&
 	          & + tauC * cons(age, ai, zi, lambdai,ei)  )   
@@ -1207,11 +1220,10 @@ SUBROUTINE GOVNT_BUDGET()
 	    GBAR_L = GBAR_L  + DBN1(age,ai,zi,lambdai,ei) * (  yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei) &
 	               &- psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei))**(1.0_DP-tauPL) )
 
-	    GBAR_K = GBAR_K + DBN1(age,ai,zi,lambdai,ei) * ( tauK*( rr*(agrid(ai)*zgrid(zi))**mu-DepRate*agrid(ai) ) )
+	    GBAR_K = GBAR_K + DBN1(age,ai,zi,lambdai,ei) * tauK*( R*agrid(ai) + Pr_mat(ai,zi) )
 
 	    GBAR_W = GBAR_W + DBN1(age,ai,zi,lambdai,ei) * &
-	            & ((agrid(ai) + ( rr * (zgrid(zi) * agrid(ai) )**mu - DepRate*agrid(ai) ) *(1.0_DP-tauK)  )		&
-	          	& - Y_a(agrid(ai),zgrid(zi)) )
+	            & (( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi) )
 
       	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei) * tauC * cons(age, ai, zi, lambdai,ei)
 	    
@@ -1270,8 +1282,11 @@ SUBROUTINE FIND_DBN_EQ()
 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		! Compute labor units 
 			CALL ComputeLaborUnits(Ebar, wage) 
-		! Form YGRID for the capital income economy given interest rate "rr"
-			CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		! Compute Capital demand and Profits by (a,z)
+			K_mat  = K_Matrix(R,P)
+			Pr_mat = Profit_Matrix(R,P)
+		! Form YGRID for the capital income economy given interest rate "P"
+			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 		! Solve for policy and value functions 
 			CALL EGM_RETIREMENT_WORKING_PERIOD 
 
@@ -1332,7 +1347,7 @@ SUBROUTINE FIND_DBN_EQ()
 	iter_indx = 1
 	!print*, 'Computing Equilibrium Distribution'
 	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. ( simutime .le. MaxSimuTime ) )
-		print*, 'Eq. Distribution difference=', DBN_dist
+		!print*, 'Eq. Distribution difference=', DBN_dist
 		!    print*, 'sum DBN1=', sum(DBN1)
 	    DBN2=0.0_DP
 
@@ -1431,6 +1446,7 @@ SUBROUTINE FIND_DBN_EQ()
 
 	    ! Update of policy function with current aggregates
 	    IF (iter_indx .ge. update_period) THEN
+	    	print*, 'Eq. Distribution difference=', DBN_dist
 
 	    	! Compute aggregates with current distribution
 	        QBAR =0.0
@@ -1440,7 +1456,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        DO a1=1,na
 	        DO lambda1=1,nlambda
 	        DO e1=1, ne
-	             QBAR= QBAR+ DBN1(age1, a1, z1, lambda1, e1) * ( zgrid(z1) *agrid(a1) )**mu
+	             QBAR= QBAR+ DBN1(age1, a1, z1, lambda1, e1) * ( zgrid(z1) *K_mat(a1,z1) )**mu
 	             NBAR= NBAR+ DBN1(age1, a1, z1, lambda1, e1) * eff_un(age1, lambda1, e1) * Hours(age1, a1, z1, lambda1,e1)
 	        ENDDO
 	        ENDDO
@@ -1449,11 +1465,14 @@ SUBROUTINE FIND_DBN_EQ()
 	        ENDDO    
 	    
 	        QBAR = ( QBAR)**(1.0_DP/mu)                
-	        rr   = alpha* QBAR **(alpha-mu) * NBAR **(1.0_DP-alpha)
+	        P    = alpha* QBAR **(alpha-mu) * NBAR **(1.0_DP-alpha)
 	        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
 	        wage = (1.0_DP-alpha)*QBAR **alpha * NBAR  **(-alpha)
 	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 	    	! print*,'DBN_dist=',DBN_dist, 'QBAR=', QBAR ,  'NBAR=', NBAR 
+
+	    	! Solve for new R 
+	    	R = zbrent(Agg_Debt,0.0_dp,0.10_dp,brent_tol) 
 
 
 	    	! Solve the model at current aggregate values
@@ -1463,8 +1482,11 @@ SUBROUTINE FIND_DBN_EQ()
 					CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 				! Compute labor units 
 					CALL ComputeLaborUnits(Ebar, wage) 
-				! Form YGRID for the capital income economy given interest rate "rr"
-					CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+				! Compute Capital demand and Profits by (a,z)
+					K_mat  = K_Matrix(R,P)
+					Pr_mat = Profit_Matrix(R,P)
+				! Form YGRID for the capital income economy given interest rate "P"
+					CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 				! Solve for policy and value functions 
 					CALL EGM_RETIREMENT_WORKING_PERIOD 
 	        
@@ -1549,6 +1571,21 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP), DIMENSION(nz) :: cdf_Gz_DBN 
 	REAL(dp), DIMENSION(na,nz) :: DBN_az, wealth
 	REAL(DP):: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz)
+
+	! Percentage of the population above threshold
+		! Compute distribution of agents by (a,z)
+		DBN_az = sum(sum(sum(DBN1,5),4),1)
+		! Compute mean before tax wealth
+		Wealth = Wealth_Matrix(R,P)
+		! Compute share of agents above threshold
+		Threshold_Share = 0.0_dp
+		do ai=1,na
+		do zi=1,nz 
+			if (Wealth(ai,zi).gt.Y_a_threshold) then 
+				Threshold_Share = Threshold_Share + DBN_az(ai,zi)
+			end if 
+		end do 
+		end do 
 
 	DO zi=1,nz
 	    cdf_Gz_DBN(zi) = sum(DBN1(:,:,zi,:,:))
@@ -1649,11 +1686,32 @@ SUBROUTINE COMPUTE_STATS()
 	DO ai=1,na
 	DO lambdai=1,nlambda
 	DO ei=1, ne
-	    MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei)*agrid(ai)         
-     	MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei)*(MBGRID(ai,zi)-1.0_DP)
-     	MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei)*agrid(ai)* &
-     	                            & (rr*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate)
-     	MeanCons     = MeanCons     + DBN1(age, ai, zi, lambdai, ei)*cons(age, ai, zi, lambdai, ei)
+	    MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei)*agrid(ai)
+	    MeanCons     = MeanCons     + DBN1(age, ai, zi, lambdai, ei)*cons(age, ai, zi, lambdai, ei)   
+
+	    if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
+	      MeanReturn = MeanReturn   + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)
+	      if (Wealth(ai,zi).lt.Y_a_Threshold) then 
+	      	MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * ((1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt)-1.0_DP)* agrid(ai)
+	      else  
+	      	MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * ((1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at)-1.0_DP)* agrid(ai)
+	      endif 
+	   else
+	      MeanReturn = MeanReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
+	       			& ( R + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP)-(R+DepRate))) 
+	      if (Wealth(ai,zi).lt.Y_a_Threshold) then 
+	      	MeanATReturn = MeanATReturn  +   DBN1(age, ai, zi, lambdai, ei) &
+		         & * ((1.0_DP+R*(1.0_DP-tauK))*(1.0_DP-tauW_bt) &
+		         & + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP) &
+		         & -(R+DepRate))*(1.0_DP-tauK)*(1.0_DP-tauW_bt) -1.0_DP)*agrid(ai) 
+		  else 
+		  	MeanATReturn = MeanATReturn  +   DBN1(age, ai, zi, lambdai, ei) &
+		         & * ((1.0_DP+R*(1.0_DP-tauK))*(1.0_DP-tauW_at) &
+		         & + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP) &
+		         & -(R+DepRate))*(1.0_DP-tauK)*(1.0_DP-tauW_at) -1.0_DP)*agrid(ai) 
+		  endif 
+	   endif      
+     	
 	ENDDO
 	ENDDO
 	ENDDO    
@@ -1680,10 +1738,32 @@ SUBROUTINE COMPUTE_STATS()
 	DO zi=1,nz
 	DO ai=1,na
 	DO lambdai=1,nlambda
-	DO ei=1, ne      
-	    VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP-MeanATReturn)**2.0_DP 
-     	VarReturn   = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai) / MeanWealth * &
-     	              & ((rr*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate) -MeanReturn)**2.0_DP 
+	DO ei=1, ne     
+	    if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
+		    VarReturn = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * (R-MeanReturn)**2.0_dp
+		    if (Wealth(ai,zi).lt.Y_a_Threshold) then 
+		    	VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+		    				&  (((1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt)-1.0_DP) - MeanATReturn)**2.0_dp
+		    else  
+		      	VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+		    				&  (((1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at)-1.0_DP) - MeanATReturn)**2.0_dp
+		   	endif 
+	   	else
+			VarReturn = VarReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * & 
+						& (( R + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP)-(R+DepRate))) -MeanReturn)**2.0_dp
+			if (Wealth(ai,zi).lt.Y_a_Threshold) then
+				VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+						& (  ((1.0_DP+R*(1.0_DP-tauK))*(1.0_DP-tauW_bt) &
+						& + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP) &
+						& -(R+DepRate))*(1.0_DP-tauK)*(1.0_DP-tauW_bt) -1.0_DP) )**2.0_dp
+			else 
+				VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+						& (  ((1.0_DP+R*(1.0_DP-tauK))*(1.0_DP-tauW_at) &
+						& + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP) &
+						& -(R+DepRate))*(1.0_DP-tauK)*(1.0_DP-tauW_at) -1.0_DP) )**2.0_dp
+			endif 
+	   	endif  
+
 	ENDDO
 	ENDDO
 	ENDDO    
@@ -1703,7 +1783,32 @@ SUBROUTINE COMPUTE_STATS()
 	DO ei=1, ne
 	     MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)
 	     MeanReturn_by_z(zi)   = MeanReturn_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * &
-	                                                   & (rr*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate)
+	                                                   & (P*mu*(zgrid(zi)**mu)*(agrid(ai)**(mu-1.0_DP))-DepRate)
+	    if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
+	      MeanReturn_by_z(zi) = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)
+	      if (Wealth(ai,zi).lt.Y_a_Threshold) then 
+	      	MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * agrid(ai) *  &
+	      	 						& ((1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt)-1.0_DP)
+	      else  
+	      	MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * agrid(ai) *  &
+	      	 						& ((1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at)-1.0_DP)
+	      endif 
+	    else
+	      MeanReturn_by_z(zi) = MeanReturn_by_z(zi)+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
+	       			& ( R + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP)-(R+DepRate))) 
+	      if (Wealth(ai,zi).lt.Y_a_Threshold) then 
+	      	MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi)  +   DBN1(age, ai, zi, lambdai, ei) &
+		         & * ((1.0_DP+R*(1.0_DP-tauK))*(1.0_DP-tauW_bt) &
+		         & + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP) &
+		         & -(R+DepRate))*(1.0_DP-tauK)*(1.0_DP-tauW_bt) -1.0_DP)*agrid(ai) 
+		  else 
+		  	MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi)  +   DBN1(age, ai, zi, lambdai, ei) &
+		         & * ((1.0_DP+R*(1.0_DP-tauK))*(1.0_DP-tauW_at) &
+		         & + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP) &
+		         & -(R+DepRate))*(1.0_DP-tauK)*(1.0_DP-tauW_at) -1.0_DP)*agrid(ai) 
+		  endif 
+	    endif 
+
 	     size_by_z(zi)         = size_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) 
 	     Wealth_by_z(zi) 	   = Wealth_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)
 	ENDDO
@@ -1711,23 +1816,18 @@ SUBROUTINE COMPUTE_STATS()
 	ENDDO    
 	ENDDO    
 	ENDDO    
-	MeanATReturn_by_z = MeanATReturn_by_z / size_by_z
+	MeanATReturn_by_z = MeanATReturn_by_z / Wealth_by_z
     MeanReturn_by_z   = MeanReturn_by_z   / Wealth_by_z
 
-	! Percentage of the population above threshold
-		! Compute distribution of agents by (a,z)
-		DBN_az = sum(sum(sum(DBN1,5),4),1)
-		! Compute mean before tax wealth
-		Wealth = spread(agrid,2,nz)+(rr*(spread(zgrid,1,na)*spread(agrid,2,nz))**mu-DepRate*spread(agrid,2,nz))*(1.0_DP-tauK)
-		! Compute share of agents above threshold
-		Threshold_Share = 0.0_dp
-		do ai=1,na
-		do zi=1,nz 
-			if (Wealth(ai,zi).gt.Y_a_threshold) then 
-				Threshold_Share = Threshold_Share + DBN_az(ai,zi)
-			end if 
-		end do 
-		end do 
+    ! Debt to GDP Ratio
+    External_Debt_GDP = 0.0_DP
+	DO zi=1,nz
+	DO ai=1,na
+	    External_Debt_GDP = External_Debt_GDP + sum(DBN1(:, ai, zi, :, :))* &
+	      & abs( K_mat(ai,zi) - agrid(ai)) 
+	ENDDO
+	ENDDO
+	External_Debt_GDP = 0.5_dp*External_Debt_GDP / YBAR
 
 	!print*, 'MeanReturn=',MeanReturn, 'StdReturn=', StdReturn
 	!print*,'MeanReturn_by_z=',MeanReturn_by_z
@@ -1739,7 +1839,7 @@ SUBROUTINE COMPUTE_STATS()
 	!print*,"Current parameters"
 	!print*,'beta',beta,'rho_z',rho_z,'sigma_z',sigma_z_eps,'sigma_lam',sigma_lambda_eps,'phi',phi
 	print*,"Statistics"
-	print*,'W/GDP',Wealth_Output,'Top 1%',prct1_wealth,'Top 10%',prct10_wealth
+	print*,'Debt/GDP',External_Debt_GDP,'W/GDP',Wealth_Output,'Top 1%',prct1_wealth,'Top 10%',prct10_wealth
 	print*,'STD Labor Earnings',Std_Log_Earnings_25_60,'Mean Labor (hours 25-60)',meanhours_25_60,'MeanReturn',MeanReturn
 	print*,'Moments',SSE_Moments 
 	!print*,''
@@ -1773,7 +1873,8 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	REAL(DP), DIMENSION(na_t+1) :: EndoCons, EndoYgrid, EndoHours
 	INTEGER , DIMENSION(na_t+1) :: sort_ind 
 	INTEGER  :: sw 
-	REAL(DP) :: Wealth, C_euler, C_foc, H_min, euler_power
+	REAL(DP) :: C_euler, C_foc, H_min, euler_power
+	REAL(DP), dimension(na_t,nz) :: Wealth
 
 
 	! Set a minimum value for labor to check in the FOC
@@ -1788,7 +1889,10 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 				euler_power = (-1.0_dp/sigma)
 		end if 
 
-		!print*, 'R=',rr, 'W=',wage, 'na=', na, 'na_t=', na_t
+	! Compute wealth given current R and P
+		Wealth = Wealth_Matrix_t(R,P)
+
+		print*, 'R=',R,'P=',P, 'W=',wage, 'na=', na, 'na_t=', na_t
 	!========================================================================================
 	!------RETIREMENT PERIOD-----------------------------------------------------------------
 
@@ -1818,13 +1922,12 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    EndoYgrid = big_p 
 	    sw 		  = 0
     DO ai=1,na_t
-    	Wealth = agrid_t(ai)+(rr*(zgrid(zi)*agrid_t(ai))**mu-DepRate*agrid_t(ai))*(1.0_DP-tauK)
-		if (abs(Wealth-Y_a_threshold).lt.1e-8) then 
+		if (abs(Wealth(ai,zi)-Y_a_threshold).lt.1e-8) then 
     		! Consumption on endogenous grid and implied asset income under tauW_bt
-    		EndoCons(ai)  = Cons_t(age+1,ai,zi,lambdai,ei) * (beta*survP(age)*MB_a_bt(agrid_t(ai),zgrid(zi)))**euler_power
+    		EndoCons(ai)  = Cons_t(age+1,ai,zi,lambdai,ei) * (beta*survP(age)*( 1.0_DP+R*(1.0_DP-tauK) )*(1.0_DP-tauW_bt))**euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! Consumption on endogenous grid and implied asset income under tauW_at
-	        EndoCons(na_t+1)  = Cons_t(age+1,ai,zi,lambdai,ei) * (beta*survP(age)*MB_a_at(agrid_t(ai),zgrid(zi)))**euler_power
+	        EndoCons(na_t+1)  = Cons_t(age+1,ai,zi,lambdai,ei)*(beta*survP(age)*(1.0_DP+R*(1.0_DP-tauK))*(1.0_DP-tauW_bt))**euler_power
 	    	EndoYgrid(na_t+1) = agrid_t(ai) +  EndoCons(na_t+1) - RetY_lambda_e(lambdai,ei)
 	    	! Set the flag!
 	    	sw                = 1 
@@ -1904,14 +2007,13 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    EndoHours = big_p 
 	    sw 		  = 0                    
         DO ai=1,na_t
-    	Wealth = agrid_t(ai)+(rr*(zgrid(zi)*agrid_t(ai))**mu-DepRate*agrid_t(ai))*(1.0_DP-tauK)
-		if (abs(Wealth-Y_a_threshold).lt.1e-8) then 
+		if (abs(Wealth(ai,zi)-Y_a_threshold).lt.1e-8) then 
 	    	! Below threshold
-			call EGM_Working_Period( MB_a_bt(agrid_t(ai),zgrid(zi)) , H_min , & 
+			call EGM_Working_Period( ( 1.0_DP+R*(1.0_DP-tauK) )*(1.0_DP-tauW_bt) , H_min , & 
 			      & EndoCons(ai), EndoHours(ai) , EndoYgrid(ai)  )
 			
 			! Above threshold
-			call EGM_Working_Period( MB_a_at(agrid_t(ai),zgrid(zi)) , H_min , & 
+			call EGM_Working_Period(( 1.0_DP+R*(1.0_DP-tauK) )*(1.0_DP-tauW_at) , H_min , & 
 			      & EndoCons(na_t+1), EndoHours(na_t+1) , EndoYgrid(na_t+1)  )
 
 			! Set the flag!
@@ -2142,7 +2244,7 @@ Subroutine Find_TauW_Threshold(DBN_in,Y_a_threshold_out)
 		! Compute distribution of agents by (a,z)
 		DBN_az = sum(sum(sum(DBN_in,5),4),1)
 		! Compute mean before tax wealth
-		Wealth = spread(agrid,2,nz)+(rr*(spread(zgrid,1,na)*spread(agrid,2,nz))**mu-DepRate*spread(agrid,2,nz))*(1.0_DP-tauK)
+		Wealth = Wealth_Matrix(R,P)
 		! Mean Wealth
 		Mean_Wealth = sum( Wealth*DBN_az )
 		! Set threshold
@@ -2177,33 +2279,145 @@ Subroutine Find_TauW_Threshold(DBN_in,Y_a_threshold_out)
 
 end Subroutine Find_TauW_Threshold
 
+!========================================================================================
+!========================================================================================
+!========================================================================================
+! This function computes the capital demand matrix for agents of type (a,z)
+! The function uses the interest rate R, price of intermediate good P
+
+Function K_Matrix(R_in,P_in)
+	Implicit None 
+	real(dp), intent(in)       :: R_in, P_in
+	real(dp), dimension(na,nz) :: K_Matrix
+	integer :: i,j
+
+	K_Matrix = min( theta*spread(agrid,2,nz) , (mu*P_in*spread(zgrid,1,na)/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+
+end Function K_Matrix
+
+Function K_Matrix_t(R_in,P_in)
+	Implicit None 
+	real(dp), intent(in)         :: R_in, P_in
+	real(dp), dimension(na_t,nz) :: K_Matrix_t
+	integer :: i,j
+
+	K_Matrix_t = min( theta*spread(agrid_t,2,nz) , (mu*P_in*spread(zgrid,1,na_t)/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+
+end Function K_Matrix_t
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+! This function computes the profit matrix for agents of type (a,z)
+! The function uses the interest rate R, price of intermediate good P
+
+Function Profit_Matrix(R_in,P_in)
+	Implicit None 
+	real(dp), intent(in)       :: R_in, P_in
+	real(dp), dimension(na,nz) :: Profit_Matrix
+	real(dp), dimension(na,nz) :: K
+	integer :: i,j
+
+	K = K_matrix(R_in,P_in)
+
+	Profit_Matrix = P_in*(spread(zgrid,1,na)*K)**mu - (R_in+DepRate)*K
+
+end Function Profit_Matrix
+
+Function Profit_Matrix_t(R_in,P_in)
+	Implicit None 
+	real(dp), intent(in)         :: R_in, P_in
+	real(dp), dimension(na_t,nz) :: Profit_Matrix_t
+	real(dp), dimension(na_t,nz) :: K
+	integer :: i,j
+
+	K = K_matrix_t(R_in,P_in)
+
+	Profit_Matrix_t = P_in*(spread(zgrid,1,na_t)*K)**mu - (R_in+DepRate)*K
+
+end Function Profit_Matrix_t
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+! This function computes the before wealth tax wealth matrix for agents of type (a,z) on agrid_t
+! The function uses the interest rate R, price of intermediate good P
+
+Function Wealth_Matrix(R_in,P_in)
+	Implicit None 
+	real(dp), intent(in)       :: R_in, P_in
+	real(dp), dimension(na,nz) :: Wealth_Matrix
+	real(dp), dimension(na,nz) :: K, Pr
+	integer :: i,j
+
+	K = K_matrix(R_in,P_in)
+
+	Pr = Profit_Matrix(R_in,P_in)
+
+	Wealth_Matrix = ( (1.0_dp+R_in*(1.0_DP-tauK))*spread(agrid,2,nz) +  Pr *(1.0_DP-tauK) )
+
+end Function Wealth_Matrix
+
+Function Wealth_Matrix_t(R_in,P_in)
+	Implicit None 
+	real(dp), intent(in)         :: R_in, P_in
+	real(dp), dimension(na_t,nz) :: Wealth_Matrix_t
+	real(dp), dimension(na_t,nz) :: K, Pr
+	integer :: i,j
+
+	K = K_matrix_t(R_in,P_in)
+
+	Pr = Profit_Matrix_t(R_in,P_in)
+
+	Wealth_Matrix_t = ( (1.0_dp+R_in*(1.0_DP-tauK))*spread(agrid_t,2,nz) +  Pr *(1.0_DP-tauK) )
+
+end Function Wealth_Matrix_t
+
+!========================================================================================
+!========================================================================================
+! This function computes the difference between capital demand and supply
+! The function uses the interest rate R and implicitely the price of intermediate good P and distribution DBN1
+
+Function Agg_Debt(R_in)
+	Implicit None 
+	real(dp), intent(in) :: R_in
+	real(dp)             :: Agg_Debt
+	real(dp), dimension(na,nz) :: DBN_az
+
+	DBN_az   = sum(sum(sum(DBN1,5),4),1)
+
+	Agg_Debt = sum(DBN_az*(K_matrix(R_in,P)-spread(agrid,2,nz)))
+
+end Function Agg_Debt
+
 
 !========================================================================================
 !========================================================================================
 !========================================================================================
 ! THIS YGRID and Marginal Benefit of Investment GRID 
-! NEEDS TO BE COMPUTED FOR EACH TIME THE INTEREST RATE "rr" IS UPDATED. 
+! NEEDS TO BE COMPUTED FOR EACH TIME THE INTEREST RATE "P" IS UPDATED. 
 
-SUBROUTINE FORM_Y_MB_GRID(TYGRID, TMBGRID,TYGRID_t,TMBGRID_t)
+SUBROUTINE FORM_Y_MB_GRID(TYGRID,TMBGRID,TYGRID_t,TMBGRID_t)
 	IMPLICIT NONE
 	REAL(DP), DIMENSION(na,nz),   INTENT(OUT) :: TYGRID, TMBGRID
 	REAL(DP), DIMENSION(na_t,nz), INTENT(OUT) :: TYGRID_t, TMBGRID_t
-	!REAL(DP), INTENT(IN) :: rr
+	!REAL(DP), INTENT(IN) :: P
 	!integer :: ai, zi
 
 	DO zi=1,nz
 		DO ai=1,na
-		! Asset income grid (by current asset -ai- and entrepreneurial ability -zi-)
-		TYGRID(ai,zi)  = Y_a(agrid(ai),zgrid(zi))
-		! Asset marginal benefit grid (by current asset -ai- and entrepreneurial ability -zi-)
-	    TMBGRID(ai,zi) = MB_a(agrid(ai),zgrid(zi))
-		ENDDO
-		DO ai=1,na_t
-		! Asset income grid (by current asset -ai- and entrepreneurial ability -zi-)
-		TYGRID_t(ai,zi)  = Y_a(agrid_t(ai),zgrid(zi))
-		! Asset marginal benefit grid (by current asset -ai- and entrepreneurial ability -zi-)
-	    TMBGRID_t(ai,zi) = MB_a(agrid_t(ai),zgrid(zi))
-		ENDDO
+			TYGRID(ai,zi)  = Y_a(agrid(ai),zgrid(zi))
+			TMBGRID(ai,zi) = MB_a(agrid(ai),zgrid(zi))
+		ENDDO 
+		if (Y_a_threshold.eq.0.0_dp) then
+			TYGRID_t  = TYGRID
+			TMBGRID_t = TMBGRID 
+		else 
+			DO ai=1,na_t
+				TYGRID_t(ai,zi)  = Y_a(agrid_t(ai),zgrid(zi))
+				TMBGRID_t(ai,zi) = MB_a(agrid(ai),zgrid(zi))
+			ENDDO
+		endif 
 	ENDDO
 
 	!print *, "Grid for asset income"
@@ -2628,11 +2842,13 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'EBAR'	, EBAR
 			WRITE(UNIT=19, FMT=*) 'YBAR'	, YBAR
 			WRITE(UNIT=19, FMT=*) 'CBAR'    , MeanCons
-			WRITE(UNIT=19, FMT=*) 'rr'		, rr
+			WRITE(UNIT=19, FMT=*) 'P'		, P
 			WRITE(UNIT=19, FMT=*) 'wage'	, wage
+			WRITE(UNIT=19, FMT=*) 'R'		, R
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) "Moments:"
 			WRITE(UNIT=19, FMT=*) " "
+			WRITE(UNIT=19, FMT=*) "Debt_Output"		  		, External_Debt_GDP
 			WRITE(UNIT=19, FMT=*) "Wealth_Output"		  	, Wealth_Output
 			WRITE(UNIT=19, FMT=*) "Mean_Assets"				, MeanWealth
 			WRITE(UNIT=19, FMT=*) "Bequest_Wealth/Wealth"	, Bequest_Wealth
@@ -2685,7 +2901,7 @@ SUBROUTINE Write_Benchmark_Results(read_write)
 		bench_folder = './SU_PT_Results/Bench_Files/'
 	end if 
 
-		bench_folder = './Test_SU_s1/Bench_Files/'
+		bench_folder = './Test_F_NSU_s4/Bench_Files/'
 
 		call system( 'mkdir -p ' // trim(bench_folder) )
 		print*, "Bench Files Folder:", bench_folder
@@ -2719,8 +2935,11 @@ SUBROUTINE Write_Benchmark_Results(read_write)
 		OPEN  (UNIT=9,  FILE=trim(bench_folder)//'QBAR'  , STATUS='replace')
 		WRITE (UNIT=9,  FMT=*) QBAR
 		CLOSE (UNIT=9)
-		OPEN  (UNIT=10, FILE=trim(bench_folder)//'rr'    , STATUS='replace')
-		WRITE (UNIT=10, FMT=*) rr
+		OPEN  (UNIT=10, FILE=trim(bench_folder)//'P'    , STATUS='replace')
+		WRITE (UNIT=10, FMT=*) P
+		CLOSE (UNIT=10)
+		OPEN  (UNIT=10, FILE=trim(bench_folder)//'R'    , STATUS='replace')
+		WRITE (UNIT=10, FMT=*) R
 		CLOSE (UNIT=10)
 		OPEN  (UNIT=11, FILE=trim(bench_folder)//'wage'  , STATUS='replace')
 		WRITE (UNIT=11, FMT=*) wage 
@@ -2740,7 +2959,8 @@ SUBROUTINE Write_Benchmark_Results(read_write)
 		OPEN (UNIT=7,  FILE=trim(bench_folder)//'EBAR'  , STATUS='old', ACTION='read')
 		OPEN (UNIT=8,  FILE=trim(bench_folder)//'NBAR'  , STATUS='old', ACTION='read')
 		OPEN (UNIT=9,  FILE=trim(bench_folder)//'QBAR'  , STATUS='old', ACTION='read')
-		OPEN (UNIT=10, FILE=trim(bench_folder)//'rr'    , STATUS='old', ACTION='read')
+		OPEN (UNIT=10, FILE=trim(bench_folder)//'P'     , STATUS='old', ACTION='read')
+		OPEN (UNIT=13, FILE=trim(bench_folder)//'R'     , STATUS='old', ACTION='read')
 		OPEN (UNIT=11, FILE=trim(bench_folder)//'wage'  , STATUS='old', ACTION='read')
 		OPEN (UNIT=12, FILE=trim(bench_folder)//'YBAR'  , STATUS='old', ACTION='read')
 
@@ -2753,7 +2973,8 @@ SUBROUTINE Write_Benchmark_Results(read_write)
 		READ (UNIT=7,  FMT=*), EBAR
 		READ (UNIT=8,  FMT=*), NBAR
 		READ (UNIT=9,  FMT=*), QBAR
-		READ (UNIT=10, FMT=*), rr
+		READ (UNIT=10, FMT=*), P
+		READ (UNIT=13, FMT=*), R
 		READ (UNIT=11, FMT=*), wage 
 		READ (UNIT=12, FMT=*), YBAR
 
@@ -2769,6 +2990,7 @@ SUBROUTINE Write_Benchmark_Results(read_write)
 		CLOSE (unit=10)
 		CLOSE (unit=11)
 		CLOSE (unit=12)
+		CLOSE (unit=13)
 
 		print*, "Reading of benchmark results completed"
 	END IF 
@@ -2807,8 +3029,11 @@ SUBROUTINE Write_Experimental_Results()
 	OPEN  (UNIT=9,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_QBAR'  , STATUS='replace')
 	WRITE (UNIT=9,  FMT=*) QBAR
 	CLOSE (UNIT=9)
-	OPEN  (UNIT=10, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_rr'    , STATUS='replace')
-	WRITE (UNIT=10, FMT=*) rr
+	OPEN  (UNIT=10, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_P'    , STATUS='replace')
+	WRITE (UNIT=10, FMT=*) P
+	CLOSE (UNIT=10)
+	OPEN  (UNIT=10, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_R'    , STATUS='replace')
+	WRITE (UNIT=10, FMT=*) R
 	CLOSE (UNIT=10)
 	OPEN  (UNIT=11, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_wage'  , STATUS='replace')
 	WRITE (UNIT=11, FMT=*) wage 

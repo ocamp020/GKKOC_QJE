@@ -103,7 +103,7 @@ PROGRAM main
 
 		
 		write(Result_Folder,'(f4.2)') Threshold_Factor
-		Result_Folder = './Test_NSU_s4/Factor_'//trim(Result_Folder)//'/'
+		Result_Folder = './Test_F_NSU_s4/Factor_'//trim(Result_Folder)//'/'
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
@@ -124,8 +124,8 @@ PROGRAM main
 
 	! Set initia lvalues of R, Wage, Ebar to find equilibrium
 		! ------- DO NOT REMOVE THE LINES BELOW
-
-		rr    =  4.906133597851297E-002 
+		R     =  0.05_dp
+		P     =  4.906133597851297E-002 
 		wage  =  1.97429920063330 
 		Ebar  =  1.82928004963637  
 		Ebar_bench = Ebar
@@ -175,7 +175,7 @@ PROGRAM main
 		QBAR_bench  = QBAR 
 		NBAR_bench  = NBAR 
 		Ebar_bench  = EBAR
-		rr_bench    = rr
+		P_bench     = P
 		wage_bench  = wage
 		Y_bench     = YBAR
 		tauK_bench  = tauK
@@ -193,7 +193,7 @@ PROGRAM main
 		Aprime_bench        = Aprime 
 
 		write(*,*) "Benchmark variables"
-		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"rr=",rr,"wage=",wage
+		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"P=",P,"wage=",wage,'R=',R
 
 	!====================================================================================================
 	PRINT*,''
@@ -290,7 +290,7 @@ PROGRAM main
 		NBAR_exp  = NBAR  
 		Y_exp 	  = YBAR
 		Ebar_exp  = EBAR
-		rr_exp    = rr
+		P_exp     = P
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
