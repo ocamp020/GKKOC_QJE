@@ -261,7 +261,7 @@ PROGRAM main
 			print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
 			print*,''
 			print*,'Bisection for TauW:'
-			DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.1 ) ! as long as the difference is greater than 0.1% continue
+			DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.001 ) ! as long as the difference is greater than 0.1% continue
 			    if (GBAR_exp .gt. GBAR_bench ) then
 			        tauW_up_bt  = tauW_bt 
 			        tauW_up_at  = tauW_at 
