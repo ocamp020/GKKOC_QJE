@@ -1467,7 +1467,7 @@ SUBROUTINE FIND_DBN_EQ()
 
 	    ! Update of policy function with current aggregates
 	    IF (iter_indx .ge. update_period) THEN
-	    	print*, 'Eq. Distribution difference=', DBN_dist
+	    	print*, 'Eq. Distribution difference=', DBN_dist, 'R=',R,'P=',P
 
 	    	! Compute aggregates with current distribution
 	        QBAR =0.0
