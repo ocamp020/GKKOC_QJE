@@ -27,10 +27,10 @@ Flags = -fbounds-check
 
 # Compile all the modules in the main folder. Modules are saved as .f90 files. 
 $(Folder)/%.o: %.F90
-	gfortran -J$(Folder) -c $< -o $@
+	gfortran -O2 -J$(Folder) -c $< -o $@
 
 $(Folder)/%.o: %.f90
-	gfortran -J$(Folder) -c $< -o $@
+	gfortran -O2 -J$(Folder) -c $< -o $@
 
 # Compile and execute programs
 Sergio_Simple.a: GKK_simple.f95 $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o
@@ -97,3 +97,4 @@ GKK_Calibration.a: $(GO_Folder)/GlobalSearch.f95 $(Objects_Main) $(Objects_GO)
 clean: 
 	cd $(Folder)
 	rm -f *.o *.mod *.a
+	cd ..

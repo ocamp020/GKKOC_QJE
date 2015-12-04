@@ -111,6 +111,7 @@ PROGRAM main
 		print*,'na=',na,'update_period=',update_period
 		print*, "NSU_Switch=",NSU_Switch,'sigma=',sigma,'gamma=',gamma,'phi',phi
 		print*,'Labor Taxes: tauPl=',tauPl,'psi',psi
+		print*, 'Borrowing Constraint: Theta=',theta
 
 
 	! Set parameters to be used in all simulations economy
