@@ -1493,7 +1493,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    	! print*,'DBN_dist=',DBN_dist, 'QBAR=', QBAR ,  'NBAR=', NBAR 
 
 	    	! Solve for new R 
-	    	R = zbrent(Agg_Debt,0.0_dp,0.10_dp,brent_tol) 
+	    	R = zbrent(Agg_Debt,0.0_dp,0.20_dp,brent_tol) 
 
 
 	    	! Solve the model at current aggregate values
