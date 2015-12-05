@@ -177,6 +177,7 @@ PROGRAM main
 		NBAR_bench  = NBAR 
 		Ebar_bench  = EBAR
 		P_bench     = P
+		R_bench     = R
 		wage_bench  = wage
 		Y_bench     = YBAR
 		tauK_bench  = tauK
@@ -292,6 +293,7 @@ PROGRAM main
 		Y_exp 	  = YBAR
 		Ebar_exp  = EBAR
 		P_exp     = P
+		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
