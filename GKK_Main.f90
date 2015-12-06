@@ -30,6 +30,8 @@ PROGRAM main
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
 		logical  :: read_write_bench
+	! Auxiliary variable for writing file
+		character(4) :: string_theta
 
 	! Switch for solving benchmark or just reading resutls
 		! If read_write_bench==.true. then just read resutls
@@ -90,20 +92,17 @@ PROGRAM main
 
 	! Resutls Folder
 		write(Result_Folder,'(f4.2)') Threshold_Factor
+		write(string_theta,'(f4.2)')  theta
 
 		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './NSU_LT_Results/Factor_'//trim(Result_Folder)//'/'
+			Result_Folder = './NSU_F_LT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './NSU_PT_Results/Factor_'//trim(Result_Folder)//'/'
+			Result_Folder = './NSU_F_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './SU_LT_Results/Factor_'//trim(Result_Folder)//'/'
+			Result_Folder = './SU_F_LT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './SU_PT_Results/Factor_'//trim(Result_Folder)//'/'
+			Result_Folder = './SU_F_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if 
-
-		
-		write(Result_Folder,'(f4.2)') Threshold_Factor
-		Result_Folder = './Test_F_NSU_s4/Factor_'//trim(Result_Folder)//'/'
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )

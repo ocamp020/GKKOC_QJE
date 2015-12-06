@@ -2861,19 +2861,19 @@ END SUBROUTINE WRITE_VARIABLES
 SUBROUTINE Write_Benchmark_Results(read_write)
 	IMPLICIT NONE
 	logical :: read_write
-	character(100) :: bench_folder
+	character(100) :: bench_folder, string_theta
+
+	write(string_theta,'(f4.2)')  theta
 
 	if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-		bench_folder = './NSU_LT_Results/Bench_Files/'
+		bench_folder = './NSU_F_LT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
 	else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-		bench_folder = './NSU_PT_Results/Bench_Files/'
+		bench_folder = './NSU_F_PT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
 	else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-		bench_folder = './SU_LT_Results/Bench_Files/'
+		bench_folder = './SU_F_LT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
 	else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-		bench_folder = './SU_PT_Results/Bench_Files/'
+		bench_folder = './SU_F_PT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
 	end if 
-
-		bench_folder = './Test_F_NSU_s4/Bench_Files/'
 
 		call system( 'mkdir -p ' // trim(bench_folder) )
 		print*, "Bench Files Folder:", bench_folder
