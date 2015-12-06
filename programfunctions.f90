@@ -1467,7 +1467,6 @@ SUBROUTINE FIND_DBN_EQ()
 
 	    ! Update of policy function with current aggregates
 	    IF (iter_indx .ge. update_period) THEN
-	    	print*, 'Eq. Distribution difference=', DBN_dist, 'R=',R,'P=',P
 
 	    	! Compute aggregates with current distribution
 	        QBAR =0.0
@@ -1490,11 +1489,11 @@ SUBROUTINE FIND_DBN_EQ()
 	        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
 	        wage = (1.0_DP-alpha)*QBAR **alpha * NBAR  **(-alpha)
 	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
-	    	! print*,'DBN_dist=',DBN_dist, 'QBAR=', QBAR ,  'NBAR=', NBAR 
 
 	    	! Solve for new R 
 	    	R = zbrent(Agg_Debt,0.0_dp,0.20_dp,brent_tol) 
 
+	    	print*, 'Eq. Distribution difference=', DBN_dist, 'R=',R,'P=',P
 
 	    	! Solve the model at current aggregate values
 				! Find the threshold for wealth taxes (a_bar)
