@@ -1332,7 +1332,6 @@ SUBROUTINE FIND_DBN_EQ()
 	iter_indx = 1
 	!print*, 'Computing Equilibrium Distribution'
 	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. ( simutime .le. MaxSimuTime ) )
-		print*, 'Eq. Distribution difference=', DBN_dist
 		!    print*, 'sum DBN1=', sum(DBN1)
 	    DBN2=0.0_DP
 
@@ -1454,6 +1453,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        wage = (1.0_DP-alpha)*QBAR **alpha * NBAR  **(-alpha)
 	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 	    	! print*,'DBN_dist=',DBN_dist, 'QBAR=', QBAR ,  'NBAR=', NBAR 
+	    	print*, 'Eq. Distribution difference=', DBN_dist, 'rr=', rr
 
 
 	    	! Solve the model at current aggregate values
@@ -2687,7 +2687,7 @@ SUBROUTINE Write_Benchmark_Results(read_write)
 		bench_folder = './SU_PT_Results/Bench_Files/'
 	end if 
 
-		bench_folder = './Test_SU_s1/Bench_Files/'
+		bench_folder = './Test_NSU_s1/Bench_Files/'
 
 		call system( 'mkdir -p ' // trim(bench_folder) )
 		print*, "Bench Files Folder:", bench_folder

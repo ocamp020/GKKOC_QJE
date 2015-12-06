@@ -44,7 +44,7 @@ PROGRAM main
 	! Switch for log utility 
 		! If Log_Switch==.true. then utility is log
 		! If Log_Switch==.false. then utility is not log
-		Log_Switch = .false.
+		Log_Switch = .true.
 
 	! Switch for labor taxes
 		! If Progressive_Tax_Switch==.true. then use progressive taxes
@@ -103,7 +103,7 @@ PROGRAM main
 
 		
 		write(Result_Folder,'(f4.2)') Threshold_Factor
-		Result_Folder = './Test_NSU_s4/Factor_'//trim(Result_Folder)//'/'
+		Result_Folder = './Test_NSU_s1/Factor_'//trim(Result_Folder)//'/'
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
