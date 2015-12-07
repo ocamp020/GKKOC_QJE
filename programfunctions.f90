@@ -152,7 +152,7 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)              :: Y_a, K, Pr
 
 		! Capital demand 
-		K   = min( theta*a_in , (mu*P*z_in/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta*a_in , (mu*P*z_in**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Profits 
 		Pr  = P*(z_in*K)**mu - (R+DepRate)*K
 		! Before tax wealth
@@ -187,7 +187,7 @@ end Subroutine Asset_Grid_Threshold
 
 
 		! Capital demand 
-		K   = min( theta*a_in , (mu*P*z_in/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta*a_in , (mu*P*z_in**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Profits 
 		Pr  = P*(z_in*K)**mu - (R+DepRate)*K
 		! Before tax wealth
@@ -214,7 +214,7 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)			  :: MB_a_at, K
 
 		! Capital demand 
-		K   = min( theta*a_in , (mu*P*z_in/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta*a_in , (mu*P*z_in**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
 		if (K.lt.theta*a_in) then 
 			MB_a_at = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at) 
@@ -231,7 +231,7 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)             :: MB_a_bt, K
 
 		! Capital demand 
-		K   = min( theta*a_in , (mu*P*z_in/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta*a_in , (mu*P*z_in**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
 		if (K.lt.theta*a_in) then 
 			MB_a_bt = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt) 
@@ -895,8 +895,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		         temp_ce_by_z(zi) = 100*sum(Cons_Eq_Welfare(age,:,zi,:,:)*DBN_bench(age,:,zi,:,:))/sum(DBN_bench(age,:,zi,:,:))
 		    ENDDO
 		    WRITE  (UNIT=80, FMT=*) temp_ce_by_z
-		    print*,'age=',age, temp_ce_by_z, ', mean:  ', &
-		        & 100*sum(Cons_Eq_Welfare(age,:,:,:,:)*DBN_bench(age,:,:,:,:))/sum(DBN_bench(age,:,:,:,:))
+		    !print*,'age=',age, temp_ce_by_z, ', mean:  ', &
+		    !    & 100*sum(Cons_Eq_Welfare(age,:,:,:,:)*DBN_bench(age,:,:,:,:))/sum(DBN_bench(age,:,:,:,:))
 		ENDDO
 
 		CE_NEWBORN = 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN_bench(1,:,:,:,:))/sum(DBN_bench(1,:,:,:,:))
@@ -1291,6 +1291,7 @@ SUBROUTINE FIND_DBN_EQ()
 	IMPLICIT NONE
 	INTEGER:: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx
 	REAL   :: DBN_dist, DBN_criteria
+	real(dp)   ::BBAR, MeanWealth
 	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: PrAprimelo, PrAprimehi, DBN2
 	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne) :: Aplo, Aphi
 
@@ -1491,9 +1492,22 @@ SUBROUTINE FIND_DBN_EQ()
 	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 
 	    	! Solve for new R 
-	    	R = zbrent(Agg_Debt,0.0_dp,0.20_dp,brent_tol) 
+	    	R = zbrent(Agg_Debt,0.0_dp,0.50_dp,brent_tol) 
 
-	    	print*, 'Eq. Distribution difference=', DBN_dist, 'R=',R,'P=',P
+! 	    	MeanWealth=0.0_DP
+! 		        DO a1=1,na
+! 		            MeanWealth = MeanWealth + sum(DBN1(:, a1, :, :, :))*agrid(a1)
+! 		        ENDDO
+! 	    	BBAR =0.0_DP          
+! 				DO z1=1,nz
+! 				DO a1=1,na
+! 					BBAR = BBAR + sum(DBN1(:, a1, z1, :, :))* &
+! 						  & ( min((mu*P*zgrid(z1)**mu/(R+DepRate))**(1.0_DP/(1.0_DP-mu)),theta*agrid(a1)) &
+! 						  & - agrid(a1)) 
+! 				ENDDO
+! 				ENDDO
+
+	    	print*, 'Eq. Distribution difference=', DBN_dist, "Residual Funciton", Agg_Debt(R), 'R=',R,'P=',P
 
 	    	! Solve the model at current aggregate values
 				! Find the threshold for wealth taxes (a_bar)
@@ -1863,7 +1877,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	! Compute wealth given current R and P
 		Wealth = Wealth_Matrix_t(R,P)
 
-		print*, 'R=',R,'P=',P, 'W=',wage, 'na=', na, 'na_t=', na_t
+		!print*, 'R=',R,'P=',P, 'W=',wage, 'na=', na, 'na_t=', na_t
 	!========================================================================================
 	!------RETIREMENT PERIOD-----------------------------------------------------------------
 
@@ -2262,7 +2276,7 @@ Function K_Matrix(R_in,P_in)
 	real(dp), dimension(na,nz) :: K_Matrix
 	integer :: i,j
 
-	K_Matrix = min( theta*spread(agrid,2,nz) , (mu*P_in*spread(zgrid,1,na)/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+	K_Matrix = min( theta*spread(agrid,2,nz) , (mu*P_in*spread(zgrid,1,na)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
 end Function K_Matrix
 
@@ -2272,7 +2286,7 @@ Function K_Matrix_t(R_in,P_in)
 	real(dp), dimension(na_t,nz) :: K_Matrix_t
 	integer :: i,j
 
-	K_Matrix_t = min( theta*spread(agrid_t,2,nz) , (mu*P_in*spread(zgrid,1,na_t)/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+	K_Matrix_t = min( theta*spread(agrid_t,2,nz) , (mu*P_in*spread(zgrid,1,na_t)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
 end Function K_Matrix_t
 
@@ -2354,10 +2368,13 @@ Function Agg_Debt(R_in)
 	real(dp), intent(in) :: R_in
 	real(dp)             :: Agg_Debt
 	real(dp), dimension(na,nz) :: DBN_az
+	real(dp)             :: Wealth 
 
 	DBN_az   = sum(sum(sum(DBN1,5),4),1)
 
-	Agg_Debt = sum(DBN_az*(K_matrix(R_in,P)-spread(agrid,2,nz)))
+	Wealth   = sum( sum(sum(sum(sum(DBN1,5),4),3),1)*agrid )
+
+	Agg_Debt = sum(DBN_az*(K_matrix(R_in,P)-spread(agrid,2,nz)))/Wealth 
 
 end Function Agg_Debt
 
