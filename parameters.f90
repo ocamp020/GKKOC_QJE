@@ -18,15 +18,15 @@ MODULE parameters
     ! Permanent labor earnings componenet (lambda)
     REAL(DP), PARAMETER      :: rho_lambda=0.5_DP 
     REAL(DP)             	 :: sigma_lambda_eps
-    INTEGER(I4B),  PARAMETER :: nlambda=1         ! Number of grid points
+    INTEGER(I4B),  PARAMETER :: nlambda=5         ! Number of grid points
 
     ! Transitory labor earnings componenet (e)
     REAL(DP), PARAMETER  	 :: rho_e=0.9_DP, sigma_e_eps=0.20_DP
-    INTEGER(I4B),  PARAMETER :: ne=1              ! Number of grid points
+    INTEGER(I4B),  PARAMETER :: ne=5              ! Number of grid points
 
     ! Entrepreneurial ability (z)
     REAL(DP)         	     :: rho_z, sigma_z_eps, mu_z
-    INTEGER(I4B),  PARAMETER :: nz=1              ! Number of grid points
+    INTEGER(I4B),  PARAMETER :: nz=7              ! Number of grid points
 
  
 
