@@ -1881,7 +1881,7 @@ DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. ( simutime .le. MaxSimuTime ) )
                 Aplo(age,ai,zi,lambdai, ei)  = tklo
                 Aphi(age,ai,zi,lambdai, ei)  = tkhi        
                 PrAprimelo(age,ai,zi,lambdai, ei) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei) ) / ( agrid(tkhi) -agrid(tklo) )
-                PrAprimehi(age,ai,zi,lambdai, ei) = ( Aprime(age,ai,zi,lambdai, ei) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )            
+                PrAprimehi(age,ai,zi,lambdai, ei) = ( Aprime(age,ai,zi,lambdai, ei) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
         ENDDO
         ENDDO
         ENDDO
@@ -2242,7 +2242,7 @@ DO age=MaxAge-1,RetAge,-1
               DO ai=tempai,na               
                     ! CONSUMPTION ON EXOGENOUS GRIDS
                     Cons(age, ai, zi, lambdai, ei) = Linear_Int(EndoYgrid, &
-                                        & EndoCons,na, YGRID(ai,zi))                                                                                 
+                                        & EndoCons,na, YGRID(ai,zi)) 
                     Aprime(age, ai, zi, lambdai,ei) = YGRID(ai,zi)+ RetY_lambda_e(lambdai,ei)  &
                                         & - Cons(age, ai, zi, lambdai, ei)                                         
                        If   (Aprime(age, ai, zi, lambdai,ei)  .lt. amin) then
