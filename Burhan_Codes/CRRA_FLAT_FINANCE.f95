@@ -26,7 +26,7 @@ MODULE parameters
 
 
    ! Financial constraint parameter
-  REAL(DP), PARAMETER :: vartheta=1.0_DP 
+  REAL(DP), PARAMETER :: vartheta=4.0_DP 
 
 
     
