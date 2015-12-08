@@ -95,6 +95,4 @@ GKK_Calibration.a: $(GO_Folder)/GlobalSearch.f90 $(Objects_Main) $(Objects_GO)
 #----------------------------------------------------------------------------------
 
 clean: 
-	cd $(Folder)
-	rm -f *.o *.mod *.a
-	cd ..
+	cd $(Folder) & rm -f *.o *.mod *.a & cd ..
