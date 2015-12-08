@@ -36,7 +36,7 @@ PROGRAM main
 	! Switch for solving benchmark or just reading resutls
 		! If read_write_bench==.true. then just read resutls
 		! If read_write_bench==.false. then solve for benchmark and store results
-		read_write_bench = .true.
+		read_write_bench = .false.
 
 	! Switch for separable and non-separable utility
 		! If NSU_Switch==.true. then do non-separable utility

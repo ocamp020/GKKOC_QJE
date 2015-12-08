@@ -1488,25 +1488,25 @@ DO ai=1,na
     DO zi=1,nz
         DO lambdai=1,nlambda          
               DO ei=1,ne
-                  if ( Aprime(age,ai,zi,lambdai, ei) .ge. amax) then
-                        tklo =na-1
-                        elseif (Aprime(age,ai,zi,lambdai, ei) .lt. amin) then
-                             tklo = 1
-                            else
-                                tklo = ((Aprime(age,ai,zi,lambdai, ei) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-                  endif            
-                  tkhi = tklo + 1        
-                  PrAprimelo(age,ai,zi,lambdai, ei) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei) ) / ( agrid(tkhi) -agrid(tklo) )
-                  PrAprimehi(age,ai,zi,lambdai, ei) = ( Aprime(age,ai,zi,lambdai, ei) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
-                  PrAprimelo(age,ai,zi,lambdai, ei) = min (PrAprimelo(age,ai,zi,lambdai, ei), 1.0_DP)
-                  PrAprimelo(age,ai,zi,lambdai, ei) = max(PrAprimelo(age,ai,zi,lambdai, ei), 0.0_DP)
-                  PrAprimehi(age,ai,zi,lambdai, ei) = min (PrAprimehi(age,ai,zi,lambdai, ei), 1.0_DP)
-                  PrAprimehi(age,ai,zi,lambdai, ei) = max(PrAprimehi(age,ai,zi,lambdai, ei), 0.0_DP)    
-             
-                  ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
-                      & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
-                      & + beta*survP(age)* (PrAprimelo(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tklo, zi, lambdai, ei)&
-                      & +                   PrAprimehi(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tkhi, zi, lambdai, ei))
+              if ( Aprime(age,ai,zi,lambdai, ei) .ge. amax) then
+                    tklo =na-1
+                    elseif (Aprime(age,ai,zi,lambdai, ei) .lt. amin) then
+                         tklo = 1
+                        else
+                            tklo = ((Aprime(age,ai,zi,lambdai, ei) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+              endif            
+              tkhi = tklo + 1        
+              PrAprimelo(age,ai,zi,lambdai, ei) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei) ) / ( agrid(tkhi) -agrid(tklo) )
+              PrAprimehi(age,ai,zi,lambdai, ei) = ( Aprime(age,ai,zi,lambdai, ei) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+              PrAprimelo(age,ai,zi,lambdai, ei) = min (PrAprimelo(age,ai,zi,lambdai, ei), 1.0_DP)
+              PrAprimelo(age,ai,zi,lambdai, ei) = max(PrAprimelo(age,ai,zi,lambdai, ei), 0.0_DP)
+              PrAprimehi(age,ai,zi,lambdai, ei) = min (PrAprimehi(age,ai,zi,lambdai, ei), 1.0_DP)
+              PrAprimehi(age,ai,zi,lambdai, ei) = max(PrAprimehi(age,ai,zi,lambdai, ei), 0.0_DP)    
+         
+              ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
+                  & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
+                  & + beta*survP(age)* (PrAprimelo(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tklo, zi, lambdai, ei)&
+                  & +                   PrAprimehi(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tkhi, zi, lambdai, ei))
               ENDDO ! ei          
         ENDDO ! lambdai
     ENDDO ! zi
@@ -1521,28 +1521,28 @@ DO ai=1,na
     DO zi=1,nz
         DO lambdai=1,nlambda          
               DO ei=1,ne
-                  if ( Aprime(age,ai,zi,lambdai, ei) .ge. amax) then
-                        tklo =na-1
-                        elseif (Aprime(age,ai,zi,lambdai, ei) .lt. amin) then
-                             tklo = 1
-                            else
-                                tklo = ((Aprime(age,ai,zi,lambdai, ei) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-                  endif            
-                  tkhi = tklo + 1        
-                  PrAprimelo(age,ai,zi,lambdai, ei) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei) ) / ( agrid(tkhi) -agrid(tklo) )
-                  PrAprimehi(age,ai,zi,lambdai, ei) = ( Aprime(age,ai,zi,lambdai, ei) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
-                  PrAprimelo(age,ai,zi,lambdai, ei) = min (PrAprimelo(age,ai,zi,lambdai, ei), 1.0_DP)
-                  PrAprimelo(age,ai,zi,lambdai, ei) = max(PrAprimelo(age,ai,zi,lambdai, ei), 0.0_DP)
-                  PrAprimehi(age,ai,zi,lambdai, ei) = min (PrAprimehi(age,ai,zi,lambdai, ei), 1.0_DP)
-                  PrAprimehi(age,ai,zi,lambdai, ei) = max(PrAprimehi(age,ai,zi,lambdai, ei), 0.0_DP)    
-              
-                  ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
-                       & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
-                       & + beta*survP(age)* sum( ( PrAprimelo(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tklo, zi, lambdai,:)  &
-                       & + PrAprimehi(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tkhi, zi, lambdai,:)) * pr_e(ei,:) )
-                  if ( ValueFunction(age, ai, zi, lambdai, ei) .lt. (-100.0_DP) ) then
-                       print*,'ValueFunction(age, ai, zi, lambdai, ei)=',ValueFunction(age, ai, zi, lambdai, ei)
-                  endif
+              if ( Aprime(age,ai,zi,lambdai, ei) .ge. amax) then
+                    tklo =na-1
+                    elseif (Aprime(age,ai,zi,lambdai, ei) .lt. amin) then
+                         tklo = 1
+                        else
+                            tklo = ((Aprime(age,ai,zi,lambdai, ei) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+              endif            
+              tkhi = tklo + 1        
+              PrAprimelo(age,ai,zi,lambdai, ei) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei) ) / ( agrid(tkhi) -agrid(tklo) )
+              PrAprimehi(age,ai,zi,lambdai, ei) = ( Aprime(age,ai,zi,lambdai, ei) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+              PrAprimelo(age,ai,zi,lambdai, ei) = min (PrAprimelo(age,ai,zi,lambdai, ei), 1.0_DP)
+              PrAprimelo(age,ai,zi,lambdai, ei) = max(PrAprimelo(age,ai,zi,lambdai, ei), 0.0_DP)
+              PrAprimehi(age,ai,zi,lambdai, ei) = min (PrAprimehi(age,ai,zi,lambdai, ei), 1.0_DP)
+              PrAprimehi(age,ai,zi,lambdai, ei) = max(PrAprimehi(age,ai,zi,lambdai, ei), 0.0_DP)    
+          
+              ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
+                   & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
+                   & + beta*survP(age)* sum( ( PrAprimelo(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tklo, zi, lambdai,:)  &
+                   & + PrAprimehi(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tkhi, zi, lambdai,:)) * pr_e(ei,:) )
+              if ( ValueFunction(age, ai, zi, lambdai, ei) .lt. (-100.0_DP) ) then
+                   print*,'ValueFunction(age, ai, zi, lambdai, ei)=',ValueFunction(age, ai, zi, lambdai, ei)
+              endif
               ENDDO ! ei          
         ENDDO ! lambdai
     ENDDO ! zi
@@ -2296,7 +2296,7 @@ DO age=RetAge-1,1,-1
                    EndoCons(ai) = ((gamma*yh(age, lambdai,ei)/(1.0_DP-gamma))**((1.0_DP-gamma)*(1.0_DP-sigma)) &
                         & *  beta*survP(age)*MBGRID(ai,zi)  &
                         & *  sum( pr_e(ei,:) * (Cons(age+1,ai,zi,lambdai,:)**(gamma*(1.0_DP-sigma)-1.0_DP)) &
-                        & *  ( (1.0_DP-Hours(age+1, ai, zi, lambdai,:))**((1.0_DP-gamma)*(1.0_DP-sigma)))))**(-1.0_DP/sigma)                    
+                        & *  ( (1.0_DP-Hours(age+1, ai, zi, lambdai,:))**((1.0_DP-gamma)*(1.0_DP-sigma)))))**(-1.0_DP/sigma)
                      
                    EndoHours(ai) = 1.0_DP - (1.0_DP-gamma)*EndoCons(ai)/(gamma*yh(age, lambdai,ei))   
                       
@@ -2320,7 +2320,7 @@ DO age=RetAge-1,1,-1
                          Cons(age, ai, zi, lambdai,ei)= Linear_Int(EndoYgrid,&
                                     & EndoCons,na, YGRID(ai,zi))                          
                          Hours(age, ai, zi, lambdai,ei) = max(0.0_DP, &                          
-                                    & 1.0_DP - (1.0_DP-gamma)*Cons(age,ai,zi,lambdai,ei)/(gamma*yh(age, lambdai,ei)) )                                
+                                    & 1.0_DP - (1.0_DP-gamma)*Cons(age,ai,zi,lambdai,ei)/(gamma*yh(age, lambdai,ei)) )
                          Aprime(age, ai, zi, lambdai,ei) = YGRID(ai,zi)  &
                                         & + yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei)  & 
                                         & - Cons(age, ai, zi, lambdai,ei)   
@@ -2328,7 +2328,7 @@ DO age=RetAge-1,1,-1
                                Aprime(age, ai, zi, lambdai,ei) = amin
                                
                                Hours(age, ai, zi, lambdai,ei)  = max( gamma - &
-                                & (1.0_DP-gamma) *( YGRID(ai,zi) - Aprime(age, ai, zi, lambdai,ei)) / yh(age, lambdai,ei) ,0.0_DP)       
+                                & (1.0_DP-gamma) *( YGRID(ai,zi) - Aprime(age, ai, zi, lambdai,ei)) / yh(age, lambdai,ei) ,0.0_DP)
                               
                                 Cons(age, ai, zi, lambdai,ei)= YGRID(ai,zi)  + yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei)&
                                                 & -Aprime(age, ai, zi, lambdai,ei)        
@@ -2345,7 +2345,7 @@ DO age=RetAge-1,1,-1
                              & FOC_W, brent_tol, Aprime(age, ai, zi, lambdai,ei) )
                         
                        Hours(age, ai, zi, lambdai,ei)  =  max(0.0_DP, &
-                                & gamma - (1.0_DP-gamma)*(YGRID(ai,zi) - Aprime(age, ai, zi, lambdai,ei))/yh(age, lambdai,ei) )            
+                                & gamma - (1.0_DP-gamma)*(YGRID(ai,zi) - Aprime(age, ai, zi, lambdai,ei))/yh(age, lambdai,ei) )
  
                        Cons(age, ai, zi, lambdai,ei)=  YGRID(ai,zi)  + yh(age, lambdai,ei) * Hours(age, ai, zi, lambdai,ei) &
                                         & -Aprime(age, ai, zi, lambdai,ei)
