@@ -86,9 +86,7 @@ PROGRAM main
 		else 
 			tauPL = 0.0_DP
 	 		psi   = 0.776_DP  	
-	 	endif 
-	 	tauPL = 0.0_DP
- 		psi   = 0.776_DP 
+	 	endif
 
 	! Resutls Folder
 		write(Result_Folder,'(f4.2)') Threshold_Factor
