@@ -44,12 +44,12 @@ PROGRAM main
 	! Switch for log utility 
 		! If Log_Switch==.true. then utility is log
 		! If Log_Switch==.false. then utility is not log
-		Log_Switch = .true.
+		Log_Switch = .false.
 
 	! Switch for labor taxes
 		! If Progressive_Tax_Switch==.true. then use progressive taxes
 		! If Progressive_Tax_Switch==.false. then use linear taxes
-		Progressive_Tax_Switch = .false.
+		Progressive_Tax_Switch = .true.
 
 	! Set Parameters 
 		Params =[ 0.9436, 0.00, 0.50, 0.70444445, 0.34, 0.4494 ] ! tauL=0.224, tauC=0.075 calibration
@@ -87,6 +87,8 @@ PROGRAM main
 			tauPL = 0.0_DP
 	 		psi   = 0.776_DP  	
 	 	endif 
+	 	tauPL = 0.0_DP
+ 		psi   = 0.776_DP 
 
 	! Resutls Folder
 		write(Result_Folder,'(f4.2)') Threshold_Factor
@@ -103,7 +105,7 @@ PROGRAM main
 
 		
 		write(Result_Folder,'(f4.2)') Threshold_Factor
-		Result_Folder = './Test_NSU_s1/Factor_'//trim(Result_Folder)//'/'
+		Result_Folder = './Test_NSU_s4_LT/Factor_'//trim(Result_Folder)//'/'
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
