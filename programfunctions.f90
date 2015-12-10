@@ -391,7 +391,8 @@ end Subroutine Asset_Grid_Threshold
 							if (cp.ge.c_foc) then
 								hp = 0.0_dp
 							else
-								par_FOC = cp 
+								par_FOC(4) = ep_ind
+								par_FOC(6) = cp 
 								brentvaluet = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, hp, par_FOC ) 
 							end if 
 					    MU_cp(ep_ind) = cp*((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hp)**((1.0_dp-sigma)*(1.0_dp-gamma))
