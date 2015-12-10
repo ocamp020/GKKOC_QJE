@@ -556,7 +556,7 @@ end Subroutine Asset_Grid_Threshold
 			FOC_HA = ( cons - (gamma/(1.0_dp-gamma))*(1.0_dp-hoursin)*MB_h(hoursin,age_in,l_in,e_in,wage) )**2.0_DP 
 		else
 			! Non-Separable Utility 
-			FOC_HA = ( MB_h(hoursin,age_in,l_in,e_in,wage)*(1.0_dp-hoursin)**(gamma) - phi*consin**(sigma) )**2.0_DP 
+			FOC_HA = ( MB_h(hoursin,age_in,l_in,e_in,wage)*(1.0_dp-hoursin)**(gamma) - phi*cons**(sigma) )**2.0_DP 
 		end if 
 	END  FUNCTION FOC_HA
 
@@ -1919,20 +1919,15 @@ END SUBROUTINE COMPUTE_STATS
 SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	use omp_lib
 	IMPLICIT NONE
-	!REAL(DP), DIMENSION(fine_na, nz) :: FineYGRID
-	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda) :: CorrectRetValueP1, CorrectRetValueP2
-	REAL(DP) :: AnRetCCtemp, cprime, AntRetVVtemp, disty, slopeV, slopeC, linearC, linearV
-	REAL(DP) :: ap_temp, brentvalue
-	REAL(DP) :: tempvar1, tempvar2, tempvar3
-	INTEGER  :: na1, na2, tempai
+	REAL(DP) :: brentvalue, C_foc, H_min, euler_power
+	INTEGER  :: tempai, sw 
 	REAL(DP), DIMENSION(na_t+1) :: EndoCons, EndoYgrid, EndoHours
 	INTEGER , DIMENSION(na_t+1) :: sort_ind 
-	INTEGER  :: sw 
-	REAL(DP) :: C_euler, C_foc, H_min, euler_power
-	REAL(DP), dimension(na_t,nz) :: Wealth
+	REAL(DP), DIMENSION(na_t,nz) :: Wealth
 	REAL(DP), DIMENSION(5)       :: state_FOC
 	REAL(DP), DIMENSION(6)       :: par_FOC
 
+	!$ call omp_set_num_threads(7)
 
 	! Set a minimum value for labor to check in the FOC
 		H_min = 0.000001_dp
@@ -1958,21 +1953,23 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 
 	! Last period of life
 	age=MaxAge
-	DO lambdai=1,nlambda
+	!$omp parallel do private(lambdai,ei,ai)
 	DO zi=1,nz
+    DO lambdai=1,nlambda
     DO ei=1,ne
     DO ai=1,na_t
         Cons_t(age,ai,zi,lambdai,ei) =  YGRID_t(ai, zi) + RetY_lambda_e(lambdai,ei) 
 	ENDDO ! ai
     ENDDO ! ei
-    ENDDO ! zi
 	ENDDO ! lambdai
+	ENDDO ! zi
 	Aprime_t(age, :, :, :, :) = 0.0_DP
 	
 	! Rest of retirement
 	DO age=MaxAge-1,RetAge,-1
-    DO lambdai=1,nlambda
+	!$omp parallel do private(lambdai,ei,ai,EndoCons,EndoYgrid,sw,sort_ind,tempai,state_FOC,par_FOC)
     DO zi=1,nz
+    DO lambdai=1,nlambda
     DO ei=1,ne
     	! Endogenous grid and consumption are initialized
 	    EndoCons  = big_p 
@@ -2022,7 +2019,6 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 
         ai=1           
         DO WHILE ( YGRID_t(ai,zi) .lt. EndoYgrid(1) )
-			! ap_temp    = Aprime(age, tempai, zi, lambdai,1) 
 			! Solve for a' directly by solving the Euler equation for retirement FOC_R
 			state_FOC  = (/age,ai,zi,lambdai,ei/)
 			brentvalue = brent_p(min(amin,YGRID_t(ai,zi)), (amin+YGRID_t(ai,zi))/2.0_DP , &
@@ -2043,9 +2039,9 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 		ENDDO  
 	               
     ENDDO ! ei     
-    ENDDO ! zi
     ENDDO ! lambda
-	ENDDO !age
+	ENDDO ! zi
+    ENDDO !age
 
 
 	!------RETIREMENT PERIOD ENDS------------------------------------------------------------
@@ -2055,8 +2051,9 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	!------Working Period Starts-------------------------------------------------------------
 
 	DO age=RetAge-1,1,-1
-    DO lambdai=1,nlambda
+	!$omp parallel do private(lambdai,ei,ai,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai,C_foc,state_FOC,par_FOC)
     DO zi=1,nz
+    DO lambdai=1,nlambda
     DO ei=1,ne	
     	! Endogenous grid and consumption are initialized
 	    EndoCons  = big_p 
@@ -2227,9 +2224,9 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 
 	                 
     ENDDO !ei         
-    ENDDO !zi
     ENDDO !lambdai
-	ENDDO !age
+	ENDDO !zi
+    ENDDO !age
 
 
 	! Interpolate to get values of policy functions on agrid (note that policy functions are defined on agrid_t)

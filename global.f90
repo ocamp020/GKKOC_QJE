@@ -132,9 +132,6 @@ MODULE global
 	    ! Welfare measures
 	    REAL(DP) :: Welfare_Gain_Pop_bench, Welfare_Gain_Pop_exp, Welfare_Gain_NB_bench, Welfare_Gain_NB_exp
 	    REAL(DP) :: CE_NEWBORN
-	
-	! Auxiliary variables for evaluating FOC: Consumption and assets and marginal benefit of assets
-    	REAL(DP) :: consin, ain, MB_a_in
 
     ! Objective moments (not currently in use)	
     	REAL(DP), DIMENSION(5)  ::  Min_Moments
