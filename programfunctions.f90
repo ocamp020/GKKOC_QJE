@@ -1926,6 +1926,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	REAL(DP), DIMENSION(na_t,nz) :: Wealth
 	REAL(DP), DIMENSION(5)       :: state_FOC
 	REAL(DP), DIMENSION(6)       :: par_FOC
+	integer  :: age, ai, zi, lambdai, ei
 
 	!$ call omp_set_num_threads(7)
 
