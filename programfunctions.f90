@@ -326,10 +326,12 @@ end Subroutine Asset_Grid_Threshold
 	FUNCTION FOC_WH(aprimet,state)
 		IMPLICIT NONE   
 		real(DP), intent(in) :: aprimet
+		real(DP), dimension(:), intent(in) :: state
 		real(DP)             :: ctemp, ntemp, yprime, MB_aprime, FOC_WH, exp1overcprime, E_MU_cp
 		REAL(DP)             :: brentvaluet, consin, H_min, c_foc, c_budget, cp, hp
 		integer              :: ep_ind
-		real(DP), dimension(ne):: cprime, nprime, MU_cp
+		real(DP), dimension(ne) :: cprime, nprime, MU_cp
+		REAL(DP), DIMENSION(6)  :: par_FOC
 		integer               :: age_in, a_in, z_in, l_in, e_in
 
 		! Allocate state and get indeces
@@ -339,6 +341,8 @@ end Subroutine Asset_Grid_Threshold
 		l_in   = int(state(4))
 		e_in   = int(state(5))
 
+		par_FOC(1:5) = state
+
 		H_min = 0.000001 
 
 		! Compute marginal benefit of next period at a' (given zi)
@@ -347,9 +351,9 @@ end Subroutine Asset_Grid_Threshold
 		yprime   = Y_a(aprimet,zgrid(z_in))
 
 		! Set auxiliary variable for FOC_HA
-		ain   = aprimet
+		par_FOC(6) = aprimet
 		! Solve for hours choice by solving the FOC for labor
-			brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp)  
+			brentvaluet = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp, par_FOC)  
 				! 			if (NSU_Switch.eqv..true.) then
 				! 				c_foc = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
 				! 			else 
@@ -387,8 +391,8 @@ end Subroutine Asset_Grid_Threshold
 							if (cp.ge.c_foc) then
 								hp = 0.0_dp
 							else
-								consin = cp
-								brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, hp ) 
+								par_FOC = cp 
+								brentvaluet = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, hp, par_FOC ) 
 							end if 
 					    MU_cp(ep_ind) = cp*((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hp)**((1.0_dp-sigma)*(1.0_dp-gamma))
 					END DO
@@ -452,37 +456,59 @@ end Subroutine Asset_Grid_Threshold
 ! Remarks: Labor taxes are taken into account. But consumption is given and does not 
 !          internalize changes in taxes. This is necessary when solving EGM.
 !
-	FUNCTION FOC_H(hoursin)
+	FUNCTION FOC_H(hoursin,par)
 		IMPLICIT NONE   
 		real(DP), intent(in) 	:: hoursin
+		real(DP), dimension(:), intent(in) :: par
 		real(DP)             	:: FOC_H
+		real(DP)                :: cons_in
+		integer                 :: age_in, a_in, z_in, l_in, e_in
+
+		! Allocate state and get indeces
+		age_in = int(par(1))
+		a_in   = int(par(2))
+		z_in   = int(par(3))
+		l_in   = int(par(4))
+		e_in   = int(par(5))
+		cons_in = par(6)
 
 		if (NSU_Switch.eqv..true.) then 
 			! Non-Separable Utility 
-			FOC_H = ( consin - (gamma/(1.0_dp-gamma))*(1.0_dp-hoursin)*MB_h(hoursin,age,lambdai,ei,wage) )**2.0_DP 
+			FOC_H = ( cons_in - (gamma/(1.0_dp-gamma))*(1.0_dp-hoursin)*MB_h(hoursin,age_in,l_in,e_in,wage) )**2.0_DP 
 		else 
 			! Separable Utility 
-			FOC_H = ( MB_h(hoursin,age,lambdai,ei,wage)*(1.0_dp-hoursin)**(gamma) - phi*consin**(sigma) )**2.0_DP 
+			FOC_H = ( MB_h(hoursin,age_in,l_in,e_in,wage)*(1.0_dp-hoursin)**(gamma) - phi*cons_in**(sigma) )**2.0_DP 
 		end if 
 
 	END  FUNCTION FOC_H
 
-	FUNCTION FOC_H_NSU(hoursin)
+	FUNCTION FOC_H_NSU(hoursin,par)
 		IMPLICIT NONE   
 		real(DP), intent(in) 	:: hoursin
-		real(DP)             	:: FOC_H_NSU, cons, E_MU_cp, MBaprime
+		real(DP), dimension(:), intent(in) :: par
+		real(DP)             	:: FOC_H_NSU, cons, E_MU_cp
 		real(DP), dimension(ne) :: MU_cp
+		real(DP)                :: MB_aprime
+		integer                 :: age_in, a_in, z_in, l_in, e_in
+
+		! Allocate state and get indeces
+		age_in = int(par(1))
+		a_in   = int(par(2))
+		z_in   = int(par(3))
+		l_in   = int(par(4))
+		e_in   = int(par(5))
+		MB_aprime = par(6)
 
 		! Compute current consumption implied by hours and labor FOC
-			cons  = (gamma/(1.0_dp-gamma))*(1.0_dp-hoursin)*MB_h(hoursin,age,lambdai,ei,wage)
+			cons  = (gamma/(1.0_dp-gamma))*(1.0_dp-hoursin)*MB_h(hoursin,age_in,l_in,e_in,wage)
 		! Compute marginal utility of consumption for next period at a' (for all values of e)
-	    	MU_cp = Cons_t(age+1,ai,zi,lambdai,:)**((1.0_dp-sigma)*gamma-1.0_dp) &
-	    	        * (1.0_dp-Hours_t(age+1,ai,zi,lambdai,:))**((1.0_dp-sigma)*(1.0_dp-gamma))
+	    	MU_cp = Cons_t(age_in+1,a_in,z_in,l_in,:)**((1.0_dp-sigma)*gamma-1.0_dp) &
+	    	        * (1.0_dp-Hours_t(age_in+1,a_in,z_in,l_in,:))**((1.0_dp-sigma)*(1.0_dp-gamma))
 	    ! Compute expected value of marginal uitility of consumption
-	    	E_MU_cp = SUM( pr_e(ei,:) * MU_cp )
+	    	E_MU_cp = SUM( pr_e(e_in,:) * MU_cp )
 		! Compute square residual of Euler FOC
 			FOC_H_NSU = ( cons**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hoursin)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
-			         	& - beta*survP(age)*MB_a_in*E_MU_cp  )**2.0_DP
+			         	& - beta*survP(age_in)*MB_aprime*E_MU_cp  )**2.0_DP
 
 	END  FUNCTION FOC_H_NSU
 
@@ -507,19 +533,30 @@ end Subroutine Asset_Grid_Threshold
 !
 ! Remarks: Labor taxes are taken into account.
 !
-	FUNCTION FOC_HA(hoursin)
+	FUNCTION FOC_HA(hoursin,par)
 		IMPLICIT NONE   
 		real(DP), intent(in) :: hoursin
+		real(DP), dimension(:), intent(in) :: par
 		real(DP)   			 :: FOC_HA, cons
+		real(DP)             :: ap_in
+		integer              :: age_in, a_in, z_in, l_in, e_in
+
+		! Allocate state and get indeces
+		age_in = int(par(1))
+		a_in   = int(par(2))
+		z_in   = int(par(3))
+		l_in   = int(par(4))
+		e_in   = int(par(5))
+		ap_in  = par(6)
 
 		! Consumption given ain and hoursin
-			cons   = YGRID_t(ai,zi)+  Y_h(hoursin,age,lambdai,ei,wage) - ain
+			cons   = YGRID_t(a_in,z_in)+  Y_h(hoursin,age_in,l_in,e_in,wage) - ap_in
 		if (NSU_Switch.eqv..true.) then
 			! Non-Separable Utility 
-			FOC_HA = ( cons - (gamma/(1.0_dp-gamma))*(1.0_dp-hoursin)*MB_h(hoursin,age,lambdai,ei,wage) )**2.0_DP 
+			FOC_HA = ( cons - (gamma/(1.0_dp-gamma))*(1.0_dp-hoursin)*MB_h(hoursin,age_in,l_in,e_in,wage) )**2.0_DP 
 		else
 			! Non-Separable Utility 
-			FOC_HA = ( MB_h(hoursin,age,lambdai,ei,wage)*(1.0_dp-hoursin)**(gamma) - phi*consin**(sigma) )**2.0_DP 
+			FOC_HA = ( MB_h(hoursin,age_in,l_in,e_in,wage)*(1.0_dp-hoursin)**(gamma) - phi*consin**(sigma) )**2.0_DP 
 		end if 
 	END  FUNCTION FOC_HA
 
@@ -544,12 +581,22 @@ end Subroutine Asset_Grid_Threshold
 ! 		  H_endo , real(dp), Endogenous value of hours in t
 ! 		  Y_endo , real(dp), Endogenous value of Y grid in t
 !
-	Subroutine EGM_Working_Period(MB_in,H_min,C_endo,H_endo,Y_endo)
+	Subroutine EGM_Working_Period(MB_in,H_min,state_FOC,C_endo,H_endo,Y_endo)
 		Implicit None 
-		real(dp), intent(in)   :: MB_in , H_min
+		real(dp), intent(in)   :: MB_in , H_min, state_FOC(5)
 		real(dp), intent(out)  :: C_endo, H_endo, Y_endo
 		real(dp)               :: C_euler, C_foc, brentvalue
 		REAL(DP), DIMENSION(6) :: par_FOC
+		integer                :: age, ai, zi, lambdai, ei
+
+		! Allocate state and get indeces
+		age 	= int(state_FOC(1))
+		ai   	= int(state_FOC(2))
+		zi      = int(state_FOC(3))
+		lambdai = int(state_FOC(4))
+		ei      = int(state_FOC(5))
+
+		par_FOC(1:5) = state_FOC
 
 		if (Progressive_Tax_Switch.eqv..true.) then !Progressive labor taxes 
 			if (NSU_Switch.eqv..true.) then 
@@ -565,15 +612,15 @@ end Subroutine Asset_Grid_Threshold
 				else 
 					if (Log_Switch.eqv..true.) then
 			  			! Auxiliary consumption variable for FOC_H        
-					    consin = C_euler
+					    par_FOC(6) = C_euler
 					    ! Solution for hours from Euler or FOC  equation according to sigma 
-					    brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, H_endo ) 
+					    brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, H_endo , par_FOC ) 
 					    C_endo = C_euler
 					else 
 					    ! Set Marginal benefit of assets to the below threshold level
-					    MB_a_in = MB_in
+					    par_FOC(6) = MB_in
 					    ! Solution for hours from Euler or FOC  equation according to sigma 
-					    brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H_NSU, brent_tol, H_endo ) 
+					    brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H_NSU, brent_tol, H_endo , par_FOC ) 
 					    ! Implied consumption by hours from Labor FOC
 					    C_endo = (gamma/(1.0_dp-gamma))*(1.0_dp-H_endo)*MB_h(H_endo,age,lambdai,ei,wage)
 					end if 
@@ -589,9 +636,9 @@ end Subroutine Asset_Grid_Threshold
 				  H_endo = 0.0_dp
 				else 
 				  ! Auxiliary consumption variable for FOC_H        
-				  consin = C_endo
+				  par_FOC(6) = C_endo
 				  ! Solution for hours from Euler or FOC  equation according to sigma 
-				  brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, H_endo ) 
+				  brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, H_endo , par_FOC ) 
 				end if  
 
 				end if 
@@ -1879,6 +1926,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	REAL(DP) :: C_euler, C_foc, H_min, euler_power
 	REAL(DP), dimension(na_t,nz) :: Wealth
 	REAL(DP), DIMENSION(5)       :: state_FOC
+	REAL(DP), DIMENSION(6)       :: par_FOC
 
 
 	! Set a minimum value for labor to check in the FOC
@@ -2011,20 +2059,21 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    EndoHours = big_p 
 	    sw 		  = 0                    
         DO ai=1,na_t
+        state_FOC  = (/age,ai,zi,lambdai,ei/)
 		if (abs(Wealth(ai,zi)-Y_a_threshold).lt.1e-8) then 
 	    	! Below threshold
-			call EGM_Working_Period( MB_a_bt(agrid(ai),zgrid(zi)) , H_min , & 
+			call EGM_Working_Period( MB_a_bt(agrid(ai),zgrid(zi)) , H_min , state_FOC , & 
 			      & EndoCons(ai), EndoHours(ai) , EndoYgrid(ai)  )
 			
 			! Above threshold
-			call EGM_Working_Period( MB_a_at(agrid(ai),zgrid(zi)) , H_min , & 
+			call EGM_Working_Period( MB_a_at(agrid(ai),zgrid(zi)) , H_min , state_FOC , & 
 			      & EndoCons(na_t+1), EndoHours(na_t+1) , EndoYgrid(na_t+1)  )
 
 			! Set the flag!
 	    	sw = 1 
 		else 
 			! Usual EGM
-			call EGM_Working_Period( MBGRID_t(ai,zi) , H_min , & 
+			call EGM_Working_Period( MBGRID_t(ai,zi) , H_min , state_FOC , & 
 			      & EndoCons(ai), EndoHours(ai) , EndoYgrid(ai)  )
 	
 		end if 
@@ -2078,9 +2127,10 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 					Hours_t(age,ai,zi,lambdai,ei) = 0.0_dp
 				else
 					! Auxiliary variables for solving FOC for hours 
-					consin = Cons_t(age, ai, zi, lambdai,ei)
+					par_FOC(1:5) = (/age,ai,zi,lambdai,ei/) 
+					par_FOC(6)   = Cons_t(age, ai, zi, lambdai,ei)
 					! FOC
-					brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, Hours_t(age,ai,zi,lambdai,ei) ) 
+					brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, Hours_t(age,ai,zi,lambdai,ei) , par_FOC ) 
 				end if
 			else 
 				if (NSU_Switch.eqv..true.) then 
@@ -2107,8 +2157,9 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 		        			&  gamma - (1.0_DP-gamma) *( YGRID(ai,zi) - Aprime(age, ai, zi, lambdai,ei)) / (psi*yh(age, lambdai,ei)) )
                 else               	        
                 	!compute  hours using FOC_HA                              
-		        	ain = amin	
-		        	brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, Hours_t(age, ai, zi, lambdai,ei))           
+		        	par_FOC(1:5) = (/age,ai,zi,lambdai,ei/) 
+		        	par_FOC(6)   = amin
+		        	brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, Hours_t(age, ai, zi, lambdai,ei), par_FOC)
 		        end if 
 
 	            Cons_t(age,ai,zi,lambdai,ei) = YGRID_t(ai,zi)+  Y_h(Hours_t(age, ai, zi, lambdai,ei),age,lambdai,ei,wage)  &
@@ -2143,8 +2194,9 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	        			&  gamma - (1.0_DP-gamma) *( YGRID(ai,zi) - Aprime(age, ai, zi, lambdai,ei)) / (psi*yh(age, lambdai,ei)) )
             else               	        
 				!compute  hours using FOC_HA                              
-				ain = Aprime_t(age, ai, zi, lambdai,ei)               
-	            brentvalue = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, Hours_t(age, ai, zi, lambdai,ei))           
+				par_FOC(1:5) = (/age,ai,zi,lambdai,ei/)
+				par_FOC(6)   = Aprime_t(age, ai, zi, lambdai,ei)
+	            brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, Hours_t(age, ai, zi, lambdai,ei), par_FOC) 
  			end if 
 
             Cons_t(age, ai, zi, lambdai,ei)=  YGRID_t(ai,zi) + Y_h(Hours_t(age, ai, zi, lambdai,ei),age,lambdai,ei,wage)  &
