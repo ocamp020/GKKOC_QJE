@@ -1361,6 +1361,7 @@ SUBROUTINE FIND_DBN_EQ()
 	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: PrAprimelo, PrAprimehi, DBN2
 	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne) :: Aplo, Aphi
 
+	!$ call omp_set_num_threads(7)
 	DBN_criteria = 1.0E-08_DP
 
 	! Solve the model at current aggregate values
@@ -1383,6 +1384,7 @@ SUBROUTINE FIND_DBN_EQ()
 		! When at that age and state the optimal decision is approximated by selecting one the grid points
 		! The grid points are selected with probability proportional to their distance to the optimal a'
 	DO age=1,MaxAge
+	!$omp parallel do private(lambdai,ei,ai,tklo,tkhi)
 	DO zi=1,nz
 	DO ai=1,na
 	DO lambdai=1,nlambda
@@ -1595,6 +1597,7 @@ SUBROUTINE FIND_DBN_EQ()
 				! When at that age and state the optimal decision is approximated by selecting one the grid points
 				! The grid points are selected with probability proportional to their distance to the optimal a'
 	        DO age=1,MaxAge
+	        !$omp parallel do private(lambdai,ei,ai,tklo,tkhi)
 	        DO zi=1,nz
 	        DO ai=1,na
 	        DO lambdai=1,nlambda
@@ -2778,11 +2781,13 @@ SUBROUTINE  LIFETIME_Y_ESTIMATE()
 	REAL(DP) :: start_timet, finish_timet
 	INTEGER  :: paneli, cohortsize
 	REAL(DP) :: mean_panel_lifetime_eff_unit , lambdaBAR
-	INTEGER , DIMENSION(10000000)   :: panele, panellambda
-	REAL(DP), DIMENSION(10000000)   :: panel_lifetime_eff_unit
+	INTEGER , DIMENSION(:), allocatable :: panele, panellambda
+	REAL(DP), DIMENSION(:), allocatable :: panel_lifetime_eff_unit
 	REAL(DP), DIMENSION(nlambda,ne) :: lifetime_eff_unit_by_lambda_e, size_by_lambda_e 
 
 	cohortsize=10000000
+	allocate(panele(cohortsize),panellambda(cohortsize),panel_lifetime_eff_unit(cohortsize))
+
 	newiseed=-1
 
 	panel_lifetime_eff_unit = 0.0_DP

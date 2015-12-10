@@ -20,7 +20,8 @@ Objects_GO      = $(Folder)/GKK_Calibration.o \
                   $(Folder)/stateControl.o $(Folder)/genericParams.o $(Folder)/utilities.o \
                   $(Folder)/simplex.o $(Folder)/objective.o $(Folder)/minimize.o
 
-Flags = -fbounds-check                  
+Flags    = -fbounds-check 
+omp_flag = -fopenmp
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
@@ -32,6 +33,9 @@ $(Folder)/%.o: %.F90
 $(Folder)/%.o: %.f90
 	gfortran -O2 -J$(Folder) -c $< -o $@
 
+$(Folder)/programfunctions.o: programfunctions.f90
+	gfortran $(omp_flag) -O2 -J$(Folder) -c programfunctions.f90 -o $(Folder)/programfunctions.o
+
 # Compile and execute programs
 Sergio_Simple.a: GKK_simple.f90 $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o
 	gfortran -I$(Folder) GKK_simple.f90 $(Folder)/NRUTIL.o $(Folder)/NRTYPE.o -o $(Folder)/Sergio_Simple.a
@@ -42,7 +46,7 @@ Sergio.a: GKK_Wealth_Tax_Sergio.f90 $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o $(Fold
 	$(Folder)/Sergio.a
 
 GKK_Main.a: GKK_Main.f90 $(Objects_Main)
-	gfortran -O2 -I$(Folder) GKK_Main.f90 $(Objects_Main) -o $(Folder)/GKK_Main.a
+	gfortran $(omp_flag) -O2 -I$(Folder) GKK_Main.f90 $(Objects_Main) -o $(Folder)/GKK_Main.a
 	$(Folder)/GKK_Main.a
 
 GKK_Main_Server.a: GKK_Main.f90 $(Objects_Main)
