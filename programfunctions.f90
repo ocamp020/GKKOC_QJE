@@ -323,20 +323,28 @@ end Subroutine Asset_Grid_Threshold
 !
 ! Remarks: This function performs a optimization for labor. Labor taxes are taken into account
 !
-	FUNCTION FOC_WH(aprimet)
+	FUNCTION FOC_WH(aprimet,state)
 		IMPLICIT NONE   
 		real(DP), intent(in) :: aprimet
 		real(DP)             :: ctemp, ntemp, yprime, MB_aprime, FOC_WH, exp1overcprime, E_MU_cp
 		REAL(DP)             :: brentvaluet, consin, H_min, c_foc, c_budget, cp, hp
 		integer              :: ep_ind
 		real(DP), dimension(ne):: cprime, nprime, MU_cp
+		integer               :: age_in, a_in, z_in, l_in, e_in
+
+		! Allocate state and get indeces
+		age_in = int(state(1))
+		a_in   = int(state(2))
+		z_in   = int(state(3))
+		l_in   = int(state(4))
+		e_in   = int(state(5))
 
 		H_min = 0.000001 
 
 		! Compute marginal benefit of next period at a' (given zi)
-		MB_aprime = MB_a(aprimet,zgrid(zi))
+		MB_aprime = MB_a(aprimet,zgrid(z_in))
 		! Compute asset income of next period at a' (given zi)
-		yprime   = Y_a(aprimet,zgrid(zi))
+		yprime   = Y_a(aprimet,zgrid(z_in))
 
 		! Set auxiliary variable for FOC_HA
 		ain   = aprimet
@@ -354,7 +362,7 @@ end Subroutine Asset_Grid_Threshold
 				! 				brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp)  
 				! 			end if 
 		! Current consumption given ntemp
-			ctemp   = YGRID_t(ai,zi)+  Y_h(ntemp,age,lambdai,ei,wage) - aprimet   
+			ctemp   = YGRID_t(a_in,z_in)+  Y_h(ntemp,age_in,l_in,e_in,wage) - aprimet   
 
 		if (NSU_Switch.eqv..true.) then
 			if (Progressive_Tax_Switch) then 
@@ -363,19 +371,19 @@ end Subroutine Asset_Grid_Threshold
 					! I have to evaluate the FOC in expectation over eindx prime given eindx
 					! Compute c' for each value of e'
 					DO ep_ind=1,ne
-					    cprime(ep_ind) = Linear_Int(Ygrid_t(:,zi),Cons_t(age+1,:,zi,lambdai,ep_ind), na_t, yprime  )
+					    cprime(ep_ind) = Linear_Int(Ygrid_t(:,z_in),Cons_t(age_in+1,:,z_in,l_in,ep_ind), na_t, yprime  )
 					ENDDO
 					! Compute the expected value of 1/c' conditional on current ei
-					E_MU_cp = SUM( pr_e(ei,:) / cprime )
+					E_MU_cp = SUM( pr_e(e_in,:) / cprime )
 
 					! Evaluate the squared residual of the Euler equation for working period
-					FOC_WH   = ( (1.0_dp/ctemp)  - beta * survP(age) * MB_aprime * E_MU_cp ) **2.0_DP 
+					FOC_WH   = ( (1.0_dp/ctemp)  - beta * survP(age_in) * MB_aprime * E_MU_cp ) **2.0_DP 
 				else
 					! I have to evaluate the FOC in expectation over eindx prime given eindx
 					! Compute consumption and labor for eachvalue of eindx prime
 					DO ep_ind=1,ne
-					    cp     = Linear_Int(Ygrid_t(:,zi),Cons_t(age+1,:,zi,lambdai,ep_ind), na_t, yprime  )
-						c_foc  = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
+					    cp     = Linear_Int(Ygrid_t(:,z_in),Cons_t(age_in+1,:,z_in,l_in,ep_ind), na_t, yprime  )
+						c_foc  = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age_in,l_in,e_in,wage)
 							if (cp.ge.c_foc) then
 								hp = 0.0_dp
 							else
@@ -385,26 +393,26 @@ end Subroutine Asset_Grid_Threshold
 					    MU_cp(ep_ind) = cp*((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hp)**((1.0_dp-sigma)*(1.0_dp-gamma))
 					END DO
 					! Compute the expected value of 1/c' conditional on current ei
-					E_MU_cp = SUM( pr_e(ei,:) * MU_cp )
+					E_MU_cp = SUM( pr_e(e_in,:) * MU_cp )
 
 					! Evaluate the squared residual of the Euler equation for working period
 					FOC_WH = ( ctemp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-ntemp)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
-						         & - beta*survP(age)*MB_aprime*E_MU_cp  )**2.0_DP
+						         & - beta*survP(age_in)*MB_aprime*E_MU_cp  )**2.0_DP
 				end if 
 			else ! Linear Taxes 
-				ntemp = max(0.0_DP , gamma - (1.0_DP-gamma)*(YGRID(ai,zi) - aprimet)/(psi*yh(age, lambdai,ei)) )
-				ctemp = YGRID(ai,zi) + psi*yh(age, lambdai,ei) * ntemp - aprimet
+				ntemp = max(0.0_DP , gamma - (1.0_DP-gamma)*(YGRID(a_in,z_in) - aprimet)/(psi*yh(age_in,l_in,e_in)) )
+				ctemp = YGRID(a_in,z_in) + psi*yh(age_in,l_in,e_in) * ntemp - aprimet
 
 				DO ep_ind=1,ne
-				      cprime(ep_ind) = Linear_Int(Ygrid(:,zi), Cons_t(age+1,:,zi,lambdai,ep_ind), na,    yprime  )
-				      nprime(ep_ind) = 1.0_DP-(1.0_DP-gamma)*cprime(ep_ind)/(gamma*psi*yh(age, lambdai,ei))                            
+				      cprime(ep_ind) = Linear_Int(Ygrid(:,z_in), Cons_t(age_in+1,:,z_in,l_in,ep_ind), na,    yprime  )
+				      nprime(ep_ind) = 1.0_DP-(1.0_DP-gamma)*cprime(ep_ind)/(gamma*psi*yh(age_in,l_in,e_in))
 				ENDDO
 
 				nprime = max(0.0_DP,nprime)
 
 				FOC_WH = ((ctemp**(gamma*(1.0_DP-sigma)-1))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
-						& - beta*survP(age)*MB_aprime  &
-						& * sum( pr_e(ei,:) * (cprime**(gamma*(1.0_DP-sigma)-1.0_DP)) &
+						& - beta*survP(age_in)*MB_aprime  &
+						& * sum( pr_e(e_in,:) * (cprime**(gamma*(1.0_DP-sigma)-1.0_DP)) &
 						& *((1.0_DP-nprime)**((1.0_DP-gamma)*(1.0_DP-sigma)))) )**2.0_DP
 			end if 
 		else 
@@ -412,13 +420,13 @@ end Subroutine Asset_Grid_Threshold
 				! I have to evaluate the FOC in expectation over eindx prime given eindx
 				! Compute c' for each value of e'
 				DO ep_ind=1,ne
-				    cprime(ep_ind) = Linear_Int(Ygrid_t(:,zi),Cons_t(age+1,:,zi,lambdai,ep_ind), na_t, yprime  )
+				    cprime(ep_ind) = Linear_Int(Ygrid_t(:,z_in),Cons_t(age+1,:,z_in,l_in,ep_ind), na_t, yprime  )
 				ENDDO
 				! Compute the expected value of 1/c' conditional on current ei
-				E_MU_cp = SUM( pr_e(ei,:) / cprime**sigma )
+				E_MU_cp = SUM( pr_e(e_in,:) / cprime**sigma )
 
 				! Evaluate the squared residual of the Euler equation for working period
-				FOC_WH   = (ctemp - 1.0_dp/(beta*survP(age)*MB_aprime*E_MU_cp)**(1.0_dp/sigma)) **2.0_DP 
+				FOC_WH   = (ctemp - 1.0_dp/(beta*survP(age_in)*MB_aprime*E_MU_cp)**(1.0_dp/sigma)) **2.0_DP 
 		end if 
 
 	END  FUNCTION FOC_WH
@@ -2124,9 +2132,10 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
         DO WHILE ( YGRID_t(ai,zi) .lt. EndoYgrid(1) )
         	! print*, ' Extrapolation between YGRID and EndoYgrid!!!!'
 	        ! Solve for the Euler equation directly
-			brentvalue = brent( min(amin,YGRID_t(ai,zi))   ,  (amin+YGRID_t(ai,zi))/2.0_DP  ,  &
+	        state_FOC  = (/age,ai,zi,lambdai,ei/)
+			brentvalue = brent_p( min(amin,YGRID_t(ai,zi))   ,  (amin+YGRID_t(ai,zi))/2.0_DP  ,  &
                              	& YGRID_t(ai,zi)  + psi * ( yh(age, lambdai,ei)*0.95_DP )**(1.0_DP-tauPL)  ,  &
-	                             & FOC_WH, brent_tol, Aprime_t(age, ai, zi, lambdai,ei) )
+	                             & FOC_WH, brent_tol, Aprime_t(age, ai, zi, lambdai,ei) , state_FOC )
 
 			! Compute hours
 	        if (NSU_Switch.and.(Progressive_Tax_Switch.eqv..false.)) then 
