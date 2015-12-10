@@ -24,6 +24,7 @@ PROGRAM main
 	USE GLOBAL
 	use programfunctions
 	use Toolbox
+	use omp_lib
 
 	IMPLICIT NONE
 	! Variables to measure running time
