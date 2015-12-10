@@ -260,11 +260,20 @@ end Subroutine Asset_Grid_Threshold
 !
 ! Output: res , real(dp), residual of the Euler equatioin under retirement
 !
-	FUNCTION FOC_R(aprimet)
+	FUNCTION FOC_R(aprimet,state)
 		IMPLICIT NONE   
 		real(DP), intent(in)  :: aprimet
+		real(DP), dimension(:), intent(in) :: state
 		real(DP)              :: FOC_R
 		real(DP)              :: MB_aprime, yprime, cprime, euler_power
+		integer               :: age_in, a_in, z_in, l_in, e_in
+
+		! Allocate state and get indeces
+		age_in = int(state(1))
+		a_in   = int(state(2))
+		z_in   = int(state(3))
+		l_in   = int(state(4))
+		e_in   = int(state(5))
 
 		! Set the power used in the Euler equation for the retirement period
 		if (NSU_Switch.eqv..true.) then 
@@ -276,19 +285,19 @@ end Subroutine Asset_Grid_Threshold
 		end if 
 
 		! Compute marginal benefit of next period at a' (given zi)
-		MB_aprime = MB_a(aprimet,zgrid(zi))
+		MB_aprime = MB_a(aprimet,zgrid(z_in))
 		 
 		! Compute asset income of next period at a' (given zi)
-		yprime   = Y_a(aprimet,zgrid(zi))
+		yprime   = Y_a(aprimet,zgrid(z_in))
 		 
 		! Compute consumption of next period given a' (given zi, lambdai and ei)
 			! The value of c' comes from interpolating next period's consumption policy function
 			! The policy function is defined over a grid of asset income Y, and is interpolated for y'
-		cprime =   Linear_Int(Ygrid_t(:,zi), Cons_t(age+1,:,zi,lambdai,ei),na_t, yprime)    
+		cprime =   Linear_Int(Ygrid_t(:,z_in), Cons_t(age_in+1,:,z_in,l_in,e_in),na_t, yprime)    
 
 		! Evaluate square residual of Euler equation at current state (given by (ai,zi,lambdai,ei)) and savings given by a'
-		FOC_R	= ( (YGRID_t(ai,zi)+RetY_lambda_e(lambdai,ei)-aprimet)    &
-		           & - ((beta * survP(age) *  MB_aprime)**euler_power)  * cprime  ) ** 2.0_DP
+		FOC_R	= ( (YGRID_t(a_in,z_in)+RetY_lambda_e(l_in,e_in)-aprimet)    &
+		           & - ((beta * survP(age_in) *  MB_aprime)**euler_power)  * cprime  ) ** 2.0_DP
 
 	END  FUNCTION FOC_R
 
@@ -529,9 +538,10 @@ end Subroutine Asset_Grid_Threshold
 !
 	Subroutine EGM_Working_Period(MB_in,H_min,C_endo,H_endo,Y_endo)
 		Implicit None 
-		real(dp), intent(in)  :: MB_in , H_min
-		real(dp), intent(out) :: C_endo, H_endo, Y_endo
-		real(dp)              :: C_euler, C_foc, brentvalue
+		real(dp), intent(in)   :: MB_in , H_min
+		real(dp), intent(out)  :: C_endo, H_endo, Y_endo
+		real(dp)               :: C_euler, C_foc, brentvalue
+		REAL(DP), DIMENSION(6) :: par_FOC
 
 		if (Progressive_Tax_Switch.eqv..true.) then !Progressive labor taxes 
 			if (NSU_Switch.eqv..true.) then 
@@ -1507,7 +1517,7 @@ SUBROUTINE FIND_DBN_EQ()
 ! 				ENDDO
 ! 				ENDDO
 
-	    	print*, 'Eq. Distribution difference=', DBN_dist, "Residual Funciton", Agg_Debt(R), 'R=',R,'P=',P
+	    	print*, 'DBN_diff=', DBN_dist, "Agg_Debt", Agg_Debt(R), 'R=',R,'P=',P
 
 	    	! Solve the model at current aggregate values
 				! Find the threshold for wealth taxes (a_bar)
@@ -1860,6 +1870,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	INTEGER  :: sw 
 	REAL(DP) :: C_euler, C_foc, H_min, euler_power
 	REAL(DP), dimension(na_t,nz) :: Wealth
+	REAL(DP), DIMENSION(5)       :: state_FOC
 
 
 	! Set a minimum value for labor to check in the FOC
@@ -1952,10 +1963,10 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
         DO WHILE ( YGRID_t(ai,zi) .lt. EndoYgrid(1) )
 			! ap_temp    = Aprime(age, tempai, zi, lambdai,1) 
 			! Solve for a' directly by solving the Euler equation for retirement FOC_R
-
-			brentvalue = brent(min(amin,YGRID_t(ai,zi)), (amin+YGRID_t(ai,zi))/2.0_DP , &
+			state_FOC  = (/age,ai,zi,lambdai,ei/)
+			brentvalue = brent_p(min(amin,YGRID_t(ai,zi)), (amin+YGRID_t(ai,zi))/2.0_DP , &
 			                & YGRID_t(ai,zi)+RetY_lambda_e(lambdai,ei) *0.95_DP, &
-			                & FOC_R, brent_tol, Aprime_t(age, ai, zi, lambdai,ei))
+			                & FOC_R, brent_tol, Aprime_t(age, ai, zi, lambdai,ei),state_FOC)
 			
 			Cons_t(age, ai, zi, lambdai, ei) =  YGRID_t(ai,zi)  + RetY_lambda_e(lambdai,ei)  - Aprime_t(age, ai, zi, lambdai,ei)
 			
