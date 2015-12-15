@@ -3415,51 +3415,51 @@ SUBROUTINE  SIMULATION(bench_indx)
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
 
 	if (bench_indx.eq.1) then
-		OPEN   (UNIT=3,  FILE=trim(Result_Folder)//'Simul/panela_bench'		 	, STATUS='replace')
-		OPEN   (UNIT=4,  FILE=trim(Result_Folder)//'Simul/panelage_bench'		, STATUS='replace')
-		OPEN   (UNIT=5,  FILE=trim(Result_Folder)//'Simul/panelz_bench'		 	, STATUS='replace')
-		OPEN   (UNIT=6,  FILE=trim(Result_Folder)//'Simul/panellambda_bench'   	, STATUS='replace')
-		OPEN   (UNIT=7,  FILE=trim(Result_Folder)//'Simul/panele_bench'        	, STATUS='replace')
-		OPEN   (UNIT=8,  FILE=trim(Result_Folder)//'Simul/panel_return_bench'  	, STATUS='replace')
-		OPEN   (UNIT=9,  FILE=trim(Result_Folder)//'Simul/panel_cons_bench'		, STATUS='replace') 
-		OPEN   (UNIT=10, FILE=trim(Result_Folder)//'Simul/panel_hours_bench'	 	, STATUS='replace') 
-		OPEN   (UNIT=11, FILE=trim(Result_Folder)//'Simul/panel_aprime_bench' 	, STATUS='replace') 
-		OPEN   (UNIT=12, FILE=trim(Result_Folder)//'Simul/panel_at_return_bench'	, STATUS='replace') 
+		OPEN   (UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_bench'		 	, STATUS='replace')
+		OPEN   (UNIT=12, FILE=trim(Result_Folder)//'Simul/panelage_bench'		, STATUS='replace')
+		OPEN   (UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_bench'		 	, STATUS='replace')
+		OPEN   (UNIT=13, FILE=trim(Result_Folder)//'Simul/panellambda_bench'   	, STATUS='replace')
+		OPEN   (UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_bench'        	, STATUS='replace')
+		OPEN   (UNIT=15, FILE=trim(Result_Folder)//'Simul/panel_return_bench'  	, STATUS='replace')
+		OPEN   (UNIT=16, FILE=trim(Result_Folder)//'Simul/panel_cons_bench'		, STATUS='replace') 
+		OPEN   (UNIT=17, FILE=trim(Result_Folder)//'Simul/panel_hours_bench'	, STATUS='replace') 
+		OPEN   (UNIT=18, FILE=trim(Result_Folder)//'Simul/panel_aprime_bench' 	, STATUS='replace') 
+		OPEN   (UNIT=19, FILE=trim(Result_Folder)//'Simul/panel_at_return_bench', STATUS='replace') 
 	else 
-		OPEN   (UNIT=3,  FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
-		OPEN   (UNIT=4,  FILE=trim(Result_Folder)//'Simul/panelage_exp'		    , STATUS='replace')
-		OPEN   (UNIT=5,  FILE=trim(Result_Folder)//'Simul/panelz_exp'		 	, STATUS='replace')
-		OPEN   (UNIT=6,  FILE=trim(Result_Folder)//'Simul/panellambda_exp'   	, STATUS='replace')
-		OPEN   (UNIT=7,  FILE=trim(Result_Folder)//'Simul/panele_exp'        	, STATUS='replace')
-		OPEN   (UNIT=8,  FILE=trim(Result_Folder)//'Simul/panel_return_exp'  	, STATUS='replace')
-		OPEN   (UNIT=9,  FILE=trim(Result_Folder)//'Simul/panel_cons_exp'		, STATUS='replace') 
-		OPEN   (UNIT=10, FILE=trim(Result_Folder)//'Simul/panel_hours_exp'	 	, STATUS='replace') 
-		OPEN   (UNIT=11, FILE=trim(Result_Folder)//'Simul/panel_aprime_exp' 	    , STATUS='replace') 
-		OPEN   (UNIT=12, FILE=trim(Result_Folder)//'Simul/panel_at_return_exp'	, STATUS='replace') 
+		OPEN   (UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
+		OPEN   (UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_exp'		    , STATUS='replace')
+		OPEN   (UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_exp'		 	, STATUS='replace')
+		OPEN   (UNIT=13, FILE=trim(Result_Folder)//'Simul/panellambda_exp'   	, STATUS='replace')
+		OPEN   (UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_exp'        	, STATUS='replace')
+		OPEN   (UNIT=15, FILE=trim(Result_Folder)//'Simul/panel_return_exp'  	, STATUS='replace')
+		OPEN   (UNIT=16, FILE=trim(Result_Folder)//'Simul/panel_cons_exp'		, STATUS='replace') 
+		OPEN   (UNIT=17, FILE=trim(Result_Folder)//'Simul/panel_hours_exp'	 	, STATUS='replace') 
+		OPEN   (UNIT=18, FILE=trim(Result_Folder)//'Simul/panel_aprime_exp' 	, STATUS='replace') 
+		OPEN   (UNIT=19, FILE=trim(Result_Folder)//'Simul/panel_at_return_exp'	, STATUS='replace') 
 	endif 
 
 
-	WRITE  (UNIT=3, FMT=*) panela
-	WRITE  (UNIT=4, FMT=*) panelage 
-	WRITE  (UNIT=5, FMT=*) panelz 
-	WRITE  (UNIT=6, FMT=*) panellambda 
-	WRITE  (UNIT=7, FMT=*) panele 
-	WRITE  (UNIT=8, FMT=*) panel_return 
-	WRITE  (UNIT=9, FMT=*) panelcons
-	WRITE  (UNIT=10, FMT=*) panelhours
-	WRITE  (UNIT=11, FMT=*) panelaprime
-	WRITE  (UNIT=12, FMT=*) panel_at_return 
+	WRITE  (UNIT=10, FMT=*) panela
+	WRITE  (UNIT=11, FMT=*) panelage 
+	WRITE  (UNIT=12, FMT=*) panelz 
+	WRITE  (UNIT=13, FMT=*) panellambda 
+	WRITE  (UNIT=14, FMT=*) panele 
+	WRITE  (UNIT=15, FMT=*) panel_return 
+	WRITE  (UNIT=16, FMT=*) panelcons
+	WRITE  (UNIT=17, FMT=*) panelhours
+	WRITE  (UNIT=18, FMT=*) panelaprime
+	WRITE  (UNIT=19, FMT=*) panel_at_return 
 
-	close (unit=3)
-	close (unit=4)
-	close (unit=5)
-	close (unit=6)
-	close (unit=7)
-	close (unit=8)
-	close (unit=9)
 	close (unit=10)
 	close (unit=11)
 	close (unit=12)
+	close (unit=13)
+	close (unit=14)
+	close (unit=15)
+	close (unit=16)
+	close (unit=17)
+	close (unit=18)
+	close (unit=19)
 
 	print*, 'Averages from simulation'
 	print*, sum(panela)/totpop, sum(panelage)/totpop, sum(panel_return)/totpop, sum(panelhours)/totpop
