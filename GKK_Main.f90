@@ -170,6 +170,8 @@ PROGRAM main
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		CALL WRITE_VARIABLES(1)
+		print*,"	Simulation"
+		CALL SIMULATION(solving_bench)
 
 	! Aggregate variables in benchmark economy
 		GBAR_bench  = GBAR
@@ -316,6 +318,9 @@ PROGRAM main
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
+
+	print*,"	Experiment Simulation"
+	CALL SIMULATION(solving_bench)
 
 
 	print*,'---------------------------'

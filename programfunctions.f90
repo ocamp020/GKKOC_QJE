@@ -2867,10 +2867,604 @@ END SUBROUTINE LIFETIME_Y_ESTIMATE
 !========================================================================================
 !========================================================================================
 
+SUBROUTINE  SIMULATION(bench_indx)
+	use parameters
+	use global
+	use omp_lib
+
+	IMPLICIT NONE
+	integer, intent(in) :: bench_indx
+	integer  :: currentzi, currentlambdai, currentei
+	REAL(DP) :: tempnoage, tempnoz, tempnolambda, tempnoe, tempno, currenta, currentY, K
+	REAL(DP) :: start_timet, finish_timet
+	INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
+	INTEGER,  DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
+	INTEGER,  DIMENSION(totpop) :: panelage , panelz , panellambda, panele,   newpanelage , newpanelz , newpanellambda, newpanele
+	REAL(DP), DIMENSION(totpop) :: panela,  newpanela,  panel_return, panelcons, panelhours, panelaprime, panel_at_return
+
+
+    age=1
+    requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
+    cdfrequirednumberby_age(age) = requirednumberby_age(age)
+    DO age=2,MaxAge
+        requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
+        cdfrequirednumberby_age(age) = requirednumberby_age(age) + cdfrequirednumberby_age(age-1)
+    ENDDO
+    ! If the total number of people are not equal to the total population, then I will add the remainder to the last age
+    requirednumberby_age(MaxAge)    = requirednumberby_age(MaxAge)-cdfrequirednumberby_age(MaxAge) + totpop
+    cdfrequirednumberby_age(MaxAge) = totpop
+
+	!=====================================================================
+	!                     GENERATE   INITIAL   PANEL
+	!=====================================================================
+
+
+	newiseed=-1
+
+	!numberby_age_z_lambda=0
+	!numberby_age_e =0
+
+	DO paneli=1,totpop
+
+		! AGE
+	   	tempnoage = ran1(newiseed)
+	   	age=1
+	   	DO WHILE (tempnoage*totpop .gt. cdfrequirednumberby_age(age))
+	    	age=age+1
+	   	ENDDO
+
+		! Z   
+	   	tempnoz = ran1(newiseed)
+	   	zi=1
+	   	DO WHILE (tempnoz .gt. cdf_Gz(zi))
+	    	zi=zi+1
+	   	ENDDO
+	 
+		! LAMBDA  
+	   	tempnolambda = ran1(newiseed) 
+	   	lambdai=1
+	   	DO WHILE (tempnolambda .gt. cdf_Glambda(lambdai))
+	    	lambdai=lambdai+1
+	   	ENDDO
+
+		! E   
+	   	tempnoe = ran1(newiseed)   
+	   	ei=1
+	   	DO WHILE (tempnoe .gt. cdf_Ge_byage(age,ei))
+	    	ei=ei+1
+	   	ENDDO
+
+		! CORRECT THE NUMBER OF PEOPLE IF THERE ARE EXCESS
+			!
+			!   if (age .gt. 1) then
+			!        if ( (cdfrequirednumberby_age(age)-tempnoage*totpop) .gt.  (tempnoage*totpop-cdfrequirednumberby_age(age-1)) ) then
+			!            agesign=1
+			!            else
+			!                 agesign=-1
+			!        endif      
+			!    else
+			!        agesign=1
+			!    endif 
+			!   agecounter=1
+			!   tage=age        
+			!111 IF (sum(numberby_age_z_lambda(age,:,:)) .ge. sum(requirednumberby_age_z_lambda(age,:,:))) then
+			!            age = tage + agecounter * agesign
+			!            age = max(age,1)
+			!            age = min(age,MaxAge)
+			!            if (sum(numberby_age_z_lambda(age,:,:)) .ge. sum(requirednumberby_age_z_lambda(age,:,:))) then
+			!                age = age - agecounter * agesign
+			!                age = max(age,1)
+			!                age = min(age,MaxAge)
+			!                if (sum(numberby_age_z_lambda(age,:,:)) .ge. sum(requirednumberby_age_z_lambda(age,:,:))) then
+			!                    agecounter = agecounter +1
+			!                    go to 111
+			!                endif    
+			!            endif
+			!       ENDIF
+			!   
+			!   if (zi .gt. 1) then 
+			!       if ( (cdf_Gz(zi) -tempnoz) .gt.  (tempnoz-cdf_Gz(zi-1)) )    then
+			!           agesign=1
+			!           else
+			!                agesign=-1
+			!       endif      
+			!   else
+			!       agesign=1
+			!   endif
+			!   agecounter=1  
+			!   tzi=zi       
+			!112 IF (sum(numberby_age_z_lambda(age,zi,:)) .ge. sum(requirednumberby_age_z_lambda(age,zi,:))) then
+			!           zi = tzi + agecounter * agesign
+			!           zi = max(zi,1)
+			!           zi=min(zi,nz)
+			!           IF (sum(numberby_age_z_lambda(age,zi,:)) .ge. sum(requirednumberby_age_z_lambda(age,zi,:))) then
+			!               zi = zi - agecounter * agesign
+			!               zi = max(zi,1)
+			!               zi=min(zi,nz)
+			!               IF (sum(numberby_age_z_lambda(age,zi,:)) .ge. sum(requirednumberby_age_z_lambda(age,zi,:))) then
+			!                   agecounter = agecounter +1
+			!                   go to 112
+			!               ENDIF
+			!           ENDIF               
+			!       ENDIF    
+			! 
+			!   if (lambdai .gt. 1) then      
+			!       if ( (cdf_Glambda(lambdai) -tempnolambda) .gt.  (tempnolambda-cdf_Glambda(lambdai-1)) )    then
+			!           agesign=1
+			!           else
+			!                agesign=-1
+			!       endif  
+			!   else
+			!       agesign=1
+			!   endif 
+			!    
+			!   agecounter=1  
+			!   tlambdai=lambdai  
+			!113 IF  (numberby_age_z_lambda(age,zi,lambdai) .ge. requirednumberby_age_z_lambda(age,zi,lambdai)) then
+			!           lambdai = tlambdai + agecounter * agesign
+			!           lambdai = max(lambdai,1)
+			!           lambdai=min(lambdai,nlambda)
+			!           IF  (numberby_age_z_lambda(age,zi,lambdai) .ge. requirednumberby_age_z_lambda(age,zi,lambdai)) then
+			!               lambdai = lambdai - agecounter * agesign
+			!               lambdai = max(lambdai,1)
+			!               lambdai=min(lambdai,nlambda)
+			!               IF  (numberby_age_z_lambda(age,zi,lambdai) .ge. requirednumberby_age_z_lambda(age,zi,lambdai)) then
+			!                   agecounter = agecounter +1
+			!                   go to 113
+			!               ENDIF
+			!           ENDIF               
+			!       ENDIF
+			!
+			!   if (ei .gt. 1) then
+			!       if ( (Ge_byage(age,ei) -tempnoe) .gt.  (tempnolambda-Ge_byage(age,ei-1) ) )    then
+			!           agesign=1
+			!           else
+			!                agesign=-1
+			!       endif     
+			!    else
+			!        agesign=1
+			!    endif 
+			!      
+			!   agecounter=1  
+			!   tei=ei      
+			!114  IF (numberby_age_e(age,ei) .ge. requirednumberby_age_e(age,ei)) THEN
+			!           ei = tei + agecounter * agesign
+			!           ei = max(ei,1)
+			!           ei=min(ei,ne)
+			!           IF (numberby_age_e(age,ei) .ge. requirednumberby_age_e(age,ei)) THEN
+			!               ei = tei -  agecounter * agesign
+			!               ei = max(ei,1)
+			!               ei=min(ei,ne)
+			!               IF (numberby_age_e(age,ei) .ge. requirednumberby_age_e(age,ei)) THEN
+			!                   agecounter = agecounter +1
+			!                   go to 114
+			!              ENDIF
+			!           ENDIF        
+			!        ENDIF
+			!   numberby_age_e(age,ei) = numberby_age_e(age,ei)+1    
+			!   numberby_age_z_lambda(age,zi,lambdai) = numberby_age_z_lambda(age,zi,lambdai)+1
+			!    
+		! CORRECTION ENDED	
+
+	   panelage(paneli)    = age
+	   panelz(paneli)      = zi
+	   panellambda(paneli) = lambdai
+	   panele(paneli)      = ei
+	   
+	ENDDO
+
+	!print '("INITIAL = ",f6.3," seconds.")',finish_timet-start_timet
+
+	newpanelage    = panelage
+	newpanelz      = panelz
+	newpanele      = panele
+	newpanellambda = panellambda
+
+	! SET INITIAL ASSET DISTRIBUTION
+	panela     = 1.0_DP
+	newpanela  = 1.0_DP
+	!=============================================================================
+	!
+	! SIMULATE FROM THE SECOND PERIOD SHOCKS AND UPDATE NEW DISTRIBUTIONS
+	!
+	!=============================================================================
+
+	!call cpu_time(start_timet) 
+
+	DO simutime=1, MaxSimuTime
+
+		panelage = newpanelage
+		panelz   = newpanelz
+		panele   = newpanele
+		panellambda = newpanellambda
+		panela   = newpanela
+
+		!print*,'simutime=',simutime
+
+		!numberby_age=0
+		!deathby_age=0
+		!survivingby_age =0
+		!
+		!deathby_age_z_lambda = 0
+		!survivingby_age_z_lambda=0
+		!numberby_age_z_lambda=0
+		!numberby_e_e=0
+
+		newpanela = amin
+
+		DO paneli=1,totpop
+		    
+			currenta  = panela(paneli)
+			age       = panelage(paneli)
+			currentzi = panelz(paneli)
+			currentlambdai = panellambda(paneli) 
+			currentei = panele(paneli)
+		       
+			! currentY=  Y_a(currenta,zgrid(currentzi)) 
+		       
+			!  COMPUTE NEXT PERIOD'S ASSET
+		    if (age .lt. MaxAge) then
+				! newpanela(paneli) = Linear_Int(agrid, Aprime(age,:,currentzi,currentlambdai, currentei),na,currenta)
+				! newpanela(paneli) = Linear_Int(YGRID(:,currentzi), Aprime(age,:,currentzi,currentlambdai, currentei),na,currentY)
+				! newpanela(paneli) = Linear_Int_Aprime(agrid, Aprime(age,:,currentzi,currentlambdai, currentei),na,currenta)
+
+		        ! do linear interpolation here to find aprime. calling the function takes much more time
+	            if (currenta .ge. amax) then
+	                tklo = na-1
+	            else if (currenta .lt. amin) then
+	                tklo = 1
+	            else
+	                tklo = ((currenta - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+	            endif 
+		            
+		        tkhi = tklo + 1        
+
+		        newpanela(paneli) = ((agrid(tkhi) - currenta)*Aprime(age,tklo,currentzi,currentlambdai, currentei) &
+		                            &  + (currenta - agrid(tklo))*Aprime(age,tkhi,currentzi,currentlambdai, currentei)) &
+		                            &  / ( agrid(tkhi) - agrid(tklo) )    
+		            
+	            if (newpanela(paneli)  .ge. amax) then
+	                newpanela(paneli) = min(newpanela(paneli), amax) 
+	            endif      
+	            if (newpanela(paneli)  .lt. amin) then
+	                newpanela(paneli) = max(newpanela(paneli), amin) 
+	            endif      
+
+			endif !age .lt. MaxAge
+			!  NEXT PERIOD'S ASSET IS COMPUTED
+
+		             
+			! DRAW NEXT PERIOD'S AGE DBN
+		    tempnoage = ran1(newiseed)  
+		  
+		    IF (tempnoage .gt. survP(age)) THEN
+		        newpanelage(paneli) = 1
+		    ELSE
+		        newpanelage(paneli)    = age+1
+		        newpanelz(paneli)      = currentzi
+		        newpanellambda(paneli) = currentlambdai   
+		    ENDIF
+		  
+			! CORRECT AGE-Z-LAMBDA DEATH DISTRIBUTION 
+				!     
+				!       IF (tempnoage .gt. survP(age)) THEN
+				!           IF (deathby_age_z_lambda(age,currentzi,currentlambdai) .lt. &
+				!                                    & requireddeathby_age_z_lambda(age,currentzi,currentlambdai)) THEN
+				!                newpanelage(paneli)=1
+				!                deathby_age_z_lambda(age,currentzi,currentlambdai) = deathby_age_z_lambda(age,currentzi,currentlambdai)+1
+				!                ELSE
+				!                       newpanelage(paneli) =age+1
+				!                       survivingby_age_z_lambda(age,currentzi,currentlambdai) = &
+				!                                    &  survivingby_age_z_lambda(age,currentzi,currentlambdai)+1
+				!                       newpanelz(paneli)=currentzi
+				!                       newpanellambda(paneli)=currentlambdai
+				!                       numberby_age_z_lambda(age+1,currentzi,currentlambdai) = & 
+				!                                    & numberby_age_z_lambda(age+1,currentzi,currentlambdai) +1
+				!           ENDIF  
+				!      ELSE
+				!          IF (survivingby_age_z_lambda(age,currentzi,currentlambdai) .lt. &
+				!                                    & requiredsurvivingby_age_z_lambda(age,currentzi,currentlambdai)) THEN
+				!              newpanelage(paneli)=age+1
+				!              survivingby_age_z_lambda(age,currentzi,currentlambdai) = &
+				!                                    & survivingby_age_z_lambda(age,currentzi,currentlambdai)+1
+				!              newpanelz(paneli)=currentzi
+				!              newpanellambda(paneli)=currentlambdai
+				!              numberby_age_z_lambda(age+1,currentzi,currentlambdai) = &
+				!                                    & numberby_age_z_lambda(age+1,currentzi,currentlambdai) +1  
+				!              ELSE
+				!                  newpanelage(paneli)=1
+				!                  deathby_age_z_lambda(age,currentzi,currentlambdai) = deathby_age_z_lambda(age,currentzi,currentlambdai) +1               
+				!          ENDIF           
+				!      ENDIF
+				!      
+			! CORRECT AGE-Z-LAMBDA DEATH DISTRIBUTION ENDED
+		  
+
+		 
+			! DRAW Z and LAMBDA DISTRIBUTION FOR ONE-YEAR OLDS
+		    age = newpanelage(paneli)   
+		 
+		   	IF (age .eq. 1) THEN    
+
+				! Z      
+		       	tempnoz = ran1(newiseed) 
+		       	zi=1
+		       	DO WHILE (tempnoz .gt. cdf_pr_z(currentzi,zi))
+		            zi=zi+1
+		       	ENDDO
+		       
+				! LAMBDA  
+		       	tempnolambda = ran1(newiseed) 
+		       	lambdai=1
+		       	DO WHILE (tempnolambda .gt. cdf_pr_lambda(currentlambdai,lambdai))
+		           lambdai=lambdai+1
+		       	ENDDO
+
+				! E       
+		       	currentei = panele(paneli)
+		       	ei=ne/2+1 ! ALL NEWBORN START FROM THE MEDIAN E  but if too many people died and started from median E, draw a new E for them
+
+				! CORRECT AGE-Z-LAMBDA  DISTRIBUTIONS
+					!
+					!       if (zi  .gt. 1) then
+					!           if ( (cdf_pr_z(currentzi,zi) -tempnoz) .lt.  (tempnoz-cdf_pr_z(currentzi,zi-1) ) )    then
+					!               agesign=1
+					!               else
+					!                    agesign=-1
+					!           endif
+					!       else
+					!            agesign=1          
+					!       endif
+					!       agecounter=1  
+					!       tzi=zi       
+					!115 IF (sum(numberby_age_z_lambda(age,zi,:)) .ge. sum(requirednumberby_age_z_lambda(age,zi,:))) then
+					!           zi = tzi + agecounter * agesign
+					!           zi = max(zi,1)
+					!           zi=min(zi,nz)
+					!           IF (sum(numberby_age_z_lambda(age,zi,:)) .ge. sum(requirednumberby_age_z_lambda(age,zi,:))) then
+					!               zi = zi - agecounter * agesign
+					!               zi = max(zi,1)
+					!               zi=min(zi,nz)
+					!               IF (sum(numberby_age_z_lambda(age,zi,:)) .ge. sum(requirednumberby_age_z_lambda(age,zi,:))) then
+					!                   agecounter = agecounter +1
+					!                   go to 115
+					!               ENDIF
+					!           ENDIF               
+					!       ENDIF    
+					!
+					!       if (lambdai .gt. 1) then
+					!            if ( (cdf_pr_lambda(currentlambdai,lambdai) -tempnolambda) .gt.  &
+					!                            & (tempnolambda-cdf_pr_lambda(currentlambdai,lambdai-1)) )   then
+					!               agesign=1
+					!               else
+					!                    agesign=-1
+					!           endif      
+					!       else
+					!            agesign=1          
+					!       endif       
+					!       agecounter=1  
+					!       tlambdai=lambdai  
+					!116 IF  (numberby_age_z_lambda(age,zi,lambdai) .ge. requirednumberby_age_z_lambda(age,zi,lambdai)) then
+					!               lambdai = tlambdai + agecounter * agesign
+					!               lambdai = max(lambdai,1)
+					!               lambdai=min(lambdai,nlambda)
+					!               IF  (numberby_age_z_lambda(age,zi,lambdai) .ge. requirednumberby_age_z_lambda(age,zi,lambdai)) then
+					!                   lambdai = lambdai - agecounter * agesign
+					!                   lambdai = max(lambdai,1)
+					!                   lambdai=min(lambdai,nlambda)
+					!                   IF  (numberby_age_z_lambda(age,zi,lambdai) .ge. requirednumberby_age_z_lambda(age,zi,lambdai)) then
+					!                       agecounter = agecounter +1
+					!                       go to 116
+					!                   ENDIF
+					!               ENDIF               
+					!         ENDIF
+					!          
+					!        if ( numberby_e_e(currentei,ei) .ge. requirednumberby_e_e(currentei,ei) ) then
+					!            tempnoe = ran1(newiseed) 
+					!            ei=1
+					!            DO WHILE (tempnoe .gt. cdf_Ge(ei))
+					!               ei=ei+1
+					!            ENDDO    
+					!
+					!           if (ei .gt. 1) then 
+					!               if ( (cdf_Ge(ei) -tempnoe) .gt.  (tempnolambda-cdf_Ge(ei-1)) )    then
+					!                   agesign=1
+					!                   else
+					!                        agesign=-1
+					!               endif      
+					!           else
+					!               agesign=1 
+					!           endif        
+					!           agecounter=1  
+					!           tei=ei      
+					! 117    IF (numberby_e_e(currentei,ei) .ge. requirednumberby_e_e(currentei,ei)) THEN
+					!                   ei = tei + agecounter * agesign
+					!                   ei = max(ei,1)
+					!                   ei=min(ei,ne)
+					!                   IF (numberby_e_e(currentei,ei) .ge. requirednumberby_e_e(currentei,ei)) THEN
+					!                       ei = tei -  agecounter * agesign
+					!                       ei = max(ei,1)
+					!                       ei=min(ei,ne)
+					!                       IF (numberby_e_e(currentei,ei) .ge. requirednumberby_e_e(currentei,ei)) THEN
+					!                           agecounter = agecounter +1
+					!                           go to 117
+					!                      ENDIF
+					!                   ENDIF        
+					!             ENDIF                
+					!        endif
+					!
+					!       numberby_age_z_lambda(age,zi,lambdai) = numberby_age_z_lambda(age,zi,lambdai) +1        
+					!       numberby_e_e(currentei, ei)  = numberby_e_e(currentei,ei) +1
+					!
+				!  CORRECTING DISTRIBUTIONS ENDED
+
+		        newpanelz(paneli)      = zi    
+		        newpanellambda(paneli) = lambdai
+		        newpanele(paneli)      = ei  
+		        
+		    ENDIF ! new age==1
+		 
+		ENDDO ! paneli
+
+
+		!E for surviving
+		!print*,'E'
+		DO paneli=1,totpop
+			!print*,'paneli',paneli
+		    age = newpanelage(paneli)  
+		    ! DRAW NEW E FOR THOSE WHO ARE NOT NEWBORN
+		    IF (age .gt. 1) THEN             
+		        currentei = panele(paneli)   
+		        tempno = ran1(newiseed)   
+		        ei=1
+		        DO WHILE (tempno .gt. cdf_pr_e(currentei,ei))
+					ei=ei+1
+		        ENDDO
+		            
+				! CORRECT E DISTRIBUTION 
+					!
+					!           if (ei .gt. 1) then 
+					!                if ( (cdf_pr_e(currentei,ei) -tempnoe) .gt.  (tempnolambda-cdf_pr_e(currentei,ei-1)) )    then
+					!                   agesign=1
+					!                   else
+					!                        agesign=-1
+					!               endif    
+					!           else
+					!               agesign=1 
+					!           endif  
+					!           agecounter=1  
+					!           tei=ei      
+					! 118    IF (numberby_e_e(currentei,ei) .ge. requirednumberby_e_e(currentei,ei)) THEN
+					!                   ei = tei + agecounter * agesign
+					!                   ei = max(ei,1)
+					!                   ei=min(ei,ne)
+					!                   IF (numberby_e_e(currentei,ei) .ge. requirednumberby_e_e(currentei,ei)) THEN
+					!                       ei = tei -  agecounter * agesign
+					!                       ei = max(ei,1)
+					!                       ei=min(ei,ne)
+					!                       IF (numberby_e_e(currentei,ei) .ge. requirednumberby_e_e(currentei,ei)) THEN
+					!                           agecounter = agecounter +1
+					!                           go to 118
+					!                      ENDIF
+					!                   ENDIF        
+					!             ENDIF                
+					!             numberby_e_e(currentei,ei) = numberby_e_e(currentei,ei) + 1
+					!
+				! CORRECT E DISTRIBUTION ENDED
+
+		        newpanele(paneli)=ei            
+		    ENDIF ! age .gt. 1        
+		ENDDO ! paneli
+
+
+		panelage     = newpanelage
+		panela       = newpanela
+		panelz       = newpanelz
+		panellambda  = newpanellambda
+		panele       = newpanele
+
+	ENDDO ! simutime
+
+	DO paneli=1,totpop
+
+		currenta  = panela(paneli)
+		age       = panelage(paneli)
+		currentzi = panelz(paneli)
+		currentlambdai = panellambda(paneli) 
+		currentei = panele(paneli)
+	       
+
+        ! do linear interpolation here to find aprime. calling the function takes much more time
+        if (currenta .ge. amax) then
+            tklo = na-1
+        else if (currenta .lt. amin) then
+            tklo = 1
+        else
+            tklo = ((currenta - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+        endif 
+        
+        tkhi = tklo + 1        
+
+        panelcons(paneli) = ((agrid(tkhi) - currenta)*cons(age,tklo,currentzi,currentlambdai, currentei) &
+                                &  + (currenta - agrid(tklo))*cons(age,tkhi,currentzi,currentlambdai, currentei)) &
+                                &  / ( agrid(tkhi) - agrid(tklo) )              
+
+        panelhours(paneli) = ((agrid(tkhi) - currenta)*hours(age,tklo,currentzi,currentlambdai, currentei) &
+                                &  + (currenta - agrid(tklo))*hours(age,tkhi,currentzi,currentlambdai, currentei)) &
+                                &  / ( agrid(tkhi) - agrid(tklo) )  
+
+        panelaprime(paneli) =((agrid(tkhi) - currenta)*Aprime(age,tklo,currentzi,currentlambdai, currentei) &
+                                &  + (currenta - agrid(tklo))*Aprime(age,tkhi,currentzi,currentlambdai, currentei)) &
+                                &  / ( agrid(tkhi) - agrid(tklo) )  
+	
+		K = min( theta*currenta , (mu*P*zgrid(currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+
+		panel_return(paneli)    = R*currenta + ( P*(zgrid(currentzi)*K)**mu - (R+DepRate)*K )
+		panel_at_return(paneli) = Y_a(currenta,zgrid(currentzi)) - 1.0_dp  
+
+	ENDDO ! paneli
+
+	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
+
+	if (bench_indx.eq.1) then
+		OPEN   (UNIT=3,  FILE='Simul/panela_bench'		 	, STATUS='replace')
+		OPEN   (UNIT=4,  FILE='Simul/panelage_bench'		, STATUS='replace')
+		OPEN   (UNIT=5,  FILE='Simul/panelz_bench'		 	, STATUS='replace')
+		OPEN   (UNIT=6,  FILE='Simul/panellambda_bench'   	, STATUS='replace')
+		OPEN   (UNIT=7,  FILE='Simul/panele_bench'        	, STATUS='replace')
+		OPEN   (UNIT=8,  FILE='Simul/panel_return_bench'  	, STATUS='replace')
+		OPEN   (UNIT=9,  FILE='Simul/panel_cons_bench'		, STATUS='replace') 
+		OPEN   (UNIT=10, FILE='Simul/panel_hours_bench'	 	, STATUS='replace') 
+		OPEN   (UNIT=11, FILE='Simul/panel_aprime_bench' 	, STATUS='replace') 
+		OPEN   (UNIT=12, FILE='Simul/panel_at_return_bench'	, STATUS='replace') 
+	else 
+		OPEN   (UNIT=3,  FILE='Simul/panela_exp'		 	, STATUS='replace')
+		OPEN   (UNIT=4,  FILE='Simul/panelage_exp'		, STATUS='replace')
+		OPEN   (UNIT=5,  FILE='Simul/panelz_exp'		 	, STATUS='replace')
+		OPEN   (UNIT=6,  FILE='Simul/panellambda_exp'   	, STATUS='replace')
+		OPEN   (UNIT=7,  FILE='Simul/panele_exp'        	, STATUS='replace')
+		OPEN   (UNIT=8,  FILE='Simul/panel_return_exp'  	, STATUS='replace')
+		OPEN   (UNIT=9,  FILE='Simul/panel_cons_exp'		, STATUS='replace') 
+		OPEN   (UNIT=10, FILE='Simul/panel_hours_exp'	 	, STATUS='replace') 
+		OPEN   (UNIT=11, FILE='Simul/panel_aprime_exp' 	, STATUS='replace') 
+		OPEN   (UNIT=12, FILE='Simul/panel_at_return_exp'	, STATUS='replace') 
+	endif 
+
+
+	WRITE  (UNIT=3, FMT=*) panela
+	WRITE  (UNIT=4, FMT=*) panelage 
+	WRITE  (UNIT=5, FMT=*) panelz 
+	WRITE  (UNIT=6, FMT=*) panellambda 
+	WRITE  (UNIT=7, FMT=*) panele 
+	WRITE  (UNIT=8, FMT=*) panel_return 
+	WRITE  (UNIT=9, FMT=*) panelcons
+	WRITE  (UNIT=10, FMT=*) panelhours
+	WRITE  (UNIT=11, FMT=*) panelaprime
+	WRITE  (UNIT=12, FMT=*) panel_at_return 
+
+	close (unit=3)
+	close (unit=4)
+	close (unit=5)
+	close (unit=6)
+	close (unit=7)
+	close (unit=8)
+	close (unit=9)
+	close (unit=10)
+	close (unit=11)
+	close (unit=12)
+
+END SUBROUTINE SIMULATION
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
 
 SUBROUTINE WRITE_VARIABLES(bench_indx)
 	IMPLICIT NONE
-	integer :: bench_indx,  prctile, status
+	integer, intent(in) :: bench_indx
+	integer ::prctile, status
 
 	if (bench_indx.eq.1) then
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='replace') 

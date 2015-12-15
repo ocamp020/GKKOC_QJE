@@ -47,7 +47,7 @@ Sergio.a: GKK_Wealth_Tax_Sergio.f90 $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o $(Fold
 
 GKK_Main.a: GKK_Main.f90 $(Objects_Main)
 	gfortran $(omp_flag) -O2 -I$(Folder) GKK_Main.f90 $(Objects_Main) -o $(Folder)/GKK_Main.a
-	time $(Folder)/GKK_Main.a
+	$(Folder)/GKK_Main.a
 
 GKK_Main_Server.a: GKK_Main.f90 $(Objects_Main)
 	gfortran -I$(Folder) GKK_Main.f90 $(Objects_Main) -o $(Folder)/GKK_Main.a
