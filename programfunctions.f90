@@ -3411,6 +3411,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	ENDDO ! paneli
 
+	print*, 'Writing simulation results'
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
 
 	if (bench_indx.eq.1) then
@@ -3460,6 +3461,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	close (unit=11)
 	close (unit=12)
 
+	print*, 'Averages from simulation'
 	print*, sum(panela)/totpop, sum(panelage)/totpop, sum(panel_return)/totpop, sum(panelhours)/totpop
 
 END SUBROUTINE SIMULATION
