@@ -3460,6 +3460,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 	close (unit=11)
 	close (unit=12)
 
+	print*, sum(panela)/totpop, sum(panelage)/totpop, sum(panel_return)/totpop, sum(panelhours)/totpop
+
 END SUBROUTINE SIMULATION
 
 
