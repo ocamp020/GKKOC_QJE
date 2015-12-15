@@ -2882,6 +2882,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	INTEGER,  DIMENSION(totpop) :: panelage , panelz , panellambda, panele,   newpanelage , newpanelz , newpanellambda, newpanele
 	REAL(DP), DIMENSION(totpop) :: panela,  newpanela,  panel_return, panelcons, panelhours, panelaprime, panel_at_return
 
+	!$ call omp_set_num_threads(40)
 
     age=1
     requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
@@ -2904,6 +2905,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	!numberby_age_z_lambda=0
 	!numberby_age_e =0
 
+	!$omp parallel do private(age,zi,lambdai,ei,tempnoage,tempnoz,tempnolambda,tempnoe)
 	DO paneli=1,totpop
 
 		! AGE
@@ -3092,6 +3094,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		newpanela = amin
 
+		!$omp parallel do &
+		!$omp private(age,zi,ei,lambdai,currenta,currentzi,currentlambdai,currentei,tklo,tkhi,tempnoage,tempnoz,tempnolambda,tempnoe)
 		DO paneli=1,totpop
 		    
 			currenta  = panela(paneli)
@@ -3309,6 +3313,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		!E for surviving
 		!print*,'E'
+
+		!$omp parallel do private(age,currentei,tempno,ei)
 		DO paneli=1,totpop
 			!print*,'paneli',paneli
 		    age = newpanelage(paneli)  
@@ -3365,6 +3371,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	ENDDO ! simutime
 
+	!$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi,K)
 	DO paneli=1,totpop
 
 		currenta  = panela(paneli)
