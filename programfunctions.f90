@@ -2905,7 +2905,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	!numberby_age_z_lambda=0
 	!numberby_age_e =0
 
-	! !$omp parallel do private(age,zi,lambdai,ei,tempnoage,tempnoz,tempnolambda,tempnoe)
+	!$omp parallel do private(age,zi,lambdai,ei,tempnoage,tempnoz,tempnolambda,tempnoe)
 	DO paneli=1,totpop
 
 		! AGE
