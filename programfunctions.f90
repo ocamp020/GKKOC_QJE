@@ -2905,7 +2905,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	!numberby_age_z_lambda=0
 	!numberby_age_e =0
 
-	!$omp parallel do private(age,zi,lambdai,ei,tempnoage,tempnoz,tempnolambda,tempnoe)
+	! !$omp parallel do private(age,zi,lambdai,ei,tempnoage,tempnoz,tempnolambda,tempnoe)
 	DO paneli=1,totpop
 
 		! AGE
@@ -3094,8 +3094,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		newpanela = amin
 
-		!$omp parallel do &
-		!$omp private(age,zi,ei,lambdai,currenta,currentzi,currentlambdai,currentei,tklo,tkhi,tempnoage,tempnoz,tempnolambda,tempnoe)
+		! !$omp parallel do &
+		! !$omp private(age,zi,ei,lambdai,currenta,currentzi,currentlambdai,currentei,tklo,tkhi,tempnoage,tempnoz,tempnolambda,tempnoe)
 		DO paneli=1,totpop
 		    
 			currenta  = panela(paneli)
@@ -3314,7 +3314,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		!E for surviving
 		!print*,'E'
 
-		!$omp parallel do private(age,currentei,tempno,ei)
+		! !$omp parallel do private(age,currentei,tempno,ei)
 		DO paneli=1,totpop
 			!print*,'paneli',paneli
 		    age = newpanelage(paneli)  
@@ -3371,7 +3371,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	ENDDO ! simutime
 
-	!$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi,K)
+	! !$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi,K)
 	DO paneli=1,totpop
 
 		currenta  = panela(paneli)
@@ -3411,6 +3411,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	ENDDO ! paneli
 
+	print*, ' '
 	print*, 'Writing simulation results'
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
 
@@ -3463,6 +3464,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	print*, 'Averages from simulation'
 	print*, sum(panela)/totpop, sum(panelage)/totpop, sum(panel_return)/totpop, sum(panelhours)/totpop
+	print*, ' '
 
 END SUBROUTINE SIMULATION
 
