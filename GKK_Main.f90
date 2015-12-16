@@ -37,7 +37,7 @@ PROGRAM main
 	! Switch for solving benchmark or just reading resutls
 		! If read_write_bench==.true. then just read resutls
 		! If read_write_bench==.false. then solve for benchmark and store results
-		read_write_bench = .false.
+		read_write_bench = .true.
 
 	! Switch for separable and non-separable utility
 		! If NSU_Switch==.true. then do non-separable utility
@@ -187,7 +187,7 @@ PROGRAM main
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		CALL WRITE_VARIABLES(1)
-		if ((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)) then 
+		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(read_write_bench.eqv..false.)) then 
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
 		endif
