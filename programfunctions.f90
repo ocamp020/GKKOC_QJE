@@ -750,6 +750,14 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	REAL(DP), dimension(max_age_category,nz) :: size_pos_welfare_by_agegroup_z, frac_pos_welfare_by_agegroup_z  
 	REAL(DP), dimension(max_age_category,nz) :: tot_wealth_by_agegroup_z_bench, size_by_agegroup_z_bench, size_by_agegroup_z_exp
 	REAL(DP), dimension(max_age_category,nz) :: tot_wealth_by_agegroup_z_exp
+	REAL(DP), dimension(max_age_category,nz) :: tot_cons_by_agegroup_by_z_bench, tot_hours_by_agegroup_by_z_bench
+	REAL(DP), dimension(max_age_category,nz) :: tot_aprime_by_agegroup_by_z_bench, tot_return_by_agegroup_by_z_bench
+	REAL(DP), dimension(max_age_category,nz) :: tot_at_return_by_agegroup_by_z_bench, tot_cap_tax_by_agegroup_by_z_bench
+	real(DP), dimension(max_age_category,nz) :: tot_lab_tax_by_agegroup_by_z_bench, tot_cons_tax_by_agegroup_by_z_bench
+	REAL(DP), dimension(max_age_category,nz) :: tot_cons_by_agegroup_by_z_exp, tot_hours_by_agegroup_by_z_exp
+	REAL(DP), dimension(max_age_category,nz) :: tot_aprime_by_agegroup_by_z_exp, tot_return_by_agegroup_by_z_exp
+	REAL(DP), dimension(max_age_category,nz) :: tot_at_return_by_agegroup_by_z_exp, tot_cap_tax_by_agegroup_by_z_exp
+	REAL(DP), dimension(max_age_category,nz) :: tot_lab_tax_by_agegroup_by_z_exp, tot_cons_tax_by_agegroup_by_z_exp
 
 
 	! Age Brackets
@@ -790,6 +798,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		!CALL COMPUTE_VALUE_FUNCTION_LINEAR
 		!CALL COMPUTE_VALUE_FUNCTION_SPLINE  
 		!ValueFunction_Bench = ValueFunction
+
+	! Profit Matrix
+		Pr_mat = Profit_Matrix(R,P)
 
 	! Print policy functions and distribution 
 		OPEN (UNIT=70, FILE=trim(Result_Folder)//'cons_by_age_z_bench', STATUS='replace')    
@@ -859,8 +870,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    ENDDO
 		ENDDO
 
-		OPEN (UNIT=60, FILE=trim(Result_Folder)//'mean_wealth_by_agegroup_z_bench', STATUS='replace')  
-		OPEN (UNIT=70, FILE=trim(Result_Folder)//'size_by_agegroup_z_bench', STATUS='replace')  
+		OPEN (UNIT=60, FILE=trim(Result_Folder)//'mean_wealth_by_agegroup_z_bench.txt', STATUS='replace')  
+		OPEN (UNIT=70, FILE=trim(Result_Folder)//'size_by_agegroup_z_bench.txt', STATUS='replace')  
 		DO age_group_counter=1,max_age_category
 		    WRITE  (UNIT=60, FMT=*)   tot_wealth_by_agegroup_z_bench(age_group_counter,:)/ size_by_agegroup_z_bench(age_group_counter,:)
 		    WRITE  (UNIT=70, FMT=*)    size_by_agegroup_z_bench(age_group_counter,:)
@@ -868,6 +879,85 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		close (UNIT=60)
 		close (UNIT=70)
 		
+	age_group_counter=1
+
+	tot_cons_by_agegroup_by_z_bench 	 = 0.0_DP
+	tot_hours_by_agegroup_by_z_bench 	 = 0.0_DP
+	tot_aprime_by_agegroup_by_z_bench 	 = 0.0_DP
+	tot_return_by_agegroup_by_z_bench    = 0.0_DP
+	tot_at_return_by_agegroup_by_z_bench = 0.0_DP
+	tot_cap_tax_by_agegroup_by_z_bench 	 = 0.0_DP
+	tot_lab_tax_by_agegroup_by_z_bench 	 = 0.0_DP
+	tot_cons_tax_by_agegroup_by_z_bench  = 0.0_DP
+
+	DO age=1,MaxAge 
+
+	    DO while (age .gt.   age_limit(age_group_counter+1) )
+	        age_group_counter=age_group_counter+1
+	    ENDDO    
+	 
+	    DO ai=1,na
+	    DO zi=1,nz
+	    DO lambdai=1,nlambda
+	    DO ei=1,ne
+
+	        tot_cons_by_agegroup_by_z_bench(age_group_counter,zi) =  tot_cons_by_agegroup_by_z_bench(age_group_counter,zi)+ &
+	                         & Cons(age,ai,zi,lambdai,ei)*DBN_bench(age,ai,zi,lambdai,ei)
+
+	        tot_hours_by_agegroup_by_z_bench(age_group_counter,zi) = tot_hours_by_agegroup_by_z_bench(age_group_counter,zi)+&
+	                         & HOURS(age,ai,zi,lambdai,ei)*DBN_bench(age,ai,zi,lambdai,ei)
+
+	        tot_aprime_by_agegroup_by_z_bench(age_group_counter,zi)=tot_aprime_by_agegroup_by_z_bench(age_group_counter,zi)+&
+	                         & Aprime(age,ai,zi,lambdai,ei)*DBN_bench(age,ai,zi,lambdai,ei)
+
+	        tot_return_by_agegroup_by_z_bench(age_group_counter,zi) = tot_at_return_by_agegroup_by_z_bench(age_group_counter,zi)+&
+	                         & DBN_bench(age,ai,zi,lambdai,ei) * (R*agrid(ai) + Pr_mat(ai,zi) )
+
+	        tot_at_return_by_agegroup_by_z_bench(age_group_counter,zi) = tot_at_return_by_agegroup_by_z_bench(age_group_counter,zi)+&
+	                         & DBN_bench(age,ai,zi,lambdai,ei) * (Y_a(agrid(ai),zgrid(zi))-1.0_dp)
+	       
+	        tot_lab_tax_by_agegroup_by_z_bench(age_group_counter,zi) =tot_lab_tax_by_agegroup_by_z_bench(age_group_counter,zi) + &
+	                         & DBN_bench(age,ai,zi,lambdai,ei) * ( wage_bench * eff_un(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei) - &
+	                          & Y_h(Hours(age,ai,zi,lambdai,ei),age,lambdai,ei,wage_bench) )
+	      
+	        tot_cons_tax_by_agegroup_by_z_bench(age_group_counter,zi)=tot_cons_tax_by_agegroup_by_z_bench(age_group_counter,zi)+&
+	                         & DBN_bench(age,ai,zi,lambdai,ei) * (  tauC *cons(age,ai,zi,lambdai,ei) )
+	         
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	ENDDO
+
+	OPEN (UNIT=10, FILE=trim(Result_Folder)//'mean_cons_by_agegroup_by_z_bench.txt'     , STATUS='replace')  
+	OPEN (UNIT=11, FILE=trim(Result_Folder)//'mean_hours_by_agegroup_by_z_bench.txt'    , STATUS='replace')  
+	OPEN (UNIT=12, FILE=trim(Result_Folder)//'mean_aprime_by_agegroup_by_z_bench.txt'   , STATUS='replace')  
+	OPEN (UNIT=13, FILE=trim(Result_Folder)//'mean_weighted_return_by_agegroup_by_z_bench.txt'   , STATUS='replace')  
+	OPEN (UNIT=14, FILE=trim(Result_Folder)//'mean_weighted_at_return_by_agegroup_by_z_bench.txt', STATUS='replace')  
+	OPEN (UNIT=15, FILE=trim(Result_Folder)//'tot_lab_tax_by_agegroup_by_z_bench.txt'  , STATUS='replace')  
+	OPEN (UNIT=16, FILE=trim(Result_Folder)//'tot_cons_tax_by_agegroup_by_z_bench.txt' , STATUS='replace')  
+	!OPEN (UNIT=17, FILE=trim(Result_Folder)//' tot_cap_tax_by_agegroup_by_z_bench.txt', STATUS='replace')  
+	DO age_group_counter=1,max_age_category
+		WRITE (UNIT=10, FMT=*) tot_cons_by_agegroup_by_z_bench(age_group_counter,:)/ size_by_agegroup_z_bench(age_group_counter,:)
+		WRITE (UNIT=11, FMT=*) tot_hours_by_agegroup_by_z_bench(age_group_counter,:)/ size_by_agegroup_z_bench(age_group_counter,:)
+		WRITE (UNIT=12, FMT=*) tot_aprime_by_agegroup_by_z_bench(age_group_counter,:)/ size_by_agegroup_z_bench(age_group_counter,:)
+		WRITE (UNIT=13, FMT=*) tot_return_by_agegroup_by_z_bench(age_group_counter,:)/ tot_wealth_by_agegroup_z_bench(age_group_counter,:)
+		WRITE (UNIT=14, FMT=*) &
+			&	tot_at_return_by_agegroup_by_z_bench(age_group_counter,:)/ tot_wealth_by_agegroup_z_bench(age_group_counter,:)
+		WRITE (UNIT=15, FMT=*) tot_lab_tax_by_agegroup_by_z_bench(age_group_counter,:) 
+		WRITE (UNIT=16, FMT=*) tot_cons_tax_by_agegroup_by_z_bench(age_group_counter,:) 
+		!WRITE (UNIT=17, FMT=*) tot_cap_tax_by_agegroup_by_z_bench(age_group_counter,:)  
+	ENDDO
+	close (UNIT=10)
+	close (UNIT=11)
+	close (UNIT=12)
+	close (UNIT=13)
+	close (UNIT=14)
+	close (UNIT=15)
+	close (UNIT=16)
+	!close (UNIT=17)
+
+
 
 	!=========================================== SOLVING EXP NEXT =================================
 	! Solve the experimental economy  
@@ -898,6 +988,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		!CALL COMPUTE_VALUE_FUNCTION_LINEAR
 		!CALL COMPUTE_VALUE_FUNCTION_SPLINE 
 		!ValueFunction_Exp = ValueFunction
+
+	! Profit Matrix
+		Pr_mat = Profit_Matrix(R,P)
 
 	! Print policy functions and distribution 
 		OPEN (UNIT=70, FILE=trim(Result_Folder)//'cons_by_age_z_exp', STATUS='replace')    
@@ -943,6 +1036,21 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		close (unit=50)  
 
 	! Consumption Equivalent Welfare
+		OPEN (UNIT=50, FILE=trim(Result_Folder)//'CE_alternative', STATUS='replace') 
+		    WRITE  (UNIT=50, FMT=*) 'CE Newborn=', ( sum(ValueFunction_exp(1,:,:,:,:)*DBN1(1,:,:,:,:)) / &
+		                                &  sum(ValueFunction_Bench(1,:,:,:,:)*DBN_bench(1,:,:,:,:))  ) &
+		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+		    WRITE  (UNIT=50, FMT=*) 'CE =', ( sum(ValueFunction_exp(:,:,:,:,:)*DBN1(:,:,:,:,:)) / &
+		                                &  sum(ValueFunction_Bench(:,:,:,:,:)*DBN_bench(:,:,:,:,:))  ) &
+		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+
+		    WRITE  (UNIT=50, FMT=*) 'Av Utility NB (bench) =',sum(ValueFunction_Bench(1,:,:,:,:)*DBN_bench(1,:,:,:,:))  
+		    WRITE  (UNIT=50, FMT=*) 'Av Utility NB (exp  ) =',sum(ValueFunction_exp(1,:,:,:,:)*DBN1(1,:,:,:,:))    
+		    WRITE  (UNIT=50, FMT=*) 'Av Utility  (bench)   =',sum(ValueFunction_Bench(:,:,:,:,:)*DBN_bench(:,:,:,:,:))  
+		    WRITE  (UNIT=50, FMT=*) 'Av Utility  (exp)     =',sum(ValueFunction_exp(:,:,:,:,:)*DBN1(:,:,:,:,:))
+		close (unit=50)		
+
+
 		OPEN (UNIT=50, FILE=trim(Result_Folder)//'CE_NEWBORN', STATUS='replace')  
 		OPEN (UNIT=60, FILE=trim(Result_Folder)//'CE', STATUS='replace')  
 		OPEN (UNIT=70, FILE=trim(Result_Folder)//'CE_by_age', STATUS='replace')  
@@ -992,6 +1100,37 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    WRITE  (UNIT=80, FMT=*)  CE_by_agegroup_z(age_group_counter,:)
 		ENDDO
 		close (unit=80)
+
+		OPEN (UNIT=80, FILE=trim(Result_Folder)//'CE_by_Asset_z_med_E_Lambda_age1', STATUS='replace') 
+		OPEN (UNIT=90, FILE=trim(Result_Folder)//'MeanAsset_by_z_med_E_Lambda_age1', STATUS='replace') 
+		DO zi=1,nz
+		    WRITE  (UNIT=80, FMT=*)   Cons_Eq_Welfare(1,:,zi,nlambda/2+1, ne/2+1)
+		    WRITE  (UNIT=90, FMT=*)   sum(agrid*DBN_bench(1,:,zi,nlambda/2+1, ne/2+1)) &
+		                                                        & /sum(DBN_bench(1,:,zi,nlambda/2+1, ne/2+1))
+		ENDDO           
+		close (unit=80)
+		close (unit=90)
+
+		OPEN (UNIT=80, FILE=trim(Result_Folder)//'CE_by_Asset_z_med_E_Lambda_age16', STATUS='replace') 
+		OPEN (UNIT=90, FILE=trim(Result_Folder)//'MeanAsset_by_z_med_E_Lambda_age16', STATUS='replace') 
+		DO zi=1,nz
+		    WRITE  (UNIT=80, FMT=*)   Cons_Eq_Welfare(16,:,zi,nlambda/2+1, ne/2+1)
+		    WRITE  (UNIT=90, FMT=*)   sum(agrid*DBN_bench(16,:,zi,nlambda/2+1, ne/2+1)) &
+		                                                        & /sum(DBN_bench(16,:,zi,nlambda/2+1, ne/2+1))
+		ENDDO           
+		close (unit=80)
+		close (unit=90)
+
+		OPEN (UNIT=80, FILE=trim(Result_Folder)//'CE_by_Asset_z_med_E_Lambda_age31', STATUS='replace') 
+		OPEN (UNIT=90, FILE=trim(Result_Folder)//'MeanAsset_by_z_med_E_Lambda_age31', STATUS='replace') 
+		DO zi=1,nz
+			WRITE  (UNIT=80, FMT=*)   Cons_Eq_Welfare(31,:,zi,nlambda/2+1, ne/2+1)
+			WRITE  (UNIT=90, FMT=*)   sum(agrid*DBN_bench(31,:,zi,nlambda/2+1, ne/2+1)) &
+			                                            & /sum(DBN_bench(31,:,zi,nlambda/2+1, ne/2+1))
+		ENDDO           
+		close (unit=8)
+		close (unit=9)
+
 
 		! FRACTION POSITIVE WELFARE BY AGE-Z GROUP
 		frac_pos_welfare=0.0_DP
@@ -1057,6 +1196,85 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	    WRITE  (UNIT=60, FMT=*) size_pos_welfare_by_age_z(age,:)/size_by_age_z_bench(age,:)
 	ENDDO
 	close (UNIT=60)
+
+
+	age_group_counter=1
+
+	tot_cons_by_agegroup_by_z_exp 	 	= 0.0_DP
+	tot_hours_by_agegroup_by_z_exp 	 	= 0.0_DP
+	tot_aprime_by_agegroup_by_z_exp 	= 0.0_DP
+	tot_return_by_agegroup_by_z_exp    	= 0.0_DP
+	tot_at_return_by_agegroup_by_z_exp 	= 0.0_DP
+	tot_cap_tax_by_agegroup_by_z_exp 	= 0.0_DP
+	tot_lab_tax_by_agegroup_by_z_exp 	= 0.0_DP
+	tot_cons_tax_by_agegroup_by_z_exp  	= 0.0_DP
+
+	DO age=1,MaxAge 
+
+	    DO while (age .gt.   age_limit(age_group_counter+1) )
+	        age_group_counter=age_group_counter+1
+	    ENDDO    
+	 
+	    DO ai=1,na
+	    DO zi=1,nz
+	    DO lambdai=1,nlambda
+	    DO ei=1,ne
+
+	        tot_cons_by_agegroup_by_z_exp(age_group_counter,zi) =  tot_cons_by_agegroup_by_z_exp(age_group_counter,zi)+ &
+	                         & Cons(age,ai,zi,lambdai,ei)*DBN1(age,ai,zi,lambdai,ei)
+
+	        tot_hours_by_agegroup_by_z_exp(age_group_counter,zi) = tot_hours_by_agegroup_by_z_exp(age_group_counter,zi)+&
+	                         & HOURS(age,ai,zi,lambdai,ei)*DBN1(age,ai,zi,lambdai,ei)
+
+	        tot_aprime_by_agegroup_by_z_exp(age_group_counter,zi)=tot_aprime_by_agegroup_by_z_exp(age_group_counter,zi)+&
+	                         & Aprime(age,ai,zi,lambdai,ei)*DBN1(age,ai,zi,lambdai,ei)
+
+	        tot_return_by_agegroup_by_z_exp(age_group_counter,zi) = tot_at_return_by_agegroup_by_z_exp(age_group_counter,zi)+&
+	                         & DBN1(age,ai,zi,lambdai,ei) * (R*agrid(ai) + Pr_mat(ai,zi) )
+
+	        tot_at_return_by_agegroup_by_z_exp(age_group_counter,zi) = tot_at_return_by_agegroup_by_z_exp(age_group_counter,zi)+&
+	                         & DBN1(age,ai,zi,lambdai,ei) * (Y_a(agrid(ai),zgrid(zi))-1.0_dp)
+	       
+	        tot_lab_tax_by_agegroup_by_z_exp(age_group_counter,zi) =tot_lab_tax_by_agegroup_by_z_exp(age_group_counter,zi) + &
+	                         & DBN1(age,ai,zi,lambdai,ei) * ( wage_exp * eff_un(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei) - &
+	                          & Y_h(Hours(age,ai,zi,lambdai,ei),age,lambdai,ei,wage_exp) )
+	      
+	        tot_cons_tax_by_agegroup_by_z_exp(age_group_counter,zi)=tot_cons_tax_by_agegroup_by_z_exp(age_group_counter,zi)+&
+	                         & DBN1(age,ai,zi,lambdai,ei) * (  tauC *cons(age,ai,zi,lambdai,ei) )
+	         
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	ENDDO
+
+	OPEN (UNIT=10, FILE=trim(Result_Folder)//'mean_cons_by_agegroup_by_z_exp.txt'     , STATUS='replace')  
+	OPEN (UNIT=11, FILE=trim(Result_Folder)//'mean_hours_by_agegroup_by_z_exp.txt'    , STATUS='replace')  
+	OPEN (UNIT=12, FILE=trim(Result_Folder)//'mean_aprime_by_agegroup_by_z_exp.txt'   , STATUS='replace')  
+	OPEN (UNIT=13, FILE=trim(Result_Folder)//'mean_weighted_return_by_agegroup_by_z_exp.txt'   , STATUS='replace')  
+	OPEN (UNIT=14, FILE=trim(Result_Folder)//'mean_weighted_at_return_by_agegroup_by_z_exp.txt', STATUS='replace')  
+	OPEN (UNIT=15, FILE=trim(Result_Folder)//'tot_lab_tax_by_agegroup_by_z_exp.txt'  , STATUS='replace')  
+	OPEN (UNIT=16, FILE=trim(Result_Folder)//'tot_cons_tax_by_agegroup_by_z_exp.txt' , STATUS='replace')  
+	!OPEN (UNIT=17, FILE=trim(Result_Folder)//' tot_cap_tax_by_agegroup_by_z_exp.txt', STATUS='replace')  
+	DO age_group_counter=1,max_age_category
+		WRITE (UNIT=10, FMT=*) tot_cons_by_agegroup_by_z_exp(age_group_counter,:)/ size_by_agegroup_z_exp(age_group_counter,:)
+		WRITE (UNIT=11, FMT=*) tot_hours_by_agegroup_by_z_exp(age_group_counter,:)/ size_by_agegroup_z_exp(age_group_counter,:)
+		WRITE (UNIT=12, FMT=*) tot_aprime_by_agegroup_by_z_exp(age_group_counter,:)/ size_by_agegroup_z_exp(age_group_counter,:)
+		WRITE (UNIT=13, FMT=*) tot_return_by_agegroup_by_z_exp(age_group_counter,:)/ tot_wealth_by_agegroup_z_exp(age_group_counter,:)
+		WRITE (UNIT=14, FMT=*) tot_at_return_by_agegroup_by_z_exp(age_group_counter,:)/ tot_wealth_by_agegroup_z_exp(age_group_counter,:)
+		WRITE (UNIT=15, FMT=*) tot_lab_tax_by_agegroup_by_z_exp(age_group_counter,:) 
+		WRITE (UNIT=16, FMT=*) tot_cons_tax_by_agegroup_by_z_exp(age_group_counter,:) 
+		!WRITE (UNIT=17, FMT=*) tot_cap_tax_by_agegroup_by_z_exp(age_group_counter,:)  
+	ENDDO
+	close (UNIT=10)
+	close (UNIT=11)
+	close (UNIT=12)
+	close (UNIT=13)
+	close (UNIT=14)
+	close (UNIT=15)
+	close (UNIT=16)
+	!close (UNIT=17)
+
 
 
 	! Compute average welfare
@@ -1793,14 +2011,17 @@ SUBROUTINE COMPUTE_STATS()
 	    MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei)*agrid(ai)
 	    MeanCons     = MeanCons     + DBN1(age, ai, zi, lambdai, ei)*cons(age, ai, zi, lambdai, ei)   
 
-	    MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)* agrid(ai)
+	    
+	    MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * (YGRID(ai,zi)-1.0_DP)
+	    MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei) * (R*agrid(ai) + Pr_mat(ai,zi))
 
-	    if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
-	      MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)    
-	    else
-	      MeanReturn = MeanReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
-	       			& ( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) 
-	    endif      
+	    !MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)* agrid(ai)
+	    !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
+	    !  MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)    
+	    !else
+	    !  MeanReturn = MeanReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
+	    !   			& ( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) 
+	    !endif      
 	ENDDO
 	ENDDO
 	ENDDO    
@@ -1827,16 +2048,22 @@ SUBROUTINE COMPUTE_STATS()
 	DO zi=1,nz
 	DO ai=1,na
 	DO lambdai=1,nlambda
-	DO ei=1, ne   
-	    VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
-	    				& ((MBGRID(ai,zi)-1.0_DP)-MeanATReturn)**2.0_dp
+	DO ei=1, ne  
 
-	    if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
-		    VarReturn = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * (R-MeanReturn)**2.0_dp
-	   	else
-			VarReturn = VarReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * & 
-						& (( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) -MeanReturn)**2.0_dp
-	   	endif  
+		VarATReturn  = VarATReturn +  DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+	    				& ((YGRID(ai,zi)/agrid(ai)-1.0_DP)-MeanATReturn)**2.0_dp
+	    VarReturn    = VarATReturn +  DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+	    				& ((R*agrid(ai) + Pr_mat(ai,zi))/agrid(ai)-MeanATReturn)**2.0_dp
+	    
+	    !VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+	    !				& ((MBGRID(ai,zi)-1.0_DP)-MeanATReturn)**2.0_dp
+
+	    !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
+		!    VarReturn = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * (R-MeanReturn)**2.0_dp
+	   	!else
+		!	VarReturn = VarReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * & 
+		!				& (( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) -MeanReturn)**2.0_dp
+	   	!endif  
 
 	ENDDO
 	ENDDO
@@ -1855,17 +2082,20 @@ SUBROUTINE COMPUTE_STATS()
 	DO ai=1,na
 	DO lambdai=1,nlambda
 	DO ei=1, ne
-	    MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP) * agrid(ai)
+	    MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * (YGRID(ai,zi)-1.0_DP) 
+	    MeanReturn_by_z(zi)   = MeanReturn_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) * (R*agrid(ai) + Pr_mat(ai,zi)) 
+	    
+	    !MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP) * agrid(ai)
 
-	    if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
-	      MeanReturn_by_z(zi) = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)
-	    else
-	      MeanReturn_by_z(zi) = MeanReturn_by_z(zi)+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
-	       			& ( R + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP)-(R+DepRate))) 
-	    endif 
+	    !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
+	    !  MeanReturn_by_z(zi) = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)
+	    !else
+	    !  MeanReturn_by_z(zi) = MeanReturn_by_z(zi)+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
+	    !   			& ( R + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP)-(R+DepRate))) 
+	    !endif 
 
-	     size_by_z(zi)         = size_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) 
-	     Wealth_by_z(zi) 	   = Wealth_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)
+	    size_by_z(zi)   = size_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) 
+	    Wealth_by_z(zi) = Wealth_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)
 	ENDDO
 	ENDDO
 	ENDDO    
@@ -2870,7 +3100,7 @@ END SUBROUTINE LIFETIME_Y_ESTIMATE
 SUBROUTINE  SIMULATION(bench_indx)
 	use parameters
 	use global
-	use omp_lib
+	!use omp_lib
 
 	IMPLICIT NONE
 	integer, intent(in) :: bench_indx
