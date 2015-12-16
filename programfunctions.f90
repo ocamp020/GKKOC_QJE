@@ -2910,6 +2910,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		! AGE
 	   	tempnoage = ran1(newiseed)
+	   	print*, newiseed
 	   	age=1
 	   	DO WHILE (tempnoage*totpop .gt. cdfrequirednumberby_age(age))
 	    	age=age+1
