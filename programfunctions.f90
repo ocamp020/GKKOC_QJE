@@ -3314,7 +3314,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		!E for surviving
 		!print*,'E'
 
-		!$omp parallel do private(age,currentei,tempno,ei)
+		! !$omp parallel do private(age,currentei,tempno,ei)
 		DO paneli=1,totpop
 			!print*,'paneli',paneli
 		    age = newpanelage(paneli)  
