@@ -2115,6 +2115,7 @@ SUBROUTINE COMPUTE_STATS()
     MeanReturn_by_z   = MeanReturn_by_z   / Wealth_by_z
 
     ! Debt to GDP Ratio
+	K_mat = K_Matrix(R,P)
     External_Debt_GDP = 0.0_DP
 	DO zi=1,nz
 	DO ai=1,na
@@ -3784,9 +3785,9 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'EBAR'	, EBAR
 			WRITE(UNIT=19, FMT=*) 'YBAR'	, YBAR
 			WRITE(UNIT=19, FMT=*) 'CBAR'    , MeanCons
-			WRITE(UNIT=19, FMT=*) 'P'		, P
+			WRITE(UNIT=19, FMT=*) 'P'		, 100.0_dp*P
 			WRITE(UNIT=19, FMT=*) 'wage'	, wage
-			WRITE(UNIT=19, FMT=*) 'R'		, R
+			WRITE(UNIT=19, FMT=*) 'R'		, 100.0_dp*R
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) "Moments:"
 			WRITE(UNIT=19, FMT=*) " "
@@ -3802,9 +3803,9 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Mean_Labor_Earnings'	  	, mean_log_earnings_25_60
 			WRITE(UNIT=19, FMT=*) 'STD_Labor_Earnings'	  	, Std_Log_Earnings_25_60
 			WRITE(UNIT=19, FMT=*) 'Mean_Labor_25_60'	   	, meanhours_25_60
-			WRITE(UNIT=19, FMT=*) 'Mean_Return'				, MeanReturn
+			WRITE(UNIT=19, FMT=*) 'Mean_Return'				, 100.0_dp*MeanReturn
 			WRITE(UNIT=19, FMT=*) 'Std_Return'				, StdReturn
-			WRITE(UNIT=19, FMT=*) 'Mean_Return_by_z'		, MeanReturn_by_z
+			WRITE(UNIT=19, FMT=*) 'Mean_Return_by_z'		, 100.0_dp*MeanReturn_by_z
 			WRITE(UNIT=19, FMT=*) 'Moments'				  	, SSE_Moments 
 			WRITE(UNIT=19, FMT=*) ' '
 		CLOSE(Unit=19)
