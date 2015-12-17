@@ -2323,11 +2323,14 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 
     ENDDO ! ai
 
+    !$omp critical
 	if (any(isnan(EndoCons))) then 
 		print*, "isnan - Consumption endogenous"
 		print*, age,lambdai,ai,zi,ei
+		print*, EndoCons
 		STOP 
 	end if 
+	!$omp end critical
 
     ! Sort endogenous grid for interpolation
 	call Sort(na_t+1,EndoYgrid,EndoYgrid,sort_ind)
