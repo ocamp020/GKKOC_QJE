@@ -96,7 +96,7 @@ PROGRAM main
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
 		tauWmin_at=0.014_DP
 		tauWinc_at=0.002_DP ! Minimum tax above threshold and increments
-		Threshold_Factor = 1.00_dp 
+		Threshold_Factor = 0.00_dp 
 	! Consumption tax
 		tauC=0.075_DP
 	! Set Labor Tax Regime
@@ -187,10 +187,10 @@ PROGRAM main
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		CALL WRITE_VARIABLES(1)
-		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(read_write_bench.eqv..false.)) then 
-			print*,"	Simulation"
-			CALL SIMULATION(solving_bench)
-		endif
+		!if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(read_write_bench.eqv..false.)) then 
+		!	print*,"	Simulation"
+		!	CALL SIMULATION(solving_bench)
+		!endif
 
 	! Aggregate variables in benchmark economy
 		GBAR_bench  = GBAR

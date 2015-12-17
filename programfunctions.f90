@@ -2005,6 +2005,9 @@ SUBROUTINE COMPUTE_STATS()
 	Var_Log_Earnings_25_60 = Var_Log_Earnings_25_60 / pop_pos_earn_25_60
 	Std_Log_Earnings_25_60 = Var_Log_Earnings_25_60 ** 0.5_DP
 
+	! Profit Matrix
+	Pr_mat = Profit_Matrix(R,P)
+
 	MeanWealth 	 = 0.0_DP
 	MeanATReturn = 0.0_DP
 	MeanReturn 	 = 0.0_DP
