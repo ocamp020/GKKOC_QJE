@@ -96,7 +96,7 @@ PROGRAM main
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
 		tauWmin_at=0.014_DP
 		tauWinc_at=0.002_DP ! Minimum tax above threshold and increments
-		Threshold_Factor = 0.00_dp 
+		Threshold_Factor = 0.50_dp 
 	! Consumption tax
 		tauC=0.075_DP
 	! Set Labor Tax Regime
@@ -337,7 +337,7 @@ PROGRAM main
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	if ((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)) then 
+	if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp)) then 
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
 	endif
