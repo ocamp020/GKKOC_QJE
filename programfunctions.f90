@@ -650,7 +650,7 @@ end Subroutine Asset_Grid_Threshold
 				  C_endo = ((gamma*psi*yh(age, lambdai,ei)/(1.0_DP-gamma))**((1.0_DP-gamma)*(1.0_DP-sigma)) &
 				    & *  beta*survP(age)*MB_in  &
 				    & *  sum( pr_e(ei,:) * (Cons_t(age+1,ai,zi,lambdai,:)**(gamma*(1.0_DP-sigma)-1.0_DP)) &
-				    & *  ( (1.0_DP-Hours_t(age+1, ai, zi, lambdai,:))**((1.0_DP-gamma)*(1.0_DP-sigma)))))**(-1.0_DP/sigma)                    
+				    & *  ( (1.0_DP-Hours_t(age+1, ai, zi, lambdai,:))**((1.0_DP-gamma)*(1.0_DP-sigma)))))**(-1.0_DP/sigma)
 
 				  H_endo = 1.0_DP - (1.0_DP-gamma)*C_endo/(gamma*psi*yh(age, lambdai,ei))   
 
@@ -674,14 +674,14 @@ end Subroutine Asset_Grid_Threshold
 		! Endogenous grid for asset income
 		Y_endo = agrid_t(ai) + C_endo - Y_h(H_endo,age,lambdai,ei,wage)
 
-		!$omp critical
-		if (zi.eq.4) then 
-		print*, "EGM Working Periods"
-		print*, C_endo, ai, zi!,H_endo,Y_endo
-		!print*, MB_in,state_FOC
-		print*, ' '
-		endif 
-		!$omp end critical
+		! 		!$omp critical
+		! 		if ((zi.eq.1).and.(ai.eq.16)) then 
+		! 		print*, "EGM Working Periods"
+		! 		print*, C_endo,H_endo,Y_endo
+		! 		print*, MB_in,state_FOC
+		! 		print*, ' '
+		! 		endif 
+		! 		!$omp end critical
 	end Subroutine EGM_Working_Period
 
 !========================================================================================
@@ -2323,16 +2323,16 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	
 		end if 
 
-    ENDDO ! ai
+    	ENDDO ! ai
 
-    !$omp critical
-	if (any(isnan(EndoCons))) then 
-		print*, "isnan - Consumption endogenous"
-		print*, age,lambdai,ai,zi,ei
-		print*, EndoCons
-		STOP 
-	end if 
-	!$omp end critical
+	    ! !$omp critical
+		if (any(isnan(EndoCons))) then 
+			print*, "isnan - Consumption endogenous"
+			print*, age,ai,zi,lambdai,ei
+			print*, EndoCons
+			STOP 
+		end if 
+		! !$omp end critical
 
     ! Sort endogenous grid for interpolation
 	call Sort(na_t+1,EndoYgrid,EndoYgrid,sort_ind)
@@ -2383,12 +2383,20 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			else 
 				if (NSU_Switch.eqv..true.) then 
 					Hours_t(age,ai,zi,lambdai,ei) = max( 0.0_dp , &
-						&  1.0_DP - (1.0_DP-gamma)*Cons_t(age,ai,zi,lambdai,ei)/(gamma*psi*yh(age, lambdai,ei)) )
+						&  1.0_DP - (1.0_DP-gamma)*Cons_t(age,ai,zi,lambdai,ei)/(gamma*psi*yh(age,lambdai,ei)) )
 				else 
 					Hours_t(age,ai,zi,lambdai,ei) = max( 0.0_DP , &
 						&  1.0_DP - phi*Cons_t(age,ai,zi,lambdai,ei)/(psi*yh(age, lambdai,ei)) )
 				end if 
 			end if 
+
+			if (Hours_t(age,ai,zi,lambdai,ei).ge.1.0_dp) then 
+				print*, ' '
+				print*, 'Hours highers than 1', age,ai,zi,lambdai,ei
+				print*, Cons_t(age,ai,zi,lambdai,ei)
+				STOP
+			endif 
+
 
 			! Savings 
 				Aprime_t(age, ai, zi, lambdai,ei) = YGRID_t(ai,zi)  + Y_h(Hours_t(age, ai, zi, lambdai,ei),age,lambdai,ei,wage)  & 
@@ -2402,13 +2410,13 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	           	! Compute hours
 		        if (NSU_Switch.and.(Progressive_Tax_Switch.eqv..false.)) then 
 		        	Hours_t(age, ai, zi, lambdai,ei)  = max( 0.0_dp , &
-		        			&  gamma - (1.0_DP-gamma) *( YGRID(ai,zi) - Aprime(age, ai, zi, lambdai,ei)) / (psi*yh(age, lambdai,ei)) )
+		        			&  gamma - (1.0_DP-gamma) *( YGRID_t(ai,zi) - Aprime_t(age, ai, zi, lambdai,ei)) / (psi*yh(age, lambdai,ei)) )
                 else               	        
                 	!compute  hours using FOC_HA                              
 		        	par_FOC(1:5) = (/age,ai,zi,lambdai,ei/) 
 		        	par_FOC(6)   = amin
 		        	brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, Hours_t(age, ai, zi, lambdai,ei), par_FOC)
-		        end if 
+		        end if  
 
 	            Cons_t(age,ai,zi,lambdai,ei) = YGRID_t(ai,zi)+  Y_h(Hours_t(age, ai, zi, lambdai,ei),age,lambdai,ei,wage)  &
 		                            		  & - Aprime_t(age, ai, zi, lambdai,ei)      
@@ -2416,7 +2424,13 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 				IF (Cons_t(age, ai, zi, lambdai,ei) .le. 0.0_DP)  THEN
 					print*,'w1: Cons(age, ai, zi, lambdai,ei)=',Cons_t(age, ai, zi, lambdai,ei)
 					STOP
-				ENDIF                   
+				ENDIF 
+				if (Hours_t(age,ai,zi,lambdai,ei).ge.1.0_dp) then 
+					print*, ' '
+					print*, 'w1 Hours highers than 1', age,ai,zi,lambdai,ei
+					print*, Cons_t(age,ai,zi,lambdai,ei)
+					STOP
+				endif                   
 		     endif      
 		ENDDO ! ai   
 
@@ -2439,7 +2453,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			! Compute hours
 	        if (NSU_Switch.and.(Progressive_Tax_Switch.eqv..false.)) then 
 	        	Hours_t(age, ai, zi, lambdai,ei)  = max( 0.0_dp , &
-	        			&  gamma - (1.0_DP-gamma) *( YGRID_t(ai,zi) - Aprime(age, ai, zi, lambdai,ei)) / (psi*yh(age, lambdai,ei)) )
+	        			&  gamma - (1.0_DP-gamma) *( YGRID_t(ai,zi) - Aprime_t(age, ai, zi, lambdai,ei)) / (psi*yh(age, lambdai,ei)) )
             else               	        
 				!compute  hours using FOC_HA                              
 				par_FOC(1:5) = (/age,ai,zi,lambdai,ei/)
@@ -2457,7 +2471,15 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
                 !pause
                 print*, "there is a problem in line 2063"
                 STOP
-            ENDIF                   
+            ENDIF 
+
+            if (Hours_t(age,ai,zi,lambdai,ei).ge.1.0_dp) then 
+				print*, ' '
+				print*, 'w2 Hours highers than 1', age,ai,zi,lambdai,ei
+				print*, Cons_t(age,ai,zi,lambdai,ei)
+				STOP
+			endif 
+
             ai = ai + 1
         ENDDO  
 
