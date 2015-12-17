@@ -151,72 +151,72 @@ PROGRAM main
 
 		! ------- DO NOT REMOVE THE LINES ABOVE
 
-! 	!====================================================================================================
-! 	PRINT*,''
-! 	Print*,'--------------- SOLVING BENCHMARK WITH BEST PARAMETERS -----------------'
-! 	PRINT*,''
-! 	print*,'CAPITAL TAX ECONOMY'
+	!====================================================================================================
+	PRINT*,''
+	Print*,'--------------- SOLVING BENCHMARK WITH BEST PARAMETERS -----------------'
+	PRINT*,''
+	print*,'CAPITAL TAX ECONOMY'
 
-! 	! Benchmark economy
-! 		solving_bench=1
+	! Benchmark economy
+		solving_bench=1
 
-! 	! Set taxes for benchmark economy
-! 		tauK = 0.25_DP
-! 		tauW_bt = 0.00_DP
-! 		tauW_at = 0.00_DP
-! 		Y_a_threshold = 0.00_DP 
+	! Set taxes for benchmark economy
+		tauK = 0.25_DP
+		tauW_bt = 0.00_DP
+		tauW_at = 0.00_DP
+		Y_a_threshold = 0.00_DP 
 
-! 	! Solve for the model and compute stats
-! 	print*,"	Initializing program"
-! 		CALL INITIALIZE
-! 	if (read_write_bench.eqv..false.) then
-! 		print*,"	Computing equilibrium distribution"
-! 		CALL FIND_DBN_EQ
-! 		print*,"	Computing government spending"
-! 		CALL GOVNT_BUDGET
-! 		print*,"	Computing Value Function"
-! 		CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-! 		print*,"	Saving results in text files to be read later"
-! 		CALL Write_Benchmark_Results(read_write_bench)
-! 	else
-! 		print*,"	Reading benchmark results from files"
-! 		CALL Write_Benchmark_Results(read_write_bench)
-! 	end if 
+	! Solve for the model and compute stats
+	print*,"	Initializing program"
+		CALL INITIALIZE
+	if (read_write_bench.eqv..false.) then
+		print*,"	Computing equilibrium distribution"
+		CALL FIND_DBN_EQ
+		print*,"	Computing government spending"
+		CALL GOVNT_BUDGET
+		print*,"	Computing Value Function"
+		CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+		print*,"	Saving results in text files to be read later"
+		CALL Write_Benchmark_Results(read_write_bench)
+	else
+		print*,"	Reading benchmark results from files"
+		CALL Write_Benchmark_Results(read_write_bench)
+	end if 
 
-! 		print*,"	Computing satitics"
-! 		CALL COMPUTE_STATS
-! 		print*,"	Writing variables"
-! 		CALL WRITE_VARIABLES(1)
-! 		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(read_write_bench.eqv..false.)) then 
-! 			print*,"	Simulation"
-! 			CALL SIMULATION(solving_bench)
-! 		endif
+		print*,"	Computing satitics"
+		CALL COMPUTE_STATS
+		print*,"	Writing variables"
+		CALL WRITE_VARIABLES(1)
+		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(read_write_bench.eqv..false.)) then 
+			print*,"	Simulation"
+			CALL SIMULATION(solving_bench)
+		endif
 
-! 	! Aggregate variables in benchmark economy
-! 		GBAR_bench  = GBAR
-! 		QBAR_bench  = QBAR 
-! 		NBAR_bench  = NBAR 
-! 		Ebar_bench  = EBAR
-! 		P_bench     = P
-! 		R_bench     = R
-! 		wage_bench  = wage
-! 		Y_bench     = YBAR
-! 		tauK_bench  = tauK
-! 		tauPL_bench = tauPL
-! 		psi_bench   = psi
-! 		DBN_bench   = DBN1
-! 		tauw_bt_bench = tauW_bt
-! 		tauw_at_bench = tauW_at
-! 		Y_a_threshold_bench = Y_a_threshold
+	! Aggregate variables in benchmark economy
+		GBAR_bench  = GBAR
+		QBAR_bench  = QBAR 
+		NBAR_bench  = NBAR 
+		Ebar_bench  = EBAR
+		P_bench     = P
+		R_bench     = R
+		wage_bench  = wage
+		Y_bench     = YBAR
+		tauK_bench  = tauK
+		tauPL_bench = tauPL
+		psi_bench   = psi
+		DBN_bench   = DBN1
+		tauw_bt_bench = tauW_bt
+		tauw_at_bench = tauW_at
+		Y_a_threshold_bench = Y_a_threshold
 
-! 		DBN_bench           = DBN1
-! 		ValueFunction_bench = ValueFunction
-! 		Cons_bench          = Cons           
-! 		Hours_bench         = Hours
-! 		Aprime_bench        = Aprime 
+		DBN_bench           = DBN1
+		ValueFunction_bench = ValueFunction
+		Cons_bench          = Cons           
+		Hours_bench         = Hours
+		Aprime_bench        = Aprime 
 
-! 		write(*,*) "Benchmark variables"
-! 		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"P=",P,"wage=",wage,'R=',R
+		write(*,*) "Benchmark variables"
+		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"P=",P,"wage=",wage,'R=',R
 
 ! 	!====================================================================================================
 ! 	PRINT*,''
