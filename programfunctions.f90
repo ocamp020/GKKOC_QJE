@@ -674,6 +674,9 @@ end Subroutine Asset_Grid_Threshold
 		! Endogenous grid for asset income
 		Y_endo = agrid_t(ai) + C_endo - Y_h(H_endo,age,lambdai,ei,wage)
 
+		!print*, "EGM Working Periods"
+		!print*, C_endo,H_endo,Y_endo
+		!print*, MB_in,H_min,state_FOC
 
 	end Subroutine EGM_Working_Period
 
@@ -2152,8 +2155,8 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	IMPLICIT NONE
 	REAL(DP) :: brentvalue, C_foc, H_min, euler_power
 	INTEGER  :: tempai, sw 
-	REAL(DP), DIMENSION(na_t+1) :: EndoCons, EndoYgrid, EndoHours
-	INTEGER , DIMENSION(na_t+1) :: sort_ind 
+	REAL(DP), DIMENSION(na_t+1)  :: EndoCons, EndoYgrid, EndoHours
+	INTEGER , DIMENSION(na_t+1)  :: sort_ind 
 	REAL(DP), DIMENSION(na_t,nz) :: Wealth
 	REAL(DP), DIMENSION(5)       :: state_FOC
 	REAL(DP), DIMENSION(6)       :: par_FOC
@@ -2296,15 +2299,19 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
         state_FOC  = (/age,ai,zi,lambdai,ei/)
 		if (abs(Wealth(ai,zi)-Y_a_threshold).lt.1e-8) then 
 	    	! Below threshold
-			call EGM_Working_Period( MB_a_bt(agrid(ai),zgrid(zi)) , H_min , state_FOC , & 
+			call EGM_Working_Period( MB_a_bt(agrid_t(ai),zgrid(zi)) , H_min , state_FOC , & 
 			      & EndoCons(ai), EndoHours(ai) , EndoYgrid(ai)  )
 			
 			! Above threshold
-			call EGM_Working_Period( MB_a_at(agrid(ai),zgrid(zi)) , H_min , state_FOC , & 
+			call EGM_Working_Period( MB_a_at(agrid_t(ai),zgrid(zi)) , H_min , state_FOC , & 
 			      & EndoCons(na_t+1), EndoHours(na_t+1) , EndoYgrid(na_t+1)  )
 
 			! Set the flag!
 	    	sw = 1 
+
+	    	!print*, ' '
+	    	!print*, State_FOC 
+	    	!print*, MB_a_bt(agrid_t(ai),zgrid(zi)), MB_a_at(agrid_t(ai),zgrid(zi))
 		else 
 			! Usual EGM
 			call EGM_Working_Period( MBGRID_t(ai,zi) , H_min , state_FOC , & 
@@ -2312,8 +2319,8 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	
 		end if 
 
-    ENDDO ! ai 
-
+    ENDDO ! ai
+    
 	if (any(isnan(EndoCons))) then 
 		print*, "isnan - Consumption endogenous"
 		print*, age,lambdai,ai,zi,ei
@@ -2709,7 +2716,7 @@ SUBROUTINE FORM_Y_MB_GRID(TYGRID,TMBGRID,TYGRID_t,TMBGRID_t)
 		else 
 			DO ai=1,na_t
 				TYGRID_t(ai,zi)  = Y_a(agrid_t(ai),zgrid(zi))
-				TMBGRID_t(ai,zi) = MB_a(agrid(ai),zgrid(zi))
+				TMBGRID_t(ai,zi) = MB_a(agrid_t(ai),zgrid(zi))
 			ENDDO
 		endif 
 	ENDDO
