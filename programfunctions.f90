@@ -675,7 +675,7 @@ end Subroutine Asset_Grid_Threshold
 		Y_endo = agrid_t(ai) + C_endo - Y_h(H_endo,age,lambdai,ei,wage)
 
 		!$omp critical
-		if (zi.eq.3) then 
+		if (zi.eq.4) then 
 		print*, "EGM Working Periods"
 		print*, C_endo, ai, zi!,H_endo,Y_endo
 		!print*, MB_in,state_FOC
