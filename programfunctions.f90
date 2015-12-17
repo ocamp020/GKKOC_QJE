@@ -405,8 +405,8 @@ end Subroutine Asset_Grid_Threshold
 						         & - beta*survP(age_in)*MB_aprime*E_MU_cp  )**2.0_DP
 				end if 
 			else ! Linear Taxes 
-				ntemp = max(0.0_DP , gamma - (1.0_DP-gamma)*(YGRID(a_in,z_in) - aprimet)/(psi*yh(age_in,l_in,e_in)) )
-				ctemp = YGRID(a_in,z_in) + psi*yh(age_in,l_in,e_in) * ntemp - aprimet
+				ntemp = max(0.0_DP , gamma - (1.0_DP-gamma)*(YGRID_t(a_in,z_in) - aprimet)/(psi*yh(age_in,l_in,e_in)) )
+				ctemp = YGRID_t(a_in,z_in) + psi*yh(age_in,l_in,e_in) * ntemp - aprimet
 
 				DO ep_ind=1,ne
 				      cprime(ep_ind) = Linear_Int(Ygrid(:,z_in), Cons_t(age_in+1,:,z_in,l_in,ep_ind), na,    yprime  )
@@ -2320,7 +2320,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 		end if 
 
     ENDDO ! ai
-    
+
 	if (any(isnan(EndoCons))) then 
 		print*, "isnan - Consumption endogenous"
 		print*, age,lambdai,ai,zi,ei
@@ -2432,7 +2432,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			! Compute hours
 	        if (NSU_Switch.and.(Progressive_Tax_Switch.eqv..false.)) then 
 	        	Hours_t(age, ai, zi, lambdai,ei)  = max( 0.0_dp , &
-	        			&  gamma - (1.0_DP-gamma) *( YGRID(ai,zi) - Aprime(age, ai, zi, lambdai,ei)) / (psi*yh(age, lambdai,ei)) )
+	        			&  gamma - (1.0_DP-gamma) *( YGRID_t(ai,zi) - Aprime(age, ai, zi, lambdai,ei)) / (psi*yh(age, lambdai,ei)) )
             else               	        
 				!compute  hours using FOC_HA                              
 				par_FOC(1:5) = (/age,ai,zi,lambdai,ei/)
