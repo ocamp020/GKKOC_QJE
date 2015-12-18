@@ -815,9 +815,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		OPEN (UNIT=90, FILE=trim(Result_Folder)//'dbn_by_age_z_bench', STATUS='replace')   
 		DO age=1,MaxAge    
 		    DO zi=1,nz
-		          temp_cons_by_z(zi)       		= sum(Cons(age,:,zi,:,:)*DBN_bench(age,:,zi,:,:))/sum(DBN_bench(age,:,zi,:,:))
-		          temp_leisure_by_z(zi)    		= sum((1.0_DP-HOURS(age,:,zi,:,:))*DBN_bench(age,:,zi,:,:))/sum(DBN_bench(age,:,zi,:,:))
-		          size_by_age_z_bench(age, zi)  = sum(DBN_bench(age,:,zi,:,:))
+		        temp_cons_by_z(zi)       	 = sum(Cons(age,:,zi,:,:)*DBN_bench(age,:,zi,:,:))/sum(DBN_bench(age,:,zi,:,:))
+		        temp_leisure_by_z(zi)    	 = sum((1.0_DP-HOURS(age,:,zi,:,:))*DBN_bench(age,:,zi,:,:))/sum(DBN_bench(age,:,zi,:,:))
+		        size_by_age_z_bench(age, zi) = sum(DBN_bench(age,:,zi,:,:))
 		    ENDDO ! zi
 		    WRITE  (UNIT=70, FMT=*) temp_cons_by_z
 		    WRITE  (UNIT=80, FMT=*) temp_leisure_by_z
@@ -1896,10 +1896,24 @@ END SUBROUTINE FIND_DBN_EQ
 
 SUBROUTINE COMPUTE_STATS()
 	IMPLICIT NONE
-	INTEGER :: prctile
-	REAL(DP), DIMENSION(nz) :: cdf_Gz_DBN 
+	INTEGER  :: prctile, group
+	REAL(DP), DIMENSION(nz)    :: cdf_Gz_DBN, Capital_by_z 
 	REAL(dp), DIMENSION(na,nz) :: DBN_az, wealth
-	REAL(DP):: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz)
+	REAL(DP) :: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz)
+	REAL(DP) :: Std_k_Return,    Var_K_Return,    Mean_K_Return_by_z(nz)
+	REAL(DP) :: Std_AT_K_Return, Var_AT_K_Return, Mean_AT_K_Return_by_z(nz)
+	REAL(DP) :: A_Age(max_age_category), A_AZ(max_age_category,nz), A_W(3)
+	REAL(DP) :: Ap_Age(max_age_category), Ap_AZ(max_age_category,nz), Ap_W(3)
+	REAL(DP) :: Y_Age(max_age_category), Y_AZ(max_age_category,nz), Y_W(3)
+	REAL(DP) :: S_Age(max_age_category), S_AZ(max_age_category,nz), S_W(3)
+	REAL(DP) :: S_Rate_A_Age(max_age_category), S_Rate_A_AZ(max_age_category,nz), S_Rate_A_W(3)
+	REAL(DP) :: S_Rate_Y_Age(max_age_category), S_Rate_Y_AZ(max_age_category,nz), S_Rate_Y_W(3)
+	REAL(DP) :: size_Age(max_age_category), size_AZ(max_age_category,nz), size_W(3)
+	character(100) :: rowname
+	INTEGER, dimension(max_age_category+1) :: age_limit
+
+	! Age Brackets
+		age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
 
 	! Percentage of the population above threshold
 		! Compute distribution of agents by (a,z)
@@ -1955,8 +1969,8 @@ SUBROUTINE COMPUTE_STATS()
 	print*,''
 	prct1_wealth  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
 	prct10_wealth = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
-	prct20_wealth =  1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
-	prct40_wealth =  1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
+	prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
+	prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
 
 
 	! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
@@ -2005,14 +2019,22 @@ SUBROUTINE COMPUTE_STATS()
 	Var_Log_Earnings_25_60 = Var_Log_Earnings_25_60 / pop_pos_earn_25_60
 	Std_Log_Earnings_25_60 = Var_Log_Earnings_25_60 ** 0.5_DP
 
-	! Profit Matrix
+	! Profit Matrix and Capital Demand 
 	Pr_mat = Profit_Matrix(R,P)
+	K_mat  = K_Matrix(R,P)
 
 	MeanWealth 	 = 0.0_DP
 	MeanATReturn = 0.0_DP
 	MeanReturn 	 = 0.0_DP
 	MeanCons  	 = 0.0_DP
 	
+	MeanATReturn_by_z     = 0.0_DP
+	MeanReturn_by_z       = 0.0_DP
+	Mean_AT_K_Return_by_z = 0.0_DP
+	Mean_K_Return_by_z    = 0.0_DP
+	size_by_z         	  = 0.0_DP
+	Wealth_by_z 	  	  = 0.0_DP
+	Capital_by_z 	  	  = 0.0_DP
 	DO age=1,MaxAge
 	DO zi=1,nz
 	DO ai=1,na
@@ -2021,9 +2043,26 @@ SUBROUTINE COMPUTE_STATS()
 	    MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei)*agrid(ai)
 	    MeanCons     = MeanCons     + DBN1(age, ai, zi, lambdai, ei)*cons(age, ai, zi, lambdai, ei)   
 
+	    size_by_z(zi)    = size_by_z(zi)    + DBN1(age, ai, zi, lambdai, ei) 
+	    Wealth_by_z(zi)  = Wealth_by_z(zi)  + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)
+	    Capital_by_z(zi) = Capital_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * K_mat(ai,zi)
+
+	    MeanReturn           = MeanReturn          + DBN1(age, ai, zi, lambdai, ei) * &
+	    							& (R*agrid(ai) + Pr_mat(ai,zi))
+	    MeanReturn_by_z(zi)  = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * &
+	    							& (R*agrid(ai) + Pr_mat(ai,zi)) 
 	    
-	    MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * (YGRID(ai,zi)-1.0_DP)
-	    MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei) * (R*agrid(ai) + Pr_mat(ai,zi))
+	    if (Wealth(ai,zi).le.Y_a_threshold) then 
+	    MeanATReturn           = MeanATReturn          + DBN1(age, ai, zi, lambdai, ei) * &
+	    							& (R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_bt)
+	    MeanATReturn_by_z(zi)  = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * &
+	    							& (R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_bt)
+	    else  
+	    MeanATReturn           = MeanATReturn          + DBN1(age, ai, zi, lambdai, ei) * &
+	    							& (R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_at)
+	    MeanATReturn_by_z(zi)  = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * &
+	    							& (R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_at)
+	    endif 
 
 	    !MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)* agrid(ai)
 	    !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
@@ -2039,31 +2078,42 @@ SUBROUTINE COMPUTE_STATS()
 	ENDDO    
 	Wealth_Output = MeanWealth/YBAR 
 	MeanReturn    = MeanReturn/MeanWealth
+	MeanATReturn  = MeanATReturn/MeanWealth
+	MeanATReturn_by_z     = MeanATReturn_by_z / Wealth_by_z
+    MeanReturn_by_z       = MeanReturn_by_z   / Wealth_by_z
+    Mean_AT_K_Return_by_z = MeanATReturn_by_z / Capital_by_z
+    Mean_K_Return_by_z    = MeanReturn_by_z   / Capital_by_z
 
-	Bequest_Wealth=0.0_DP
-	DO zi=1,nz
-	DO ai=1,na
-	DO lambdai=1,nlambda
-	DO ei=1, ne
-	     Bequest_Wealth = Bequest_Wealth  +   DBN1(1, ai, zi, lambdai, ei) * agrid(ai)         
-	ENDDO
-	ENDDO
-	ENDDO    
-	ENDDO  
-	Bequest_Wealth =Bequest_Wealth/MeanWealth
 
 	VarATReturn = 0.0_DP
 	VarReturn 	= 0.0_DP
+	Var_AT_K_Return = 0.0_DP
+	Var_K_Return 	= 0.0_DP
 	DO age=1,MaxAge
 	DO zi=1,nz
 	DO ai=1,na
 	DO lambdai=1,nlambda
 	DO ei=1, ne  
 
-		VarATReturn  = VarATReturn +  DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
-	    				& ((YGRID(ai,zi)/agrid(ai)-1.0_DP)-MeanATReturn)**2.0_dp
-	    VarReturn    = VarATReturn +  DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
-	    				& ((R*agrid(ai) + Pr_mat(ai,zi))/agrid(ai)-MeanATReturn)**2.0_dp
+	    VarReturn    = VarReturn +  DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+	    				& ((R*agrid(ai) + Pr_mat(ai,zi))/agrid(ai)-MeanReturn)**2.0_dp
+
+	    Var_K_Return = Var_K_Return +  DBN1(age, ai, zi, lambdai, ei) * K_mat(ai,zi)/MeanWealth * &
+	    				& ((R*agrid(ai) + Pr_mat(ai,zi))/K_mat(ai,zi)-MeanATReturn)**2.0_dp
+
+	    if (Wealth(ai,zi).le.Y_a_threshold) then
+	    VarATReturn  = VarATReturn +  DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+	    				& (((R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_bt))/agrid(ai)-MeanATReturn)**2.0_dp 
+
+	    Var_AT_K_Return  = Var_AT_K_Return +  DBN1(age, ai, zi, lambdai, ei) * K_mat(ai,zi)/MeanWealth * &
+	    				& (((R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_bt))/K_mat(ai,zi)-MeanATReturn)**2.0_dp 
+	    else  
+	    VarATReturn  = VarATReturn +  DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+	    				& (((R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_at))/agrid(ai)-MeanATReturn)**2.0_dp 
+
+		Var_AT_K_Return  = Var_AT_K_Return +  DBN1(age, ai, zi, lambdai, ei) * K_mat(ai,zi)/MeanWealth * &
+	    				& (((R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_at))/K_mat(ai,zi)-MeanATReturn)**2.0_dp 
+	    endif 
 	    
 	    !VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
 	    !				& ((MBGRID(ai,zi)-1.0_DP)-MeanATReturn)**2.0_dp
@@ -2080,50 +2130,100 @@ SUBROUTINE COMPUTE_STATS()
 	ENDDO    
 	ENDDO    
 	ENDDO  
-	StdATReturn = VarATReturn**0.5_DP
-	StdReturn   = VarReturn**0.5_DP
+	StdATReturn     = VarATReturn**0.5_DP
+	StdReturn       = VarReturn**0.5_DP
+	Std_AT_K_Return = Var_AT_K_Return**0.5_DP
+	Std_K_Return    = Var_K_Return**0.5_DP
 
-	MeanATReturn_by_z = 0.0_DP
-	MeanReturn_by_z   = 0.0_DP
-	size_by_z         = 0.0_DP
-	Wealth_by_z 	  = 0.0_DP
-	DO age=1,MaxAge
+
+    ! Bequest Wealth
+    Bequest_Wealth=0.0_DP
 	DO zi=1,nz
 	DO ai=1,na
 	DO lambdai=1,nlambda
 	DO ei=1, ne
-	    MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * (YGRID(ai,zi)-1.0_DP) 
-	    MeanReturn_by_z(zi)   = MeanReturn_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) * (R*agrid(ai) + Pr_mat(ai,zi)) 
-	    
-	    !MeanATReturn_by_z(zi) = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP) * agrid(ai)
-
-	    !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
-	    !  MeanReturn_by_z(zi) = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)
-	    !else
-	    !  MeanReturn_by_z(zi) = MeanReturn_by_z(zi)+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
-	    !   			& ( R + (P*mu*((zgrid(zi))**mu)*(theta*agrid(ai))**(mu-1.0_DP)-(R+DepRate))) 
-	    !endif 
-
-	    size_by_z(zi)   = size_by_z(zi)   + DBN1(age, ai, zi, lambdai, ei) 
-	    Wealth_by_z(zi) = Wealth_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)
+	     Bequest_Wealth = Bequest_Wealth  +   DBN1(1, ai, zi, lambdai, ei) * agrid(ai)         
 	ENDDO
 	ENDDO
 	ENDDO    
-	ENDDO    
-	ENDDO    
-	MeanATReturn_by_z = MeanATReturn_by_z / Wealth_by_z
-    MeanReturn_by_z   = MeanReturn_by_z   / Wealth_by_z
+	ENDDO  
+	Bequest_Wealth =Bequest_Wealth/MeanWealth
 
     ! Debt to GDP Ratio
-	K_mat = K_Matrix(R,P)
     External_Debt_GDP = 0.0_DP
 	DO zi=1,nz
 	DO ai=1,na
-	    External_Debt_GDP = External_Debt_GDP + sum(DBN1(:, ai, zi, :, :))* &
-	      & abs( K_mat(ai,zi) - agrid(ai)) 
+	    External_Debt_GDP = External_Debt_GDP + sum(DBN1(:, ai, zi, :, :))*abs(K_mat(ai,zi)-agrid(ai))
 	ENDDO
 	ENDDO
 	External_Debt_GDP = 0.5_dp*External_Debt_GDP / YBAR
+
+	! Savings Rate
+	group 	 = 1
+	A_Age 	 = 0.0_dp
+	A_AZ  	 = 0.0_dp 
+	A_W  	 = 0.0_dp
+	Ap_Age 	 = 0.0_dp
+	Ap_AZ  	 = 0.0_dp 
+	Ap_W  	 = 0.0_dp
+	Y_Age 	 = 0.0_dp
+	Y_AZ  	 = 0.0_dp 
+	Y_W   	 = 0.0_dp
+	size_Age = 0.0_dp
+	size_AZ  = 0.0_dp
+	size_W   = 0.0_dp
+	DO age=1,MaxAge 
+
+	    DO while (age.gt.age_limit(group+1))
+	        group = group+1
+	    ENDDO    
+	 
+	    DO ai=1,na
+        DO zi=1,nz
+        DO lambdai=1,nlambda
+        DO ei=1,ne
+        	size_Age(group)   = size_Age(group)   + DBN1(age,ai,zi,lambdai,ei)
+        	size_AZ(group,zi) = size_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei)
+
+        	A_Age(group)   = A_Age(group)   + DBN1(age,ai,zi,lambdai,ei)*agrid(ai)
+        	A_AZ(group,zi) = A_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei)*agrid(ai)
+
+        	Ap_Age(group)   = Ap_Age(group)   + DBN1(age,ai,zi,lambdai,ei)*Aprime(age,ai,zi,lambdai,ei)
+        	Ap_AZ(group,zi) = Ap_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei)*Aprime(age,ai,zi,lambdai,ei)
+
+        	Y_Age(group)   = Y_Age(group)   + DBN1(age,ai,zi,lambdai,ei)*&
+        					 & (YGRID(ai,zi)+ Y_h(Hours(age,ai,zi,lambdai,ei),age,lambdai,ei,Wage))
+        	Y_AZ(group,zi) = Y_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei)*&
+        					 & (YGRID(ai,zi)+ Y_h(Hours(age,ai,zi,lambdai,ei),age,lambdai,ei,Wage))
+
+        	if (ai.le.prctile_ai_ind(90)) then 
+        		size_W(1) = size_W(1) + DBN1(age,ai,zi,lambdai,ei)
+        		A_W(1)    = A_W(1)    + DBN1(age,ai,zi,lambdai,ei)*agrid(ai)
+        		Y_W(1)    = Y_W(1)    + DBN1(age,ai,zi,lambdai,ei)*&
+        					(YGRID(ai,zi)+ Y_h(Hours(age,ai,zi,lambdai,ei),age,lambdai,ei,Wage))
+        	else if  ((ai.gt.prctile_ai_ind(90)).and.(ai.le.prctile_ai_ind(99))) then
+        		size_W(2) = size_W(2) + DBN1(age,ai,zi,lambdai,ei)
+        		A_W(2)    = A_W(2)    + DBN1(age,ai,zi,lambdai,ei)*agrid(ai)
+        		Y_W(2)    = Y_W(2)    + DBN1(age,ai,zi,lambdai,ei)*&
+        					(YGRID(ai,zi)+ Y_h(Hours(age,ai,zi,lambdai,ei),age,lambdai,ei,Wage))
+        	else 
+        		size_W(3) = size_W(3) + DBN1(age,ai,zi,lambdai,ei)
+        		A_W(3)    = A_W(3)    + DBN1(age,ai,zi,lambdai,ei)*agrid(ai)
+        		Y_W(3)    = Y_W(3)    + DBN1(age,ai,zi,lambdai,ei)*&
+        					(YGRID(ai,zi)+ Y_h(Hours(age,ai,zi,lambdai,ei),age,lambdai,ei,Wage))
+        	endif 
+        ENDDO
+        ENDDO
+        ENDDO
+	    ENDDO
+	ENDDO
+	S_Rate_A_Age = (Ap_Age-A_Age)/A_Age
+	S_Rate_A_AZ  = (Ap_AZ-A_AZ)/A_AZ
+	S_Rate_A_W   = (Ap_W-A_W)/A_W
+	S_Rate_Y_Age = (Ap_Age-A_Age)/Y_Age
+	S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
+	S_Rate_Y_W   = (Ap_W-A_W)/Y_W
+
 
 	!print*, 'MeanReturn=',MeanReturn, 'StdReturn=', StdReturn
 	!print*,'MeanReturn_by_z=',MeanReturn_by_z
@@ -2144,11 +2244,87 @@ SUBROUTINE COMPUTE_STATS()
 	if (solving_bench.eq.1) then
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'a_prctile_bench', STATUS='replace') 
 			WRITE(UNIT=19, FMT=*) prctile_ai
+		OPEN (UNIT=20, FILE=trim(Result_Folder)//'Return_bench.txt', STATUS='replace') 
+			WRITE(UNIT=20, FMT=*) ' ', 'Assets', 'Capital'
+			WRITE(UNIT=20, FMT=*) 'Mean_Return', MeanReturn, MeanReturn
+			WRITE(UNIT=20, FMT=*) 'Std_Return', StdReturn, Std_K_Return
+			do zi=1,nz
+				write(rowname,*)  zi 
+				rowname = 'Mean_Return_z'//trim(rowname)
+				WRITE(UNIT=20, FMT=*) trim(rowname), MeanReturn_by_z(zi), Mean_K_Return_by_z(zi)
+			enddo 
+			WRITE(UNIT=20, FMT=*) ' '
+			WRITE(UNIT=20, FMT=*) 'Mean_Return_AT', MeanATReturn, MeanATReturn
+			WRITE(UNIT=20, FMT=*) 'Std_Return_AT', StdATReturn, Std_AT_K_Return
+			do zi=1,nz
+				write(rowname,*)  zi 
+				rowname = 'Mean_Return_z'//trim(rowname)//'_AT'
+				WRITE(UNIT=20, FMT=*) trim(rowname), MeanATReturn_by_z(zi), Mean_AT_K_Return_by_z(zi)
+			enddo 
+		OPEN (UNIT=21, FILE=trim(Result_Folder)//'S_Rate_bench.txt', STATUS='replace') 
+			WRITE(UNIT=20, FMT=*) '(Ap-A)/A'
+			WRITE(UNIT=20, FMT=*) ' ', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'Total'
+			do group=1,max_age_category
+				write(rowname,*) group  
+				rowname = 'Age_Group_'//trim(rowname)
+				WRITE(UNIT=20, FMT=*) rowname, S_Rate_A_AZ(group,:), S_Rate_A_Age(group)
+			enddo 
+			WRITE(UNIT=20, FMT=*) ' '
+			WRITE(UNIT=20, FMT=*) '(Ap-A)/Y'
+			WRITE(UNIT=20, FMT=*) ' ', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'Total'
+			do group=1,max_age_category
+				write(rowname,*) group  
+				rowname = 'Age_Group_'//trim(rowname)
+				WRITE(UNIT=20, FMT=*) rowname, S_Rate_Y_AZ(group,:), S_Rate_Y_Age(group)
+			enddo
+			WRITE(UNIT=20, FMT=*) ' '
+			WRITE(UNIT=20, FMT=*) ' ', '<90%','90%<99%','99%<'
+			WRITE(UNIT=20, FMT=*) '(Ap-A)/A', S_Rate_A_W
+			WRITE(UNIT=20, FMT=*) '(Ap-A)/Y', S_Rate_Y_W
 	else
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'a_prctile_exp', STATUS='replace') 
 			WRITE(UNIT=19, FMT=*) prctile_ai
+		OPEN (UNIT=20, FILE=trim(Result_Folder)//'Return_exp.txt', STATUS='replace') 
+			WRITE(UNIT=20, FMT=*) ' ', 'Assets', 'Capital'
+			WRITE(UNIT=20, FMT=*) 'Mean_Return', MeanReturn, MeanReturn
+			WRITE(UNIT=20, FMT=*) 'Std_Return', StdReturn, Std_K_Return
+			do zi=1,nz
+				write(rowname,*)  zi 
+				rowname = 'Mean_Return_z'//trim(rowname)
+				WRITE(UNIT=20, FMT=*) trim(rowname), MeanReturn_by_z(zi), Mean_K_Return_by_z(zi)
+			enddo 
+			WRITE(UNIT=20, FMT=*) ' '
+			WRITE(UNIT=20, FMT=*) 'Mean_Return_AT', MeanATReturn, MeanATReturn
+			WRITE(UNIT=20, FMT=*) 'Std_Return_AT', StdATReturn, Std_AT_K_Return
+			do zi=1,nz
+				write(rowname,*)  zi 
+				rowname = 'Mean_Return_z'//trim(rowname)//'_AT'
+				WRITE(UNIT=20, FMT=*) trim(rowname), MeanATReturn_by_z(zi), Mean_AT_K_Return_by_z(zi)
+			enddo 
+		OPEN (UNIT=21, FILE=trim(Result_Folder)//'S_Rate_exp.txt', STATUS='replace') 
+			WRITE(UNIT=20, FMT=*) '(Ap-A)/A'
+			WRITE(UNIT=20, FMT=*) ' ', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'Total'
+			do group=1,max_age_category
+				write(rowname,*) group  
+				rowname = 'Age_Group_'//trim(rowname)
+				WRITE(UNIT=20, FMT=*) rowname, S_Rate_A_AZ(group,:), S_Rate_A_Age(group)
+			enddo 
+			WRITE(UNIT=20, FMT=*) ' '
+			WRITE(UNIT=20, FMT=*) '(Ap-A)/Y'
+			WRITE(UNIT=20, FMT=*) ' ', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'Total'
+			do group=1,max_age_category
+				write(rowname,*) group  
+				rowname = 'Age_Group_'//trim(rowname)
+				WRITE(UNIT=20, FMT=*) rowname, S_Rate_Y_AZ(group,:), S_Rate_Y_Age(group)
+			enddo
+			WRITE(UNIT=20, FMT=*) ' '
+			WRITE(UNIT=20, FMT=*) ' ', '<90%','90%<99%','99%<'
+			WRITE(UNIT=20, FMT=*) '(Ap-A)/A', S_Rate_A_W
+			WRITE(UNIT=20, FMT=*) '(Ap-A)/Y', S_Rate_Y_W
 	end if 
 		CLOSE(Unit=19)
+		CLOSE(Unit=20)
+	CLOSE(Unit=21)
 
 
 END SUBROUTINE COMPUTE_STATS
