@@ -26,52 +26,105 @@ PROGRAM Optimal_Taxes
 	use Opt_Tax_Parameters
 	use Opt_Tax_Functions
 	use Toolbox
+	use omp_lib
 
 	IMPLICIT NONE
 	! Variables to measure running time
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
-		INTEGER  :: read_write_bench
+		logical  :: read_write_bench
+	! Auxiliary variable for writing file
+		character(4) :: string_theta
 
 	! Set type of optimal taxe 1->TauK 0->TauW
-		opt_tax_switch = 0	
+		opt_tax_switch = 1
 
-	! Set Parameters 
-		Params =[ 0.9436, 0.00, 0.50, 0.70444445, 0.34, 0.4494 ] ! tauL=0.224, tauC=0.075 calibration
+	! Switch for solving benchmark or just reading resutls
+		! If read_write_bench==.true. then just read resutls
+		! If read_write_bench==.false. then solve for benchmark and store results
+		read_write_bench = .true.	
+
+	! Switch for separable and non-separable utility
+		! If NSU_Switch==.true. then do non-separable utility
+		! If NSU_Switch==.false. then do separable utility
+		NSU_Switch = .true.
+
+	! Switch for log utility 
+		! If Log_Switch==.true. then utility is log
+		! If Log_Switch==.false. then utility is not log
+		Log_Switch = .false.
+
+	! Switch for labor taxes
+		! If Progressive_Tax_Switch==.true. then use progressive taxes
+		! If Progressive_Tax_Switch==.false. then use linear taxes
+		Progressive_Tax_Switch = .false.
+
+	! Set Parameters
+		if (theta.eq.1.0_dp) then 
+			Params =[0.9436_dp, 0.0_dp, 0.50_dp, 0.70444445_dp, 0.34_dp, 0.4494_dp] ! tauL=0.224, tauC=0.075 calibration
+		else if (theta.eq.1.50_dp) then 
+			if (mu.eq.0.85_dp) then 
+			Params= [0.945_dp, 0.00_dp, 0.50_dp, 0.7889_dp, 0.34_dp, 0.4494_dp] ! mu=0.85 calibration, targetting 0.34, 0.69, vartheta1.5 
+			else 
+			Params= [0.9412_dp, 0.0_dp, 0.50_dp, 0.640_dp, 0.34_dp, 0.4494_dp] ! mu=0.9 calibration, targetting 0.34, 0.69, vartheta1.5
+			endif 
+		else if (theta.eq.1.60_dp) then 
+			Params= [0.9409_dp, 0.0_dp, 0.50_dp, 0.640_dp, 0.34_dp, 0.4494_dp] ! mu=0.9 calibration, targetting 0.34, 0.69, vartheta1.6
+		else if (theta.eq.2.00_dp) then 
+			Params= [0.9405_dp, 0.0_dp, 0.50_dp, 0.639_dp, 0.34_dp, 0.4494_dp] ! mu=0.9 calibration, targetting 0.34, 0.69, vartheta2
+		else if (theta.eq.2.50_dp) then 
+			Params= [0.9400_dp, 0.0_dp, 0.50_dp, 0.639_dp, 0.34_dp, 0.4494_dp] ! mu=0.9 calibration, targetting 0.34, 0.69, vartheta2.5
+		else
+			print*, "No parameters for this theta, changing to default parameters (theta=1)"
+			Params =[0.9436_dp, 0.0_dp, 0.50_dp, 0.70444445_dp, 0.34_dp, 0.4494_dp] ! tauL=0.224, tauC=0.075 calibration
+		endif 
 		beta   = params(1)
 		mu_z   = params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  = params(3) 
 		sigma_z_eps      =params(4)
 		sigma_lambda_eps = params(5)
 		gamma  = params(6)
+		
 		sigma  = 4.0_dp
+		phi    = (1.0_dp-gamma)/gamma
+
+		if (Log_Switch.eqv..true.) then
+				sigma = 1.0_dp
+			if (NSU_Switch.eqv..false.) then 
+				gamma = 1.0_dp 
+			endif 
+		endif 
 
 	! Taxes
 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
 		tauWmin_bt=0.00_DP
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
-		tauWmin_at=0.012_DP
+		tauWmin_at=0.014_DP
 		tauWinc_at=0.002_DP ! Minimum tax above threshold and increments
 		Threshold_Factor = 0.00_dp 
 	! Consumption tax
 		tauC=0.075_DP
 	! Set Labor Tax Regime
-		!tauPL=0.185_DP
-		!psi=0.77_DP  
- 		tauPL=0.0_DP
- 		psi=0.776_DP  	
+		if (Progressive_Tax_Switch.eqv..true.) then 
+			tauPL = 0.185_DP
+			psi   = 0.776_DP  
+		else 
+			tauPL = 0.0_DP
+	 		psi   = 0.776_DP  	
+	 	endif  	
 
 	! Resutls Folder
 		write(Result_Folder,'(f4.2)') Threshold_Factor
+		write(string_theta,'(f4.2)')  theta
 
-		if ((TauPL.eq.0.0_dp).and.(sigma.ne.1.0_dp)) then 
-			Result_Folder = './NSU_LT_Results/Factor_'//trim(Result_Folder)//'/'
-		else if ((TauPL.ne.0.0_dp).and.(sigma.ne.1.0_dp)) then 
-			Result_Folder = './NSU_PT_Results/Factor_'//trim(Result_Folder)//'/'
-		else if ((TauPL.eq.0.0_dp).and.(sigma.eq.1.0_dp)) then 
-			Result_Folder = './SU_LT_Results/Factor_'//trim(Result_Folder)//'/'
-		else if ((TauPL.ne.0.0_dp).and.(sigma.eq.1.0_dp)) then 
-			Result_Folder = './SU_PT_Results/Factor_'//trim(Result_Folder)//'/'
+		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
+			Result_Folder = './NSU_F_LT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
+		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
+			Result_Folder = './NSU_F_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
+		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
+			Result_Folder = './SU_F_LT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
+		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
+			Result_Folder = './SU_F_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if 
 
 		if (opt_tax_switch.eq.1) then 
@@ -84,6 +137,9 @@ PROGRAM Optimal_Taxes
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 		print*, "Results are stored in directory: ", Result_Folder
 		print*,'na=',na,'update_period=',update_period
+		print*, "NSU_Switch=",NSU_Switch,'sigma=',sigma,'gamma=',gamma,'phi',phi
+		print*,'Labor Taxes: tauPl=',tauPl,'psi',psi
+		print*, 'Borrowing Constraint: Theta=',theta
 
 	! Set parameters to be used in all simulations economy
 		OPEN(UNIT=3, FILE=trim(Result_Folder)//'params', STATUS='replace')
@@ -96,8 +152,8 @@ PROGRAM Optimal_Taxes
 
 	! Set initia lvalues of R, Wage, Ebar to find equilibrium
 		! ------- DO NOT REMOVE THE LINES BELOW
-
-		rr    =  4.906133597851297E-002 
+		R     =  0.05_dp
+		P     =  4.906133597851297E-002 
 		wage  =  1.97429920063330 
 		Ebar  =  1.82928004963637  
 		Ebar_bench = Ebar
@@ -120,11 +176,19 @@ PROGRAM Optimal_Taxes
 		tauW_at = 0.00_DP
 		Y_a_threshold = 0.00_DP 
 
+	! Benchmark economy
+		solving_bench=1
+
+	! Set taxes for benchmark economy
+		tauK = 0.25_DP
+		tauW_bt = 0.00_DP
+		tauW_at = 0.00_DP
+		Y_a_threshold = 0.00_DP 
+
 	! Solve for the model and compute stats
-	read_write_bench = 1
 	print*,"	Initializing program"
 		CALL INITIALIZE
-	if (read_write_bench.eq.0) then
+	if (read_write_bench.eqv..false.) then
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
 		print*,"	Computing government spending"
@@ -148,7 +212,8 @@ PROGRAM Optimal_Taxes
 		QBAR_bench  = QBAR 
 		NBAR_bench  = NBAR 
 		Ebar_bench  = EBAR
-		rr_bench    = rr
+		P_bench     = P
+		R_bench     = R
 		wage_bench  = wage
 		Y_bench     = YBAR
 		tauK_bench  = tauK
@@ -166,7 +231,7 @@ PROGRAM Optimal_Taxes
 		Aprime_bench        = Aprime 
 
 		write(*,*) "Benchmark variables"
-		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"rr=",rr,"wage=",wage
+		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"P=",P,"wage=",wage,'R=',R
 
 	!====================================================================================================
 	PRINT*,''
@@ -175,18 +240,13 @@ PROGRAM Optimal_Taxes
 	
 	! Experiment economy
 		solving_bench=0
-
-	! Set Y_a_threshold
-		call Find_TauW_Threshold(DBN_bench,W_bench)  
-		Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
-		Wealth_factor = Y_a_threshold/W_bench
 	
 	! Set initial taxes for finding optimal ones
-	tauK     = 0.0_DP
-	tauW_at  = 0.0_DP
-	Opt_TauK = 0.0_DP
-	Opt_TauW = 0.0_DP
-	maxbrentvaluet=-10000.0_DP
+		tauK     = 0.0_DP
+		tauW_at  = 0.0_DP
+		Opt_TauK = 0.0_DP
+		Opt_TauW = 0.0_DP
+		maxbrentvaluet=-10000.0_DP
 	
 	print*,'Optimal Tax Loop'
 	If ( opt_tax_switch .eq. 1 ) then
@@ -210,29 +270,34 @@ PROGRAM Optimal_Taxes
               & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60	    
 
 
-! 	    DO tauindx=0,50
+		! 	    DO tauindx=0,50
 
-!             tauK=real(tauindx,8)/100_DP
-!             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
+		!             tauK=real(tauindx,8)/100_DP
+		!             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
-!             if (brentvaluet .gt. maxbrentvaluet) then
-!                 maxbrentvaluet = brentvaluet
-!                 Opt_TauK=tauK
-!             endif
+		!             if (brentvaluet .gt. maxbrentvaluet) then
+		!                 maxbrentvaluet = brentvaluet
+		!                 Opt_TauK=tauK
+		!             endif
 
-!             ! Print results
-!             print*, ' '
-!             print*, 'Iteration',tauindx
-!             print*, tauK, tauPL, psi, GBAR_K, MeanWealth, QBAR, NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
-!               & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+		!             ! Print results
+		!             print*, ' '
+		!             print*, 'Iteration',tauindx
+		!             print*, tauK, tauPL, psi, GBAR_K, MeanWealth, QBAR, NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+		!               & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 
-!             WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
-!               & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-!               & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60	    
-! 	    ENDDO                
+		!             WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+		!               & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+		!               & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60	    
+		! 	    ENDDO                
 	else
 
 		OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_all_tau_w', STATUS='replace')
+
+		! Set Y_a_threshold
+		call Find_TauW_Threshold(DBN_bench,W_bench)  
+		Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
+		Wealth_factor = Y_a_threshold/W_bench
 
 	    !brentvaluet = brent(0.00_DP, 0.016_DP , 0.05_DP, EQ_WELFARE_GIVEN_TauW, brent_tol, Opt_TauW)
 	    call Find_Opt_Tax(opt_tax_switch,Opt_TauW)
@@ -250,25 +315,25 @@ PROGRAM Optimal_Taxes
               & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
               & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
 
-! 	    DO tauindx=0,50
-!             tauW_at=real(tauindx,8)/1000_DP
-!             brentvaluet = -EQ_WELFARE_GIVEN_TauW(tauW_at)
-            
-!             if (brentvaluet .gt. maxbrentvaluet) then
-!                 maxbrentvaluet = brentvaluet
-!                 Opt_TauW=tauW_at
-!             endif
+		! 	    DO tauindx=0,50
+		!             tauW_at=real(tauindx,8)/1000_DP
+		!             brentvaluet = -EQ_WELFARE_GIVEN_TauW(tauW_at)
+		            
+		!             if (brentvaluet .gt. maxbrentvaluet) then
+		!                 maxbrentvaluet = brentvaluet
+		!                 Opt_TauW=tauW_at
+		!             endif
 
-!             ! Print results
-!             print*, ' '
-!             print*, 'Iteration',tauindx
-!             print*, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
-!               & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+		!             ! Print results
+		!             print*, ' '
+		!             print*, 'Iteration',tauindx
+		!             print*, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+		!               & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 
-!             WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
-!               & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-!               & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
-! 	    ENDDO                
+		!             WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+		!               & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+		!               & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
+		! 	    ENDDO                
 	endif
 	close (unit=77)
 
@@ -282,13 +347,14 @@ PROGRAM Optimal_Taxes
 	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
 	CALL Write_Experimental_Results()
 	
-	! AGgregate variable in experimental economy
+	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
 		QBAR_exp  = QBAR 
 		NBAR_exp  = NBAR  
 		Y_exp 	  = YBAR
 		Ebar_exp  = EBAR
-		rr_exp    = rr
+		P_exp     = P
+		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL

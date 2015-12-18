@@ -53,7 +53,7 @@ GKK_Main_Server.a: GKK_Main.f90 $(Objects_Main)
 	gfortran -I$(Folder) GKK_Main.f90 $(Objects_Main) -o $(Folder)/GKK_Main.a
 
 GKK_Opt_Taxes.a: GKK_Optimal_Taxes.f90 $(Objects_Main) $(Objects_Opt_Tax)
-	gfortran -I$(Folder) GKK_Optimal_Taxes.f90 $(Objects_Main) $(Objects_Opt_Tax) -o $(Folder)/GKK_Opt_Taxes.a  
+	gfortran $(omp_flag) -O2 -I$(Folder) GKK_Optimal_Taxes.f90 $(Objects_Main) $(Objects_Opt_Tax) -o $(Folder)/GKK_Opt_Taxes.a  
 
 CE_program.a: Consumption_Equivalent.f90 $(Objects_Main)
 	gfortran -I$(Folder) Consumption_Equivalent.f90 $(Objects_Main) -o $(Folder)/CE_program.a

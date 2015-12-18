@@ -1319,7 +1319,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE()
 
 	! Announce method of interpolation
 	! Interpolation is used to get value function at optimal a' (when computing expectations)
-	print*,'VALUE FUNCTION SPLINE'
+	!print*,'VALUE FUNCTION SPLINE'
 
 	! Compute value function at grid nodes
 	! Final age
@@ -1788,20 +1788,9 @@ SUBROUTINE FIND_DBN_EQ()
 	    	! Solve for new R 
 	    	R = zbrent(Agg_Debt,0.0_dp,0.50_dp,brent_tol) 
 
-! 	    	MeanWealth=0.0_DP
-! 		        DO a1=1,na
-! 		            MeanWealth = MeanWealth + sum(DBN1(:, a1, :, :, :))*agrid(a1)
-! 		        ENDDO
-! 	    	BBAR =0.0_DP          
-! 				DO z1=1,nz
-! 				DO a1=1,na
-! 					BBAR = BBAR + sum(DBN1(:, a1, z1, :, :))* &
-! 						  & ( min((mu*P*zgrid(z1)**mu/(R+DepRate))**(1.0_DP/(1.0_DP-mu)),theta*agrid(a1)) &
-! 						  & - agrid(a1)) 
-! 				ENDDO
-! 				ENDDO
-
-	    	print*, 'DBN_diff=', DBN_dist, "Agg_Debt", Agg_Debt(R), 'R=',R,'P=',P
+	    	!!
+	    	!!!!!!!! print*, 'DBN_diff=', DBN_dist, "Agg_Debt", Agg_Debt(R), 'R=',R,'P=',P
+	    	!!
 
 	    	! Solve the model at current aggregate values
 				! Find the threshold for wealth taxes (a_bar)
