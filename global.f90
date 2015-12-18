@@ -119,8 +119,8 @@ MODULE global
 	    ! Mass of assets by a_grid (defined as a_grid(i)sum(DBN(:,i,:,:,:)))
 	    REAL(DP), DIMENSION(na)  :: tot_a_by_grid, cdf_tot_a_by_grid
 	    ! Percentiles of the asset distribution and mass of total assets by them
-	    INTEGER , DIMENSION(100) ::  prctile_ai_ind, prctile_ai
-	    REAL(DP), DIMENSION(100) ::  cdf_tot_a_by_prctile
+	    INTEGER , DIMENSION(100) ::  prctile_ai_ind
+	    REAL(DP), DIMENSION(100) ::  cdf_tot_a_by_prctile, prctile_ai
     	! Other stats
 	    REAL(DP) :: pop_25_60 , tothours_25_60, pop_pos_earn_25_60, tot_log_earnings_25_60, mean_log_earnings_25_60 
 	    REAL(DP) :: meanhours_25_60, Var_Log_Earnings_25_60, Std_Log_Earnings_25_60, MeanWealth, Wealth_Output
