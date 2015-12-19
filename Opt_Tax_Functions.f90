@@ -61,7 +61,13 @@ FUNCTION EQ_WELFARE_GIVEN_TauK(tauk_in)
 
 	! CALL COMPUTE_WELFARE_GAIN
 	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-	EQ_WELFARE_GIVEN_TAUK = - sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+	if (Log_Switch.eqv..true.) then 
+    	EQ_WELFARE_GIVEN_TAUK = - sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+    else 
+    	EQ_WELFARE_GIVEN_TAUK = - sum( ((ValueFunction_exp(1,:,:,:,:)/ValueFunction_Bench(1,:,:,:,:)) &
+                        				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP) *DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+    end if
+
 	!CALL COMPUTE_STATS
 
 	!
