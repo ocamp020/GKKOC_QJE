@@ -37,7 +37,7 @@ PROGRAM Optimal_Taxes
 		character(4) :: string_theta
 
 	! Set type of optimal taxe 1->TauK 0->TauW
-		opt_tax_switch = 0
+		opt_tax_switch = 1
 
 	! Switch for solving benchmark or just reading resutls
 		! If read_write_bench==.true. then just read resutls
@@ -101,7 +101,7 @@ PROGRAM Optimal_Taxes
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
 		tauWmin_at=0.014_DP
 		tauWinc_at=0.002_DP ! Minimum tax above threshold and increments
-		Threshold_Factor = 0.00_dp 
+		Threshold_Factor = 1.00_dp 
 	! Consumption tax
 		tauC=0.075_DP
 	! Set Labor Tax Regime
