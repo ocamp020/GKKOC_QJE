@@ -95,6 +95,9 @@ PROGRAM Optimal_Taxes
 			endif 
 		endif 
 
+	! Capital Market
+		theta = 1.50_dp 
+
 	! Taxes
 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
 		tauWmin_bt=0.00_DP
