@@ -17,9 +17,9 @@ SUBROUTINE Find_Opt_Tax(switch,opt_Tau)
 	real(dp)              :: brentvaluet
 
 	if (switch.eq.1) then 
-		brentvaluet = brent(0.00_DP, 0.1_DP , 0.4_DP, EQ_WELFARE_GIVEN_TauK, brent_tol, Opt_Tau)  
+		brentvaluet = brent(0.00_DP, 0.05_DP , 0.4_DP, EQ_WELFARE_GIVEN_TauK, brent_tol, Opt_Tau)  
 	else 
-		brentvaluet = brent(0.00_DP, 0.016_DP , 0.03_DP, EQ_WELFARE_GIVEN_TauW, brent_tol, Opt_Tau)
+		brentvaluet = brent(0.00_DP, 0.016_DP , 0.05_DP, EQ_WELFARE_GIVEN_TauW, brent_tol, Opt_Tau)
 	end if 
 
 
@@ -64,7 +64,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauK(tauk_in)
 	if (Log_Switch.eqv..true.) then 
     	EQ_WELFARE_GIVEN_TAUK = - sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
     else 
-    	EQ_WELFARE_GIVEN_TAUK = - sum( ((ValueFunction_exp(1,:,:,:,:)/ValueFunction_Bench(1,:,:,:,:)) &
+    	EQ_WELFARE_GIVEN_TAUK = - sum( ((ValueFunction(1,:,:,:,:)/ValueFunction_Bench(1,:,:,:,:)) &
                         				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP) *DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
     end if
 
@@ -77,6 +77,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauK(tauk_in)
 	!CLOSE (unit=3)
 	!
 	!print*,'tauK=', tauK, ' CE_NEWBORN=', CE_NEWBORN, 'Av. Util=',sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+	print*, 'tauK=', tauK,'CE_NEWBORN=', -EQ_WELFARE_GIVEN_TAUK
 
 END  FUNCTION EQ_WELFARE_GIVEN_TAUK
 
@@ -116,7 +117,12 @@ FUNCTION EQ_WELFARE_GIVEN_TauW(tauW_in)
 
 	!CALL COMPUTE_WELFARE_GAIN
 	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-	EQ_WELFARE_GIVEN_TauW = - sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+	if (Log_Switch.eqv..true.) then 
+    	EQ_WELFARE_GIVEN_TauW = - sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+    else 
+    	EQ_WELFARE_GIVEN_TauW = - sum( ((ValueFunction(1,:,:,:,:)/ValueFunction_Bench(1,:,:,:,:)) &
+                        				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP) *DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+    end if
 	!CALL COMPUTE_STATS
 
 	!OPEN   (UNIT=3, FILE='psi', STATUS='replace')
@@ -125,7 +131,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauW(tauW_in)
 	!CLOSE (unit=3)
 	!
 	!print*,'tauW=', tauW, ' CE_NEWBORN=', CE_NEWBORN, 'Av. Util=',sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
-
+	print*, 'tauW_at=', tauW_at,'CE_NEWBORN=', -EQ_WELFARE_GIVEN_TAUW
 
 END  FUNCTION EQ_WELFARE_GIVEN_TauW
 
@@ -200,7 +206,7 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 	print*,'Results from GOVNT_BUDGET'
 	print*, 'GBAR_bench',GBAR_bench, 'GBAR=',GBAR, 'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=',GBAR_L/Ebar 
 	print*, 'GBAR_NL  =',GBAR_NL, 'BT_EARNINGS=',BT_EARNINGS,'A_EARNINGS=',A_EARNINGS 
-	PRINT*,'PSI=',psi
+	PRINT*,'PSI=',psi, 'tauK=', tauK, 'tauW_at=',tauW_at
 
 	! OBTAIN NEW PSI IF GOVETNMENT BUDGET DOES NOT BALANCE
 	if (solving_bench .eq. 0) then

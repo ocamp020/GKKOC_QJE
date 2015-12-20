@@ -88,7 +88,10 @@ PROGRAM main
 			if (NSU_Switch.eqv..false.) then 
 				gamma = 1.0_dp 
 			endif 
-		endif 
+		endif
+
+	! Capital Market
+		theta = 1.00_dp 
 
 	! Taxes
 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
