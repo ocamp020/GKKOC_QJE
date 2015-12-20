@@ -91,7 +91,7 @@ PROGRAM main
 		endif
 
 	! Capital Market
-		theta = 2.50_dp 
+		theta = 1.50_dp 
 
 	! Taxes
 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
