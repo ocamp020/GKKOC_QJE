@@ -40,7 +40,7 @@ PROGRAM Optimal_Taxes
 		theta = 1.50_dp 
 
 	! Set type of optimal taxe 1->TauK 0->TauW
-		opt_tax_switch = 0
+		opt_tax_switch = 1
 
 	! Switch for solving benchmark or just reading resutls
 		! If read_write_bench==.true. then just read resutls
