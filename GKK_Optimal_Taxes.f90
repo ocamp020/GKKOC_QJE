@@ -38,6 +38,8 @@ PROGRAM Optimal_Taxes
 
 	! Capital Market
 		theta = 1.50_dp 
+	! Threshold
+		Threshold_Factor = 0.00_dp 
 
 	! Set type of optimal taxe 1->TauK 0->TauW
 		opt_tax_switch = 1
@@ -104,7 +106,6 @@ PROGRAM Optimal_Taxes
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
 		tauWmin_at=0.014_DP
 		tauWinc_at=0.002_DP ! Minimum tax above threshold and increments
-		Threshold_Factor = 0.00_dp 
 	! Consumption tax
 		tauC=0.075_DP
 	! Set Labor Tax Regime
