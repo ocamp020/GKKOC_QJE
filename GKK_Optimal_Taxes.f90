@@ -39,15 +39,15 @@ PROGRAM Optimal_Taxes
 	! Capital Market
 		theta = 1.50_dp 
 	! Threshold
-		Threshold_Factor = 2.00_dp 
+		Threshold_Factor = 1.00_dp 
 
 	! Set type of optimal taxe 1->TauK 0->TauW
-		opt_tax_switch = 0
+		opt_tax_switch = 1
 
 	! Switch for solving benchmark or just reading resutls
 		! If read_write_bench==.true. then just read resutls
 		! If read_write_bench==.false. then solve for benchmark and store results
-		read_write_bench = .true.	
+		read_write_bench = .false.	
 
 	! Switch for separable and non-separable utility
 		! If NSU_Switch==.true. then do non-separable utility
