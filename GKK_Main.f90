@@ -35,7 +35,7 @@ PROGRAM main
 		character(4) :: string_theta
 
 	! Capital Market
-		theta = 2.50_dp 
+		theta = 1.50_dp 
 
 	! Switch for solving benchmark or just reading resutls
 		! If read_write_bench==.true. then just read resutls
