@@ -35,7 +35,7 @@ PROGRAM main
 		character(4) :: string_theta
 
 	! Capital Market
-		theta = 2.50_dp
+		theta = 1.60_dp
 	! Threshold 
 		Threshold_Factor = 0.00_dp 
 
