@@ -34,6 +34,9 @@ PROGRAM main
 	! Auxiliary variable for writing file
 		character(4) :: string_theta
 
+	! Capital Market
+		theta = 1.50_dp 
+
 	! Switch for solving benchmark or just reading resutls
 		! If read_write_bench==.true. then just read resutls
 		! If read_write_bench==.false. then solve for benchmark and store results
@@ -89,9 +92,6 @@ PROGRAM main
 				gamma = 1.0_dp 
 			endif 
 		endif
-
-	! Capital Market
-		theta = 1.50_dp 
 
 	! Taxes
 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget

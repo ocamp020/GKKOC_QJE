@@ -36,8 +36,11 @@ PROGRAM Optimal_Taxes
 	! Auxiliary variable for writing file
 		character(4) :: string_theta
 
+	! Capital Market
+		theta = 1.50_dp 
+
 	! Set type of optimal taxe 1->TauK 0->TauW
-		opt_tax_switch = 0
+		opt_tax_switch = 1
 
 	! Switch for solving benchmark or just reading resutls
 		! If read_write_bench==.true. then just read resutls
@@ -95,16 +98,13 @@ PROGRAM Optimal_Taxes
 			endif 
 		endif 
 
-	! Capital Market
-		theta = 1.50_dp 
-
 	! Taxes
 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
 		tauWmin_bt=0.00_DP
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
 		tauWmin_at=0.014_DP
 		tauWinc_at=0.002_DP ! Minimum tax above threshold and increments
-		Threshold_Factor = 2.00_dp 
+		Threshold_Factor = 0.00_dp 
 	! Consumption tax
 		tauC=0.075_DP
 	! Set Labor Tax Regime
