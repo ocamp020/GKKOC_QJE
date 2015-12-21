@@ -1789,7 +1789,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    	R = zbrent(Agg_Debt,0.0_dp,0.50_dp,brent_tol) 
 
 	    	!!
-	    	!!!!!!!! print*, 'DBN_diff=', DBN_dist, "Agg_Debt", Agg_Debt(R), 'R=',R,'P=',P
+	    	print*, 'DBN_diff=', DBN_dist, "Agg_Debt", Agg_Debt(R), 'R=',R,'P=',P
 	    	!!
 
 	    	! Solve the model at current aggregate values
