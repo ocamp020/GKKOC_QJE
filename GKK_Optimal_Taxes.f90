@@ -42,7 +42,7 @@ PROGRAM Optimal_Taxes
 		Threshold_Factor = 0.00_dp 
 
 	! Set type of optimal taxe 1->TauK 0->TauW
-		opt_tax_switch = 0
+		opt_tax_switch = 1
 		Opt_Tax_brent  = .false.
 
 	! Switch for solving benchmark or just reading resutls
@@ -207,10 +207,12 @@ PROGRAM Optimal_Taxes
 		CALL Write_Benchmark_Results(read_write_bench)
 	end if 
 
-		print*,"	Computing satitics"
-		CALL COMPUTE_STATS
-		print*,"	Writing variables"
-		CALL WRITE_VARIABLES(1)
+		if (Opt_Tax_brent) then 
+			print*,"	Computing satitics"
+			CALL COMPUTE_STATS
+			print*,"	Writing variables"
+			CALL WRITE_VARIABLES(1)
+		endif 
 
 	! Aggregate variables in benchmark economy
 		GBAR_bench  = GBAR
