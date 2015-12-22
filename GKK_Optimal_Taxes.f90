@@ -270,7 +270,8 @@ PROGRAM Optimal_Taxes
 	            print*, tauK, tauPL, psi, GBAR_K, MeanWealth, QBAR, NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
 	              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 
-	            WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+	            WRITE(UNIT=77, FMT=*) &
+	              & tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
 	              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
 	              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60	    
 
@@ -291,7 +292,8 @@ PROGRAM Optimal_Taxes
 		            print*, tauK, tauPL, psi, GBAR_K, MeanWealth, QBAR, NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
 		              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 
-		            WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+		            WRITE(UNIT=77, FMT=*) &
+		              & tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
 		              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
 		              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60	    
 			    ENDDO  
@@ -317,7 +319,8 @@ PROGRAM Optimal_Taxes
 	            print*, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
 	              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 
-	            WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+	            WRITE(UNIT=77, FMT=*) & 
+	              & tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
 	              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
 	              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
         else 
@@ -337,7 +340,8 @@ PROGRAM Optimal_Taxes
 		            print*, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
 		              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 
-		            WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+		            WRITE(UNIT=77, FMT=*) & 
+		              & tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
 		              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
 		              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
 			    ENDDO                
