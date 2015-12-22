@@ -32,17 +32,18 @@ PROGRAM Optimal_Taxes
 	! Variables to measure running time
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
-		logical  :: read_write_bench
+		logical  :: read_write_bench, Opt_Tax_brent
 	! Auxiliary variable for writing file
 		character(4) :: string_theta
 
 	! Capital Market
 		theta = 1.50_dp 
 	! Threshold
-		Threshold_Factor = 1.00_dp 
+		Threshold_Factor = 0.00_dp 
 
 	! Set type of optimal taxe 1->TauK 0->TauW
 		opt_tax_switch = 0
+		Opt_Tax_brent  = .false.
 
 	! Switch for solving benchmark or just reading resutls
 		! If read_write_bench==.true. then just read resutls
@@ -254,90 +255,93 @@ PROGRAM Optimal_Taxes
 	
 	print*,'Optimal Tax Loop'
 	If ( opt_tax_switch .eq. 1 ) then
-		
-		OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_all_tau_k', STATUS='replace')
-	    
-	    !brentvaluet = brent(0.00_DP, 0.1_DP , 0.4_DP, EQ_WELFARE_GIVEN_TauK, brent_tol, Opt_TauK)  
-	    call Find_Opt_Tax(opt_tax_switch,Opt_TauK)
-	    tauK = Opt_TauK
+		if (Opt_Tax_brent) then
+			OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_all_tau_k', STATUS='replace')
+		    
+		    !brentvaluet = brent(0.00_DP, 0.1_DP , 0.4_DP, EQ_WELFARE_GIVEN_TauK, brent_tol, Opt_TauK)  
+		    call Find_Opt_Tax(opt_tax_switch,Opt_TauK)
+		    tauK = Opt_TauK
 
-	    brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
+		    brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
-	    ! Print results
-            print*, ' '
-            print*, 'Values optimal capital taxes'
-            print*, tauK, tauPL, psi, GBAR_K, MeanWealth, QBAR, NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
-              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+		    ! Print results
+	            print*, ' '
+	            print*, 'Values optimal capital taxes'
+	            print*, tauK, tauPL, psi, GBAR_K, MeanWealth, QBAR, NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+	              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 
-            WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
-              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60	    
+	            WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+	              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+	              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60	    
 
+        else 
+        	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
+			    DO tauindx=0,30
+		            tauK        = real(tauindx,8)/150_DP
+		            brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
-		! 	    DO tauindx=0,50
+		            if (brentvaluet .gt. maxbrentvaluet) then
+		                maxbrentvaluet = brentvaluet
+		                Opt_TauK=tauK
+		            endif
 
-		!             tauK=real(tauindx,8)/100_DP
-		!             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
+		            ! Print results
+		            print*, ' '
+		            print*, 'Iteration',tauindx
+		            print*, tauK, tauPL, psi, GBAR_K, MeanWealth, QBAR, NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+		              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 
-		!             if (brentvaluet .gt. maxbrentvaluet) then
-		!                 maxbrentvaluet = brentvaluet
-		!                 Opt_TauK=tauK
-		!             endif
-
-		!             ! Print results
-		!             print*, ' '
-		!             print*, 'Iteration',tauindx
-		!             print*, tauK, tauPL, psi, GBAR_K, MeanWealth, QBAR, NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
-		!               & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
-
-		!             WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
-		!               & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-		!               & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60	    
-		! 	    ENDDO                
+		            WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+		              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+		              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60	    
+			    ENDDO  
+		endif               
 	else
+		if (Opt_Tax_brent) then
+			OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_all_tau_w', STATUS='replace')
 
-		OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_all_tau_w', STATUS='replace')
+			! Set Y_a_threshold
+			call Find_TauW_Threshold(DBN_bench,W_bench)  
+			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
+			Wealth_factor = Y_a_threshold/W_bench
 
-		! Set Y_a_threshold
-		call Find_TauW_Threshold(DBN_bench,W_bench)  
-		Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
-		Wealth_factor = Y_a_threshold/W_bench
+		    !brentvaluet = brent(0.00_DP, 0.016_DP , 0.05_DP, EQ_WELFARE_GIVEN_TauW, brent_tol, Opt_TauW)
+		    call Find_Opt_Tax(opt_tax_switch,Opt_TauW)
+		    tauW_at = Opt_TauW
 
-	    !brentvaluet = brent(0.00_DP, 0.016_DP , 0.05_DP, EQ_WELFARE_GIVEN_TauW, brent_tol, Opt_TauW)
-	    call Find_Opt_Tax(opt_tax_switch,Opt_TauW)
-	    tauW_at = Opt_TauW
+		    brentvaluet = -EQ_WELFARE_GIVEN_TauW(tauW_at)
 
-	    brentvaluet = -EQ_WELFARE_GIVEN_TauW(tauW_at)
+		    ! Print results
+	            print*, ' '
+	            print*, 'Values optimal wealth taxes'
+	            print*, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+	              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 
-	    ! Print results
-            print*, ' '
-            print*, 'Values optimal wealth taxes'
-            print*, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
-              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
-
-            WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
-              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
-
-		! 	    DO tauindx=0,50
-		!             tauW_at=real(tauindx,8)/1000_DP
-		!             brentvaluet = -EQ_WELFARE_GIVEN_TauW(tauW_at)
+	            WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+	              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+	              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
+        else 
+        	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace') 
+			    DO tauindx=0,30
+		            tauW_at=real(tauindx,8)/600_DP
+		            brentvaluet = -EQ_WELFARE_GIVEN_TauW(tauW_at)
 		            
-		!             if (brentvaluet .gt. maxbrentvaluet) then
-		!                 maxbrentvaluet = brentvaluet
-		!                 Opt_TauW=tauW_at
-		!             endif
+		            if (brentvaluet .gt. maxbrentvaluet) then
+		                maxbrentvaluet = brentvaluet
+		                Opt_TauW=tauW_at
+		            endif
 
-		!             ! Print results
-		!             print*, ' '
-		!             print*, 'Iteration',tauindx
-		!             print*, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
-		!               & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+		            ! Print results
+		            print*, ' '
+		            print*, 'Iteration',tauindx
+		            print*, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+		              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 
-		!             WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
-		!               & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-		!               & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
-		! 	    ENDDO                
+		            WRITE  (UNIT=77, FMT=*) tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+		              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+		              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
+			    ENDDO                
+		endif 
 	endif
 	close (unit=77)
 
