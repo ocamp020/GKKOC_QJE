@@ -345,53 +345,56 @@ PROGRAM Optimal_Taxes
 	endif
 	close (unit=77)
 
-	tauK    = Opt_TauK
-	tauW_at = Opt_TauW
+	if (Opt_Tax_brent) then 
+		tauK    = Opt_TauK
+		tauW_at = Opt_TauW
 
-	CALL FIND_DBN_EQ
-	CALL GOVNT_BUDGET
+		CALL FIND_DBN_EQ
+		CALL GOVNT_BUDGET
 
-	! Compute value function and store policy functions, value function and distribution in file
-	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-	CALL Write_Experimental_Results()
-	
-	! Aggregate variable in experimental economy
-		GBAR_exp  = GBAR
-		QBAR_exp  = QBAR 
-		NBAR_exp  = NBAR  
-		Y_exp 	  = YBAR
-		Ebar_exp  = EBAR
-		P_exp     = P
-		R_exp	  = R
-		wage_exp  = wage
-		tauK_exp  = tauK
-		tauPL_exp = tauPL
-		psi_exp   = psi
-		DBN_exp   = DBN1
-		tauw_bt_exp = tauW_bt
-		tauw_at_exp = tauW_at
-		Y_a_threshold_exp = Y_a_threshold
+		! Compute value function and store policy functions, value function and distribution in file
+		CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+		CALL Write_Experimental_Results()
+		
+		! Aggregate variable in experimental economy
+			GBAR_exp  = GBAR
+			QBAR_exp  = QBAR 
+			NBAR_exp  = NBAR  
+			Y_exp 	  = YBAR
+			Ebar_exp  = EBAR
+			P_exp     = P
+			R_exp	  = R
+			wage_exp  = wage
+			tauK_exp  = tauK
+			tauPL_exp = tauPL
+			psi_exp   = psi
+			DBN_exp   = DBN1
+			tauw_bt_exp = tauW_bt
+			tauw_at_exp = tauW_at
+			Y_a_threshold_exp = Y_a_threshold
 
-		ValueFunction_exp = ValueFunction
-		Cons_exp          = Cons           
-		Hours_exp         = Hours
-		Aprime_exp        = Aprime 
+			ValueFunction_exp = ValueFunction
+			Cons_exp          = Cons           
+			Hours_exp         = Hours
+			Aprime_exp        = Aprime 
 
-	! Compute moments
-	CALL COMPUTE_STATS
-	
-	! Compute welfare gain between economies
-	CALL COMPUTE_WELFARE_GAIN
+		! Compute moments
+		CALL COMPUTE_STATS
+		
+		! Compute welfare gain between economies
+		CALL COMPUTE_WELFARE_GAIN
 
-	! Write experimental results in output.txt
-	CALL WRITE_VARIABLES(0)
+		! Write experimental results in output.txt
+		CALL WRITE_VARIABLES(0)
 
 
-	print*,'---------------------------'
-	print*,''
-	print*,'Output Gain Prct=', 100.0_DP*(Y_exp/Y_bench-1.0) 
-	print*,''
-	print*,'---------------------------'
+		print*,'---------------------------'
+		print*,''
+		print*,'Output Gain Prct=', 100.0_DP*(Y_exp/Y_bench-1.0) 
+		print*,''
+		print*,'---------------------------'
+
+	endif 
 
 	call cpu_time(finish_time)
 	print*,'Total time =',finish_time-start_time
