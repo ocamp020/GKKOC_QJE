@@ -61,7 +61,7 @@ PROGRAM main
 
 	! Set Parameters
 		if (theta.eq.1.0_dp) then 
-			Params =[0.9436_dp, 0.0_dp, 0.50_dp, 0.70444445_dp, 0.34_dp, 0.4494_dp] ! tauL=0.224, tauC=0.075 calibration
+			Params =[0.9415_dp,  0.00_dp,  0.50_dp,  0.65_dp,  0.34_dp,  0.4494dp] ! tauL=0.224, tauC=0.075 calibration
 		else if (theta.eq.1.50_dp) then 
 			if (mu.eq.0.85_dp) then 
 			Params= [0.945_dp, 0.00_dp, 0.50_dp, 0.7889_dp, 0.34_dp, 0.4494_dp] ! mu=0.85 calibration, targetting 0.34, 0.69, vartheta1.5 

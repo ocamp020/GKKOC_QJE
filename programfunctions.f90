@@ -2253,7 +2253,7 @@ SUBROUTINE COMPUTE_STATS()
 	!print*, 'MeanReturn=',MeanReturn, 'StdReturn=', StdReturn
 	!print*,'MeanReturn_by_z=',MeanReturn_by_z
 
-	SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP  + (1.0_DP-prct1_wealth/0.34_DP)**2.0_DP  + (prct10_wealth-0.71_DP)**2.0_DP &
+	SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP  + (1.0_DP-prct1_wealth/0.34_DP)**2.0_DP  + (prct10_wealth-0.69_DP)**2.0_DP &
                    & + (1.0_DP-Std_Log_Earnings_25_60 / 0.8_DP)**2.0_DP + (1.0_DP-meanhours_25_60/0.4_DP)**2.0_DP &
                    & + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
 	!print*,''
