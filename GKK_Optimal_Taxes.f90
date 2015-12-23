@@ -48,7 +48,7 @@ PROGRAM Optimal_Taxes
 	! Switch for solving benchmark or just reading resutls
 		! If read_write_bench==.true. then just read resutls
 		! If read_write_bench==.false. then solve for benchmark and store results
-		read_write_bench = .false.	
+		read_write_bench = .true.	
 
 	! Switch for separable and non-separable utility
 		! If NSU_Switch==.true. then do non-separable utility
@@ -67,7 +67,7 @@ PROGRAM Optimal_Taxes
 
 	! Set Parameters
 		if (theta.eq.1.0_dp) then 
-			Params =[0.9415_dp,  0.00_dp,  0.50_dp,  0.65_dp,  0.34_dp,  0.4494dp] ! tauL=0.224, tauC=0.075 calibration
+			Params =[0.9415_dp,  0.00_dp,  0.50_dp,  0.65_dp,  0.34_dp,  0.4494_dp] ! tauL=0.224, tauC=0.075 calibration
 		else if (theta.eq.1.50_dp) then 
 			if (mu.eq.0.85_dp) then 
 			Params= [0.945_dp, 0.00_dp, 0.50_dp, 0.7889_dp, 0.34_dp, 0.4494_dp] ! mu=0.85 calibration, targetting 0.34, 0.69, vartheta1.5 
@@ -327,7 +327,7 @@ PROGRAM Optimal_Taxes
 
 	            WRITE(UNIT=77, FMT=*) & 
 		              & tauK, tauPL, psi, 100.0_DP*(Y_exp/Y_bench-1.0), CE_NEWBORN, &
-		              & GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 
+		              & GBAR_K, MeanWealth, QBAR,NBAR, YBAR, &
 		              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
         else 
         	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace') 
@@ -352,7 +352,7 @@ PROGRAM Optimal_Taxes
 
 		            WRITE(UNIT=77, FMT=*) & 
 		              & tauW_at, tauPL, psi, 100.0_DP*(Y_exp/Y_bench-1.0), CE_NEWBORN, &
-		              & GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 
+		              & GBAR_K, MeanWealth, QBAR,NBAR, YBAR, &
 		              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
 			    ENDDO                
 		endif 
