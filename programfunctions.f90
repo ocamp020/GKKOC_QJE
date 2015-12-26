@@ -4145,56 +4145,110 @@ SUBROUTINE Write_Benchmark_Results(read_write)
 END SUBROUTINE Write_Benchmark_Results
 
 
-SUBROUTINE Write_Experimental_Results()
+SUBROUTINE Write_Experimental_Results(compute_exp)
 	IMPLICIT NONE
+	logical, intent(in) :: compute_exp
+
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Exp_Files/' )
 
-	OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_cons'  , STATUS='replace')
-	WRITE (UNIT=1,  FMT=*) cons
+	if (compute_exp) then 
+		print*, "Writing experimental results in folder", trim(Result_Folder) // 'Exp_Files/'
+		OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_cons'  , STATUS='replace')
+		WRITE (UNIT=1,  FMT=*) cons
+		OPEN  (UNIT=2,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_aprime', STATUS='replace')
+		WRITE (UNIT=2,  FMT=*) aprime
+		OPEN  (UNIT=3,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_hours' , STATUS='replace')
+		WRITE (UNIT=3,  FMT=*) hours
+		OPEN  (UNIT=4,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_value' , STATUS='replace')
+		WRITE (UNIT=4,  FMT=*) ValueFunction
+
+		OPEN  (UNIT=5,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_DBN'   , STATUS='replace')
+		WRITE (UNIT=5,  FMT=*) DBN1 
+		OPEN  (UNIT=60,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_GBAR'  , STATUS='replace')
+		WRITE (UNIT=60,  FMT=*) GBAR
+		OPEN  (UNIT=7,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_EBAR'  , STATUS='replace')
+		WRITE (UNIT=7,  FMT=*) EBAR
+		OPEN  (UNIT=8,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_NBAR'  , STATUS='replace')
+		WRITE (UNIT=8,  FMT=*) NBAR
+		OPEN  (UNIT=9,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_QBAR'  , STATUS='replace')
+		WRITE (UNIT=9,  FMT=*) QBAR
+		OPEN  (UNIT=10, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_P'    , STATUS='replace')
+		WRITE (UNIT=10, FMT=*) P
+		OPEN  (UNIT=11, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_R'    , STATUS='replace')
+		WRITE (UNIT=11, FMT=*) R
+		OPEN  (UNIT=12, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_wage'  , STATUS='replace')
+		WRITE (UNIT=12, FMT=*) wage 
+		OPEN  (UNIT=13, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_YBAR'  , STATUS='replace')
+		WRITE (UNIT=13, FMT=*) YBAR
+
+		OPEN  (UNIT=14, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_psi'  	, STATUS='replace')
+		WRITE (UNIT=14, FMT=*) psi
+		OPEN  (UNIT=15, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauPL'  	, STATUS='replace')
+		WRITE (UNIT=15, FMT=*) tauPL
+		OPEN  (UNIT=16, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_bt', STATUS='replace')
+		WRITE (UNIT=16, FMT=*) tauW_bt
+		OPEN  (UNIT=17, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_at', STATUS='replace')
+		WRITE (UNIT=17, FMT=*) tauW_at
+
+		print*, "Writing of experimental results completed"
+
+	else 
+		print*, "Reading experimental results from folder", trim(Result_Folder) // 'Exp_Files/'
+		OPEN (UNIT=1,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_cons'  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=2,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_aprime'	, STATUS='old', ACTION='read')
+		OPEN (UNIT=3,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_hours' 	, STATUS='old', ACTION='read')
+		OPEN (UNIT=4,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_value' 	, STATUS='old', ACTION='read')
+		OPEN (UNIT=5,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_DBN'   	, STATUS='old', ACTION='read')
+		OPEN (UNIT=60, FILE=trim(bench_folder)//'Exp_Files/Exp_results_GBAR'  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=7,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_EBAR'  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=8,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_NBAR'  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=9,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_QBAR'  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=10, FILE=trim(bench_folder)//'Exp_Files/Exp_results_P'     	, STATUS='old', ACTION='read')
+		OPEN (UNIT=11, FILE=trim(bench_folder)//'Exp_Files/Exp_results_R'     	, STATUS='old', ACTION='read')
+		OPEN (UNIT=12, FILE=trim(bench_folder)//'Exp_Files/Exp_results_wage'  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=13, FILE=trim(bench_folder)//'Exp_Files/Exp_results_YBAR'  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=14, FILE=trim(bench_folder)//'Exp_Files/Exp_results_psi'	  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=15, FILE=trim(bench_folder)//'Exp_Files/Exp_results_tauPL'	, STATUS='old', ACTION='read')
+		OPEN (UNIT=16, FILE=trim(bench_folder)//'Exp_Files/Exp_results_tauW_bt'	, STATUS='old', ACTION='read')
+		OPEN (UNIT=17, FILE=trim(bench_folder)//'Exp_Files/Exp_results_tauW_at'	, STATUS='old', ACTION='read')
+
+		READ (UNIT=1,  FMT=*), cons
+		READ (UNIT=2,  FMT=*), aprime
+		READ (UNIT=3,  FMT=*), hours
+		READ (UNIT=4,  FMT=*), ValueFunction
+		READ (UNIT=5,  FMT=*), DBN1 
+		READ (UNIT=60, FMT=*), GBAR 
+		READ (UNIT=7,  FMT=*), EBAR
+		READ (UNIT=8,  FMT=*), NBAR
+		READ (UNIT=9,  FMT=*), QBAR
+		READ (UNIT=10, FMT=*), P
+		READ (UNIT=11, FMT=*), R
+		READ (UNIT=12, FMT=*), wage 
+		READ (UNIT=13, FMT=*), YBAR
+		READ (UNIT=14, FMT=*), psi
+		READ (UNIT=15, FMT=*), tauPL
+		READ (UNIT=16, FMT=*), tauW_bt
+		READ (UNIT=17, FMT=*), tauW_at
+		print*, "Reading of experimental results completed"
+	endif 
+
 	CLOSE (unit=1)
-	OPEN  (UNIT=2,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_aprime', STATUS='replace')
-	WRITE (UNIT=2,  FMT=*) aprime
 	CLOSE (unit=2)
-	OPEN  (UNIT=3,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_hours' , STATUS='replace')
-	WRITE (UNIT=3,  FMT=*) hours
 	CLOSE (unit=3)
-	OPEN  (UNIT=4,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_value' , STATUS='replace')
-	WRITE (UNIT=4,  FMT=*) ValueFunction
 	CLOSE (unit=4)
-
-	OPEN  (UNIT=5,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_DBN'   , STATUS='replace')
-	WRITE (UNIT=5,  FMT=*) DBN1 
-	CLOSE (UNIT=5)
-	OPEN  (UNIT=60,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_GBAR'  , STATUS='replace')
-	WRITE (UNIT=60,  FMT=*) GBAR
-	CLOSE (UNIT=60)
-	OPEN  (UNIT=7,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_EBAR'  , STATUS='replace')
-	WRITE (UNIT=7,  FMT=*) EBAR
-	CLOSE (UNIT=7)
-	OPEN  (UNIT=8,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_NBAR'  , STATUS='replace')
-	WRITE (UNIT=8,  FMT=*) NBAR
-	CLOSE (UNIT=8)
-	OPEN  (UNIT=9,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_QBAR'  , STATUS='replace')
-	WRITE (UNIT=9,  FMT=*) QBAR
-	CLOSE (UNIT=9)
-	OPEN  (UNIT=10, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_P'    , STATUS='replace')
-	WRITE (UNIT=10, FMT=*) P
-	CLOSE (UNIT=10)
-	OPEN  (UNIT=10, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_R'    , STATUS='replace')
-	WRITE (UNIT=10, FMT=*) R
-	CLOSE (UNIT=10)
-	OPEN  (UNIT=11, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_wage'  , STATUS='replace')
-	WRITE (UNIT=11, FMT=*) wage 
-	CLOSE (UNIT=11)
-	OPEN  (UNIT=12, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_YBAR'  , STATUS='replace')
-	WRITE (UNIT=12, FMT=*) YBAR
-	CLOSE (UNIT=12)
-
-	OPEN  (UNIT=12, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_psi'  , STATUS='replace')
-	WRITE (UNIT=12, FMT=*) psi
-	CLOSE (UNIT=12)
-
-	print*, "Writing of experimental results completed"
+	CLOSE (unit=5)
+	CLOSE (unit=60)
+	CLOSE (unit=7)
+	CLOSE (unit=8)
+	CLOSE (unit=9)
+	CLOSE (unit=10)
+	CLOSE (unit=11)
+	CLOSE (unit=12)
+	CLOSE (unit=13)
+	CLOSE (unit=14)
+	CLOSE (unit=15)
+	CLOSE (unit=16)
+	CLOSE (unit=17)
 
 END SUBROUTINE Write_Experimental_Results
 

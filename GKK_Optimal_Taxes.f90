@@ -42,7 +42,7 @@ PROGRAM Optimal_Taxes
 		Threshold_Factor = 0.00_dp 
 
 	! Set type of optimal taxe 1->TauK 0->TauW
-		opt_tax_switch = 0
+		opt_tax_switch = 1
 		Opt_Tax_brent  = .false.
 
 	! Switch for solving benchmark or just reading resutls
@@ -299,9 +299,9 @@ PROGRAM Optimal_Taxes
 		              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 
 		            WRITE(UNIT=77, FMT=*) &
-		              & tauK, tauW_at, tauPL, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
-		              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-		              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60	    
+		              & tauK, tauPL, psi, 100.0_DP*(Y_exp/Y_bench-1.0), CE_NEWBORN, &
+		              & GBAR_K, MeanWealth, QBAR,NBAR, YBAR, &
+		              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
 			    ENDDO  
 		endif               
 	else
