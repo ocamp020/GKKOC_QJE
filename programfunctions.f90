@@ -1898,6 +1898,7 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP) :: S_Rate_A_Age(max_age_category), S_Rate_A_AZ(max_age_category,nz), S_Rate_A_W(3)
 	REAL(DP) :: S_Rate_Y_Age(max_age_category), S_Rate_Y_AZ(max_age_category,nz), S_Rate_Y_W(3)
 	REAL(DP) :: size_Age(max_age_category), size_AZ(max_age_category,nz), size_W(3)
+	real(DP) :: leverage_age_z(MaxAge,nz), size_by_age_z(MaxAge,nz)
 	character(100) :: rowname
 	INTEGER, dimension(max_age_category+1) :: age_limit
 
@@ -2249,6 +2250,27 @@ SUBROUTINE COMPUTE_STATS()
 	S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
 	S_Rate_Y_W   = (Ap_W-A_W)/Y_W
 
+	! Leverage Ratio and fraction of contrainted firms 
+	leverage_age_z = 0.0_dp 
+	size_by_age_z  = 0.0_dp 
+	do age = 1,MaxAge 
+	do zi  = 1,nz 
+        DO lambdai=1,nlambda
+        DO ei=1,ne
+        DO ai=1,na
+			size_by_age_z(age,zi)  = size_by_age_z(age,zi)  + DBN1(age,ai,zi,lambdai,ei)
+			leverage_age_z(age,zi) = leverage_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei)*K_mat(ai,zi)/agrid(ai)
+			if (K_mat(ai,zi).eq.(theta*agrid(ai))) then 
+				constrained_firms_age_z(age,zi) = constrained_firms_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei)
+			endif 
+		enddo
+		enddo 
+		enddo 
+	enddo 
+	enddo 
+	leverage_age_z = leverage_age_z/size_by_age_z
+	constrained_firms_age_z = constrained_firms_age_z/size_by_age_z 
+
 
 	!print*, 'MeanReturn=',MeanReturn, 'StdReturn=', StdReturn
 	!print*,'MeanReturn_by_z=',MeanReturn_by_z
@@ -2268,8 +2290,10 @@ SUBROUTINE COMPUTE_STATS()
 	! Write in files some stats
 	if (solving_bench.eq.1) then
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'Asset_Stats_bench.txt', STATUS='replace')
+		OPEN (UNIT=20, FILE=trim(Result_Folder)//'leverage_bench.txt', STATUS='replace')
 	else
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'Asset_Stats_exp.txt', STATUS='replace')
+		OPEN (UNIT=20, FILE=trim(Result_Folder)//'leverage_exp.txt', STATUS='replace')
 	end if 
 
 		WRITE(UNIT=19, FMT=*) 'Stats on assets, return and savings'
@@ -2354,6 +2378,14 @@ SUBROUTINE COMPUTE_STATS()
 		WRITE(UNIT=19, FMT=*) prctile_ai
 
 	CLOSE(Unit=19)
+
+	! Leverage and constrained firms 
+		WRITE(UNIT=20, FMT=*) 'Leverage ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', & 
+							& 'Cons_Firms',,'z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 '
+		do age=1,MaxAge 
+			WRITE(UNIT=20, FMT=*) age, leverage_age_z(age,:), ' ', age, constrained_firms_age_z(age,:)
+		enddo 
+	CLOSE(UNIT=20)
 
 
 
