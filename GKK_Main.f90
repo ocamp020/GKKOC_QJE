@@ -35,7 +35,7 @@ PROGRAM main
 		character(4) :: string_theta
 
 	! Capital Market
-		theta = 1.60_dp
+		theta = 1.50_dp
 	! Threshold 
 		Threshold_Factor = 0.00_dp 
 
@@ -193,7 +193,7 @@ PROGRAM main
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		CALL WRITE_VARIABLES(1)
-		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(compute_bench.eqv..false.)) then 
+		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(compute_bench)) then 
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
 		endif
@@ -347,7 +347,7 @@ PROGRAM main
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp)) then 
+	if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp).and.(compute_exp)) then 
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
 	endif

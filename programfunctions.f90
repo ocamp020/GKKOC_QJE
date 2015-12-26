@@ -4034,9 +4034,9 @@ END SUBROUTINE WRITE_VARIABLES
 !========================================================================================
 !========================================================================================
 
-SUBROUTINE Write_Benchmark_Results(read_write)
+SUBROUTINE Write_Benchmark_Results(Compute_bench)
 	IMPLICIT NONE
-	logical :: read_write
+	logical :: Compute_bench
 	character(100) :: bench_folder, string_theta
 
 	write(string_theta,'(f4.2)')  theta
@@ -4054,7 +4054,7 @@ SUBROUTINE Write_Benchmark_Results(read_write)
 		call system( 'mkdir -p ' // trim(bench_folder) )
 		print*, "Bench Files Folder:", bench_folder
 	
-	IF (read_write .eqv. .false.) then 
+	IF (Compute_bench) then 
 		OPEN  (UNIT=1,  FILE=trim(bench_folder)//'cons'  , STATUS='replace')
 		WRITE (UNIT=1,  FMT=*) cons
 		CLOSE (unit=1)
@@ -4194,23 +4194,23 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 
 	else 
 		print*, "Reading experimental results from folder", trim(Result_Folder) // 'Exp_Files/'
-		OPEN (UNIT=1,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_cons'  	, STATUS='old', ACTION='read')
-		OPEN (UNIT=2,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_aprime'	, STATUS='old', ACTION='read')
-		OPEN (UNIT=3,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_hours' 	, STATUS='old', ACTION='read')
-		OPEN (UNIT=4,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_value' 	, STATUS='old', ACTION='read')
-		OPEN (UNIT=5,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_DBN'   	, STATUS='old', ACTION='read')
-		OPEN (UNIT=60, FILE=trim(bench_folder)//'Exp_Files/Exp_results_GBAR'  	, STATUS='old', ACTION='read')
-		OPEN (UNIT=7,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_EBAR'  	, STATUS='old', ACTION='read')
-		OPEN (UNIT=8,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_NBAR'  	, STATUS='old', ACTION='read')
-		OPEN (UNIT=9,  FILE=trim(bench_folder)//'Exp_Files/Exp_results_QBAR'  	, STATUS='old', ACTION='read')
-		OPEN (UNIT=10, FILE=trim(bench_folder)//'Exp_Files/Exp_results_P'     	, STATUS='old', ACTION='read')
-		OPEN (UNIT=11, FILE=trim(bench_folder)//'Exp_Files/Exp_results_R'     	, STATUS='old', ACTION='read')
-		OPEN (UNIT=12, FILE=trim(bench_folder)//'Exp_Files/Exp_results_wage'  	, STATUS='old', ACTION='read')
-		OPEN (UNIT=13, FILE=trim(bench_folder)//'Exp_Files/Exp_results_YBAR'  	, STATUS='old', ACTION='read')
-		OPEN (UNIT=14, FILE=trim(bench_folder)//'Exp_Files/Exp_results_psi'	  	, STATUS='old', ACTION='read')
-		OPEN (UNIT=15, FILE=trim(bench_folder)//'Exp_Files/Exp_results_tauPL'	, STATUS='old', ACTION='read')
-		OPEN (UNIT=16, FILE=trim(bench_folder)//'Exp_Files/Exp_results_tauW_bt'	, STATUS='old', ACTION='read')
-		OPEN (UNIT=17, FILE=trim(bench_folder)//'Exp_Files/Exp_results_tauW_at'	, STATUS='old', ACTION='read')
+		OPEN (UNIT=1 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_cons'  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=2 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_aprime'	, STATUS='old', ACTION='read')
+		OPEN (UNIT=3 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_hours' 	, STATUS='old', ACTION='read')
+		OPEN (UNIT=4 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_value' 	, STATUS='old', ACTION='read')
+		OPEN (UNIT=5 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_DBN'   	, STATUS='old', ACTION='read')
+		OPEN (UNIT=60, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_GBAR'  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=7 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_EBAR'  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=8 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_NBAR'  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=9 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_QBAR'  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=10, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_P'     	, STATUS='old', ACTION='read')
+		OPEN (UNIT=11, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_R'     	, STATUS='old', ACTION='read')
+		OPEN (UNIT=12, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_wage'  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=13, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_YBAR'  	, STATUS='old', ACTION='read')
+		OPEN (UNIT=14, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_psi'	, STATUS='old', ACTION='read')
+		OPEN (UNIT=15, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauPL'	, STATUS='old', ACTION='read')
+		OPEN (UNIT=16, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_bt', STATUS='old', ACTION='read')
+		OPEN (UNIT=17, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_at', STATUS='old', ACTION='read')
 
 		READ (UNIT=1,  FMT=*), cons
 		READ (UNIT=2,  FMT=*), aprime
