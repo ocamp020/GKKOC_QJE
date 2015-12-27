@@ -193,7 +193,7 @@ PROGRAM Optimal_Taxes
 	! Solve for the model and compute stats
 	print*,"	Initializing program"
 		CALL INITIALIZE
-	if (compute_bench.eqv..false.) then
+	if (compute_bench) then
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
 		print*,"	Computing government spending"
