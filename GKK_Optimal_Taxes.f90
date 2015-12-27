@@ -37,7 +37,7 @@ PROGRAM Optimal_Taxes
 		character(4) :: string_theta
 
 	! Capital Market
-		theta = 1.50_dp 
+		theta = 2.50_dp 
 	! Threshold
 		Threshold_Factor = 0.00_dp 
 
@@ -48,7 +48,7 @@ PROGRAM Optimal_Taxes
 	! Switch for solving benchmark or just reading resutls
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		compute_bench = .true.	
+		compute_bench = .false.	
 
 	! Switch for separable and non-separable utility
 		! If NSU_Switch==.true. then do non-separable utility
