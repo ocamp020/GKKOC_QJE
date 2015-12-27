@@ -32,7 +32,7 @@ PROGRAM Optimal_Taxes
 	! Variables to measure running time
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
-		logical  :: read_write_bench, Opt_Tax_brent
+		logical  :: compute_bench, Opt_Tax_brent
 	! Auxiliary variable for writing file
 		character(4) :: string_theta
 
@@ -46,9 +46,9 @@ PROGRAM Optimal_Taxes
 		Opt_Tax_brent  = .false.
 
 	! Switch for solving benchmark or just reading resutls
-		! If read_write_bench==.true. then just read resutls
-		! If read_write_bench==.false. then solve for benchmark and store results
-		read_write_bench = .true.	
+		! If compute_bench==.true. then just read resutls
+		! If compute_bench==.false. then solve for benchmark and store results
+		compute_bench = .true.	
 
 	! Switch for separable and non-separable utility
 		! If NSU_Switch==.true. then do non-separable utility
@@ -193,7 +193,7 @@ PROGRAM Optimal_Taxes
 	! Solve for the model and compute stats
 	print*,"	Initializing program"
 		CALL INITIALIZE
-	if (read_write_bench.eqv..false.) then
+	if (compute_bench.eqv..false.) then
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
 		print*,"	Computing government spending"
@@ -201,10 +201,10 @@ PROGRAM Optimal_Taxes
 		print*,"	Computing Value Function"
 		CALL COMPUTE_VALUE_FUNCTION_SPLINE 
 		print*,"	Saving results in text files to be read later"
-		CALL Write_Benchmark_Results(read_write_bench)
+		CALL Write_Benchmark_Results(compute_bench)
 	else
 		print*,"	Reading benchmark results from files"
-		CALL Write_Benchmark_Results(read_write_bench)
+		CALL Write_Benchmark_Results(compute_bench)
 	end if 
 
 		if (Opt_Tax_brent) then 
