@@ -368,7 +368,7 @@ PROGRAM Optimal_Taxes
 
 		! Compute value function and store policy functions, value function and distribution in file
 		CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-		CALL Write_Experimental_Results()
+		CALL Write_Experimental_Results(Opt_Tax_brent)
 		
 		! Aggregate variable in experimental economy
 			GBAR_exp  = GBAR
