@@ -43,7 +43,7 @@ PROGRAM Optimal_Taxes
 
 	! Set type of optimal taxe 1->TauK 0->TauW
 		opt_tax_switch = 0
-		Opt_Tax_brent  = .false.
+		Opt_Tax_brent  = .true.
 
 	! Switch for solving benchmark or just reading resutls
 		! If compute_bench==.true. then just read resutls
