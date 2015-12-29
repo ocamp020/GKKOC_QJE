@@ -17,9 +17,9 @@ SUBROUTINE Find_Opt_Tax(switch,opt_Tau)
 	real(dp)              :: brentvaluet
 
 	if (switch.eq.1) then 
-		brentvaluet = brent(0.00_DP, 0.05_DP , 0.4_DP, EQ_WELFARE_GIVEN_TauK, brent_tol, Opt_Tau)  
+		brentvaluet = brent(0.00_DP, 0.05_DP , 0.1_DP, EQ_WELFARE_GIVEN_TauK, brent_tol, Opt_Tau)  
 	else 
-		brentvaluet = brent(0.00_DP, 0.016_DP , 0.05_DP, EQ_WELFARE_GIVEN_TauW, brent_tol, Opt_Tau)
+		brentvaluet = brent(0.00_DP, 0.02_DP , 0.04_DP, EQ_WELFARE_GIVEN_TauW, brent_tol, Opt_Tau)
 	end if 
 
 

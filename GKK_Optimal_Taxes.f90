@@ -42,13 +42,13 @@ PROGRAM Optimal_Taxes
 		Threshold_Factor = 0.00_dp 
 
 	! Set type of optimal taxe 1->TauK 0->TauW
-		opt_tax_switch = 0
-		Opt_Tax_brent  = .true.
+		opt_tax_switch = 1
+		Opt_Tax_brent  = .false.
 
 	! Switch for solving benchmark or just reading resutls
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		compute_bench = .true.	
+		compute_bench = .false.	
 
 	! Switch for separable and non-separable utility
 		! If NSU_Switch==.true. then do non-separable utility
@@ -279,14 +279,36 @@ PROGRAM Optimal_Taxes
 
         else 
         	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
-			    DO tauindx=0,30
-		            tauK        = real(tauindx,8)/150_DP
+			    DO tauindx=0,40
+		            tauK        = real(tauindx,8)/100_DP
 		            brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
 		            if (brentvaluet .gt. maxbrentvaluet) then
 		                maxbrentvaluet = brentvaluet
 		                Opt_TauK=tauK
 		            endif
+
+		            ! Aggregate variable in experimental economy
+						GBAR_exp  = GBAR
+						QBAR_exp  = QBAR 
+						NBAR_exp  = NBAR  
+						Y_exp 	  = YBAR
+						Ebar_exp  = EBAR
+						P_exp     = P
+						R_exp	  = R
+						wage_exp  = wage
+						tauK_exp  = tauK
+						tauPL_exp = tauPL
+						psi_exp   = psi
+						DBN_exp   = DBN1
+						tauw_bt_exp = tauW_bt
+						tauw_at_exp = tauW_at
+						Y_a_threshold_exp = Y_a_threshold
+
+					! CALL COMPUTE_WELFARE_GAIN
+					CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+
+		            CALL COMPUTE_WELFARE_GAIN
 
 		            ! Compute moments
 					CALL COMPUTE_STATS
@@ -297,11 +319,16 @@ PROGRAM Optimal_Taxes
 		            print*, 'Iteration',tauindx
 		            print*, tauK, tauPL, psi, GBAR_K, MeanWealth, QBAR, NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
 		              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
-
-		            WRITE(UNIT=77, FMT=*) &
-		              & tauK, tauPL, psi, 100.0_DP*(Y_exp/Y_bench-1.0), CE_NEWBORN, &
-		              & GBAR_K, MeanWealth, QBAR,NBAR, YBAR, &
-		              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
+		            
+		            WRITE(UNIT=77, FMT=*) & 
+		             & tauW_at, tauPL, psi, &
+		             & GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+                     & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)),  &
+                     & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+                     & 100.0_DP*( (sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)) /&
+                     & sum(ValueFunction_bench(1,:,:,:,:)*DBN_bench(1,:,:,:,:))/sum(DBN_bench(1,:,:,:,:))) &
+                     &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+                     & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
 			    ENDDO  
 		endif               
 	else
@@ -331,14 +358,36 @@ PROGRAM Optimal_Taxes
 		              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
         else 
         	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace') 
-			    DO tauindx=0,30
-		            tauW_at=real(tauindx,8)/600_DP
+			    DO tauindx=0,40
+		            tauW_at=real(tauindx,8)/1000_DP
 		            brentvaluet = -EQ_WELFARE_GIVEN_TauW(tauW_at)
 		            
 		            if (brentvaluet .gt. maxbrentvaluet) then
 		                maxbrentvaluet = brentvaluet
 		                Opt_TauW=tauW_at
 		            endif
+
+		            ! Aggregate variable in experimental economy
+						GBAR_exp  = GBAR
+						QBAR_exp  = QBAR 
+						NBAR_exp  = NBAR  
+						Y_exp 	  = YBAR
+						Ebar_exp  = EBAR
+						P_exp     = P
+						R_exp	  = R
+						wage_exp  = wage
+						tauK_exp  = tauK
+						tauPL_exp = tauPL
+						psi_exp   = psi
+						DBN_exp   = DBN1
+						tauw_bt_exp = tauW_bt
+						tauw_at_exp = tauW_at
+						Y_a_threshold_exp = Y_a_threshold
+
+					! CALL COMPUTE_WELFARE_GAIN
+					CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+
+		            CALL COMPUTE_WELFARE_GAIN
 
 		            ! Compute moments
 					CALL COMPUTE_STATS
@@ -351,9 +400,15 @@ PROGRAM Optimal_Taxes
 		              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 
 		            WRITE(UNIT=77, FMT=*) & 
-		              & tauW_at, tauPL, psi, 100.0_DP*(Y_exp/Y_bench-1.0), CE_NEWBORN, &
-		              & GBAR_K, MeanWealth, QBAR,NBAR, YBAR, &
-		              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
+		             & tauW_at, tauPL, psi, &
+		             & GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0) , &
+                     & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)),  &
+                     & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+                     & 100.0_DP*( (sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)) /&
+                     & sum(ValueFunction_bench(1,:,:,:,:)*DBN_bench(1,:,:,:,:))/sum(DBN_bench(1,:,:,:,:))) &
+                     &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+                     & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
+		              
 			    ENDDO                
 		endif 
 	endif
