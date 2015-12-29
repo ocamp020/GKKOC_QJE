@@ -747,7 +747,7 @@ end Subroutine Asset_Grid_Threshold
 SUBROUTINE COMPUTE_WELFARE_GAIN()
 	IMPLICIT NONE
 	real(DP), dimension(MaxAge):: CumDiscountF
-	REAL(DP), dimension(MaxAge, na, nz, nlambda, ne) ::  Cons_Eq_Welfare ! ValueFunction_Bench, ValueFunction_Exp,
+	! REAL(DP), dimension(MaxAge, na, nz, nlambda, ne) ::  Cons_Eq_Welfare ! ValueFunction_Bench, ValueFunction_Exp,
 	REAL(DP), dimension(nz) ::  temp_ce_by_z, temp_cons_by_z, temp_leisure_by_z, temp_dbn_by_z 
 	REAL(DP) :: frac_pos_welfare 
 	REAL(DP), dimension(MaxAge, nz) :: frac_pos_welfare_by_age_z, size_pos_welfare_by_age_z, size_by_age_z_bench, size_by_age_z_exp

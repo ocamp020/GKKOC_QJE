@@ -54,6 +54,7 @@ MODULE global
     REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: Cons, Hours, Aprime
     REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: Cons_bench, Hours_bench, Aprime_bench, Cons_exp, Hours_exp, Aprime_exp 
     REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: ValueFunction, ValueFunction_bench, ValueFunction_exp
+    REAL(DP), dimension(MaxAge, na, nz, nlambda, ne) :: Cons_Eq_Welfare
 		! Analytical solution for mu=1 for all the lifecycle not just retirement period
     	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda) :: AnRetCons,   AnRetValue, AnRetHours 
 	! Policy function and value function (defined on the adjusted grid for breakpoints)
