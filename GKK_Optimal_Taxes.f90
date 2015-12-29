@@ -37,7 +37,7 @@ PROGRAM Optimal_Taxes
 		character(4) :: string_theta
 
 	! Capital Market
-		theta = 2.50_dp 
+		theta = 1.50_dp 
 	! Threshold
 		Threshold_Factor = 0.00_dp 
 
@@ -326,7 +326,7 @@ PROGRAM Optimal_Taxes
 	              & CE_NEWBORN, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 
 	            WRITE(UNIT=77, FMT=*) & 
-		              & tauK, tauPL, psi, 100.0_DP*(Y_exp/Y_bench-1.0), CE_NEWBORN, &
+		              & tauW_at, tauPL, psi, 100.0_DP*(Y_exp/Y_bench-1.0), CE_NEWBORN, &
 		              & GBAR_K, MeanWealth, QBAR,NBAR, YBAR, &
 		              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
         else 
@@ -400,6 +400,10 @@ PROGRAM Optimal_Taxes
 
 		! Write experimental results in output.txt
 		CALL WRITE_VARIABLES(0)
+		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp)) then 
+		 	print*,"	Optimal Tax Simulation"
+			CALL SIMULATION(solving_bench)
+		endif
 
 
 		print*,'---------------------------'

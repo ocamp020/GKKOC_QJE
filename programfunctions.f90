@@ -3986,7 +3986,7 @@ END SUBROUTINE SIMULATION
 SUBROUTINE WRITE_VARIABLES(bench_indx)
 	IMPLICIT NONE
 	integer, intent(in) :: bench_indx
-	integer ::prctile, status
+	integer :: prctile, status, zi
 
 	if (bench_indx.eq.1) then
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='replace') 
@@ -4043,7 +4043,9 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Mean_Labor_25_60'	   	, meanhours_25_60
 			WRITE(UNIT=19, FMT=*) 'Mean_Return'				, 100.0_dp*MeanReturn
 			WRITE(UNIT=19, FMT=*) 'Std_Return'				, StdReturn
-			WRITE(UNIT=19, FMT=*) 'Mean_Return_by_z'		, 100.0_dp*MeanReturn_by_z
+			do zi=1,nz
+			WRITE(UNIT=19, FMT=*) 'Mean_Return_by_z'		, 100.0_dp*MeanReturn_by_z(zi)
+			enddo 
 			WRITE(UNIT=19, FMT=*) 'Moments'				  	, SSE_Moments 
 			WRITE(UNIT=19, FMT=*) ' '
 		CLOSE(Unit=19)
@@ -4129,6 +4131,22 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		WRITE (UNIT=12, FMT=*) YBAR
 		CLOSE (UNIT=12)
 
+		OPEN  (UNIT=12, FILE=trim(bench_folder)//'tauK'  , STATUS='replace')
+		WRITE (UNIT=12, FMT=*) tauK
+		CLOSE (UNIT=12)
+		OPEN  (UNIT=12, FILE=trim(bench_folder)//'tauPL'  , STATUS='replace')
+		WRITE (UNIT=12, FMT=*) tauPL
+		CLOSE (UNIT=12)
+		OPEN  (UNIT=12, FILE=trim(bench_folder)//'psi'  , STATUS='replace')
+		WRITE (UNIT=12, FMT=*) psi
+		CLOSE (UNIT=12)
+		OPEN  (UNIT=12, FILE=trim(bench_folder)//'tauW_bt'  , STATUS='replace')
+		WRITE (UNIT=12, FMT=*) tauW_bt
+		CLOSE (UNIT=12)
+		OPEN  (UNIT=12, FILE=trim(bench_folder)//'tauW_at'  , STATUS='replace')
+		WRITE (UNIT=12, FMT=*) tauW_at
+		CLOSE (UNIT=12)
+
 		print*, "Writing of benchmark results completed"
 	ELSE 
 		OPEN (UNIT=1,  FILE=trim(bench_folder)//'cons'  , STATUS='old', ACTION='read')
@@ -4141,9 +4159,15 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN (UNIT=8,  FILE=trim(bench_folder)//'NBAR'  , STATUS='old', ACTION='read')
 		OPEN (UNIT=9,  FILE=trim(bench_folder)//'QBAR'  , STATUS='old', ACTION='read')
 		OPEN (UNIT=10, FILE=trim(bench_folder)//'P'     , STATUS='old', ACTION='read')
-		OPEN (UNIT=13, FILE=trim(bench_folder)//'R'     , STATUS='old', ACTION='read')
-		OPEN (UNIT=11, FILE=trim(bench_folder)//'wage'  , STATUS='old', ACTION='read')
-		OPEN (UNIT=12, FILE=trim(bench_folder)//'YBAR'  , STATUS='old', ACTION='read')
+		OPEN (UNIT=11, FILE=trim(bench_folder)//'R'     , STATUS='old', ACTION='read')
+		OPEN (UNIT=12, FILE=trim(bench_folder)//'wage'  , STATUS='old', ACTION='read')
+		OPEN (UNIT=13, FILE=trim(bench_folder)//'YBAR'  , STATUS='old', ACTION='read')
+
+		OPEN (UNIT=14, FILE=trim(bench_folder)//'tauK'    , STATUS='old', ACTION='read')
+		OPEN (UNIT=15, FILE=trim(bench_folder)//'tauPL'   , STATUS='old', ACTION='read')
+		OPEN (UNIT=16, FILE=trim(bench_folder)//'psi'  	  , STATUS='old', ACTION='read')
+		OPEN (UNIT=17, FILE=trim(bench_folder)//'tauW_bt' , STATUS='old', ACTION='read')
+		OPEN (UNIT=18, FILE=trim(bench_folder)//'tauW_at' , STATUS='old', ACTION='read')
 
 		READ (UNIT=1,  FMT=*), cons
 		READ (UNIT=2,  FMT=*), aprime
@@ -4155,9 +4179,15 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		READ (UNIT=8,  FMT=*), NBAR
 		READ (UNIT=9,  FMT=*), QBAR
 		READ (UNIT=10, FMT=*), P
-		READ (UNIT=13, FMT=*), R
-		READ (UNIT=11, FMT=*), wage 
-		READ (UNIT=12, FMT=*), YBAR
+		READ (UNIT=11, FMT=*), R
+		READ (UNIT=12, FMT=*), wage 
+		READ (UNIT=13, FMT=*), YBAR
+
+		READ (UNIT=14, FMT=*), tauK
+		READ (UNIT=15, FMT=*), tauPL
+		READ (UNIT=16, FMT=*), psi
+		READ (UNIT=17, FMT=*), tauW_bt
+		READ (UNIT=18, FMT=*), tauW_at
 
 		CLOSE (unit=1)
 		CLOSE (unit=2)
@@ -4172,6 +4202,11 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		CLOSE (unit=11)
 		CLOSE (unit=12)
 		CLOSE (unit=13)
+		CLOSE (unit=14)
+		CLOSE (unit=15)
+		CLOSE (unit=16)
+		CLOSE (unit=17)
+		CLOSE (unit=18)
 
 		print*, "Reading of benchmark results completed"
 	END IF 
@@ -4197,7 +4232,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 
 		OPEN  (UNIT=5,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_DBN'   , STATUS='replace')
 		WRITE (UNIT=5,  FMT=*) DBN1 
-		OPEN  (UNIT=60,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_GBAR'  , STATUS='replace')
+		OPEN  (UNIT=60,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_GBAR' , STATUS='replace')
 		WRITE (UNIT=60,  FMT=*) GBAR
 		OPEN  (UNIT=7,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_EBAR'  , STATUS='replace')
 		WRITE (UNIT=7,  FMT=*) EBAR
@@ -4205,23 +4240,25 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		WRITE (UNIT=8,  FMT=*) NBAR
 		OPEN  (UNIT=9,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_QBAR'  , STATUS='replace')
 		WRITE (UNIT=9,  FMT=*) QBAR
-		OPEN  (UNIT=10, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_P'    , STATUS='replace')
+		OPEN  (UNIT=10, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_P'     , STATUS='replace')
 		WRITE (UNIT=10, FMT=*) P
-		OPEN  (UNIT=11, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_R'    , STATUS='replace')
+		OPEN  (UNIT=11, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_R'     , STATUS='replace')
 		WRITE (UNIT=11, FMT=*) R
 		OPEN  (UNIT=12, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_wage'  , STATUS='replace')
 		WRITE (UNIT=12, FMT=*) wage 
 		OPEN  (UNIT=13, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_YBAR'  , STATUS='replace')
 		WRITE (UNIT=13, FMT=*) YBAR
 
-		OPEN  (UNIT=14, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_psi'  	, STATUS='replace')
-		WRITE (UNIT=14, FMT=*) psi
-		OPEN  (UNIT=15, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauPL'  	, STATUS='replace')
-		WRITE (UNIT=15, FMT=*) tauPL
-		OPEN  (UNIT=16, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_bt', STATUS='replace')
-		WRITE (UNIT=16, FMT=*) tauW_bt
-		OPEN  (UNIT=17, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_at', STATUS='replace')
-		WRITE (UNIT=17, FMT=*) tauW_at
+		OPEN  (UNIT=14, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauK'   , STATUS='replace')
+		WRITE (UNIT=14, FMT=*) tauK
+		OPEN  (UNIT=15, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_psi'  	 , STATUS='replace')
+		WRITE (UNIT=15, FMT=*) psi
+		OPEN  (UNIT=16, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauPL'  , STATUS='replace')
+		WRITE (UNIT=16, FMT=*) tauPL
+		OPEN  (UNIT=17, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_bt', STATUS='replace')
+		WRITE (UNIT=17, FMT=*) tauW_bt
+		OPEN  (UNIT=18, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_at', STATUS='replace')
+		WRITE (UNIT=18, FMT=*) tauW_at
 
 		print*, "Writing of experimental results completed"
 
@@ -4240,10 +4277,11 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN (UNIT=11, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_R'     	, STATUS='old', ACTION='read')
 		OPEN (UNIT=12, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_wage'  	, STATUS='old', ACTION='read')
 		OPEN (UNIT=13, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_YBAR'  	, STATUS='old', ACTION='read')
-		OPEN (UNIT=14, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_psi'	, STATUS='old', ACTION='read')
-		OPEN (UNIT=15, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauPL'	, STATUS='old', ACTION='read')
-		OPEN (UNIT=16, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_bt', STATUS='old', ACTION='read')
-		OPEN (UNIT=17, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_at', STATUS='old', ACTION='read')
+		OPEN (UNIT=14, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauK'	, STATUS='old', ACTION='read')
+		OPEN (UNIT=15, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_psi'	, STATUS='old', ACTION='read')
+		OPEN (UNIT=16, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauPL'	, STATUS='old', ACTION='read')
+		OPEN (UNIT=17, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_bt', STATUS='old', ACTION='read')
+		OPEN (UNIT=18, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_at', STATUS='old', ACTION='read')
 
 		READ (UNIT=1,  FMT=*), cons
 		READ (UNIT=2,  FMT=*), aprime
@@ -4258,10 +4296,11 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		READ (UNIT=11, FMT=*), R
 		READ (UNIT=12, FMT=*), wage 
 		READ (UNIT=13, FMT=*), YBAR
-		READ (UNIT=14, FMT=*), psi
-		READ (UNIT=15, FMT=*), tauPL
-		READ (UNIT=16, FMT=*), tauW_bt
-		READ (UNIT=17, FMT=*), tauW_at
+		READ (UNIT=14, FMT=*), tauK
+		READ (UNIT=15, FMT=*), psi
+		READ (UNIT=16, FMT=*), tauPL
+		READ (UNIT=17, FMT=*), tauW_bt
+		READ (UNIT=18, FMT=*), tauW_at
 		print*, "Reading of experimental results completed"
 	endif 
 
@@ -4282,6 +4321,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 	CLOSE (unit=15)
 	CLOSE (unit=16)
 	CLOSE (unit=17)
+	CLOSE (unit=18)
 
 END SUBROUTINE Write_Experimental_Results
 
