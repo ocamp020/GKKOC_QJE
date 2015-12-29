@@ -193,7 +193,7 @@ PROGRAM main
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		CALL WRITE_VARIABLES(1)
-		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(compute_bench)) then 
+		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(compute_bench.eqv..false.)) then 
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
 		endif
