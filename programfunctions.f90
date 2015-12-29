@@ -3379,7 +3379,7 @@ END SUBROUTINE LIFETIME_Y_ESTIMATE
 SUBROUTINE  SIMULATION(bench_indx)
 	use parameters
 	use global
-	!use omp_lib
+	use omp_lib
 
 	IMPLICIT NONE
 	integer, intent(in) :: bench_indx
@@ -3391,7 +3391,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	INTEGER,  DIMENSION(totpop) :: panelage , panelz , panellambda, panele,   newpanelage , newpanelz , newpanellambda, newpanele
 	REAL(DP), DIMENSION(totpop) :: panela,  newpanela,  panel_return, panelcons, panelhours, panelaprime, panel_at_return
 
-	!$ call omp_set_num_threads(40)
+	!$ call omp_set_num_threads(20)
 
     age=1
     requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
@@ -3880,7 +3880,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	ENDDO ! simutime
 
-	! !$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi,K)
+	!$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi,K)
 	DO paneli=1,totpop
 
 		currenta  = panela(paneli)
@@ -3916,7 +3916,12 @@ SUBROUTINE  SIMULATION(bench_indx)
 		K = min( theta*currenta , (mu*P*zgrid(currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
 		panel_return(paneli)    = R*currenta + ( P*(zgrid(currentzi)*K)**mu - (R+DepRate)*K )
-		panel_at_return(paneli) = Y_a(currenta,zgrid(currentzi)) - 1.0_dp  
+
+		if ( ( currenta + panel_return(paneli)*(1.0_DP-tauK) ).le.Y_a_threshold) then  
+			panel_at_return(paneli) = ( currenta + panel_return(paneli)*(1.0_DP-tauK) )*(1-tauW_bt) - 1.0_dp
+		else 
+			panel_at_return(paneli) = ( currenta + panel_return(paneli)*(1.0_DP-tauK) )*(1-tauW_at) - 1.0_dp
+		endif 
 
 	ENDDO ! paneli
 

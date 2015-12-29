@@ -42,13 +42,13 @@ PROGRAM Optimal_Taxes
 		Threshold_Factor = 0.00_dp 
 
 	! Set type of optimal taxe 1->TauK 0->TauW
-		opt_tax_switch = 0
+		opt_tax_switch = 1
 		Opt_Tax_brent  = .true.
 
 	! Switch for solving benchmark or just reading resutls
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		compute_bench = .false.	
+		compute_bench = .true.	
 
 	! Switch for separable and non-separable utility
 		! If NSU_Switch==.true. then do non-separable utility
