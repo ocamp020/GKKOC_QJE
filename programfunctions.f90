@@ -2674,15 +2674,29 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 					print*, Cons_t(age,ai,zi,lambdai,ei)
 					STOP
 				endif                   
-		     endif      
+		     endif  
+		    !$omp critical
+		    IF (Cons_t(age, ai, zi, lambdai,ei) .le. 0.0_DP)  THEN
+				print*,'w1: Cons(age, ai, zi, lambdai,ei)=',Cons_t(age, ai, zi, lambdai,ei)
+				STOP
+			ENDIF 
+			if (Hours_t(age,ai,zi,lambdai,ei).ge.1.0_dp) then 
+				print*, ' '
+				print*, 'w1 Hours highers than 1', age,ai,zi,lambdai,ei
+				print*, Cons_t(age,ai,zi,lambdai,ei)
+				STOP
+			endif    
+			!$omp end critical
 		ENDDO ! ai   
 
+		!$omp critical
 		if (any(isnan(Cons_t))) then 
 			print*, "isnan - Consumption working 3"
 			print*, age,lambdai,ai,zi,ei
 			print*, Cons_t(age,ai,zi,lambdai,ei), Hours_t(age,ai,zi,lambdai,ei) 
 			STOP 
-		end if                
+		end if         
+		!$omp end critical        
 
 		ai=1           
         DO WHILE ( YGRID_t(ai,zi) .lt. EndoYgrid(1) )
