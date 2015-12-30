@@ -2690,13 +2690,13 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 		ENDDO ! ai   
 
 		!$omp critical
-		if (any(isnan(Cons_t))) then 
+		if (any(isnan(Cons_t(age,:,zi,lambdai,ei)))) then 
 			print*, "isnan - Consumption working 3"
 			print*, age,lambdai,ai,zi,ei
 			print*, 'Cons'
 			print*, Cons_t(age,:,zi,lambdai,ei)
 			print*, 'Hours'
-			print*, Cons_t(age,:,zi,lambdai,ei), Hours_t(age,ai,zi,lambdai,ei) 
+			print*, Hours_t(age,:,zi,lambdai,ei) 
 			STOP 
 		end if         
 		!$omp end critical        
