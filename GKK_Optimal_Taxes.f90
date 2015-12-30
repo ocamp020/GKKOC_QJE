@@ -42,7 +42,7 @@ PROGRAM Optimal_Taxes
 		Threshold_Factor = 0.00_dp 
 
 	! Set type of optimal taxe 1->TauK 0->TauW
-		opt_tax_switch = 0
+		opt_tax_switch = 1
 		Opt_Tax_brent  = .false.
 
 	! Switch for solving benchmark or just reading resutls
@@ -280,6 +280,7 @@ PROGRAM Optimal_Taxes
         else 
         	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
 			    DO tauindx=0,40
+			    print*, tauindx
 		            tauK        = real(tauindx,8)/100_DP
 		            brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
