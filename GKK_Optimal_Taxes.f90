@@ -279,7 +279,7 @@ PROGRAM Optimal_Taxes
 
         else 
         	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
-			    DO tauindx=0,40
+			    DO tauindx=0,25
 			    print*, tauindx
 		            tauK        = real(tauindx,8)/100_DP
 		            brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
@@ -368,8 +368,8 @@ PROGRAM Optimal_Taxes
 		              & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
         else 
         	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace') 
-			    DO tauindx=0,40
-		            tauW_at=real(tauindx,8)/1000_DP
+			    DO tauindx=0,25
+		            tauW_at=real(tauindx,8)/500_DP
 		            brentvaluet = -EQ_WELFARE_GIVEN_TauW(tauW_at)
 		            
 		            if (brentvaluet .gt. maxbrentvaluet) then
