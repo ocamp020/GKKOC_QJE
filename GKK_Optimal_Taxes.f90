@@ -42,8 +42,8 @@ PROGRAM Optimal_Taxes
 		Threshold_Factor = 0.00_dp 
 
 	! Set type of optimal taxe 1->TauK 0->TauW
-		opt_tax_switch = 0
-		Opt_Tax_brent  = .false.
+		opt_tax_switch = 1
+		Opt_Tax_brent  = .true.
 
 	! Switch for solving benchmark or just reading resutls
 		! If compute_bench==.true. then just read resutls
@@ -265,6 +265,7 @@ PROGRAM Optimal_Taxes
 		    tauK = Opt_TauK
 
 		    brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
+		    CE_NEWBORN  = brentvaluet
 
 		    ! Print results
 	            print*, ' '
@@ -321,6 +322,7 @@ PROGRAM Optimal_Taxes
 		    tauW_at = Opt_TauW
 
 		    brentvaluet = -EQ_WELFARE_GIVEN_TauW(tauW_at)
+		    CE_NEWBORN  = brentvaluet
 
 		    ! Print results
 	            print*, ' '
