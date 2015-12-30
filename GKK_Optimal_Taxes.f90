@@ -42,7 +42,7 @@ PROGRAM Optimal_Taxes
 		Threshold_Factor = 0.00_dp 
 
 	! Set type of optimal taxe 1->TauK 0->TauW
-		opt_tax_switch = 0
+		opt_tax_switch = 1
 		Opt_Tax_brent  = .false.
 
 	! Switch for solving benchmark or just reading resutls
@@ -288,6 +288,9 @@ PROGRAM Optimal_Taxes
 		                Opt_TauK=tauK
 		            endif
 
+		            ! Compute value function and store policy functions, value function and distribution in file
+					CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+
 		            ! Aggregate variable in experimental economy
 						GBAR_exp  = GBAR
 						QBAR_exp  = QBAR 
@@ -305,14 +308,16 @@ PROGRAM Optimal_Taxes
 						tauw_at_exp = tauW_at
 						Y_a_threshold_exp = Y_a_threshold
 
-					! CALL COMPUTE_WELFARE_GAIN
-					CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+						ValueFunction_exp = ValueFunction
+						Cons_exp          = Cons           
+						Hours_exp         = Hours
+						Aprime_exp        = Aprime 
 
-		            CALL COMPUTE_WELFARE_GAIN
-
-		            ! Compute moments
+					! Compute moments
 					CALL COMPUTE_STATS
-					CE_NEWBORN = brentvaluet
+					
+					! Compute welfare gain between economies
+					CALL COMPUTE_WELFARE_GAIN
 
 		            ! Print results
 		            print*, ' '
@@ -367,6 +372,9 @@ PROGRAM Optimal_Taxes
 		                Opt_TauW=tauW_at
 		            endif
 
+		            ! Compute value function and store policy functions, value function and distribution in file
+					CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+
 		            ! Aggregate variable in experimental economy
 						GBAR_exp  = GBAR
 						QBAR_exp  = QBAR 
@@ -384,14 +392,16 @@ PROGRAM Optimal_Taxes
 						tauw_at_exp = tauW_at
 						Y_a_threshold_exp = Y_a_threshold
 
-					! CALL COMPUTE_WELFARE_GAIN
-					CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+						ValueFunction_exp = ValueFunction
+						Cons_exp          = Cons           
+						Hours_exp         = Hours
+						Aprime_exp        = Aprime 
 
-		            CALL COMPUTE_WELFARE_GAIN
-
-		            ! Compute moments
+					! Compute moments
 					CALL COMPUTE_STATS
-					CE_NEWBORN = brentvaluet
+					
+					! Compute welfare gain between economies
+					CALL COMPUTE_WELFARE_GAIN
 
 		            ! Print results
 		            print*, ' '
