@@ -288,9 +288,11 @@ PROGRAM Optimal_Taxes
 		                maxbrentvaluet = brentvaluet
 		                Opt_TauK=tauK
 		            endif
+		            print*, tauindx
 
 		            ! Compute value function and store policy functions, value function and distribution in file
 					CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+					print*, tauindx
 
 		            ! Aggregate variable in experimental economy
 						GBAR_exp  = GBAR
@@ -316,9 +318,11 @@ PROGRAM Optimal_Taxes
 
 					! Compute moments
 					CALL COMPUTE_STATS
+					print*, tauindx
 					
 					! Compute welfare gain between economies
 					CALL COMPUTE_WELFARE_GAIN
+					print*, tauindx
 
 		            ! Print results
 		            print*, ' '
