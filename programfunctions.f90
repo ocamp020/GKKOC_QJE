@@ -3951,7 +3951,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	if (bench_indx.eq.1) then
 		OPEN   (UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_bench'		 	, STATUS='replace')
-		OPEN   (UNIT=12, FILE=trim(Result_Folder)//'Simul/panelage_bench'		, STATUS='replace')
+		OPEN   (UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_bench'		, STATUS='replace')
 		OPEN   (UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_bench'		 	, STATUS='replace')
 		OPEN   (UNIT=13, FILE=trim(Result_Folder)//'Simul/panellambda_bench'   	, STATUS='replace')
 		OPEN   (UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_bench'        	, STATUS='replace')
