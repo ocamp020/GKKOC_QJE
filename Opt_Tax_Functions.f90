@@ -10,16 +10,17 @@ Module Opt_Tax_Functions
 	Contains
 
 !================================================================================
-SUBROUTINE Find_Opt_Tax(switch,opt_Tau)
+SUBROUTINE Find_Opt_Tax(switch,opt_Tau,a,b)
 	IMPLICIT NONE
-	integer , intent(in)  :: switch
+	logical , intent(in)  :: switch
+	real(dp), intent(in)  :: a,b
 	real(dp), intent(out) :: opt_Tau
 	real(dp)              :: brentvaluet
 
-	if (switch.eq.1) then 
-		brentvaluet = brent(0.00_DP, 0.05_DP , 0.4_DP, EQ_WELFARE_GIVEN_TauK, brent_tol, Opt_Tau)  
+	if (switch) then 
+		brentvaluet = brent( a, (a+b)/2 , b , EQ_WELFARE_GIVEN_TauK, brent_tol, Opt_Tau)  
 	else 
-		brentvaluet = brent(0.00_DP, 0.016_DP , 0.05_DP, EQ_WELFARE_GIVEN_TauW, brent_tol, Opt_Tau)
+		brentvaluet = brent( a, (a+b)/2 , b , EQ_WELFARE_GIVEN_TauW, brent_tol, Opt_Tau)
 	end if 
 
 

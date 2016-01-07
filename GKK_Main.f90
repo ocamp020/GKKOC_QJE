@@ -30,9 +30,10 @@ PROGRAM main
 	! Variables to measure running time
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
-		logical  :: compute_bench, compute_exp
+		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW Tax_Reform
 	! Auxiliary variable for writing file
 		character(4) :: string_theta
+		character(100) :: folder_aux
 
 	! Capital Market
 		theta = 1.50_dp
@@ -42,8 +43,11 @@ PROGRAM main
 	! Switch for solving benchmark or just reading resutls
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		compute_bench = .false.
-		compute_exp   = .false.
+		Tax_Reform    = .false.
+			compute_bench = .false.
+			compute_exp   = .false.
+		Opt_Tax       = .true.
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 
 
 	! Switch for separable and non-separable utility
@@ -159,8 +163,28 @@ PROGRAM main
 
 
 	! Call routines
-		call Solve_Benchmark(compute_bench)
-		call Solve_Experiment(compute_exp)
+		! Tax Reform experiment
+		if (Tax_Reform) then 
+			call Solve_Benchmark(compute_bench)
+			call Solve_Experiment(compute_exp)
+
+			compute_bench = .false.
+		endif 
+
+		! Optimal Tax
+		if (Opt_Tax) then 
+			folder_aux = Result_Folder
+			if (Opt_Tax_KW) then 
+				Result_Folder = trim(folder_aux)//'Opt_Tax_K/'
+			else 
+				Result_Folder = trim(folder_aux)//'Opt_Tax_W/'
+			endif
+			call system( 'mkdir -p ' // trim(Result_Folder) )
+
+			call Solve_Benchmark(compute_bench)
+			call Solve_Opt_Tax(Opt_Tax_KW)
+		endif 
+
 
 
 	call cpu_time(finish_time)
@@ -181,7 +205,7 @@ Subroutine Solve_Benchmark(compute_bench)
 	use Toolbox
 	use omp_lib
 	implicit none 
-	logical :: compute_bench
+	logical, intent(in) :: compute_bench
 
 	!====================================================================================================
 	PRINT*,''
@@ -253,8 +277,6 @@ Subroutine Solve_Benchmark(compute_bench)
 end Subroutine Solve_Benchmark
 
 
-
-
 !========================================================================================
 !========================================================================================
 !========================================================================================
@@ -266,7 +288,7 @@ Subroutine Solve_Experiment(compute_exp)
 	use Toolbox
 	use omp_lib
 	implicit none 
-	logical :: compute_exp
+	logical, intent(in) :: compute_exp
 
 	!====================================================================================================
 	PRINT*,''
@@ -408,6 +430,210 @@ Subroutine Solve_Experiment(compute_exp)
 	print*," "
 
 end Subroutine Solve_Experiment
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Subroutine Solve_Opt_Tax(Opt_Tax_KW)
+	use parameters 
+	use global
+	use Opt_Tax_Parameters
+	use Opt_Tax_Functions
+	use Toolbox
+	use omp_lib
+	implicit none 
+	logical, intent(in) :: Opt_Tax_KW
+
+	!====================================================================================================
+	PRINT*,''
+	Print*,'--------------- SOLVING OPTIMAL TAXES -----------------'
+	PRINT*,''
+	
+	! Experiment economy
+		solving_bench=0
+	
+	! Set initial taxes for finding optimal ones
+		tauK     = 0.0_DP
+		tauW_at  = 0.0_DP
+		Opt_TauK = 0.0_DP
+		Opt_TauW = 0.0_DP
+		maxbrentvaluet=-10000.0_DP
+	
+	print*,'Optimal Tax Loop'
+	If (Opt_Tax_KW) then
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
+	    DO tauindx=0,40
+            tauK        = real(tauindx,8)/100_DP
+            brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
+
+            ! Compute moments
+			CALL COMPUTE_STATS
+
+		    if (brentvaluet .gt. maxbrentvaluet) then
+		        maxbrentvaluet = brentvaluet
+				OPT_tauK = tauK
+				OPT_psi  = psi
+			endif
+
+			! Print Results 
+		    print*, 'tauK=', tauK, 'YBAR=', YBAR, & 
+		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+		      
+		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+		      &  wage, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)),  &
+			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+		      &100*( (sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)) /&
+		      &sum(ValueFunction_bench(1,:,:,:,:)*DBN_bench(1,:,:,:,:))/sum(DBN_bench(1,:,:,:,:))) &
+		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		      &100*( (sum(ValueFunction(:,:,:,:,:)*DBN1(:,:,:,:,:))/sum(DBN1(:,:,:,:,:)) /&
+		      &sum(ValueFunction_bench(:,:,:,:,:)*DBN_bench(:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:))) &
+		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
+	    ENDDO 
+
+	    CLOSE (unit=77)
+
+	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
+
+		tauK = OPT_tauK
+		psi  = OPT_psi
+
+		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.01_dp,Opt_TauK+0.01_dp)
+
+		tauK = OPT_tauK
+		psi  = OPT_psi
+
+		! Compute moments
+		CALL COMPUTE_STATS
+
+		print*, "Optimal tau_K=", tauK, "Optimal psi=", psi
+
+		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+		      &  wage, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)),  &
+			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+		      &100*( (sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)) /&
+		      &sum(ValueFunction_bench(1,:,:,:,:)*DBN_bench(1,:,:,:,:))/sum(DBN_bench(1,:,:,:,:))) &
+		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		      &100*( (sum(ValueFunction(:,:,:,:,:)*DBN1(:,:,:,:,:))/sum(DBN1(:,:,:,:,:)) /&
+		      &sum(ValueFunction_bench(:,:,:,:,:)*DBN_bench(:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:))) &
+		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
+
+
+		CLOSE (UNIT=77)
+
+	else
+    	! Set Y_a_threshold
+			call Find_TauW_Threshold(DBN_bench,W_bench)  
+			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
+			Wealth_factor = Y_a_threshold/W_bench
+
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
+	    DO tauindx=0,40
+            tauw_at     = real(tauindx,8)/1000_DP
+            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+
+            ! Compute moments
+			CALL COMPUTE_STATS
+
+		    if (brentvaluet .gt. maxbrentvaluet) then
+		        maxbrentvaluet = brentvaluet
+				OPT_tauW = tauW_at
+				OPT_psi  = psi
+			endif
+
+			! Print Results 
+		    print*, 'tauW=', tauW_at, 'YBAR=', YBAR, & 
+		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+		      
+		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+		      &  wage, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)),  &
+			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+		      &100*( (sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)) /&
+		      &sum(ValueFunction_bench(1,:,:,:,:)*DBN_bench(1,:,:,:,:))/sum(DBN_bench(1,:,:,:,:))) &
+		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		      &100*( (sum(ValueFunction(:,:,:,:,:)*DBN1(:,:,:,:,:))/sum(DBN1(:,:,:,:,:)) /&
+		      &sum(ValueFunction_bench(:,:,:,:,:)*DBN_bench(:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:))) &
+		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
+	    ENDDO 
+
+	    CLOSE (unit=77)
+
+	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w.txt', STATUS='replace')
+
+		tauW_at = OPT_tauW
+		psi  = OPT_psi
+
+		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.001_dp,Opt_TauW+0.001_dp)
+
+		tauW_at = OPT_tauW
+		psi  = OPT_psi
+
+		! Compute moments
+		CALL COMPUTE_STATS
+
+		print*, "Optimal tau_W=", tauW_at, "Optimal psi=", psi
+		
+		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+		      &  wage, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)),  &
+			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+		      &100*( (sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)) /&
+		      &sum(ValueFunction_bench(1,:,:,:,:)*DBN_bench(1,:,:,:,:))/sum(DBN_bench(1,:,:,:,:))) &
+		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		      &100*( (sum(ValueFunction(:,:,:,:,:)*DBN1(:,:,:,:,:))/sum(DBN1(:,:,:,:,:)) /&
+		      &sum(ValueFunction_bench(:,:,:,:,:)*DBN_bench(:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:))) &
+		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60
+
+
+		CLOSE (UNIT=77)
+	endif 
+
+	CALL FIND_DBN_EQ
+	CALL GOVNT_BUDGET
+
+	! Compute value function and store policy functions, value function and distribution in file
+	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+	CALL Write_Experimental_Results(Opt_Tax_brent)
+	
+	! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+		ValueFunction_exp = ValueFunction
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime 
+
+	! Compute moments
+	CALL COMPUTE_STATS
+	
+	! Compute welfare gain between economies
+	CALL COMPUTE_WELFARE_GAIN
+
+	! Write experimental results in output.txt
+	CALL WRITE_VARIABLES(0)
+	if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp)) then 
+	 	print*,"	Optimal Tax Simulation"
+		CALL SIMULATION(solving_bench)
+	endif
+
+end Subroutine Solve_Opt_Tax
 
 
 
