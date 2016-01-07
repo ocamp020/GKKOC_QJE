@@ -462,6 +462,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 	
 	print*,'Optimal Tax Loop'
 	If (Opt_Tax_KW) then
+		if (Threshold_Factor.eq.0.0_dp) then 
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
 	    DO tauindx=0,40
             tauK        = real(tauindx,8)/100_DP
@@ -493,14 +494,22 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 	    ENDDO 
 
 	    CLOSE (unit=77)
+	    endif 
 
 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
 
-		tauK = OPT_tauK
+	    if (Threshold_Factor.eq.0.0_dp) then 
+		tauW_at = OPT_tauW
 		psi  = OPT_psi
-
 		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.01_dp,Opt_TauK+0.01_dp)
+		else 
+		Opt_tauK = 0.04
+		tauK     = 0.04
+		psi  = psi_bench
+		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauK-0.03_dp,Opt_TauW+0.03_dp)
+		endif 
 
+		
 		tauK = OPT_tauK
 		psi  = OPT_psi
 
@@ -529,6 +538,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 			Wealth_factor = Y_a_threshold/W_bench
 
+		if (Threshold_Factor.eq.0.0_dp) then 
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
 	    DO tauindx=0,40
             tauw_at     = real(tauindx,8)/1000_DP
@@ -560,13 +570,21 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 	    ENDDO 
 
 	    CLOSE (unit=77)
+	    endif 
 
 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w.txt', STATUS='replace')
 
+	    if (Threshold_Factor.eq.0.0_dp) then 
 		tauW_at = OPT_tauW
 		psi  = OPT_psi
-
 		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.001_dp,Opt_TauW+0.001_dp)
+		else 
+		Opt_tauW = 0.02
+		tauW_at  = 0.02
+		psi  = psi_bench
+		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.01_dp,Opt_TauW+0.01_dp)
+		endif 
+
 
 		tauW_at = OPT_tauW
 		psi  = OPT_psi
