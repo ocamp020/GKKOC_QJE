@@ -1022,7 +1022,7 @@ N = numel(Sim_A_ben) ;
 % Return
     Return_mat =  1 + mu * R_bench * Z_mat.^mu .* A_mat.^(mu-1) - delta  ;
     
-%% Moments 
+a%% Moments 
 
     mean_A_dbn  = sum(sum(sum(sum(sum(A_mat.*DBN_bench)))))      ;
     mean_A_sim  = mean(Sim_A_ben)            ; 

@@ -157,6 +157,32 @@ PROGRAM main
 
 		! ------- DO NOT REMOVE THE LINES ABOVE
 
+
+	! Call routines
+		call Solve_Benchmark(compute_bench)
+		call Solve_Experiment(compute_exp)
+
+
+	call cpu_time(finish_time)
+	print*,'Total time =',finish_time-start_time
+
+
+END PROGRAM main
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Subroutine Solve_Benchmark(compute_bench)
+	use parameters
+	use global 
+	use programfunctions
+	use Toolbox
+	use omp_lib
+	implicit none 
+	logical :: compute_bench
+
 	!====================================================================================================
 	PRINT*,''
 	Print*,'--------------- SOLVING BENCHMARK WITH BEST PARAMETERS -----------------'
@@ -223,6 +249,24 @@ PROGRAM main
 
 		write(*,*) "Benchmark variables"
 		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"P=",P,"wage=",wage,'R=',R
+
+end Subroutine Solve_Benchmark
+
+
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Subroutine Solve_Experiment(compute_exp)
+	use parameters
+	use global 
+	use programfunctions
+	use Toolbox
+	use omp_lib
+	implicit none 
+	logical :: compute_exp
 
 	!====================================================================================================
 	PRINT*,''
@@ -363,14 +407,7 @@ PROGRAM main
 	print*,"Wealth_factor=",Wealth_factor
 	print*," "
 
-	call cpu_time(finish_time)
-	print*,'Total time =',finish_time-start_time
+end Subroutine Solve_Experiment
 
 
-END PROGRAM main
-
-
-!========================================================================================
-!========================================================================================
-!========================================================================================
 

@@ -3938,9 +3938,9 @@ SUBROUTINE  SIMULATION(bench_indx)
 		panel_return(paneli)    = R*currenta + ( P*(zgrid(currentzi)*K)**mu - (R+DepRate)*K )
 
 		if ( ( currenta + panel_return(paneli)*(1.0_DP-tauK) ).le.Y_a_threshold) then  
-			panel_at_return(paneli) = ( currenta + panel_return(paneli)*(1.0_DP-tauK) )*(1-tauW_bt) - 1.0_dp
+			panel_at_return(paneli) = ( currenta + panel_return(paneli)*(1.0_DP-tauK) )*(1-tauW_bt) - currenta
 		else 
-			panel_at_return(paneli) = ( currenta + panel_return(paneli)*(1.0_DP-tauK) )*(1-tauW_at) - 1.0_dp
+			panel_at_return(paneli) = ( currenta + panel_return(paneli)*(1.0_DP-tauK) )*(1-tauW_at) - currenta
 		endif 
 
 	ENDDO ! paneli

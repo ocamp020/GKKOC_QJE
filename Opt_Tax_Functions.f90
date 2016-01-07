@@ -61,12 +61,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauK(tauk_in)
 
 	! CALL COMPUTE_WELFARE_GAIN
 	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-	if (Log_Switch.eqv..true.) then 
     	EQ_WELFARE_GIVEN_TAUK = - sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
-    else 
-    	EQ_WELFARE_GIVEN_TAUK = - sum( ((ValueFunction(1,:,:,:,:)/ValueFunction_Bench(1,:,:,:,:)) &
-                        				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP) *DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
-    end if
 
 	!CALL COMPUTE_STATS
 
@@ -77,7 +72,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauK(tauk_in)
 	!CLOSE (unit=3)
 	!
 	!print*,'tauK=', tauK, ' CE_NEWBORN=', CE_NEWBORN, 'Av. Util=',sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
-	print*, 'tauK=', tauK,'CE_NEWBORN=', -EQ_WELFARE_GIVEN_TAUK
+	print*, 'tauK=', tauK,'Av_Utility_NEWBORN=', -EQ_WELFARE_GIVEN_TAUK, 'Psi=', psi
 
 END  FUNCTION EQ_WELFARE_GIVEN_TAUK
 
@@ -117,13 +112,8 @@ FUNCTION EQ_WELFARE_GIVEN_TauW(tauW_in)
 
 	!CALL COMPUTE_WELFARE_GAIN
 	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-	if (Log_Switch.eqv..true.) then 
     	EQ_WELFARE_GIVEN_TauW = - sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
-    else 
-    	EQ_WELFARE_GIVEN_TauW = - sum( ((ValueFunction(1,:,:,:,:)/ValueFunction_Bench(1,:,:,:,:)) &
-                        				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP) *DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
-    end if
-	!CALL COMPUTE_STATS
+    !CALL COMPUTE_STATS
 
 	!OPEN   (UNIT=3, FILE='psi', STATUS='replace')
 	!print*,'Budget balancing psi=',psi
@@ -131,7 +121,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauW(tauW_in)
 	!CLOSE (unit=3)
 	!
 	!print*,'tauW=', tauW, ' CE_NEWBORN=', CE_NEWBORN, 'Av. Util=',sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
-	print*, 'tauW_at=', tauW_at,'CE_NEWBORN=', -EQ_WELFARE_GIVEN_TAUW
+	print*, 'tauW_at=', tauW_at,'Av_Utility_NEWBORN=', -EQ_WELFARE_GIVEN_TAUW, 'Psi=', psi
 
 END  FUNCTION EQ_WELFARE_GIVEN_TauW
 
