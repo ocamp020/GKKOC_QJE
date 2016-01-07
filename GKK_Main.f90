@@ -32,7 +32,7 @@ PROGRAM main
 	! Compute benchmark or load results
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform
 	! Auxiliary variable for writing file
-		character(4) :: string_theta
+		character(4)   :: string_theta
 		character(100) :: folder_aux
 
 	! Capital Market
