@@ -30,7 +30,7 @@ PROGRAM main
 	! Variables to measure running time
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
-		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW Tax_Reform
+		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform
 	! Auxiliary variable for writing file
 		character(4) :: string_theta
 		character(100) :: folder_aux
@@ -596,7 +596,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 
 	! Compute value function and store policy functions, value function and distribution in file
 	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-	CALL Write_Experimental_Results(Opt_Tax_brent)
+	CALL Write_Experimental_Results(.true.)
 	
 	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
