@@ -38,7 +38,7 @@ PROGRAM main
 	! Capital Market
 		theta = 1.50_dp
 	! Threshold 
-		Threshold_Factor = 0.00_dp 
+		Threshold_Factor = 1.00_dp 
 
 	! Switch for solving benchmark or just reading resutls
 		! If compute_bench==.true. then just read resutls
@@ -47,7 +47,7 @@ PROGRAM main
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 
 
 	! Switch for separable and non-separable utility
@@ -509,7 +509,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauK-0.03_dp,Opt_TauW+0.03_dp)
 		endif 
 
-		
+
 		tauK = OPT_tauK
 		psi  = OPT_psi
 
