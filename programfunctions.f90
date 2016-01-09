@@ -4036,6 +4036,8 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) "Threshold"			  	, Y_a_Threshold
 			WRITE(UNIT=19, FMT=*) "Wealth_Tax_Above"	    , TauW_at
 			WRITE(UNIT=19, FMT=*) 'Share_Above_Threshold'	, Threshold_Share
+			WRITE(UNIT=19, FMT=*) 'Psi'						, Psi
+			WRITE(UNIT=19, FMT=*) 'Tau_K'					, TauK
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) "Results for experimental economy"
 			WRITE(UNIT=19, FMT=*) ' '
