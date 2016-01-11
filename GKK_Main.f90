@@ -38,7 +38,7 @@ PROGRAM main
 	! Capital Market
 		theta = 1.50_dp
 	! Threshold 
-		Threshold_Factor = 3.00_dp 
+		Threshold_Factor = 0.00_dp 
 
 	! Switch for solving benchmark or just reading resutls
 		! If compute_bench==.true. then just read resutls
@@ -47,7 +47,7 @@ PROGRAM main
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 
 
 	! Switch for separable and non-separable utility
@@ -496,10 +496,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 
 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
 
-		tauW_at = OPT_tauW
+		tauK = OPT_tauK
 		psi  = OPT_psi
 		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.01_dp,Opt_TauK+0.01_dp) 
-
 
 		tauK = OPT_tauK
 		psi  = OPT_psi
@@ -564,12 +563,12 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w.txt', STATUS='replace')
 
 		tauW_at = OPT_tauW
-		psi  = OPT_psi
+		psi     = OPT_psi
 		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.001_dp,Opt_TauW+0.001_dp)
 
 
 		tauW_at = OPT_tauW
-		psi  = OPT_psi
+		psi     = OPT_psi
 
 		! Compute moments
 		CALL COMPUTE_STATS
