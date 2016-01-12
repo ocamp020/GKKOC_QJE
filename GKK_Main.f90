@@ -47,7 +47,7 @@ PROGRAM main
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 
 
 	! Switch for separable and non-separable utility
@@ -182,7 +182,6 @@ PROGRAM main
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
 			call Solve_Benchmark(compute_bench)
-				SSC_Payments_bench = SSC_Payments
 			call Solve_Opt_Tax(Opt_Tax_KW)
 		endif 
 
@@ -445,6 +444,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 	use omp_lib
 	implicit none 
 	logical, intent(in) :: Opt_Tax_KW
+
+	SSC_Payments_bench = SSC_Payments
 
 	!====================================================================================================
 	PRINT*,''
