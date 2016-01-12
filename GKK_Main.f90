@@ -44,7 +44,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .false.
-			compute_bench = .false.
+			compute_bench = .true.
 			compute_exp   = .false.
 		Opt_Tax       = .true.
 			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
