@@ -36,9 +36,9 @@ PROGRAM main
 		character(100) :: folder_aux
 
 	! Capital Market
-		theta = 1.50_dp
+		theta = 1.00_dp
 	! Threshold 
-		Threshold_Factor = 2.00_dp 
+		Threshold_Factor = 0.00_dp 
 
 	! Switch for solving benchmark or just reading resutls
 		! If compute_bench==.true. then just read resutls
@@ -47,7 +47,7 @@ PROGRAM main
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 
 
 	! Switch for separable and non-separable utility
@@ -182,6 +182,7 @@ PROGRAM main
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
 			call Solve_Benchmark(compute_bench)
+				SSC_Payments_bench = SSC_Payments
 			call Solve_Opt_Tax(Opt_Tax_KW)
 		endif 
 
@@ -462,6 +463,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 	
 	print*,'Optimal Tax Loop'
 	If (Opt_Tax_KW) then
+		if ((theta.eq.1.50_dp).and.(Threshold_Factor.eq.0.00_dp)) then 
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
 	    DO tauindx=0,40
             tauK        = real(tauindx,8)/100_DP
@@ -480,7 +482,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 		    print*, 'tauK=', tauK, 'YBAR=', YBAR, & 
 		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 		      
-		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 		      &  wage, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
 		      &100*( (sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)) /&
@@ -494,11 +497,19 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 
 	    CLOSE (unit=77) 
 
+
 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
 
 		tauK = OPT_tauK
 		psi  = OPT_psi
 		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.01_dp,Opt_TauK+0.01_dp) 
+
+		else 
+			OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
+
+			call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,0.01_dp,0.10_dp) 
+		endif 
+
 
 		tauK = OPT_tauK
 		psi  = OPT_psi
@@ -508,7 +519,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 
 		print*, "Optimal tau_K=", tauK, "Optimal psi=", psi
 
-		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 		      &  wage, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
 		      &100*( (sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)) /&
@@ -527,7 +539,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 			call Find_TauW_Threshold(DBN_bench,W_bench)  
 			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 			Wealth_factor = Y_a_threshold/W_bench
-
+		if ((theta.eq.1.50_dp).and.(Threshold_Factor.eq.0.00_dp)) then 
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
 	    DO tauindx=0,40
             tauw_at     = real(tauindx,8)/1000_DP
@@ -546,7 +558,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 		    print*, 'tauW=', tauW_at, 'YBAR=', YBAR, & 
 		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
 		      
-		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
+		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 		      &  wage, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
 		      &100*( (sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)) /&
@@ -566,6 +579,11 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 		psi     = OPT_psi
 		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.001_dp,Opt_TauW+0.001_dp)
 
+		else 
+			OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w.txt', STATUS='replace')
+
+			call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,0.01_dp,0.05_dp)
+		endif 
 
 		tauW_at = OPT_tauW
 		psi     = OPT_psi
@@ -575,7 +593,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 
 		print*, "Optimal tau_W=", tauW_at, "Optimal psi=", psi
 		
-		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K, MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 		      &  wage, sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
 		      &100*( (sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)) /&
@@ -627,7 +646,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp)) then 
+	if (((theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp)) then 
 	 	print*,"	Optimal Tax Simulation"
 		CALL SIMULATION(solving_bench)
 	endif

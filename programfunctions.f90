@@ -1301,6 +1301,16 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	print*,''
 	print*,'---------------------------'
 
+	! Compute Average Utility
+
+	Av_Util_NB  =  100.0_dp * ( sum(ValueFunction_exp(1,:,:,:,:)*DBN1(1,:,:,:,:)) / &
+				&               sum(ValueFunction_Bench(1,:,:,:,:)*DBN_bench(1,:,:,:,:)) ) &
+				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+
+	Av_Util_Pop =  100.0_dp * ( sum(ValueFunction_exp(:,:,:,:,:)*DBN1(:,:,:,:,:)) / &
+				& 	            sum(ValueFunction_Bench(:,:,:,:,:)*DBN_bench(:,:,:,:,:)) ) &
+				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+
 
 
 END SUBROUTINE  COMPUTE_WELFARE_GAIN
@@ -1504,7 +1514,7 @@ END SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR
 
 SUBROUTINE GOVNT_BUDGET()
 	IMPLICIT NONE
-	real(DP) ::  GBAR_K,  GBAR_W,  GBAR_L, GBAR_C, SSC_Payments
+	real(DP) ::  GBAR_K,  GBAR_W,  GBAR_L, GBAR_C
 
 	! Initialize variables
 	GBAR 		 = 0.0_DP
@@ -4081,11 +4091,13 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Welfare and output gain'
 			WRITE(UNIT=19, FMT=*) ' '
-			WRITE(UNIT=19, FMT=*) "Welfare_Gain_Pop(bench)" , Welfare_Gain_Pop_bench
-			WRITE(UNIT=19, FMT=*) "Welfare_Gain_Pop(exp)"   , Welfare_Gain_Pop_exp
-			WRITE(UNIT=19, FMT=*) "Welfare_Gain_NB(bench)"  , Welfare_Gain_NB_bench
-			WRITE(UNIT=19, FMT=*) "Welfare_Gain_NB(exp)"    , Welfare_Gain_NB_exp
+			WRITE(UNIT=19, FMT=*) "CE_Pop(bench)" , Welfare_Gain_Pop_bench
+			WRITE(UNIT=19, FMT=*) "CE_Pop(exp)"   , Welfare_Gain_Pop_exp
+			WRITE(UNIT=19, FMT=*) "CE_NB(bench)"  , Welfare_Gain_NB_bench
+			WRITE(UNIT=19, FMT=*) "CE_NB(exp)"    , Welfare_Gain_NB_exp
 			WRITE(UNIT=19, FMT=*) "Output_Gain(prct)"	  	, 100.0_DP*(Y_exp/Y_bench-1.0) 
+			WRITE(UNIT=19, FMT=*) "Av_Util_Pop(exp)"		, Av_Util_Pop
+			WRITE(UNIT=19, FMT=*) "Av_Util_NB(exp)"			, Av_Util_NB
 		CLOSE(Unit=19)
 	end if 
 

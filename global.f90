@@ -67,7 +67,7 @@ MODULE global
 	    ! Experiment values of Q, N, E, Wage, R, G, Y
 	    REAL(DP) :: QBAR_exp,   NBAR_exp,   Ebar_exp,   wage_exp,   P_exp,   GBAR_exp, GBAR_exp_old, Y_exp, R_exp
 	    ! Values for aggregate variables (used when solving a given economy)
-	    REAL(DP) :: P, Ebar , wage, NBAR, QBAR, YBAR, GBAR, R
+	    REAL(DP) :: P, Ebar , wage, NBAR, QBAR, YBAR, GBAR, R, SSC_Payments
 	    ! Wealth tax threshold as proportion of mean benchmark wealth
 	    REAL(DP) :: Wealth_factor, Threshold_Share
 
@@ -132,7 +132,7 @@ MODULE global
 	    REAL(DP) :: Bequest_Wealth, MeanCons, External_Debt_GDP
 	    ! Welfare measures
 	    REAL(DP) :: Welfare_Gain_Pop_bench, Welfare_Gain_Pop_exp, Welfare_Gain_NB_bench, Welfare_Gain_NB_exp
-	    REAL(DP) :: CE_NEWBORN
+	    REAL(DP) :: CE_NEWBORN, Av_Util_Pop, Av_Util_NB
 
     ! Objective moments (not currently in use)	
     	REAL(DP), DIMENSION(5)  ::  Min_Moments
