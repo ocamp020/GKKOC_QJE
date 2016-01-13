@@ -36,7 +36,7 @@ PROGRAM main
 		character(100) :: folder_aux
 
 	! Capital Market
-		theta = 1.50_dp
+		theta = 2.50_dp
 	! Threshold 
 		Threshold_Factor = 0.00_dp 
 
@@ -47,7 +47,7 @@ PROGRAM main
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 
 
 	! Switch for separable and non-separable utility
