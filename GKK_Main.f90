@@ -38,7 +38,7 @@ PROGRAM main
 	! Capital Market
 		theta = 1.00_dp
 	! Threshold 
-		Threshold_Factor = 1.00_dp 
+		Threshold_Factor = 2.00_dp 
 
 	! Switch for solving benchmark or just reading resutls
 		! If compute_bench==.true. then just read resutls
@@ -243,7 +243,7 @@ Subroutine Solve_Benchmark(compute_bench)
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		CALL WRITE_VARIABLES(1)
-		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(compute_bench)) then 
+		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.00_dp).and.(compute_bench)) then 
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
 		endif
