@@ -1303,13 +1303,13 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 
 	! Compute Average Utility
 
-	Av_Util_NB  =  100.0_dp * ( sum(ValueFunction_exp(1,:,:,:,:)*DBN1(1,:,:,:,:)) / &
+	Av_Util_NB  =  100.0_dp * (( sum(ValueFunction_exp(1,:,:,:,:)*DBN1(1,:,:,:,:)) / &
 				&               sum(ValueFunction_Bench(1,:,:,:,:)*DBN_bench(1,:,:,:,:)) ) &
-				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 
-	Av_Util_Pop =  100.0_dp * ( sum(ValueFunction_exp(:,:,:,:,:)*DBN1(:,:,:,:,:)) / &
+	Av_Util_Pop =  100.0_dp * (( sum(ValueFunction_exp(:,:,:,:,:)*DBN1(:,:,:,:,:)) / &
 				& 	            sum(ValueFunction_Bench(:,:,:,:,:)*DBN_bench(:,:,:,:,:)) ) &
-				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 
 
 
