@@ -156,7 +156,8 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 	    GBAR_L = GBAR_L  + DBN1(age,ai,zi,lambdai,ei) * (  yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei) &
 	          &- psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei))**(1.0_DP-tauPL) )
 
-	    BT_EARNINGS = BT_EARNINGS + DBN1(age,ai,zi,lambdai,ei) *     yh(age,lambdai,ei)* Hours(age, ai, zi, lambdai,ei) 
+	    BT_EARNINGS = BT_EARNINGS + DBN1(age,ai,zi,lambdai,ei) * yh(age,lambdai,ei)* Hours(age, ai, zi, lambdai,ei) 
+	    
 	    A_EARNINGS  = A_EARNINGS  + DBN1(age,ai,zi,lambdai,ei) *&
 	                    & (yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei))**(1.0_DP-tauPL)
 	    
@@ -201,7 +202,7 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 
 	! OBTAIN NEW PSI IF GOVETNMENT BUDGET DOES NOT BALANCE
 	if (solving_bench .eq. 0) then
-	    IF (  abs(100.0_DP*(1.0_DP-GBAR/GBAR_bench)) .gt. 0.01 ) THEN
+	    IF (  abs(100.0_DP*(1.0_DP-GBAR/GBAR_bench)) .gt. 0.001 ) THEN
 	        new_psi =  ( BT_EARNINGS - GBAR_bench -  SSC_Payments   + GBAR_NL ) / A_EARNINGS
 	        PRINT*,'NEW PSI=',new_psi
 	        psi = new_psi
