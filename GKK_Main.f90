@@ -50,10 +50,10 @@ PROGRAM main
 	! Switch for solving benchmark or just reading resutls
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
-			compute_bench = .false.
-			compute_exp   = .false.
-		Opt_Tax       = .true.
+		Tax_Reform    = .true.
+			compute_bench = .true.
+			compute_exp   = .true.
+		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 
 
@@ -137,7 +137,9 @@ PROGRAM main
 			Result_Folder = './SU_F_LT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
 			Result_Folder = './SU_F_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
-		end if 
+		end if
+
+		Result_Folder = trim(Result_Folder)//'mu_95/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
