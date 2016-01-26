@@ -52,7 +52,7 @@ PROGRAM main
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
 			compute_bench = .true.
-			compute_exp   = .true.
+			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 
@@ -139,7 +139,7 @@ PROGRAM main
 			Result_Folder = './SU_F_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'z_grid/' 
+		Result_Folder = trim(Result_Folder)//'mu_95/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
