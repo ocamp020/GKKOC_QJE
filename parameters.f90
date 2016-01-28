@@ -37,7 +37,7 @@ MODULE parameters
 		! Final good producer
 		REAL(DP), PARAMETER  :: alpha=0.33_DP, Aprod=1.0_DP
 		! Intermediate good (or home production)
-		REAL(DP), PARAMETER  :: mu=0.95_DP
+		REAL(DP), PARAMETER  :: mu=0.90_DP
 		! Depreciation rate
 		REAL(DP), PARAMETER  :: DepRate=0.0_DP
 		! Financial constraints
