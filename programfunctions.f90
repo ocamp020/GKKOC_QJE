@@ -184,8 +184,6 @@ end Subroutine Asset_Grid_Threshold
 		real(DP) 			  :: MB_a
 		real(DP) :: K, Pr, Y_a, tauW
 
-
-
 		! Capital demand 
 		K   = min( theta*a_in , (mu*P*z_in**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Profits 
@@ -1538,6 +1536,12 @@ SUBROUTINE GOVNT_BUDGET()
 	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei)  												&
 	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei))**(1.0_DP-tauPL)  					&
 	          & + tauC * cons(age, ai, zi, lambdai,ei)  )   
+
+	    GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei) * ( tauK * int_rate * agrid(ai)    &
+          & + tauW * (1.0_DP+int_rate) * agrid(ai) - tauK*tauW*int_rate*agrid(ai)   &
+          & + tauL * wage * eff_un(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei) &
+          & + tauC * cons(age, ai, zi, lambdai,ei)    )
+
 
 	    GBAR_L = GBAR_L  + DBN1(age,ai,zi,lambdai,ei) * (  yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei) &
 	               &- psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei))**(1.0_DP-tauPL) )
