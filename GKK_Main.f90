@@ -45,7 +45,7 @@ PROGRAM main
 	! Capital Market
 		theta = 2.50_dp
 	! Threshold 
-		Threshold_Factor = 0.00_dp 
+		Threshold_Factor = 1.00_dp 
 
 	! Switch for solving benchmark or just reading resutls
 		! If compute_bench==.true. then just read resutls
