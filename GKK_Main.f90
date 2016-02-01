@@ -43,17 +43,17 @@ PROGRAM main
 		character(100) :: folder_aux
 
 	! Capital Market
-		theta = 1.00_dp
+		theta = 1.50_dp
 	! Threshold 
 		Threshold_Factor = 0.00_dp 
 
 	! Switch for solving benchmark or just reading resutls
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
-			compute_bench = .false.
+		Tax_Reform    = .true.
+			compute_bench = .true.
 			compute_exp   = .false.
-		Opt_Tax       = .true.
+		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 
 
