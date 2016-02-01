@@ -51,7 +51,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
+			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
@@ -252,7 +252,7 @@ Subroutine Solve_Benchmark(compute_bench)
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		CALL WRITE_VARIABLES(1)
-		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.00_dp).and.(compute_bench)) then 
+		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.00_dp)) then 
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
 		endif

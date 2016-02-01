@@ -3959,6 +3959,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 		eligible_panela_new_2 = pack(panela_new_2 , (eligible.eq.1) )
 		eligible_panela_new_3 = pack(panela_new_3 , (eligible.eq.1) )
 
+		print*, ' '
+		print*, 'n_eligible', sum(eligible)
+		print*, eligible_panela_old_1
+		print*, ' '
 
 
 	!=============================================================================
