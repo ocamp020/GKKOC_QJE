@@ -3422,6 +3422,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	REAL(DP), DIMENSION(totpop) :: panela_old_1, panela_old_2, panela_old_3, panela_new_1, panela_new_2, panela_new_3 
 	Real(DP), allocatable       :: eligible_panela_old_1(:), eligible_panela_old_2(:), eligible_panela_old_3(:)
 	Real(DP), allocatable       :: eligible_panela_new_1(:), eligible_panela_new_2(:), eligible_panela_new_3(:)
+	INTEGER                     :: n_eligible
 
 	!$ call omp_set_num_threads(20)
 
@@ -3951,6 +3952,11 @@ SUBROUTINE  SIMULATION(bench_indx)
 		    	where(panelage==1) eligible = 0 
 	        endif 
 		ENDDO ! simutime
+
+		n_eligible = sum(eligible)
+
+		allocate( eligible_panela_old_1(n_eligible), eligible_panela_old_2(n_eligible), eligible_panela_old_3(n_eligible) )
+		allocate( eligible_panela_new_1(n_eligible), eligible_panela_new_2(n_eligible), eligible_panela_new_3(n_eligible) )
 
 		eligible_panela_old_1 = pack(panela_old_1 , (eligible.eq.1) )
 		eligible_panela_old_2 = pack(panela_old_2 , (eligible.eq.1) )
