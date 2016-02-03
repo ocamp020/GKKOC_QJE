@@ -37,7 +37,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauK(tauk_in)
 	tauW_at = 0.0_DP
 
 	GBAR_exp = 2*GBAR_bench
-	DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.0001 ) ! as long as the difference is greater than 0.05% continue
+	DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.001 ) ! as long as the difference is greater than 0.05% continue
 	    CALL FIND_DBN_EQ
 	    CALL GOVNT_BUDGET_OPT
 	    GBAR_exp = GBAR    
@@ -88,7 +88,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauW(tauW_in)
 	tauW_at =  tauW_in
 
 	GBAR_exp = 2*GBAR_bench
-	DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.0001 ) ! as long as the difference is greater than 0.05% continue
+	DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.001 ) ! as long as the difference is greater than 0.05% continue
 	    CALL FIND_DBN_EQ
 	    CALL GOVNT_BUDGET_OPT
 	    GBAR_exp = GBAR    
@@ -202,7 +202,7 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 
 	! OBTAIN NEW PSI IF GOVETNMENT BUDGET DOES NOT BALANCE
 	if (solving_bench .eq. 0) then
-	    IF (  abs(100.0_DP*(1.0_DP-GBAR/GBAR_bench)) .gt. 0.0001 ) THEN
+	    IF (  abs(100.0_DP*(1.0_DP-GBAR/GBAR_bench)) .gt. 0.001 ) THEN
 	        new_psi =  ( BT_EARNINGS - GBAR_bench -  SSC_Payments   + GBAR_NL ) / A_EARNINGS
 	        PRINT*,'NEW PSI=',new_psi,'Old Psi=',psi
 	        psi = 0.5_dp*new_psi+0.5_dp*psi
