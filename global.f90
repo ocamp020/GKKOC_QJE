@@ -62,11 +62,11 @@ MODULE global
  
  	! Aggregate variables
 	 	! Benchmark values of Q, N, E, Wage, R, G, Y
-	    REAL(DP) :: QBAR_bench, NBAR_bench, Ebar_bench, wage_bench, rr_bench, GBAR_bench, Y_bench, W_bench
+	    REAL(DP) :: QBAR_bench, NBAR_bench, Ebar_bench, wage_bench, P_bench, GBAR_bench, Y_bench, W_bench, R_bench
 	    ! Experiment values of Q, N, E, Wage, R, G, Y
-	    REAL(DP) :: QBAR_exp,   NBAR_exp,   Ebar_exp,   wage_exp,   rr_exp,   GBAR_exp, GBAR_exp_old, Y_exp
+	    REAL(DP) :: QBAR_exp,   NBAR_exp,   Ebar_exp,   wage_exp,   P_exp,   GBAR_exp, GBAR_exp_old, Y_exp, R_exp
 	    ! Values for aggregate variables (used when solving a given economy)
-	    REAL(DP) :: rr, Ebar , wage, NBAR, QBAR, YBAR, GBAR
+	    REAL(DP) :: P, Ebar , wage, NBAR, QBAR, YBAR, GBAR, R
 	    ! Wealth tax threshold as proportion of mean benchmark wealth
 	    REAL(DP) :: Wealth_factor, Threshold_Share
 
@@ -79,6 +79,9 @@ MODULE global
 	    REAL(DP), DIMENSION(:,:), ALLOCATABLE :: YGRID_t, MBGRID_t
 	    REAL(DP), DIMENSION(:),   ALLOCATABLE :: agrid_t
 	    INTEGER                      :: na_t
+
+    ! Capital markets
+    	REAL(DP), DIMENSION(na,nz) :: K_mat, Pr_mat
 	
 	! Values for taxes in benchmark and experiment
     REAL(DP) :: tauk_bench, tauPL_bench, psi_bench, tauw_bt_bench, tauw_at_bench, Y_a_threshold_bench 
@@ -125,7 +128,7 @@ MODULE global
 	    REAL(DP), DIMENSION(nz) :: MeanReturn_by_z(nz), size_by_z(nz), Wealth_by_z(nz)
 	    REAL(DP) :: prct1_wealth, prct10_wealth, prct20_wealth, prct40_wealth
 	    REAL(DP) :: SSE_Moments, Min_SSE_Moments
-	    REAL(DP) :: Bequest_Wealth, MeanCons
+	    REAL(DP) :: Bequest_Wealth, MeanCons, External_Debt_GDP
 	    ! Welfare measures
 	    REAL(DP) :: Welfare_Gain_Pop_bench, Welfare_Gain_Pop_exp, Welfare_Gain_NB_bench, Welfare_Gain_NB_exp
 	    REAL(DP) :: CE_NEWBORN

@@ -44,7 +44,7 @@ MODULE Toolbox
 		 
 		      h=xa(khi)-xa(klo)  
 		      if (h.eq.0.) then 
-		      	print*,'bad xa input in linear int'  
+		      	print*,'bad xa input in linear int', khi,klo, xa(khi), xa(klo),x
 		      end if 
 		      a=(xa(khi)-x)/h  
 		      b=(x-xa(klo))/h  
@@ -156,6 +156,112 @@ MODULE Toolbox
 			c=d
 		END SUBROUTINE shft
 	END FUNCTION brent
+
+!========================================================================================
+!========================================================================================
+
+	FUNCTION brent_p(ax,bx,cx,func,tol,xmin,par)
+		USE nrtype; USE nrutil, ONLY : nrerror
+		IMPLICIT NONE
+		
+		REAL(DP), INTENT(IN) :: ax,bx,cx,tol
+		REAL(DP), INTENT(OUT) :: xmin
+		REAL(DP), dimension(:), INTENT(IN) :: par
+		REAL(DP) :: brent_p
+		INTERFACE
+			FUNCTION func(x,par)
+				USE nrtype
+				IMPLICIT NONE
+				REAL(DP), INTENT(IN) :: x
+				REAL(DP), dimension(:), INTENT(IN) :: par
+				REAL(DP) :: func
+			END FUNCTION func
+		END INTERFACE
+		INTEGER(I4B), PARAMETER :: ITMAX=100
+		REAL(DP), PARAMETER :: CGOLD=0.3819660_DP,ZEPS=1.0e-3_DP*epsilon(ax)
+		INTEGER(I4B) :: iter
+		REAL(DP) :: a,b,d,e,etemp,fu,fv,fw,fx,p,q,r,tol1,tol2,u,v,w,x,xm
+		
+		a=min(ax,cx)
+		b=max(ax,cx)
+		v=bx
+		w=v
+		x=v
+		e=0.0
+		fx=func(x,par)
+		fv=fx
+		fw=fx
+		do iter=1,ITMAX
+
+			xm=0.5_DP*(a+b)
+			tol1=tol*abs(x)+ZEPS
+			tol2=2.0_DP*tol1
+			if (abs(x-xm) <= (tol2-0.5_DP*(b-a))) then
+				xmin=x
+				brent_p=fx
+				RETURN
+			end if
+			if (abs(e) > tol1) then
+				r=(x-w)*(fx-fv)
+				q=(x-v)*(fx-fw)
+				p=(x-v)*q-(x-w)*r
+				q=2.0_DP*(q-r)
+				if (q > 0.0) p=-p
+				q=abs(q)
+				etemp=e
+				e=d
+				if (abs(p) >= abs(0.5_DP*q*etemp) .or. &
+					p <= q*(a-x) .or. p >= q*(b-x)) then
+					e=merge(a-x,b-x, x >= xm )
+					d=CGOLD*e
+				else
+					d=p/q
+					u=x+d
+					if (u-a < tol2 .or. b-u < tol2) d=sign(tol1,xm-x)
+				end if
+			else
+				e=merge(a-x,b-x, x >= xm )
+				d=CGOLD*e
+			end if
+			u=merge(x+d,x+sign(tol1,d), abs(d) >= tol1 )
+			fu=func(u,par)
+			if (fu <= fx) then
+				if (u >= x) then
+					a=x
+				else
+					b=x
+				end if
+				call shft(v,w,x,u)
+				call shft(fv,fw,fx,fu)
+			else
+				if (u < x) then
+					a=u
+				else
+					b=u
+				end if
+				if (fu <= fw .or. w == x) then
+					v=w
+					fv=fw
+					w=u
+					fw=fu
+				else if (fu <= fv .or. v == x .or. v == w) then
+					v=u
+					fv=fu
+				end if
+			end if
+		end do
+		call nrerror('brent_p: exceed maximum iterations')
+		
+		CONTAINS
+		SUBROUTINE shft(a,b,c,d)
+			REAL(DP), INTENT(OUT) :: a
+			REAL(DP), INTENT(INOUT) :: b,c
+			REAL(DP), INTENT(IN) :: d
+			a=b
+			b=c
+			c=d
+		END SUBROUTINE shft
+	END FUNCTION brent_p
 
 !========================================================================================
 !========================================================================================
