@@ -2013,7 +2013,7 @@ SUBROUTINE COMPUTE_STATS()
 			WRITE(UNIT=11, FMT=*) ' '
 			WRITE(UNIT=11, FMT=*) 'prctl','Wealth','Wealth_Above_%'
 			do prctile=1,100
-				WRITE(UNIT=11, FMT=*) prctile,FW_prctile,FW_above_prctile
+				WRITE(UNIT=11, FMT=*) prctile,FW_prctile(prctile),FW_above_prctile(prctile)
 			enddo
 
 			CLOSE(UNIT=11)
@@ -4234,7 +4234,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	WRITE  (UNIT=18, FMT=*) panelaprime
 	WRITE  (UNIT=19, FMT=*) panel_at_return 
 
-	WRITE  (UNIT=19, FMT=*) panel_firm_wealth
+	WRITE  (UNIT=26, FMT=*) panel_firm_wealth
 
 	close (unit=10)
 	close (unit=11)
@@ -4267,6 +4267,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	print*, 'Averages from simulation'
 	print*, sum(panela)/totpop, sum(panelage)/totpop, sum(panel_return)/totpop, sum(panelhours)/totpop
+	print*, sum(panel_firm_wealth)/totpop 
 	print*, 'Number of eligible agents for dynamics', sum(eligible)
 	print*, ' '
 
