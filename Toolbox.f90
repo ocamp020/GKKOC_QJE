@@ -573,12 +573,12 @@ MODULE Toolbox
 	    real(dp) :: z_grid_aux(n_z-1), P_aux(n_z-1,n_z-1), P_a(n_z+1,n_z+1), P_b(n_z,n_z), P_half(n_z,n_z)
 
 	    ! Parameters p, q and psi
-	        p = (1+rho)/2
-	        q = (1+rho)/2
-	        psi = sqrt(real(n_z)-1)*sigma/sqrt(1-rho**2)
+	        p = (1.0_dp+rho)/2.0_dp
+	        q = (1.0_dp+rho)/2.0_dp
+	        psi = sqrt(real(n_z)-1.0_dp)*sigma/sqrt(1.0_dp-rho**2.0_dp)
 
 	    ! Step of grid
-	        step = 2*psi/(n_z-1)
+	        step = 2.0_dp*psi/(real(n_z)-1.0_dp)
 	    
 	    ! Compute z_grid
 	        z_grid(1) = -psi
@@ -587,7 +587,7 @@ MODULE Toolbox
 	        end do
 	    
 	    ! Compute transition matrix for n_z=2
-	        P_2 = reshape((/p,1-q,1-p,q/),(/2,2/))
+	        P_2 = reshape((/p,1.0_dp-q,1.0_dp-p,q/),(/2,2/))
 
 	    ! Compute transition matrix for arbitrary n_z 
 	        if (n_z>2) then
@@ -599,8 +599,8 @@ MODULE Toolbox
 		        ! plus
 		        P_a = 0.0_dp
 		        P_a(2:n_z, 2:n_z) = P_aux
-		        P_b = ( p*P_a(2:n_z+1,2:n_z+1) + (1-p)*P_a(2:n_z+1,1:n_z) + &
-		              & (1-q)*P_a(1:n_z,2:n_z+1) + q*P_a(1:n_z,1:n_z) )
+		        P_b = ( p*P_a(2:n_z+1,2:n_z+1) + (1.0_dp-p)*P_a(2:n_z+1,1:n_z) + &
+		              & (1.0_dp-q)*P_a(1:n_z,2:n_z+1) + q*P_a(1:n_z,1:n_z) )
 		        P_half(1,:)       =  1.0_dp
 		        P_half(2:n_z-1,:) = 0.50_dp
 		        P_half(n_z,:)     = 1.0_dp

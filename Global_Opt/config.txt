@@ -25,24 +25,28 @@
 !                      (if -1, then default to all i.e. maximum points)
 !
 !# parameters, # moments targetting, maximum evaluations, # draws, maximum points, selectType, lotteryPoints
-2, 1, -1, 200, 100, 0, 10
+6, 1, -1, 200, 100, 0, 10
 !
 ! for each parameter, the range of values. This specifies the values from which the sobol
 ! points are selected. These lines are mandatory
 ! Note: If simply updating sobol points, then these values are ignored
 ! Do not separate these parameters with any comments
--5.0, 5.0
--5.0, 5.0
-!5.0, 18.0
-!0.8, 0.95
+0.92, 0.99
+0.0, 1.0
+0.20, 0.80
+0.50, 0.95
+0.20, 0.50
+0.30, 0.70
 !
 ! for each parameter, the initial guess. These lines are mandatory
 ! Note: If simply updating sobol points, then these values are ignored
 ! Do not separate these parameters with any comments
-0.0
-0.0
-!7.0
-!0.94
+0.945
+0.000
+0.500
+0.700
+0.340
+0.449
 !
 ! for each parameter, the parameter bounds. These specify the absolute
 ! maximum and minimum values for which we should evaluate the functions.
@@ -50,7 +54,9 @@
 ! but are ignored if not using bobyq as the minimization routine.
 ! Note: If simply updating sobol points, then these values are ignored
 ! Do not separate these parameters with any comments
--10.0, 10.0
--10.0, 10.0
-!0.0, 20.0
-!0.8, 0.99
+0.90, 0.999
+0.0, 2.0
+0.10, 0.90
+0.20, 1.00
+0.10, 0.70
+0.20, 0.80
