@@ -241,6 +241,8 @@ Subroutine Solve_Benchmark(compute_bench)
 		CALL GOVNT_BUDGET
 		print*,"	Computing Value Function"
 		CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+		print*,"	Computing Firm Value Function"
+		CALL Firm_Value
 		print*,"	Saving results in text files to be read later"
 		CALL Write_Benchmark_Results(compute_bench)
 	else
@@ -279,6 +281,7 @@ Subroutine Solve_Benchmark(compute_bench)
 		Cons_bench          = Cons           
 		Hours_bench         = Hours
 		Aprime_bench        = Aprime 
+		V_Pr_bench          = V_Pr
 
 		write(*,*) "Benchmark variables"
 		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"P=",P,"wage=",wage,'R=',R
@@ -387,6 +390,7 @@ Subroutine Solve_Experiment(compute_exp)
 
 		! Compute value function and store policy functions, value function and distribution in file
 		CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+		CALL Firm_Value
 
 	endif 
 	
@@ -412,7 +416,8 @@ Subroutine Solve_Experiment(compute_exp)
 		ValueFunction_exp = ValueFunction
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
-		Aprime_exp        = Aprime 
+		Aprime_exp        = Aprime
+		V_Pr_exp          = V_Pr 
 
 	! Compute moments
 	CALL COMPUTE_STATS

@@ -1907,6 +1907,9 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP) :: S_Rate_Y_Age(max_age_category), S_Rate_Y_AZ(max_age_category,nz), S_Rate_Y_W(3)
 	REAL(DP) :: size_Age(max_age_category), size_AZ(max_age_category,nz), size_W(3)
 	real(DP) :: leverage_age_z(MaxAge,nz), size_by_age_z(MaxAge,nz), constrained_firms_age_z(MaxAge,nz)
+	real(DP) :: DBN_vec(size(DBN1)), Firm_Wealth_vec(size(DBN1)), CDF_Firm_Wealth(size(DBN1))
+	real(DP) :: FW_prctile(100), FW_above_prctile(100)
+	integer  :: Firm_Wealth_ind(size(DBN1)), i, FW_prctile_ind(100)
 	character(100) :: rowname
 	INTEGER, dimension(max_age_category+1) :: age_limit
 
@@ -1969,6 +1972,53 @@ SUBROUTINE COMPUTE_STATS()
 	prct10_wealth = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
 	prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
 	prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
+
+
+	! Distribution of firm wealth
+		Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
+
+		DBN_vec         = reshape(DBN1       ,(/size(DBN1)/))
+		Firm_Wealth_vec = reshape(Firm_Wealth,(/size(DBN1)/))
+		Call Sort(size(DBN1),Firm_Wealth_vec,Firm_Wealth_vec,Firm_Wealth_ind)
+		DBN_vec = DBN_vec(Firm_Wealth_ind)
+
+		do i=1,size(DBN1)
+			CDF_Firm_Wealth(i) = sum( DBN_vec(1:i) )
+		enddo 
+
+		do prctile=1,100
+	    i=1
+	    DO while (CDF_Firm_Wealth(i) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
+	        i=i+1
+	    ENDDO
+	    FW_prctile_ind(prctile)   = i
+	    FW_prctile(prctile)       = Firm_Wealth_vec(i)
+	    FW_above_prctile(prctile) = 100*sum(Firm_Wealth_vec(i:)*DBN_vec(i:))/Mean_Firm_Wealth
+	    enddo
+
+	    if (solving_bench.eq.1) then
+			OPEN (UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Bench.txt', STATUS='replace')
+		else
+			OPEN (UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Exp.txt', STATUS='replace')
+		end if 
+
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'Firm_Wealth _Stats'
+			WRITE(UNIT=11, FMT=*) 'Mean_Firm_Wealth=', Mean_Firm_Wealth
+			WRITE(UNIT=11, FMT=*) 'Wealth_Top_1%='   , FW_above_prctile(99)
+			WRITE(UNIT=11, FMT=*) 'Wealth_Top_5%='   , FW_above_prctile(95)
+			WRITE(UNIT=11, FMT=*) 'Wealth_Top_10%='  , FW_above_prctile(90)
+			WRITE(UNIT=11, FMT=*) 'Wealth_Top_20%='  , FW_above_prctile(80)
+			WRITE(UNIT=11, FMT=*) 'Wealth_Top_40%='  , FW_above_prctile(60)
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'prctl','Wealth','Wealth_Above_%'
+			do prctile=1,100
+				WRITE(UNIT=11, FMT=*) prctile,FW_prctile,FW_above_prctile
+			enddo
+
+			CLOSE(UNIT=11)
+	
+		
 
 
 	! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
@@ -3399,6 +3449,111 @@ SUBROUTINE  LIFETIME_Y_ESTIMATE()
 
 END SUBROUTINE LIFETIME_Y_ESTIMATE
 
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+
+SUBROUTINE  Firm_Value()
+	use omp_lib
+
+	IMPLICIT NONE
+	integer  :: age, ai, zi, lambdai, ei, ei_p
+	real(dp) :: dV_low, dV_high, spline_coeff(na), V_spline_R, sp_coeff_W(na,ne), V_spline_W(ne)
+
+	!$ call omp_set_num_threads(5)
+
+	K_mat  = K_Matrix(R,P)
+	Pr_mat = Profit_Matrix(R,P)
+
+	! Final period of life
+	age = MaxAge 
+	do zi=1,nz
+	do ai=1,na 
+		V_Pr(age,ai,zi,:,:) = Pr_mat(ai,zi)
+	enddo 
+	enddo 
+
+	! Retirement Periods
+	do zi=1,nz 
+		! Prepare spline interpolation
+			! Derivative of value function in first grid point
+			if (K_mat(1,zi).lt.theta*agrid(1)) then 
+				dV_low  = 0.0_dp
+			else 
+				dV_low  = P*mu*((theta*zgrid(zi))**mu)*agrid(1)**(mu-1.0_DP)-(R+DepRate)*theta
+			endif
+			! Derivative of value function in last grid point
+			if (K_mat(na,zi).lt.theta*agrid(na)) then 
+				dV_high = 0.0_dp
+			else 
+				dV_high = P*mu*((theta*zgrid(zi))**mu)*agrid(na)**(mu-1.0_DP)-(R+DepRate)*theta
+			endif
+
+		do age=MaxAge-1,RetAge-1
+		!$omp parallel do private(lambdai,ei,ai,spline_coeff,V_spline_R)
+		do ei=1,ne 
+		do lambdai=1,nlambda
+
+			CALL spline( agrid, V_Pr(age+1, :, zi, lambdai, ei) , na , dV_low , dV_high , spline_coeff)  
+		
+			do ai=1,na
+				call splint( agrid, V_Pr(age+1, :, zi, lambdai, ei), &
+	                    & spline_coeff, na, Aprime(age,ai,zi,lambdai, ei), V_spline_R )  
+				V_Pr(age,ai,zi,lambdai,ei) = Pr_mat(ai,zi) + survP(age)/(1.0_dp+R) * V_spline_R
+			enddo
+	enddo
+	enddo
+	enddo
+	enddo
+
+	! Working Periods
+	do zi=1,nz 
+		! Prepare spline interpolation
+			! Derivative of value function in first grid point
+			if (K_mat(1,zi).lt.theta*agrid(1)) then 
+				dV_low  = 0.0_dp
+			else 
+				dV_low  = P*mu*((theta*zgrid(zi))**mu)*agrid(1)**(mu-1.0_DP)-(R+DepRate)*theta
+			endif
+			! Derivative of value function in last grid point
+			if (K_mat(na,zi).lt.theta*agrid(na)) then 
+				dV_high = 0.0_dp
+			else 
+				dV_high = P*mu*((theta*zgrid(zi))**mu)*agrid(na)**(mu-1.0_DP)-(R+DepRate)*theta
+			endif
+
+		do age=RetAge-1,1,-1
+		!$omp parallel do private(lambdai,ei,ai,sp_coeff_W,V_spline_W,ei_p)
+		do lambdai=1,nlambda
+			do ei_p=1,ne
+				CALL spline( agrid, V_Pr(age+1, :, zi, lambdai, ei_p) , na , dV_low , dV_high , sp_coeff_W(:,ei_p))
+			enddo   
+		
+		do ei=1,ne 
+		do ai=1,na
+			do ei_p=1,ne
+				call splint( agrid, V_Pr(age+1, :, zi, lambdai, ei_p), &
+	                    & sp_coeff_W, na, Aprime(age,ai,zi,lambdai, ei), V_spline_W(ei_p) )  
+			enddo
+
+			V_Pr(age,ai,zi,lambdai,ei) = Pr_mat(ai,zi) + survP(age)/(1.0_dp+R) * sum(  pr_e(ei,:)*V_spline_W )
+
+		enddo
+	enddo
+	enddo
+	enddo
+	enddo
+
+
+	! Define Firm based Wealth measure
+	do ai=1,na
+		Firm_Wealth(:,ai,:,:,:) = V_Pr(:,ai,:,:,:) + (1.0_dp+R)*agrid(ai)
+	enddo
+
+
+END SUBROUTINE Firm_Value
+
 
 !========================================================================================
 !========================================================================================
@@ -3418,6 +3573,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	INTEGER,  DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
 	INTEGER,  DIMENSION(totpop) :: panelage , panelz , panellambda, panele,   newpanelage , newpanelz , newpanellambda, newpanele
 	REAL(DP), DIMENSION(totpop) :: panela,  newpanela,  panel_return, panelcons, panelhours, panelaprime, panel_at_return
+	REAL(DP), DIMENSION(totpop) :: panel_firm_wealth
 	INTEGER,  DIMENSION(totpop) :: eligible
 	REAL(DP), DIMENSION(totpop) :: panela_old_1, panela_old_2, panela_old_3, panela_new_1, panela_new_2, panela_new_3 
 	Real(DP), allocatable       :: eligible_panela_old_1(:), eligible_panela_old_2(:), eligible_panela_old_3(:)
@@ -4019,6 +4175,11 @@ SUBROUTINE  SIMULATION(bench_indx)
 				panel_at_return(paneli) = ( currenta + panel_return(paneli)*(1.0_DP-tauK) )*(1-tauW_at) - currenta
 			endif 
 
+			panel_firm_wealth(paneli) = (1.0_dp+R)*currenta + & 
+									& ((agrid(tkhi) - currenta)*V_Pr(age,tklo,currentzi,currentlambdai, currentei) &
+	                                &  + (currenta - agrid(tklo))*V_Pr(age,tkhi,currentzi,currentlambdai, currentei)) &
+	                                &  / ( agrid(tkhi) - agrid(tklo) )              
+
 		ENDDO ! paneli
 
 
@@ -4027,23 +4188,25 @@ SUBROUTINE  SIMULATION(bench_indx)
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
 
 	if (bench_indx.eq.1) then
-		OPEN   (UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_bench'		 	, STATUS='replace')
-		OPEN   (UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_bench'		, STATUS='replace')
-		OPEN   (UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_bench'		 	, STATUS='replace')
-		OPEN   (UNIT=13, FILE=trim(Result_Folder)//'Simul/panellambda_bench'   	, STATUS='replace')
-		OPEN   (UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_bench'        	, STATUS='replace')
-		OPEN   (UNIT=15, FILE=trim(Result_Folder)//'Simul/panel_return_bench'  	, STATUS='replace')
-		OPEN   (UNIT=16, FILE=trim(Result_Folder)//'Simul/panel_cons_bench'		, STATUS='replace') 
-		OPEN   (UNIT=17, FILE=trim(Result_Folder)//'Simul/panel_hours_bench'	, STATUS='replace') 
-		OPEN   (UNIT=18, FILE=trim(Result_Folder)//'Simul/panel_aprime_bench' 	, STATUS='replace') 
-		OPEN   (UNIT=19, FILE=trim(Result_Folder)//'Simul/panel_at_return_bench', STATUS='replace')
+		OPEN   (UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_bench'		   	  , STATUS='replace')
+		OPEN   (UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_bench'	  	  , STATUS='replace')
+		OPEN   (UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_bench'		 	  , STATUS='replace')
+		OPEN   (UNIT=13, FILE=trim(Result_Folder)//'Simul/panellambda_bench'   	  , STATUS='replace')
+		OPEN   (UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_bench'        	  , STATUS='replace')
+		OPEN   (UNIT=15, FILE=trim(Result_Folder)//'Simul/panel_return_bench'  	  , STATUS='replace')
+		OPEN   (UNIT=16, FILE=trim(Result_Folder)//'Simul/panel_cons_bench'		  , STATUS='replace') 
+		OPEN   (UNIT=17, FILE=trim(Result_Folder)//'Simul/panel_hours_bench'	  , STATUS='replace') 
+		OPEN   (UNIT=18, FILE=trim(Result_Folder)//'Simul/panel_aprime_bench' 	  , STATUS='replace') 
+		OPEN   (UNIT=19, FILE=trim(Result_Folder)//'Simul/panel_at_return_bench'  , STATUS='replace')
 
-		OPEN   (UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_old_1'         , STATUS='replace')
-		OPEN   (UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_old_2'         , STATUS='replace')
-		OPEN   (UNIT=22, FILE=trim(Result_Folder)//'Simul/panela_old_3'         , STATUS='replace')
-		OPEN   (UNIT=23, FILE=trim(Result_Folder)//'Simul/panela_new_1'         , STATUS='replace')
-		OPEN   (UNIT=24, FILE=trim(Result_Folder)//'Simul/panela_new_2'         , STATUS='replace')
-		OPEN   (UNIT=25, FILE=trim(Result_Folder)//'Simul/panela_new_3'         , STATUS='replace')
+		OPEN   (UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_old_1'           , STATUS='replace')
+		OPEN   (UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_old_2'           , STATUS='replace')
+		OPEN   (UNIT=22, FILE=trim(Result_Folder)//'Simul/panela_old_3'           , STATUS='replace')
+		OPEN   (UNIT=23, FILE=trim(Result_Folder)//'Simul/panela_new_1'           , STATUS='replace')
+		OPEN   (UNIT=24, FILE=trim(Result_Folder)//'Simul/panela_new_2'           , STATUS='replace')
+		OPEN   (UNIT=25, FILE=trim(Result_Folder)//'Simul/panela_new_3'           , STATUS='replace')
+
+		OPEN   (UNIT=26, FILE=trim(Result_Folder)//'Simul/panel_firm_wealth_bench', STATUS='replace')
 	else 
 		OPEN   (UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
 		OPEN   (UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_exp'		    , STATUS='replace')
@@ -4055,6 +4218,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		OPEN   (UNIT=17, FILE=trim(Result_Folder)//'Simul/panel_hours_exp'	 	, STATUS='replace') 
 		OPEN   (UNIT=18, FILE=trim(Result_Folder)//'Simul/panel_aprime_exp' 	, STATUS='replace') 
 		OPEN   (UNIT=19, FILE=trim(Result_Folder)//'Simul/panel_at_return_exp'	, STATUS='replace') 
+
+		OPEN   (UNIT=26, FILE=trim(Result_Folder)//'Simul/panel_firm_wealth_exp', STATUS='replace')
 	endif 
 
 
@@ -4069,6 +4234,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 	WRITE  (UNIT=18, FMT=*) panelaprime
 	WRITE  (UNIT=19, FMT=*) panel_at_return 
 
+	WRITE  (UNIT=19, FMT=*) panel_firm_wealth
+
 	close (unit=10)
 	close (unit=11)
 	close (unit=12)
@@ -4079,6 +4246,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 	close (unit=17)
 	close (unit=18)
 	close (unit=19)
+
+	close (unit=26)
 
 	if (bench_indx.eq.1) then
 		WRITE (UNIT=20, FMT=*) eligible_panela_old_1
@@ -4232,6 +4401,9 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN  (UNIT=4,  FILE=trim(bench_folder)//'value' , STATUS='replace')
 		WRITE (UNIT=4,  FMT=*) ValueFunction
 		CLOSE (unit=4)
+		OPEN  (UNIT=4,  FILE=trim(bench_folder)//'v_pr'  , STATUS='replace')
+		WRITE (UNIT=4,  FMT=*) V_Pr
+		CLOSE (unit=4)
 
 		OPEN  (UNIT=5,  FILE=trim(bench_folder)//'DBN'   , STATUS='replace')
 		WRITE (UNIT=5,  FMT=*) DBN1 
@@ -4299,6 +4471,8 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN (UNIT=17, FILE=trim(bench_folder)//'tauW_bt' , STATUS='old', ACTION='read')
 		OPEN (UNIT=18, FILE=trim(bench_folder)//'tauW_at' , STATUS='old', ACTION='read')
 
+		OPEN (UNIT=19, FILE=trim(bench_folder)//'v_pr'    , STATUS='old', ACTION='read')		
+
 		READ (UNIT=1,  FMT=*), cons
 		READ (UNIT=2,  FMT=*), aprime
 		READ (UNIT=3,  FMT=*), hours
@@ -4319,6 +4493,8 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		READ (UNIT=17, FMT=*), tauW_bt
 		READ (UNIT=18, FMT=*), tauW_at
 
+		READ (UNIT=19, FMT=*), V_Pr
+
 		CLOSE (unit=1)
 		CLOSE (unit=2)
 		CLOSE (unit=3)
@@ -4337,6 +4513,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		CLOSE (unit=16)
 		CLOSE (unit=17)
 		CLOSE (unit=18)
+		CLOSE (unit=19)
 
 		print*, "Reading of benchmark results completed"
 	END IF 
@@ -4390,6 +4567,9 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN  (UNIT=18, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_at', STATUS='replace')
 		WRITE (UNIT=18, FMT=*) tauW_at
 
+		OPEN  (UNIT=19,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr'  , STATUS='replace')
+		WRITE (UNIT=19,  FMT=*) V_Pr
+
 		print*, "Writing of experimental results completed"
 
 	else 
@@ -4412,6 +4592,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN (UNIT=16, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauPL'	, STATUS='old', ACTION='read')
 		OPEN (UNIT=17, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_bt', STATUS='old', ACTION='read')
 		OPEN (UNIT=18, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_at', STATUS='old', ACTION='read')
+		OPEN (UNIT=19, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr'   , STATUS='old', ACTION='read')
 
 		READ (UNIT=1,  FMT=*), cons
 		READ (UNIT=2,  FMT=*), aprime
@@ -4431,6 +4612,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		READ (UNIT=16, FMT=*), tauPL
 		READ (UNIT=17, FMT=*), tauW_bt
 		READ (UNIT=18, FMT=*), tauW_at
+		READ (UNIT=19, FMT=*), V_Pr
 		print*, "Reading of experimental results completed"
 	endif 
 
@@ -4452,6 +4634,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 	CLOSE (unit=16)
 	CLOSE (unit=17)
 	CLOSE (unit=18)
+	CLOSE (unit=19)
 
 END SUBROUTINE Write_Experimental_Results
 

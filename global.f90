@@ -83,6 +83,7 @@ MODULE global
 
     ! Capital markets
     	REAL(DP), DIMENSION(na,nz) :: K_mat, Pr_mat
+    	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: V_Pr, V_Pr_bench, V_Pr_exp, Firm_Wealth
 	
 	! Values for taxes in benchmark and experiment
     REAL(DP) :: tauk_bench, tauPL_bench, psi_bench, tauw_bt_bench, tauw_at_bench, Y_a_threshold_bench 
@@ -130,6 +131,7 @@ MODULE global
 	    REAL(DP) :: prct1_wealth, prct10_wealth, prct20_wealth, prct40_wealth
 	    REAL(DP) :: SSE_Moments, Min_SSE_Moments
 	    REAL(DP) :: Bequest_Wealth, MeanCons, External_Debt_GDP
+	    REAL(DP) :: Mean_Firm_Wealth, Firm_Wealth_by_z
 	    ! Welfare measures
 	    REAL(DP) :: Welfare_Gain_Pop_bench, Welfare_Gain_Pop_exp, Welfare_Gain_NB_bench, Welfare_Gain_NB_exp
 	    REAL(DP) :: CE_NEWBORN, Av_Util_Pop, Av_Util_NB

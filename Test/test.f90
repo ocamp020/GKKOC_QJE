@@ -72,11 +72,13 @@ real, dimension(3)         :: agrid
 real, dimension(4)         :: zgrid
 integer :: i,j
 character(100) :: mydir 
-real :: aaa = 3.25
+!real :: aaa = 3.25
 
 real, allocatable  :: zz(:)
 real, dimension(15) :: yy
 integer, dimension(15) :: xx
+real, dimension(2,2) :: aaa 
+real, dimension(4)   :: bbb
 
 ! !answer = select (array)
 ! call select(array,answer)
@@ -173,5 +175,14 @@ yy(14) = 3.1111
 zz = pack(yy,(xx.eq.1))
 
 print *, zz
+
+aaa(1,1)=22.1
+aaa(1,2)=55.1
+aaa(2,1)=99.0
+aaa(2,2)=34.22
+
+bbb=reshape(aaa,(/size(aaa)/))
+print*, bbb
+print*, size(aaa)
 
 end program test
