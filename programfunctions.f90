@@ -4012,15 +4012,6 @@ SUBROUTINE  SIMULATION(bench_indx)
 			        
 			    ENDIF ! new age==1
 			 
-			ENDDO ! paneli
-
-			!E for surviving
-			!print*,'E'
-
-			! !$omp parallel do private(age,currentei,tempno,ei)
-			DO paneli=1,totpop
-				!print*,'paneli',paneli
-			    age = newpanelage(paneli)  
 			    ! DRAW NEW E FOR THOSE WHO ARE NOT NEWBORN
 			    IF (age .gt. 1) THEN             
 			        currentei = panele(paneli)   
@@ -4175,8 +4166,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				panel_at_return(paneli) = ( currenta + panel_return(paneli)*(1.0_DP-tauK) )*(1-tauW_at) - currenta
 			endif 
 
-			panel_firm_wealth(paneli) = (1.0_dp+R)*currenta + & 
-									& ((agrid(tkhi) - currenta)*V_Pr(age,tklo,currentzi,currentlambdai, currentei) &
+			panel_firm_wealth(paneli) = ((agrid(tkhi) - currenta)*V_Pr(age,tklo,currentzi,currentlambdai, currentei) &
 	                                &  + (currenta - agrid(tklo))*V_Pr(age,tkhi,currentzi,currentlambdai, currentei)) &
 	                                &  / ( agrid(tkhi) - agrid(tklo) )              
 
