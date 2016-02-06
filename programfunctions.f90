@@ -1892,6 +1892,8 @@ END SUBROUTINE FIND_DBN_EQ
 
 
 SUBROUTINE COMPUTE_STATS()
+	use omp_lib
+
 	IMPLICIT NONE
 	INTEGER  :: prctile, group
 	REAL(DP), DIMENSION(nz)    :: cdf_Gz_DBN, Capital_by_z 
@@ -1912,6 +1914,8 @@ SUBROUTINE COMPUTE_STATS()
 	integer  :: Firm_Wealth_ind(size(DBN1)), i, FW_prctile_ind(100)
 	character(100) :: rowname
 	INTEGER, dimension(max_age_category+1) :: age_limit
+
+	!$ call omp_set_num_threads(20)
 
 	print*, 'Check 1'
 	! Age Brackets
@@ -1984,11 +1988,13 @@ SUBROUTINE COMPUTE_STATS()
 		Call Sort(size(DBN1),Firm_Wealth_vec,Firm_Wealth_vec,Firm_Wealth_ind)
 		DBN_vec = DBN_vec(Firm_Wealth_ind)
 
+		!$omp parallel do 
 		do i=1,size(DBN1)
 			CDF_Firm_Wealth(i) = sum( DBN_vec(1:i) )
 		enddo 
 
 		print*, 'Wealth concentration by prct'
+		!$omp parallel do 
 		do prctile=1,100
 	    	i=1
 		    DO while (CDF_Firm_Wealth(i) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
