@@ -1913,6 +1913,7 @@ SUBROUTINE COMPUTE_STATS()
 	character(100) :: rowname
 	INTEGER, dimension(max_age_category+1) :: age_limit
 
+	print*, 'Check 1'
 	! Age Brackets
 		age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
 
@@ -1931,6 +1932,7 @@ SUBROUTINE COMPUTE_STATS()
 		end do 
 		end do 
 
+	print*, 'Check 2'
 	DO zi=1,nz
 	    cdf_Gz_DBN(zi) = sum(DBN1(:,:,zi,:,:))
 	ENDDO
@@ -1951,7 +1953,7 @@ SUBROUTINE COMPUTE_STATS()
 	!ENDDO
 
 	!print*,''
-
+	print*, 'Check 3'
 	! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
 	DO prctile=1,100
 	    ai=1
@@ -1973,6 +1975,7 @@ SUBROUTINE COMPUTE_STATS()
 	prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
 	prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
 
+	print*, 'Check 4'
 	! Distribution of firm wealth
 		Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
 
@@ -2022,7 +2025,7 @@ SUBROUTINE COMPUTE_STATS()
 
 	
 		
-
+	print*, 'Check 5'
 
 	! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
 	! COMPUTE VARIANCE OF LOG EARNINGS FOR 25-60 FOR THOSE WHO WORK MORE THAN 260 HOURS
