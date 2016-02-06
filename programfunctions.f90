@@ -1973,7 +1973,6 @@ SUBROUTINE COMPUTE_STATS()
 	prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
 	prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
 
-
 	! Distribution of firm wealth
 		Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
 
@@ -1986,14 +1985,17 @@ SUBROUTINE COMPUTE_STATS()
 			CDF_Firm_Wealth(i) = sum( DBN_vec(1:i) )
 		enddo 
 
+		print*, 'Wealth concentration by prct'
 		do prctile=1,100
-	    i=1
-	    DO while (CDF_Firm_Wealth(i) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
-	        i=i+1
-	    ENDDO
-	    FW_prctile_ind(prctile)   = i
-	    FW_prctile(prctile)       = Firm_Wealth_vec(i)
-	    FW_above_prctile(prctile) = 100*sum(Firm_Wealth_vec(i:)*DBN_vec(i:))/Mean_Firm_Wealth
+	    	i=1
+		    DO while (CDF_Firm_Wealth(i) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
+		        i=i+1
+		    ENDDO
+		    print*, prctile, i, Firm_Wealth_vec(i),100*sum(Firm_Wealth_vec(i:)*DBN_vec(i:))/Mean_Firm_Wealth
+		    FW_prctile_ind(prctile)   = i
+		    FW_prctile(prctile)       = Firm_Wealth_vec(i)
+		    FW_above_prctile(prctile) = 100*sum(Firm_Wealth_vec(i:)*DBN_vec(i:))/Mean_Firm_Wealth
+		    
 	    enddo
 
 	    if (solving_bench.eq.1) then
@@ -2017,6 +2019,7 @@ SUBROUTINE COMPUTE_STATS()
 			enddo
 
 			CLOSE(UNIT=11)
+
 	
 		
 
@@ -3579,9 +3582,9 @@ SUBROUTINE  SIMULATION(bench_indx)
 	Real(DP), allocatable       :: eligible_panela_old_1(:), eligible_panela_old_2(:), eligible_panela_old_3(:)
 	Real(DP), allocatable       :: eligible_panela_new_1(:), eligible_panela_new_2(:), eligible_panela_new_3(:)
 	INTEGER                     :: n_eligible
-
-	!$ call omp_set_num_threads(20)
-
+	print*, 'Im here 0.0'
+	!$ call omp_set_num_threads(2)
+	print*, 'Im here 0'
     age=1
     requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
     cdfrequirednumberby_age(age) = requirednumberby_age(age)
@@ -3597,7 +3600,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	!                     GENERATE   INITIAL   PANEL
 	!=====================================================================
 
-
+	print*, 'Im here 1'
 		newiseed=-1
 
 		!numberby_age_z_lambda=0
@@ -3752,7 +3755,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		   panele(paneli)      = ei
 		   
 		ENDDO
-
+	print*, 'Im here 2'
 		!print '("INITIAL = ",f6.3," seconds.")',finish_timet-start_timet
 
 		newpanelage    = panelage
@@ -3776,6 +3779,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	!=============================================================================
 
 		!call cpu_time(start_timet) 
+
 
 		DO simutime=1, MaxSimuTime
 
