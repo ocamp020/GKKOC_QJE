@@ -3591,9 +3591,9 @@ SUBROUTINE  SIMULATION(bench_indx)
 	Real(DP), allocatable       :: eligible_panela_old_1(:), eligible_panela_old_2(:), eligible_panela_old_3(:)
 	Real(DP), allocatable       :: eligible_panela_new_1(:), eligible_panela_new_2(:), eligible_panela_new_3(:)
 	INTEGER                     :: n_eligible
-	print*, 'Im here 0.0'
-	!$ call omp_set_num_threads(2)
-	print*, 'Im here 0'
+
+	!$ call omp_set_num_threads(20)
+
     age=1
     requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
     cdfrequirednumberby_age(age) = requirednumberby_age(age)
@@ -3609,7 +3609,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	!                     GENERATE   INITIAL   PANEL
 	!=====================================================================
 
-	print*, 'Im here 1'
+	
 		newiseed=-1
 
 		!numberby_age_z_lambda=0
@@ -3764,7 +3764,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		   panele(paneli)      = ei
 		   
 		ENDDO
-	print*, 'Im here 2'
+	
 		!print '("INITIAL = ",f6.3," seconds.")',finish_timet-start_timet
 
 		newpanelage    = panelage
