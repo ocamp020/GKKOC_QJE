@@ -3537,7 +3537,7 @@ SUBROUTINE  Firm_Value()
 	                    & sp_coeff_W, na, Aprime(age,ai,zi,lambdai, ei), V_spline_W(ei_p) )  
 			enddo
 
-			V_Pr(age,ai,zi,lambdai,ei) = Pr_mat(ai,zi) + survP(age)/(1.0_dp+R) * sum(  pr_e(ei,:)*V_spline_W )
+			V_Pr(age,ai,zi,lambdai,ei) = (1.0_dp+R)*agrid(ai) + Pr_mat(ai,zi) + survP(age)/(1.0_dp+R) * sum(pr_e(ei,:)*V_spline_W)
 
 		enddo
 	enddo
@@ -3547,10 +3547,10 @@ SUBROUTINE  Firm_Value()
 
 
 	! Define Firm based Wealth measure
-	do ai=1,na
-		Firm_Wealth(:,ai,:,:,:) = V_Pr(:,ai,:,:,:) + (1.0_dp+R)*agrid(ai)
-	enddo
-
+	!do ai=1,na
+	!	Firm_Wealth(:,ai,:,:,:) = V_Pr(:,ai,:,:,:) + (1.0_dp+R)*agrid(ai)
+	!enddo
+	Firm_Wealth = V_Pr
 
 END SUBROUTINE Firm_Value
 
