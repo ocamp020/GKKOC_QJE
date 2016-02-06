@@ -1917,7 +1917,7 @@ SUBROUTINE COMPUTE_STATS()
 
 	!$ call omp_set_num_threads(20)
 
-	print*, 'Check 1'
+	
 	! Age Brackets
 		age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
 
@@ -1936,7 +1936,7 @@ SUBROUTINE COMPUTE_STATS()
 		end do 
 		end do 
 
-	print*, 'Check 2'
+	
 	DO zi=1,nz
 	    cdf_Gz_DBN(zi) = sum(DBN1(:,:,zi,:,:))
 	ENDDO
@@ -1957,7 +1957,7 @@ SUBROUTINE COMPUTE_STATS()
 	!ENDDO
 
 	!print*,''
-	print*, 'Check 3'
+	
 	! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
 	DO prctile=1,100
 	    ai=1
@@ -1979,61 +1979,59 @@ SUBROUTINE COMPUTE_STATS()
 	prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
 	prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
 
-	print*, 'Check 4'
-	! Distribution of firm wealth
-		Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
+	
+	! ! Distribution of firm wealth
+	! 	Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
 
-		DBN_vec         = reshape(DBN1       ,(/size(DBN1)/))
-		Firm_Wealth_vec = reshape(Firm_Wealth,(/size(DBN1)/))
-		print*, 'Check 4.1'
-		Call Sort(size(DBN1),Firm_Wealth_vec,Firm_Wealth_vec,Firm_Wealth_ind)
-		DBN_vec = DBN_vec(Firm_Wealth_ind)
-		print*, 'Check 4.2'
+	! 	DBN_vec         = reshape(DBN1       ,(/size(DBN1)/))
+	! 	Firm_Wealth_vec = reshape(Firm_Wealth,(/size(DBN1)/))
+	! 	print*, 'Check 4.1'
+	! 	Call Sort(size(DBN1),Firm_Wealth_vec,Firm_Wealth_vec,Firm_Wealth_ind)
+	! 	DBN_vec = DBN_vec(Firm_Wealth_ind)
+	! 	print*, 'Check 4.2'
 
-		!$omp parallel do 
-		do i=1,size(DBN1)
-			CDF_Firm_Wealth(i) = sum( DBN_vec(1:i) )
-		enddo 
+	! 	!$omp parallel do 
+	! 	do i=1,size(DBN1)
+	! 		CDF_Firm_Wealth(i) = sum( DBN_vec(1:i) )
+	! 	enddo 
 
-		print*, 'Wealth concentration by prct'
-		!$omp parallel do 
-		do prctile=1,100
-	    	i=1
-		    DO while (CDF_Firm_Wealth(i) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
-		        i=i+1
-		    ENDDO
-		    print*, prctile, i, Firm_Wealth_vec(i),100*sum(Firm_Wealth_vec(i:)*DBN_vec(i:))/Mean_Firm_Wealth
-		    FW_prctile_ind(prctile)   = i
-		    FW_prctile(prctile)       = Firm_Wealth_vec(i)
-		    FW_above_prctile(prctile) = 100*sum(Firm_Wealth_vec(i:)*DBN_vec(i:))/Mean_Firm_Wealth
+	! 	print*, 'Wealth concentration by prct'
+	! 	!$omp parallel do 
+	! 	do prctile=1,100
+	!     	i=1
+	! 	    DO while (CDF_Firm_Wealth(i) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
+	! 	        i=i+1
+	! 	    ENDDO
+	! 	    print*, prctile, i, Firm_Wealth_vec(i),100*sum(Firm_Wealth_vec(i:)*DBN_vec(i:))/Mean_Firm_Wealth
+	! 	    FW_prctile_ind(prctile)   = i
+	! 	    FW_prctile(prctile)       = Firm_Wealth_vec(i)
+	! 	    FW_above_prctile(prctile) = 100*sum(Firm_Wealth_vec(i:)*DBN_vec(i:))/Mean_Firm_Wealth
 		    
-	    enddo
+	!     enddo
 
-	    if (solving_bench.eq.1) then
-			OPEN (UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Bench.txt', STATUS='replace')
-		else
-			OPEN (UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Exp.txt', STATUS='replace')
-		end if 
+	!     if (solving_bench.eq.1) then
+	! 		OPEN (UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Bench.txt', STATUS='replace')
+	! 	else
+	! 		OPEN (UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Exp.txt', STATUS='replace')
+	! 	end if 
 
-			WRITE(UNIT=11, FMT=*) ' '
-			WRITE(UNIT=11, FMT=*) 'Firm_Wealth _Stats'
-			WRITE(UNIT=11, FMT=*) 'Mean_Firm_Wealth=', Mean_Firm_Wealth
-			WRITE(UNIT=11, FMT=*) 'Wealth_Top_1%='   , FW_above_prctile(99)
-			WRITE(UNIT=11, FMT=*) 'Wealth_Top_5%='   , FW_above_prctile(95)
-			WRITE(UNIT=11, FMT=*) 'Wealth_Top_10%='  , FW_above_prctile(90)
-			WRITE(UNIT=11, FMT=*) 'Wealth_Top_20%='  , FW_above_prctile(80)
-			WRITE(UNIT=11, FMT=*) 'Wealth_Top_40%='  , FW_above_prctile(60)
-			WRITE(UNIT=11, FMT=*) ' '
-			WRITE(UNIT=11, FMT=*) 'prctl','Wealth','Wealth_Above_%'
-			do prctile=1,100
-				WRITE(UNIT=11, FMT=*) prctile,FW_prctile(prctile),FW_above_prctile(prctile)
-			enddo
+	! 		WRITE(UNIT=11, FMT=*) ' '
+	! 		WRITE(UNIT=11, FMT=*) 'Firm_Wealth _Stats'
+	! 		WRITE(UNIT=11, FMT=*) 'Mean_Firm_Wealth=', Mean_Firm_Wealth
+	! 		WRITE(UNIT=11, FMT=*) 'Wealth_Top_1%='   , FW_above_prctile(99)
+	! 		WRITE(UNIT=11, FMT=*) 'Wealth_Top_5%='   , FW_above_prctile(95)
+	! 		WRITE(UNIT=11, FMT=*) 'Wealth_Top_10%='  , FW_above_prctile(90)
+	! 		WRITE(UNIT=11, FMT=*) 'Wealth_Top_20%='  , FW_above_prctile(80)
+	! 		WRITE(UNIT=11, FMT=*) 'Wealth_Top_40%='  , FW_above_prctile(60)
+	! 		WRITE(UNIT=11, FMT=*) ' '
+	! 		WRITE(UNIT=11, FMT=*) 'prctl','Wealth','Wealth_Above_%'
+	! 		do prctile=1,100
+	! 			WRITE(UNIT=11, FMT=*) prctile,FW_prctile(prctile),FW_above_prctile(prctile)
+	! 		enddo
 
-			CLOSE(UNIT=11)
+	! 		CLOSE(UNIT=11)
 
 	
-		
-	print*, 'Check 5'
 
 	! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
 	! COMPUTE VARIANCE OF LOG EARNINGS FOR 25-60 FOR THOSE WHO WORK MORE THAN 260 HOURS
