@@ -4127,7 +4127,6 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		print*, ' '
 		print*, 'n_eligible', sum(eligible)
-		print*, eligible_panela_old_1
 		print*, ' '
 
 
