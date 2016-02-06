@@ -1985,9 +1985,10 @@ SUBROUTINE COMPUTE_STATS()
 
 		DBN_vec         = reshape(DBN1       ,(/size(DBN1)/))
 		Firm_Wealth_vec = reshape(Firm_Wealth,(/size(DBN1)/))
+		print*, 'Check 4.1'
 		Call Sort(size(DBN1),Firm_Wealth_vec,Firm_Wealth_vec,Firm_Wealth_ind)
 		DBN_vec = DBN_vec(Firm_Wealth_ind)
-		print*, 'Check 4.1'
+		print*, 'Check 4.2'
 
 		!$omp parallel do 
 		do i=1,size(DBN1)
