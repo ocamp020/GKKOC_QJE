@@ -518,8 +518,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 		psi  = OPT_psi
 		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.01_dp,Opt_TauK+0.01_dp) 
 
-		tauK = OPT_tauK
-		psi  = OPT_psi
+		tauK     = OPT_tauK
+		OPT_psi  = psi
 
 		! Compute moments
 		CALL COMPUTE_STATS
@@ -586,7 +586,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.001_dp,Opt_TauW+0.001_dp)
 
 		tauW_at = OPT_tauW
-		psi     = OPT_psi
+		OPT_psi = psi
 
 		! Compute moments
 		CALL COMPUTE_STATS
