@@ -3470,8 +3470,8 @@ SUBROUTINE  Firm_Value()
 	use omp_lib
 
 	IMPLICIT NONE
-	integer  :: age, ai, zi, lambdai, ei, ei_p
-	real(dp) :: dV_low, dV_high, spline_coeff(na), V_spline_R, sp_coeff_W(na,ne), V_spline_W(ne)
+	integer  :: age, ai, zi, lambdai, ei, ei_p, tklo, tkhi
+	real(dp) :: dV_low, dV_high, spline_coeff(na), V_spline_R, sp_coeff_W(na,ne), V_spline_W(ne), Prob_lo, Prob_hi
 
 	!$ call omp_set_num_threads(5)
 
@@ -3487,32 +3487,51 @@ SUBROUTINE  Firm_Value()
 	enddo 
 
 	! Retirement Periods
-	do zi=1,nz 
-		! Prepare spline interpolation
-			! Derivative of value function in first grid point
-			if (K_mat(1,zi).lt.theta*agrid(1)) then 
-				dV_low  = 0.0_dp
-			else 
-				dV_low  = P*mu*((theta*zgrid(zi))**mu)*agrid(1)**(mu-1.0_DP)-(R+DepRate)*theta
-			endif
-			! Derivative of value function in last grid point
-			if (K_mat(na,zi).lt.theta*agrid(na)) then 
-				dV_high = 0.0_dp
-			else 
-				dV_high = P*mu*((theta*zgrid(zi))**mu)*agrid(na)**(mu-1.0_DP)-(R+DepRate)*theta
-			endif
+	do zi=1,nz
+		! ! Prepare spline interpolation
+		! 	! Derivative of value function in first grid point
+		! 	if (K_mat(1,zi).lt.theta*agrid(1)) then 
+		! 		dV_low  = 0.0_dp
+		! 	else 
+		! 		dV_low  = P*mu*((theta*zgrid(zi))**mu)*agrid(1)**(mu-1.0_DP)-(R+DepRate)*theta
+		! 	endif
+		! 	! Derivative of value function in last grid point
+		! 	if (K_mat(na,zi).lt.theta*agrid(na)) then 
+		! 		dV_high = 0.0_dp
+		! 	else 
+		! 		dV_high = P*mu*((theta*zgrid(zi))**mu)*agrid(na)**(mu-1.0_DP)-(R+DepRate)*theta
+		! 	endif
 
 		do age=MaxAge-1,RetAge-1
 		!$omp parallel do private(lambdai,ei,ai,spline_coeff,V_spline_R)
 		do ei=1,ne 
 		do lambdai=1,nlambda
 
-			CALL spline( agrid, V_Pr(age+1, :, zi, lambdai, ei) , na , dV_low , dV_high , spline_coeff)  
+			!CALL spline( agrid, V_Pr(age+1, :, zi, lambdai, ei) , na , dV_low , dV_high , spline_coeff)  
 		
 			do ai=1,na
-				call splint( agrid, V_Pr(age+1, :, zi, lambdai, ei), &
-	                    & spline_coeff, na, Aprime(age,ai,zi,lambdai, ei), V_spline_R )  
-				V_Pr(age,ai,zi,lambdai,ei) = Pr_mat(ai,zi) + survP(age)/(1.0_dp+R) * V_spline_R
+				! call splint( agrid, V_Pr(age+1, :, zi, lambdai, ei), spline_coeff, na, Aprime(age,ai,zi,lambdai, ei), V_spline_R ) 
+				! V_Pr(age,ai,zi,lambdai,ei) = Pr_mat(ai,zi) + survP(age)/(1.0_dp+R) * V_spline_R
+
+				! Prepare linear interpolation
+				if ( Aprime(age,ai,zi,lambdai, ei) .ge. amax) then
+					tklo =na-1
+				elseif (Aprime(age,ai,zi,lambdai, ei) .lt. amin) then
+				    tklo = 1
+				else
+				    tklo = ((Aprime(age,ai,zi,lambdai, ei) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+				endif            
+				tkhi = tklo + 1        
+				Prob_lo = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei) ) / ( agrid(tkhi) -agrid(tklo) )
+				Prob_hi = ( Aprime(age,ai,zi,lambdai, ei) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
+				Prob_lo = min(Prob_lo, 1.0_DP)
+				Prob_lo = max(Prob_lo, 0.0_DP)
+				Prob_hi = min(Prob_hi, 1.0_DP)
+				Prob_hi = max(Prob_hi, 0.0_DP)    
+
+				V_Pr(age,ai,zi,lambdai,ei) = Pr_mat(ai,zi) + survP(age)/(1.0_dp+R) &
+			  		&  * ( Prob_lo* V_Pr(age+1, tklo, zi, lambdai, ei)  + Prob_hi* V_Pr(age+1, tkhi, zi, lambdai, ei) ) 
+
 			enddo
 	enddo
 	enddo
@@ -3521,32 +3540,47 @@ SUBROUTINE  Firm_Value()
 
 	! Working Periods
 	do zi=1,nz 
-		! Prepare spline interpolation
-			! Derivative of value function in first grid point
-			if (K_mat(1,zi).lt.theta*agrid(1)) then 
-				dV_low  = 0.0_dp
-			else 
-				dV_low  = P*mu*((theta*zgrid(zi))**mu)*agrid(1)**(mu-1.0_DP)-(R+DepRate)*theta
-			endif
-			! Derivative of value function in last grid point
-			if (K_mat(na,zi).lt.theta*agrid(na)) then 
-				dV_high = 0.0_dp
-			else 
-				dV_high = P*mu*((theta*zgrid(zi))**mu)*agrid(na)**(mu-1.0_DP)-(R+DepRate)*theta
-			endif
+		! ! Prepare spline interpolation
+		! 	! Derivative of value function in first grid point
+		! 	if (K_mat(1,zi).lt.theta*agrid(1)) then 
+		! 		dV_low  = 0.0_dp
+		! 	else 
+		! 		dV_low  = P*mu*((theta*zgrid(zi))**mu)*agrid(1)**(mu-1.0_DP)-(R+DepRate)*theta
+		! 	endif
+		! 	! Derivative of value function in last grid point
+		! 	if (K_mat(na,zi).lt.theta*agrid(na)) then 
+		! 		dV_high = 0.0_dp
+		! 	else 
+		! 		dV_high = P*mu*((theta*zgrid(zi))**mu)*agrid(na)**(mu-1.0_DP)-(R+DepRate)*theta
+		! 	endif
 
 		do age=RetAge-1,1,-1
 		!$omp parallel do private(lambdai,ei,ai,sp_coeff_W,V_spline_W,ei_p)
 		do lambdai=1,nlambda
-			do ei_p=1,ne
-				CALL spline( agrid, V_Pr(age+1, :, zi, lambdai, ei_p) , na , dV_low , dV_high , sp_coeff_W(:,ei_p))
-			enddo   
+			! do ei_p=1,ne
+			! 	CALL spline( agrid, V_Pr(age+1, :, zi, lambdai, ei_p) , na , dV_low , dV_high , sp_coeff_W(:,ei_p))
+			! enddo   
 		
 		do ei=1,ne 
 		do ai=1,na
 			do ei_p=1,ne
-				call splint( agrid, V_Pr(age+1, :, zi, lambdai, ei_p), &
-	                    & sp_coeff_W, na, Aprime(age,ai,zi,lambdai, ei), V_spline_W(ei_p) )  
+				! call splint( agrid, V_Pr(age+1, :, zi, lambdai, ei_p), sp_coeff_W, na, Aprime(age,ai,zi,lambdai, ei), V_spline_W(ei_p) )
+				if ( Aprime(age,ai,zi,lambdai, ei_p) .ge. amax) then
+					tklo =na-1
+				elseif (Aprime(age,ai,zi,lambdai, ei_p) .lt. amin) then
+				    tklo = 1
+				else
+				    tklo = ((Aprime(age,ai,zi,lambdai, ei_p) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+				endif            
+				tkhi = tklo + 1        
+				Prob_lo = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei_p) ) / ( agrid(tkhi) -agrid(tklo) )
+				Prob_hi = ( Aprime(age,ai,zi,lambdai, ei_p) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
+				Prob_lo = min(Prob_lo, 1.0_DP)
+				Prob_lo = max(Prob_lo, 0.0_DP)
+				Prob_hi = min(Prob_hi, 1.0_DP)
+				Prob_hi = max(Prob_hi, 0.0_DP) 
+
+				V_spline_W(ei_p) = Prob_lo* V_Pr(age+1, tklo, zi, lambdai, ei_p)  + Prob_hi* V_Pr(age+1, tkhi, zi, lambdai, ei_p)   
 			enddo
 
 			V_Pr(age,ai,zi,lambdai,ei) = Pr_mat(ai,zi) + survP(age)/(1.0_dp+R) * sum(pr_e(ei,:)*V_spline_W)
