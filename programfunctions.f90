@@ -3482,7 +3482,7 @@ SUBROUTINE  Firm_Value()
 	age = MaxAge 
 	do zi=1,nz
 	do ai=1,na 
-		V_Pr(age,ai,zi,:,:) = (1.0_dp+R)*agrid(ai) + Pr_mat(ai,zi)
+		V_Pr(age,ai,zi,:,:) = Pr_mat(ai,zi)
 	enddo 
 	enddo 
 
@@ -3512,7 +3512,7 @@ SUBROUTINE  Firm_Value()
 			do ai=1,na
 				call splint( agrid, V_Pr(age+1, :, zi, lambdai, ei), &
 	                    & spline_coeff, na, Aprime(age,ai,zi,lambdai, ei), V_spline_R )  
-				V_Pr(age,ai,zi,lambdai,ei) = (1.0_dp+R)*agrid(ai) +  Pr_mat(ai,zi) + survP(age)/(1.0_dp+R) * V_spline_R
+				V_Pr(age,ai,zi,lambdai,ei) = Pr_mat(ai,zi) + survP(age)/(1.0_dp+R) * V_spline_R
 			enddo
 	enddo
 	enddo
@@ -3549,7 +3549,7 @@ SUBROUTINE  Firm_Value()
 	                    & sp_coeff_W, na, Aprime(age,ai,zi,lambdai, ei), V_spline_W(ei_p) )  
 			enddo
 
-			V_Pr(age,ai,zi,lambdai,ei) = (1.0_dp+R)*agrid(ai) + Pr_mat(ai,zi) + survP(age)/(1.0_dp+R) * sum(pr_e(ei,:)*V_spline_W)
+			V_Pr(age,ai,zi,lambdai,ei) = Pr_mat(ai,zi) + survP(age)/(1.0_dp+R) * sum(pr_e(ei,:)*V_spline_W)
 
 		enddo
 	enddo
@@ -3559,10 +3559,9 @@ SUBROUTINE  Firm_Value()
 
 
 	! Define Firm based Wealth measure
-	!do ai=1,na
-	!	Firm_Wealth(:,ai,:,:,:) = V_Pr(:,ai,:,:,:) + (1.0_dp+R)*agrid(ai)
-	!enddo
-	Firm_Wealth = V_Pr
+	do ai=1,na
+		Firm_Wealth(:,ai,:,:,:) = V_Pr(:,ai,:,:,:) + (1.0_dp+R)*agrid(ai)
+	enddo
 
 END SUBROUTINE Firm_Value
 
@@ -4178,7 +4177,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 				panel_at_return(paneli) = ( currenta + panel_return(paneli)*(1.0_DP-tauK) )*(1-tauW_at) - currenta
 			endif 
 
-			panel_firm_wealth(paneli) = ((agrid(tkhi) - currenta)*V_Pr(age,tklo,currentzi,currentlambdai, currentei) &
+			panel_firm_wealth(paneli) = (1.0_dp+R)*currenta + &
+									& ((agrid(tkhi) - currenta)*V_Pr(age,tklo,currentzi,currentlambdai, currentei) &
 	                                &  + (currenta - agrid(tklo))*V_Pr(age,tkhi,currentzi,currentlambdai, currentei)) &
 	                                &  / ( agrid(tkhi) - agrid(tklo) )              
 
