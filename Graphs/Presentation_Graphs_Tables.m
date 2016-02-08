@@ -1066,4 +1066,32 @@ print -dps  1fig_diff_savings_rate_age31.eps
 print -dpng 1fig_diff_savings_rate_age31.png
 
 
+%% Wealth measures
 
+    eval(['load ',Simul_Folder,'panela_bench']) ; eval(['load ',Simul_Folder,'panel_firm_wealth_bench']) ; 
+    eval(['load ',Bench_Folder,'EBAR'])         ;
+    
+    Wage_earnings = 47000; 
+    panel_a  = Wage_earnings/EBAR * panela_bench ;
+    panel_PV = Wage_earnings/EBAR * panel_firm_wealth_bench ;
+    
+    mean = [mean(panel_a) mean(panel_PV)];
+    max  = [max(panel_a)  max(panel_PV) ];
+    tot  = [sum(panel_a)  sum(panel_PV) ];
+    
+    i=1;
+    for prc=100-[0.01 0.10 1.00 10.00 20.00 40.00 50.00 90.00 99.00]
+        a_prc  = prctile(panel_a ,prc);
+        PV_prc = prctile(panel_PV,prc);
+        W_a    = sum(panel_a(panel_a>=a_prc))/tot(1)   ;
+        W_PV   = sum(panel_PV(panel_PV>=PV_prc))/tot(2);
+        AA(i,:)= [prc W_a W_PV]                        ;
+        i=i+1;
+    end
+        
+    col_name  = {' ','assets','present_value'};
+    row_name  = {'Mean';'Max'};
+    col_name1 = {'pcrt','assets','present_value'};
+    Mat = [col_name;row_name num2cell([mean;max]);col_name1;num2cell(AA)]
+    status = xlwrite(Tables_file,Mat,'Wealth_Stats') ;
+          
