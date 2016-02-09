@@ -3529,7 +3529,7 @@ SUBROUTINE  Firm_Value()
 		! 		dV_high = P*mu*((theta*zgrid(zi))**mu)*agrid(na)**(mu-1.0_DP)-(R+DepRate)*theta
 		! 	endif
 
-		do age=MaxAge-1,RetAge-1
+		do age=MaxAge-1,RetAge,-1
 		!$omp parallel do private(lambdai,ei,ai,spline_coeff,V_spline_R)
 		do ei=1,ne 
 		do lambdai=1,nlambda
