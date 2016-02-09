@@ -2951,7 +2951,13 @@ Function K_Matrix(R_in,P_in)
 	real(dp), dimension(na,nz) :: K_Matrix
 	integer :: i,j
 
-	K_Matrix = min( theta*spread(agrid,2,nz) , (mu*P_in*spread(zgrid,1,na)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+	! K_Matrix = min( theta*spread(agrid,2,nz) , (mu*P_in*spread(zgrid,1,na)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+
+	do j=1,nz
+	do i=1,na 
+		K_Matrix(i,j) = min( theta*agrid(i) , (mu*P_in*zgrid(j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+	enddo
+	enddo 
 
 end Function K_Matrix
 
@@ -2961,7 +2967,13 @@ Function K_Matrix_t(R_in,P_in)
 	real(dp), dimension(na_t,nz) :: K_Matrix_t
 	integer :: i,j
 
-	K_Matrix_t = min( theta*spread(agrid_t,2,nz) , (mu*P_in*spread(zgrid,1,na_t)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+	! K_Matrix_t = min( theta*spread(agrid_t,2,nz) , (mu*P_in*spread(zgrid,1,na_t)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+
+	do j=1,nz
+	do i=1,na_t
+		K_Matrix(i,j) = min( theta*agrid_t(i) , (mu*P_in*zgrid(j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+	enddo
+	enddo 
 
 end Function K_Matrix_t
 
@@ -2980,7 +2992,13 @@ Function Profit_Matrix(R_in,P_in)
 
 	K = K_matrix(R_in,P_in)
 
-	Profit_Matrix = P_in*(spread(zgrid,1,na)*K)**mu - (R_in+DepRate)*K
+	! Profit_Matrix = P_in*(spread(zgrid,1,na)*K)**mu - (R_in+DepRate)*K
+
+	do j=1,nz 
+	do i=1,na 
+		Profit_Matrix(i,j) = P_in*(zgrid(j)*K(i,j))**mu - (R_in+DepRate)*K(i,j)
+	enddo 
+	enddo 
 
 end Function Profit_Matrix
 
@@ -2993,7 +3011,12 @@ Function Profit_Matrix_t(R_in,P_in)
 
 	K = K_matrix_t(R_in,P_in)
 
-	Profit_Matrix_t = P_in*(spread(zgrid,1,na_t)*K)**mu - (R_in+DepRate)*K
+	! Profit_Matrix_t = P_in*(spread(zgrid,1,na_t)*K)**mu - (R_in+DepRate)*K
+	do j=1,nz 
+	do i=1,na_t 
+		Profit_Matrix(i,j) = P_in*(zgrid(j)*K(i,j))**mu - (R_in+DepRate)*K(i,j)
+	enddo 
+	enddo 
 
 end Function Profit_Matrix_t
 
@@ -3482,7 +3505,11 @@ SUBROUTINE  Firm_Value()
 	age = MaxAge 
 	do zi=1,nz
 	do ai=1,na 
+	do ei=1,ne 
+	do lambdai=1,nlambda
 		V_Pr(age,ai,zi,:,:) = Pr_mat(ai,zi)
+	enddo 
+	enddo
 	enddo 
 	enddo 
 
