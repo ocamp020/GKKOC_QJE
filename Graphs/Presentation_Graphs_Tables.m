@@ -1068,30 +1068,56 @@ print -dpng 1fig_diff_savings_rate_age31.png
 
 %% Wealth measures
 
-    eval(['load ',Simul_Folder,'panela_bench']) ; eval(['load ',Simul_Folder,'panel_firm_wealth_bench']) ; 
-    eval(['load ',Bench_Folder,'EBAR'])         ;
+    eval(['load ',Simul_Folder,'panela_bench'])             ; 
+    eval(['load ',Simul_Folder,'panel_firm_wealth_bench'])  ; 
+    eval(['load ',Simul_Folder,'panelage_bench'])           ; 
+    eval(['load ',Bench_Folder,'EBAR'])                     ;
     
     Wage_earnings = 47000; 
     panel_a  = Wage_earnings/EBAR * panela_bench ;
     panel_PV = Wage_earnings/EBAR * panel_firm_wealth_bench ;
     
-    mean = [mean(panel_a) mean(panel_PV)];
-    max  = [max(panel_a)  max(panel_PV) ];
-    tot  = [sum(panel_a)  sum(panel_PV) ];
+    mean_w = [mean(panel_a) mean(panel_PV)];
+    max_w  = [max(panel_a)  max(panel_PV) ];
+    tot_w  = [sum(panel_a)  sum(panel_PV) ];
     
     i=1;
     for prc=100-[0.01 0.10 1.00 10.00 20.00 40.00 50.00 90.00 99.00]
         a_prc  = prctile(panel_a ,prc);
         PV_prc = prctile(panel_PV,prc);
-        W_a    = sum(panel_a(panel_a>=a_prc))/tot(1)   ;
-        W_PV   = sum(panel_PV(panel_PV>=PV_prc))/tot(2);
+        W_a    = sum(panel_a(panel_a>=a_prc))/tot_w(1)   ;
+        W_PV   = sum(panel_PV(panel_PV>=PV_prc))/tot_w(2);
         AA(i,:)= [prc W_a W_PV]                        ;
         i=i+1;
     end
-        
+    
+    % Age brackets 
+    age = [6  11, 16, 21, 26, 31, 36, 41, 46, Max_Age ];
+    %%%    24, 34, 44, 54, 64, 74, 80
+    n_age = numel(age) ;
+    
+    
+    %  Mean and std by age
+    for j=1:n_age
+        if j==1
+            ind = (panelage_bench<age(j))  ;
+        elseif j<n_age && j>1
+            ind = ((panelage_bench>=age(j-1)).*(panelage_bench<age(j)))==1  ;
+        else
+            ind = (panelage_bench>=age(j-1))  ;
+        end
+        mean_wealth_age(j,1) = mean(panel_a(ind))   ;
+        mean_wealth_age(j,2) = mean(panel_PV(ind))  ;
+    end
+    
+    BB = [ 19+age' mean_wealth_age ];
+    
     col_name  = {' ','assets','present_value'};
     row_name  = {'Mean';'Max'};
     col_name1 = {'pcrt','assets','present_value'};
-    Mat = [col_name;row_name num2cell([mean;max]);col_name1;num2cell(AA)]
+    col_name2 = {'Age','assets','present_value'};
+    Mat = [col_name;row_name num2cell([mean_w;max_w]);col_name1;num2cell(AA);col_name2;num2cell(BB)]
     status = xlwrite(Tables_file,Mat,'Wealth_Stats') ;
-          
+    
+            
+                  
