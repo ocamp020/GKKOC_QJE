@@ -2971,7 +2971,7 @@ Function K_Matrix_t(R_in,P_in)
 
 	do j=1,nz
 	do i=1,na_t
-		K_Matrix(i,j) = min( theta*agrid_t(i) , (mu*P_in*zgrid(j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K_Matrix_t(i,j) = min( theta*agrid_t(i) , (mu*P_in*zgrid(j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 	enddo
 	enddo 
 
@@ -3014,7 +3014,7 @@ Function Profit_Matrix_t(R_in,P_in)
 	! Profit_Matrix_t = P_in*(spread(zgrid,1,na_t)*K)**mu - (R_in+DepRate)*K
 	do j=1,nz 
 	do i=1,na_t 
-		Profit_Matrix(i,j) = P_in*(zgrid(j)*K(i,j))**mu - (R_in+DepRate)*K(i,j)
+		Profit_Matrix_t(i,j) = P_in*(zgrid(j)*K(i,j))**mu - (R_in+DepRate)*K(i,j)
 	enddo 
 	enddo 
 
