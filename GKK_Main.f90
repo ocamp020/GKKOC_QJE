@@ -37,7 +37,7 @@ PROGRAM main
 	! Variables to measure running time
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
-		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform
+		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -55,6 +55,7 @@ PROGRAM main
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+		Simul_Switch  = .true.
 
 
 	! Switch for separable and non-separable utility
@@ -174,8 +175,8 @@ PROGRAM main
 	! Call routines
 		! Tax Reform experiment
 		if (Tax_Reform) then 
-			call Solve_Benchmark(compute_bench)
-			call Solve_Experiment(compute_exp)
+			call Solve_Benchmark(compute_bench,Simul_Switch)
+			call Solve_Experiment(compute_exp,Simul_Switch)
 
 			compute_bench = .false.
 		endif 
@@ -190,8 +191,8 @@ PROGRAM main
 			endif
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
-			call Solve_Benchmark(compute_bench)
-			call Solve_Opt_Tax(Opt_Tax_KW)
+			call Solve_Benchmark(compute_bench,Simul_Switch)
+			call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		endif 
 
 
@@ -207,14 +208,14 @@ END PROGRAM main
 !========================================================================================
 !========================================================================================
 
-Subroutine Solve_Benchmark(compute_bench)
+Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
 	use Toolbox
 	use omp_lib
 	implicit none 
-	logical, intent(in) :: compute_bench
+	logical, intent(in) :: compute_bench, Simul_Switch
 
 	!====================================================================================================
 	PRINT*,''
@@ -254,7 +255,7 @@ Subroutine Solve_Benchmark(compute_bench)
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		CALL WRITE_VARIABLES(1)
-		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.00_dp).and.(compute_bench)) then 
+		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.00_dp).and.(Simul_Switch)) then 
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
 		endif
@@ -293,14 +294,14 @@ end Subroutine Solve_Benchmark
 !========================================================================================
 !========================================================================================
 
-Subroutine Solve_Experiment(compute_exp)
+Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
 	use Toolbox
 	use omp_lib
 	implicit none 
-	logical, intent(in) :: compute_exp
+	logical, intent(in) :: compute_exp, Simul_Switch
 
 	!====================================================================================================
 	PRINT*,''
@@ -427,7 +428,7 @@ Subroutine Solve_Experiment(compute_exp)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp).and.(compute_exp)) then 
+	if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp).and.(Simul_Switch)) then 
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
 	endif
@@ -449,7 +450,7 @@ end Subroutine Solve_Experiment
 !========================================================================================
 !========================================================================================
 
-Subroutine Solve_Opt_Tax(Opt_Tax_KW)
+Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	use parameters 
 	use global
 	use Opt_Tax_Parameters
@@ -457,7 +458,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 	use Toolbox
 	use omp_lib
 	implicit none 
-	logical, intent(in) :: Opt_Tax_KW
+	logical, intent(in) :: Opt_Tax_KW,Simul_Switch
 
 	SSC_Payments_bench = SSC_Payments
 
@@ -646,7 +647,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	if (((theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp)) then 
+	if (((theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp).and.(Simul_Switch)) then 
 	 	print*,"	Optimal Tax Simulation"
 		CALL SIMULATION(solving_bench)
 	endif
