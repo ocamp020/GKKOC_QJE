@@ -4330,7 +4330,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	print*, 'Averages from simulation'
 	print*, sum(panela)/totpop, sum(panelage)/totpop, sum(panel_return)/totpop, sum(panelhours)/totpop
-	print*, sum(panel_firm_wealth)/totpop 
+	print*, 'Mean Firm Wealth:', 47000/EBAR*sum(panel_firm_wealth)/totpop, 47000/EBAR*sum(Firm_Wealth*DBN1) 
 	print*, 'Number of eligible agents for dynamics', sum(eligible)
 	print*, ' '
 
