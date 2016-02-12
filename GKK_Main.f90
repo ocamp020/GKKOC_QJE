@@ -251,9 +251,6 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL Write_Benchmark_Results(compute_bench)
 	end if 
 
-		print*,"	Computing Firm Value Function"
-		CALL Firm_Value
-
 		print*,"	Computing satitics"
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
