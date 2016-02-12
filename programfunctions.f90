@@ -3507,7 +3507,7 @@ SUBROUTINE  Firm_Value()
 	do ai=1,na 
 	do ei=1,ne 
 	do lambdai=1,nlambda
-		V_Pr(age,ai,zi,:,:) = Pr_mat(ai,zi)
+		V_Pr(age,ai,zi,lambdai,ei) = Pr_mat(ai,zi)
 	enddo 
 	enddo
 	enddo 
@@ -3530,7 +3530,7 @@ SUBROUTINE  Firm_Value()
 		! 	endif
 
 		do age=MaxAge-1,RetAge,-1
-		!$omp parallel do private(lambdai,ei,ai,spline_coeff,V_spline_R,tklo,tkhi,Prob_lo,Prob_hi)
+		! !$omp parallel do private(lambdai,ei,ai,spline_coeff,V_spline_R,tklo,tkhi,Prob_lo,Prob_hi)
 		do ei=1,ne 
 		do lambdai=1,nlambda
 
@@ -3582,7 +3582,7 @@ SUBROUTINE  Firm_Value()
 		! 	endif
 
 		do age=RetAge-1,1,-1
-		!$omp parallel do private(lambdai,ei,ai,sp_coeff_W,V_spline_W,ei_p,tklo,tkhi,Prob_lo,Prob_hi)
+		! !$omp parallel do private(lambdai,ei,ai,sp_coeff_W,V_spline_W,ei_p,tklo,tkhi,Prob_lo,Prob_hi)
 		do lambdai=1,nlambda
 			! do ei_p=1,ne
 			! 	CALL spline( agrid, V_Pr(age+1, :, zi, lambdai, ei_p) , na , dV_low , dV_high , sp_coeff_W(:,ei_p))

@@ -1110,14 +1110,22 @@ print -dpng 1fig_diff_savings_rate_age31.png
         mean_wealth_age(j,2) = mean(panel_PV(ind))  ;
     end
     
+    for j=1:Max_Age
+        ind = (panelage_bench==j)  ;
+        
+        mean_wealth_age_all(j,1) = mean(panel_a(ind))   ;
+        mean_wealth_age_all(j,2) = mean(panel_PV(ind))  ;
+    end
+    
     BB = [ 19+age' mean_wealth_age ];
+    
+    CC = [ 19+(1:Max_Age)' mean_wealth_age_all ];
     
     col_name  = {' ','assets','present_value'};
     row_name  = {'Mean';'Max'};
     col_name1 = {'pcrt','assets','present_value'};
-    col_name2 = {'Age','assets','present_value'};
-    Mat = [col_name;row_name num2cell([mean_w;max_w]);col_name1;num2cell(AA);col_name2;num2cell(BB)]
+    col_name2 = {'Age-Group','assets','present_value'};
+    col_name3 = {'Age','assets','present_value'};
+    Mat = [col_name;row_name num2cell([mean_w;max_w]);col_name1;num2cell(AA);col_name2;num2cell(BB);col_name2;num2cell(CC)]
     status = xlwrite(Tables_file,Mat,'Wealth_Stats') ;
     
-            
-                  
