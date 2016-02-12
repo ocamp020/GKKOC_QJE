@@ -3498,8 +3498,8 @@ SUBROUTINE  Firm_Value()
 
 	!$ call omp_set_num_threads(5)
 
-	K_mat  = K_Matrix(R,P)
-	Pr_mat = Profit_Matrix(R,P)
+	!K_mat  = K_Matrix(R,P)
+	!Pr_mat = Profit_Matrix(R,P)
 
 	! Final period of life
 	age = MaxAge 
