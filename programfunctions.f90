@@ -1909,7 +1909,10 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP) :: S_Rate_Y_Age(max_age_category), S_Rate_Y_AZ(max_age_category,nz), S_Rate_Y_W(3)
 	REAL(DP) :: size_Age(max_age_category), size_AZ(max_age_category,nz), size_W(3)
 	real(DP) :: leverage_age_z(MaxAge,nz), size_by_age_z(MaxAge,nz), constrained_firms_age_z(MaxAge,nz)
+	real(DP) :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
+	integer  :: constrained_firm_ind(MaxAge,na,nz,nlambda,ne), Firm_Output(MaxAge,na,nz,nlambda,ne), Firm_Profit(MaxAge,na,nz,nlambda,ne)
 	real(DP) :: DBN_vec(size(DBN1)), Firm_Wealth_vec(size(DBN1)), CDF_Firm_Wealth(size(DBN1))
+	real(DP) :: FW_top_x(4), FW_top_x_share(4), prctile_FW(4), a, b, c, CCDF_c
 	real(DP) :: FW_prctile(100), FW_above_prctile(100)
 	integer  :: Firm_Wealth_ind(size(DBN1)), i, FW_prctile_ind(100)
 	character(100) :: rowname
@@ -1979,7 +1982,56 @@ SUBROUTINE COMPUTE_STATS()
 	prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
 	prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
 
-	
+
+	! Distribution of firm wealth
+		do ai=1,na
+			Firm_Wealth(:,ai,:,:,:) = V_Pr(:,ai,:,:,:) + (1.0_dp+R)*agrid(ai)
+		enddo
+		Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
+
+		DBN_vec         = reshape(DBN1       ,(/size(DBN1)/))
+		Firm_Wealth_vec = reshape(Firm_Wealth,(/size(DBN1)/))
+
+		if (solving_bench.eq.1) then
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Bench.txt', STATUS='replace')
+		else
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Exp.txt', STATUS='replace')
+		end if 
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'Firm_Wealth _Stats'
+			WRITE(UNIT=11, FMT=*) 'Mean_Firm_Wealth= ', Mean_Firm_Wealth
+			WRITE(UNIT=11, FMT=*) 'Top_x% ','x_percentile ','wealth_share_above_x ', 'Counter_CDF'
+
+		prctile_FW = (/0.20_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+		a = minval(Firm_Wealth_vec)
+		b = maxval(Firm_Wealth_vec) 
+		c = a
+		do i=1,size(prctile_FW)
+			a = c
+			b = maxval(Firm_Wealth_vec)
+			c = (a+b)/2.0_dp
+			CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+			print*, ' '
+			!print*, 'Percentile', prctile_FW(i)
+			do while (abs(CCDF_c-prctile_FW(i))>0.0001_dp)
+				if (CCDF_c<prctile_FW(i)) then 
+					b = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+				else 
+					a = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+				endif
+				!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', CCDF_c-prctile_FW(i)
+			enddo 
+			FW_top_x(i)       = c 
+			FW_top_x_share(i) = 100*sum(Firm_Wealth_vec*DBN_vec,Firm_Wealth_vec>=c)/Mean_Firm_Wealth
+			WRITE(UNIT=11, FMT=*) i,FW_top_x(i),FW_top_x_share(i), CCDF_c
+		enddo 
+
+			CLOSE(UNIT=11)
+
 	! ! Distribution of firm wealth
 	! 	Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
 
@@ -2010,9 +2062,9 @@ SUBROUTINE COMPUTE_STATS()
 	!     enddo
 
 	!     if (solving_bench.eq.1) then
-	! 		OPEN (UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Bench.txt', STATUS='replace')
+	! 		OPEN (UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Bench_sort.txt', STATUS='replace')
 	! 	else
-	! 		OPEN (UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Exp.txt', STATUS='replace')
+	! 		OPEN (UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Exp_sort.txt', STATUS='replace')
 	! 	end if 
 
 	! 		WRITE(UNIT=11, FMT=*) ' '
@@ -2324,16 +2376,22 @@ SUBROUTINE COMPUTE_STATS()
 	leverage_age_z = 0.0_dp 
 	size_by_age_z  = 0.0_dp 
 	constrained_firms_age_z = 0.0_dp
+	constrained_firm_ind = 0
 	do age = 1,MaxAge 
 	do zi  = 1,nz 
         DO lambdai=1,nlambda
         DO ei=1,ne
         DO ai=1,na
+        	size_by_age(age)       = size_by_age(age)       + DBN1(age,ai,zi,lambdai,ei)
 			size_by_age_z(age,zi)  = size_by_age_z(age,zi)  + DBN1(age,ai,zi,lambdai,ei)
 			leverage_age_z(age,zi) = leverage_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei)*K_mat(ai,zi)/agrid(ai)
 			if (K_mat(ai,zi).ge.(theta*agrid(ai))) then 
+				constrained_firms_age(age)      = constrained_firms_age(age)      + DBN1(age,ai,zi,lambdai,ei)
 				constrained_firms_age_z(age,zi) = constrained_firms_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei)
+				constrained_firm_ind(age,ai,zi,lambdai,ei) = 1
 			endif 
+			Firm_Output(age,ai,zi,lambdai,ei) = zgrid(zi)*K_mat/(ai,zi)
+			Firm_Profit(age,ai,zi,lambdai,ei) = Pr_mat(ai,zi)
 		enddo
 		enddo 
 		enddo 
@@ -2341,6 +2399,9 @@ SUBROUTINE COMPUTE_STATS()
 	enddo 
 	leverage_age_z = leverage_age_z/size_by_age_z
 	constrained_firms_age_z = constrained_firms_age_z/size_by_age_z 
+	constrained_firms_age   = constrained_firms_age/size_by_age 
+
+
 
 
 	!print*, 'MeanReturn=',MeanReturn, 'StdReturn=', StdReturn
@@ -2451,13 +2512,33 @@ SUBROUTINE COMPUTE_STATS()
 	CLOSE(Unit=19)
 
 	! Leverage and constrained firms 
-		WRITE(UNIT=20, FMT=*) 'Leverage ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', & 
-							& 'Cons_Firms ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 '
+		WRITE(UNIT=20, FMT=*) 'Leverage ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', 	&
+							& 'Cons_Firm',' ',' ',											&	 
+							& 'Cons_Firms ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', & 
+							& 'Size_AZ ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 '
 		do age=1,MaxAge 
-			WRITE(UNIT=20, FMT=*) age, leverage_age_z(age,:), ' ', age, constrained_firms_age_z(age,:)
+			WRITE(UNIT=20, FMT=*) age, leverage_age_z(age,:), ' ',&
+								& age, constrained_firms_age(age), ' ', age, constrained_firms_age_z(age,:), ' ', &
+								& age, size_by_age_z(age,:)
 		enddo 
 	CLOSE(UNIT=20)
 
+	! Save files of constrained index, output and profits
+	if (solving_bench.eq.1) then
+		OPEN(UNIT=1,  FILE='constrained_ind_bench'  , STATUS='replace')
+		OPEN(UNIT=2,  FILE='firm_output_bench'      , STATUS='replace')
+		OPEN(UNIT=3,  FILE='firm_profit_bench' 	    , STATUS='replace')
+	else 
+		OPEN(UNIT=1,  FILE='constrained_ind_exp'    , STATUS='replace')
+		OPEN(UNIT=2,  FILE='firm_output_exp'        , STATUS='replace')
+		OPEN(UNIT=3,  FILE='firm_profit_exp'  	    , STATUS='replace')
+	endif
+		WRITE(UNIT=1,FMT=*) constrained_firm_ind
+		WRITE(UNIT=2,FMT=*) Firm_Output
+		WRITE(UNIT=3,FMT=*) Firm_Profit
+		CLOSE(UNIT=1)
+		CLOSE(UNIT=2)
+		CLOSE(UNIT=3)
 
 
 END SUBROUTINE COMPUTE_STATS
