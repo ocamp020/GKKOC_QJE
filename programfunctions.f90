@@ -2391,7 +2391,7 @@ SUBROUTINE COMPUTE_STATS()
 				constrained_firms_age_z(age,zi) = constrained_firms_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei)
 				constrained_firm_ind(age,ai,zi,lambdai,ei) = 1
 			endif 
-			Firm_Output(age,ai,zi,lambdai,ei) = zgrid(zi)*K_mat/(ai,zi)
+			Firm_Output(age,ai,zi,lambdai,ei) = zgrid(zi)*K_mat(ai,zi)
 			Firm_Profit(age,ai,zi,lambdai,ei) = Pr_mat(ai,zi)
 		enddo
 		enddo 
