@@ -2526,13 +2526,13 @@ SUBROUTINE COMPUTE_STATS()
 
 	! Save files of constrained index, output and profits
 	if (solving_bench.eq.1) then
-		OPEN(UNIT=1,  FILE='constrained_ind_bench'  , STATUS='replace')
-		OPEN(UNIT=2,  FILE='firm_output_bench'      , STATUS='replace')
-		OPEN(UNIT=3,  FILE='firm_profit_bench' 	    , STATUS='replace')
+		OPEN(UNIT=1,  FILE=trim(Result_Folder)//'constrained_ind_bench'  , STATUS='replace')
+		OPEN(UNIT=2,  FILE=trim(Result_Folder)//'firm_output_bench'      , STATUS='replace')
+		OPEN(UNIT=3,  FILE=trim(Result_Folder)//'firm_profit_bench' 	    , STATUS='replace')
 	else 
-		OPEN(UNIT=1,  FILE='constrained_ind_exp'    , STATUS='replace')
-		OPEN(UNIT=2,  FILE='firm_output_exp'        , STATUS='replace')
-		OPEN(UNIT=3,  FILE='firm_profit_exp'  	    , STATUS='replace')
+		OPEN(UNIT=1,  FILE=trim(Result_Folder)//'constrained_ind_exp'    , STATUS='replace')
+		OPEN(UNIT=2,  FILE=trim(Result_Folder)//'firm_output_exp'        , STATUS='replace')
+		OPEN(UNIT=3,  FILE=trim(Result_Folder)//'firm_profit_exp'  	    , STATUS='replace')
 	endif
 		WRITE(UNIT=1,FMT=*) constrained_firm_ind
 		WRITE(UNIT=2,FMT=*) Firm_Output
