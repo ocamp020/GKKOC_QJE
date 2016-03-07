@@ -43,7 +43,7 @@ PROGRAM main
 		character(100) :: folder_aux
 
 	! Capital Market
-		theta = 1.00_dp
+		theta = 2.50_dp
 	! Threshold 
 		Threshold_Factor = 4.00_dp 
 
