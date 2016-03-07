@@ -54,7 +54,7 @@ PROGRAM main
 			compute_bench = .true.
 			compute_exp   = .false.
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Simul_Switch  = .false.
 
 
