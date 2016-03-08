@@ -43,7 +43,7 @@ PROGRAM main
 		character(100) :: folder_aux
 
 	! Capital Market
-		theta = 2.50_dp
+		theta = 1.00_dp
 	! Threshold 
 		Threshold_Factor = 4.00_dp 
 
@@ -587,7 +587,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		! call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.001_dp,Opt_TauW+0.001_dp)
 
 		tauW_at = 0.025_dp
-		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,0.02_dp,0.035_dp)
+		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,0.023_dp,0.028_dp)
 
 		tauW_at = OPT_tauW
 		OPT_psi = psi
