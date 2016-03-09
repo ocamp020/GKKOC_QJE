@@ -1053,6 +1053,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    WRITE  (UNIT=50, FMT=*) 'Av Utility NB (exp  ) =',sum(ValueFunction_exp(1,:,:,:,:)*DBN1(1,:,:,:,:))    
 		    WRITE  (UNIT=50, FMT=*) 'Av Utility  (bench)   =',sum(ValueFunction_Bench(:,:,:,:,:)*DBN_bench(:,:,:,:,:))  
 		    WRITE  (UNIT=50, FMT=*) 'Av Utility  (exp)     =',sum(ValueFunction_exp(:,:,:,:,:)*DBN1(:,:,:,:,:))
+		    print*,' '
+		    print*, 'Av Utility NB (bench) =',sum(ValueFunction_Bench(1,:,:,:,:)*DBN_bench(1,:,:,:,:))  
+		    print*, 'Av Utility NB (exp  ) =',sum(ValueFunction_exp(1,:,:,:,:)*DBN1(1,:,:,:,:))    
 		close (unit=50)		
 
 

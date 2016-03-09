@@ -51,8 +51,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
-			compute_exp   = .true.
+			compute_bench = .false.
+			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Simul_Switch  = .false.
@@ -150,6 +150,7 @@ PROGRAM main
 		print*, "NSU_Switch=",NSU_Switch,'sigma=',sigma,'gamma=',gamma,'phi',phi
 		print*,'Labor Taxes: tauPl=',tauPl,'psi',psi
 		print*, 'Borrowing Constraint: Theta=',theta
+		print*,'m tauchen for zgrid is ',mtauchen_z,'nz=',nz, 'amax=',amax, 'totpop=', totpop
 
 
 	! Set parameters to be used in all simulations economy
