@@ -1794,7 +1794,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 
 	    	! Solve for new R 
-	    	R = zbrent(Agg_Debt,0.0_dp,0.50_dp,brent_tol) 
+	    	R = zbrent(Agg_Debt,-0.1_dp,0.50_dp,brent_tol) 
 
 	    	!!
 	    	print*, 'DBN_diff=', DBN_dist, "Agg_Debt", Agg_Debt(R), 'R=',R,'P=',P
