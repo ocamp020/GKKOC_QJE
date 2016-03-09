@@ -3241,7 +3241,7 @@ SUBROUTINE  INITIALIZE()
 	INTEGER, DIMENSION(RetAge) :: agevec
 	
 	! Initiliaze grids for z, lamda and e	
-		CALL tauchen(mtauchen,rho_z,sigma_z_eps,nz,zgrid,pr_z,Gz)
+		CALL tauchen(mtauchen_z,rho_z,sigma_z_eps,nz,zgrid,pr_z,Gz)
 		CALL tauchen(mtauchen,rho_E,sigma_e_eps,ne,egrid,pr_e,Ge)
 		CALL tauchen(mtauchen,rho_lambda,sigma_lambda_eps,nlambda,lambdagrid,pr_lambda,Glambda)
 
