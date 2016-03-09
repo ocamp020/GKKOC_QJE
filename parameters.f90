@@ -64,7 +64,7 @@ MODULE parameters
 
 	! Parameters for external functions and procedures
 		! Number of std std away from mean in tauchen
-		REAL(DP), PARAMETER  :: mtauchen=3.0_DP
+		REAL(DP), PARAMETER  :: mtauchen=3.0_DP, mtauchen_z=5.0_dp
 		! Tolerance for brent algorithm
 		REAL(DP), PARAMETER  :: brent_tol=0.00000001_DP
 
