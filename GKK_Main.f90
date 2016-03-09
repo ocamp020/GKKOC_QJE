@@ -43,17 +43,17 @@ PROGRAM main
 		character(100) :: folder_aux
 
 	! Capital Market
-		theta = 1.00_dp
+		theta = 1.50_dp
 	! Threshold 
-		Threshold_Factor = 4.00_dp 
+		Threshold_Factor = 0.00_dp 
 
 	! Switch for solving benchmark or just reading resutls
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
-			compute_bench = .false.
-			compute_exp   = .false.
-		Opt_Tax       = .true.
+		Tax_Reform    = .true.
+			compute_bench = .true.
+			compute_exp   = .true.
+		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Simul_Switch  = .false.
 
@@ -81,6 +81,8 @@ PROGRAM main
 			Params= [0.945_dp, 0.00_dp, 0.50_dp, 0.7889_dp, 0.34_dp, 0.4494_dp] ! mu=0.85 calibration, targetting 0.34, 0.69, vartheta1.5 
 			else 
 			Params= [0.9412_dp, 0.0_dp, 0.50_dp, 0.640_dp, 0.34_dp, 0.4494_dp] ! mu=0.9 calibration, targetting 0.34, 0.69, vartheta1.5
+			Params =[0.9620_dp, 0.0_dp, 0.50_dp, 0.387_dp, 0.29_dp, 0.4494_dp] ! alpha=0.4, zgrid 11, m5, alpha=0.4, dep005, mu=090, K/Y=3, Top1PVa=0.36
+
 			endif 
 		else if (theta.eq.1.60_dp) then 
 			Params= [0.9409_dp, 0.0_dp, 0.50_dp, 0.640_dp, 0.34_dp, 0.4494_dp] ! mu=0.9 calibration, targetting 0.34, 0.69, vartheta1.6
@@ -113,8 +115,8 @@ PROGRAM main
 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
 		tauWmin_bt=0.00_DP
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
-		tauWmin_at=0.014_DP
-		tauWinc_at=0.002_DP ! Minimum tax above threshold and increments
+		tauWmin_at=0.010_DP
+		tauWinc_at=0.005_DP ! Minimum tax above threshold and increments
 	! Consumption tax
 		tauC=0.075_DP
 	! Set Labor Tax Regime
@@ -428,10 +430,10 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp).and.(Simul_Switch)) then 
-	 	print*,"	Experiment Simulation"
-		CALL SIMULATION(solving_bench)
-	endif
+	! if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp).and.(Simul_Switch)) then 
+	!  	print*,"	Experiment Simulation"
+	! 	CALL SIMULATION(solving_bench)
+	! endif
 
 
 	print*,'---------------------------'
@@ -650,10 +652,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	if (((theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp).and.(Simul_Switch)) then 
-	 	print*,"	Optimal Tax Simulation"
-		CALL SIMULATION(solving_bench)
-	endif
+	! if (((theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp).and.(Simul_Switch)) then 
+	!  	print*,"	Optimal Tax Simulation"
+	! 	CALL SIMULATION(solving_bench)
+	! endif
 
 end Subroutine Solve_Opt_Tax
 
