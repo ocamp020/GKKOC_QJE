@@ -1591,7 +1591,7 @@ SUBROUTINE FIND_DBN_EQ()
 	IMPLICIT NONE
 	INTEGER:: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx
 	REAL   :: DBN_dist, DBN_criteria
-	real(dp)   ::BBAR, MeanWealth
+	real(dp)   ::BBAR, MeanWealth, brent_value
 	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: PrAprimelo, PrAprimehi, DBN2
 	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne) :: Aplo, Aphi
 
@@ -1802,7 +1802,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        endif
 
 	    	!!
-	    	print*, 'DBN_diff=', DBN_dist, "Agg_Debt", Agg_Debt(R), 'R=',R,'P=',P
+	    	print*, 'DBN_diff=', DBN_dist, "Agg_Debt", Agg_Debt(R)**0.5_dp, 'R=',R,'P=',P
 	    	!!
 
 	    	! Solve the model at current aggregate values
