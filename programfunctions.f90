@@ -1920,10 +1920,6 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
 	integer  :: constrained_firm_ind(MaxAge,na,nz,nlambda,ne)
 	real(DP) :: Firm_Output(MaxAge,na,nz,nlambda,ne), Firm_Profit(MaxAge,na,nz,nlambda,ne)
-	real(DP) :: DBN_vec(size(DBN1)), Firm_Wealth_vec(size(DBN1)), CDF_Firm_Wealth(size(DBN1))
-	real(DP) :: FW_top_x(4), FW_top_x_share(4), prctile_FW(4), a, b, c, CCDF_c
-	real(DP) :: FW_prctile(100), FW_above_prctile(100)
-	integer  :: Firm_Wealth_ind(size(DBN1)), i, FW_prctile_ind(100)
 	real(DP), dimension(size(DBN1)) :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq
 	real(DP) :: FW_top_x(4),  prctile_FW(4), prctile_bq(7), a, b, c, CCDF_c
 	real(DP) :: DBN_bq(MaxAge,na,nz,nlambda,ne)
