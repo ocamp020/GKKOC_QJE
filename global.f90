@@ -130,7 +130,7 @@ MODULE global
 	    REAL(DP), DIMENSION(nz) :: MeanReturn_by_z(nz), size_by_z(nz), Wealth_by_z(nz)
 	    REAL(DP) :: prct1_wealth, prct10_wealth, prct20_wealth, prct40_wealth
 	    REAL(DP) :: SSE_Moments, Min_SSE_Moments
-	    REAL(DP) :: Bequest_Wealth, MeanCons, External_Debt_GDP
+	    REAL(DP) :: MeanCons, External_Debt_GDP
 	    REAL(DP) :: Mean_Firm_Wealth, Firm_Wealth_by_z
 	    ! Welfare measures
 	    REAL(DP) :: Welfare_Gain_Pop_bench, Welfare_Gain_Pop_exp, Welfare_Gain_NB_bench, Welfare_Gain_NB_exp

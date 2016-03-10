@@ -2111,19 +2111,6 @@ SUBROUTINE COMPUTE_STATS()
 	Std_K_Return    = Var_K_Return**0.5_DP
 
 
-    ! Bequest Wealth
-    Bequest_Wealth=0.0_DP
-	DO zi=1,nz
-	DO ai=1,na
-	DO lambdai=1,nlambda
-	DO ei=1, ne
-	     Bequest_Wealth = Bequest_Wealth  +   DBN1(1, ai, zi, lambdai, ei) * agrid(ai)         
-	ENDDO
-	ENDDO
-	ENDDO    
-	ENDDO  
-	Bequest_Wealth =Bequest_Wealth/MeanWealth
-
     ! Debt to GDP Ratio
     External_Debt_GDP = 0.0_DP
 	DO zi=1,nz
@@ -4482,7 +4469,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) "Debt_Output"		  		, External_Debt_GDP
 			WRITE(UNIT=19, FMT=*) "Wealth_Output"		  	, Wealth_Output
 			WRITE(UNIT=19, FMT=*) "Mean_Assets"				, MeanWealth
-			WRITE(UNIT=19, FMT=*) "Bequest_Wealth/Wealth"	, Bequest_Wealth
+			WRITE(UNIT=19, FMT=*) "Bequest_Wealth"	        , Bequest_Wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_1%' 	, prct1_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_10%'	, prct10_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_20%'	, prct20_wealth
