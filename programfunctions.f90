@@ -1497,9 +1497,9 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
 		ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age,ai,zi,lambdai,ei),Hours(age,ai,zi,lambdai,ei))  &
 		   & + beta*survP(age)* sum( ( PrAprimelo(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tklo, zi, lambdai,:)  &
 		   & + PrAprimehi(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tkhi, zi, lambdai,:)) * pr_e(ei,:) )
-		if ( ValueFunction(age, ai, zi, lambdai, ei) .lt. (-100.0_DP) ) then
-		   print*,'ValueFunction(age, ai, zi, lambdai, ei)=',ValueFunction(age, ai, zi, lambdai, ei)
-		endif
+		! if ( ValueFunction(age, ai, zi, lambdai, ei) .lt. (-100.0_DP) ) then
+		!    print*,'ValueFunction(age, ai, zi, lambdai, ei)=',ValueFunction(age, ai, zi, lambdai, ei)
+		! endif
 	ENDDO ! ei          
     ENDDO ! lambdai
     ENDDO ! zi
