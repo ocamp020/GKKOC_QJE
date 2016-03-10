@@ -641,7 +641,7 @@ end
     G_K_Frac_w = Stats_by_tau_w(:,4) ;
     
 
-% Aggregate variabls as a function of capital/wealth tax revenue
+% Aggregate variabls as a function of Borrowing/wealth tax revenue
     clf
     hold on
     plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,5)/Stats_by_tau_k(1,5)-1),'r')
@@ -1129,3 +1129,438 @@ print -dpng 1fig_diff_savings_rate_age31.png
     Mat = [col_name;row_name num2cell([mean_w;max_w]);col_name1;num2cell(AA);col_name2;num2cell(BB);col_name2;num2cell(CC)]
     status = xlwrite(Tables_file,Mat,'Wealth_Stats') ;
     
+%% Constrained firms
+    % Grids    
+        % A grid
+        eval(['load ',Result_Folder,'agrid']);
+        A_mat = repmat(agrid,[Max_Age,1,n_z,n_l,n_e]);
+
+        % Z grid
+        eval(['load ',Result_Folder,'zgrid']);
+        Z_mat = repmat(reshape(zgrid,[1,1,n_z,1,1]),[Max_Age,n_a,1,n_l,n_e]);
+
+    % Distribution
+    eval(['load ',Bench_Folder,'DBN'])
+    DBN_bench = reshape(DBN,[Max_Age,n_a,n_z,n_l,n_e]) ;
+    clear DBN
+
+    eval(['load ',Result_Folder,'Exp_Files/Exp_results_DBN']) ;
+    DBN_exp = reshape(Exp_results_DBN,[Max_Age,n_a,n_z,n_l,n_e]) ;
+    clear Exp_results_DBN
+    
+    % Constrained Firms output and profits
+    eval(['load ',Result_Folder,'Exp_Files/constrained_ind_bench']) ;
+    constrained_ind_bench = reshape(constrained_ind_bench,[Max_Age,n_a,n_z,n_l,n_e]) ;
+    
+    eval(['load ',Result_Folder,'Exp_Files/constrained_ind_exp']) ;
+    constrained_ind_exp = reshape(constrained_ind_exp,[Max_Age,n_a,n_z,n_l,n_e]) ;
+    
+    eval(['load ',Result_Folder,'Exp_Files/firm_output_bench']) ;
+    firm_output_bench = reshape(firm_output_bench,[Max_Age,n_a,n_z,n_l,n_e]) ;
+    
+    eval(['load ',Result_Folder,'Exp_Files/firm_output_exp']) ;
+    firm_output_exp = reshape(firm_output_exp,[Max_Age,n_a,n_z,n_l,n_e]) ;
+    
+    eval(['load ',Result_Folder,'Exp_Files/firm_profit_bench']) ;
+    firm_profit_bench = reshape(firm_profit_bench,[Max_Age,n_a,n_z,n_l,n_e]) ;
+    
+    eval(['load ',Result_Folder,'Exp_Files/firm_profit_exp']) ;
+    firm_profit_exp = reshape(firm_profit_exp,[Max_Age,n_a,n_z,n_l,n_e]) ;
+    
+    Capital_bench   = firm_output_bench./Z_mat ;
+    Capital_exp     = firm_output_exp./Z_mat   ;
+    
+    Borrowing_bench = Capital_bench - A_mat    ;
+    Borrowing_exp   = Capital_exp   - A_mat    ;
+    
+    
+    % Aggregate measures
+    Constrained_firms_tot(1) = sum(sum(sum(sum(sum(constrained_ind_bench.*DBN_bench)))));
+    Constrained_firms_tot(2) = sum(sum(sum(sum(sum(constrained_ind_exp.*DBN_exp)))))    ;
+    Capital_tot(1)           = sum(sum(sum(sum(sum(Capital_bench.*DBN_bench)))))        ;
+    Capital_tot(2)           = sum(sum(sum(sum(sum(Capital_exp.*DBN_exp)))))            ;
+    Borrowing_tot(1)         = sum(sum(sum(sum(sum(Borrowing_bench.*DBN_bench)))))      ;
+    Borrowing_tot(2)         = sum(sum(sum(sum(sum(Borrowing_exp.*DBN_exp)))))          ;
+    Assets_tot(1)            = sum(sum(sum(sum(sum(A_mat.*DBN_bench)))))                ;
+    Assets_tot(2)            = sum(sum(sum(sum(sum(A_mat.*DBN_exp)))))                  ;
+    for age = 1:Max_Age
+        Constrained_firms_age(age,1) = sum(sum(sum(sum(constrained_ind_bench(age,:,:,:,:).*DBN_bench(age,:,:,:,:)))))/sum(sum(sum(sum(DBN_bench(age,:,:,:,:)))));
+        Constrained_firms_age(age,2) = sum(sum(sum(sum(constrained_ind_exp(age,:,:,:,:).*DBN_exp(age,:,:,:,:)))))/sum(sum(sum(sum(DBN_exp(age,:,:,:,:)))));
+        Capital_age(age,1)           = sum(sum(sum(sum(Capital_bench(age,:,:,:,:).*DBN_bench(age,:,:,:,:)))))/sum(sum(sum(sum(DBN_bench(age,:,:,:,:)))));
+        Capital_age(age,2)           = sum(sum(sum(sum(Capital_exp(age,:,:,:,:).*DBN_exp(age,:,:,:,:)))))/sum(sum(sum(sum(DBN_exp(age,:,:,:,:)))));
+        Borrowing_age(age,1)         = sum(sum(sum(sum(Borrowing_bench(age,:,:,:,:).*DBN_bench(age,:,:,:,:)))))/sum(sum(sum(sum(DBN_bench(age,:,:,:,:)))));
+        Borrowing_age(age,2)         = sum(sum(sum(sum(Borrowing_exp(age,:,:,:,:).*DBN_exp(age,:,:,:,:)))))/sum(sum(sum(sum(DBN_exp(age,:,:,:,:)))));
+        for z = 1:n_z
+            Constrained_firms_AZ(age,z,1) = sum(sum(sum(constrained_ind_bench(age,:,z,:,:).*DBN_bench(age,:,z,:,:))))/sum(sum(sum(DBN_bench(age,:,z,:,:))));
+            Constrained_firms_AZ(age,z,2) = sum(sum(sum(constrained_ind_exp(age,:,z,:,:).*DBN_exp(age,:,z,:,:))))/sum(sum(sum(DBN_exp(age,:,z,:,:))));
+            Capital_AZ(age,z,1)           = sum(sum(sum(Capital_bench(age,:,z,:,:).*DBN_bench(age,:,z,:,:))))/sum(sum(sum(DBN_bench(age,:,z,:,:))));
+            Capital_AZ(age,z,2)           = sum(sum(sum(Capital_exp(age,:,z,:,:).*DBN_exp(age,:,z,:,:))))/sum(sum(sum(DBN_exp(age,:,z,:,:))));
+            Borrowing_AZ(age,z,1)         = sum(sum(sum(Borrowing_bench(age,:,z,:,:).*DBN_bench(age,:,z,:,:))))/sum(sum(sum(DBN_bench(age,:,z,:,:))));
+            Borrowing_AZ(age,z,2)         = sum(sum(sum(Borrowing_exp(age,:,z,:,:).*DBN_exp(age,:,z,:,:))))/sum(sum(sum(DBN_exp(age,:,z,:,:))));
+        end 
+    end 
+    
+    
+    for age=1:7
+        DBN_bench_aux       = DBN_bench(age_limit(age)+1:age_limit(age+1),:,:,:,:)             ;
+        DBN_exp_aux         = DBN_exp(age_limit(age)+1:age_limit(age+1),:,:,:,:)               ;
+        cons_ind_bench_aux  = constrained_ind_bench(age_limit(age)+1:age_limit(age+1),:,:,:,:) ;
+        cons_ind_exp_aux    = constrained_ind_exp(age_limit(age)+1:age_limit(age+1),:,:,:,:)   ;
+        Capital_bench_aux   = Capital_bench(age_limit(age)+1:age_limit(age+1),:,:,:,:)         ;
+        Capital_exp_aux     = Capital_exp(age_limit(age)+1:age_limit(age+1),:,:,:,:)           ;
+        Borrowing_bench_aux = Borrowing_bench(age_limit(age)+1:age_limit(age+1),:,:,:,:)       ;
+        Borrowing_exp_aux   = Borrowing_exp(age_limit(age)+1:age_limit(age+1),:,:,:,:)         ;
+        Assets_bench_aux    = A_mat(age_limit(age)+1:age_limit(age+1),:,:,:,:)                 ;
+        Assets_exp_aux      = A_mat(age_limit(age)+1:age_limit(age+1),:,:,:,:)                 ;
+        size_bench          = 100*sum(sum(sum(sum(sum(sum( DBN_bench_aux )))))) ;
+        size_exp            = 100*sum(sum(sum(sum(sum(sum( DBN_exp_aux ))))))   ;
+         
+        Constrained_firms_A_group(age,1) = sum(sum(sum(sum(sum(cons_ind_bench_aux.*DBN_bench_aux)))))/size_bench ;
+        Constrained_firms_A_group(age,2) = sum(sum(sum(sum(sum(cons_ind_exp_aux.*DBN_exp_aux)))))/size_exp       ;
+        Capital_A_group(age,1)           = sum(sum(sum(sum(sum(Capital_bench_aux.*DBN_bench_aux)))))/size_bench  ;
+        Capital_A_group(age,2)           = sum(sum(sum(sum(sum(Capital_exp_aux.*DBN_exp_aux)))))/size_exp        ;
+        Borrowing_A_group(age,1)         = sum(sum(sum(sum(sum(Borrowing_bench_aux.*DBN_bench_aux)))))/size_bench;
+        Borrowing_A_group(age,2)         = sum(sum(sum(sum(sum(Borrowing_exp_aux.*DBN_exp_aux)))))/size_exp      ;
+        Assets_A_group(age,1)            = sum(sum(sum(sum(sum(Assets_bench_aux.*DBN_bench_aux)))))/size_bench   ;
+        Assets_A_group(age,2)            = sum(sum(sum(sum(sum(Assets_exp_aux.*DBN_exp_aux)))))/size_exp         ;
+        A_share_A_group(age,1)           = 100*sum(sum(sum(sum(sum(Assets_exp_aux.*DBN_bench_aux)))))/Assets_tot(1)  ;
+        A_share_A_group(age,2)           = 100*sum(sum(sum(sum(sum(Assets_exp_aux.*DBN_exp_aux)))))/Assets_tot(2)    ;
+        size_A_group(age,1)              = 100*size_bench                                                            ;
+        size_A_group(age,2)              = 100*size_exp                                                              ;
+        for z=1:n_z
+            DBN_bench_aux       = DBN_bench(age_limit(age)+1:age_limit(age+1),:,z,:,:)             ;
+            DBN_exp_aux         = DBN_exp(age_limit(age)+1:age_limit(age+1),:,z,:,:)               ;
+            cons_ind_bench_aux  = constrained_ind_bench(age_limit(age)+1:age_limit(age+1),:,z,:,:) ;
+            cons_ind_exp_aux    = constrained_ind_exp(age_limit(age)+1:age_limit(age+1),:,z,:,:)   ;
+            Capital_bench_aux   = Capital_bench(age_limit(age)+1:age_limit(age+1),:,z,:,:)         ;
+            Capital_exp_aux     = Capital_exp(age_limit(age)+1:age_limit(age+1),:,z,:,:)           ;
+            Borrowing_bench_aux = Borrowing_bench(age_limit(age)+1:age_limit(age+1),:,z,:,:)       ;
+            Borrowing_exp_aux   = Borrowing_exp(age_limit(age)+1:age_limit(age+1),:,z,:,:)         ;
+            Assets_bench_aux    = A_mat(age_limit(age)+1:age_limit(age+1),:,z,:,:)                 ;
+            Assets_exp_aux      = A_mat(age_limit(age)+1:age_limit(age+1),:,z,:,:)                 ;
+            size_bench          = sum(sum(sum(sum(sum( DBN_bench_aux ))))) ;
+            size_exp            = sum(sum(sum(sum(sum( DBN_exp_aux )))))   ;
+
+            Constrained_firms_AZ_group(age,z,1) = sum(sum(sum(sum(cons_ind_bench_aux.*DBN_bench_aux))))/size_bench  ;
+            Constrained_firms_AZ_group(age,z,2) = sum(sum(sum(sum(cons_ind_exp_aux.*DBN_exp_aux))))/size_exp        ;
+            Capital_AZ_group(age,z,1)           = sum(sum(sum(sum(Capital_bench_aux.*DBN_bench_aux))))/size_bench   ;
+            Capital_AZ_group(age,z,2)           = sum(sum(sum(sum(Capital_exp_aux.*DBN_exp_aux))))/size_exp         ;
+            Borrowing_AZ_group(age,z,1)         = sum(sum(sum(sum(Borrowing_bench_aux.*DBN_bench_aux))))/size_bench ;
+            Borrowing_AZ_group(age,z,2)         = sum(sum(sum(sum(Borrowing_exp_aux.*DBN_exp_aux))))/size_exp       ;
+            Assets_AZ_group(age,z,1)            = sum(sum(sum(sum(Assets_bench_aux.*DBN_bench_aux))))/size_bench    ;
+            Assets_AZ_group(age,z,2)            = sum(sum(sum(sum(Assets_exp_aux.*DBN_exp_aux))))/size_exp          ;
+            A_share_AZ_group(age,z,1)           = 100*sum(sum(sum(sum(Assets_exp_aux.*DBN_bench_aux))))/Assets_tot(1)   ;
+            A_share_AZ_group(age,z,2)           = 100*sum(sum(sum(sum(Assets_exp_aux.*DBN_exp_aux))))/Assets_tot(2)     ;
+            size_AZ_group(age,z,1)              = 100*size_bench                                                        ;
+            size_AZ_group(age,z,2)              = 100*size_exp                                                          ;
+            
+            % Wealth Shares by Z
+            size_Z(z,1)    = 100*sum(sum(sum(sum(DBN_bench(:,:,z,:,:))))) ;
+            size_Z(z,2)    = 100*sum(sum(sum(sum(DBN_exp(:,:,z,:,:)))))   ;
+            A_share_Z(z,1) = 100*sum(sum(sum(sum(A_mat(:,:,z,:,:).*DBN_bench(:,:,z,:,:)))))/Assets_tot(1) ;
+            A_share_Z(z,2) = 100*sum(sum(sum(sum(A_mat(:,:,z,:,:).*DBN_exp(:,:,z,:,:)))))/Assets_tot(2)   ;
+        end 
+    end
+
+    
+    
+    % Firms that were constrained and now are not
+    ind  = (constrained_ind_bench==1)&(constrained_ind_exp==0) ;
+    size = sum(sum(sum(sum(sum(ind.*DBN_bench)))));
+    output_ba(1)    = sum(sum(sum(sum(sum(firm_output_bench.*ind.*DBN_bench)))))/size ;
+    output_ba(2)    = sum(sum(sum(sum(sum(firm_output_exp.*ind.*DBN_bench)))))/size   ;
+    profit_ba(1)    = sum(sum(sum(sum(sum(firm_profit_bench.*ind.*DBN_bench)))))/size ;
+    profit_ba(2)    = sum(sum(sum(sum(sum(firm_profit_exp.*ind.*DBN_bench)))))/size   ;
+    Capital_ba(1)   = sum(sum(sum(sum(sum(Capital_bench.*ind.*DBN_bench)))))/size ;
+    Capital_ba(2)   = sum(sum(sum(sum(sum(Capital_exp.*ind.*DBN_bench)))))/size   ;
+    Borrowing_ba(1) = sum(sum(sum(sum(sum(Borrowing_bench.*ind.*DBN_bench)))))/size ;
+    Borrowing_ba(2) = sum(sum(sum(sum(sum(Borrowing_exp.*ind.*DBN_bench)))))/size   ;
+              
+    for age = 1:Max_Age
+        size = sum(sum(sum(sum(ind(age,:,:,:,:).*DBN_bench(age,:,:,:,:))))) ;
+        output_ba_age(age,1) = sum(sum(sum(sum(sum(firm_output_bench(age,:,:,:,:).*ind(age,:,:,:,:).*DBN_bench(age,:,:,:,:))))))/size ;
+        output_ba_age(age,2) = sum(sum(sum(sum(sum(firm_output_exp(age,:,:,:,:).*ind(age,:,:,:,:).*DBN_bench(age,:,:,:,:))))))/size ;
+        profit_ba_age(age,1) = sum(sum(sum(sum(sum(firm_profit_bench(age,:,:,:,:).*ind(age,:,:,:,:).*DBN_bench(age,:,:,:,:))))))/size ;
+        profit_ba_age(age,2) = sum(sum(sum(sum(sum(firm_profit_exp(age,:,:,:,:).*ind(age,:,:,:,:).*DBN_bench(age,:,:,:,:))))))/size ;
+        for z = 1:n_z
+            size = sum(sum(sum(ind(age,:,z,:,:).*DBN_bench(age,:,z,:,:)))) ;
+            output_ba_AZ(age,z,1) = sum(sum(sum(sum(firm_output_bench(age,:,z,:,:).*ind(age,:,z,:,:).*DBN_bench(age,:,z,:,:)))))/size ;
+            output_ba_AZ(age,z,2) = sum(sum(sum(sum(firm_output_exp(age,:,z,:,:).*ind(age,:,z,:,:).*DBN_bench(age,:,z,:,:)))))/size   ;
+            profit_ba_AZ(age,z,1) = sum(sum(sum(sum(firm_profit_bench(age,:,z,:,:).*ind(age,:,z,:,:).*DBN_bench(age,:,z,:,:)))))/size ;
+            profit_ba_AZ(age,z,2) = sum(sum(sum(sum(firm_profit_exp(age,:,z,:,:).*ind(age,:,z,:,:).*DBN_bench(age,:,z,:,:)))))/size   ;
+        end 
+    end 
+
+    for age=1:7
+        ind_aux             = ind(age_limit(age)+1:age_limit(age+1),:,:,:,:)                   ;
+        DBN_bench_aux       = DBN_bench(age_limit(age)+1:age_limit(age+1),:,:,:,:)             ;
+        DBN_exp_aux         = DBN_exp(age_limit(age)+1:age_limit(age+1),:,:,:,:)               ;
+        profit_bench_aux    = firm_profit_bench(age_limit(age)+1:age_limit(age+1),:,:,:,:)     ;
+        profit_exp_aux      = firm_profit_exp(age_limit(age)+1:age_limit(age+1),:,:,:,:)       ;
+        output_bench_aux    = firm_output_bench(age_limit(age)+1:age_limit(age+1),:,:,:,:)     ;
+        output_exp_aux      = firm_output_exp(age_limit(age)+1:age_limit(age+1),:,:,:,:)       ;
+        Capital_bench_aux   = Capital_bench(age_limit(age)+1:age_limit(age+1),:,:,:,:)         ;
+        Capital_exp_aux     = Capital_exp(age_limit(age)+1:age_limit(age+1),:,:,:,:)           ;
+        Borrowing_bench_aux = Borrowing_bench(age_limit(age)+1:age_limit(age+1),:,:,:,:)       ;
+        Borrowing_exp_aux   = Borrowing_exp(age_limit(age)+1:age_limit(age+1),:,:,:,:)         ;
+        size_bench          = sum(sum(sum(sum(sum(sum( ind_aux.*DBN_bench_aux )))))) ;
+        size_exp            = sum(sum(sum(sum(sum(sum( ind_aux.*DBN_exp_aux ))))))   ;
+        
+        output_A_group(age,1)    = sum(sum(sum(sum(sum(sum(output_bench_aux.*ind_aux.*DBN_bench_aux))))))/size_bench ;
+        output_A_group(age,2)    = sum(sum(sum(sum(sum(sum(output_exp_aux.*ind_aux.*DBN_bench_aux))))))/size_exp     ;
+        profit_A_group(age,1)    = sum(sum(sum(sum(sum(sum(profit_bench_aux.*ind_aux.*DBN_bench_aux))))))/size_bench ;
+        profit_A_group(age,2)    = sum(sum(sum(sum(sum(sum(profit_exp_aux.*ind_aux.*DBN_bench_aux))))))/size_exp     ;
+        Capital_ba_A_group(age,1)   = sum(sum(sum(sum(sum(sum(Capital_bench_aux.*ind_aux.*DBN_bench_aux))))))/size_bench ;
+        Capital_ba_A_group(age,2)   = sum(sum(sum(sum(sum(sum(Capital_exp_aux.*ind_aux.*DBN_bench_aux))))))/size_exp     ;
+        Borrowing_ba_A_group(age,1) = sum(sum(sum(sum(sum(sum(Borrowing_bench_aux.*ind_aux.*DBN_bench_aux))))))/size_bench ;
+        Borrowing_ba_A_group(age,2) = sum(sum(sum(sum(sum(sum(Borrowing_exp_aux.*ind_aux.*DBN_bench_aux))))))/size_exp     ;
+        
+        for z=1:n_z
+            ind_aux            = ind(age_limit(age)+1:age_limit(age+1),:,z,:,:)                   ;
+            DBN_bench_aux      = DBN_bench(age_limit(age)+1:age_limit(age+1),:,z,:,:)             ;
+            DBN_exp_aux        = DBN_exp(age_limit(age)+1:age_limit(age+1),:,z,:,:)               ;
+            profit_bench_aux   = firm_profit_bench(age_limit(age)+1:age_limit(age+1),:,z,:,:)     ;
+            profit_exp_aux     = firm_profit_exp(age_limit(age)+1:age_limit(age+1),:,z,:,:)       ;
+            output_bench_aux   = firm_output_bench(age_limit(age)+1:age_limit(age+1),:,z,:,:)     ;
+            output_exp_aux     = firm_output_exp(age_limit(age)+1:age_limit(age+1),:,z,:,:)       ;
+            Capital_bench_aux  = Capital_bench(age_limit(age)+1:age_limit(age+1),:,z,:,:)         ;
+            Capital_exp_aux    = Capital_exp(age_limit(age)+1:age_limit(age+1),:,z,:,:)           ;
+            Borrowing_bench_aux  = Borrowing_bench(age_limit(age)+1:age_limit(age+1),:,z,:,:)     ;
+            Borrowing_exp_aux    = Borrowing_exp(age_limit(age)+1:age_limit(age+1),:,z,:,:)       ;
+            size_bench           = sum(sum(sum(sum(sum(sum( ind_aux.*DBN_bench_aux )))))) ;
+            size_exp             = sum(sum(sum(sum(sum(sum( ind_aux.*DBN_exp_aux ))))))   ;
+
+            output_AZ_group(age,z,1) = sum(sum(sum(sum(sum(output_bench_aux.*ind_aux.*DBN_bench_aux)))))/size_bench ;
+            output_AZ_group(age,z,2) = sum(sum(sum(sum(sum(output_exp_aux.*ind_aux.*DBN_bench_aux)))))/size_exp     ;
+            profit_AZ_group(age,z,1) = sum(sum(sum(sum(sum(profit_bench_aux.*ind_aux.*DBN_bench_aux)))))/size_bench ;
+            profit_AZ_group(age,z,2) = sum(sum(sum(sum(sum(profit_exp_aux.*ind_aux.*DBN_bench_aux)))))/size_exp     ;
+            Capital_ba_AZ_group(age,z,1) = sum(sum(sum(sum(sum(Capital_bench_aux.*ind_aux.*DBN_bench_aux)))))/size_bench ;
+            Capital_ba_AZ_group(age,z,2) = sum(sum(sum(sum(sum(Capital_exp_aux.*ind_aux.*DBN_bench_aux)))))/size_exp     ;
+            Borrowing_ba_AZ_group(age,z,1) = sum(sum(sum(sum(sum(Borrowing_bench_aux.*ind_aux.*DBN_bench_aux)))))/size_bench ;
+            Borrowing_ba_AZ_group(age,z,2) = sum(sum(sum(sum(sum(Borrowing_exp_aux.*ind_aux.*DBN_bench_aux)))))/size_exp     ;
+        end
+    end
+
+    
+    % Excel file
+        Blank = {' ',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        % Constrained firms
+        Mat_bench   = [Constrained_firms_A_group(:,1) Constrained_firms_AZ_group(:,:,1)] ;
+        Mat_exp     = [Constrained_firms_A_group(:,2) Constrained_firms_AZ_group(:,:,2)] ;
+        bench_title = {'Capital_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        bench_end   = [{'Average over all population'},num2cell(Constrained_firms_tot(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        exp_title   = {'Wealth_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        exp_end     = [{'Average over all population'},num2cell(Constrained_firms_tot(2)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_title  = {'Difference (Wealth-Capital)',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_end    = [{'Average over all population'},num2cell(Constrained_firms_tot(2)-Constrained_firms_tot(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        col_title   = {'Age_Group','Total','z1','z2','z3','z4','z5','z6','z7'} ;
+        row_title   = {'20-24';'25-34';'35-44';'45-54';'55-64';'65-74';'75-80'};
+        Title       = {'Percentage of firms constrained by age-group and Z',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        Mat = [Blank; Title;
+               bench_title ; col_title ; row_title , num2cell(Mat_bench) ; bench_end ; Blank;
+               exp_title   ; col_title ; row_title , num2cell(Mat_exp)   ; exp_end   ; Blank;
+               diff_title  ; col_title ; row_title , num2cell(Mat_exp-Mat_bench) ; diff_end ] 
+        status = xlwrite(Tables_file,Mat,'Constrained Firms (all)') ;
+        
+        Mat_bench   = [Capital_A_group(:,1) Capital_AZ_group(:,:,1)] ;
+        Mat_exp     = [Capital_A_group(:,2) Capital_AZ_group(:,:,2)] ;
+        bench_title = {'Capital_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        bench_end   = [{'Average over all population'},num2cell(Capital_tot(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        exp_title   = {'Wealth_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        exp_end     = [{'Average over all population'},num2cell(Capital_tot(2)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_title  = {'Difference (Wealth-Capital',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_end    = [{'Average over all population'},num2cell(Capital_tot(2)-Capital_tot(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_pc_title  = {'% Difference (Wealth/Capital)',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_pc_end    = [{'Average over all population'},num2cell(100*(Capital_tot(2)./Capital_tot(1)-1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        col_title   = {'Age_Group','Total','z1','z2','z3','z4','z5','z6','z7'} ;
+        row_title   = {'20-24';'25-34';'35-44';'45-54';'55-64';'65-74';'75-80'};
+        Title       = {'Average Capital Demand by age-group and Z',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        Mat = [Blank ; Title;
+               bench_title ; col_title ; row_title , num2cell(Mat_bench) ; bench_end ; Blank;
+               exp_title   ; col_title ; row_title , num2cell(Mat_exp)   ; exp_end   ; Blank;
+               diff_title  ; col_title ; row_title , num2cell(Mat_exp-Mat_bench) ; diff_end ; Blank ;
+               diff_pc_title  ; col_title ; row_title , num2cell(100*(Mat_exp./Mat_bench-1)) ; diff_pc_end] 
+        status = xlwrite(Tables_file,Mat,'Capital Firms (all)') ;
+        
+        Mat_bench   = [Borrowing_A_group(:,1) Borrowing_AZ_group(:,:,1)] ;
+        Mat_exp     = [Borrowing_A_group(:,2) Borrowing_AZ_group(:,:,2)] ;
+        bench_title = {'Capital_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        bench_end   = [{'Average over all population'},num2cell(Borrowing_tot(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        exp_title   = {'Wealth_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        exp_end     = [{'Average over all population'},num2cell(Borrowing_tot(2)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_title  = {'Difference (Wealth-Capital',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_end    = [{'Average over all population'},num2cell(Borrowing_tot(2)-Borrowing_tot(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_pc_title  = {'% Difference (Wealth/Capital)',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_pc_end    = [{'Average over all population'},num2cell(100*(Borrowing_tot(2)./Borrowing_tot(1)-1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        col_title   = {'Age_Group','Total','z1','z2','z3','z4','z5','z6','z7'} ;
+        row_title   = {'20-24';'25-34';'35-44';'45-54';'55-64';'65-74';'75-80'};
+        Title       = {'Average Borrowing by age-group and Z',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        Mat = [Blank ; Title;
+               bench_title ; col_title ; row_title , num2cell(Mat_bench) ; bench_end ; Blank;
+               exp_title   ; col_title ; row_title , num2cell(Mat_exp)   ; exp_end   ; Blank;
+               diff_title  ; col_title ; row_title , num2cell(Mat_exp-Mat_bench) ; diff_end ; Blank ;
+               diff_pc_title  ; col_title ; row_title , num2cell(100*(Mat_exp./Mat_bench-1)) ; diff_pc_end] 
+        status = xlwrite(Tables_file,Mat,'Borrowing Firms (all)') ;
+        
+        Mat_bench   = [Assets_A_group(:,1) Assets_AZ_group(:,:,1)] ;
+        Mat_exp     = [Assets_A_group(:,2) Assets_AZ_group(:,:,2)] ;
+        bench_title = {'Capital_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        bench_end   = [{'Average over all population'},num2cell(Assets_tot(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        exp_title   = {'Wealth_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        exp_end     = [{'Average over all population'},num2cell(Assets_tot(2)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_title  = {'Difference (Wealth-Capital',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_end    = [{'Average over all population'},num2cell(Assets_tot(2)-Assets_tot(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_pc_title  = {'% Difference (Wealth/Capital)',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_pc_end    = [{'Average over all population'},num2cell(100*(Assets_tot(2)./Assets_tot(1)-1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        col_title   = {'Age_Group','Total','z1','z2','z3','z4','z5','z6','z7'} ;
+        row_title   = {'20-24';'25-34';'35-44';'45-54';'55-64';'65-74';'75-80'};
+        Title       = {'Average Assets by age-group and Z',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        Mat = [Blank ; Title;
+               bench_title ; col_title ; row_title , num2cell(Mat_bench) ; bench_end ; Blank;
+               exp_title   ; col_title ; row_title , num2cell(Mat_exp)   ; exp_end   ; Blank;
+               diff_title  ; col_title ; row_title , num2cell(Mat_exp-Mat_bench) ; diff_end ; Blank ;
+               diff_pc_title  ; col_title ; row_title , num2cell(100*(Mat_exp./Mat_bench-1)) ; diff_pc_end] 
+        status = xlwrite(Tables_file,Mat,'Assets Firms (all)') ;
+        
+        
+        Mat_bench   = [A_share_A_group(:,1) A_share_AZ_group(:,:,1)] ;
+        Mat_exp     = [A_share_A_group(:,2) A_share_AZ_group(:,:,2)] ;
+        bench_title = {'Capital_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        bench_end   = [{'Average over all population'},num2cell([100 A_share_Z(:,1)'])] ;
+        exp_title   = {'Wealth_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        exp_end   = [{'Average over all population'},num2cell([100 A_share_Z(:,2)'])] ;
+        diff_title  = {'Difference (Wealth-Capital',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_end    = [{'Average over all population'},num2cell([0, A_share_Z(:,2)'-A_share_Z(:,1)'])] ;
+        col_title   = {'Age_Group','Total','z1','z2','z3','z4','z5','z6','z7'} ;
+        row_title   = {'20-24';'25-34';'35-44';'45-54';'55-64';'65-74';'75-80'};
+        Title       = {'Wealth Shares by age-group and Z',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        Mat = [Blank ; Title;
+               bench_title ; col_title ; row_title , num2cell(Mat_bench) ; bench_end ; Blank;
+               exp_title   ; col_title ; row_title , num2cell(Mat_exp)   ; exp_end   ; Blank;
+               diff_title  ; col_title ; row_title , num2cell(Mat_exp-Mat_bench) ; diff_end ] 
+        status = xlwrite(Tables_file,Mat,'Wealth Shares AZ') ;
+        
+        Mat_bench   = [size_A_group(:,1) size_AZ_group(:,:,1)] ;
+        Mat_exp     = [size_A_group(:,2) size_AZ_group(:,:,2)] ;
+        bench_title = {'Capital_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        bench_end   = [{'Average over all population'},num2cell([100 size_Z(:,1)'])] ;
+        exp_title   = {'Wealth_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        exp_end   = [{'Average over all population'},num2cell([100 size_Z(:,2)'])] ;
+        diff_title  = {'Difference (Wealth-Capital',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_end    = [{'Average over all population'},num2cell([0, size_Z(:,2)'-size_Z(:,1)'])] ;
+        col_title   = {'Age_Group','Total','z1','z2','z3','z4','z5','z6','z7'} ;
+        row_title   = {'20-24';'25-34';'35-44';'45-54';'55-64';'65-74';'75-80'};
+        Title       = {'Population Shares by age-group and Z',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        Mat = [Blank ; Title;
+               bench_title ; col_title ; row_title , num2cell(Mat_bench) ; bench_end ; Blank;
+               exp_title   ; col_title ; row_title , num2cell(Mat_exp)   ; exp_end   ; Blank;
+               diff_title  ; col_title ; row_title , num2cell(Mat_exp-Mat_bench) ; diff_end ] 
+        status = xlwrite(Tables_file,Mat,'Population Shares AZ') ;
+        
+        % Output and profit Change
+        Mat_bench   = [output_A_group(:,1) output_AZ_group(:,:,1)] ;
+        Mat_exp     = [output_A_group(:,2) output_AZ_group(:,:,2)] ;
+        Mat_diff    = 100*(Mat_exp./Mat_bench-1)                   ; 
+        bench_title = {'Capital_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        bench_end   = [{'Average over sample'},num2cell(output_ba(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        exp_title   = {'Wealth_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        exp_end     = [{'Average over sample'},num2cell(output_ba(2)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_title  = {'Difference (Wealth-Capital)',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_end    = [{'Average over sample'},num2cell(output_ba(2)-output_ba(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_pc_title  = {'% Difference (Wealth/Capital)',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_pc_end    = [{'Average over sample'},num2cell(100*(output_ba(2)/output_ba(1)-1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        col_title   = {'Age_Group','Total','z1','z2','z3','z4','z5','z6','z7'} ;
+        row_title   = {'20-24';'25-34';'35-44';'45-54';'55-64';'65-74';'75-80'};
+        Title       = {'Average output by age-group and Z',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        Title_aux   = {'Only firms that were constrained under Capital_Tax that are not constrained under Wealth_Tax',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        Mat = [Blank ; Title; Title_aux ;
+               bench_title ; col_title ; row_title , num2cell(Mat_bench) ; bench_end ; Blank ; 
+               exp_title   ; col_title ; row_title , num2cell(Mat_exp)   ; exp_end   ; Blank ; 
+               diff_title  ; col_title ; row_title , num2cell(Mat_diff)  ; diff_end  ; Blank ;
+               diff_pc_title  ; col_title ; row_title , num2cell(Mat_diff)  ; diff_pc_end  ] 
+        status = xlwrite(Tables_file,Mat,'Output (Cons-Unc)') ;
+        
+        Mat_bench   = [profit_A_group(:,1) profit_AZ_group(:,:,1)] ;
+        Mat_exp     = [profit_A_group(:,2) profit_AZ_group(:,:,2)] ;
+        Mat_diff    = 100*(Mat_exp./Mat_bench-1)                   ; 
+        bench_title = {'Capital_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        bench_end   = [{'Average over sample'},num2cell(profit_ba(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        exp_title   = {'Wealth_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        exp_end     = [{'Average over sample'},num2cell(profit_ba(2)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_title  = {'Difference (Wealth-Capital)',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_end    = [{'Average over sample'},num2cell(profit_ba(2)-profit_ba(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_pc_title  = {'% Difference (Wealth/Capital)',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_pc_end    = [{'Average over sample'},num2cell(100*(profit_ba(2)/profit_ba(1)-1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        col_title   = {'Age_Group','Total','z1','z2','z3','z4','z5','z6','z7'} ;
+        row_title   = {'20-24';'25-34';'35-44';'45-54';'55-64';'65-74';'75-80'};
+        Title       = {'Average profit by age-group and Z',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        Title_aux   = {'Only firms that were constrained under Capital_Tax that are not constrained under Wealth_Tax',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        Mat = [Blank ; Title; Title_aux ;
+               bench_title ; col_title ; row_title , num2cell(Mat_bench) ; bench_end ; Blank ; 
+               exp_title   ; col_title ; row_title , num2cell(Mat_exp)   ; exp_end   ; Blank ; 
+               diff_title  ; col_title ; row_title , num2cell(Mat_diff)  ; diff_end  ; Blank ;
+               diff_pc_title  ; col_title ; row_title , num2cell(Mat_diff)  ; diff_pc_end  ] 
+        status = xlwrite(Tables_file,Mat,'Profits (Cons-Unc)') ;
+        
+        Mat_bench   = [Capital_ba_A_group(:,1) Capital_ba_AZ_group(:,:,1)] ;
+        Mat_exp     = [Capital_ba_A_group(:,2) Capital_ba_AZ_group(:,:,2)] ;
+        Mat_diff    = 100*(Mat_exp./Mat_bench-1)                   ; 
+        bench_title = {'Capital_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        bench_end   = [{'Average over sample'},num2cell(Capital_ba(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        exp_title   = {'Wealth_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        exp_end     = [{'Average over sample'},num2cell(Capital_ba(2)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_title  = {'Difference (Wealth-Capital)',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_end    = [{'Average over sample'},num2cell(Capital_ba(2)-Capital_ba(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_pc_title  = {'% Difference (Wealth/Capital)',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_pc_end    = [{'Average over sample'},num2cell(100*(Capital_ba(2)/Capital_ba(1)-1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        col_title   = {'Age_Group','Total','z1','z2','z3','z4','z5','z6','z7'} ;
+        row_title   = {'20-24';'25-34';'35-44';'45-54';'55-64';'65-74';'75-80'};
+        Title       = {'Average Capital_ba by age-group and Z',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        Title_aux   = {'Only firms that were constrained under Capital_Tax that are not constrained under Wealth_Tax',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        Mat = [Blank ; Title; Title_aux ;
+               bench_title ; col_title ; row_title , num2cell(Mat_bench) ; bench_end ; Blank ; 
+               exp_title   ; col_title ; row_title , num2cell(Mat_exp)   ; exp_end   ; Blank ; 
+               diff_title  ; col_title ; row_title , num2cell(Mat_diff)  ; diff_end  ; Blank ;
+               diff_pc_title  ; col_title ; row_title , num2cell(Mat_diff)  ; diff_pc_end  ] 
+        status = xlwrite(Tables_file,Mat,'Capital (Cons-Unc)') ;
+        
+        Mat_bench   = [Borrowing_ba_A_group(:,1) Borrowing_ba_AZ_group(:,:,1)] ;
+        Mat_exp     = [Borrowing_ba_A_group(:,2) Borrowing_ba_AZ_group(:,:,2)] ;
+        Mat_diff    = 100*(Mat_exp./Mat_bench-1)                   ; 
+        bench_title = {'Capital_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        bench_end   = [{'Average over sample'},num2cell(Borrowing_ba(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        exp_title   = {'Wealth_Tax Economy',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        exp_end     = [{'Average over sample'},num2cell(Borrowing_ba(2)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_title  = {'Difference (Wealth-Borrowing)',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_end    = [{'Average over sample'},num2cell(Borrowing_ba(2)-Borrowing_ba(1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        diff_pc_title  = {'% Difference (Wealth/Borrowing)',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        diff_pc_end    = [{'Average over sample'},num2cell(100*(Borrowing_ba(2)/Borrowing_ba(1)-1)),{' ',' ',' ',' ',' ',' ',' '}] ;
+        col_title   = {'Age_Group','Total','z1','z2','z3','z4','z5','z6','z7'} ;
+        row_title   = {'20-24';'25-34';'35-44';'45-54';'55-64';'65-74';'75-80'};
+        Title       = {'Average Borrowing_ba by age-group and Z',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        Title_aux   = {'Only firms that were constrained under Borrowing_Tax that are not constrained under Wealth_Tax',' ',' ',' ',' ',' ',' ',' ',' '} ;
+        Mat = [Blank ; Title; Title_aux ;
+               bench_title ; col_title ; row_title , num2cell(Mat_bench) ; bench_end ; Blank ; 
+               exp_title   ; col_title ; row_title , num2cell(Mat_exp)   ; exp_end   ; Blank ; 
+               diff_title  ; col_title ; row_title , num2cell(Mat_diff)  ; diff_end  ; Blank ;
+               diff_pc_title  ; col_title ; row_title , num2cell(Mat_diff)  ; diff_pc_end  ] 
+        status = xlwrite(Tables_file,Mat,'Borrowing (Cons-Unc)') ;
+        
+    % Figures
+        % Constrained firms
+        figure;
+        plot([20:100]',Constrained_firms_age,'linewidth',2);
+        legend('Capital Tax','Wealth_Tax','location','southeast'); 
+        xlabel('age'); xlim([20,100]); ylim([0 1]); title('Percentage of Constrained Firms')
+        print('-dpdf','Constrained_Firms_Age.pdf') ;
+        
+        figure;
+        for z=1:n_z
+            subplot(2,4,z); plot([20:100]',[Constrained_firms_AZ(:,z,1),Constrained_firms_AZ(:,z,2)],'linewidth',2);
+            aa = ['Cons. Firms (Z',num2str(z),')'] ; title(aa); xlabel('age'); xlim([20,100]); ylim([0 1]);
+        end 
+            legend('K Tax','W Tax','location','south');
+        print('-dpdf','Constrained_Firms_Age_Z.pdf') ;
+
+
+

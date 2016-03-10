@@ -3808,6 +3808,250 @@ SUBROUTINE  SIMULATION(bench_indx)
 	use parameters
 	use global
 	use omp_lib
+	IMPLICIT NONE
+	integer, intent(in) :: bench_indx
+	integer  :: currentzi, currentlambdai, currentei
+	REAL(DP) :: tempnoage, tempnoz, tempnolambda, tempnoe, tempno, currenta, currentY
+	REAL(DP) :: start_timet, finish_timet
+	INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
+	INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
+	INTEGER , DIMENSION(totpop) :: panelage, panelz, panellambda, panele 
+	REAL(DP), DIMENSION(totpop) :: panela, panelPV_a, panelK  
+
+	!$ call omp_set_num_threads(20)
+
+	print*,'SIMULATION STARTED'
+
+    age=1
+    requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
+    cdfrequirednumberby_age(age) = requirednumberby_age(age)
+    DO age=2,MaxAge
+        requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
+        cdfrequirednumberby_age(age) = requirednumberby_age(age) + cdfrequirednumberby_age(age-1)
+    ENDDO
+    ! If the total number of people are not equal to the total population, then I will add the remainder to the last age
+    requirednumberby_age(MaxAge) =  requirednumberby_age(MaxAge)-cdfrequirednumberby_age(MaxAge) + totpop
+    cdfrequirednumberby_age(MaxAge) = totpop
+
+	!=====================================================================
+	!                     GENERATE   INITIAL   PANEL
+	!=====================================================================
+
+
+	newiseed=-1
+
+	DO paneli=1,totpop
+
+	! AGE
+	   tempnoage = ran1(newiseed)
+	   age=1
+	   DO WHILE (tempnoage*totpop .gt. cdfrequirednumberby_age(age))
+	       age=age+1
+	   ENDDO
+
+	! Z   
+	   tempnoz = ran1(newiseed)
+	   zi=1
+	   DO WHILE (tempnoz .gt. cdf_Gz(zi))
+	       zi=zi+1
+	   ENDDO
+	 
+	! LAMBDA  
+	   tempnolambda = ran1(newiseed) 
+	   lambdai=1
+	   DO WHILE (tempnolambda .gt. cdf_Glambda(lambdai))
+	       lambdai=lambdai+1
+	   ENDDO
+
+	! E   
+	   tempnoe = ran1(newiseed)   
+	   ei=1
+	   DO WHILE (tempnoe .gt. cdf_Ge_byage(age,ei))
+	       ei=ei+1
+	   ENDDO
+
+	   panelage(paneli)=age
+	   panelz(paneli)=zi
+	   panellambda(paneli)=lambdai
+	   panele(paneli)=ei
+	   
+	ENDDO
+
+	! SET INITIAL ASSET DISTRIBUTION
+	panela            = 1.0_DP
+
+	!=============================================================================
+	!
+	! SIMULATE FROM THE SECOND PERIOD SHOCKS AND UPDATE NEW DISTRIBUTIONS
+	!
+	!=============================================================================
+
+	!call cpu_time(start_timet) 
+
+	DO simutime=1, MaxSimuTime
+
+	   DO paneli=1,totpop
+	    
+	       	currenta  		= panela(paneli)
+	       	age       		= panelage(paneli)
+	       	currentzi      	= panelz(paneli)
+	       	currentlambdai 	= panellambda(paneli) 
+	       	currentei 		= panele(paneli)
+	        
+			!  COMPUTE NEXT PERIOD'S ASSET
+	       	if (age .lt. MaxAge) then
+	            ! do linear interpolation here to find aprime. calling the function takes much more time
+	            if (currenta .ge. amax) then
+                	tklo = na-1
+                elseif (currenta .lt. amin) then
+                    tklo = 1
+                else
+                    tklo = ((currenta - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+	            endif 
+	            tkhi = tklo + 1        
+
+	            panela(paneli) = ((agrid(tkhi) - currenta)*Aprime(age,tklo,currentzi,currentlambdai,currentei) 		&
+	                           	&  + (currenta - agrid(tklo))*Aprime(age,tkhi,currentzi,currentlambdai, currentei)) &
+	                            &  / ( agrid(tkhi) - agrid(tklo) )    
+	            
+	            if (panela(paneli)  .ge. amax) then
+	                panela(paneli) = min(panela(paneli), amax) 
+	            endif      
+	            if (panela(paneli)  .lt. amin) then
+	                panela(paneli) = max(panela(paneli), amin) 
+	            endif      
+
+	       	endif !age .lt. MaxAge
+			!  NEXT PERIOD'S ASSET IS COMPUTED
+
+	             
+			! DRAW NEXT PERIOD'S AGE DBN
+	      	tempnoage = ran1(newiseed)  
+	  
+	      	IF (tempnoage .gt. survP(age)) THEN
+				panelage(paneli)   = 1
+			ELSE
+				panelage(paneli)   = age+1
+				panelz(paneli)     = currentzi
+				panellambda(paneli)= currentlambdai   
+	      	ENDIF
+	    
+			! DRAW Z and LAMBDA DISTRIBUTION FOR ONE-YEAR OLDS
+	     	age = panelage(paneli)   
+	     	IF (age .eq. 1) THEN    
+				! Z      
+		       	tempnoz = ran1(newiseed) 
+		       	zi=1
+				DO WHILE (tempnoz .gt. cdf_pr_z(currentzi,zi))
+					zi=zi+1
+				ENDDO
+	       
+				! LAMBDA  
+				tempnolambda = ran1(newiseed) 
+				lambdai=1
+				DO WHILE (tempnolambda .gt. cdf_pr_lambda(currentlambdai,lambdai))
+					lambdai=lambdai+1
+				ENDDO
+
+				! E       
+				currentei = panele(paneli)
+				ei = ne/2+1 ! ALL NEWBORN START FROM THE MEDIAN E  but if too many people died and started from median E, draw a new E for them
+
+				panelz(paneli)		= zi    
+				panellambda(paneli)	= lambdai
+				panele(paneli) 		= ei 
+
+       		else  IF (age .gt. 1) THEN
+	            currentei = panele(paneli)   
+	            tempno 	  = ran1(newiseed)   
+	            ei 		  = 1
+	            DO WHILE (tempno .gt. cdf_pr_e(currentei,ei))
+	               ei = ei+1
+	            ENDDO            
+	            panele(paneli)=ei            
+	     	ENDIF ! new age==1
+	    ENDDO ! paneli
+	ENDDO ! simutime
+
+	!$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi)
+	DO paneli=1,totpop
+	    currenta = panela(paneli)
+	    age=panelage(paneli)
+	    currentzi = panelz(paneli)
+	    currentlambdai = panellambda(paneli) 
+	    currentei = panele(paneli)
+
+	    if (currenta .ge. amax) then
+	        tklo = na-1
+	    elseif (currenta .lt. amin) then
+            tklo = 1
+        else
+            tklo = ((currenta - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+	    endif    
+	    tkhi = tklo + 1        
+
+	    panelPV_a(paneli) = (   (agrid(tkhi) - currenta)     * PV_a(age,tklo,currentzi,currentlambdai, currentei)  &
+	                       &  + (currenta - agrid(tklo))     * PV_a(age,tkhi,currentzi,currentlambdai, currentei)) &
+	                       &  / ( agrid(tkhi) - agrid(tklo) ) 
+
+	    panelK(paneli)    = min( theta*currenta , (mu*P*zgrid(currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )             
+	           
+	ENDDO ! paneli
+
+
+	print*, ' '
+	print*, 'Writing simulation results'
+	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
+
+	if (bench_indx.eq.1) then
+		OPEN   (UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_bench'		   	, STATUS='replace')
+		OPEN   (UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_bench'	 	, STATUS='replace')
+		OPEN   (UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_bench'		    , STATUS='replace')
+		OPEN   (UNIT=13, FILE=trim(Result_Folder)//'Simul/panellambda_bench'    , STATUS='replace')
+		OPEN   (UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_bench'        	, STATUS='replace')
+		OPEN   (UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_bench'      , STATUS='replace')
+		OPEN   (UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_bench'         , STATUS='replace')
+	else 
+		OPEN   (UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
+		OPEN   (UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_exp'		    , STATUS='replace')
+		OPEN   (UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_exp'		 	, STATUS='replace')
+		OPEN   (UNIT=13, FILE=trim(Result_Folder)//'Simul/panellambda_exp'   	, STATUS='replace')
+		OPEN   (UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_exp'        	, STATUS='replace')
+		OPEN   (UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_exo'        , STATUS='replace')
+		OPEN   (UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_exp' 	        , STATUS='replace')
+	endif 
+
+
+	WRITE  (UNIT=10, FMT=*) panela
+	WRITE  (UNIT=11, FMT=*) panelage 
+	WRITE  (UNIT=12, FMT=*) panelz 
+	WRITE  (UNIT=13, FMT=*) panellambda 
+	WRITE  (UNIT=14, FMT=*) panele 
+	WRITE  (UNIT=26, FMT=*) panelPV_a
+	WRITE  (UNIT=27, FMT=*) panelK
+
+	close (unit=10)
+	close (unit=11)
+	close (unit=12)
+	close (unit=13)
+	close (unit=14)
+	close (unit=26)
+	close (unit=27)
+
+
+END SUBROUTINE SIMULATION
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+
+
+SUBROUTINE  SIMULATION_STATS(bench_indx)
+	use parameters
+	use global
+	use omp_lib
 
 	IMPLICIT NONE
 	integer, intent(in) :: bench_indx
