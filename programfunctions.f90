@@ -779,7 +779,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	! Solve for the benchmark economy 
 		solving_bench = 1
 		tauK    = tauK_bench
-		R       = R_exp
+		R       = R_bench
 		P       = P_bench
 		wage    = wage_bench
 		Ebar    = Ebar_bench
@@ -789,17 +789,15 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		tauPL   = tauPL_bench
 		Y_a_threshold = Y_a_threshold_bench
 
-		! Cons   = Cons_bench
-		! Hours  = Hours_bench
-		! Aprime = Aprime_bench
+		Cons   = Cons_bench
+		Hours  = Hours_bench
+		Aprime = Aprime_bench
 
-		print*,'BENCH: P=',P,'wage=',wage,'Ebar=',Ebar
-		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
-		CALL ComputeLaborUnits(Ebar, wage) 
-		CALL EGM_RETIREMENT_WORKING_PERIOD 
-
-		print*, 'C_BAR_aux=', sum(Cons*DBN_Bench)
+		! print*,'BENCH: P=',P,'wage=',wage,'Ebar=',Ebar
+		! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		! CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		! CALL ComputeLaborUnits(Ebar, wage) 
+		! CALL EGM_RETIREMENT_WORKING_PERIOD 
 
 	! Compute the value function using interpolation and save it
 		CALL COMPUTE_VALUE_FUNCTION_LINEAR
@@ -1434,7 +1432,9 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
     DO zi=1,nz
     DO lambdai=1,nlambda          
 	DO ei=1,ne
-      	ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age, ai, zi, lambdai, ei),Hours(age, ai, zi, lambdai, ei))
+      	! ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age, ai, zi, lambdai, ei),Hours(age, ai, zi, lambdai, ei))
+      	ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
+                   & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma)  
 		! print*,Cons(age, ai, zi, lambdai, ei),  ValueFunction(age, ai, zi, lambdai, ei) 
 		! pause
 	ENDDO ! ei          
@@ -1463,9 +1463,14 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
 		PrAprimehi(age,ai,zi,lambdai, ei) = min (PrAprimehi(age,ai,zi,lambdai, ei), 1.0_DP)
 		PrAprimehi(age,ai,zi,lambdai, ei) = max(PrAprimehi(age,ai,zi,lambdai, ei), 0.0_DP)    
 
-		ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age,ai,zi,lambdai,ei),Hours(age,ai,zi,lambdai,ei)) &
-			  & + beta*survP(age)* (PrAprimelo(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tklo, zi, lambdai, ei)&
-			  & 				 +  PrAprimehi(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tkhi, zi, lambdai, ei))
+		! ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age,ai,zi,lambdai,ei),Hours(age,ai,zi,lambdai,ei)) &
+		! 	  & + beta*survP(age)* (PrAprimelo(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tklo, zi, lambdai, ei)&
+		! 	  & 				 +  PrAprimehi(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tkhi, zi, lambdai, ei))
+
+        ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
+                      & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
+                      & + beta*survP(age)* (PrAprimelo(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tklo, zi, lambdai, ei)&
+                      & +                   PrAprimehi(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tkhi, zi, lambdai, ei))
 	ENDDO ! ei          
     ENDDO ! lambdai
     ENDDO ! zi
@@ -1496,9 +1501,13 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
 		PrAprimehi(age,ai,zi,lambdai, ei) = min (PrAprimehi(age,ai,zi,lambdai, ei), 1.0_DP)
 		PrAprimehi(age,ai,zi,lambdai, ei) = max(PrAprimehi(age,ai,zi,lambdai, ei), 0.0_DP)    
 
-		ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age,ai,zi,lambdai,ei),Hours(age,ai,zi,lambdai,ei))  &
-		   & + beta*survP(age)* sum( ( PrAprimelo(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tklo, zi, lambdai,:)  &
-		   & 						 + PrAprimehi(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tkhi, zi, lambdai,:)) * pr_e(ei,:))
+		! ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age,ai,zi,lambdai,ei),Hours(age,ai,zi,lambdai,ei))  &
+		!    & + beta*survP(age)* sum( ( PrAprimelo(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tklo, zi, lambdai,:)  &
+		!    & 						 + PrAprimehi(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tkhi, zi, lambdai,:)) * pr_e(ei,:))
+		ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
+                       & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
+                       & + beta*survP(age)* sum( ( PrAprimelo(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tklo, zi, lambdai,:)  &
+                       & + PrAprimehi(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tkhi, zi, lambdai,:)) * pr_e(ei,:) )
 		! if ( ValueFunction(age, ai, zi, lambdai, ei) .lt. (-100.0_DP) ) then
 		!    print*,'ValueFunction(age, ai, zi, lambdai, ei)=',ValueFunction(age, ai, zi, lambdai, ei)
 		! endif
