@@ -1420,104 +1420,195 @@ END SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE
 !========================================================================================
 
 
-SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
-	IMPLICIT NONE
-	INTEGER :: tklo, tkhi
-	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: PrAprimelo, PrAprimehi
+! SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
+! 	IMPLICIT NONE
+! 	INTEGER :: tklo, tkhi
+! 	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: PrAprimelo, PrAprimehi
 
-	print*,'VALUE FUNCTION LINEAR'
+! 	print*,'VALUE FUNCTION LINEAR'
 
-	age=MaxAge
-	DO ai=1,na    
+! 	age=MaxAge
+! 	DO ai=1,na    
+!     DO zi=1,nz
+!     DO lambdai=1,nlambda          
+! 	DO ei=1,ne
+!       	! ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age, ai, zi, lambdai, ei),Hours(age, ai, zi, lambdai, ei))
+!       	ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
+!                    & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma)  
+! 		! print*,Cons(age, ai, zi, lambdai, ei),  ValueFunction(age, ai, zi, lambdai, ei) 
+! 		! pause
+! 	ENDDO ! ei          
+!     ENDDO ! lambdai
+!     ENDDO ! zi
+! 	ENDDO ! ai
+
+! 	! Retirement Period
+! 	DO age=MaxAge-1,RetAge,-1
+! 	DO ai=1,na    
+!     DO zi=1,nz
+!     DO lambdai=1,nlambda          
+! 	DO ei=1,ne
+! 		if ( Aprime(age,ai,zi,lambdai, ei) .ge. amax) then
+! 		    tklo =na-1
+! 		else if (Aprime(age,ai,zi,lambdai, ei) .lt. amin) then
+! 		    tklo = 1
+! 		else
+! 		    tklo = ((Aprime(age,ai,zi,lambdai, ei) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+! 		end if            
+! 		tkhi = tklo + 1        
+! 		PrAprimelo(age,ai,zi,lambdai, ei) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei) ) / ( agrid(tkhi) -agrid(tklo) )
+! 		PrAprimehi(age,ai,zi,lambdai, ei) = ( Aprime(age,ai,zi,lambdai, ei) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
+! 		PrAprimelo(age,ai,zi,lambdai, ei) = min (PrAprimelo(age,ai,zi,lambdai, ei), 1.0_DP)
+! 		PrAprimelo(age,ai,zi,lambdai, ei) = max(PrAprimelo(age,ai,zi,lambdai, ei), 0.0_DP)
+! 		PrAprimehi(age,ai,zi,lambdai, ei) = min (PrAprimehi(age,ai,zi,lambdai, ei), 1.0_DP)
+! 		PrAprimehi(age,ai,zi,lambdai, ei) = max(PrAprimehi(age,ai,zi,lambdai, ei), 0.0_DP)    
+
+! 		! ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age,ai,zi,lambdai,ei),Hours(age,ai,zi,lambdai,ei)) &
+! 		! 	  & + beta*survP(age)* (PrAprimelo(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tklo, zi, lambdai, ei)&
+! 		! 	  & 				 +  PrAprimehi(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tkhi, zi, lambdai, ei))
+
+!         ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
+!                       & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
+!                       & + beta*survP(age)* (PrAprimelo(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tklo, zi, lambdai, ei)&
+!                       & +                   PrAprimehi(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tkhi, zi, lambdai, ei))
+! 	ENDDO ! ei          
+!     ENDDO ! lambdai
+!     ENDDO ! zi
+! 	ENDDO ! ai
+! 	ENDDO ! age
+! 	!print*,ValueFunction
+
+
+! 	! Working Period
+! 	DO age=RetAge-1,1,-1
+! 	DO ai=1,na    
+!     DO zi=1,nz
+!     DO lambdai=1,nlambda          
+! 	DO ei=1,ne
+! 		if ( Aprime(age,ai,zi,lambdai, ei) .ge. amax) then
+! 		    tklo =na-1
+! 	    elseif (Aprime(age,ai,zi,lambdai, ei) .lt. amin) then
+! 	        tklo = 1
+!         else
+!             tklo = ((Aprime(age,ai,zi,lambdai, ei) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+! 		endif  
+
+! 		tkhi = tklo + 1        
+! 		PrAprimelo(age,ai,zi,lambdai, ei) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei) ) / ( agrid(tkhi) -agrid(tklo) )
+! 		PrAprimehi(age,ai,zi,lambdai, ei) = ( Aprime(age,ai,zi,lambdai, ei) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
+! 		PrAprimelo(age,ai,zi,lambdai, ei) = min (PrAprimelo(age,ai,zi,lambdai, ei), 1.0_DP)
+! 		PrAprimelo(age,ai,zi,lambdai, ei) = max(PrAprimelo(age,ai,zi,lambdai, ei), 0.0_DP)
+! 		PrAprimehi(age,ai,zi,lambdai, ei) = min (PrAprimehi(age,ai,zi,lambdai, ei), 1.0_DP)
+! 		PrAprimehi(age,ai,zi,lambdai, ei) = max(PrAprimehi(age,ai,zi,lambdai, ei), 0.0_DP)    
+
+! 		! ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age,ai,zi,lambdai,ei),Hours(age,ai,zi,lambdai,ei))  &
+! 		!    & + beta*survP(age)* sum( ( PrAprimelo(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tklo, zi, lambdai,:)  &
+! 		!    & 						 + PrAprimehi(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tkhi, zi, lambdai,:)) * pr_e(ei,:))
+! 		ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
+!                        & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
+!                        & + beta*survP(age)* sum( ( PrAprimelo(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tklo, zi, lambdai,:)  &
+!                        & + PrAprimehi(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tkhi, zi, lambdai,:)) * pr_e(ei,:) )
+! 		! if ( ValueFunction(age, ai, zi, lambdai, ei) .lt. (-100.0_DP) ) then
+! 		!    print*,'ValueFunction(age, ai, zi, lambdai, ei)=',ValueFunction(age, ai, zi, lambdai, ei)
+! 		! endif
+! 	ENDDO ! ei          
+!     ENDDO ! lambdai
+!     ENDDO ! zi
+! 	ENDDO ! ai
+! 	ENDDO ! age
+
+! END SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR 
+
+SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR
+IMPLICIT NONE
+INTEGER :: tklo, tkhi
+REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: PrAprimelo, PrAprimehi
+
+age=MaxAge
+DO ai=1,na    
     DO zi=1,nz
-    DO lambdai=1,nlambda          
-	DO ei=1,ne
-      	! ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age, ai, zi, lambdai, ei),Hours(age, ai, zi, lambdai, ei))
-      	ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
+        DO lambdai=1,nlambda          
+              DO ei=1,ne
+                  ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
                    & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma)  
-		! print*,Cons(age, ai, zi, lambdai, ei),  ValueFunction(age, ai, zi, lambdai, ei) 
-		! pause
-	ENDDO ! ei          
-    ENDDO ! lambdai
+!                  print*,Cons(age, ai, zi, lambdai, ei),  ValueFunction(age, ai, zi, lambdai, ei) 
+!                  pause
+              ENDDO ! ei          
+        ENDDO ! lambdai
     ENDDO ! zi
-	ENDDO ! ai
+ENDDO ! ai
 
-	! Retirement Period
-	DO age=MaxAge-1,RetAge,-1
-	DO ai=1,na    
+! Retirement Period
+DO age=MaxAge-1,RetAge,-1
+DO ai=1,na    
     DO zi=1,nz
-    DO lambdai=1,nlambda          
-	DO ei=1,ne
-		if ( Aprime(age,ai,zi,lambdai, ei) .ge. amax) then
-		    tklo =na-1
-		else if (Aprime(age,ai,zi,lambdai, ei) .lt. amin) then
-		    tklo = 1
-		else
-		    tklo = ((Aprime(age,ai,zi,lambdai, ei) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-		end if            
-		tkhi = tklo + 1        
-		PrAprimelo(age,ai,zi,lambdai, ei) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei) ) / ( agrid(tkhi) -agrid(tklo) )
-		PrAprimehi(age,ai,zi,lambdai, ei) = ( Aprime(age,ai,zi,lambdai, ei) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
-		PrAprimelo(age,ai,zi,lambdai, ei) = min (PrAprimelo(age,ai,zi,lambdai, ei), 1.0_DP)
-		PrAprimelo(age,ai,zi,lambdai, ei) = max(PrAprimelo(age,ai,zi,lambdai, ei), 0.0_DP)
-		PrAprimehi(age,ai,zi,lambdai, ei) = min (PrAprimehi(age,ai,zi,lambdai, ei), 1.0_DP)
-		PrAprimehi(age,ai,zi,lambdai, ei) = max(PrAprimehi(age,ai,zi,lambdai, ei), 0.0_DP)    
-
-		! ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age,ai,zi,lambdai,ei),Hours(age,ai,zi,lambdai,ei)) &
-		! 	  & + beta*survP(age)* (PrAprimelo(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tklo, zi, lambdai, ei)&
-		! 	  & 				 +  PrAprimehi(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tkhi, zi, lambdai, ei))
-
-        ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
+        DO lambdai=1,nlambda          
+              DO ei=1,ne
+                  if ( Aprime(age,ai,zi,lambdai, ei) .ge. amax) then
+                        tklo =na-1
+                        elseif (Aprime(age,ai,zi,lambdai, ei) .lt. amin) then
+                             tklo = 1
+                            else
+                                tklo = ((Aprime(age,ai,zi,lambdai, ei) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+                  endif            
+                  tkhi = tklo + 1        
+                  PrAprimelo(age,ai,zi,lambdai, ei) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei) ) / ( agrid(tkhi) -agrid(tklo) )
+                  PrAprimehi(age,ai,zi,lambdai, ei) = ( Aprime(age,ai,zi,lambdai, ei) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
+                  PrAprimelo(age,ai,zi,lambdai, ei) = min (PrAprimelo(age,ai,zi,lambdai, ei), 1.0_DP)
+                  PrAprimelo(age,ai,zi,lambdai, ei) = max(PrAprimelo(age,ai,zi,lambdai, ei), 0.0_DP)
+                  PrAprimehi(age,ai,zi,lambdai, ei) = min (PrAprimehi(age,ai,zi,lambdai, ei), 1.0_DP)
+                  PrAprimehi(age,ai,zi,lambdai, ei) = max(PrAprimehi(age,ai,zi,lambdai, ei), 0.0_DP)    
+             
+                  ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
                       & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
                       & + beta*survP(age)* (PrAprimelo(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tklo, zi, lambdai, ei)&
                       & +                   PrAprimehi(age,ai,zi,lambdai, ei)*ValueFunction(age+1, tkhi, zi, lambdai, ei))
-	ENDDO ! ei          
-    ENDDO ! lambdai
+              ENDDO ! ei          
+        ENDDO ! lambdai
     ENDDO ! zi
-	ENDDO ! ai
-	ENDDO ! age
-	!print*,ValueFunction
+ENDDO ! ai
+ENDDO ! age
+!print*,ValueFunction
 
 
-	! Working Period
-	DO age=RetAge-1,1,-1
-	DO ai=1,na    
+! Working Period
+DO age=RetAge-1,1,-1
+DO ai=1,na    
     DO zi=1,nz
-    DO lambdai=1,nlambda          
-	DO ei=1,ne
-		if ( Aprime(age,ai,zi,lambdai, ei) .ge. amax) then
-		    tklo =na-1
-	    elseif (Aprime(age,ai,zi,lambdai, ei) .lt. amin) then
-	        tklo = 1
-        else
-            tklo = ((Aprime(age,ai,zi,lambdai, ei) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-		endif  
-
-		tkhi = tklo + 1        
-		PrAprimelo(age,ai,zi,lambdai, ei) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei) ) / ( agrid(tkhi) -agrid(tklo) )
-		PrAprimehi(age,ai,zi,lambdai, ei) = ( Aprime(age,ai,zi,lambdai, ei) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
-		PrAprimelo(age,ai,zi,lambdai, ei) = min (PrAprimelo(age,ai,zi,lambdai, ei), 1.0_DP)
-		PrAprimelo(age,ai,zi,lambdai, ei) = max(PrAprimelo(age,ai,zi,lambdai, ei), 0.0_DP)
-		PrAprimehi(age,ai,zi,lambdai, ei) = min (PrAprimehi(age,ai,zi,lambdai, ei), 1.0_DP)
-		PrAprimehi(age,ai,zi,lambdai, ei) = max(PrAprimehi(age,ai,zi,lambdai, ei), 0.0_DP)    
-
-		! ValueFunction(age, ai, zi, lambdai, ei) = Utility(Cons(age,ai,zi,lambdai,ei),Hours(age,ai,zi,lambdai,ei))  &
-		!    & + beta*survP(age)* sum( ( PrAprimelo(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tklo, zi, lambdai,:)  &
-		!    & 						 + PrAprimehi(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tkhi, zi, lambdai,:)) * pr_e(ei,:))
-		ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
+        DO lambdai=1,nlambda          
+              DO ei=1,ne
+                  if ( Aprime(age,ai,zi,lambdai, ei) .ge. amax) then
+                        tklo =na-1
+                        elseif (Aprime(age,ai,zi,lambdai, ei) .lt. amin) then
+                             tklo = 1
+                            else
+                                tklo = ((Aprime(age,ai,zi,lambdai, ei) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+                  endif            
+                  tkhi = tklo + 1        
+                  PrAprimelo(age,ai,zi,lambdai, ei) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei) ) / ( agrid(tkhi) -agrid(tklo) )
+                  PrAprimehi(age,ai,zi,lambdai, ei) = ( Aprime(age,ai,zi,lambdai, ei) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
+                  PrAprimelo(age,ai,zi,lambdai, ei) = min (PrAprimelo(age,ai,zi,lambdai, ei), 1.0_DP)
+                  PrAprimelo(age,ai,zi,lambdai, ei) = max(PrAprimelo(age,ai,zi,lambdai, ei), 0.0_DP)
+                  PrAprimehi(age,ai,zi,lambdai, ei) = min (PrAprimehi(age,ai,zi,lambdai, ei), 1.0_DP)
+                  PrAprimehi(age,ai,zi,lambdai, ei) = max(PrAprimehi(age,ai,zi,lambdai, ei), 0.0_DP)    
+              
+                  ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei)**gamma) &
                        & * (1.0_DP-Hours(age,ai,zi,lambdai,ei))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
                        & + beta*survP(age)* sum( ( PrAprimelo(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tklo, zi, lambdai,:)  &
                        & + PrAprimehi(age,ai,zi,lambdai, ei) * ValueFunction(age+1, tkhi, zi, lambdai,:)) * pr_e(ei,:) )
-		! if ( ValueFunction(age, ai, zi, lambdai, ei) .lt. (-100.0_DP) ) then
-		!    print*,'ValueFunction(age, ai, zi, lambdai, ei)=',ValueFunction(age, ai, zi, lambdai, ei)
-		! endif
-	ENDDO ! ei          
-    ENDDO ! lambdai
+!                  if ( ValueFunction(age, ai, zi, lambdai, ei) .lt. (-100.0_DP) ) then
+!                       print*,'ValueFunction(age, ai, zi, lambdai, ei)=',ValueFunction(age, ai, zi, lambdai, ei)
+!                  endif
+              ENDDO ! ei          
+        ENDDO ! lambdai
     ENDDO ! zi
-	ENDDO ! ai
-	ENDDO ! age
+ENDDO ! ai
+ENDDO ! age
+
 
 END SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR 
+
+
 
 !========================================================================================
 !========================================================================================
@@ -2578,7 +2669,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	! Compute wealth given current R and P
 		Wealth = Wealth_Matrix_t(R,P)
 
-		print*, 'R=',R,'P=',P, 'W=',wage, 'na=', na, 'na_t=', na_t
+		! print*, 'R=',R,'P=',P, 'W=',wage, 'na=', na, 'na_t=', na_t
 	!========================================================================================
 	!------RETIREMENT PERIOD-----------------------------------------------------------------
 
