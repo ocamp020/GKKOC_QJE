@@ -243,7 +243,8 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		print*,"	Computing government spending"
 		CALL GOVNT_BUDGET
 		print*,"	Computing Value Function"
-		CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+		! CALL COMPUTE_VALUE_FUNCTION_SPLINE
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR 
 		print*,"	Computing Firm Value Function"
 		CALL Firm_Value
 		print*,"	Saving results in text files to be read later"
@@ -253,6 +254,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL Write_Benchmark_Results(compute_bench)
 	end if 
 
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR
 		print*,"	Computing satitics"
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
@@ -392,7 +394,8 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 				ENDDO
 
 		! Compute value function and store policy functions, value function and distribution in file
-		CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+		! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR
 		CALL Firm_Value
 
 	endif 
