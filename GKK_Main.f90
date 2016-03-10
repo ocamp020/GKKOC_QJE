@@ -51,8 +51,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
-			compute_exp   = .false.
+			compute_bench = .true.
+			compute_exp   = .true.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Simul_Switch  = .false.
@@ -254,7 +254,6 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL Write_Benchmark_Results(compute_bench)
 	end if 
 
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR
 		print*,"	Computing satitics"
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
@@ -401,7 +400,6 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	endif 
 	
 	CALL Write_Experimental_Results(compute_exp)
-	CALL COMPUTE_VALUE_FUNCTION_LINEAR
 
 	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
