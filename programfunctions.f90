@@ -794,15 +794,15 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		Aprime = Aprime_bench
 
 		!print*,'BENCH: P=',P,'wage=',wage,'Ebar=',Ebar
-		! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-		! CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
-		! CALL ComputeLaborUnits(Ebar, wage) 
-		! CALL EGM_RETIREMENT_WORKING_PERIOD 
+		!CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		!CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		!CALL ComputeLaborUnits(Ebar, wage) 
+		!CALL EGM_RETIREMENT_WORKING_PERIOD 
 
 	! Compute the value function using interpolation and save it
-		! CALL COMPUTE_VALUE_FUNCTION_LINEAR
-		! !CALL COMPUTE_VALUE_FUNCTION_SPLINE  
-		! ValueFunction_Bench = ValueFunction
+		!CALL COMPUTE_VALUE_FUNCTION_LINEAR
+		!CALL COMPUTE_VALUE_FUNCTION_SPLINE  
+		!ValueFunction_Bench = ValueFunction
 
 	! Profit Matrix
 		Pr_mat = Profit_Matrix(R,P)
