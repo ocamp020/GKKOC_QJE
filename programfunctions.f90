@@ -1924,6 +1924,9 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: FW_top_x(4), FW_top_x_share(4), prctile_FW(4), a, b, c, CCDF_c
 	real(DP) :: FW_prctile(100), FW_above_prctile(100)
 	integer  :: Firm_Wealth_ind(size(DBN1)), i, FW_prctile_ind(100)
+	real(DP), dimension(size(DBN1)) :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq
+	real(DP) :: FW_top_x(4),  prctile_FW(4), prctile_bq(7), a, b, c, CCDF_c
+	real(DP) :: DBN_bq(MaxAge,na,nz,nlambda,ne)
 	character(100) :: rowname
 	INTEGER, dimension(max_age_category+1) :: age_limit
 
@@ -1932,166 +1935,6 @@ SUBROUTINE COMPUTE_STATS()
 	
 	! Age Brackets
 		age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
-
-	! Percentage of the population above threshold
-		! Compute distribution of agents by (a,z)
-		DBN_az = sum(sum(sum(DBN1,5),4),1)
-		! Compute mean before tax wealth
-		Wealth = Wealth_Matrix(R,P)
-		! Compute share of agents above threshold
-		Threshold_Share = 0.0_dp
-		do ai=1,na
-		do zi=1,nz 
-			if (Wealth(ai,zi).gt.Y_a_threshold) then 
-				Threshold_Share = Threshold_Share + DBN_az(ai,zi)
-			end if 
-		end do 
-		end do 
-
-	
-	DO zi=1,nz
-	    cdf_Gz_DBN(zi) = sum(DBN1(:,:,zi,:,:))
-	ENDDO
-	!print*,'cdf_Gz_DBN ='
-	!print*,cdf_Gz_DBN
-
-	DO ai=1,na
-	     pr_a_dbn(ai)          = sum(DBN1(:,ai,:,:,:)) 
-	     cdf_a_dbn(ai)         = sum( pr_a_dbn(1:ai) )      
-	     tot_a_by_grid(ai)     = sum(DBN1(:,ai,:,:,:) * agrid(ai) )
-	     cdf_tot_a_by_grid(ai) = sum(tot_a_by_grid(1:ai))   
-	!     print*, pr_a_dbn(ai), cdf_a_dbn(ai)
-	ENDDO
-	cdf_a_dbn = cdf_a_dbn + 1.0_DP - cdf_a_dbn(na)
-
-	!DO ai=1,na
-	!     print*, pr_a_dbn(ai), cdf_a_dbn(ai)
-	!ENDDO
-
-	!print*,''
-	
-	! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
-	DO prctile=1,100
-	    ai=1
-	    DO while (cdf_a_dbn(ai) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
-	        ai=ai+1
-	    ENDDO
-	    prctile_ai_ind(prctile) = ai
-	    prctile_ai(prctile)     = agrid(ai)
-	    ! print*,prctile, REAL(prctile,8)/100.0_DP,  ai
-	    IF (ai .gt. 1) THEN
-	        cdf_tot_a_by_prctile(prctile)  = cdf_tot_a_by_grid(ai-1) + (REAL(prctile,8)/100.0_DP - cdf_a_dbn(ai-1))*agrid(ai) 
-	    else
-	        cdf_tot_a_by_prctile(prctile)  = (REAL(prctile,8)/100.0_DP )*agrid(ai)     
-	    ENDIF
-	ENDDO
-	print*,''
-	prct1_wealth  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
-	prct10_wealth = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
-	prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
-	prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
-
-
-	! Distribution of firm wealth
-		do ai=1,na
-			Firm_Wealth(:,ai,:,:,:) = V_Pr(:,ai,:,:,:) + (1.0_dp+R)*agrid(ai)
-		enddo
-		Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
-
-		DBN_vec         = reshape(DBN1       ,(/size(DBN1)/))
-		Firm_Wealth_vec = reshape(Firm_Wealth,(/size(DBN1)/))
-
-		if (solving_bench.eq.1) then
-			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Bench.txt', STATUS='replace')
-		else
-			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Exp.txt', STATUS='replace')
-		end if 
-			WRITE(UNIT=11, FMT=*) ' '
-			WRITE(UNIT=11, FMT=*) 'Firm_Wealth _Stats'
-			WRITE(UNIT=11, FMT=*) 'Mean_Firm_Wealth= ', Mean_Firm_Wealth
-			WRITE(UNIT=11, FMT=*) 'Top_x% ','x_percentile ','wealth_share_above_x ', 'Counter_CDF'
-
-		prctile_FW = (/0.20_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
-		a = minval(Firm_Wealth_vec)
-		b = maxval(Firm_Wealth_vec) 
-		c = a
-		do i=1,size(prctile_FW)
-			a = c
-			b = maxval(Firm_Wealth_vec)
-			c = (a+b)/2.0_dp
-			CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
-			print*, ' '
-			!print*, 'Percentile', prctile_FW(i)
-			do while (abs(CCDF_c-prctile_FW(i))>0.0001_dp)
-				if (CCDF_c<prctile_FW(i)) then 
-					b = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
-				else 
-					a = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
-				endif
-				!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', CCDF_c-prctile_FW(i)
-			enddo 
-			FW_top_x(i)       = c 
-			FW_top_x_share(i) = 100*sum(Firm_Wealth_vec*DBN_vec,Firm_Wealth_vec>=c)/Mean_Firm_Wealth
-			WRITE(UNIT=11, FMT=*) i,FW_top_x(i),FW_top_x_share(i), CCDF_c
-		enddo 
-
-			CLOSE(UNIT=11)
-
-	! ! Distribution of firm wealth
-	! 	Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
-
-	! 	DBN_vec         = reshape(DBN1       ,(/size(DBN1)/))
-	! 	Firm_Wealth_vec = reshape(Firm_Wealth,(/size(DBN1)/))
-	! 	print*, 'Check 4.1'
-	! 	Call Sort(size(DBN1),Firm_Wealth_vec,Firm_Wealth_vec,Firm_Wealth_ind)
-	! 	DBN_vec = DBN_vec(Firm_Wealth_ind)
-	! 	print*, 'Check 4.2'
-
-	! 	!$omp parallel do 
-	! 	do i=1,size(DBN1)
-	! 		CDF_Firm_Wealth(i) = sum( DBN_vec(1:i) )
-	! 	enddo 
-
-	! 	print*, 'Wealth concentration by prct'
-	! 	!$omp parallel do 
-	! 	do prctile=1,100
-	!     	i=1
-	! 	    DO while (CDF_Firm_Wealth(i) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
-	! 	        i=i+1
-	! 	    ENDDO
-	! 	    print*, prctile, i, Firm_Wealth_vec(i),100*sum(Firm_Wealth_vec(i:)*DBN_vec(i:))/Mean_Firm_Wealth
-	! 	    FW_prctile_ind(prctile)   = i
-	! 	    FW_prctile(prctile)       = Firm_Wealth_vec(i)
-	! 	    FW_above_prctile(prctile) = 100*sum(Firm_Wealth_vec(i:)*DBN_vec(i:))/Mean_Firm_Wealth
-		    
-	!     enddo
-
-	!     if (solving_bench.eq.1) then
-	! 		OPEN (UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Bench_sort.txt', STATUS='replace')
-	! 	else
-	! 		OPEN (UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Exp_sort.txt', STATUS='replace')
-	! 	end if 
-
-	! 		WRITE(UNIT=11, FMT=*) ' '
-	! 		WRITE(UNIT=11, FMT=*) 'Firm_Wealth _Stats'
-	! 		WRITE(UNIT=11, FMT=*) 'Mean_Firm_Wealth=', Mean_Firm_Wealth
-	! 		WRITE(UNIT=11, FMT=*) 'Wealth_Top_1%='   , FW_above_prctile(99)
-	! 		WRITE(UNIT=11, FMT=*) 'Wealth_Top_5%='   , FW_above_prctile(95)
-	! 		WRITE(UNIT=11, FMT=*) 'Wealth_Top_10%='  , FW_above_prctile(90)
-	! 		WRITE(UNIT=11, FMT=*) 'Wealth_Top_20%='  , FW_above_prctile(80)
-	! 		WRITE(UNIT=11, FMT=*) 'Wealth_Top_40%='  , FW_above_prctile(60)
-	! 		WRITE(UNIT=11, FMT=*) ' '
-	! 		WRITE(UNIT=11, FMT=*) 'prctl','Wealth','Wealth_Above_%'
-	! 		do prctile=1,100
-	! 			WRITE(UNIT=11, FMT=*) prctile,FW_prctile(prctile),FW_above_prctile(prctile)
-	! 		enddo
-
-	! 		CLOSE(UNIT=11)
-
 	
 
 	! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
@@ -2409,6 +2252,161 @@ SUBROUTINE COMPUTE_STATS()
 	leverage_age_z = leverage_age_z/size_by_age_z
 	constrained_firms_age_z = constrained_firms_age_z/size_by_age_z 
 	constrained_firms_age   = constrained_firms_age/size_by_age 
+
+
+	! Percentage of the population above wealth tax threshold
+		! Compute distribution of agents by (a,z)
+		DBN_az = sum(sum(sum(DBN1,5),4),1)
+		! Compute mean before tax wealth
+		Wealth = Wealth_Matrix(R,P)
+		! Compute share of agents above threshold
+		Threshold_Share = 0.0_dp
+		do ai=1,na
+		do zi=1,nz 
+			if (Wealth(ai,zi).gt.Y_a_threshold) then 
+				Threshold_Share = Threshold_Share + DBN_az(ai,zi)
+			end if 
+		end do 
+		end do 
+
+	! Distribution of Assets
+		DO ai=1,na
+		     pr_a_dbn(ai)          = sum(DBN1(:,ai,:,:,:)) 
+		     cdf_a_dbn(ai)         = sum( pr_a_dbn(1:ai) )      
+		     tot_a_by_grid(ai)     = sum(DBN1(:,ai,:,:,:) * agrid(ai) )
+		     cdf_tot_a_by_grid(ai) = sum(tot_a_by_grid(1:ai))   
+		!     print*, pr_a_dbn(ai), cdf_a_dbn(ai)
+		ENDDO
+		cdf_a_dbn = cdf_a_dbn + 1.0_DP - cdf_a_dbn(na)
+
+		
+		! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
+		DO prctile=1,100
+		    ai=1
+		    DO while (cdf_a_dbn(ai) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
+		        ai=ai+1
+		    ENDDO
+		    prctile_ai_ind(prctile) = ai
+		    prctile_ai(prctile)     = agrid(ai)
+		    ! print*,prctile, REAL(prctile,8)/100.0_DP,  ai
+		    IF (ai .gt. 1) THEN
+		        cdf_tot_a_by_prctile(prctile)  = cdf_tot_a_by_grid(ai-1) + (REAL(prctile,8)/100.0_DP - cdf_a_dbn(ai-1))*agrid(ai) 
+		    else
+		        cdf_tot_a_by_prctile(prctile)  = (REAL(prctile,8)/100.0_DP )*agrid(ai)     
+		    ENDIF
+		ENDDO
+		print*,''
+		prct1_wealth  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
+		prct10_wealth = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
+		prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
+		prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
+
+	! Distribution of firm wealth
+		do ai=1,na
+			Firm_Wealth(:,ai,:,:,:) = V_Pr(:,ai,:,:,:) + (1.0_dp+R)*agrid(ai)
+		enddo
+		Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
+
+		DBN_vec         = reshape(DBN1       ,(/size(DBN1)/))
+		Firm_Wealth_vec = reshape(Firm_Wealth,(/size(DBN1)/))
+
+		if (solving_bench.eq.1) then
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Bench.txt', STATUS='replace')
+		else
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Exp.txt', STATUS='replace')
+		end if 
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'Firm_Wealth_Stats'
+			WRITE(UNIT=11, FMT=*) 'Mean_Firm_Wealth= ', Mean_Firm_Wealth
+			WRITE(UNIT=11, FMT=*) 'Top_x% ','x_percentile ','wealth_share_above_x ', 'Counter_CDF'
+
+		prctile_FW = (/0.40_DP, 0.20_dp, 0.10_dp, 0.01_dp/)
+		a = minval(Firm_Wealth_vec)
+		b = maxval(Firm_Wealth_vec) 
+		c = a
+		do i=1,size(prctile_FW)
+			a = c
+			b = maxval(Firm_Wealth_vec)
+			c = (a+b)/2.0_dp
+			CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+			print*, ' '
+			!print*, 'Percentile', prctile_FW(i)
+			do while ((abs(CCDF_c-prctile_FW(i))>0.0001_dp).and.(b-a>1e-8))
+				if (CCDF_c<prctile_FW(i)) then 
+					b = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+				else 
+					a = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+				endif
+				!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', CCDF_c-prctile_FW(i)
+			enddo 
+			FW_top_x(i)       = c 
+			FW_top_x_share(i) = 100*sum(Firm_Wealth_vec*DBN_vec,Firm_Wealth_vec>=c)/Mean_Firm_Wealth
+			WRITE(UNIT=11, FMT=*) 100_dp*prctile_FW(i),FW_top_x(i),FW_top_x_share(i), CCDF_c
+		enddo 
+
+			CLOSE(UNIT=11)
+
+	! Distribution of bequest
+		! Distribution of bequest (matrix)	
+		do ai=1,MaxAge
+			DBN_bq(age,:,:,:,:) = DBN1(age,:,:,:,:)*(1.0_DP-survP(age))
+		enddo 
+		DBN_bq = DBN_bq/sum(DBN_bq)
+		
+		! Vectorization
+		DBN_bq_vec        = reshape(DBN_bq,(/size(DBN1)/))
+		BQ_vec            = reshape(Aprime,(/size(DBN1)/))
+
+		! Mean Bequest
+		Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
+
+		if (solving_bench.eq.1) then
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Bench.txt', STATUS='replace')
+		else
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Exp.txt', STATUS='replace')
+		end if 
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'Bequest_Stats'
+			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/Wealth= '		, Mean_Bequest/MeanWealth 
+			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/PV_Wealth= '	, Mean_Bequest/Mean_Firm_Wealth 
+			WRITE(UNIT=11, FMT=*) 'Bequests_Above_Threshold= '	, Threshold_Share_bq
+			WRITE(UNIT=11, FMT=*) 'Bequest_Revenue/YBAR= '		, 0
+			WRITE(UNIT=11, FMT=*) 'Top_x% ','x_percentile ','x_percentile/YBAR'
+
+		prctile_bq = (/0.90_dp, 0.70_dp, 0.5_dp, 0.30_dp, 0.10_dp, 0.02_dp, 0.01_dp/)
+		a = minval(BQ_vec)
+		b = maxval(BQ_vec) 
+		c = a
+		do i=1,size(prctile_bq)
+			a = c
+			b = maxval(BQ_vec)
+			c = (a+b)/2.0_dp
+			CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+			!print*, ' '
+			!print*, 'Percentile', prctile_bq(i)
+			do while ((abs(CCDF_c-prctile_bq(i))>0.0001_dp).and.(b-a>1e-8))
+				if (CCDF_c<prctile_bq(i)) then 
+					b = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+				else 
+					a = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+				endif
+				!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', abs(CCDF_c-prctile_bq(i))
+			enddo 
+			BQ_top_x(i) = c 
+			WRITE(UNIT=11, FMT=*) 100_dp*prctile_bq(i),BQ_top_x(i),BQ_top_x(i)/YBAR, CCDF_C
+		enddo 
+
+			CLOSE(UNIT=11)
+	
+
 
 
 
@@ -4499,6 +4497,25 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			enddo 
 			WRITE(UNIT=19, FMT=*) 'Moments'				  	, SSE_Moments 
 			WRITE(UNIT=19, FMT=*) ' '
+			WRITE(UNIT=19, FMT=*) 'Present_Value_Wealth'
+			WRITE(UNIT=19, FMT=*) "Mean_PV_Wealth"		    , Mean_Firm_Wealth
+			WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_1%' 		, FW_top_x_share(4)
+			WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_10%'		, FW_top_x_share(3)
+			WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_20%'		, FW_top_x_share(2)
+			WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_40%'		, FW_top_x_share(1)
+			WRITE(UNIT=19, FMT=*) ' '
+			WRITE(UNIT=19, FMT=*) 'Bequest'
+			WRITE(UNIT=19, FMT=*) 'Mean_Bequest/Wealth='	, Mean_Bequest/MeanWealth 
+			WRITE(UNIT=19, FMT=*) 'Mean_Bequest/PV_Wealth='	, Mean_Bequest/Mean_Firm_Wealth 
+			WRITE(UNIT=19, FMT=*) 'BQ_Above_Threshold='		, Threshold_Share_bq
+			WRITE(UNIT=19, FMT=*) 'Bequest_Revenue/YBAR='	, GBAR_bq/YBAR
+			WRITE(UNIT=19, FMT=*) 'BQ_p10/YBAR'				, BQ_top_x(1)/YBAR
+			WRITE(UNIT=19, FMT=*) 'BQ_p30/YBAR'				, BQ_top_x(2)/YBAR
+			WRITE(UNIT=19, FMT=*) 'BQ_p50/YBAR'				, BQ_top_x(3)/YBAR
+			WRITE(UNIT=19, FMT=*) 'BQ_p70/YBAR'				, BQ_top_x(4)/YBAR
+			WRITE(UNIT=19, FMT=*) 'BQ_p90/YBAR'				, BQ_top_x(5)/YBAR
+			WRITE(UNIT=19, FMT=*) 'BQ_p98/YBAR'				, BQ_top_x(6)/YBAR
+			WRITE(UNIT=19, FMT=*) 'BQ_p99/YBAR'				, BQ_top_x(7)/YBAR
 		CLOSE(Unit=19)
 	if (bench_indx.ne.1) then
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='old', POSITION='append') 
