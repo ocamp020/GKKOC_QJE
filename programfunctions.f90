@@ -4491,7 +4491,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Mean_Bequest/Wealth='	, Mean_Bequest/MeanWealth 
 			WRITE(UNIT=19, FMT=*) 'Mean_Bequest/PV_Wealth='	, Mean_Bequest/Mean_Firm_Wealth 
 			WRITE(UNIT=19, FMT=*) 'BQ_Above_Threshold='		, Threshold_Share_bq
-			WRITE(UNIT=19, FMT=*) 'Bequest_Revenue/YBAR='	, GBAR_bq/YBAR
+			WRITE(UNIT=19, FMT=*) 'Bequest_Revenue/YBAR='	, 0
 			WRITE(UNIT=19, FMT=*) 'BQ_p10/YBAR'				, BQ_top_x(1)/YBAR
 			WRITE(UNIT=19, FMT=*) 'BQ_p30/YBAR'				, BQ_top_x(2)/YBAR
 			WRITE(UNIT=19, FMT=*) 'BQ_p50/YBAR'				, BQ_top_x(3)/YBAR
