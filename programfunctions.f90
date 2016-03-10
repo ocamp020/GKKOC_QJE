@@ -4046,6 +4046,231 @@ END SUBROUTINE SIMULATION
 !========================================================================================
 !========================================================================================
 
+SUBROUTINE  SIMULATION_TOP(bench_indx)
+	use parameters
+	use global
+	use omp_lib
+	IMPLICIT NONE
+	integer, intent(in) :: bench_indx
+	integer  :: currentzi, currentlambdai, currentei
+	REAL(DP) :: tempnoage, tempnoz, tempnolambda, tempnoe, tempno, currenta, currentY
+	REAL(DP) :: start_timet, finish_timet
+	INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
+	INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
+	INTEGER , DIMENSION(totpop) :: panelage, panelz, panellambda, panele 
+	REAL(DP), DIMENSION(totpop) :: panela, panelPV_a, panelK 
+	INTEGER , DIMENSION(150,80) :: panelage_top, panelz_top
+	REAL(DP), DIMENSION(150,80) :: panela_top, panelK_top 
+	INTEGER 				    :: top_ind(80)
+
+	!$ call omp_set_num_threads(20)
+
+	top_ind = (/ 12989503 , 16359499 , 17210684 , 2112354  , 2286434  , 16526136 , 7438210  , 6869588  , 19078203 , 15606788 ,&
+			&    2225856  , 12531737 , 11062763 , 19793497 , 16188809 , 18407385 , 11304514 , 6412028  , 1148323 , 8595835 ,&
+			&    14145270 , 18478397 , 2737060  , 1032430  , 7474392  , 12080222 , 7661199  , 8814829  , 7723389 , 168007 ,&
+			&    17158184 , 9059254  , 4597720  , 11328153 , 9623802  , 877507   , 9864235  , 5559945  , 16345916 , 7342133 ,&
+			&    16218846 , 13141854 , 9039802  , 16373055 , 14633731 , 3949499  , 8253465  , 48763    , 18557196 , 19577804 ,&
+			&    19590912 , 6845111  , 10804332 , 10151506 , 3053807  , 18567572 , 6728883  , 13320399 , 2160040 , 7239959 ,&
+			&    366537   , 15071340 , 1194864  , 11098872 , 12735017 , 2876272  , 5195770  , 4720772  , 12421325 , 12027769 ,&
+			&    6114885  , 14643750 , 11624454 , 13317533 , 10460044 , 9292769  , 177466   , 9419824  , 17555631 , 16615490/)
+
+	print*,'SIMULATION STARTED (for top agents)'
+
+    age=1
+    requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
+    cdfrequirednumberby_age(age) = requirednumberby_age(age)
+    DO age=2,MaxAge
+        requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
+        cdfrequirednumberby_age(age) = requirednumberby_age(age) + cdfrequirednumberby_age(age-1)
+    ENDDO
+    ! If the total number of people are not equal to the total population, then I will add the remainder to the last age
+    requirednumberby_age(MaxAge) =  requirednumberby_age(MaxAge)-cdfrequirednumberby_age(MaxAge) + totpop
+    cdfrequirednumberby_age(MaxAge) = totpop
+
+	!=====================================================================
+	!                     GENERATE   INITIAL   PANEL
+	!=====================================================================
+
+
+	newiseed=-1
+
+	DO paneli=1,totpop
+
+	! AGE
+	   tempnoage = ran1(newiseed)
+	   age=1
+	   DO WHILE (tempnoage*totpop .gt. cdfrequirednumberby_age(age))
+	       age=age+1
+	   ENDDO
+
+	! Z   
+	   tempnoz = ran1(newiseed)
+	   zi=1
+	   DO WHILE (tempnoz .gt. cdf_Gz(zi))
+	       zi=zi+1
+	   ENDDO
+	 
+	! LAMBDA  
+	   tempnolambda = ran1(newiseed) 
+	   lambdai=1
+	   DO WHILE (tempnolambda .gt. cdf_Glambda(lambdai))
+	       lambdai=lambdai+1
+	   ENDDO
+
+	! E   
+	   tempnoe = ran1(newiseed)   
+	   ei=1
+	   DO WHILE (tempnoe .gt. cdf_Ge_byage(age,ei))
+	       ei=ei+1
+	   ENDDO
+
+	   panelage(paneli)=age
+	   panelz(paneli)=zi
+	   panellambda(paneli)=lambdai
+	   panele(paneli)=ei
+	   
+	ENDDO
+
+	! SET INITIAL ASSET DISTRIBUTION
+	panela            = 1.0_DP
+
+	!=============================================================================
+	!
+	! SIMULATE FROM THE SECOND PERIOD SHOCKS AND UPDATE NEW DISTRIBUTIONS
+	!
+	!=============================================================================
+
+	!call cpu_time(start_timet) 
+
+	DO simutime=1, MaxSimuTime
+	    DO paneli=1,totpop
+	    
+	       	currenta  		= panela(paneli)
+	       	age       		= panelage(paneli)
+	       	currentzi      	= panelz(paneli)
+	       	currentlambdai 	= panellambda(paneli) 
+	       	currentei 		= panele(paneli)
+	        
+			!  COMPUTE NEXT PERIOD'S ASSET
+	       	if (age .lt. MaxAge) then
+	            ! do linear interpolation here to find aprime. calling the function takes much more time
+	            if (currenta .ge. amax) then
+                	tklo = na-1
+                elseif (currenta .lt. amin) then
+                    tklo = 1
+                else
+                    tklo = ((currenta - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+	            endif 
+	            tkhi = tklo + 1        
+
+	            panela(paneli) = ((agrid(tkhi) - currenta)*Aprime(age,tklo,currentzi,currentlambdai,currentei) 		&
+	                           	&  + (currenta - agrid(tklo))*Aprime(age,tkhi,currentzi,currentlambdai, currentei)) &
+	                            &  / ( agrid(tkhi) - agrid(tklo) )    
+	            
+	            if (panela(paneli)  .ge. amax) then
+	                panela(paneli) = min(panela(paneli), amax) 
+	            endif      
+	            if (panela(paneli)  .lt. amin) then
+	                panela(paneli) = max(panela(paneli), amin) 
+	            endif      
+
+	       	endif !age .lt. MaxAge
+			!  NEXT PERIOD'S ASSET IS COMPUTED
+
+	             
+			! DRAW NEXT PERIOD'S AGE DBN
+	      	tempnoage = ran1(newiseed)  
+	  
+	      	IF (tempnoage .gt. survP(age)) THEN
+				panelage(paneli)   = 1
+			ELSE
+				panelage(paneli)   = age+1
+				panelz(paneli)     = currentzi
+				panellambda(paneli)= currentlambdai   
+	      	ENDIF
+	    
+			! DRAW Z and LAMBDA DISTRIBUTION FOR ONE-YEAR OLDS
+	     	age = panelage(paneli)   
+	     	IF (age .eq. 1) THEN    
+				! Z      
+		       	tempnoz = ran1(newiseed) 
+		       	zi=1
+				DO WHILE (tempnoz .gt. cdf_pr_z(currentzi,zi))
+					zi=zi+1
+				ENDDO
+	       
+				! LAMBDA  
+				tempnolambda = ran1(newiseed) 
+				lambdai=1
+				DO WHILE (tempnolambda .gt. cdf_pr_lambda(currentlambdai,lambdai))
+					lambdai=lambdai+1
+				ENDDO
+
+				! E       
+				currentei = panele(paneli)
+				ei = ne/2+1 ! ALL NEWBORN START FROM THE MEDIAN E  but if too many people died and started from median E, draw a new E for them
+
+				panelz(paneli)		= zi    
+				panellambda(paneli)	= lambdai
+				panele(paneli) 		= ei 
+
+       		else  IF (age .gt. 1) THEN
+	            currentei = panele(paneli)   
+	            tempno 	  = ran1(newiseed)   
+	            ei 		  = 1
+	            DO WHILE (tempno .gt. cdf_pr_e(currentei,ei))
+	               ei = ei+1
+	            ENDDO            
+	            panele(paneli)=ei            
+	     	ENDIF ! new age==1
+	    
+	     	! Record data of top agents
+	     	if (simutime.ge.(MaxSimuTime-149)) then 
+	     		panelage_top(simutime-MaxSimuTime+150,:) = panelage(top_ind)
+	     		panelz_top(simutime-MaxSimuTime+150,:)   = panelz(top_ind)
+	     		panela_top(simutime-MaxSimuTime+150,:)   = panela(top_ind)
+	     		panelk_top(simutime-MaxSimuTime+150,:)   = min( theta*panela_top(simutime-MaxSimuTime+150,:) ,&
+	     					& (mu*P*zgrid(cpanelz_top(simutime-MaxSimuTime+150,:))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+	     	endif
+
+	    ENDDO ! paneli
+	ENDDO ! simutime
+
+	print*, ' '
+	print*, 'Writing simulation results for top agents'
+	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
+
+	if (bench_indx.eq.1) then
+		OPEN   (UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_top_bench'		   	, STATUS='replace')
+		OPEN   (UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_top_bench'	 	, STATUS='replace')
+		OPEN   (UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_top_bench'		    , STATUS='replace')
+		OPEN   (UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_top_bench'         , STATUS='replace')
+	else 
+		OPEN   (UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_top_exp'		 	, STATUS='replace')
+		OPEN   (UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_top_exp'		    , STATUS='replace')
+		OPEN   (UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_top_exp'		 	, STATUS='replace')
+		OPEN   (UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_top_exp' 	        , STATUS='replace')
+	endif 
+
+
+	WRITE  (UNIT=10, FMT=*) panela_top
+	WRITE  (UNIT=11, FMT=*) panelage_top  
+	WRITE  (UNIT=12, FMT=*) panelz_top 
+	WRITE  (UNIT=27, FMT=*) panelK_top
+
+	close (unit=10)
+	close (unit=11)
+	close (unit=12)
+	close (unit=27)
+
+
+END SUBROUTINE SIMULATION_TOP
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
 
 
 ! SUBROUTINE  SIMULATION_STATS(bench_indx)

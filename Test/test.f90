@@ -184,5 +184,7 @@ aaa(2,2)=34.22
 bbb=reshape(aaa,(/size(aaa)/))
 print*, bbb
 print*, size(aaa)
+print*, bbb( (/4,1/)  )
+print*, min(bbb,(/30.0,1.0,1.0,10000.0/))
 
 end program test
