@@ -4230,7 +4230,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	     		panelz_top(simutime-MaxSimuTime+150,:)   = panelz(top_ind)
 	     		panela_top(simutime-MaxSimuTime+150,:)   = panela(top_ind)
 	     		panelk_top(simutime-MaxSimuTime+150,:)   = min( theta*panela_top(simutime-MaxSimuTime+150,:) ,&
-	     					& (mu*P*zgrid(cpanelz_top(simutime-MaxSimuTime+150,:))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+	     					& (mu*P*zgrid(panelz_top(simutime-MaxSimuTime+150,:))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 	     	endif
 
 	    ENDDO ! paneli
