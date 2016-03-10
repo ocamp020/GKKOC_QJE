@@ -2567,7 +2567,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	! Compute wealth given current R and P
 		Wealth = Wealth_Matrix_t(R,P)
 
-		!print*, 'R=',R,'P=',P, 'W=',wage, 'na=', na, 'na_t=', na_t
+		print*, 'R=',R,'P=',P, 'W=',wage, 'na=', na, 'na_t=', na_t
 	!========================================================================================
 	!------RETIREMENT PERIOD-----------------------------------------------------------------
 
@@ -3160,7 +3160,7 @@ SUBROUTINE FORM_Y_MB_GRID(TYGRID,TMBGRID,TYGRID_t,TMBGRID_t)
 	REAL(DP), DIMENSION(na_t,nz), INTENT(OUT) :: TYGRID_t, TMBGRID_t
 	!REAL(DP), INTENT(IN) :: P
 	!integer :: ai, zi
-	print*, ' FORM_Y_MB_GRID ', 'R=',R,'P=',P
+
 	DO zi=1,nz
 		DO ai=1,na
 			TYGRID(ai,zi)  = Y_a(agrid(ai),zgrid(zi))
