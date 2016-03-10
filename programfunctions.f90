@@ -779,7 +779,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	! Solve for the benchmark economy 
 		solving_bench = 1
 		tauK    = tauK_bench
-		R       = R_bench
+		R       = R_exp
 		P       = P_bench
 		wage    = wage_bench
 		Ebar    = Ebar_bench
@@ -798,6 +798,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
 		CALL ComputeLaborUnits(Ebar, wage) 
 		CALL EGM_RETIREMENT_WORKING_PERIOD 
+
+		print*, 'C_BAR_aux=', sum(Cons*DBN_Bench)
 
 	! Compute the value function using interpolation and save it
 		CALL COMPUTE_VALUE_FUNCTION_LINEAR
