@@ -3990,8 +3990,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 	    endif    
 	    tkhi = tklo + 1        
 
-	    panelPV_a(paneli) = (   (agrid(tkhi) - currenta)     * PV_a(age,tklo,currentzi,currentlambdai, currentei)  &
-	                       &  + (currenta - agrid(tklo))     * PV_a(age,tkhi,currentzi,currentlambdai, currentei)) &
+	    panelPV_a(paneli) = (   (agrid(tkhi) - currenta)     * Firm_Wealth(age,tklo,currentzi,currentlambdai, currentei)  &
+	                       &  + (currenta - agrid(tklo))     * Firm_Wealth(age,tkhi,currentzi,currentlambdai, currentei)) &
 	                       &  / ( agrid(tkhi) - agrid(tklo) ) 
 
 	    panelK(paneli)    = min( theta*currenta , (mu*P*zgrid(currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )             
