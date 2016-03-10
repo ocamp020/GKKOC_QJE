@@ -779,7 +779,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	! Solve for the benchmark economy 
 		solving_bench = 1
 		tauK    = tauK_bench
-		!R       = R_bench
+		R       = R_exp
 		P       = P_bench
 		wage    = wage_bench
 		Ebar    = Ebar_bench
