@@ -4223,18 +4223,18 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	            ENDDO            
 	            panele(paneli)=ei            
 	     	ENDIF ! new age==1
-	    
-	     	! Record data of top agents
-	     	if (simutime.ge.(MaxSimuTime-149)) then 
-	     		print*, "Selecting top agents - Period", simutime-MaxSimuTime+150
-	     		panelage_top(simutime-MaxSimuTime+150,:) = panelage(top_ind)
-	     		panelz_top(simutime-MaxSimuTime+150,:)   = panelz(top_ind)
-	     		panela_top(simutime-MaxSimuTime+150,:)   = panela(top_ind)
-	     		panelk_top(simutime-MaxSimuTime+150,:)   = min( theta*panela_top(simutime-MaxSimuTime+150,:) ,&
-	     					& (mu*P*zgrid(panelz_top(simutime-MaxSimuTime+150,:))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-	     	endif
 
 	    ENDDO ! paneli
+
+	    ! Record data of top agents
+     	if (simutime.ge.(MaxSimuTime-149)) then 
+     		print*, "Selecting top agents - Period", simutime-MaxSimuTime+150
+     		panelage_top(simutime-MaxSimuTime+150,:) = panelage(top_ind)
+     		panelz_top(simutime-MaxSimuTime+150,:)   = panelz(top_ind)
+     		panela_top(simutime-MaxSimuTime+150,:)   = panela(top_ind)
+     		panelk_top(simutime-MaxSimuTime+150,:)   = min( theta*panela_top(simutime-MaxSimuTime+150,:) ,&
+     					& (mu*P*zgrid(panelz_top(simutime-MaxSimuTime+150,:))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+     	endif
 	    print*, "Simulation period", simutime
 	ENDDO ! simutime
 
