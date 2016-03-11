@@ -4226,6 +4226,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	    
 	     	! Record data of top agents
 	     	if (simutime.ge.(MaxSimuTime-149)) then 
+	     		print*, "Selecting top agents - Period", simutime-MaxSimuTime+150
 	     		panelage_top(simutime-MaxSimuTime+150,:) = panelage(top_ind)
 	     		panelz_top(simutime-MaxSimuTime+150,:)   = panelz(top_ind)
 	     		panela_top(simutime-MaxSimuTime+150,:)   = panela(top_ind)
@@ -4234,6 +4235,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	     	endif
 
 	    ENDDO ! paneli
+	    print*, "Simulation period", simutime
 	ENDDO ! simutime
 
 	print*, ' '
