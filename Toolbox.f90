@@ -778,6 +778,9 @@ MODULE Toolbox
 			G(1)  = sum(G_in(1:n_cut+1))
 			G(2:) = G_in(n_cut+2:)
 			print*, 'Test!!!!!!!!!!!!!!!!!!!!!'
+			print*, G_cut
+			print*, sum(G_cut)
+			print*, "End Test"
 		endif
 
 	end Subroutine Markov_Cut
