@@ -3336,7 +3336,7 @@ SUBROUTINE  INITIALIZE()
 		! print*, 'zgrid check' , all(zgrid.eq.zgrid_aux)
 		! print*, 'pr_z check' , all(pr_z.eq.pr_z_aux)
 		do ee0=1,nz 
-			print*, sum(pr_z(ee0,:))
+			print*, sum(pr_z(ee0,:)),sum(pr_z_aux(ee0,:)) 
 		enddo 
 		print*, sum(Gz)
 		print*, zgrid_aux
