@@ -769,7 +769,7 @@ MODULE Toolbox
 			! Transition Matrix
 				! Sum transition probabilities into first n_cut+1 states
 				P_aux(:,1)  = sum(P_in(:,1:n_cut+1),2)
-				P_aux(:,2:) = P_aux(:,n_cut+2:)
+				P_aux(:,2:) = P_in(:,n_cut+2:)
 				! Average across the states to be merged with G_cut
 				P(1,:)      = sum(P_aux(1:n_cut+1,:)*spread(G_cut,2,n-n_cut),1)
 				P(2:,:)     = P_aux(n_cut+2:,:)
@@ -780,6 +780,7 @@ MODULE Toolbox
 			print*, 'Test!!!!!!!!!!!!!!!!!!!!!'
 			print*, G_cut
 			print*, sum(G_cut)
+			print*, sum(P,2)
 			print*, "End Test"
 		endif
 
