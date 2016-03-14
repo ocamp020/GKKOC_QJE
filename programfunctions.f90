@@ -3321,8 +3321,10 @@ SUBROUTINE  INITIALIZE()
 		REAL(DP), DIMENSION(nz_aux,nz_aux) :: pr_z_aux
 	
 	! Initiliaze grids for z
-		!CALL tauchen(mtauchen_z,rho_z,sigma_z_eps,nz_aux,zgrid_aux,pr_z_aux,Gz_aux)
-		CALL tauchen(mtauchen_z,rho_z,sigma_z_eps,nz,zgrid,pr_z,Gz)
+		CALL tauchen(mtauchen_z,rho_z,sigma_z_eps,nz_aux,zgrid_aux,pr_z_aux,Gz_aux)
+		zgrid = zgrid_aux
+		pr_z = pr_z_aux
+		Gz   = Gz_aux
 		! Tauchen gives grids for the log of the variables. Exponentiate to adjust
 		zgrid_aux      = exp(zgrid_aux) + mu_z
 		! Cut process 
