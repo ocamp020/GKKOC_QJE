@@ -68,6 +68,7 @@ integer, dimension(4) :: bb_ind
 real, dimension(2,3,4) :: matrix, matrix_in
 real, dimension(2,3,4,5,6) :: dbn
 real, dimension(3,4)       :: dbn_1, dbn_2, a_mat, z_mat
+real, dimension(3,3)       :: zz_mat
 real, dimension(3)         :: agrid
 real, dimension(4)         :: zgrid
 integer :: i,j
@@ -186,5 +187,19 @@ print*, bbb
 print*, size(aaa)
 print*, bbb( (/4,1/)  )
 print*, min(bbb,(/30.0,1.0,1.0,10000.0/))
+
+
+z_mat(:,1) = 1.0
+z_mat(:,2) = 2.0
+z_mat(:,3) = 3.0
+z_mat(:,4) = 4.0
+
+zz_mat(:,1) = sum(z_mat(:,1:2),2)
+zz_mat(:,2:3) = z_mat(:,3:4)
+
+print*,zz_mat(1,:)
+print*,zz_mat(2,:)
+print*,zz_mat(3,:)
+
 
 end program test

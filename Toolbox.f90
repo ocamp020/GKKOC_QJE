@@ -718,6 +718,72 @@ MODULE Toolbox
 	    return
 	end subroutine  MarkovAR_95
 
+! =============================================================================
+! Markov_Cut: Cuts down the first n_cut nodes of a discrete markov process. 
+!			  This subroutine takes in an "n" state markov process with transition matrix P_in
+! 			  and invariant distribution G_in, and returns a process with "n-n_cut" states and
+!			  transition matrix P and invariant distribution G
+!			  The transition matrix is assumed to sum trhough columns so that p(i,j) = Pr(z'=j|z=i)
+!			  The first n_cut+1 states of the original grid are merged into the first state of the 
+!			  new grid
+!
+! Usage: Call Markov_Cut(n,grid_in,P_in,G_in,n_cut,grid,P,G)
+!
+! Input:  n      , integer , 			    Grid dimension for original Markov process
+! 		  n_cut  , integer , 			    Number of states to eliminate. New process has n-n_cut states
+!		  grid_in, real(dp), dimension(n)  , Grid of states of original markov process
+!		  P_in   , real(dp), dimension(n,n), Transition matrix of original markov process
+!		  G_in   , real(dp), dimension(n)  , Invariant distribution of original markov process
+!
+! Output: grid   , real(dp), dimension(n-n_cut)        , Grid of states of new markov process
+!		  P      , real(dp), dimension(n-n_cut,n-n_cut), Transition matrix of new markov process
+!		  G      , real(dp), dimension(n-n_cut)        , Invariant distribution of new markov process
+!
+	
+
+	Subroutine Markov_Cut(n,grid_in,P_in,G_in,n_cut,grid,P,G)
+		use nrtype
+    	use nrutil
+		IMPLICIT NONE
+		integer , intent(in)  :: n, n_cut
+		real(dp), intent(in)  :: grid_in(n), P_in(n,n), G_in(n)
+		real(dp), intent(out) :: grid(n-n_cut), P(n-n_cut,n-n_cut), G(n-n_cut)
+		real(dp)              :: G_cut(n_cut+1), P_aux(n,n-n_cut)
+
+
+		if (n_cut.ge.n) then
+			print*, "Error in Markov_Cut: n_cut>=n"
+			STOP
+		elseif (n.eq.0) then
+			print*, "Warning in Markov_Cut: Nothing to cut (n_cut=0)"
+			print*, "Output is unchanged."
+			grid = grid_in
+			P 	 = P_in
+			G 	 = G_in
+		else
+			! Distribution of nodes to be eliminated
+			G_cut = G_in(1:n_cut+1)/sum(G_in(1:n_cut+1))
+
+			! Grid 
+			grid(1)  = sum(grid_in(1:n_cut+1)*G_cut)
+			grid(2:) = grid_in(n_cut+2:)
+
+			! Transition Matrix
+				! Sum transition probabilities into first n_cut+1 states
+				P_aux(:,1)  = sum(P_in(:,1:n_cut+1),2)
+				P_aux(:,2:) = P_aux(:,n_cut+2:)
+				! Average across the states to be merged with G_cut
+				P(1,:)      = sum(P_aux(1:n_cut+1,:)*spread(G_cut,2,n-n_cut),1)
+				P(2:,:)     = P_aux(n_cut+2:,:)
+
+			! Satationary Distribution
+			G(1)  = sum(G_in(1:n_cut+1))
+			G(2:) = G_in(n_cut+2:)
+
+		endif
+
+	end Subroutine Markov_Cut
+
 
 !========================================================================================
 !========================================================================================

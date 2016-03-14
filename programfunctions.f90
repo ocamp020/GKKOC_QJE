@@ -3314,14 +3314,22 @@ SUBROUTINE  INITIALIZE()
 	REAL(DP) :: m, Rh, start_timet, finish_timet
 	INTEGER  :: ee0, ee1, ee2, zindx1, zindx2, lambdaindx1, lambdaindx2, diff_array, eindx1, eindx2
 	INTEGER, DIMENSION(RetAge) :: agevec
+	! Entrepreneurial ability
+		! grid (zgrid), invariant distribution (Glz)
+		REAL(DP), DIMENSION(nz_aux)    :: zgrid_aux , Gz_aux
+		! transition matrix (pr_z)
+		REAL(DP), DIMENSION(nz_aux,nz_aux) :: pr_z_aux
 	
-	! Initiliaze grids for z, lamda and e	
-		CALL tauchen(mtauchen_z,rho_z,sigma_z_eps,nz,zgrid,pr_z,Gz)
+	! Initiliaze grids for z
+		CALL tauchen(mtauchen_z,rho_z,sigma_z_eps,nz_aux,zgrid_aux,pr_z_aux,Gz_aux)
+		! Tauchen gives grids for the log of the variables. Exponentiate to adjust
+		zgrid_aux      = exp(zgrid_aux) + mu_z
+		! Cut process 
+		CALL Markov_Cut(nz_aux,zgrid_aux,pr_z_aux,Gz_aux,nz_aux-nz,zgrid,pr_z,Gz)
+
+	! Initiliaze grids for lamda and e
 		CALL tauchen(mtauchen,rho_E,sigma_e_eps,ne,egrid,pr_e,Ge)
 		CALL tauchen(mtauchen,rho_lambda,sigma_lambda_eps,nlambda,lambdagrid,pr_lambda,Glambda)
-
-		! Tauchen gives grids for the log of the variables. Exponentiate to adjust
-		zgrid      = exp(zgrid) + mu_z
 		egrid      = exp(egrid)
 		lambdagrid = exp(lambdagrid) 
 
