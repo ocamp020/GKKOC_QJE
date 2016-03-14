@@ -2760,7 +2760,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	!------Working Period Starts-------------------------------------------------------------
 
 	DO age=RetAge-1,1,-1
-	!$omp parallel do private(lambdai,ei,ai,zi,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai,C_foc,state_FOC,par_FOC)
+	! !$omp parallel do private(lambdai,ei,ai,zi,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai,C_foc,state_FOC,par_FOC)
     DO zi=1,nz
     DO lambdai=1,nlambda
     DO ei=1,ne	
@@ -2795,14 +2795,14 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 
     	ENDDO ! ai
 
-	    !$omp critical
+	    ! !$omp critical
 		if (any(isnan(EndoCons))) then 
 			print*, "isnan - Consumption endogenous"
 			print*, age,zi,ai,lambdai,ei
 			print*, EndoCons
 			STOP 
 		end if 
-		!$omp end critical
+		! !$omp end critical
 
     ! Sort endogenous grid for interpolation
 	call Sort(na_t+1,EndoYgrid,EndoYgrid,sort_ind)
