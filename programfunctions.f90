@@ -163,6 +163,7 @@ end Subroutine Asset_Grid_Threshold
 			Y_a = Y_a* (1.0_dp-tauW_bt)
 		else
 			Y_a = Y_a_threshold*(1.0_dp-tauW_bt) + (Y_a - Y_a_threshold) * (1.0_dp-tauW_at)
+			print*, tauW_bt, tauW_at
 		end if
 	END  FUNCTION Y_a
 
