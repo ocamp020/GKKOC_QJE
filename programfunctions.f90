@@ -3321,17 +3321,17 @@ SUBROUTINE  INITIALIZE()
 		REAL(DP), DIMENSION(nz_aux,nz_aux) :: pr_z_aux
 	
 	! Initiliaze grids for z, lamda and e	
-		CALL tauchen(mtauchen_z,rho_z,sigma_z_eps,nz,zgrid,pr_z,Gz)
+		CALL tauchen(mtauchen_z,rho_z,sigma_z_eps,nz_aux,zgrid_aux,pr_z_aux,Gz_aux)
 		CALL tauchen(mtauchen,rho_e,sigma_e_eps,ne,egrid,pr_e,Ge)
 		CALL tauchen(mtauchen,rho_lambda,sigma_lambda_eps,nlambda,lambdagrid,pr_lambda,Glambda)
 
 		! Tauchen gives grids for the log of the variables. Exponentiate to adjust
-		zgrid      = exp(zgrid) + mu_z
+		zgrid_aux  = exp(zgrid_aux) + mu_z
 		egrid      = exp(egrid)
 		lambdagrid = exp(lambdagrid) 
 
 		! Cut bottom elements of zgrid 
-		CALL Markov_Cut(nz,zgrid,pr_z,Gz,nz-nz_aux,zgrid_aux,pr_z_aux,Gz_aux)
+		CALL Markov_Cut(nz_aux,zgrid_aux,pr_z_aux,Gz_aux,nz_aux-nz,zgrid,pr_z,Gz)
 		print*, 'Gz check', all(Gz.eq.Gz_aux)
 		print*, 'zgrid check' , all(zgrid.eq.zgrid_aux)
 		print*, 'pr_z check' , all(pr_z.eq.pr_z_aux)
