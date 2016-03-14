@@ -1905,7 +1905,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    	! Solve for new R 
 	    	!R = zbrent(Agg_Debt,0.0_dp,0.50_dp,brent_tol) 
 	    	if (theta .gt. 1.0_DP) then
-	           brent_value = brent(-0.1_DP,0.1_DP,0.5_DP,Agg_Debt, brent_tol,R)
+	           brent_value = brent(-0.0_DP,0.1_DP,0.9_DP,Agg_Debt, brent_tol,R)
             else
                 R = 0.0_DP
 	        endif
@@ -2764,7 +2764,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	!------Working Period Starts-------------------------------------------------------------
 
 	DO age=RetAge-1,1,-1
-	!  !$omp parallel do private(lambdai,ei,ai,zi,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai,C_foc,state_FOC,par_FOC)
+	!$omp parallel do private(lambdai,ei,ai,zi,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai,C_foc,state_FOC,par_FOC)
     DO zi=1,nz
     DO lambdai=1,nlambda
     DO ei=1,ne	
