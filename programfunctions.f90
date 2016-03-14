@@ -3332,9 +3332,9 @@ SUBROUTINE  INITIALIZE()
 
 		! Cut bottom elements of zgrid 
 		CALL Markov_Cut(nz_aux,zgrid_aux,pr_z_aux,Gz_aux,nz_aux-nz,zgrid,pr_z,Gz)
-		print*, 'Gz check', all(Gz.eq.Gz_aux), size(Gz), size(Gz_aux)
-		print*, 'zgrid check' , all(zgrid.eq.zgrid_aux)
-		print*, 'pr_z check' , all(pr_z.eq.pr_z_aux)
+		! print*, 'Gz check', all(Gz.eq.Gz_aux), size(Gz), size(Gz_aux)
+		! print*, 'zgrid check' , all(zgrid.eq.zgrid_aux)
+		! print*, 'pr_z check' , all(pr_z.eq.pr_z_aux)
 
 		! Obtain CDF of invariant distribution and transition matrix
 			! Entrepreneurial ability
