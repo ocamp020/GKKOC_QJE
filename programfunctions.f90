@@ -3316,13 +3316,13 @@ SUBROUTINE  INITIALIZE()
 	INTEGER, DIMENSION(RetAge) :: agevec
 	! Entrepreneurial ability
 		! grid (zgrid), invariant distribution (Glz)
-		REAL(DP), DIMENSION(nz)    :: zgrid_aux , Gz_aux
+		REAL(DP), DIMENSION(nz_aux)    :: zgrid_aux , Gz_aux
 		! transition matrix (pr_z)
-		REAL(DP), DIMENSION(nz,nz) :: pr_z_aux
+		REAL(DP), DIMENSION(nz_aux,nz_aux) :: pr_z_aux
 	
 	! Initiliaze grids for z, lamda and e	
-		CALL tauchen(mtauchen_z,rho_z,sigma_z_eps,nz_aux,zgrid_aux,pr_z_aux,Gz_aux)
-		CALL tauchen(mtauchen,rho_E,sigma_e_eps,ne,egrid,pr_e,Ge)
+		CALL tauchen(mtauchen_z,rho_z,sigma_z_eps,nz,zgrid,pr_z,Gz)
+		CALL tauchen(mtauchen,rho_e,sigma_e_eps,ne,egrid,pr_e,Ge)
 		CALL tauchen(mtauchen,rho_lambda,sigma_lambda_eps,nlambda,lambdagrid,pr_lambda,Glambda)
 
 		! Tauchen gives grids for the log of the variables. Exponentiate to adjust
@@ -3331,7 +3331,7 @@ SUBROUTINE  INITIALIZE()
 		lambdagrid = exp(lambdagrid) 
 
 		! Cut bottom elements of zgrid 
-		CALL Markov_Cut(nz_aux,zgrid_aux,pr_z_aux,Gz_aux,nz_aux-nz,zgrid,pr_z,Gz)
+		! CALL Markov_Cut(nz_aux,zgrid_aux,pr_z_aux,Gz_aux,nz_aux-nz,zgrid,pr_z,Gz)
 
 		! Obtain CDF of invariant distribution and transition matrix
 			! Entrepreneurial ability
