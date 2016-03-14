@@ -1700,7 +1700,7 @@ SUBROUTINE FIND_DBN_EQ()
 	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: PrAprimelo, PrAprimehi, DBN2
 	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne) :: Aplo, Aphi
 
-	!$ call omp_set_num_threads(7)
+	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-08_DP
 
 	! Solve the model at current aggregate values
@@ -1713,6 +1713,7 @@ SUBROUTINE FIND_DBN_EQ()
 		! Compute Capital demand and Profits by (a,z)
 			K_mat  = K_Matrix(R,P)
 			Pr_mat = Profit_Matrix(R,P)
+			print*, K_mat(1,:)
 		! Form YGRID for the capital income economy given interest rate "P"
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 		! Solve for policy and value functions 
