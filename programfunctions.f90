@@ -160,9 +160,9 @@ end Subroutine Asset_Grid_Threshold
 
 		! Compute after tax wealth according to threshold
 		if (Y_a.le.Y_a_threshold) then 
-			Y_a = Y_a * (1-tauW_bt)
+			Y_a = Y_a* (1.0_dp-tauW_bt)
 		else
-			Y_a = Y_a * (1-tauW_at)
+			Y_a = Y_a_threshold*(1.0_dp-tauW_bt) + (Y_a - Y_a_threshold) * (1.0_dp-tauW_at)
 		end if
 	END  FUNCTION Y_a
 
@@ -2122,17 +2122,9 @@ SUBROUTINE COMPUTE_STATS()
 	    MeanReturn_by_z(zi)  = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * &
 	    							& (R*agrid(ai) + Pr_mat(ai,zi)) 
 	    
-	    if (Wealth(ai,zi).le.Y_a_threshold) then 
-	    MeanATReturn           = MeanATReturn          + DBN1(age, ai, zi, lambdai, ei) * &
-	    							& (R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_bt)
-	    MeanATReturn_by_z(zi)  = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * &
-	    							& (R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_bt)
-	    else  
-	    MeanATReturn           = MeanATReturn          + DBN1(age, ai, zi, lambdai, ei) * &
-	    							& (R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_at)
-	    MeanATReturn_by_z(zi)  = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * &
-	    							& (R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_at)
-	    endif 
+	    MeanATReturn           = MeanATReturn          + DBN1(age, ai, zi, lambdai, ei) * (YGRID(ai,zi)-agrid(ai))
+	    MeanATReturn_by_z(zi)  = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei) * (YGRID(ai,zi)-agrid(ai))
+	    
 
 	    !MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)* agrid(ai)
 	    !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
@@ -2174,19 +2166,11 @@ SUBROUTINE COMPUTE_STATS()
 	    Var_K_Return = Var_K_Return +  DBN1(age, ai, zi, lambdai, ei) * K_mat(ai,zi)/MeanWealth * &
 	    				& ((R*agrid(ai) + Pr_mat(ai,zi))/K_mat(ai,zi)-MeanATReturn)**2.0_dp
 
-	    if (Wealth(ai,zi).le.Y_a_threshold) then
 	    VarATReturn  = VarATReturn +  DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
-	    				& (((R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_bt))/agrid(ai)-MeanATReturn)**2.0_dp 
+	    				& ((YGRID(ai,zi)-agrid(ai))/agrid(ai)-MeanATReturn)**2.0_dp 
 
 	    Var_AT_K_Return  = Var_AT_K_Return +  DBN1(age, ai, zi, lambdai, ei) * K_mat(ai,zi)/MeanWealth * &
-	    				& (((R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_bt))/K_mat(ai,zi)-MeanATReturn)**2.0_dp 
-	    else  
-	    VarATReturn  = VarATReturn +  DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
-	    				& (((R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_at))/agrid(ai)-MeanATReturn)**2.0_dp 
-
-		Var_AT_K_Return  = Var_AT_K_Return +  DBN1(age, ai, zi, lambdai, ei) * K_mat(ai,zi)/MeanWealth * &
-	    				& (((R*agrid(ai) + Pr_mat(ai,zi))*(1.0_dp-tauK)*(1.0_dp-tauW_at))/K_mat(ai,zi)-MeanATReturn)**2.0_dp 
-	    endif 
+	    				& ((YGRID(ai,zi)-agrid(ai))/K_mat(ai,zi)-MeanATReturn)**2.0_dp 
 	    
 	    !VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
 	    !				& ((MBGRID(ai,zi)-1.0_DP)-MeanATReturn)**2.0_dp
