@@ -3335,6 +3335,14 @@ SUBROUTINE  INITIALIZE()
 		! print*, 'Gz check', all(Gz.eq.Gz_aux), size(Gz), size(Gz_aux)
 		! print*, 'zgrid check' , all(zgrid.eq.zgrid_aux)
 		! print*, 'pr_z check' , all(pr_z.eq.pr_z_aux)
+		do ee0=1,nz 
+			print*, sum(pr_z(ee0,:))
+		enddo 
+		print*, sum(Gz)
+		print*, zgrid_aux
+		print*, zgrid
+		print*, Gz_aux 
+		print*, Gz
 
 		! Obtain CDF of invariant distribution and transition matrix
 			! Entrepreneurial ability
