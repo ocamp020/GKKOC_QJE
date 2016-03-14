@@ -754,7 +754,7 @@ MODULE Toolbox
 		if (n_cut.ge.n) then
 			print*, "Error in Markov_Cut: n_cut>=n"
 			STOP
-		elseif (n.eq.0) then
+		elseif (n_cut.eq.0) then
 			print*, "Warning in Markov_Cut: Nothing to cut (n_cut=0)"
 			print*, "Output is unchanged."
 			grid = grid_in
