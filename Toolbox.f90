@@ -740,7 +740,6 @@ MODULE Toolbox
 !		  G      , real(dp), dimension(n-n_cut)        , Invariant distribution of new markov process
 !
 	
-
 	Subroutine Markov_Cut(n,grid_in,P_in,G_in,n_cut,grid,P,G)
 		use nrtype
     	use nrutil
