@@ -1716,7 +1716,7 @@ SUBROUTINE FIND_DBN_EQ()
 			print*, K_mat(1,:)
 			print*, ' '
 			print*, mu 
-			print*, (mu*P_in*zgrid**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu))
+			print*, (mu*P*zgrid**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))
 		! Form YGRID for the capital income economy given interest rate "P"
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 		! Solve for policy and value functions 
