@@ -3332,13 +3332,13 @@ SUBROUTINE  INITIALIZE()
 
 		! Cut bottom elements of zgrid 
 		CALL Markov_Cut(nz_aux,zgrid_aux,pr_z_aux,Gz_aux,nz_aux-nz,zgrid,pr_z,Gz)
-		if (Gz.eq.Gz_aux) then 
+		if all(Gz.eq.Gz_aux) then 
 		print*, 'Gz check' 
 		endif 
-		if (zgrid.eq.zgrid_aux) then 
+		if all(zgrid.eq.zgrid_aux) then 
 		print*, 'zgrid check' 
 		endif 
-		if (pr_z.eq.pr_z_aux) then 
+		if all(pr_z.eq.pr_z_aux) then 
 		print*, 'pr_z check' 
 		endif 
 
