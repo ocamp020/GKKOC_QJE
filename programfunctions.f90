@@ -1905,7 +1905,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    	! Solve for new R 
 	    	!R = zbrent(Agg_Debt,0.0_dp,0.50_dp,brent_tol) 
 	    	if (theta .gt. 1.0_DP) then
-	           brent_value = brent(-0.1_DP,0.1_DP,1.0_DP,Agg_Debt, brent_tol,R)
+	           brent_value = brent(-0.1_DP,0.1_DP,2.0_DP,Agg_Debt, brent_tol,R)
             else
                 R = 0.0_DP
 	        endif
