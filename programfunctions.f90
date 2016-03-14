@@ -2636,7 +2636,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	REAL(DP), DIMENSION(6)       :: par_FOC
 	integer  :: age, ai, zi, lambdai, ei
 
-	!$ call omp_set_num_threads(11)
+	!$ call omp_set_num_threads(nz)
 
 	! Set a minimum value for labor to check in the FOC
 		H_min = 0.000001_dp
@@ -2760,8 +2760,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	!------Working Period Starts-------------------------------------------------------------
 
 	DO age=RetAge-1,1,-1
-	!$omp parallel do private(lambdai,ei,ai,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai,C_foc,state_FOC,par_FOC),&
-	!$omp & private(C_euler,C_foc,C_endo,H_endo,Y_endo)
+	!$omp parallel do private(lambdai,ei,ai,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai,C_foc,state_FOC,par_FOC)
     DO zi=1,nz
     DO lambdai=1,nlambda
     DO ei=1,ne	
