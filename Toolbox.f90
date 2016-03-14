@@ -742,7 +742,6 @@ MODULE Toolbox
 	
 	Subroutine Markov_Cut(n,grid_in,P_in,G_in,n_cut,grid,P,G)
 		use nrtype
-    	use nrutil
 		IMPLICIT NONE
 		integer , intent(in)  :: n, n_cut
 		real(dp), intent(in)  :: grid_in(n), P_in(n,n), G_in(n)
