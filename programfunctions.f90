@@ -2761,7 +2761,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 
 	DO age=RetAge-1,1,-1
 	!$omp parallel do private(lambdai,ei,ai,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai,C_foc,state_FOC,par_FOC),&
-	!$omp &private(C_euler,C_foc,C_endo,H_endo,Y_endo)
+	!$omp & private(C_euler,C_foc,C_endo,H_endo,Y_endo)
     DO zi=1,nz
     DO lambdai=1,nlambda
     DO ei=1,ne	
