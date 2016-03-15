@@ -25,7 +25,7 @@ MODULE parameters
     INTEGER(I4B),  PARAMETER :: ne=5              ! Number of grid points
 
     ! Entrepreneurial ability (z)
-    REAL(DP)         	     :: rho_z, sigma_z_eps, mu_z
+    REAL(DP)         	     :: rho_z, sigma_z_eps, mu_z, xi=1.5_dp
     INTEGER(I4B),  PARAMETER :: nz=11, nz_aux=11  ! Number of grid points
 
  
