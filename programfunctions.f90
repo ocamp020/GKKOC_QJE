@@ -3797,7 +3797,7 @@ SUBROUTINE  Firm_Value()
 				Prob_hi = min(Prob_hi, 1.0_DP)
 				Prob_hi = max(Prob_hi, 0.0_DP)    
 
-				V_Pr(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi) + survP(age)/(1.0_dp+R) &
+				V_Pr(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi) + survP(age)/(1.0_dp+MeanReturn) &
 			  		&  * sum( pr_x(xi,:,zi) * (Prob_lo*V_Pr(age+1,tklo,zi,lambdai,ei,:)+Prob_hi*V_Pr(age+1,tkhi,zi,lambdai,ei,:) ) ) 
 
 			enddo
@@ -3853,7 +3853,7 @@ SUBROUTINE  Firm_Value()
 				V_spline_W(xi_p) = sum( pr_e(ei,:)*( Prob_lo*V_Pr(age+1,tklo,zi,lambdai,:,xi_p) + Prob_hi*V_Pr(age+1,tkhi,zi,lambdai,:,xi_p)) )
 			enddo
 
-			V_Pr(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi) + survP(age)/(1.0_dp+R) * sum(pr_x(xi,:,zi)*V_spline_W)
+			V_Pr(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi) + survP(age)/(1.0_dp+MeanReturn) * sum(pr_x(xi,:,zi)*V_spline_W)
 
 		enddo
 	enddo
