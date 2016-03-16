@@ -1745,7 +1745,7 @@ SUBROUTINE FIND_DBN_EQ()
 	!print*, 'Computing Equilibrium Distribution'
 	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. ( simutime .le. MaxSimuTime ) )
 		!print*, 'Eq. Distribution difference=', DBN_dist
-		! print*, 'sum DBN1=', sum(DBN1)
+		print*, 'sum DBN1=', sum(DBN1)
 	    DBN2=0.0_DP
 
 		! Everyone in MaxAge dies. Those who die, switch to z2, lambda2 and start at ne/2+1 and x=1
@@ -1846,7 +1846,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    
 	    
 	    DBN_dist = maxval(abs(DBN2-DBN1))
-	    ! print*, DBN_dist
+	    print*, DBN_dist
 	    DBN1 = DBN2
 
 	    ! Instead of adjusting policy functions to be consistent with current DBN at each iteration
