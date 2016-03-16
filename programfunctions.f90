@@ -1718,12 +1718,12 @@ SUBROUTINE FIND_DBN_EQ()
             tklo = 1
         else
             tklo = ((Aprime(age,ai,zi,lambdai, ei,nx) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-        endif            
+        endif
         tkhi = tklo + 1        
         Aplo(age,ai,zi,lambdai,ei,nx)  		= tklo
         Aphi(age,ai,zi,lambdai,ei,nx)  		= tkhi        
         PrAprimelo(age,ai,zi,lambdai,ei,nx) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,nx) ) / ( agrid(tkhi) -agrid(tklo) )
-        PrAprimehi(age,ai,zi,lambdai,ei,nx) = ( Aprime(age,ai,zi,lambdai,ei,nx) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
+        PrAprimehi(age,ai,zi,lambdai,ei,nx) = ( Aprime(age,ai,zi,lambdai,ei,nx) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
 	ENDDO
 	ENDDO
 	ENDDO
@@ -1846,6 +1846,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    
 	    
 	    DBN_dist = maxval(abs(DBN2-DBN1))
+	    print*, DBN_dist
 	    DBN1 = DBN2
 
 	    ! Instead of adjusting policy functions to be consistent with current DBN at each iteration
@@ -1927,7 +1928,7 @@ SUBROUTINE FIND_DBN_EQ()
 			        Aplo(age,ai,zi,lambdai,ei,nx)  		= tklo
 			        Aphi(age,ai,zi,lambdai,ei,nx)  		= tkhi        
 			        PrAprimelo(age,ai,zi,lambdai,ei,nx) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,nx) ) / ( agrid(tkhi) -agrid(tklo) )
-			        PrAprimehi(age,ai,zi,lambdai,ei,nx) = ( Aprime(age,ai,zi,lambdai,ei,nx) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
+			        PrAprimehi(age,ai,zi,lambdai,ei,nx) = ( Aprime(age,ai,zi,lambdai,ei,nx) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
 				ENDDO
 				ENDDO
 				ENDDO
@@ -4130,7 +4131,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	                       &  + (currenta - agrid(tklo)) * Firm_Wealth(age,tkhi,currentzi,currentlambdai, currentei, currentxi)) &
 	                       &  / ( agrid(tkhi) - agrid(tklo) ) 
 
-	    panelK(paneli)    = min( theta*currenta , (mu*P*xz_grid(currentxi,currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )             
+	    panelK(paneli)    = min( theta*currenta , (mu*P*xz_grid(currentxi,currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 	           
 	ENDDO ! paneli
 
