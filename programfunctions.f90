@@ -3609,17 +3609,17 @@ SUBROUTINE  INITIALIZE()
 
 	! Set the initial distribution
 	DBN1=0.0_DP
-		DO xi=1,nx
+		! DO xi=1,nx
 		DO age=1,MaxAge
 		DO zi=1,nz
 		DO lambdai=1,nlambda
 		DO ei=1, ne
-		    DBN1(age,1,zi,lambdai,ei,xi) = (pop(age)/sum(pop))*Gz(zi)*Glambda(lambdai)*Ge_byage(age,ei)
+		    DBN1(age,1,zi,lambdai,ei,1) = (pop(age)/sum(pop))*Gz(zi)*Glambda(lambdai)*Ge_byage(age,ei)
 		ENDDO
 		ENDDO
 		ENDDO
 		ENDDO
-		ENDDO  
+		! ENDDO  
 		print*,'Initial Distrbution', sum(DBN1)
 		DBN1 = DBN1/sum(DBN1)
 
