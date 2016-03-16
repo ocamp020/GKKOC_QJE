@@ -1712,18 +1712,18 @@ SUBROUTINE FIND_DBN_EQ()
 	DO ai=1,na
 	DO lambdai=1,nlambda
 	DO ei=1, ne
-        if ( Aprime(age,ai,zi,lambdai,ei,nx) .ge. amax) then
+        if ( Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
             tklo =na-1
-        elseif (Aprime(age,ai,zi,lambdai, ei,nx) .lt. amin) then
+        elseif (Aprime(age,ai,zi,lambdai, ei,xi) .lt. amin) then
             tklo = 1
         else
-            tklo = ((Aprime(age,ai,zi,lambdai, ei,nx) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+            tklo = ((Aprime(age,ai,zi,lambdai, ei,xi) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
         endif
         tkhi = tklo + 1        
-        Aplo(age,ai,zi,lambdai,ei,nx)  		= tklo
-        Aphi(age,ai,zi,lambdai,ei,nx)  		= tkhi        
-        PrAprimelo(age,ai,zi,lambdai,ei,nx) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,nx) ) / ( agrid(tkhi) -agrid(tklo) )
-        PrAprimehi(age,ai,zi,lambdai,ei,nx) = ( Aprime(age,ai,zi,lambdai,ei,nx) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+        Aplo(age,ai,zi,lambdai,ei,xi)  		= tklo
+        Aphi(age,ai,zi,lambdai,ei,xi)  		= tkhi        
+        PrAprimelo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
+        PrAprimehi(age,ai,zi,lambdai,ei,xi) = ( Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
 	ENDDO
 	ENDDO
 	ENDDO
@@ -1917,18 +1917,18 @@ SUBROUTINE FIND_DBN_EQ()
 				DO ai=1,na
 				DO lambdai=1,nlambda
 				DO ei=1, ne
-			        if ( Aprime(age,ai,zi,lambdai,ei,nx) .ge. amax) then
+			        if ( Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
 			            tklo =na-1
-			        elseif (Aprime(age,ai,zi,lambdai, ei,nx) .lt. amin) then
+			        elseif (Aprime(age,ai,zi,lambdai, ei,xi) .lt. amin) then
 			            tklo = 1
 			        else
-			            tklo = ((Aprime(age,ai,zi,lambdai, ei,nx) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+			            tklo = ((Aprime(age,ai,zi,lambdai, ei,xi) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
 			        endif            
 			        tkhi = tklo + 1        
-			        Aplo(age,ai,zi,lambdai,ei,nx)  		= tklo
-			        Aphi(age,ai,zi,lambdai,ei,nx)  		= tkhi        
-			        PrAprimelo(age,ai,zi,lambdai,ei,nx) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,nx) ) / ( agrid(tkhi) -agrid(tklo) )
-			        PrAprimehi(age,ai,zi,lambdai,ei,nx) = ( Aprime(age,ai,zi,lambdai,ei,nx) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+			        Aplo(age,ai,zi,lambdai,ei,xi)  		= tklo
+			        Aphi(age,ai,zi,lambdai,ei,xi)  		= tkhi        
+			        PrAprimelo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
+			        PrAprimehi(age,ai,zi,lambdai,ei,xi) = ( Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
 				ENDDO
 				ENDDO
 				ENDDO
