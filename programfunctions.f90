@@ -860,25 +860,25 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	! This prints Aprime for different "z" for median lambda and e
 		OPEN (UNIT=50, FILE=trim(Result_Folder)//'aprime_age1_bench', STATUS='replace')     
 		DO zi=1,nz 
-		    WRITE  (UNIT=50, FMT=*) Aprime(1, :, zi, nlambda/2+1, ne/2+1, 2)
+		    WRITE  (UNIT=50, FMT=*) Aprime(1, :, zi, nlambda/2+1, ne/2+1, 1)
 		ENDDO
 		close (unit=50)
 
 		OPEN (UNIT=50, FILE=trim(Result_Folder)//'aprime_age16_bench', STATUS='replace')   
 		DO zi=1,nz 
-		    WRITE  (UNIT=50, FMT=*) Aprime(16, :, zi, nlambda/2+1, ne/2+1, 2)
+		    WRITE  (UNIT=50, FMT=*) Aprime(16, :, zi, nlambda/2+1, ne/2+1, 1)
 		ENDDO
 		close (unit=50)  
 
 		OPEN (UNIT=50, FILE=trim(Result_Folder)//'aprime_age31_bench', STATUS='replace')   
 		DO zi=1,nz 
-		    WRITE  (UNIT=50, FMT=*) Aprime(31, :, zi, nlambda/2+1, ne/2+1, 2)
+		    WRITE  (UNIT=50, FMT=*) Aprime(31, :, zi, nlambda/2+1, ne/2+1, 1)
 		ENDDO
 		close (unit=50)  
 
 		OPEN (UNIT=50, FILE=trim(Result_Folder)//'aprime_age46_bench', STATUS='replace')   
 		DO zi=1,nz 
-		    WRITE  (UNIT=50, FMT=*) Aprime(46, :, zi, nlambda/2+1, ne/2+1, 2)
+		    WRITE  (UNIT=50, FMT=*) Aprime(46, :, zi, nlambda/2+1, ne/2+1, 1)
 		ENDDO
 		close (unit=50)  
 
@@ -1054,25 +1054,25 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	! This prints Aprime for different "z" for median lambda and e
 		OPEN (UNIT=50, FILE=trim(Result_Folder)//'aprime_age1_exp', STATUS='replace')     
 		DO zi=1,nz 
-		    WRITE  (UNIT=50, FMT=*) Aprime(1, :, zi, nlambda/2+1, ne/2+1, 2)
+		    WRITE  (UNIT=50, FMT=*) Aprime(1, :, zi, nlambda/2+1, ne/2+1, 1)
 		ENDDO
 		close (unit=50)
 
 		OPEN (UNIT=50, FILE=trim(Result_Folder)//'aprime_age16_exp', STATUS='replace')   
 		DO zi=1,nz 
-		    WRITE  (UNIT=50, FMT=*) Aprime(16, :, zi, nlambda/2+1, ne/2+1, 2)
+		    WRITE  (UNIT=50, FMT=*) Aprime(16, :, zi, nlambda/2+1, ne/2+1, 1)
 		ENDDO
 		close (unit=50)  
 
 		OPEN (UNIT=50, FILE=trim(Result_Folder)//'aprime_age31_exp', STATUS='replace')   
 		DO zi=1,nz 
-		    WRITE  (UNIT=50, FMT=*) Aprime(31, :, zi, nlambda/2+1, ne/2+1, 2)
+		    WRITE  (UNIT=50, FMT=*) Aprime(31, :, zi, nlambda/2+1, ne/2+1, 1)
 		ENDDO
 		close (unit=50)  
 
 		OPEN (UNIT=50, FILE=trim(Result_Folder)//'aprime_age46_exp', STATUS='replace')   
 		DO zi=1,nz 
-		    WRITE  (UNIT=50, FMT=*) Aprime(46, :, zi, nlambda/2+1, ne/2+1, 2)
+		    WRITE  (UNIT=50, FMT=*) Aprime(46, :, zi, nlambda/2+1, ne/2+1, 1)
 		ENDDO
 		close (unit=50)  
 
@@ -1149,9 +1149,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'CE_by_Asset_z_med_E_Lambda_age1', STATUS='replace') 
 		OPEN (UNIT=90, FILE=trim(Result_Folder)//'MeanAsset_by_z_med_E_Lambda_age1', STATUS='replace') 
 		DO zi=1,nz
-		    WRITE  (UNIT=80, FMT=*)   Cons_Eq_Welfare(1,:,zi,nlambda/2+1, ne/2+1, 2)
-		    WRITE  (UNIT=90, FMT=*)   sum(agrid*DBN_bench(1,:,zi,nlambda/2+1, ne/2+1, 2)) &
-		                                                        & /sum(DBN_bench(1,:,zi,nlambda/2+1, ne/2+1, 2))
+		    WRITE  (UNIT=80, FMT=*)   Cons_Eq_Welfare(1,:,zi,nlambda/2+1, ne/2+1, 1)
+		    WRITE  (UNIT=90, FMT=*)   sum(agrid*DBN_bench(1,:,zi,nlambda/2+1, ne/2+1, 1)) &
+		                                                        & /sum(DBN_bench(1,:,zi,nlambda/2+1, ne/2+1, 1))
 		ENDDO           
 		close (unit=80)
 		close (unit=90)
@@ -1159,9 +1159,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'CE_by_Asset_z_med_E_Lambda_age16', STATUS='replace') 
 		OPEN (UNIT=90, FILE=trim(Result_Folder)//'MeanAsset_by_z_med_E_Lambda_age16', STATUS='replace') 
 		DO zi=1,nz
-		    WRITE  (UNIT=80, FMT=*)   Cons_Eq_Welfare(16,:,zi,nlambda/2+1, ne/2+1, 2)
-		    WRITE  (UNIT=90, FMT=*)   sum(agrid*DBN_bench(16,:,zi,nlambda/2+1, ne/2+1, 2)) &
-		                                                        & /sum(DBN_bench(16,:,zi,nlambda/2+1, ne/2+1, 2))
+		    WRITE  (UNIT=80, FMT=*)   Cons_Eq_Welfare(16,:,zi,nlambda/2+1, ne/2+1, 1)
+		    WRITE  (UNIT=90, FMT=*)   sum(agrid*DBN_bench(16,:,zi,nlambda/2+1, ne/2+1, 1)) &
+		                                                        & /sum(DBN_bench(16,:,zi,nlambda/2+1, ne/2+1, 1))
 		ENDDO           
 		close (unit=80)
 		close (unit=90)
@@ -1169,9 +1169,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'CE_by_Asset_z_med_E_Lambda_age31', STATUS='replace') 
 		OPEN (UNIT=90, FILE=trim(Result_Folder)//'MeanAsset_by_z_med_E_Lambda_age31', STATUS='replace') 
 		DO zi=1,nz
-			WRITE  (UNIT=80, FMT=*)   Cons_Eq_Welfare(31,:,zi,nlambda/2+1, ne/2+1, 2)
-			WRITE  (UNIT=90, FMT=*)   sum(agrid*DBN_bench(31,:,zi,nlambda/2+1, ne/2+1, 2)) &
-			                                            & /sum(DBN_bench(31,:,zi,nlambda/2+1, ne/2+1, 2))
+			WRITE  (UNIT=80, FMT=*)   Cons_Eq_Welfare(31,:,zi,nlambda/2+1, ne/2+1, 1)
+			WRITE  (UNIT=90, FMT=*)   sum(agrid*DBN_bench(31,:,zi,nlambda/2+1, ne/2+1, 1)) &
+			                                            & /sum(DBN_bench(31,:,zi,nlambda/2+1, ne/2+1, 1))
 		ENDDO           
 		close (unit=8)
 		close (unit=9)
@@ -3368,22 +3368,29 @@ SUBROUTINE  INITIALIZE()
 		CALL Markov_Cut(nz_aux,zgrid_aux,pr_z_aux,Gz_aux,nz_aux-nz,zgrid,pr_z,Gz)
 
 	! Transitory investment productivity x
-		print*, 'X probability '
-		xgrid = (/x_hi , x_lo /)
-		do zi=1,nz 
-			pr_x(1,1,zi) = max(0.0_dp , 1.0_dp - a_x*exp(b_x*zgrid(zi))/(1.0_dp+exp(b_x*zgrid(zi))) )
-			pr_x(1,2,zi) = min(1.0_dp ,          a_x*exp(b_x*zgrid(zi))/(1.0_dp+exp(b_x*zgrid(zi))) )
-			pr_x(2,1,zi) = 0.0_dp 
-			pr_x(2,2,zi) = 1.0_dp 
-			Gx(1,zi)     = 0.0_dp 
-			Gx(2,zi)     = 1.0_dp 
-			print*,'z=',zi,'Pr(x_hi)=', pr_x(1,1,zi),'Pr(x_lo)=', pr_x(1,2,zi)
-		enddo 
-		xz_grid = exp(log(spread(zgrid,1,nx))*spread(xgrid,2,nz))
-		print*, ' zgrid', zgrid 
-		do xi=1,nx
-		print*, 'xzgrid', xz_grid(xi,:)
-		enddo 
+		if (nx.gt.1) then
+			print*, 'X probability '
+			xgrid = (/x_hi , x_lo /)
+			do zi=1,nz 
+				pr_x(1,1,zi) = max(0.0_dp , 1.0_dp - a_x*exp(b_x*zgrid(zi))/(1.0_dp+exp(b_x*zgrid(zi))) )
+				pr_x(1,2,zi) = min(1.0_dp ,          a_x*exp(b_x*zgrid(zi))/(1.0_dp+exp(b_x*zgrid(zi))) )
+				pr_x(2,1,zi) = 0.0_dp 
+				pr_x(2,2,zi) = 1.0_dp 
+				Gx(1,zi)     = 0.0_dp 
+				Gx(2,zi)     = 1.0_dp 
+				print*,'z=',zi,'Pr(x_hi)=', pr_x(1,1,zi),'Pr(x_lo)=', pr_x(1,2,zi)
+			enddo 
+			xz_grid = exp(log(spread(zgrid,1,nx))*spread(xgrid,2,nz))
+			print*, ' zgrid', zgrid 
+			do xi=1,nx
+			print*, 'xzgrid', xz_grid(xi,:)
+			enddo 
+		else 
+			xgrid = 1.0_dp
+			xz_grid(1,:) = zgrid 
+			pr_x(1,1,:)  = 1.0_dp
+			Gx(1,:)      = 1.0_dp
+		endif 
 
 		! Obtain CDF of invariant distribution and transition matrix
 			! Entrepreneurial ability
