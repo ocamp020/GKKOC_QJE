@@ -1706,7 +1706,7 @@ SUBROUTINE FIND_DBN_EQ()
 		! When at that age and state the optimal decision is approximated by selecting one the grid points
 		! The grid points are selected with probability proportional to their distance to the optimal a'
 	DO age=1,MaxAge
-	!$omp parallel do private(lambdai,ei,ai,tklo,tkhi)
+	!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
 	DO zi=1,nz
 	DO xi=1,nx
 	DO ai=1,na
