@@ -3369,22 +3369,24 @@ SUBROUTINE  INITIALIZE()
 
 	! Transitory investment productivity x
 		if (nx.gt.1) then
-			print*, 'X probability '
-			xgrid = (/x_hi , x_lo /)
-			do zi=1,nz 
-				pr_x(1,1,zi) = max(0.0_dp , 1.0_dp - a_x*exp(b_x*zgrid(zi))/(1.0_dp+exp(b_x*zgrid(zi))) )
-				pr_x(1,2,zi) = min(1.0_dp ,          a_x*exp(b_x*zgrid(zi))/(1.0_dp+exp(b_x*zgrid(zi))) )
-				pr_x(2,1,zi) = 0.0_dp 
-				pr_x(2,2,zi) = 1.0_dp 
-				Gx(1,zi)     = 0.0_dp 
-				Gx(2,zi)     = 1.0_dp 
-				print*,'z=',zi,'Pr(x_hi)=', pr_x(1,1,zi),'Pr(x_lo)=', pr_x(1,2,zi)
-			enddo 
-			xz_grid = exp(log(spread(zgrid,1,nx))*spread(xgrid,2,nz))
-			print*, ' zgrid', zgrid 
-			do xi=1,nx
-			print*, 'xzgrid', xz_grid(xi,:)
-			enddo 
+			! print*, 'X probability '
+			! xgrid = (/x_hi , x_lo /)
+			! do zi=1,nz 
+			! 	pr_x(1,1,zi) = max(0.0_dp , 1.0_dp - a_x*exp(b_x*zgrid(zi))/(1.0_dp+exp(b_x*zgrid(zi))) )
+			! 	pr_x(1,2,zi) = min(1.0_dp ,          a_x*exp(b_x*zgrid(zi))/(1.0_dp+exp(b_x*zgrid(zi))) )
+			! 	pr_x(2,1,zi) = 0.0_dp 
+			! 	pr_x(2,2,zi) = 1.0_dp 
+			! 	Gx(1,zi)     = 0.0_dp 
+			! 	Gx(2,zi)     = 1.0_dp 
+			! 	print*,'z=',zi,'Pr(x_hi)=', pr_x(1,1,zi),'Pr(x_lo)=', pr_x(1,2,zi)
+			! enddo 
+			! xz_grid = exp(log(spread(zgrid,1,nx))*spread(xgrid,2,nz))
+			! print*, ' zgrid', zgrid 
+			! do xi=1,nx
+			! print*, 'xzgrid', xz_grid(xi,:)
+			! enddo
+			print*, 'xgrid error'
+			STOP 
 		else 
 			xgrid = 1.0_dp
 			xz_grid(1,:) = zgrid 
