@@ -3254,12 +3254,10 @@ Function Agg_Debt(R_in)
 
 	K_mat = K_matrix(R_in,P)
 	Agg_Debt = 0.0_dp
-	Wealth   = 0.0_dp
 	do xi=1,nx
-	do zi=1,nx 
-	do ai=1,nx
-		Agg_Debt = Agg_Debt + sum(DBN1(:,ai,zi,:,:,zi)*(K_mat(ai,zi,xi)-agrid(ai)))
-		Wealth   = Wealth   + sum(DBN1(:,ai,zi,:,:,zi)*agrid(ai))
+	do zi=1,nz 
+	do ai=1,na
+		Agg_Debt = Agg_Debt + sum(DBN1(:,ai,zi,:,:,xi)*(K_mat(ai,zi,xi)-agrid(ai)))
 	enddo 
 	enddo 
 	enddo 
