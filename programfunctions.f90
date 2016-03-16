@@ -3243,7 +3243,7 @@ Function Agg_Debt(R_in)
 	Implicit None 
 	real(dp), intent(in) :: R_in
 	real(dp)             :: Agg_Debt
-	real(dp), dimension(na,nz,nx) :: DBN_azx
+	real(dp), dimension(na,nz,nx) :: DBN_azx, K_mat
 	real(dp)             :: Wealth 
 
 	DBN_azx  = sum(sum(sum(DBN1,5),4),1)
@@ -3251,6 +3251,17 @@ Function Agg_Debt(R_in)
 	Wealth   = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 
 	Agg_Debt = (sum(DBN_azx*(K_matrix(R_in,P)-spread(spread(agrid,2,nz),3,nx)))/Wealth)**2.0_DP 
+
+	K_mat = K_matrix(R_in,P)
+	Agg_Debt = 0.0_dp
+	do xi=1,nx
+	do zi=1,nx 
+	do ai=1,nx
+		Agg_Debt = Agg_Debt + sum(DBN1(:,ai,zi,:,:,zi)*(K_mat(ai,zi,xi)-agrid(ai)))
+	enddo 
+	enddo 
+	enddo 
+	Agg_Debt = (Agg_Debt/Wealth)**2.0_dp
 
 end Function Agg_Debt
 
