@@ -3614,7 +3614,7 @@ SUBROUTINE  INITIALIZE()
 		DO zi=1,nz
 		DO lambdai=1,nlambda
 		DO ei=1, ne
-		    DBN1(age,1,zi,lambdai,ei,xi) = (pop(age)/sum(pop))*Gz(zi)*Glambda(lambdai)*Ge_byage(age,ei)*0.5_dp     
+		    DBN1(age,1,zi,lambdai,ei,xi) = (pop(age)/sum(pop))*Gz(zi)*Glambda(lambdai)*Ge_byage(age,ei)
 		ENDDO
 		ENDDO
 		ENDDO
