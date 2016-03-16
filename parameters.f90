@@ -16,17 +16,21 @@ MODULE parameters
 		! kappa: life-cycle component
 		! e: indiveidual transitory component (varies across time)
     ! Permanent labor earnings componenet (lambda)
-    REAL(DP), PARAMETER      :: rho_lambda=0.5_DP 
-    REAL(DP)             	 :: sigma_lambda_eps
-    INTEGER(I4B),  PARAMETER :: nlambda=5         ! Number of grid points
+    REAL(DP)	, PARAMETER :: rho_lambda=0.5_DP 
+    REAL(DP)             	:: sigma_lambda_eps
+    INTEGER(I4B), PARAMETER :: nlambda=5         ! Number of grid points
 
     ! Transitory labor earnings componenet (e)
-    REAL(DP), PARAMETER  	 :: rho_e=0.9_DP, sigma_e_eps=0.20_DP
-    INTEGER(I4B),  PARAMETER :: ne=5              ! Number of grid points
+    REAL(DP), PARAMETER  	:: rho_e=0.9_DP, sigma_e_eps=0.20_DP
+    INTEGER(I4B), PARAMETER :: ne=5              ! Number of grid points
 
     ! Entrepreneurial ability (z)
-    REAL(DP)         	     :: rho_z, sigma_z_eps, mu_z, xi=1.5_dp
-    INTEGER(I4B),  PARAMETER :: nz=11, nz_aux=11  ! Number of grid points
+    REAL(DP)         	    :: rho_z, sigma_z_eps, mu_z
+    INTEGER(I4B), PARAMETER :: nz=11, nz_aux=11  ! Number of grid points
+
+    ! Transitory entrepreneurial ablity (x)
+    INTEGER(I4B), PARAMETER :: nx=2
+    REAL(DP)                :: x_hi=1.5_dp, x_lo=1.0_dp, a_x=0.30_dp, b_x=0.1_dp
 
  
 
@@ -37,7 +41,7 @@ MODULE parameters
 		! Final good producer
 		REAL(DP), PARAMETER  :: alpha=0.40_DP, Aprod=1.0_DP
 		! Intermediate good (or home production)
-		REAL(DP), PARAMETER  :: mu=0.95_DP
+		REAL(DP), PARAMETER  :: mu=0.90_DP
 		! Depreciation rate
 		REAL(DP), PARAMETER  :: DepRate=0.05_DP
 		! Financial constraints

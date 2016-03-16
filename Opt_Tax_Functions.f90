@@ -62,7 +62,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauK(tauk_in)
 
 	! CALL COMPUTE_WELFARE_GAIN
 	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-    	EQ_WELFARE_GIVEN_TAUK = - sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+    	EQ_WELFARE_GIVEN_TAUK = - sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
 
 	!CALL COMPUTE_STATS
 
@@ -113,7 +113,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauW(tauW_in)
 
 	!CALL COMPUTE_WELFARE_GAIN
 	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-    	EQ_WELFARE_GIVEN_TauW = - sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+    	EQ_WELFARE_GIVEN_TauW = - sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
     !CALL COMPUTE_STATS
 
 	!OPEN   (UNIT=3, FILE='psi', STATUS='replace')
@@ -144,35 +144,37 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 	BT_EARNINGS = 0.0_DP
 	A_EARNINGS 	= 0.0_DP
 
+	DO xi=1,nx
 	DO age=1, MaxAge
 	DO ai=1,na
 	DO zi=1,nz
 	DO lambdai=1,nlambda
 	DO ei=1,ne
-		GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei) * ( tauK*( R*agrid(ai) + Pr_mat(ai,zi) )  	     &
-	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi) &	
-	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei)  												&
-	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei))**(1.0_DP-tauPL)  					&
-	          & + tauC * cons(age, ai, zi, lambdai,ei)  )   
+		GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei,xi) * ( tauK*( R*agrid(ai) + Pr_mat(ai,zi,xi) )  	    &
+	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi) 	&	
+	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)  									&
+	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)  			&
+	          & + tauC * cons(age, ai, zi, lambdai,ei,xi)  )   
 
-	    GBAR_NL = GBAR_NL + DBN1(age,ai,zi,lambdai,ei) * ( tauK*( R*agrid(ai) + Pr_mat(ai,zi) )   &
-	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi)  & 
-	          & + tauC * cons(age, ai, zi, lambdai,ei)  )         
+	    GBAR_NL = GBAR_NL + DBN1(age,ai,zi,lambdai,ei,xi) * ( tauK*( R*agrid(ai) + Pr_mat(ai,zi,xi) )   &
+	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi)  & 
+	          & + tauC * cons(age, ai, zi, lambdai,ei,xi)  )         
 
-	    GBAR_L = GBAR_L  + DBN1(age,ai,zi,lambdai,ei) * (  yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei) &
-	          &- psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei))**(1.0_DP-tauPL) )
+	    GBAR_L = GBAR_L  + DBN1(age,ai,zi,lambdai,ei,xi) * (  yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi) &
+	          &- psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL) )
 
-	    BT_EARNINGS = BT_EARNINGS + DBN1(age,ai,zi,lambdai,ei) * yh(age,lambdai,ei)* Hours(age, ai, zi, lambdai,ei) 
+	    BT_EARNINGS = BT_EARNINGS + DBN1(age,ai,zi,lambdai,ei,xi) * yh(age,lambdai,ei)* Hours(age, ai, zi, lambdai,ei,xi) 
 	    
-	    A_EARNINGS  = A_EARNINGS  + DBN1(age,ai,zi,lambdai,ei) *&
-	                    & (yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei))**(1.0_DP-tauPL)
+	    A_EARNINGS  = A_EARNINGS  + DBN1(age,ai,zi,lambdai,ei,xi) *&
+	                    & (yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)
 	    
-	    GBAR_K = GBAR_K +DBN1(age,ai,zi,lambdai,ei) * (  tauK*( R*agrid(ai) + Pr_mat(ai,zi) )   &
-	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi) )
+	    GBAR_K = GBAR_K +DBN1(age,ai,zi,lambdai,ei,xi) * (  tauK*( R*agrid(ai) + Pr_mat(ai,zi,xi) )   &
+	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi) )
 
-      	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei) * tauC * cons(age, ai, zi, lambdai,ei)
+      	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei,xi) * tauC * cons(age, ai, zi, lambdai,ei,xi)
 	    
 	   
+	ENDDO
 	ENDDO
 	ENDDO
 	ENDDO
@@ -181,14 +183,16 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 
 	SSC_Payments = 0.0_DP
 
+	DO xi=1,nx
 	DO age=RetAge, MaxAge
 	DO ai=1,na
 	DO zi=1,nz
 	DO lambdai=1,nlambda
 	DO ei=1,ne
 
-	    SSC_Payments = SSC_Payments + DBN1(age,ai,zi,lambdai,ei) * RetY_lambda_e(lambdai,ei) 
+	    SSC_Payments = SSC_Payments + DBN1(age,ai,zi,lambdai,ei,xi) * RetY_lambda_e(lambdai,ei) 
 	    
+	ENDDO
 	ENDDO
 	ENDDO
 	ENDDO

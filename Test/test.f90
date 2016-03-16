@@ -80,6 +80,8 @@ real, dimension(15) :: yy
 integer, dimension(15) :: xx
 real, dimension(2,2) :: aaa 
 real, dimension(4)   :: bbb
+real(8), dimension(2) :: ccc
+logical :: log_1, log_2(2)
 
 ! !answer = select (array)
 ! call select(array,answer)
@@ -200,6 +202,21 @@ zz_mat(:,2:3) = z_mat(:,3:4)
 print*,zz_mat(1,:)
 print*,zz_mat(2,:)
 print*,zz_mat(3,:)
+
+	
+print*, ' '
+print*, (1e-9.lt.1e-8)
+	ccc(1)=0.0
+	ccc(2)=0.3
+print*, any(ccc/ccc*(/1e-9,1e-7/).lt.1e-8)
+log_1 = any(ccc/ccc*(/1e-9,1e-7/).lt.1e-8)
+log_2 =    (ccc/ccc*(/1e-9,1e-7/).lt.1e-8)
+if (log_1) then 
+	print*, 'Test 1'
+	endif 
+if (any(log_2)) then 
+	print*, 'Test 2'
+	endif 
 
 
 end program test

@@ -40,6 +40,11 @@ MODULE global
 		REAL(DP), DIMENSION(nz)    :: zgrid , Gz, cdf_Gz
 		! transition matrix (pr_z), CDF of transition matrix (by row) (cdf_pr_z)
 		REAL(DP), DIMENSION(nz,nz) :: pr_z, cdf_pr_z
+		! grid (xgrid), invariant distribution (Gx), CDF of invariant distribution (cdf_Gx)
+		REAL(DP), DIMENSION(nx)    :: xgrid 
+		REAL(DP), DIMENSION(nx,nz) :: Gx, cdf_Gx, xz_grid
+		! transition matrix (pr_x), CDF of transition matrix (by row) (cdf_pr_x)
+		REAL(DP), DIMENSION(nx,nx,nz) :: pr_x, cdf_pr_x
 
 	! Retirement income 
 	REAL(DP), DIMENSION(nlambda,ne) :: phi_lambda_e   ! phi_lambda_e is the income replacement ratio used to compute SS payments
@@ -51,14 +56,12 @@ MODULE global
 		REAL(DP), DIMENSION(MaxAge  , nlambda, ne) :: eff_un,  yh
 
 	! Policy function and value function (defined on the exogenous grid)
-    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: Cons, Hours, Aprime
-    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: Cons_bench, Hours_bench, Aprime_bench, Cons_exp, Hours_exp, Aprime_exp 
-    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: ValueFunction, ValueFunction_bench, ValueFunction_exp
-    REAL(DP), dimension(MaxAge, na, nz, nlambda, ne) :: Cons_Eq_Welfare
-		! Analytical solution for mu=1 for all the lifecycle not just retirement period
-    	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda) :: AnRetCons,   AnRetValue, AnRetHours 
+    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Cons, Hours, Aprime
+    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Cons_bench, Hours_bench, Aprime_bench, Cons_exp, Hours_exp, Aprime_exp 
+    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: ValueFunction, ValueFunction_bench, ValueFunction_exp
+    REAL(DP), dimension(MaxAge, na, nz, nlambda, ne, nx) :: Cons_Eq_Welfare
 	! Policy function and value function (defined on the adjusted grid for breakpoints)
-	REAL(DP), DIMENSION(:,:,:,:,:), allocatable :: Cons_t, Hours_t, Aprime_t
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_t, Hours_t, Aprime_t
 	!REAL(DP), DIMENSION(MaxAge,na+nz,nz,nlambda,ne) :: Cons_t, Hours_t, Aprime_t
  
  	! Aggregate variables
@@ -76,14 +79,14 @@ MODULE global
 		! For each tax rate we weill have different Y grids
 		REAL(DP), DIMENSION(na)      :: agrid
 	    REAL(DP), DIMENSION(fine_na) :: fine_agrid
-	    REAL(DP), DIMENSION(na,nz)   :: YGRID, MBGRID
-	    REAL(DP), DIMENSION(:,:), ALLOCATABLE :: YGRID_t, MBGRID_t
-	    REAL(DP), DIMENSION(:),   ALLOCATABLE :: agrid_t
+	    REAL(DP), DIMENSION(na,nz,nx):: YGRID, MBGRID
+	    REAL(DP), DIMENSION(:,:,:), ALLOCATABLE :: YGRID_t, MBGRID_t
+	    REAL(DP), DIMENSION(:)    , ALLOCATABLE :: agrid_t
 	    INTEGER                      :: na_t
 
     ! Capital markets
-    	REAL(DP), DIMENSION(na,nz) :: K_mat, Pr_mat
-    	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) :: V_Pr, V_Pr_bench, V_Pr_exp, Firm_Wealth
+    	REAL(DP), DIMENSION(na,nz,nx) :: K_mat, Pr_mat, Wealth_mat
+    	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: V_Pr, V_Pr_bench, V_Pr_exp, Firm_Wealth
 	
 	! Values for taxes in benchmark and experiment
     REAL(DP) :: tauk_bench, tauPL_bench, psi_bench, tauw_bt_bench, tauw_at_bench, Y_a_threshold_bench 
@@ -110,10 +113,10 @@ MODULE global
     REAL(DP) :: tauWindx, tauW_low_bt, tauW_up_bt, tauW_low_at, tauW_up_at
 
 	! Counters for the age, and index of lamnbda, z, a and e
-    INTEGER :: age, lambdai, zi, ai, ei    
+    INTEGER :: age, lambdai, zi, ai, ei, xi    
 
     ! Distribution of population by age, a, z, lambda, e
-    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne) ::DBN1, DBN_bench, DBN_exp
+    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) ::DBN1, DBN_bench, DBN_exp
 
     ! Stats and distribution in equilibrium
 	    ! Distribution of assets
