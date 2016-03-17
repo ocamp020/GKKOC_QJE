@@ -3888,10 +3888,13 @@ SUBROUTINE  SIMULATION(bench_indx)
 	INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
 	INTEGER , DIMENSION(totpop) :: panelage, panelz, panellambda, panele, panelx
 	REAL(DP), DIMENSION(totpop) :: panela, panelPV_a, panelK  
-	INTEGER,  DIMENSION(totpop) :: eligible
+	INTEGER,  DIMENSION(totpop) :: eligible, death_count
 	REAL(DP), DIMENSION(totpop) :: panela_old_1, panela_old_2, panela_old_3, panela_new_1, panela_new_2, panela_new_3 
+	REAL(DP), DIMENSION(totpop) :: panelage_old_1, panelage_old_2, panelage_old_3, panelage_new_1, panelage_new_2, panelage_new_3 
 	Real(DP), allocatable       :: eligible_panela_old_1(:), eligible_panela_old_2(:), eligible_panela_old_3(:)
 	Real(DP), allocatable       :: eligible_panela_new_1(:), eligible_panela_new_2(:), eligible_panela_new_3(:)
+	Real(DP), allocatable       :: eligible_panelage_old_1(:), eligible_panelage_old_2(:), eligible_panelage_old_3(:)
+	Real(DP), allocatable       :: eligible_panelage_new_1(:), eligible_panelage_new_2(:), eligible_panelage_new_3(:)
 	INTEGER                     :: n_eligible
 
 
@@ -4074,55 +4077,69 @@ SUBROUTINE  SIMULATION(bench_indx)
 		ENDDO ! paneli
 
 		! Save data on assets for the last periods
-			! Agents are eligible if:
-				! 1) They don't die during the first two recording periods
-				! 2) They they die in the third recording period
-				! 3) They don't die again
+		! Agents are eligible if:
+			! 1) They don't die during the first two recording periods
+			! 2) They they die between the third recording period and the recording periods for the next generation
+			! 3) They don't die again
 			if (simutime.eq.(MaxSimuTime-15)) then 
-		    	panela_old_1 = panela
-		    	where(panelage==1) eligible = 0 
+		    	panela_old_1   = panela
+		    	panelage_old_1 = panelage
 	        endif 
 	        if (simutime.eq.(MaxSimuTime-14)) then 
 		    	panela_old_2 = panela
+		    	panelage_old_2 = panelage
 		    	where(panelage==1) eligible = 0 
 	        endif 
 	        if (simutime.eq.(MaxSimuTime-13)) then 
 		    	panela_old_3 = panela
+		    	panelage_old_3 = panelage
 		    	where(panelage==1) eligible = 0 
 	        endif 
-	        if (simutime.eq.(MaxSimuTime-12)) then
-	        	where(panelage>1) eligible = 0
-	        endif 
-	        if ((simutime.gt.(MaxSimuTime-12)).and.(simutime.lt.(MaxSimuTime-2))) then
-	        	where(panelage==1) eligible = 0 
+	        if ((simutime.ge.(MaxSimuTime-12)).and.(simutime.le.(MaxSimuTime-2))) then
+	        	where(panelage==1) death_count = death_count + 1
 	        endif
 	        if (simutime.eq.(MaxSimuTime-2)) then 
-		    	panela_new_1 = panela
-		    	where(panelage==1) eligible = 0 
+		    	panela_new_1   = panela
+		    	panelage_new_1 = panelage
 	        endif 
 	        if (simutime.eq.(MaxSimuTime-1)) then 
-		    	panela_new_2 = panela
+		    	panela_new_2   = panela
+		    	panelage_new_2 = panelage
 		    	where(panelage==1) eligible = 0 
 	        endif 
 	        if (simutime.eq.(MaxSimuTime)) then 
-		    	panela_new_3 = panela
+		    	panela_new_3   = panela
+		    	panelage_new_3 = panelage
 		    	where(panelage==1) eligible = 0 
 	        endif 
+		ENDDO ! simutime
 
-	ENDDO ! simutime
+		! Clean eligibles 
+			where(death_count/=1) eligible = 0
 
-	! Allocate eligible individuals for inter-generational wealth panel
-		n_eligible = sum(eligible)
 
-		allocate( eligible_panela_old_1(n_eligible), eligible_panela_old_2(n_eligible), eligible_panela_old_3(n_eligible) )
-		allocate( eligible_panela_new_1(n_eligible), eligible_panela_new_2(n_eligible), eligible_panela_new_3(n_eligible) )
+		! Get data on intergenerational mobility
+			n_eligible = sum(eligible)
 
-		eligible_panela_old_1 = pack(panela_old_1 , (eligible.eq.1) )
-		eligible_panela_old_2 = pack(panela_old_2 , (eligible.eq.1) )
-		eligible_panela_old_3 = pack(panela_old_3 , (eligible.eq.1) )
-		eligible_panela_new_1 = pack(panela_new_1 , (eligible.eq.1) )
-		eligible_panela_new_2 = pack(panela_new_2 , (eligible.eq.1) )
-		eligible_panela_new_3 = pack(panela_new_3 , (eligible.eq.1) )
+			allocate( eligible_panela_old_1(n_eligible), eligible_panela_old_2(n_eligible), eligible_panela_old_3(n_eligible) )
+			allocate( eligible_panela_new_1(n_eligible), eligible_panela_new_2(n_eligible), eligible_panela_new_3(n_eligible) )
+
+			allocate( eligible_panelage_old_1(n_eligible), eligible_panelage_old_2(n_eligible), eligible_panelage_old_3(n_eligible) )
+			allocate( eligible_panelage_new_1(n_eligible), eligible_panelage_new_2(n_eligible), eligible_panelage_new_3(n_eligible) )
+
+			eligible_panela_old_1 = pack(panela_old_1 , (eligible.eq.1) )
+			eligible_panela_old_2 = pack(panela_old_2 , (eligible.eq.1) )
+			eligible_panela_old_3 = pack(panela_old_3 , (eligible.eq.1) )
+			eligible_panela_new_1 = pack(panela_new_1 , (eligible.eq.1) )
+			eligible_panela_new_2 = pack(panela_new_2 , (eligible.eq.1) )
+			eligible_panela_new_3 = pack(panela_new_3 , (eligible.eq.1) )
+
+			eligible_panelage_old_1 = pack(panelage_old_1 , (eligible.eq.1) )
+			eligible_panelage_old_2 = pack(panelage_old_2 , (eligible.eq.1) )
+			eligible_panelage_old_3 = pack(panelage_old_3 , (eligible.eq.1) )
+			eligible_panelage_new_1 = pack(panelage_new_1 , (eligible.eq.1) )
+			eligible_panelage_new_2 = pack(panelage_new_2 , (eligible.eq.1) )
+			eligible_panelage_new_3 = pack(panelage_new_3 , (eligible.eq.1) )
 
 		print*, ' '
 		print*, 'n_eligible', sum(eligible)
@@ -4170,12 +4187,19 @@ SUBROUTINE  SIMULATION(bench_indx)
 		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_bench'        , STATUS='replace')
 		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
 
-		OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_old_1'        , STATUS='replace')
-		OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_old_2'        , STATUS='replace')
-		OPEN(UNIT=22, FILE=trim(Result_Folder)//'Simul/panela_old_3'        , STATUS='replace')
-		OPEN(UNIT=23, FILE=trim(Result_Folder)//'Simul/panela_new_1'        , STATUS='replace')
-		OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panela_new_2'        , STATUS='replace')
-		OPEN(UNIT=25, FILE=trim(Result_Folder)//'Simul/panela_new_3'        , STATUS='replace')
+		OPEN   (UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_old_1'     , STATUS='replace')
+		OPEN   (UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_old_2'     , STATUS='replace')
+		OPEN   (UNIT=22, FILE=trim(Result_Folder)//'Simul/panela_old_3'     , STATUS='replace')
+		OPEN   (UNIT=23, FILE=trim(Result_Folder)//'Simul/panela_new_1'     , STATUS='replace')
+		OPEN   (UNIT=24, FILE=trim(Result_Folder)//'Simul/panela_new_2'     , STATUS='replace')
+		OPEN   (UNIT=25, FILE=trim(Result_Folder)//'Simul/panela_new_3'     , STATUS='replace')
+
+		OPEN   (UNIT=30, FILE=trim(Result_Folder)//'Simul/panelage_old_1'   , STATUS='replace')
+		OPEN   (UNIT=31, FILE=trim(Result_Folder)//'Simul/panelage_old_2'   , STATUS='replace')
+		OPEN   (UNIT=32, FILE=trim(Result_Folder)//'Simul/panelage_old_3'   , STATUS='replace')
+		OPEN   (UNIT=33, FILE=trim(Result_Folder)//'Simul/panelage_new_1'   , STATUS='replace')
+		OPEN   (UNIT=34, FILE=trim(Result_Folder)//'Simul/panelage_new_2'   , STATUS='replace')
+		OPEN   (UNIT=35, FILE=trim(Result_Folder)//'Simul/panelage_new_3'   , STATUS='replace')
 
 	else 
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
@@ -4215,12 +4239,26 @@ SUBROUTINE  SIMULATION(bench_indx)
 		WRITE (UNIT=24, FMT=*) eligible_panela_new_2
 		WRITE (UNIT=25, FMT=*) eligible_panela_new_3
 
+		WRITE (UNIT=30, FMT=*) eligible_panelage_old_1
+		WRITE (UNIT=31, FMT=*) eligible_panelage_old_2
+		WRITE (UNIT=32, FMT=*) eligible_panelage_old_3
+		WRITE (UNIT=33, FMT=*) eligible_panelage_new_1
+		WRITE (UNIT=34, FMT=*) eligible_panelage_new_2
+		WRITE (UNIT=35, FMT=*) eligible_panelage_new_3
+
 		close (unit=20)
 		close (unit=21)
 		close (unit=22)
 		close (unit=23)
 		close (unit=24)
 		close (unit=25)
+
+		close (unit=30)
+		close (unit=31)
+		close (unit=32)
+		close (unit=33)
+		close (unit=34)
+		close (unit=35)
 	endif
 
 
