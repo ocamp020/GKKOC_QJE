@@ -140,7 +140,7 @@ MODULE global
 	    REAL(DP) :: CE_NEWBORN, Av_Util_Pop, Av_Util_NB
 
     ! Objective moments (not currently in use)	
-    	REAL(DP), DIMENSION(5)  ::  Min_Moments
+    	REAL(DP), DIMENSION(6)  ::  Min_Moments
     
     ! Switch to solve benchmark or experiment
     INTEGER :: solving_bench
