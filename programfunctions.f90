@@ -4138,6 +4138,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 	   panellambda(paneli)	= lambdai
 	   panele(paneli)		= ei
 	   panelx(paneli)		= xi
+
+	   print*,'Preparing initial state', paneli
 	   
 	ENDDO
 
