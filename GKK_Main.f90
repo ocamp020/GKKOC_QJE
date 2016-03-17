@@ -74,35 +74,23 @@ PROGRAM main
 		Progressive_Tax_Switch = .false.
 
 	! Set Parameters
-		if (theta.eq.1.0_dp) then 
-			Params =[0.9415_dp,  0.00_dp,  0.50_dp,  0.65_dp,  0.34_dp,  0.4494_dp] ! tauL=0.224, tauC=0.075 calibration
-		else if (theta.eq.1.50_dp) then 
-			if (mu.eq.0.85_dp) then 
-			Params= [0.945_dp, 0.00_dp, 0.50_dp, 0.7889_dp, 0.34_dp, 0.4494_dp] ! mu=0.85 calibration, targetting 0.34, 0.69, vartheta1.5 
-			else 
-			! Params= [0.9412_dp, 0.0_dp, 0.50_dp, 0.640_dp, 0.34_dp, 0.4494_dp] ! mu=0.9 calibration, targetting 0.34, 0.69, vartheta1.5
-			Params =[0.962_dp, 0.0_dp, 0.50_dp, 0.387_dp, 0.29_dp, 0.4494_dp] ! alpha=0.4, zgrid 11, m5, alpha=0.4, dep005, mu=090, K/Y=3, Top1PVa=0.36
-			! Params =[0.957_dp, 0.0_dp, 0.50_dp, 0.302_dp, 0.30_dp, 0.4494_dp] ! mu=0.95
-			endif 
-		else if (theta.eq.1.60_dp) then 
-			Params= [0.9409_dp, 0.0_dp, 0.50_dp, 0.640_dp, 0.34_dp, 0.4494_dp] ! mu=0.9 calibration, targetting 0.34, 0.69, vartheta1.6
-		else if (theta.eq.2.00_dp) then 
-			Params= [0.9405_dp, 0.0_dp, 0.50_dp, 0.639_dp, 0.34_dp, 0.4494_dp] ! mu=0.9 calibration, targetting 0.34, 0.69, vartheta2
-		else if (theta.eq.2.50_dp) then 
-			Params= [0.9400_dp, 0.0_dp, 0.50_dp, 0.639_dp, 0.34_dp, 0.4494_dp] ! mu=0.9 calibration, targetting 0.34, 0.69, vartheta2.5
-		else
-			print*, "No parameters for this theta, changing to default parameters (theta=1)"
-			Params =[0.9436_dp, 0.0_dp, 0.50_dp, 0.70444445_dp, 0.34_dp, 0.4494_dp] ! tauL=0.224, tauC=0.075 calibration
-		endif 
-		beta   = params(1)
-		mu_z   = params(2) ! this is just shifting the z grids. it is zero now.
-		rho_z  = params(3) 
+		Params =[0.962_dp, 0.0_dp, 0.50_dp, 0.387_dp, 0.29_dp, 0.4494_dp] ! alpha=0.4, zgrid 11, m5, alpha=0.4, dep005, mu=090, K/Y=3, Top1PVa=0.36
+		
+
+		beta   	= params(1)
+		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
+		rho_z  	= params(3) 
 		sigma_z_eps      =params(4)
 		sigma_lambda_eps = params(5)
-		gamma  = params(6)
+		gamma  	= params(6)
 		
-		sigma  = 4.0_dp
-		phi    = (1.0_dp-gamma)/gamma
+		sigma  	= 4.0_dp
+		phi    	= (1.0_dp-gamma)/gamma
+
+		x_hi	= 1.3_dp
+		x_lo	= 1.0_dp
+		a_x 	= 0.15_dp
+		b_x 	= 0.1_dp
 
 		if (Log_Switch.eqv..true.) then
 				sigma = 1.0_dp
