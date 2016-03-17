@@ -4287,6 +4287,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		!     	panelage_new_3 = panelage
 		!     	where(panelage==1) eligible = 0 
 	 !        endif 
+
+	 		print*, "Simulation period", simutime
 		ENDDO ! simutime
 
 		! ! Clean eligibles 
