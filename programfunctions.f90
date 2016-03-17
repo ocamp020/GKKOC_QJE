@@ -4187,19 +4187,19 @@ SUBROUTINE  SIMULATION(bench_indx)
 		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_bench'        , STATUS='replace')
 		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
 
-		OPEN   (UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_old_1'     , STATUS='replace')
-		OPEN   (UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_old_2'     , STATUS='replace')
-		OPEN   (UNIT=22, FILE=trim(Result_Folder)//'Simul/panela_old_3'     , STATUS='replace')
-		OPEN   (UNIT=23, FILE=trim(Result_Folder)//'Simul/panela_new_1'     , STATUS='replace')
-		OPEN   (UNIT=24, FILE=trim(Result_Folder)//'Simul/panela_new_2'     , STATUS='replace')
-		OPEN   (UNIT=25, FILE=trim(Result_Folder)//'Simul/panela_new_3'     , STATUS='replace')
+		OPEN   (UNIT=40, FILE=trim(Result_Folder)//'Simul/panela_old_1'     , STATUS='replace')
+		OPEN   (UNIT=41, FILE=trim(Result_Folder)//'Simul/panela_old_2'     , STATUS='replace')
+		OPEN   (UNIT=42, FILE=trim(Result_Folder)//'Simul/panela_old_3'     , STATUS='replace')
+		OPEN   (UNIT=43, FILE=trim(Result_Folder)//'Simul/panela_new_1'     , STATUS='replace')
+		OPEN   (UNIT=44, FILE=trim(Result_Folder)//'Simul/panela_new_2'     , STATUS='replace')
+		OPEN   (UNIT=45, FILE=trim(Result_Folder)//'Simul/panela_new_3'     , STATUS='replace')
 
-		OPEN   (UNIT=30, FILE=trim(Result_Folder)//'Simul/panelage_old_1'   , STATUS='replace')
-		OPEN   (UNIT=31, FILE=trim(Result_Folder)//'Simul/panelage_old_2'   , STATUS='replace')
-		OPEN   (UNIT=32, FILE=trim(Result_Folder)//'Simul/panelage_old_3'   , STATUS='replace')
-		OPEN   (UNIT=33, FILE=trim(Result_Folder)//'Simul/panelage_new_1'   , STATUS='replace')
-		OPEN   (UNIT=34, FILE=trim(Result_Folder)//'Simul/panelage_new_2'   , STATUS='replace')
-		OPEN   (UNIT=35, FILE=trim(Result_Folder)//'Simul/panelage_new_3'   , STATUS='replace')
+		OPEN   (UNIT=50, FILE=trim(Result_Folder)//'Simul/panelage_old_1'   , STATUS='replace')
+		OPEN   (UNIT=51, FILE=trim(Result_Folder)//'Simul/panelage_old_2'   , STATUS='replace')
+		OPEN   (UNIT=52, FILE=trim(Result_Folder)//'Simul/panelage_old_3'   , STATUS='replace')
+		OPEN   (UNIT=53, FILE=trim(Result_Folder)//'Simul/panelage_new_1'   , STATUS='replace')
+		OPEN   (UNIT=54, FILE=trim(Result_Folder)//'Simul/panelage_new_2'   , STATUS='replace')
+		OPEN   (UNIT=55, FILE=trim(Result_Folder)//'Simul/panelage_new_3'   , STATUS='replace')
 
 	else 
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
@@ -4231,35 +4231,35 @@ SUBROUTINE  SIMULATION(bench_indx)
 	close (unit=27)
 	close (unit=28)
 
-	! if (bench_indx==1) then
-	! 	WRITE (UNIT=20, FMT=*) eligible_panela_old_1
-	! 	WRITE (UNIT=21, FMT=*) eligible_panela_old_2
-	! 	WRITE (UNIT=22, FMT=*) eligible_panela_old_3
-	! 	WRITE (UNIT=23, FMT=*) eligible_panela_new_1
-	! 	WRITE (UNIT=24, FMT=*) eligible_panela_new_2
-	! 	WRITE (UNIT=25, FMT=*) eligible_panela_new_3
+	if (bench_indx==1) then
+		WRITE (UNIT=40, FMT=*) eligible_panela_old_1
+		WRITE (UNIT=41, FMT=*) eligible_panela_old_2
+		WRITE (UNIT=42, FMT=*) eligible_panela_old_3
+		WRITE (UNIT=43, FMT=*) eligible_panela_new_1
+		WRITE (UNIT=44, FMT=*) eligible_panela_new_2
+		WRITE (UNIT=45, FMT=*) eligible_panela_new_3
 
-	! 	WRITE (UNIT=30, FMT=*) eligible_panelage_old_1
-	! 	WRITE (UNIT=31, FMT=*) eligible_panelage_old_2
-	! 	WRITE (UNIT=32, FMT=*) eligible_panelage_old_3
-	! 	WRITE (UNIT=33, FMT=*) eligible_panelage_new_1
-	! 	WRITE (UNIT=34, FMT=*) eligible_panelage_new_2
-	! 	WRITE (UNIT=35, FMT=*) eligible_panelage_new_3
+		WRITE (UNIT=50, FMT=*) eligible_panelage_old_1
+		WRITE (UNIT=51, FMT=*) eligible_panelage_old_2
+		WRITE (UNIT=52, FMT=*) eligible_panelage_old_3
+		WRITE (UNIT=53, FMT=*) eligible_panelage_new_1
+		WRITE (UNIT=54, FMT=*) eligible_panelage_new_2
+		WRITE (UNIT=55, FMT=*) eligible_panelage_new_3
 
-	! 	close (unit=20)
-	! 	close (unit=21)
-	! 	close (unit=22)
-	! 	close (unit=23)
-	! 	close (unit=24)
-	! 	close (unit=25)
+		close (unit=40)
+		close (unit=41)
+		close (unit=42)
+		close (unit=43)
+		close (unit=44)
+		close (unit=45)
 
-	! 	close (unit=30)
-	! 	close (unit=31)
-	! 	close (unit=32)
-	! 	close (unit=33)
-	! 	close (unit=34)
-	! 	close (unit=35)
-	! endif
+		close (unit=50)
+		close (unit=51)
+		close (unit=52)
+		close (unit=53)
+		close (unit=54)
+		close (unit=55)
+	endif
 
 
 END SUBROUTINE SIMULATION
