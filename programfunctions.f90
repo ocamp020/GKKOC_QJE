@@ -4096,7 +4096,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	newiseed=-1
 
 	DO paneli=1,totpop
-	print*,'Preparing initial state', paneli
+	print*,'Preparing initial state 1', paneli
 
 	! AGE
 	   tempnoage = ran1(newiseed)
@@ -4113,11 +4113,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	   ENDDO
 
 	! X   
-	   tempnox = ran1(newiseed)
 	   xi=1
-	   DO WHILE (tempnox .gt. 0.5_dp)  !cdf_Gx(xi,zi)
-	       xi=xi+1
-	   ENDDO
 	 
 	! LAMBDA  
 	   tempnolambda = ran1(newiseed) 
@@ -4524,6 +4520,10 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	   DO WHILE (tempnoz .gt. cdf_Gz(zi))
 	       zi=zi+1
 	   ENDDO
+
+	
+	! X   
+	   xi=1
 	 
 	! LAMBDA  
 	   tempnolambda = ran1(newiseed) 
