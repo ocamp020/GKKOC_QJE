@@ -4096,6 +4096,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	newiseed=-1
 
 	DO paneli=1,totpop
+	print*,'Preparing initial state', paneli
 
 	! AGE
 	   tempnoage = ran1(newiseed)
