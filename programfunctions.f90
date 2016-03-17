@@ -4185,7 +4185,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_bench'        , STATUS='replace')
 		OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_bench'     , STATUS='replace')
 		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_bench'        , STATUS='replace')
-		OPEN(UNIT=38, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
+		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
 
 		OPEN   (UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_old_1'     , STATUS='replace')
 		OPEN   (UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_old_2'     , STATUS='replace')
@@ -4201,34 +4201,6 @@ SUBROUTINE  SIMULATION(bench_indx)
 		OPEN   (UNIT=34, FILE=trim(Result_Folder)//'Simul/panelage_new_2'   , STATUS='replace')
 		OPEN   (UNIT=35, FILE=trim(Result_Folder)//'Simul/panelage_new_3'   , STATUS='replace')
 
-		WRITE (UNIT=20, FMT=*) eligible_panela_old_1
-		WRITE (UNIT=21, FMT=*) eligible_panela_old_2
-		WRITE (UNIT=22, FMT=*) eligible_panela_old_3
-		WRITE (UNIT=23, FMT=*) eligible_panela_new_1
-		WRITE (UNIT=24, FMT=*) eligible_panela_new_2
-		WRITE (UNIT=25, FMT=*) eligible_panela_new_3
-
-		WRITE (UNIT=30, FMT=*) eligible_panelage_old_1
-		WRITE (UNIT=31, FMT=*) eligible_panelage_old_2
-		WRITE (UNIT=32, FMT=*) eligible_panelage_old_3
-		WRITE (UNIT=33, FMT=*) eligible_panelage_new_1
-		WRITE (UNIT=34, FMT=*) eligible_panelage_new_2
-		WRITE (UNIT=35, FMT=*) eligible_panelage_new_3
-
-		close (unit=20)
-		close (unit=21)
-		close (unit=22)
-		close (unit=23)
-		close (unit=24)
-		close (unit=25)
-
-		close (unit=30)
-		close (unit=31)
-		close (unit=32)
-		close (unit=33)
-		close (unit=34)
-		close (unit=35)
-
 	else 
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_exp'		, STATUS='replace')
@@ -4237,7 +4209,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_exp'        	, STATUS='replace')
 		OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_exo'       , STATUS='replace')
 		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_exp' 	        , STATUS='replace')
-		OPEN(UNIT=38, FILE=trim(Result_Folder)//'Simul/panelx_exp'	        , STATUS='replace')
+		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_exp'	        , STATUS='replace')
 	endif 
 
 
@@ -4257,7 +4229,37 @@ SUBROUTINE  SIMULATION(bench_indx)
 	close (unit=14)
 	close (unit=26)
 	close (unit=27)
-	close (unit=38)
+	close (unit=28)
+
+	! if (bench_indx==1) then
+	! 	WRITE (UNIT=20, FMT=*) eligible_panela_old_1
+	! 	WRITE (UNIT=21, FMT=*) eligible_panela_old_2
+	! 	WRITE (UNIT=22, FMT=*) eligible_panela_old_3
+	! 	WRITE (UNIT=23, FMT=*) eligible_panela_new_1
+	! 	WRITE (UNIT=24, FMT=*) eligible_panela_new_2
+	! 	WRITE (UNIT=25, FMT=*) eligible_panela_new_3
+
+	! 	WRITE (UNIT=30, FMT=*) eligible_panelage_old_1
+	! 	WRITE (UNIT=31, FMT=*) eligible_panelage_old_2
+	! 	WRITE (UNIT=32, FMT=*) eligible_panelage_old_3
+	! 	WRITE (UNIT=33, FMT=*) eligible_panelage_new_1
+	! 	WRITE (UNIT=34, FMT=*) eligible_panelage_new_2
+	! 	WRITE (UNIT=35, FMT=*) eligible_panelage_new_3
+
+	! 	close (unit=20)
+	! 	close (unit=21)
+	! 	close (unit=22)
+	! 	close (unit=23)
+	! 	close (unit=24)
+	! 	close (unit=25)
+
+	! 	close (unit=30)
+	! 	close (unit=31)
+	! 	close (unit=32)
+	! 	close (unit=33)
+	! 	close (unit=34)
+	! 	close (unit=35)
+	! endif
 
 
 END SUBROUTINE SIMULATION
