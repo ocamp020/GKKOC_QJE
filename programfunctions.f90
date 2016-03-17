@@ -4096,7 +4096,6 @@ SUBROUTINE  SIMULATION(bench_indx)
 	newiseed=-1
 
 	DO paneli=1,totpop
-	print*,'Preparing initial state 1', paneli
 
 	! AGE
 	   tempnoage = ran1(newiseed)
@@ -4135,12 +4134,9 @@ SUBROUTINE  SIMULATION(bench_indx)
 	   panellambda(paneli)	= lambdai
 	   panele(paneli)		= ei
 	   panelx(paneli)		= xi
-
-	   print*,'Preparing initial state', paneli
 	   
 	ENDDO
 
-	print*, 'Simulation prep ready'
 	! SET INITIAL ASSET DISTRIBUTION
 	panela            = 1.0_DP
 
@@ -4521,7 +4517,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	       zi=zi+1
 	   ENDDO
 
-	
+
 	! X   
 	   xi=1
 	 
