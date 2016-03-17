@@ -4231,7 +4231,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	close (unit=27)
 	close (unit=28)
 
-	if (bench_indx.eq.1) then
+	if (bench_indx==1) then
 		WRITE (UNIT=20, FMT=*) eligible_panela_old_1
 		WRITE (UNIT=21, FMT=*) eligible_panela_old_2
 		WRITE (UNIT=22, FMT=*) eligible_panela_old_3
