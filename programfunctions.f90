@@ -4185,7 +4185,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_bench'        , STATUS='replace')
 		OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_bench'     , STATUS='replace')
 		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_bench'        , STATUS='replace')
-		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
+		OPEN(UNIT=38, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
 
 		OPEN   (UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_old_1'     , STATUS='replace')
 		OPEN   (UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_old_2'     , STATUS='replace')
@@ -4237,7 +4237,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_exp'        	, STATUS='replace')
 		OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_exo'       , STATUS='replace')
 		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_exp' 	        , STATUS='replace')
-		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_exp'	        , STATUS='replace')
+		OPEN(UNIT=38, FILE=trim(Result_Folder)//'Simul/panelx_exp'	        , STATUS='replace')
 	endif 
 
 
@@ -4257,7 +4257,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	close (unit=14)
 	close (unit=26)
 	close (unit=27)
-	close (unit=28)
+	close (unit=38)
 
 
 END SUBROUTINE SIMULATION
