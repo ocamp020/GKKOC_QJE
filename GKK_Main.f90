@@ -37,7 +37,7 @@ PROGRAM main
 	! Variables to measure running time
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
-		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch
+		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -48,6 +48,7 @@ PROGRAM main
 		Threshold_Factor = 0.00_dp 
 
 	! Switch for solving benchmark or just reading resutls
+		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
@@ -164,6 +165,11 @@ PROGRAM main
 
 
 	! Call routines
+		! Calibration
+		if (Calibration_Switch) then 
+			CALL CALIBRATION_TRIALS
+		endif 
+		
 		! Tax Reform experiment
 		if (Tax_Reform) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
@@ -651,5 +657,155 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 end Subroutine Solve_Opt_Tax
 
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+
+SUBROUTINE CALIBRATION_TRIALS
+	use parameters
+	use global 
+	use programfunctions
+	use Toolbox
+	use omp_lib
+
+	IMPLICIT NONE
+	real(DP)::  betaL, betaH, sigmalambL,sigmalambH, sigmazL, sigmazH, rhozL, rhozH, gammaL, gammaH, muzL, muzH
+	integer :: parindx1,  parindx2, parindx3, parindx4, parindx5, parindx6, nbeta, ngamma, nsigmalambda, nrhoz, nsigmaz, nmuz
+	real(DP), dimension(6):: paramsL, paramsH
+
+	print*,'SOLVING CALIBRATION'
+	print*,'-----------------------------------------------------------------------'
+
+
+
+	! CALIBRATIONS WITH POSITIVE DEPRECIATION
+
+	ParamsL = [0.973, 0.0,  0.50, 0.45,  0.34,  0.4494]      
+	ParamsH = [0.977, 0.0,  0.50, 0.64,  0.34,  0.4494]     ! dep. rat=0.04, mu=0.9 calibration, 7z,m3, vartheta1.5
+
+
+	ParamsL= [0.935, 0.0,  0.50, 0.46,  0.34,  0.4494]       
+	ParamsH= [0.937, 0.0,  0.50, 0.48,  0.34,  0.4494]       ! mu=0.95, lower sigma_z, vartheta1.5
+
+	ParamsL = [0.968, 0.0,  0.50, 0.46,  0.34,  0.4494]      
+	ParamsH = [0.979, 0.0,  0.50, 0.49,  0.34,  0.4494]      ! dep. rate=0.04, mu=0.95, calibration, 7z, m=3, vartheta=1.5
+
+	ParamsL = [0.968, 0.0,  0.50, 0.41,  0.34,  0.4494]      
+	ParamsH = [0.979, 0.0,  0.50, 0.43,  0.34,  0.4494]     ! dep. rat=0.04, mu=0.95, calibration, 9z,m4, vartheta1.5
+
+	ParamsL = [0.973, 0.0,  0.50, 0.45,  0.34,  0.4494]      
+	ParamsH = [0.975, 0.0,  0.50, 0.64,  0.34,  0.4494]     ! dep. rat=0.04, mu=0.9 calibration, 9 z, m=4, vartheta1.5
+
+	ParamsL = [0.964, 0.0,  0.50, 0.38,  0.34,  0.4494]      
+	ParamsH = [0.966, 0.0,  0.50, 0.42,  0.34,  0.4494]      ! dep. rate=0.04, mu=0.98, calibration, 7z, m=3, vartheta=1.5
+
+	ParamsL = [0.967, 0.0,  0.50, 0.40,  0.34,  0.4494]      
+	ParamsH = [0.968, 0.0,  0.50, 0.42,  0.34,  0.4494]     ! dep. rate=0.04, mu=0.95, calibration, 11 z, m = 5, vartheta1.5
+
+	ParamsL = [0.968, 0.0,  0.50, 0.42,  0.34,  0.4494]      
+	ParamsH = [0.969, 0.0,  0.50, 0.48,  0.34,  0.4494]     ! dep. rate=0.04, mu=0.93, calibration, 11 z, m = 5, vartheta1.5
+
+	ParamsL= [0.935, 0.0,  0.50, 0.45,  0.34,  0.4494]     ! mu=0.95 calibration, targetting 0.34, 0.69, vartheta1.5
+	ParamsH= [0.94, 0.0,  0.50, 0.5,  0.34,  0.4494]       ! mu=0.95 calibration, targetting 0.34, 0.69, vartheta1.5
+
+	paramsL=  [0.969,  0.00, 0.50,  0.46,  0.34, 0.4494]       ! zgrid 19, m5, dep004, mu=093
+	paramsH=  [0.969,  0.00, 0.50,  0.48,  0.34, 0.4494]       ! zgrid 19, m5, dep004, mu=093
+
+	paramsL=  [0.9675,  0.00, 0.50,  0.41,  0.34, 0.4494]       ! zgrid 19, 17, m5, dep004, mu=095
+	paramsH=  [0.9675,  0.00, 0.50,  0.43,  0.34, 0.4494]       ! zgrid 19, 17, m5, dep004, mu=095
+
+	ParamsL = [0.95,  0.0,  0.50, 0.38,  0.29,  0.4494] ! zgrid 11, m5, alpha=0.4, dep005, mu=090, K/Y=3, Top1PVa=0.36 
+	ParamsH = [0.955, 0.0,  0.50, 0.40,  0.29,  0.4494] ! phi_B=1
+
+	ParamsL = [0.945, 0.0,  0.50, 0.38, 0.29, 0.4494] ! zgrid 11, m5, alpha=0.4, dep005, mu=090, K/Y=3, Top1PVa=0.36 
+	ParamsH = [0.95,  0.0,  0.50, 0.40, 0.29, 0.4494] ! phi_B=1.5
+
+
+	! CALIBRATION STARTS
+
+	betaL=paramsL(1)
+	betaH=paramsH(1)
+
+	muzL = paramsL(2)
+	muzH = paramsH(2)
+
+	rhozL = paramsL(3)
+	rhozH = paramsH(3)
+
+	sigmazL = paramsL(4)
+	sigmazH = paramsH(4)
+
+
+	sigmalambL= paramsL(5)
+	sigmalambH= paramsH(5)
+
+	gammaL  = paramsL(6)
+	gammaH  = paramsH(6)
+
+	nbeta =2
+	nmuz  =1
+	nsigmaz=3
+	nrhoz=1
+	nsigmalambda=1
+	ngamma=1
+
+	Min_SSE_Moments=1000.0_DP
+
+	DO parindx3=1,nsigmalambda
+	DO parindx2=1,ngamma
+	DO parindx4=1,nrhoz
+	DO parindx1=1,nbeta
+	DO parindx6=1,nmuz
+	DO parindx5=1,nsigmaz
+
+	    beta  = betaL  + real(parindx1-1,8) *(betaH-betaL)/max(real(nbeta-1,8),1.0_DP)
+	    gamma = gammaL + real(parindx2-1,8) *(gammaH-gammaL)/max(real(ngamma-1,8),1.0_DP)
+	    sigma_lambda_eps = sigmalambL + real(parindx3-1,8)*(sigmalambH -sigmalambL) / max(real(nsigmalambda-1,8),1.0_DP)
+	    rho_z= rhozL   +  real(parindx4-1,8)*(rhozH-rhozL) / max(real(nrhoz-1,8),1.0_DP)
+	    sigma_z_eps = sigmazL +  real(parindx5-1,8)*(sigmazH-sigmazL) / max(real(nsigmaz-1,8),1.0_DP)
+	    mu_z = muzL +  real(parindx6-1,8)*(muzH-muzL) / max(real(nmuz-1,8),1.0_DP)
+
+	    print*,'parameters=',beta, mu_z, rho_z,sigma_z_eps,sigma_lambda_eps, gamma
+	        
+	    solving_bench=1
+	    CALL INITIALIZE
+	    CALL FIND_DBN_EQ
+	    CALL Firm_Value
+	    CALL COMPUTE_MOMENTS
+	    SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP  + (1.0_DP-FW_top_x_share(4)/0.357_DP)**2.0_DP  & !+ (FW_top_x_share(3)-0.75_DP)**2.0_DP &
+	                   & + (1.0_DP-Std_Log_Earnings_25_60 / 0.8_DP)**2.0_DP + (1.0_DP-meanhours_25_60/0.4_DP)**2.0_DP !&
+	                   !& + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
+	                   
+	!    SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
+
+	!    print*,'parameters=',beta, mu_z, rho_z,sigma_z_eps,sigma_lambda_eps, gamma,'SSE_Moments =',SSE_Moments
+
+	    IF (SSE_Moments .lt. Min_SSE_Moments ) THEN
+	        Min_SSE_Moments =SSE_Moments
+	        params= [ beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma ]
+	        Min_Moments = [  Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, MeanReturn  ]
+	    ENDIF
+	    !CALL WRITE_TO_FILE
+	    
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	print*, params
+	print*, Min_Moments
+
+	beta=params(1)
+	mu_z=params(2)
+	rho_z=params(3)
+	sigma_z_eps =params(4)
+	sigma_lambda_eps = params(5)
+	gamma= params(6)
+
+END SUBROUTINE CALIBRATION_TRIALS
+
+!====================================================================
 
 

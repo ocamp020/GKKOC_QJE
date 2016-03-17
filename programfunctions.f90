@@ -2622,6 +2622,181 @@ END SUBROUTINE COMPUTE_STATS
 !========================================================================================
 !========================================================================================
 
+
+SUBROUTINE COMPUTE_MOMENTS
+	IMPLICIT NONE
+	real(DP), dimension(size(DBN1)) :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq
+	real(DP) :: FW_top_x(4),  prctile_FW(4), prctile_bq(7), a, b, c, CCDF_c
+	real(DP) :: DBN_bq(MaxAge,na,nz,nlambda,ne)
+	integer  :: i, prctile
+
+
+	! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
+		! COMPUTE VARIANCE OF LOG EARNINGS FOR 25-60 FOR THOSE WHO WORK MORE THAN 260 HOURS
+		! WHICH CORRESPOND TO 0.055 IN THE MODEL
+		pop_25_60        	   = 0.0_DP
+		tothours_25_60         = 0.0_DP
+		pop_pos_earn_25_60     = 0.0_DP
+		tot_log_earnings_25_60 = 0.0_DP 
+		Var_Log_Earnings_25_60 = 0.0_DP
+		do xi=1,nx
+		DO age=5,40
+		DO ai=1,na
+		DO zi=1,nz
+		DO lambdai=1,nlambda
+		DO ei=1,ne
+			tothours_25_60 = tothours_25_60 + DBN1(age, ai, zi, lambdai, ei, xi)  * Hours(age, ai, zi, lambdai,ei,xi)
+			pop_25_60      = pop_25_60 +  DBN1(age, ai, zi, lambdai, ei,xi)
+			IF (Hours(age, ai, zi, lambdai, ei,xi) .ge. 0.055) THEN
+			tot_log_earnings_25_60 = tot_log_earnings_25_60 + DBN1(age, ai, zi, lambdai, ei,xi)  &
+			                 		& *  log( Y_h(Hours(age, ai, zi, lambdai, ei,xi),age,lambdai,ei,wage) )
+			pop_pos_earn_25_60     = pop_pos_earn_25_60 +  DBN1(age, ai, zi, lambdai, ei,xi)
+			ENDIF
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		meanhours_25_60         = tothours_25_60 / pop_25_60
+		mean_log_earnings_25_60 = tot_log_earnings_25_60 / pop_pos_earn_25_60
+
+		DO xi=1,nx
+		DO age=5,40
+		DO ai=1,na
+		DO zi=1,nz
+		DO lambdai=1,nlambda
+		DO ei=1,ne
+			IF (Hours(age, ai, zi, lambdai, ei,xi) .ge. 0.055) THEN
+			    Var_Log_Earnings_25_60 =  Var_Log_Earnings_25_60 + DBN1(age, ai, zi, lambdai, ei,xi)  &
+			                 			& * ( log( Y_h(Hours(age, ai, zi, lambdai, ei,xi),age,lambdai,ei,wage) ) &
+			                 			& -   mean_log_earnings_25_60 ) ** 2.0_DP
+			ENDIF
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		Var_Log_Earnings_25_60 = Var_Log_Earnings_25_60 / pop_pos_earn_25_60
+		Std_Log_Earnings_25_60 = Var_Log_Earnings_25_60 ** 0.5_DP
+
+
+	! Sources of income
+		Pr_mat = Profit_Matrix(R,P)
+
+		MeanWealth 	 = 0.0_DP
+		MeanReturn 	 = 0.0_DP
+		
+		DO xi=1,nx
+		DO age=1,MaxAge
+		DO zi=1,nz
+		DO ai=1,na
+		DO lambdai=1,nlambda
+		DO ei=1, ne
+		    MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei, xi)*agrid(ai)
+		    MeanReturn           = MeanReturn          + DBN1(age, ai, zi, lambdai, ei, xi) * &
+		    							& (R*agrid(ai) + Pr_mat(ai,zi,xi))
+		    
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO    
+		ENDDO    
+		ENDDO
+		Wealth_Output = MeanWealth/YBAR 
+		MeanReturn    = MeanReturn/MeanWealth
+		
+
+
+
+	! Distribution of Assets
+		DO ai=1,na
+		     pr_a_dbn(ai)          = sum(DBN1(:,ai,:,:,:,:)) 
+		     cdf_a_dbn(ai)         = sum( pr_a_dbn(1:ai) )      
+		     tot_a_by_grid(ai)     = sum(DBN1(:,ai,:,:,:,:) * agrid(ai) )
+		     cdf_tot_a_by_grid(ai) = sum(tot_a_by_grid(1:ai))   
+		!     print*, pr_a_dbn(ai), cdf_a_dbn(ai)
+		ENDDO
+		cdf_a_dbn = cdf_a_dbn + 1.0_DP - cdf_a_dbn(na)
+
+		
+		! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
+		DO prctile=1,100
+		    ai=1
+		    DO while (cdf_a_dbn(ai) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
+		        ai=ai+1
+		    ENDDO
+		    prctile_ai_ind(prctile) = ai
+		    prctile_ai(prctile)     = agrid(ai)
+		    ! print*,prctile, REAL(prctile,8)/100.0_DP,  ai
+		    IF (ai .gt. 1) THEN
+		        cdf_tot_a_by_prctile(prctile)  = cdf_tot_a_by_grid(ai-1) + (REAL(prctile,8)/100.0_DP - cdf_a_dbn(ai-1))*agrid(ai) 
+		    else
+		        cdf_tot_a_by_prctile(prctile)  = (REAL(prctile,8)/100.0_DP )*agrid(ai)     
+		    ENDIF
+		ENDDO
+		print*,''
+		prct1_wealth  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
+		prct10_wealth = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
+		prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
+		prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
+
+	! Distribution of firm wealth
+		do ai=1,na
+			Firm_Wealth(:,ai,:,:,:,:) = V_Pr(:,ai,:,:,:,:) + (1.0_dp+R)*agrid(ai)
+		enddo
+		Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
+
+		DBN_vec         = reshape(DBN1       ,(/size(DBN1)/))
+		Firm_Wealth_vec = reshape(Firm_Wealth,(/size(DBN1)/))
+
+
+		prctile_FW = (/0.40_DP, 0.20_dp, 0.10_dp, 0.01_dp/)
+		a = minval(Firm_Wealth_vec)
+		b = maxval(Firm_Wealth_vec) 
+		c = a
+		do i=1,size(prctile_FW)
+			a = c
+			b = maxval(Firm_Wealth_vec)
+			c = (a+b)/2.0_dp
+			CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+			print*, ' '
+			!print*, 'Percentile', prctile_FW(i)
+			do while ((abs(CCDF_c-prctile_FW(i))>0.0001_dp).and.(b-a>1e-8))
+				if (CCDF_c<prctile_FW(i)) then 
+					b = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+				else 
+					a = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+				endif
+				!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', CCDF_c-prctile_FW(i)
+			enddo 
+			FW_top_x(i)       = c 
+			FW_top_x_share(i) = 100*sum(Firm_Wealth_vec*DBN_vec,Firm_Wealth_vec>=c)/Mean_Firm_Wealth
+		enddo 
+
+			CLOSE(UNIT=11)
+
+	! Define SSE_Moments
+		SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP  + (1.0_DP-prct1_wealth/0.34_DP)**2.0_DP  + (prct10_wealth-0.69_DP)**2.0_DP &
+	                   & + (1.0_DP-Std_Log_Earnings_25_60 / 0.8_DP)**2.0_DP + (1.0_DP-meanhours_25_60/0.4_DP)**2.0_DP &
+	                   & + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
+
+
+END SUBROUTINE COMPUTE_MOMENTS
+
+
+
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
 SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	use omp_lib
 	IMPLICIT NONE
