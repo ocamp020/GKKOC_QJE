@@ -4071,7 +4071,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	REAL(DP), DIMENSION(:)      , allocatable :: eligible_panela_new_1  , eligible_panela_new_2  , eligible_panela_new_3
 	INTEGER , DIMENSION(totpop) 			  :: panelage_old_1, panelage_old_2, panelage_old_3
 	INTEGER , DIMENSION(totpop) 			  :: panelage_new_1, panelage_new_2, panelage_new_3 
-	INTEGER , DIMENSION(:)      , allocatable :: e_panelage_old_1, eligible_panelage_old_2, eligible_panelage_old_3
+	INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_old_1, eligible_panelage_old_2, eligible_panelage_old_3
 	INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_new_1, eligible_panelage_new_2, eligible_panelage_new_3
 	INTEGER                     			  :: n_eligible
 
@@ -4307,15 +4307,16 @@ SUBROUTINE  SIMULATION(bench_indx)
 			eligible_panela_new_2 	= pack(panela_new_2   , (eligible.eq.1) )
 			eligible_panela_new_3 	= pack(panela_new_3   , (eligible.eq.1) )
 
-			allocate( e_panelage_old_1(n_eligible), eligible_panelage_old_2(n_eligible), eligible_panelage_old_3(n_eligible) )
+			allocate( eligible_panelage_old_1(n_eligible), eligible_panelage_old_2(n_eligible), eligible_panelage_old_3(n_eligible) )
 			allocate( eligible_panelage_new_1(n_eligible), eligible_panelage_new_2(n_eligible), eligible_panelage_new_3(n_eligible) )
 
-			e_panelage_old_1 = pack(panelage_old_1 , (eligible.eq.1) )
+			! eligible_panelage_old_1 = pack(panelage_old_1 , (eligible.eq.1) )
 			! eligible_panelage_old_2 = pack(panelage_old_2 , (eligible.eq.1) )
 			! eligible_panelage_old_3 = pack(panelage_old_3 , (eligible.eq.1) )
 			! eligible_panelage_new_1 = pack(panelage_new_1 , (eligible.eq.1) )
 			! eligible_panelage_new_2 = pack(panelage_new_2 , (eligible.eq.1) )
 			! eligible_panelage_new_3 = pack(panelage_new_3 , (eligible.eq.1) )
+			panela_old_1 = pack(panela_old_1,.true.)
 
 		print*, ' '
 		print*, 'n_eligible', sum(eligible)
@@ -4415,7 +4416,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		WRITE (UNIT=24, FMT=*) eligible_panela_new_2
 		WRITE (UNIT=25, FMT=*) eligible_panela_new_3
 
-		WRITE (UNIT=30, FMT=*) e_panelage_old_1
+		WRITE (UNIT=30, FMT=*) eligible_panelage_old_1
 		WRITE (UNIT=31, FMT=*) eligible_panelage_old_2
 		WRITE (UNIT=32, FMT=*) eligible_panelage_old_3
 		WRITE (UNIT=33, FMT=*) eligible_panelage_new_1
