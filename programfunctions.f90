@@ -4259,7 +4259,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			if (simutime.eq.(MaxSimuTime-15)) then 
 		    	panela_old_1   = panela
 		    	panelage_1 = panelage
-		    	print*, size(panelage_1), sum(panelage)
+		    	! print*, size(panelage_1), sum(panelage_1)
 	        endif 
 	        if (simutime.eq.(MaxSimuTime-14)) then 
 		    	panela_old_2   = panela
@@ -4312,7 +4312,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			allocate( eligible_panelage_old_1(n_eligible), eligible_panelage_old_2(n_eligible), eligible_panelage_old_3(n_eligible) )
 			allocate( eligible_panelage_new_1(n_eligible), eligible_panelage_new_2(n_eligible), eligible_panelage_new_3(n_eligible) )
 
-			! eligible_panelage_old_1 = pack(panelage_old_1 , (eligible.eq.1) )
+			eligible_panelage_old_1 = pack(panelage_1 , (eligible.eq.1) )
 			! eligible_panelage_old_2 = pack(panelage_old_2 , (eligible.eq.1) )
 			! eligible_panelage_old_3 = pack(panelage_old_3 , (eligible.eq.1) )
 			! eligible_panelage_new_1 = pack(panelage_new_1 , (eligible.eq.1) )
