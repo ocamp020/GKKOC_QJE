@@ -28,13 +28,13 @@ omp_flag = -fopenmp
 
 # Compile all the modules in the main folder. Modules are saved as .f90 files. 
 $(Folder)/%.o: %.F90
-	gfortran -O2 -J$(Folder) -c $< -o $@
+	gfortran -O3 -J$(Folder) -c $< -o $@
 
 $(Folder)/%.o: %.f90
-	gfortran -O2 -J$(Folder) -c $< -o $@
+	gfortran -O3 -J$(Folder) -c $< -o $@
 
 $(Folder)/programfunctions.o: programfunctions.f90
-	gfortran $(omp_flag) -O2 -J$(Folder) -c programfunctions.f90 -o $(Folder)/programfunctions.o
+	gfortran $(omp_flag) -O3 -J$(Folder) -c programfunctions.f90 -o $(Folder)/programfunctions.o
 
 # Compile and execute programs
 Sergio_Simple.a: GKK_simple.f90 $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o
