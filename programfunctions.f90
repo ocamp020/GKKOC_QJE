@@ -4317,7 +4317,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			! eligible_panelage_new_2 = pack(panelage_new_2 , (eligible.eq.1) )
 			! eligible_panelage_new_3 = pack(panelage_new_3 , (eligible.eq.1) )
 			! eligible_panela_old_1 	= pack(panela_old_1   , (eligible.eq.1) )
-			print*, size(panelage_new_1), sum(panelage_new_1)
+			print*, size(panelage), sum(panelage)
 
 		print*, ' '
 		print*, 'n_eligible', sum(eligible)
