@@ -4067,12 +4067,12 @@ SUBROUTINE  SIMULATION(bench_indx)
 	INTEGER , DIMENSION(totpop) 			  :: eligible, death_count
 	REAL(DP), DIMENSION(totpop) 			  :: panela_old_1  , panela_old_2  , panela_old_3
 	REAL(DP), DIMENSION(totpop) 			  :: panela_new_1  , panela_new_2  , panela_new_3 
-	REAL(DP), DIMENSION(:)      , allocatable :: eligible_panela_old_1(:)  , eligible_panela_old_2(:)  , eligible_panela_old_3(:)
-	REAL(DP), DIMENSION(:)      , allocatable :: eligible_panela_new_1(:)  , eligible_panela_new_2(:)  , eligible_panela_new_3(:)
+	REAL(DP), DIMENSION(:)      , allocatable :: eligible_panela_old_1  , eligible_panela_old_2  , eligible_panela_old_3
+	REAL(DP), DIMENSION(:)      , allocatable :: eligible_panela_new_1  , eligible_panela_new_2  , eligible_panela_new_3
 	INTEGER , DIMENSION(totpop) 			  :: panelage_old_1, panelage_old_2, panelage_old_3
 	INTEGER , DIMENSION(totpop) 			  :: panelage_new_1, panelage_new_2, panelage_new_3 
-	INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_old_1(:), eligible_panelage_old_2(:), eligible_panelage_old_3(:)
-	INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_new_1(:), eligible_panelage_new_2(:), eligible_panelage_new_3(:)
+	INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_old_1, eligible_panelage_old_2, eligible_panelage_old_3
+	INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_new_1, eligible_panelage_new_2, eligible_panelage_new_3
 	INTEGER                     			  :: n_eligible
 
 
