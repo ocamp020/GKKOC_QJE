@@ -4069,7 +4069,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	REAL(DP), DIMENSION(totpop) 			  :: panela_new_1  , panela_new_2  , panela_new_3 
 	REAL(DP), DIMENSION(:)      , allocatable :: eligible_panela_old_1  , eligible_panela_old_2  , eligible_panela_old_3
 	REAL(DP), DIMENSION(:)      , allocatable :: eligible_panela_new_1  , eligible_panela_new_2  , eligible_panela_new_3
-	INTEGER , DIMENSION(totpop) 			  :: panelage_old_1, panelage_old_2, panelage_old_3
+	INTEGER , DIMENSION(totpop) 			  :: age_old_1, panelage_old_2, panelage_old_3
 	INTEGER , DIMENSION(totpop) 			  :: panelage_new_1, panelage_new_2, panelage_new_3 
 	INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_old_1, eligible_panelage_old_2, eligible_panelage_old_3
 	INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_new_1, eligible_panelage_new_2, eligible_panelage_new_3
@@ -4257,7 +4257,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			! 3) They don't die again
 			if (simutime.eq.(MaxSimuTime-15)) then 
 		    	panela_old_1   = panela
-		    	panelage_old_1 = panelage
+		    	age_old_1 = panelage
 	        endif 
 	        if (simutime.eq.(MaxSimuTime-14)) then 
 		    	panela_old_2   = panela
@@ -4317,7 +4317,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			! eligible_panelage_new_2 = pack(panelage_new_2 , (eligible.eq.1) )
 			! eligible_panelage_new_3 = pack(panelage_new_3 , (eligible.eq.1) )
 			! eligible_panela_old_1 	= pack(panela_old_1   , (eligible.eq.1) )
-			print*, size(panelage), sum(panelage)
+			print*, size(age_old_1), sum(age_old_1)
 
 		print*, ' '
 		print*, 'n_eligible', sum(eligible)
