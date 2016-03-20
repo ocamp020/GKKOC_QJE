@@ -4248,15 +4248,15 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     	ENDIF ! new age==1
 		ENDDO ! paneli
 
-		! ! Save data on assets for the last periods
-		! ! Agents are eligible if:
-		! 	! 1) They don't die during the first two recording periods
-		! 	! 2) They they die between the third recording period and the recording periods for the next generation
-		! 	! 3) They don't die again
-		! 	if (simutime.eq.(MaxSimuTime-15)) then 
-		!     	panela_old_1   = panela
-		!     	panelage_old_1 = panelage
-	 !        endif 
+		! Save data on assets for the last periods
+		! Agents are eligible if:
+			! 1) They don't die during the first two recording periods
+			! 2) They they die between the third recording period and the recording periods for the next generation
+			! 3) They don't die again
+			if (simutime.eq.(MaxSimuTime-15)) then 
+		    	panela_old_1   = panela
+		    	panelage_old_1 = panelage
+	        endif 
 	 !        if (simutime.eq.(MaxSimuTime-14)) then 
 		!     	panela_old_2 = panela
 		!     	panelage_old_2 = panelage
