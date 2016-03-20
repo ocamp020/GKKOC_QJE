@@ -4064,13 +4064,13 @@ SUBROUTINE  SIMULATION(bench_indx)
 	INTEGER , DIMENSION(totpop) :: panelage, panelz, panellambda, panele, panelx
 	REAL(DP), DIMENSION(totpop) :: panela, panelPV_a, panelK  
 	! Intergenerational statistics
-	INTEGER,  DIMENSION(totpop) :: eligible, death_count
+	INTEGER ,  DIMENSION(totpop) :: eligible, death_count
 	REAL(DP), DIMENSION(totpop) :: panela_old_1  , panela_old_2  , panela_old_3  , panela_new_1  , panela_new_2  , panela_new_3 
-	REAL(DP), DIMENSION(totpop) :: panelage_old_1, panelage_old_2, panelage_old_3, panelage_new_1, panelage_new_2, panelage_new_3 
+	INTEGER , DIMENSION(totpop) :: panelage_old_1, panelage_old_2, panelage_old_3, panelage_new_1, panelage_new_2, panelage_new_3 
 	Real(DP), allocatable       :: eligible_panela_old_1(:)  , eligible_panela_old_2(:)  , eligible_panela_old_3(:)
 	Real(DP), allocatable       :: eligible_panela_new_1(:)  , eligible_panela_new_2(:)  , eligible_panela_new_3(:)
-	Real(DP), allocatable       :: eligible_panelage_old_1(:), eligible_panelage_old_2(:), eligible_panelage_old_3(:)
-	Real(DP), allocatable       :: eligible_panelage_new_1(:), eligible_panelage_new_2(:), eligible_panelage_new_3(:)
+	INTEGER , allocatable       :: eligible_panelage_old_1(:), eligible_panelage_old_2(:), eligible_panelage_old_3(:)
+	INTEGER , allocatable       :: eligible_panelage_new_1(:), eligible_panelage_new_2(:), eligible_panelage_new_3(:)
 	INTEGER                     :: n_eligible
 
 
@@ -4309,12 +4309,12 @@ SUBROUTINE  SIMULATION(bench_indx)
 			allocate( eligible_panelage_new_1(n_eligible), eligible_panelage_new_2(n_eligible), eligible_panelage_new_3(n_eligible) )
 
 
-		! 	eligible_panelage_old_1 = pack(panelage_old_1 , (eligible.eq.1) )
-		! 	eligible_panelage_old_2 = pack(panelage_old_2 , (eligible.eq.1) )
-		!	eligible_panelage_old_3 = pack(panelage_old_3 , (eligible.eq.1) )
-		! 	eligible_panelage_new_1 = pack(panelage_new_1 , (eligible.eq.1) )
-		! 	eligible_panelage_new_2 = pack(panelage_new_2 , (eligible.eq.1) )
-		!	eligible_panelage_new_3 = pack(panelage_new_3 , (eligible.eq.1) )
+			eligible_panelage_old_1 = pack(panelage_old_1 , (eligible.eq.1) )
+			eligible_panelage_old_2 = pack(panelage_old_2 , (eligible.eq.1) )
+			eligible_panelage_old_3 = pack(panelage_old_3 , (eligible.eq.1) )
+			eligible_panelage_new_1 = pack(panelage_new_1 , (eligible.eq.1) )
+			eligible_panelage_new_2 = pack(panelage_new_2 , (eligible.eq.1) )
+			eligible_panelage_new_3 = pack(panelage_new_3 , (eligible.eq.1) )
 
 		print*, ' '
 		print*, 'n_eligible', sum(eligible)
@@ -4414,7 +4414,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		WRITE (UNIT=24, FMT=*) eligible_panela_new_2
 		WRITE (UNIT=25, FMT=*) eligible_panela_new_3
 
-		WRITE (UNIT=30, FMT=*) panelage_old_1( (eligible.eq.1) )
+		WRITE (UNIT=30, FMT=*) eligible_panelage_old_1
 		WRITE (UNIT=31, FMT=*) eligible_panelage_old_2
 		WRITE (UNIT=32, FMT=*) eligible_panelage_old_3
 		WRITE (UNIT=33, FMT=*) eligible_panelage_new_1
