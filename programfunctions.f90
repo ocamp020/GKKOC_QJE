@@ -4267,23 +4267,23 @@ SUBROUTINE  SIMULATION(bench_indx)
 		    	panelage_old_3 = panelage
 		    	where(panelage==1) eligible = 0 
 	        endif 
-	 !        if ((simutime.ge.(MaxSimuTime-12)).and.(simutime.le.(MaxSimuTime-2))) then
-	 !        	where(panelage==1) death_count = death_count + 1
-	 !        endif
-	 !        if (simutime.eq.(MaxSimuTime-2)) then 
-		!     	panela_new_1   = panela
-		!     	panelage_new_1 = panelage
-	 !        endif 
-	 !        if (simutime.eq.(MaxSimuTime-1)) then 
-		!     	panela_new_2   = panela
-		!     	panelage_new_2 = panelage
-		!     	where(panelage==1) eligible = 0 
-	 !        endif 
-	 !        if (simutime.eq.(MaxSimuTime)) then 
-		!     	panela_new_3   = panela
-		!     	panelage_new_3 = panelage
-		!     	where(panelage==1) eligible = 0 
-	 !        endif 
+	        if ((simutime.ge.(MaxSimuTime-12)).and.(simutime.le.(MaxSimuTime-2))) then
+	        	where(panelage==1) death_count = death_count + 1
+	        endif
+	        if (simutime.eq.(MaxSimuTime-2)) then 
+		    	panela_new_1   = panela
+		    	panelage_new_1 = panelage
+	        endif 
+	        if (simutime.eq.(MaxSimuTime-1)) then 
+		    	panela_new_2   = panela
+		    	panelage_new_2 = panelage
+		    	where(panelage==1) eligible = 0 
+	        endif 
+	        if (simutime.eq.(MaxSimuTime)) then 
+		    	panela_new_3   = panela
+		    	panelage_new_3 = panelage
+		    	where(panelage==1) eligible = 0 
+	        endif 
 
 	 		! print*, "Simulation period", simutime
 		ENDDO ! simutime
