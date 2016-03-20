@@ -4258,7 +4258,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			if (simutime.eq.(MaxSimuTime-15)) then 
 		    	panela_old_1   = panela
 		    	age_old_1 = panelage
-		    	print*, size(age_old_1), sum(age_old_1)
+		    	print*, size(panelage), sum(panelage)
 	        endif 
 	        if (simutime.eq.(MaxSimuTime-14)) then 
 		    	panela_old_2   = panela
