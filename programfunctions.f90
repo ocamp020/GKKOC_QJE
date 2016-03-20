@@ -4415,7 +4415,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		WRITE (UNIT=24, FMT=*) eligible_panela_new_2
 		WRITE (UNIT=25, FMT=*) eligible_panela_new_3
 
-		WRITE (UNIT=30, FMT=*) eligible_panelage_old_1
+		WRITE (UNIT=30, FMT=*) e_panelage_old_1
 		WRITE (UNIT=31, FMT=*) eligible_panelage_old_2
 		WRITE (UNIT=32, FMT=*) eligible_panelage_old_3
 		WRITE (UNIT=33, FMT=*) eligible_panelage_new_1
