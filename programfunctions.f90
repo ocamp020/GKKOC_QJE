@@ -4257,16 +4257,16 @@ SUBROUTINE  SIMULATION(bench_indx)
 		    	panela_old_1   = panela
 		    	panelage_old_1 = panelage
 	        endif 
-	 !        if (simutime.eq.(MaxSimuTime-14)) then 
-		!     	panela_old_2 = panela
-		!     	panelage_old_2 = panelage
-		!     	where(panelage==1) eligible = 0 
-	 !        endif 
-	 !        if (simutime.eq.(MaxSimuTime-13)) then 
-		!     	panela_old_3 = panela
-		!     	panelage_old_3 = panelage
-		!     	where(panelage==1) eligible = 0 
-	 !        endif 
+	        if (simutime.eq.(MaxSimuTime-14)) then 
+		    	panela_old_2 = panela
+		    	panelage_old_2 = panelage
+		    	where(panelage==1) eligible = 0 
+	        endif 
+	        if (simutime.eq.(MaxSimuTime-13)) then 
+		    	panela_old_3 = panela
+		    	panelage_old_3 = panelage
+		    	where(panelage==1) eligible = 0 
+	        endif 
 	 !        if ((simutime.ge.(MaxSimuTime-12)).and.(simutime.le.(MaxSimuTime-2))) then
 	 !        	where(panelage==1) death_count = death_count + 1
 	 !        endif
