@@ -4301,7 +4301,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			allocate( eligible_panelage_old_1(n_eligible), eligible_panelage_old_2(n_eligible), eligible_panelage_old_3(n_eligible) )
 			allocate( eligible_panelage_new_1(n_eligible), eligible_panelage_new_2(n_eligible), eligible_panelage_new_3(n_eligible) )
 
-		! 	eligible_panela_old_1 = pack(panela_old_1 , (eligible.eq.1) )
+			eligible_panela_old_1 = pack(panela_old_1 , (eligible.eq.1) )
 		! 	eligible_panela_old_2 = pack(panela_old_2 , (eligible.eq.1) )
 		! 	eligible_panela_old_3 = pack(panela_old_3 , (eligible.eq.1) )
 		! 	eligible_panela_new_1 = pack(panela_new_1 , (eligible.eq.1) )
