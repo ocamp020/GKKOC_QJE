@@ -4070,11 +4070,12 @@ SUBROUTINE  SIMULATION(bench_indx)
 	REAL(DP), DIMENSION(:)      , allocatable :: eligible_panela_old_1  , eligible_panela_old_2  , eligible_panela_old_3
 	REAL(DP), DIMENSION(:)      , allocatable :: eligible_panela_new_1  , eligible_panela_new_2  , eligible_panela_new_3
 	INTEGER , DIMENSION(:)      , allocatable :: panelage_old_1, panelage_old_2, panelage_old_3
-	INTEGER , DIMENSION(totpop) 			  :: panelage_new_1, panelage_new_2, panelage_new_3 
+	INTEGER , DIMENSION(:) 		, allocatable :: panelage_new_1, panelage_new_2, panelage_new_3 
 	INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_old_1, eligible_panelage_old_2, eligible_panelage_old_3
 	INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_new_1, eligible_panelage_new_2, eligible_panelage_new_3
 	INTEGER                     			  :: n_eligible
-	allocate(panelage_old_1(totpop),panelage_old_2(totpop),panelage_old_3(totpop))
+		allocate(panelage_old_1(totpop),panelage_old_2(totpop),panelage_old_3(totpop))
+		allocate(panelage_new_1(totpop),panelage_new_2(totpop),panelage_new_3(totpop))
 
 	!$ call omp_set_num_threads(20)
 
