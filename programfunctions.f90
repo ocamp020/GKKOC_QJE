@@ -4308,7 +4308,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			eligible_panela_new_2 	= pack(panela_new_2   , (eligible.eq.1) )
 			eligible_panela_new_3 	= pack(panela_new_3   , (eligible.eq.1) )
 
-			! eligible_panelage_old_1 = pack(panelage_old_1 , (eligible.eq.1) )
+		! 	eligible_panelage_old_1 = pack(panelage_old_1 , (eligible.eq.1) )
 		! 	eligible_panelage_old_2 = pack(panelage_old_2 , (eligible.eq.1) )
 		! 	eligible_panelage_old_3 = pack(panelage_old_3 , (eligible.eq.1) )
 		! 	eligible_panelage_new_1 = pack(panelage_new_1 , (eligible.eq.1) )
@@ -4361,12 +4361,12 @@ SUBROUTINE  SIMULATION(bench_indx)
 		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_bench'        , STATUS='replace')
 		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
 
-		! OPEN   (UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_old_1'     , STATUS='replace')
-		! OPEN   (UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_old_2'     , STATUS='replace')
-		! OPEN   (UNIT=22, FILE=trim(Result_Folder)//'Simul/panela_old_3'     , STATUS='replace')
-		! OPEN   (UNIT=23, FILE=trim(Result_Folder)//'Simul/panela_new_1'     , STATUS='replace')
-		! OPEN   (UNIT=24, FILE=trim(Result_Folder)//'Simul/panela_new_2'     , STATUS='replace')
-		! OPEN   (UNIT=25, FILE=trim(Result_Folder)//'Simul/panela_new_3'     , STATUS='replace')
+		OPEN   (UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_old_1'     , STATUS='replace')
+		OPEN   (UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_old_2'     , STATUS='replace')
+		OPEN   (UNIT=22, FILE=trim(Result_Folder)//'Simul/panela_old_3'     , STATUS='replace')
+		OPEN   (UNIT=23, FILE=trim(Result_Folder)//'Simul/panela_new_1'     , STATUS='replace')
+		OPEN   (UNIT=24, FILE=trim(Result_Folder)//'Simul/panela_new_2'     , STATUS='replace')
+		OPEN   (UNIT=25, FILE=trim(Result_Folder)//'Simul/panela_new_3'     , STATUS='replace')
 
 		! OPEN   (UNIT=30, FILE=trim(Result_Folder)//'Simul/panelage_old_1'   , STATUS='replace')
 		! OPEN   (UNIT=31, FILE=trim(Result_Folder)//'Simul/panelage_old_2'   , STATUS='replace')
@@ -4405,13 +4405,13 @@ SUBROUTINE  SIMULATION(bench_indx)
 	close (unit=27)
 	close (unit=28)
 
-	! if (bench_indx==1) then
-	! 	WRITE (UNIT=20, FMT=*) eligible_panela_old_1
-	! 	WRITE (UNIT=21, FMT=*) eligible_panela_old_2
-	! 	WRITE (UNIT=22, FMT=*) eligible_panela_old_3
-	! 	WRITE (UNIT=23, FMT=*) eligible_panela_new_1
-	! 	WRITE (UNIT=24, FMT=*) eligible_panela_new_2
-	! 	WRITE (UNIT=25, FMT=*) eligible_panela_new_3
+	if (bench_indx==1) then
+		WRITE (UNIT=20, FMT=*) eligible_panela_old_1
+		WRITE (UNIT=21, FMT=*) eligible_panela_old_2
+		WRITE (UNIT=22, FMT=*) eligible_panela_old_3
+		WRITE (UNIT=23, FMT=*) eligible_panela_new_1
+		WRITE (UNIT=24, FMT=*) eligible_panela_new_2
+		WRITE (UNIT=25, FMT=*) eligible_panela_new_3
 
 	! 	WRITE (UNIT=30, FMT=*) eligible_panelage_old_1
 	! 	WRITE (UNIT=31, FMT=*) eligible_panelage_old_2
@@ -4420,12 +4420,12 @@ SUBROUTINE  SIMULATION(bench_indx)
 	! 	WRITE (UNIT=34, FMT=*) eligible_panelage_new_2
 	! 	WRITE (UNIT=35, FMT=*) eligible_panelage_new_3
 
-	! 	close (unit=20)
-	! 	close (unit=21)
-	! 	close (unit=22)
-	! 	close (unit=23)
-	! 	close (unit=24)
-	! 	close (unit=25)
+		close (unit=20)
+		close (unit=21)
+		close (unit=22)
+		close (unit=23)
+		close (unit=24)
+		close (unit=25)
 
 	! 	close (unit=30)
 	! 	close (unit=31)
@@ -4433,7 +4433,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	! 	close (unit=33)
 	! 	close (unit=34)
 	! 	close (unit=35)
-	! endif
+	endif
 
 
 END SUBROUTINE SIMULATION
