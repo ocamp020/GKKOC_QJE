@@ -4288,12 +4288,12 @@ SUBROUTINE  SIMULATION(bench_indx)
 	 		! print*, "Simulation period", simutime
 		ENDDO ! simutime
 
-		! ! Clean eligibles 
-		! 	where(death_count/=1) eligible = 0
+		! Clean eligibles 
+			where(death_count/=1) eligible = 0
 
 
-		! ! Get data on intergenerational mobility
-		! 	n_eligible = sum(eligible)
+		! Get data on intergenerational mobility
+			n_eligible = sum(eligible)
 
 		! 	allocate( eligible_panela_old_1(n_eligible), eligible_panela_old_2(n_eligible), eligible_panela_old_3(n_eligible) )
 		! 	allocate( eligible_panela_new_1(n_eligible), eligible_panela_new_2(n_eligible), eligible_panela_new_3(n_eligible) )
