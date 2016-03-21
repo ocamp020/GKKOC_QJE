@@ -88,7 +88,7 @@ PROGRAM main
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
 
-		x_hi	= 1.50_dp
+		x_hi	= 2.00_dp
 		x_lo	= 1.0_dp
 		a_x 	= 0.10_dp
 		b_x 	= 0.0_dp
@@ -131,7 +131,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'x_hi_15_z7/' 
+		Result_Folder = trim(Result_Folder)//'x_hi_20_z7/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
