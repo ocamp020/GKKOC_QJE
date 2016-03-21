@@ -2488,8 +2488,11 @@ SUBROUTINE COMPUTE_STATS()
 	!print*,"Current parameters"
 	!print*,'beta',beta,'rho_z',rho_z,'sigma_z',sigma_z_eps,'sigma_lam',sigma_lambda_eps,'phi',phi
 	print*,"Statistics"
-	print*,'Debt/GDP',External_Debt_GDP,'W/GDP',Wealth_Output,'Top 1%',prct1_wealth,'Top 10%',prct10_wealth
+	print*,'Debt/GDP',External_Debt_GDP,'W/GDP',Wealth_Output,'Top 1% A',prct1_wealth,'Top 10% A',prct10_wealth
 	print*,'STD Labor Earnings',Std_Log_Earnings_25_60,'Mean Labor (hours 25-60)',meanhours_25_60,'MeanReturn',MeanReturn
+	print*,'PV_Wealth_Top_1%', FW_top_x_share(4), 'PV_Top_10%', FW_top_x_share(3)
+	print*,'Constrained firms by z:'
+	print*, 100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:))
 	print*,'Moments',SSE_Moments 
 	!print*,''
 
@@ -5508,7 +5511,8 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		bench_folder = './SU_SZ_PT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
 	end if 
 
-		call system( 'mkdir -p ' // trim(bench_folder) )
+		!call system( 'mkdir -p ' // trim(bench_folder) )
+		call system( 'mkdir -p ' // trim(Result_Folder)//'Bench_Files/'
 		print*, "Bench Files Folder:", bench_folder
 	
 	IF (Compute_bench) then 
