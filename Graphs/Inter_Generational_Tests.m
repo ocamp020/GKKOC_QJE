@@ -99,12 +99,12 @@
         Bench_Folder  = strcat('../../NSU_F_LT_Results/Theta_',num2str(theta,'%.2f'),'/Bench_Files/') ;
         
     % Load Simulation
-        eval(['load ',Simul_Folder,'panela_old_1']) ;
-        eval(['load ',Simul_Folder,'panela_old_2']) ;
-        eval(['load ',Simul_Folder,'panela_old_3']) ;
-        eval(['load ',Simul_Folder,'panela_new_1']) ;
-        eval(['load ',Simul_Folder,'panela_new_2']) ;
-        eval(['load ',Simul_Folder,'panela_new_3']) ;
+        eval(['load ',Simul_Folder,'panela_old_1']) ; 
+        eval(['load ',Simul_Folder,'panela_old_2']) ; 
+        eval(['load ',Simul_Folder,'panela_old_3']) ; eval(['load ',Simul_Folder,'panelage_old_3']) ;
+        eval(['load ',Simul_Folder,'panela_new_1']) ; 
+        eval(['load ',Simul_Folder,'panela_new_2']) ; 
+        eval(['load ',Simul_Folder,'panela_new_3']) ; eval(['load ',Simul_Folder,'panelage_new_3']) ;
         eval(['load ',Bench_Folder,'EBAR'])         ;
         
     % Averages
@@ -117,8 +117,8 @@
         panela_new_3 = Wage_earnings/EBAR * panela_new_3 ;
         
         
-        panela_old = log((panela_old_1+panela_old_2+panela_old_3)/3) ;
-        panela_new = log((panela_new_1+panela_new_2+panela_new_3)/3) ;
+        panela_old = log((panela_old_1+panela_old_2+panela_old_3)/3) ; panelage_old = panelage_old_3 ;
+        panela_new = log((panela_new_1+panela_new_2+panela_new_3)/3) ; panelage_new = panelage_new_3 ;
         
     w_cut = log([1 1000000 10000000]);  
     for i=1:numel(w_cut)
@@ -147,26 +147,39 @@
     
         
     % Regression Rank
-        [~, ~, rank_x] = unique(x) ; rank_x = 100*(rank_x-0.5)/numel(unique(x)) ;
-        [~, ~, rank_y] = unique(y) ; rank_y = 100*(rank_y-0.5)/numel(unique(y)) ;
-        mdl            = fitlm(rank_x',rank_y')       ;
-        cons_R(i)      = mdl.Coefficients.Estimate(1) ;
-        slope_R(i)     = mdl.Coefficients.Estimate(2) ;
-        SE_slope_R(i)  = mdl.Coefficients.SE(2)       ;
-        R2_R(i)        = mdl.Rsquared.Ordinary        ;
-        xx             = linspace(0,100,3)             ;
+        x           = panela_old(panela_old>=w_cut(i)) ; x_age = panelage_old(panela_old>=w_cut(i)) ; rank_x = NaN(numel(x)) ;
+        y           = panela_new(panela_old>=w_cut(i)) ; y_age = panelage_new(panela_old>=w_cut(i)) ; rank_y = NaN(numel(x)) ;
+        
+        for age = unique(x_age)
+           aux = x(x_age==age) ;
+           [~, ~, rank_aux] = unique(aux) ; rank_aux = 100*(rank_aux-0.5)/numel(unique(aux)) ;
+           rank_x(x_age==age) = rank_aux  ;
+        end
+        for age = unique(y_age)
+           aux = y(y_age==age) ;
+           [~, ~, rank_aux] = unique(aux) ; rank_aux = 100*(rank_aux-0.5)/numel(unique(aux)) ;
+           rank_y(y_age==age) = rank_aux  ;
+        end
+        
         % Bins
         for j=1:100
             y_aux(j) = mean(rank_y( (rank_x>(j-1))&(rank_x<j) )) ;
             x_aux(j) = j                                         ;
         end
+        % Regression
+        mdl            = fitlm(x_aux',y_aux')       ;
+        cons_R(i)      = mdl.Coefficients.Estimate(1) ;
+        slope_R(i)     = mdl.Coefficients.Estimate(2) ;
+        SE_slope_R(i)  = mdl.Coefficients.SE(2)       ;
+        R2_R(i)        = mdl.Rsquared.Ordinary        ;
+        xx             = linspace(0,100,3)             ;
 	
     % Graph
         figure; hold on; 
         scatter(x_aux,y_aux); plot(xx,cons_R(i)+slope_R(i)*xx,'linewidth',2); plot(x_aux,x_aux,'--k')
         hold off; 
         fig_title = ['Inter-Generational Rank: W>',num2str(exp(w_cut(i))),' bench'] ;
-        title(fig_title); xlabel('Rank Wealth Father'); ylabel('Rank Wealth Son'); xlim([min(xx),max(xx)]);
+        title(fig_title); xlabel('Rank Wealth Father'); ylabel('Average Rank Wealth Son'); xlim([min(xx),max(xx)]);
         file_name = ['Inter_Generational_Rank_',num2str(exp(w_cut(i))),'_bench.fig'] ;
         file_name_pdf = ['Inter_Generational_Rank_',num2str(exp(w_cut(i))),'_bench.pdf'] ;
         savefig(file_name); print('-dpdf',file_name_pdf) ;
