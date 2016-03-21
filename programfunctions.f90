@@ -2492,7 +2492,9 @@ SUBROUTINE COMPUTE_STATS()
 	print*,'STD Labor Earnings',Std_Log_Earnings_25_60,'Mean Labor (hours 25-60)',meanhours_25_60,'MeanReturn',MeanReturn
 	print*,'PV_Wealth_Top_1%', FW_top_x_share(4), 'PV_Top_10%', FW_top_x_share(3)
 	print*,'Constrained firms by z:'
-	print*, 100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:))
+	do zi=1,nz 
+		print*, zi, 100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:))
+	enddo 
 	print*,'Moments',SSE_Moments 
 	!print*,''
 
