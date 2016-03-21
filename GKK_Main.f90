@@ -90,7 +90,7 @@ PROGRAM main
 
 		x_hi	= 3.0_dp
 		x_lo	= 1.0_dp
-		a_x 	= 0.95_dp
+		a_x 	= 1.90_dp
 		b_x 	= 0.0_dp
 
 		if (Log_Switch.eqv..true.) then
