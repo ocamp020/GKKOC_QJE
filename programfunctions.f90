@@ -4151,6 +4151,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 	!=============================================================================
 
 	!call cpu_time(start_timet) 
+	eligible    = 1 
+	death_count = 0
 
 	DO simutime=1, MaxSimuTime
 
