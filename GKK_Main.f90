@@ -88,10 +88,10 @@ PROGRAM main
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
 
-		x_hi	= 1.3_dp
+		x_hi	= 3.0_dp
 		x_lo	= 1.0_dp
-		a_x 	= 0.15_dp
-		b_x 	= 0.1_dp
+		a_x 	= 0.95_dp
+		b_x 	= 0.0_dp
 
 		if (Log_Switch.eqv..true.) then
 				sigma = 1.0_dp

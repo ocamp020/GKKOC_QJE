@@ -30,7 +30,7 @@ MODULE parameters
 
     ! Transitory entrepreneurial ablity (x)
     INTEGER(I4B), PARAMETER :: nx=2
-    REAL(DP)                :: x_hi=3.0_dp, x_lo=1.0_dp, a_x=0.95_dp, b_x=0.0_dp
+    REAL(DP)                :: x_hi, x_lo, a_x, b_x
 
  
 
