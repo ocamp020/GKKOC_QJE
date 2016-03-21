@@ -140,7 +140,8 @@ PROGRAM main
 		print*, "NSU_Switch=",NSU_Switch,'sigma=',sigma,'gamma=',gamma,'phi',phi
 		print*,'Labor Taxes: tauPl=',tauPl,'psi',psi
 		print*, 'Borrowing Constraint: Theta=',theta
-		print*,'m tauchen for zgrid is ',mtauchen_z,'nz=',nz, 'amax=',amax, 'totpop=', totpop
+		print*, 'm tauchen for zgrid is ',mtauchen_z,'nz=',nz, 'amax=',amax, 'totpop=', totpop
+		print*, 'x_hi', x_hi, 'a_x', a_x, 'b_x', b_x
 
 
 	! Set parameters to be used in all simulations economy
