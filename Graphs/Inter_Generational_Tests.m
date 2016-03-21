@@ -27,9 +27,11 @@
         
 %% Fixed Parameters
 
+EBAR_data = 8.8891*10^12/(122.46*10^6) ; % 2013 total compensation of employees' devided by number of HH's in 2013
+
 % Grids
     n_a = 201 ; 
-    n_z = 7   ;
+    n_z = 11   ;
     n_l = 5   ;
     n_e = 5   ;
     
@@ -99,26 +101,13 @@
         Bench_Folder  = strcat('../../NSU_F_LT_Results/Theta_',num2str(theta,'%.2f'),'/Bench_Files/') ;
         
     % Load Simulation
-        eval(['load ',Simul_Folder,'panela_old_1']) ; 
-        eval(['load ',Simul_Folder,'panela_old_2']) ; 
-        eval(['load ',Simul_Folder,'panela_old_3']) ; eval(['load ',Simul_Folder,'panelage_old_3']) ;
-        eval(['load ',Simul_Folder,'panela_new_1']) ; 
-        eval(['load ',Simul_Folder,'panela_new_2']) ; 
-        eval(['load ',Simul_Folder,'panela_new_3']) ; eval(['load ',Simul_Folder,'panelage_new_3']) ;
+        eval(['load ',Simul_Folder,'panela_parents']) ; eval(['load ',Simul_Folder,'panelage_parents']) ;
+        eval(['load ',Simul_Folder,'panela_sons'])    ; eval(['load ',Simul_Folder,'panelage_sons']) ;
         eval(['load ',Bench_Folder,'EBAR'])         ;
         
-    % Averages
-        Wage_earnings = 47000;
-        panela_old_1 = Wage_earnings/EBAR * panela_old_1 ;
-        panela_old_2 = Wage_earnings/EBAR * panela_old_2 ;
-        panela_old_3 = Wage_earnings/EBAR * panela_old_3 ;
-        panela_new_1 = Wage_earnings/EBAR * panela_new_1 ;
-        panela_new_2 = Wage_earnings/EBAR * panela_new_2 ;
-        panela_new_3 = Wage_earnings/EBAR * panela_new_3 ;
-        
-        
-        panela_old = log((panela_old_1+panela_old_2+panela_old_3)/3) ; panelage_old = panelage_old_3 ;
-        panela_new = log((panela_new_1+panela_new_2+panela_new_3)/3) ; panelage_new = panelage_new_3 ;
+    % Dollar units
+        panela_old = log(panela_parents*EBAR_data/EBAR) ; panelage_old = panelage_parents ;
+        panela_new = log(panela_sons*EBAR_data/EBAR)    ; panelage_new = panelage_sons ;
         
     w_cut = log([1 1000000 10000000]);  
     for i=1:numel(w_cut)
