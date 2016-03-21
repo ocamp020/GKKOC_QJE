@@ -5512,7 +5512,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 	end if 
 
 		!call system( 'mkdir -p ' // trim(bench_folder) )
-		call system( 'mkdir -p ' // trim(Result_Folder)//'Bench_Files/'
+		call system( 'mkdir -p ' // trim(Result_Folder)//'Bench_Files/')
 		print*, "Bench Files Folder:", bench_folder
 	
 	IF (Compute_bench) then 
