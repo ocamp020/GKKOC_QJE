@@ -26,7 +26,7 @@ MODULE parameters
 
     ! Entrepreneurial ability (z)
     REAL(DP)         	    :: rho_z, sigma_z_eps, mu_z
-    INTEGER(I4B), PARAMETER :: nz=11, nz_aux=11  ! Number of grid points
+    INTEGER(I4B), PARAMETER :: nz=7, nz_aux=7  ! Number of grid points
 
     ! Transitory entrepreneurial ablity (x)
     INTEGER(I4B), PARAMETER :: nx=2
@@ -68,7 +68,7 @@ MODULE parameters
 
 	! Parameters for external functions and procedures
 		! Number of std std away from mean in tauchen
-		REAL(DP), PARAMETER  :: mtauchen=3.0_DP, mtauchen_z=5.0_dp
+		REAL(DP), PARAMETER  :: mtauchen=3.0_DP, mtauchen_z=3.0_dp
 		! Tolerance for brent algorithm
 		REAL(DP), PARAMETER  :: brent_tol=0.00000001_DP
 
