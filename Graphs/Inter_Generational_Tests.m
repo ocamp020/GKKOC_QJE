@@ -124,7 +124,8 @@ EBAR_data = 8.8891*10^12/(122.46*10^6) ; % 2013 total compensation of employees'
         
     % Graph
         figure; hold on; 
-        scatter(x,y); plot(xx,cons(i)+slope(i)*xx,'linewidth',2);
+        % scatter(x,y); 
+        plot(xx,cons(i)+slope(i)*xx,'linewidth',2);
         hold off; 
         fig_title = ['Inter-Generational Wealth: W>',num2str(exp(w_cut(i))),' bench'] ;
         title(fig_title); xlabel('ln(Wealth Father)'); ylabel('ln(Wealth Son)'); xlim([min(xx),max(xx)]);
@@ -136,8 +137,8 @@ EBAR_data = 8.8891*10^12/(122.46*10^6) ; % 2013 total compensation of employees'
     
         
     % Regression Rank
-        x           = panela_old(panela_old>=w_cut(i)) ; x_age = panelage_old(panela_old>=w_cut(i)) ; rank_x = NaN(numel(x)) ;
-        y           = panela_new(panela_old>=w_cut(i)) ; y_age = panelage_new(panela_old>=w_cut(i)) ; rank_y = NaN(numel(x)) ;
+        x           = panela_old(panela_old>=w_cut(i)) ; x_age = panelage_old(panela_old>=w_cut(i)) ; rank_x = NaN(1,numel(x)) ;
+        y           = panela_new(panela_old>=w_cut(i)) ; y_age = panelage_new(panela_old>=w_cut(i)) ; rank_y = NaN(1,numel(x)) ;
         
         for age = unique(x_age)
            aux = x(x_age==age) ;
@@ -156,12 +157,20 @@ EBAR_data = 8.8891*10^12/(122.46*10^6) ; % 2013 total compensation of employees'
             x_aux(j) = j                                         ;
         end
         % Regression
-        mdl            = fitlm(x_aux',y_aux')       ;
+        mdl            = fitlm(x_aux',y_aux')         ;
         cons_R(i)      = mdl.Coefficients.Estimate(1) ;
         slope_R(i)     = mdl.Coefficients.Estimate(2) ;
         SE_slope_R(i)  = mdl.Coefficients.SE(2)       ;
         R2_R(i)        = mdl.Rsquared.Ordinary        ;
-        xx             = linspace(0,100,3)             ;
+        xx             = linspace(0,100,3)            ;
+        
+        % Regression 2
+        mdl            = fitlm(rank_x',rank_y')         ;
+        cons_R_2(i)    = mdl.Coefficients.Estimate(1) ;
+        slope_R_2(i)   = mdl.Coefficients.Estimate(2) ;
+        SE_slope_R_2(i)= mdl.Coefficients.SE(2)       ;
+        R2_R_2(i)      = mdl.Rsquared.Ordinary        ;
+        xx             = linspace(0,100,3)            ;
 	
     % Graph
         figure; hold on; 
@@ -185,6 +194,10 @@ EBAR_data = 8.8891*10^12/(122.46*10^6) ; % 2013 total compensation of employees'
         AA       = [w_cut',cons_R',slope_R',SE_slope_R',R2_R',n'];
         Mat      = [col_name; num2cell(AA)]
         status   = xlwrite(Tables_file,Mat,'Rank-bench') ;
+        col_name = {'w_cut','Cons','Slope','SE_slope','R2','obs'};
+        AA       = [w_cut',cons_R_2',slope_R_2',SE_slope_R_2',R2_R_2',n'];
+        Mat      = [col_name; num2cell(AA)]
+        status   = xlwrite(Tables_file,Mat,'Rank-bench-No-Bins') ;
         
 %% Benchmark
 
