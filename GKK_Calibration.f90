@@ -98,9 +98,10 @@ Function Moments_Objective(par_in)
 		Obj_Moments(5) = (meanhours_25_60/0.40_dp		 -1.0_dp)**2.0_dp 
 		Obj_Moments(6) = (MeanReturn/0.069_DP 			 -1.0_dp)**2.0_dp 
 
-		SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP  + (1.0_DP-FW_top_x_share(4)/0.357_DP)**2.0_DP  + (pFW_top_x_share(3)-0.75_DP)**2.0_DP &
-                   & + (1.0_DP-Std_Log_Earnings_25_60 / 0.8_DP)**2.0_DP + (1.0_DP-meanhours_25_60/0.4_DP)**2.0_DP &
-                   & + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
+		SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP  &
+					& + (1.0_DP-FW_top_x_share(4)/0.357_DP)**2.0_DP  + (FW_top_x_share(3)-0.75_DP)**2.0_DP 		   &
+                   	& + (1.0_DP-Std_Log_Earnings_25_60 / 0.8_DP)**2.0_DP + (1.0_DP-meanhours_25_60/0.4_DP)**2.0_DP &
+                   	& + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
 
 		Moments_Objective = SSE_Moments 
 
