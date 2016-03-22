@@ -730,8 +730,9 @@ SUBROUTINE CALIBRATION_TRIALS
 	                   !& + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
 	                   
 	!    SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
-
-	!    print*,'parameters=',beta, mu_z, rho_z,sigma_z_eps,sigma_lambda_eps, gamma,'SSE_Moments =',SSE_Moments
+		print*, ' '
+		print*,'parameters=',beta, sigma_z_eps, x_hi,'SSE_Moments =',SSE_Moments
+		print*,'Wealth_Output', Wealth_Output,'Top 1%',FW_top_x_share(4),'Std_Log_E',Std_Log_Earnings_25_60,'meanhours',meanhours_25_60
 
 	    IF (SSE_Moments .lt. Min_SSE_Moments ) THEN
 	        Min_SSE_Moments =SSE_Moments
