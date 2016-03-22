@@ -709,7 +709,16 @@ SUBROUTINE CALIBRATION_TRIALS
 	    print*, ' '
 	    print*,'parameters=', beta, sigma_z_eps, x_hi
 	        
-	    solving_bench=1
+	    
+		! Benchmark economy
+			solving_bench=1
+
+		! Set taxes for benchmark economy
+			tauK = 0.25_DP
+			tauW_bt = 0.00_DP
+			tauW_at = 0.00_DP
+			Y_a_threshold = 0.00_DP 
+			
 	    CALL INITIALIZE
 	    CALL FIND_DBN_EQ
 	    CALL Firm_Value
