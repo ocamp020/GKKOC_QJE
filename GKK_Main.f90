@@ -702,9 +702,9 @@ SUBROUTINE CALIBRATION_TRIALS
 	DO parindx6=1,n_x_hi
 	DO parindx5=1,n_sigmaz
 
-	    beta  = beta_L  + real(parindx1-1,8) *(beta_H-beta_L)/max(real(n_beta-1,8),1.0_DP)
-	    sigma_z_eps = sigmazL +  real(parindx5-1,8)*(sigmaz_H-sigmaz_L) / max(real(n_sigmaz-1,8),1.0_DP)
-	    x_hi = x_hi_L +  real(parindx6-1,8)*(x_hi_H-x_hi_L) / max(real(n_x_hi-1,8),1.0_DP)
+	    beta  		= beta_L  	+ real(parindx1-1,8) *(beta_H-beta_L)/max(real(n_beta-1,8),1.0_DP)
+	    sigma_z_eps = sigmaz_L 	+ real(parindx5-1,8)*(sigmaz_H-sigmaz_L) / max(real(n_sigmaz-1,8),1.0_DP)
+	    x_hi 		= x_hi_L 	+ real(parindx6-1,8)*(x_hi_H-x_hi_L) / max(real(n_x_hi-1,8),1.0_DP)
 
 	    print*, ' '
 	    print*,'parameters=', beta, sigma_z_eps, x_hi
