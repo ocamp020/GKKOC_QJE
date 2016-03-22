@@ -76,7 +76,8 @@ Function Moments_Objective(par_in)
 		solving_bench=1
 		
 	! Set initia lvalues of R, Wage, Ebar to find equilibrium
-		rr    =  4.906133597851297E-002 
+		R     =  0.05_dp
+		P     =  4.906133597851297E-002 
 		wage  =  1.97429920063330 
 		Ebar  =  1.82928004963637  
 		Ebar_bench = Ebar
@@ -91,13 +92,13 @@ Function Moments_Objective(par_in)
 	!====================================================================================================
 	! Print moments (square difference)
 		Obj_Moments(1) = (Wealth_Output/3.00_dp 		 -1.0_dp)**2.0_dp 
-		Obj_Moments(2) = (prct1_wealth/0.34_dp 			 -1.0_dp)**2.0_dp 
-		Obj_Moments(3) = (prct10_wealth/0.71_dp          -1.0_dp)**2.0_dp 
+		Obj_Moments(2) = (FW_top_x_share(4)/0.357_dp 	 -1.0_dp)**2.0_dp 
+		Obj_Moments(3) = (FW_top_x_share(3)/0.75_dp      -1.0_dp)**2.0_dp 
 		Obj_Moments(4) = (Std_Log_Earnings_25_60/0.80_dp -1.0_dp)**2.0_dp 
 		Obj_Moments(5) = (meanhours_25_60/0.40_dp		 -1.0_dp)**2.0_dp 
 		Obj_Moments(6) = (MeanReturn/0.069_DP 			 -1.0_dp)**2.0_dp 
 
-		SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP  + (1.0_DP-prct1_wealth/0.34_DP)**2.0_DP  + (prct10_wealth-0.71_DP)**2.0_DP &
+		SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP  + (1.0_DP-FW_top_x_share(4)/0.357_DP)**2.0_DP  + (pFW_top_x_share(3)-0.75_DP)**2.0_DP &
                    & + (1.0_DP-Std_Log_Earnings_25_60 / 0.8_DP)**2.0_DP + (1.0_DP-meanhours_25_60/0.4_DP)**2.0_DP &
                    & + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
 
