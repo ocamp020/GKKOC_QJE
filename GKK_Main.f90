@@ -48,10 +48,10 @@ PROGRAM main
 		Threshold_Factor = 0.00_dp 
 
 	! Switch for solving benchmark or just reading resutls
-		Calibration_Switch = .true.
+		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
+		Tax_Reform    = .true.
 			compute_bench = .true.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
