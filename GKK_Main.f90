@@ -78,7 +78,7 @@ PROGRAM main
 		Params =[0.962_dp, 0.0_dp, 0.50_dp, 0.387_dp, 0.29_dp, 0.4494_dp] ! alpha=0.4, zgrid 11, m5, alpha=0.4, dep005, mu=090, K/Y=3, Top1PVa=0.36
 		
 
-		beta   	= 0.95_dp ! params(1)
+		beta   	= params(1)
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= params(3) 
 		sigma_z_eps      = 0.125_dp ! params(4)
@@ -131,7 +131,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'x_hi_30_zeps_125_z11/' 
+		Result_Folder = trim(Result_Folder)//'x_hi_30_zeps_125_z11_9/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
