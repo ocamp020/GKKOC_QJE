@@ -78,7 +78,7 @@ PROGRAM main
 		Params =[0.962_dp, 0.0_dp, 0.50_dp, 0.387_dp, 0.29_dp, 0.4494_dp] ! alpha=0.4, zgrid 11, m5, alpha=0.4, dep005, mu=090, K/Y=3, Top1PVa=0.36
 		
 
-		beta   	= 0.955_dp ! params(1)
+		beta   	= 0.953_dp ! params(1)
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= params(3) 
 		sigma_z_eps      = 0.125_dp ! params(4)
@@ -90,7 +90,7 @@ PROGRAM main
 
 		x_hi	= 3.0_dp
 		x_lo	= 1.0_dp
-		a_x 	= 0.10_dp
+		a_x 	= 0.08_dp
 		b_x 	= 0.0_dp
 
 		if (Log_Switch.eqv..true.) then
@@ -244,7 +244,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		print*,"	Computing Firm Value Function"
 		CALL Firm_Value
 		print*,"	Saving results in text files to be read later"
-		CALL Write_Benchmark_Results(compute_bench)
+		!CALL Write_Benchmark_Results(compute_bench)
 	else
 		print*,"	Reading benchmark results from files"
 		CALL Write_Benchmark_Results(compute_bench)
