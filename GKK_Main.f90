@@ -676,6 +676,8 @@ SUBROUTINE CALIBRATION_TRIALS
 	real(DP), dimension(6):: paramsL, paramsH
 	real(DP), dimension(3) :: opt_par
 
+	!$ call omp_set_num_threads(3)
+
 	print*,'SOLVING CALIBRATION'
 	print*,'-----------------------------------------------------------------------'
 
