@@ -733,9 +733,7 @@ SUBROUTINE CALIBRATION_TRIALS
 	ENDDO
 	ENDDO
 	ENDDO
-	ENDDO
-	ENDDO
-	ENDDO
+
 	print*, opt_par
 	print*, Min_Moments
 
