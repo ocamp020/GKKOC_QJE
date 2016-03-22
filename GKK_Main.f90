@@ -682,19 +682,19 @@ SUBROUTINE CALIBRATION_TRIALS
 
 	! CALIBRATION STARTS
 
-	beta_L=0.95_dp
-	beta_H=0.96_dp
+	beta_L=0.952_dp
+	beta_H=0.957_dp
 
-	sigmaz_L = 0.1_dp
-	sigmaz_H = 0.2_dp
+	sigmaz_L = 0.11_dp
+	sigmaz_H = 0.15_dp
 
-	x_hi_L  = 1.5_dp 
+	x_hi_L  = 2.5_dp 
 	x_hi_H  = 3.5_dp
 
 
-	n_beta   = 4
-	n_sigmaz = 4
-	n_x_hi   = 4
+	n_beta   = 3
+	n_sigmaz = 3
+	n_x_hi   = 3
 
 	Min_SSE_Moments=1000.0_DP
 
