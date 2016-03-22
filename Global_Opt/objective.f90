@@ -1,5 +1,6 @@
 module OBJECTIVE
     use, intrinsic :: iso_c_binding, only: c_int
+    use omp_lib
     implicit none
     PRIVATE
     PUBLIC objFun, dfovec, initial0
@@ -18,6 +19,7 @@ contains
 
     FUNCTION objFun(theta)
         use genericParams
+        use omp_lib
         implicit none
         REAL(DP),DIMENSION(p_nx),INTENT(IN) :: theta
         REAL(DP) :: objFun
@@ -35,6 +37,7 @@ contains
         USE global
         use genericParams
         use GKK_Calibration
+        use omp_lib
         IMPLICIT NONE
 
         INTEGER, INTENT(IN)     :: n, mv
