@@ -688,13 +688,13 @@ SUBROUTINE CALIBRATION_TRIALS
 	sigmaz_L = 0.11_dp
 	sigmaz_H = 0.15_dp
 
-	x_hi_L  = 2.5_dp 
-	x_hi_H  = 3.5_dp
+	x_hi_L  = 3.0_dp 
+	x_hi_H  = 3.0_dp
 
 
 	n_beta   = 3
 	n_sigmaz = 3
-	n_x_hi   = 3
+	n_x_hi   = 1
 
 	Min_SSE_Moments=1000.0_DP
 
@@ -718,7 +718,7 @@ SUBROUTINE CALIBRATION_TRIALS
 			tauW_bt = 0.00_DP
 			tauW_at = 0.00_DP
 			Y_a_threshold = 0.00_DP 
-			
+
 	    CALL INITIALIZE
 	    CALL FIND_DBN_EQ
 	    CALL Firm_Value
