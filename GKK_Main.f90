@@ -698,7 +698,7 @@ SUBROUTINE CALIBRATION_TRIALS
 	n_sigmaz = 3
 	n_x_hi   = 1
 
-	Min_SSE_Moments=1000.0_DP
+	Min_SSE_Moments=1000000.0_DP
 
 	DO parindx1=1,n_beta
 	DO parindx6=1,n_x_hi
