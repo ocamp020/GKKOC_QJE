@@ -91,7 +91,7 @@ PROGRAM main
 		x_hi	= 4.00_dp
 		x_lo	= 1.00_dp
 		a_x 	= 0.10_dp
-		b_x 	= 0.40_dp
+		b_x 	= 0.80_dp
 
 		if (Log_Switch.eqv..true.) then
 				sigma = 1.0_dp
