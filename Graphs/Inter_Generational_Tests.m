@@ -129,6 +129,7 @@ EBAR_data = 8.8891*10^12/(122.46*10^6) ; % 2013 total compensation of employees'
     child_a    = child_a(child_age >4)/3;
     child_age  = child_age(child_age >4)/3;
 
+
     [parent_a,ind_a] = sort(parent_a);
     parent_age       = parent_age(ind_a);
     child_a          = child_a(ind_a);
