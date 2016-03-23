@@ -87,7 +87,7 @@ PROGRAM GKK_Calibration_Loop
 		b_x 	= 0.40_dp
 
 	! Set Parameters from Loop
-		OPEN (UNIT=1,  FILE=trim(Result_Folder)//'Loop_Par'  , STATUS='old', ACTION='read')
+		OPEN (UNIT=3,  FILE=trim(Result_Folder)//'Loop_Par'  , STATUS='old', ACTION='read')
 		WRITE(unit=3, FMT=*) Loop_Par
 		CLOSE(unit=3)
 
