@@ -23,14 +23,14 @@ Program Calibration_Loop
 	beta_L   = 0.95_dp
 	beta_H   = 0.97_dp
 
-	sigmaz_L = 0.1_dp
-	sigmaz_H = 0.4_dp
+	sigmaz_L = 0.2_dp
+	sigmaz_H = 0.3_dp
 
-	x_hi_L   = 1.5_dp 
+	x_hi_L   = 3.0_dp 
 	x_hi_H   = 5.0_dp
 
 
-	n_beta   = 3
+	n_beta   = 4
 	n_sigmaz = 3
 	n_x_hi   = 3
 
