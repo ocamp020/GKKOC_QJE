@@ -18,7 +18,7 @@ Program Calibration_Loop
 			& 'PV_Top_1%','PV_Top_10%'
 	CLOSE(unit=3)
 
-	call system( 'nohup make GKK_Calibration_Loop.a' )
+	call system( 'make GKK_Calibration_Loop.a' )
 
 	beta_L   = 0.95_dp
 	beta_H   = 0.97_dp
@@ -54,7 +54,7 @@ Program Calibration_Loop
 			CLOSE(unit=3)
 
 		! Call Main Program
-			call system( 'nohup .Compiled_Files/GKK_Calibration_Loop.a >' // trim(log_file) //' &' )
+			call system( 'nohup Compiled_Files/GKK_Calibration_Loop.a >' // trim(log_file) //' &' )
 
 	enddo 
 	enddo
