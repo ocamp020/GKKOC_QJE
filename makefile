@@ -106,6 +106,7 @@ GKK_Calibration_Loop.a: GKK_Calibration_Loop.f90 $(Objects_Main) $(Objects_Opt_T
 
 Calibration_Loop.a: Calibration_Loop.f90 $(Folder)/NRTYPE.o
 	gfortran $(omp_flag) -O2 -I$(Folder) Calibration_Loop.f90 $(Folder)/NRTYPE.o -o $(Folder)/Calibration_Loop.a
+	rm -f log_ind*
 	time $(Folder)/Calibration_Loop.a
 
 
