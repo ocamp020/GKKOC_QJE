@@ -72,5 +72,8 @@ MODULE parameters
 		! Tolerance for brent algorithm
 		REAL(DP), PARAMETER  :: brent_tol=0.00000001_DP
 
+	! Exchange Rate
+		REAL(DP), PARAMETER  :: EBAR_data = 8.8891*10^12/(122.46*10^6)
+
 
 END MODULE parameters

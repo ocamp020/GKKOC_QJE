@@ -103,20 +103,21 @@ EBAR_data = 8.8891*10^12/(122.46*10^6) ; % 2013 total compensation of employees'
 %     % Load Simulation
 %         eval(['load ',Simul_Folder,'panela_parents']) ; eval(['load ',Simul_Folder,'panelage_parents']) ;
 %         eval(['load ',Simul_Folder,'panela_sons'])    ; eval(['load ',Simul_Folder,'panelage_sons']) ;
-%         eval(['load ',Bench_Folder,'EBAR'])         ;
+%         eval(['load ',Bench_Folder,'EBAR'])         ; EBAR = EBAR**0.727853584919652 ;
 %         
 %     % Dollar units
 %         panela_old = log(panela_parents*EBAR_data/EBAR) ; panelage_old = panelage_parents ;
 %         panela_new = log(panela_sons*EBAR_data/EBAR)    ; panelage_new = panelage_sons ;
         
     
-    cd '/Users/s-ocampo/Dropbox/RA_Guvenen/Wealth_Tax/CGGK_CODES/kubu_fortran/EGM_NEW/DBN/CRRA_CALIBRATION/FLAT_TAX/FINANCE/ZERO_DEP/vartheta1.5_re_calibration/1zgrid11_m5_dep005_mu075_KY3'
+    cd '/Users/s-ocampo/Dropbox/RA_Guvenen/Wealth_Tax/CGGK_CODES/kubu_fortran/EGM_NEW/DBN/CRRA_CALIBRATION/FLAT_TAX/FINANCE/ZERO_DEP/vartheta1.5_re_calibration/1zgrid11_m5_dep005_mu090_KY3'
 
     load parent_tot_a
     load parent_tot_age
     load child_tot_a
     load child_tot_age
     load family_death
+    load EBAR_bench
 
     parent_a   = parent_tot_a(family_death==1);
     parent_age = parent_tot_age(family_death==1);
@@ -133,8 +134,10 @@ EBAR_data = 8.8891*10^12/(122.46*10^6) ; % 2013 total compensation of employees'
     child_a          = child_a(ind_a);
     child_age        = child_age(ind_a);
     
-    panela_old = log(parent_a); panelage_old = parent_age;
-    panela_new = log(child_a ); panelage_new = child_age ;
+    EBAR = EBAR_bench*0.727853584919652 ;
+    panela_old = log(parent_a*EBAR_data/EBAR); panelage_old = parent_age;
+    panela_new = log(child_a*EBAR_data/EBAR ); panelage_new = child_age ;
+    
       
     cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Inter_Generation/Burhan'
         
