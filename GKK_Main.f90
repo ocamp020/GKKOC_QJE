@@ -77,21 +77,24 @@ PROGRAM main
 	! Set Parameters
 		Params =[0.962_dp, 0.0_dp, 0.50_dp, 0.387_dp, 0.29_dp, 0.4494_dp] ! alpha=0.4, zgrid 11, m5, alpha=0.4, dep005, mu=090, K/Y=3, Top1PVa=0.36
 		
+		! Multiplicative Shock
+		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x
+		! 0.95	0.25	3		3.079403947	0.789919246		0.387819464	7.99E-02	36.60252401	71.46784902	0.1 	0.4
 
 		beta   	= 0.95_dp ! params(1)
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= params(3) 
-		sigma_z_eps      = 0.1_dp ! params(4)
+		sigma_z_eps      = 0.25_dp ! params(4)
 		sigma_lambda_eps = params(5)
-		gamma  	= 0.449_dp ! params(6)
+		gamma  	= params(6)
 		
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
 
-		x_hi	= 4.00_dp
+		x_hi	= 3.00_dp
 		x_lo	= 1.00_dp
 		a_x 	= 0.10_dp
-		b_x 	= 0.80_dp
+		b_x 	= 0.40_dp
 
 		if (Log_Switch.eqv..true.) then
 				sigma = 1.0_dp

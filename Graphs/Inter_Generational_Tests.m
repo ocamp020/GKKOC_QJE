@@ -95,19 +95,48 @@ EBAR_data = 8.8891*10^12/(122.46*10^6) ; % 2013 total compensation of employees'
     Tables_file = 'Tables_Inter_Generation.xls' ; 
     
 %% Benchmark
-    % Result_Folders
-        Result_Folder = strcat('../../NSU_F_LT_Results/Theta_',num2str(theta,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/') ;
-        Simul_Folder  = strcat('../../NSU_F_LT_Results/Theta_',num2str(theta,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Simul/') ;
-        Bench_Folder  = strcat('../../NSU_F_LT_Results/Theta_',num2str(theta,'%.2f'),'/Bench_Files/') ;
+%     % Result_Folders
+%         Result_Folder = strcat('../../NSU_F_LT_Results/Theta_',num2str(theta,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/') ;
+%         Simul_Folder  = strcat('../../NSU_F_LT_Results/Theta_',num2str(theta,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Simul/') ;
+%         Bench_Folder  = strcat('../../NSU_F_LT_Results/Theta_',num2str(theta,'%.2f'),'/Bench_Files/') ;
+%         
+%     % Load Simulation
+%         eval(['load ',Simul_Folder,'panela_parents']) ; eval(['load ',Simul_Folder,'panelage_parents']) ;
+%         eval(['load ',Simul_Folder,'panela_sons'])    ; eval(['load ',Simul_Folder,'panelage_sons']) ;
+%         eval(['load ',Bench_Folder,'EBAR'])         ;
+%         
+%     % Dollar units
+%         panela_old = log(panela_parents*EBAR_data/EBAR) ; panelage_old = panelage_parents ;
+%         panela_new = log(panela_sons*EBAR_data/EBAR)    ; panelage_new = panelage_sons ;
         
-    % Load Simulation
-        eval(['load ',Simul_Folder,'panela_parents']) ; eval(['load ',Simul_Folder,'panelage_parents']) ;
-        eval(['load ',Simul_Folder,'panela_sons'])    ; eval(['load ',Simul_Folder,'panelage_sons']) ;
-        eval(['load ',Bench_Folder,'EBAR'])         ;
-        
-    % Dollar units
-        panela_old = log(panela_parents*EBAR_data/EBAR) ; panelage_old = panelage_parents ;
-        panela_new = log(panela_sons*EBAR_data/EBAR)    ; panelage_new = panelage_sons ;
+    
+    cd '/Users/s-ocampo/Dropbox/RA_Guvenen/Wealth_Tax/CGGK_CODES/kubu_fortran/EGM_NEW/DBN/CRRA_CALIBRATION/FLAT_TAX/FINANCE/ZERO_DEP/vartheta1.5_re_calibration/1zgrid11_m5_dep005_mu075_KY3'
+
+    load parent_tot_a
+    load parent_tot_age
+    load child_tot_a
+    load child_tot_age
+    load family_death
+
+    parent_a   = parent_tot_a(family_death==1);
+    parent_age = parent_tot_age(family_death==1);
+    child_a    = child_tot_a(family_death==1);
+    child_age  = child_tot_age(family_death==1);
+
+    parent_a   = parent_a(child_age >4)/3;
+    parent_age = parent_age(child_age >4)/3;
+    child_a    = child_a(child_age >4)/3;
+    child_age  = child_age(child_age >4)/3;
+
+    [parent_a,ind_a] = sort(parent_a);
+    parent_age       = parent_age(ind_a);
+    child_a          = child_a(ind_a);
+    child_age        = child_age(ind_a);
+    
+    panela_old = log(parent_a); panelage_old = parent_age;
+    panela_new = log(child_a ); panelage_new = child_age ;
+      
+    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Inter_Generation/Burhan'
         
     w_cut = log([1 1000000 10000000]);  
     for i=1:numel(w_cut)
