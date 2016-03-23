@@ -85,7 +85,7 @@ PROGRAM GKK_Calibration_Loop
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
 
-		x_hi	= 3.00_dp
+		x_hi	= 1.00_dp
 		x_lo	= 1.0_dp
 		a_x 	= 0.10_dp
 		b_x 	= 0.40_dp
