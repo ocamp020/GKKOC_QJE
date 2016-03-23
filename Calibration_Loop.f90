@@ -21,16 +21,16 @@ Program Calibration_Loop
 	call system( 'make GKK_Calibration_Loop.a' )
 
 	beta_L   = 0.95_dp
-	beta_H   = 0.97_dp
+	beta_H   = 0.95_dp
 
-	sigmaz_L = 0.1_dp
-	sigmaz_H = 0.3_dp
+	sigmaz_L = 0.05_dp
+	sigmaz_H = 0.15_dp
 
-	x_hi_L   = 2.0_dp 
-	x_hi_H   = 4.0_dp
+	x_hi_L   = 4.0_dp 
+	x_hi_H   = 5.0_dp
 
 
-	n_beta   = 3
+	n_beta   = 1
 	n_sigmaz = 4
 	n_x_hi   = 4
 
