@@ -10,7 +10,7 @@ Program Calibration_Loop
 	Result_Folder = './Calibration_Loop/'
 	call system( 'mkdir -p ' // trim(Result_Folder) )
 
-	OPEN(UNIT=3, FILE=trim(Result_Folder)//'Calibration_Loop_Restuls', STATUS='replace')
+	OPEN(UNIT=3, FILE=trim(Result_Folder)//'Calibration_Loop_Restuls.txt', STATUS='replace')
 	WRITE(unit=3, FMT=*) ' '
 	WRITE(unit=3, FMT=*) 'This file contains the results of the benchmark model with different calibrations'
 	WRITE(unit=3, FMT=*) ' '
