@@ -42,6 +42,10 @@ PROGRAM GKK_Calibration_Loop
 		character(4)   :: string_theta
 		character(100) :: folder_aux
 
+	! Resutls Folder
+		Result_Folder = './Calibration_Loop/'
+
+
 	! Capital Market
 		theta = 1.50_dp
 	! Threshold 
@@ -87,7 +91,7 @@ PROGRAM GKK_Calibration_Loop
 		b_x 	= 0.40_dp
 
 	! Set Parameters from Loop
-		OPEN (UNIT=3,  FILE=trim(Result_Folder)//'Loop_Par'  , STATUS='old', ACTION='read')
+		OPEN (UNIT=3, FILE=trim(Result_Folder)//'Loop_Par'  , STATUS='old', ACTION='read')
 		WRITE(unit=3, FMT=*) Loop_Par
 		CLOSE(unit=3)
 
@@ -119,10 +123,6 @@ PROGRAM GKK_Calibration_Loop
 			tauPL = 0.0_DP
 	 		psi   = 0.776_DP  	
 	 	endif 
-
-	! Resutls Folder
-		Result_Folder = './Calibration_Loop/'
-
 	
 		print*, "Results are stored in directory: ", Result_Folder
 		print*,'na=',na,'update_period=',update_period
