@@ -14,8 +14,8 @@ Program Calibration_Loop
 	WRITE(unit=3, FMT=*) ' '
 	WRITE(unit=3, FMT=*) 'This file contains the results of the benchmark model with different calibrations'
 	WRITE(unit=3, FMT=*) ' '
-	WRITE(unit=3, FMT=*) 'beta','sigmaz','x_hi','W/GDP','STD_Earnings','Mean_Labor','MeanReturn', &
-			& 'PV_Top_1%','PV_Top_10%'
+	WRITE(unit=3, FMT=*) 'beta ','sigmaz ','x_hi ','W/GDP ','STD_Earnings ','Mean_Labor ','MeanReturn ', &
+			& 'PV_Top_1% ','PV_Top_10% '
 	CLOSE(unit=3)
 
 	call system( 'make GKK_Calibration_Loop.a' )
