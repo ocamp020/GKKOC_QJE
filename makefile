@@ -101,11 +101,11 @@ GKK_Calibration.a: $(GO_Folder)/GlobalSearch.f90 $(Objects_Main) $(Objects_GO)
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
 
-GKK_Calibration_Loop.a: GKK_Calibration_Loop.f90 $(Objects_Main) 
-	gfortran $(omp_flag) -O2 -I$(Folder) GKK_Main.f90 $(Objects_Main) -o $(Folder)/GKK_Calibration_Loop.a
+GKK_Calibration_Loop.a: GKK_Calibration_Loop.f90 $(Objects_Main) $(Objects_Opt_Tax)
+	gfortran $(omp_flag) -O2 -I$(Folder) GKK_Main.f90 $(Objects_Main) $(Objects_Opt_Tax) -o $(Folder)/GKK_Calibration_Loop.a
 
-Calibration_Loop.a: Calibration_Loop.f90 $(Objects_Main) 
-	gfortran $(omp_flag) -O2 -I$(Folder) GKK_Main.f90 $(Objects_Main) -o $(Folder)/Calibration_Loop.a
+Calibration_Loop.a: Calibration_Loop.f90 $(Folder)/NRTYPE.o
+	gfortran $(omp_flag) -O2 -I$(Folder) GKK_Main.f90 $(Folder)/NRTYPE.o -o $(Folder)/Calibration_Loop.a
 	time $(Folder)/Calibration_Loop.a
 
 
