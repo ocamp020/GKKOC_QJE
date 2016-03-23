@@ -44,12 +44,13 @@ Program Calibration_Loop
 
 		! Set Log File 
 			write(log_file,'(f4.2)') ind 
-			log_file = 'log_ind_'//trim(log_fle)//'.txt'
+			log_file = 'log_ind_'//trim(log_file)//'.txt'
+			ind = ind + 1
 
 		! Write parameters into file
 			par = (/beta,sigmaz,x_hi/)
 			OPEN(UNIT=3, FILE=trim(Result_Folder)//'Loop_Par', STATUS='replace')
-			WRITE(unit=3, FMT=*) params
+			WRITE(unit=3, FMT=*) par
 			CLOSE(unit=3)
 
 		! Call Main Program
