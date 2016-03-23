@@ -43,7 +43,7 @@ Program Calibration_Loop
 		x_hi   = x_hi_L   + real(k-1,8)*(x_hi_H-x_hi_L)/real(max((n_x_hi-1),1),8)
 
 		! Set Log File 
-			write(log_file,'(f4.2)') ind 
+			write(log_file,'(I3.1)') ind 
 			log_file = 'log_ind_'//trim(log_file)//'.txt'
 			ind = ind + 1
 
