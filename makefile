@@ -95,6 +95,20 @@ GKK_Calibration.a: $(GO_Folder)/GlobalSearch.f90 $(Objects_Main) $(Objects_GO)
 	& nohup ../Compiled_Files/GKK_Calibration.a 1 ../Global_Opt/config.txt b \
 	& nohup ../Compiled_Files/GKK_Calibration.a 1 ../Global_Opt/config.txt b \
 
+
+
+#----------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------
+
+GKK_Calibration_Loop.a: GKK_Calibration_Loop.f90 $(Objects_Main) 
+	gfortran $(omp_flag) -O2 -I$(Folder) GKK_Main.f90 $(Objects_Main) -o $(Folder)/GKK_Calibration_Loop.a
+
+Calibration_Loop.a: Calibration_Loop.f90 $(Objects_Main) 
+	gfortran $(omp_flag) -O2 -I$(Folder) GKK_Main.f90 $(Objects_Main) -o $(Folder)/Calibration_Loop.a
+	time $(Folder)/Calibration_Loop.a
+
+
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
