@@ -27,12 +27,12 @@ Program Calibration_Loop
 	sigmaz_H = 0.4_dp
 
 	x_hi_L   = 1.5_dp 
-	x_hi_H   = 3.5_dp
+	x_hi_H   = 5.0_dp
 
 
-	n_beta   = 5
-	n_sigmaz = 5
-	n_x_hi   = 5
+	n_beta   = 3
+	n_sigmaz = 3
+	n_x_hi   = 3
 
 	ind =1
 	do i=1,n_beta
@@ -55,6 +55,7 @@ Program Calibration_Loop
 
 		! Call Main Program
 			call system( 'nohup Compiled_Files/GKK_Calibration_Loop.a >' // trim(log_file) //' &' )
+			call system( 'sleep 15' )
 
 	enddo 
 	enddo
