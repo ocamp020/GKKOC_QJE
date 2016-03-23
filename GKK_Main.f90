@@ -78,18 +78,18 @@ PROGRAM main
 		Params =[0.962_dp, 0.0_dp, 0.50_dp, 0.387_dp, 0.29_dp, 0.4494_dp] ! alpha=0.4, zgrid 11, m5, alpha=0.4, dep005, mu=090, K/Y=3, Top1PVa=0.36
 		
 
-		beta   	= 0.95_dp ! params(1)
+		beta   	= params(1) ! 0.95_dp ! 
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= params(3) 
-		sigma_z_eps      = 0.21_dp ! params(4)
+		sigma_z_eps      = params(4) !0.21_dp 
 		sigma_lambda_eps = params(5)
-		gamma  	= 0.449_dp ! params(6)
+		gamma  	=  params(6) ! 0.449_dp
 		
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
 
 		x_hi	= 1.10_dp
-		x_lo	= 1.0_dp
+		x_lo	= 1.00_dp
 		a_x 	= 0.10_dp
 		b_x 	= 0.40_dp
 
