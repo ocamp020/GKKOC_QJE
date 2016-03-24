@@ -35,7 +35,7 @@ PROGRAM GKK_Calibration_Loop
 
 	IMPLICIT NONE
 	! Variables to measure running time
-		REAL(DP) :: start_time, finish_time, Loop_Par(3)
+		REAL(DP) :: start_time, finish_time, Loop_Par(5)
 	! Compute benchmark or load results
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
 	! Auxiliary variable for writing file
@@ -98,6 +98,8 @@ PROGRAM GKK_Calibration_Loop
 		beta 		= Loop_Par(1)
 		sigma_z_eps = Loop_Par(2)
 		x_hi 		= Loop_Par(3)
+		a_x  		= Loop_Par(4)
+		b_x  		= Loop_Par(5)
 
 
 		if (Log_Switch.eqv..true.) then
