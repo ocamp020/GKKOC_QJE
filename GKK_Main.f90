@@ -53,7 +53,7 @@ PROGRAM main
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
 			compute_bench = .true.
-			compute_exp   = .false.
+			compute_exp   = .true.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Simul_Switch  = .false.
@@ -177,7 +177,7 @@ PROGRAM main
 		! Tax Reform experiment
 		if (Tax_Reform) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
-			!call Solve_Experiment(compute_exp,Simul_Switch)
+			call Solve_Experiment(compute_exp,Simul_Switch)
 
 			compute_bench = .false.
 		endif 
