@@ -3562,9 +3562,9 @@ SUBROUTINE  INITIALIZE()
 				Gx(2,zi)     = 0.5_dp 
 				print*,'z=',zi,'Pr(x_hi)=', pr_x(1,1,zi),'Pr(x_lo)=', pr_x(1,2,zi)
 			enddo 
-			xz_grid = exp(log(spread(zgrid,1,nx))*spread(xgrid,2,nz))
+			! xz_grid = exp(log(spread(zgrid,1,nx))*spread(xgrid,2,nz))
 			! xz_grid = spread(zgrid,1,nx)*spread(xgrid,2,nz)
-			! xz_grid(1,:)   = zgrid 	; xz_grid(2,1:3) = zgrid(1:3)	;	xz_grid(2,4:)  = zgrid(4)
+			xz_grid(1,:)   = zgrid 	; xz_grid(2,1:3) = zgrid(1:3)	;	xz_grid(2,4:)  = zgrid(4)
 			print*, ' xgrid', xgrid
 			print*, ' zgrid', zgrid 
 			do xi=1,nx
