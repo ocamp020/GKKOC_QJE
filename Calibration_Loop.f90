@@ -9,7 +9,7 @@ Program Calibration_Loop
 	real(DP) :: a_x, a_x_L, a_x_H
 	real(DP) :: b_x, b_x_L, b_x_H
 	real(DP) :: par(5)
-	integer  :: n_beta, n_sigmaz, n_x_hi,, n_a, n_b, i, j, k, l, m, ind
+	integer  :: n_beta, n_sigmaz, n_x_hi, n_a, n_b, i, j, k, l, m, ind
 	character(100) :: Result_Folder, log_file
 
 	Result_Folder = './Calibration_Loop_2/'
