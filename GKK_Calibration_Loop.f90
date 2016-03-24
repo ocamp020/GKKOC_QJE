@@ -88,7 +88,7 @@ PROGRAM GKK_Calibration_Loop
 		x_hi	= 3.00_dp
 		x_lo	= 1.0_dp
 		a_x 	= 0.10_dp
-		b_x 	= 0.40_dp
+		b_x 	= 0.00_dp
 
 	! Set Parameters from Loop
 		OPEN (UNIT=3, FILE=trim(Result_Folder)//'Loop_Par'  , STATUS='old', ACTION='read')
