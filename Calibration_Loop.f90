@@ -7,7 +7,7 @@ Program Calibration_Loop
 	integer :: n_beta, n_sigmaz, n_x_hi, i, j, k, ind
 	character(100) :: Result_Folder, log_file
 
-	Result_Folder = './Calibration_Loop/'
+	Result_Folder = './Calibration_Loop_2/'
 	call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	OPEN(UNIT=3, FILE=trim(Result_Folder)//'Calibration_Loop_Restuls.txt', STATUS='replace')
@@ -23,16 +23,16 @@ Program Calibration_Loop
 	beta_L   = 0.95_dp
 	beta_H   = 0.95_dp
 
-	sigmaz_L = 0.06_dp
-	sigmaz_H = 0.10_dp
+	sigmaz_L = 0.30_dp
+	sigmaz_H = 0.40_dp
 
 	x_hi_L   = 4.0_dp 
 	x_hi_H   = 5.0_dp
 
 
 	n_beta   = 1
-	n_sigmaz = 5
-	n_x_hi   = 5
+	n_sigmaz = 10
+	n_x_hi   = 1
 
 	ind =1
 	do i=1,n_beta

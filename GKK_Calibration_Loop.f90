@@ -43,7 +43,7 @@ PROGRAM GKK_Calibration_Loop
 		character(100) :: folder_aux
 
 	! Resutls Folder
-		Result_Folder = './Calibration_Loop/'
+		Result_Folder = './Calibration_Loop_2/'
 
 
 	! Capital Market
