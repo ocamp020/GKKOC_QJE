@@ -833,10 +833,10 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 
 	! Compute the value function using interpolation and save it
 		
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,ValueFunction_Bench)
 		!CALL COMPUTE_VALUE_FUNCTION_SPLINE  
-		ValueFunction_Bench = ValueFunction
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR
+		! ValueFunction_Bench = ValueFunction
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,ValueFunction)
 		ValueFunction_exp = ValueFunction
 		print*, ' '
 		print*, '!!!!!!!!!!!!!!!!!!!!!!'
@@ -1033,7 +1033,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		!CALL EGM_RETIREMENT_WORKING_PERIOD 
 
 	! Compute the value function using interpolation and save it
-		! CALL COMPUTE_VALUE_FUNCTION_LINEAR
+		! CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,ValueFunction_Exp)
 		!CALL COMPUTE_VALUE_FUNCTION_SPLINE 
 		! ValueFunction_Exp = ValueFunction
 
@@ -1501,7 +1501,8 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Value_mat)
     DO zi=1,nz
     DO lambdai=1,nlambda          
 	DO ei=1,ne
-      	Value_mat(age, ai, zi, lambdai, ei, xi) = Utility(Cons_mat(age, ai, zi, lambdai, ei, xi),Hours_mat(age, ai, zi, lambdai, ei, xi))
+      	Value_mat(age, ai, zi, lambdai, ei, xi) = &
+      				& Utility(Cons_mat(age, ai, zi, lambdai, ei, xi),Hours_mat(age, ai, zi, lambdai, ei, xi))
       	! Value_mat(age, ai, zi, lambdai, ei, xi) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
        !             & * (1.0_DP-Hours_mat(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma)  
 		! print*,Cons_mat(age, ai, zi, lambdai, ei),  Value_mat(age, ai, zi, lambdai, ei) 
