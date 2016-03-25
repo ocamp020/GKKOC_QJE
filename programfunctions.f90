@@ -1036,7 +1036,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		!CALL EGM_RETIREMENT_WORKING_PERIOD 
 
 	! Compute the value function using interpolation and save it
-		! CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction_Exp)
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction_Exp)
 		!CALL COMPUTE_VALUE_FUNCTION_SPLINE 
 		! ValueFunction_Exp = ValueFunction
 
@@ -1554,8 +1554,6 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	ENDDO ! age
 	ENDDO ! xi
 	!print*,Value_mat
-	print*, 'Sum of value function Ret',  sum(Value_mat(RetAge:MaxAge-1,:,:,:,:,:)), sum(Aprime_mat(RetAge:MaxAge-1,:,:,:,:,:)), &
-			 & sum(Cons_mat(RetAge:MaxAge-1,:,:,:,:,:)), sum(Hours_mat(RetAge:MaxAge-1,:,:,:,:,:)), aux
 
 
 	! Working Period
