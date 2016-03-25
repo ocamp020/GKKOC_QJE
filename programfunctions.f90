@@ -1489,9 +1489,9 @@ END SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE
 !========================================================================================
 
 
-SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Value_mat)
+SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat)
 	IMPLICIT NONE
-	REAL(DP), DIMENSION(MaxAge,na,nz,nlambda,ne,nx), INTENT(in)  :: Cons_mat, Hours_mat
+	REAL(DP), DIMENSION(MaxAge,na,nz,nlambda,ne,nx), INTENT(in)  :: Cons_mat, Hours_mat, Aprime_mat
 	REAL(DP), DIMENSION(MaxAge,na,nz,nlambda,ne,nx), INTENT(out) :: Value_mat
 	INTEGER  :: tklo, tkhi, xp_ind
 	REAL(DP) :: PrAprimelo, PrAprimehi, E_MU_cp(nx)
@@ -1523,16 +1523,16 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Value_mat)
     DO zi=1,nz
     DO lambdai=1,nlambda          
 	DO ei=1,ne
-		if ( Aprime(age,ai,zi,lambdai, ei,xi) .ge. amax) then
+		if ( Aprime_mat(age,ai,zi,lambdai, ei,xi) .ge. amax) then
 		    tklo =na-1
-		else if (Aprime(age,ai,zi,lambdai, ei, xi) .lt. amin) then
+		else if (Aprime_mat(age,ai,zi,lambdai, ei, xi) .lt. amin) then
 		    tklo = 1
 		else
-		    tklo = ((Aprime(age,ai,zi,lambdai, ei, xi) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+		    tklo = ((Aprime_mat(age,ai,zi,lambdai, ei, xi) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
 		end if            
 		tkhi = tklo + 1        
-		PrAprimelo = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei, xi) ) / ( agrid(tkhi) -agrid(tklo) )
-		PrAprimehi = ( Aprime(age,ai,zi,lambdai, ei, xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
+		PrAprimelo = ( agrid(tkhi) - Aprime_mat(age,ai,zi,lambdai, ei, xi) ) / ( agrid(tkhi) -agrid(tklo) )
+		PrAprimehi = ( Aprime_mat(age,ai,zi,lambdai, ei, xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
 		PrAprimelo = min(PrAprimelo, 1.0_DP)
 		PrAprimelo = max(PrAprimelo, 0.0_DP)
 		PrAprimehi = min(PrAprimehi, 1.0_DP)
@@ -1562,17 +1562,17 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Value_mat)
     DO zi=1,nz
     DO lambdai=1,nlambda          
 	DO ei=1,ne
-		if ( Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
+		if ( Aprime_mat(age,ai,zi,lambdai,ei,xi) .ge. amax) then
 		    tklo =na-1
-	    elseif (Aprime(age,ai,zi,lambdai,ei,xi) .lt. amin) then
+	    elseif (Aprime_mat(age,ai,zi,lambdai,ei,xi) .lt. amin) then
 	        tklo = 1
         else
-            tklo = ((Aprime(age,ai,zi,lambdai,ei,xi) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+            tklo = ((Aprime_mat(age,ai,zi,lambdai,ei,xi) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
 		endif  
 
 		tkhi = tklo + 1        
-		PrAprimelo = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai, ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
-		PrAprimehi = ( Aprime(age,ai,zi,lambdai, ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
+		PrAprimelo = ( agrid(tkhi) - Aprime_mat(age,ai,zi,lambdai, ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
+		PrAprimehi = ( Aprime_mat(age,ai,zi,lambdai, ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )        
 		PrAprimelo = min(PrAprimelo, 1.0_DP)
 		PrAprimelo = max(PrAprimelo, 0.0_DP)
 		PrAprimehi = min(PrAprimehi, 1.0_DP)
