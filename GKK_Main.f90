@@ -287,6 +287,14 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		Aprime_bench        = Aprime 
 		V_Pr_bench          = V_Pr
 
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction_Exp)
+		print*, ' '
+		print*, '!!!!!!!!!!!!!!!!!!!!!!'
+		print*, maxval(abs(ValueFunction_Bench-ValueFunction_Exp))
+		print*, maxval(abs(ValueFunction_Bench-ValueFunction))
+		print*, maxval(abs(ValueFunction-ValueFunction_Exp))
+
 		write(*,*) "Benchmark variables"
 		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"P=",P,"wage=",wage,'R=',R
 
