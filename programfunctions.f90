@@ -1494,7 +1494,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	REAL(DP), DIMENSION(MaxAge,na,nz,nlambda,ne,nx), INTENT(in)  :: Cons_mat, Hours_mat, Aprime_mat
 	REAL(DP), DIMENSION(MaxAge,na,nz,nlambda,ne,nx), INTENT(out) :: Value_mat
 	INTEGER  :: tklo, tkhi, xp_ind, age, xi, ai, zi, lambdai, ei
-	REAL(DP) :: PrAprimelo, PrAprimehi, E_MU_cp(nx)
+	REAL(DP) :: PrAprimelo, PrAprimehi, E_MU_cp(nx), aux
 
 	print*,'VALUE FUNCTION LINEAR'
 
@@ -1517,6 +1517,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	ENDDO ! xi
 	print*, 'Sum of value function MaxAge',  sum(Value_mat(MaxAge,:,:,:,:,:))
 
+	aux = 0.0_dp
 	! Retirement Period
 	DO xi=1,nx
 	DO age=MaxAge-1,RetAge,-1
@@ -1543,6 +1544,8 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 			  & + beta*survP(age)* sum( pr_x(xi,:,zi)* (PrAprimelo*Value_mat(age+1, tklo, zi, lambdai, ei, :) &
 			  & 				                     +  PrAprimehi*Value_mat(age+1, tkhi, zi, lambdai, ei, :)) ) 
 
+		aux = PrAprimehi + aux
+
         ! Value_mat(age, ai, zi, lambdai, ei, xi) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
         !               & * (1.0_DP-Hours_mat(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
         !               & + beta*survP(age)* sum(pr_x(xi,:,zi) * (PrAprimelo*Value_mat(age+1, tklo, zi, lambdai, ei, :)&
@@ -1555,7 +1558,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	ENDDO ! xi
 	!print*,Value_mat
 	print*, 'Sum of value function Ret',  sum(Value_mat(RetAge:MaxAge-1,:,:,:,:,:)), sum(Aprime_mat(RetAge:MaxAge-1,:,:,:,:,:)), &
-			 & sum(Cons_mat(RetAge:MaxAge-1,:,:,:,:,:)), sum(Hours_mat(RetAge:MaxAge-1,:,:,:,:,:))
+			 & sum(Cons_mat(RetAge:MaxAge-1,:,:,:,:,:)), sum(Hours_mat(RetAge:MaxAge-1,:,:,:,:,:)), aux
 
 
 	! Working Period
