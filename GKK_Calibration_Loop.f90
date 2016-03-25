@@ -176,7 +176,7 @@ PROGRAM GKK_Calibration_Loop
 	! Save Results 
 	OPEN(UNIT=3, FILE=trim(Result_Folder)//'Calibration_Loop_Restuls.txt', STATUS='old', POSITION='append') 
 	WRITE(unit=3, FMT=*) ' '
-	WRITE(unit=3, FMT=*) beta,sigma_z_eps,x_hi,Wealth_Output,Std_Log_Earnings_25_60,meanhours_25_60,MeanReturn, &
+	WRITE(unit=3, FMT=*) beta,sigma_z_eps,x_hi,a_x,b_x,Wealth_Output,Std_Log_Earnings_25_60,meanhours_25_60,MeanReturn, &
 		& FW_top_x_share(4), FW_top_x_share(3)
 	CLOSE(unit=3)
 		

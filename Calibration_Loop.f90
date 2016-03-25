@@ -19,7 +19,7 @@ Program Calibration_Loop
 	WRITE(unit=3, FMT=*) ' '
 	WRITE(unit=3, FMT=*) 'This file contains the results of the benchmark model with different calibrations'
 	WRITE(unit=3, FMT=*) ' '
-	WRITE(unit=3, FMT=*) 'beta ','sigmaz ','x_hi ','W/GDP ','STD_Earnings ','Mean_Labor ','MeanReturn ', &
+	WRITE(unit=3, FMT=*) 'beta ','sigmaz ','x_hi ','a_x ','b_x ','W/GDP ','STD_Earnings ','Mean_Labor ','MeanReturn ', &
 			& 'PV_Top_1% ','PV_Top_10% '
 	CLOSE(unit=3)
 
