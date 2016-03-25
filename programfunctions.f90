@@ -837,10 +837,11 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		!CALL COMPUTE_VALUE_FUNCTION_SPLINE  
 		! ValueFunction_Bench = ValueFunction
 		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,ValueFunction)
-		ValueFunction_exp = ValueFunction
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,ValueFunction_Exp)
+		
 		print*, ' '
 		print*, '!!!!!!!!!!!!!!!!!!!!!!'
-		print*, maxval(abs(ValueFunction_Bench-ValueFunction))
+		print*, maxval(abs(ValueFunction_Bench-ValueFunction_Exp))
 
 
 	! Profit Matrix
