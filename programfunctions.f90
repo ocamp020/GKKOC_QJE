@@ -1599,6 +1599,8 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	ENDDO ! age
 	ENDDO ! xi
 
+	print*, 'Sum of value function',  sum(Value_mat)
+
 END SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR 
 
 
