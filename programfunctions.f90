@@ -842,6 +842,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		print*, ' '
 		print*, '!!!!!!!!!!!!!!!!!!!!!!'
 		print*, maxval(abs(ValueFunction_Bench-ValueFunction_Exp))
+		print*, maxval(abs(ValueFunction_Bench-ValueFunction))
+		print*, maxval(abs(ValueFunction-ValueFunction_Exp))
 
 
 	! Profit Matrix
