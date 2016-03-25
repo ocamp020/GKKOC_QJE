@@ -1526,8 +1526,8 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
 		PrAprimehi = max(PrAprimehi, 0.0_DP)    
 
 		ValueFunction(age, ai, zi, lambdai, ei, xi) = Utility(Cons(age,ai,zi,lambdai,ei,xi),Hours(age,ai,zi,lambdai,ei,xi)) &
-			  & + beta*survP(age)* sum(pr_x(xi,:,zi)* (PrAprimelo*ValueFunction(age+1, tklo, zi, lambdai, ei, :) &
-			  & 				 +  PrAprimehi*ValueFunction(age+1, tkhi, zi, lambdai, ei, :)) ) 
+			  & + beta*survP(age)* sum( pr_x(xi,:,zi)* (PrAprimelo*ValueFunction(age+1, tklo, zi, lambdai, ei, :) &
+			  & 				                     +  PrAprimehi*ValueFunction(age+1, tkhi, zi, lambdai, ei, :)) ) 
 
         ! ValueFunction(age, ai, zi, lambdai, ei, xi) = ((Cons(age,ai,zi,lambdai,ei,xi)**gamma) &
         !               & * (1.0_DP-Hours(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
@@ -3562,9 +3562,9 @@ SUBROUTINE  INITIALIZE()
 				Gx(2,zi)     = 0.5_dp 
 				print*,'z=',zi,'Pr(x_hi)=', pr_x(1,1,zi),'Pr(x_lo)=', pr_x(1,2,zi)
 			enddo 
-			! xz_grid = exp(log(spread(zgrid,1,nx))*spread(xgrid,2,nz))
+			xz_grid = exp(log(spread(zgrid,1,nx))*spread(xgrid,2,nz))
 			! xz_grid = spread(zgrid,1,nx)*spread(xgrid,2,nz)
-			xz_grid(1,:)   = zgrid 	; xz_grid(2,1:3) = zgrid(1:3)	;	xz_grid(2,4:)  = zgrid(4)
+			! xz_grid(1,:)   = zgrid 	; xz_grid(2,1:3) = zgrid(1:3)	;	xz_grid(2,4:)  = zgrid(4)
 			print*, ' xgrid', xgrid
 			print*, ' zgrid', zgrid 
 			do xi=1,nx
@@ -5511,17 +5511,17 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 	write(string_theta,'(f4.2)')  theta
 
 	if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-		bench_folder = './NSU_SZ_LT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
+		bench_folder = './NSU_ZS_LT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
 	else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-		bench_folder = './NSU_SZ_PT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
+		bench_folder = './NSU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
 	else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-		bench_folder = './SU_SZ_LT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
+		bench_folder = './SU_ZS_LT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
 	else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-		bench_folder = './SU_SZ_PT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
+		bench_folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
 	end if 
 
-		!call system( 'mkdir -p ' // trim(bench_folder) )
-		call system( 'mkdir -p ' // trim(Result_Folder)//'Bench_Files/')
+	bench_folder = trim(Result_Folder)//'Bench_Files/'
+		call system( 'mkdir -p ' // trim(bench_folder) )
 		print*, "Bench Files Folder:", bench_folder
 	
 	IF (Compute_bench) then 
