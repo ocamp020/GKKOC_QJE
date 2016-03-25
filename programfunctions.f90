@@ -1486,8 +1486,10 @@ END SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE
 !========================================================================================
 
 
-SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
+SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Value_mat)
 	IMPLICIT NONE
+	REAL(DP), DIMENSION(MaxAge,na,nz,nlambda,ne,nx), INTENT(in)  :: Cons_mat, Hours_mat
+	REAL(DP), DIMENSION(MaxAge,na,nz,nlambda,ne,nx), INTENT(out) :: Value_mat
 	INTEGER  :: tklo, tkhi, xp_ind
 	REAL(DP) :: PrAprimelo, PrAprimehi, E_MU_cp(nx)
 
@@ -1499,10 +1501,10 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
     DO zi=1,nz
     DO lambdai=1,nlambda          
 	DO ei=1,ne
-      	ValueFunction(age, ai, zi, lambdai, ei, xi) = Utility(Cons(age, ai, zi, lambdai, ei, xi),Hours(age, ai, zi, lambdai, ei, xi))
-      	! ValueFunction(age, ai, zi, lambdai, ei, xi) = ((Cons(age,ai,zi,lambdai,ei,xi)**gamma) &
-       !             & * (1.0_DP-Hours(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma)  
-		! print*,Cons(age, ai, zi, lambdai, ei),  ValueFunction(age, ai, zi, lambdai, ei) 
+      	Value_mat(age, ai, zi, lambdai, ei, xi) = Utility(Cons_mat(age, ai, zi, lambdai, ei, xi),Hours_mat(age, ai, zi, lambdai, ei, xi))
+      	! Value_mat(age, ai, zi, lambdai, ei, xi) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
+       !             & * (1.0_DP-Hours_mat(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma)  
+		! print*,Cons_mat(age, ai, zi, lambdai, ei),  Value_mat(age, ai, zi, lambdai, ei) 
 		! pause
 	ENDDO ! ei          
     ENDDO ! lambdai
@@ -1532,21 +1534,21 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
 		PrAprimehi = min(PrAprimehi, 1.0_DP)
 		PrAprimehi = max(PrAprimehi, 0.0_DP)    
 
-		ValueFunction(age, ai, zi, lambdai, ei, xi) = Utility(Cons(age,ai,zi,lambdai,ei,xi),Hours(age,ai,zi,lambdai,ei,xi)) &
-			  & + beta*survP(age)* sum( pr_x(xi,:,zi)* (PrAprimelo*ValueFunction(age+1, tklo, zi, lambdai, ei, :) &
-			  & 				                     +  PrAprimehi*ValueFunction(age+1, tkhi, zi, lambdai, ei, :)) ) 
+		Value_mat(age, ai, zi, lambdai, ei, xi) = Utility(Cons_mat(age,ai,zi,lambdai,ei,xi),Hours_mat(age,ai,zi,lambdai,ei,xi)) &
+			  & + beta*survP(age)* sum( pr_x(xi,:,zi)* (PrAprimelo*Value_mat(age+1, tklo, zi, lambdai, ei, :) &
+			  & 				                     +  PrAprimehi*Value_mat(age+1, tkhi, zi, lambdai, ei, :)) ) 
 
-        ! ValueFunction(age, ai, zi, lambdai, ei, xi) = ((Cons(age,ai,zi,lambdai,ei,xi)**gamma) &
-        !               & * (1.0_DP-Hours(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
-        !               & + beta*survP(age)* sum(pr_x(xi,:,zi) * (PrAprimelo*ValueFunction(age+1, tklo, zi, lambdai, ei, :)&
-        !               & +                   PrAprimehi*ValueFunction(age+1, tkhi, zi, lambdai, ei, :)) )
+        ! Value_mat(age, ai, zi, lambdai, ei, xi) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
+        !               & * (1.0_DP-Hours_mat(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
+        !               & + beta*survP(age)* sum(pr_x(xi,:,zi) * (PrAprimelo*Value_mat(age+1, tklo, zi, lambdai, ei, :)&
+        !               & +                   PrAprimehi*Value_mat(age+1, tkhi, zi, lambdai, ei, :)) )
 	ENDDO ! ei          
     ENDDO ! lambdai
     ENDDO ! zi
 	ENDDO ! ai
 	ENDDO ! age
 	ENDDO ! xi
-	!print*,ValueFunction
+	!print*,Value_mat
 
 
 	! Working Period
@@ -1574,17 +1576,17 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR()
 
 
 		do xp_ind=1,nx
-			E_MU_cp(xp_ind) = sum( ( PrAprimelo * ValueFunction(age+1, tklo, zi, lambdai,:,xp_ind)  &
-		   & 					+    PrAprimehi * ValueFunction(age+1, tkhi, zi, lambdai,:,xp_ind)) * pr_e(ei,:))
+			E_MU_cp(xp_ind) = sum( ( PrAprimelo * Value_mat(age+1, tklo, zi, lambdai,:,xp_ind)  &
+		   & 					+    PrAprimehi * Value_mat(age+1, tkhi, zi, lambdai,:,xp_ind)) * pr_e(ei,:))
 		enddo    
 
-		ValueFunction(age, ai, zi, lambdai, ei, xi) = Utility(Cons(age,ai,zi,lambdai,ei,xi),Hours(age,ai,zi,lambdai,ei,xi))  &
+		Value_mat(age, ai, zi, lambdai, ei, xi) = Utility(Cons_mat(age,ai,zi,lambdai,ei,xi),Hours_mat(age,ai,zi,lambdai,ei,xi))  &
 		   & + beta*survP(age)* sum( pr_x(xi,:,zi)*E_mu_cp )
-		! ValueFunction(age, ai, zi, lambdai, ei) = ((Cons(age,ai,zi,lambdai,ei,xi)**gamma) &
-  !                      & * (1.0_DP-Hours(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
+		! Value_mat(age, ai, zi, lambdai, ei) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
+  !                      & * (1.0_DP-Hours_mat(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
   !                      & + beta*survP(age)* sum( pr_x(xi,:,zi)*E_mu_cp )
-		! if ( ValueFunction(age, ai, zi, lambdai, ei) .lt. (-100.0_DP) ) then
-		!    print*,'ValueFunction(age, ai, zi, lambdai, ei)=',ValueFunction(age, ai, zi, lambdai, ei)
+		! if ( Value_mat(age, ai, zi, lambdai, ei) .lt. (-100.0_DP) ) then
+		!    print*,'Value_mat(age, ai, zi, lambdai, ei)=',Value_mat(age, ai, zi, lambdai, ei)
 		! endif
 	ENDDO ! ei          
     ENDDO ! lambdai
