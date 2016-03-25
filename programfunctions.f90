@@ -1499,8 +1499,8 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	print*,'VALUE FUNCTION LINEAR'
 
 	age=MaxAge
-	DO xi=1,nx    
-	DO ai=1,na    
+	DO xi=1,nx
+	DO ai=1,na
     DO zi=1,nz
     DO lambdai=1,nlambda          
 	DO ei=1,ne
@@ -1519,8 +1519,8 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 
 	aux = 0.0_dp
 	! Retirement Period
-	DO xi=1,nx
 	DO age=MaxAge-1,RetAge,-1
+	DO xi=1,nx
 	DO ai=1,na    
     DO zi=1,nz
     DO lambdai=1,nlambda          
@@ -1544,7 +1544,9 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 			  & + beta*survP(age)* sum( pr_x(xi,:,zi)* (PrAprimelo*Value_mat(age+1, tklo, zi, lambdai, ei, :) &
 			  & 				                     +  PrAprimehi*Value_mat(age+1, tkhi, zi, lambdai, ei, :)) ) 
 
-		aux = tklo + aux
+		if (age.eq.MaxAge-1) then 
+			print*, 'Special report', 
+			aux = tklo + aux
 
         ! Value_mat(age, ai, zi, lambdai, ei, xi) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
         !               & * (1.0_DP-Hours_mat(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
@@ -1562,8 +1564,8 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 
 
 	! Working Period
-	DO xi=1,nx
 	DO age=RetAge-1,1,-1
+	DO xi=1,nx
 	DO ai=1,na    
     DO zi=1,nz
     DO lambdai=1,nlambda          
