@@ -1515,6 +1515,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
     ENDDO ! zi
 	ENDDO ! ai
 	ENDDO ! xi
+	print*, 'Sum of value function MaxAge',  sum(Value_mat(MaxAge,:,:,:,:,:))
 
 	! Retirement Period
 	DO xi=1,nx
@@ -1553,6 +1554,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	ENDDO ! age
 	ENDDO ! xi
 	!print*,Value_mat
+	print*, 'Sum of value function Ret',  sum(Value_mat(RetAge:MaxAge-1,:,:,:,:,:))
 
 
 	! Working Period
@@ -1599,7 +1601,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	ENDDO ! age
 	ENDDO ! xi
 
-	print*, 'Sum of value function',  sum(Value_mat)
+	print*, 'Sum of value function Working',  sum(Value_mat(1:RetAge-1,:,:,:,:,:))
 
 END SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR 
 
