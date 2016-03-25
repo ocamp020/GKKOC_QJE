@@ -1493,7 +1493,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	IMPLICIT NONE
 	REAL(DP), DIMENSION(MaxAge,na,nz,nlambda,ne,nx), INTENT(in)  :: Cons_mat, Hours_mat, Aprime_mat
 	REAL(DP), DIMENSION(MaxAge,na,nz,nlambda,ne,nx), INTENT(out) :: Value_mat
-	INTEGER  :: tklo, tkhi, xp_ind
+	INTEGER  :: tklo, tkhi, xp_ind, age, xi, ai, zi, lambdai, ei
 	REAL(DP) :: PrAprimelo, PrAprimehi, E_MU_cp(nx)
 
 	print*,'VALUE FUNCTION LINEAR'
