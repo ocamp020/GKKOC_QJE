@@ -251,6 +251,8 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	else
 		print*,"	Reading benchmark results from files"
 		CALL Write_Benchmark_Results(compute_bench)
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL Write_Benchmark_Results(.true.)
 	end if 
 
 		print*,"	Computing satitics"
@@ -400,6 +402,8 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	endif 
 	
 	CALL Write_Experimental_Results(compute_exp)
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL Write_Experimental_Results(.true.)
 
 	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR

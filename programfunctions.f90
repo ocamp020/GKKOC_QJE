@@ -833,17 +833,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 
 	! Compute the value function using interpolation and save it
 		
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction_Bench)
-		!CALL COMPUTE_VALUE_FUNCTION_SPLINE  
+		! CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction_Bench)
+		! CALL COMPUTE_VALUE_FUNCTION_SPLINE  
 		! ValueFunction_Bench = ValueFunction
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction_Exp)
-		
-		print*, ' '
-		print*, '!!!!!!!!!!!!!!!!!!!!!!'
-		print*, maxval(abs(ValueFunction_Bench-ValueFunction_Exp))
-		print*, maxval(abs(ValueFunction_Bench-ValueFunction))
-		print*, maxval(abs(ValueFunction-ValueFunction_Exp))
 
 
 	! Profit Matrix
@@ -1036,7 +1028,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		!CALL EGM_RETIREMENT_WORKING_PERIOD 
 
 	! Compute the value function using interpolation and save it
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction_Exp)
+		! CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction_Exp)
 		!CALL COMPUTE_VALUE_FUNCTION_SPLINE 
 		! ValueFunction_Exp = ValueFunction
 
