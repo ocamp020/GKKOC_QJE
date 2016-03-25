@@ -832,9 +832,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		! CALL EGM_RETIREMENT_WORKING_PERIOD 
 
 	! Compute the value function using interpolation and save it
-		!CALL COMPUTE_VALUE_FUNCTION_LINEAR
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR
 		!CALL COMPUTE_VALUE_FUNCTION_SPLINE  
-		!ValueFunction_Bench = ValueFunction
+		ValueFunction_Bench = ValueFunction
 
 	! Profit Matrix
 		Pr_mat = Profit_Matrix(R,P)
@@ -1026,9 +1026,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		!CALL EGM_RETIREMENT_WORKING_PERIOD 
 
 	! Compute the value function using interpolation and save it
-		!CALL COMPUTE_VALUE_FUNCTION_LINEAR
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR
 		!CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-		!ValueFunction_Exp = ValueFunction
+		ValueFunction_Exp = ValueFunction
 
 	! Profit Matrix
 		Pr_mat = Profit_Matrix(R,P)
@@ -1219,8 +1219,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		ENDDO
 
 
-	OPEN (UNIT=60, FILE=trim(Result_Folder)//'mean_wealth_by_agegroup_z_exp', STATUS='replace')  
-	OPEN (UNIT=70, FILE=trim(Result_Folder)//'size_by_agegroup_z_exp', STATUS='replace')  
+	OPEN (UNIT=60, FILE=trim(Result_Folder)//'mean_wealth_by_agegroup_z_exp.txt', STATUS='replace')  
+	OPEN (UNIT=70, FILE=trim(Result_Folder)//'size_by_agegroup_z_exp.txt', STATUS='replace')  
 	DO age_group_counter=1,max_age_category
 	    WRITE  (UNIT=60, FMT=*)   tot_wealth_by_agegroup_z_exp(age_group_counter,:)/ size_by_agegroup_z_exp(age_group_counter,:)
 	    WRITE  (UNIT=70, FMT=*)   size_by_agegroup_z_exp(age_group_counter,:)
@@ -3562,9 +3562,9 @@ SUBROUTINE  INITIALIZE()
 				Gx(2,zi)     = 0.5_dp 
 				print*,'z=',zi,'Pr(x_hi)=', pr_x(1,1,zi),'Pr(x_lo)=', pr_x(1,2,zi)
 			enddo 
-			! xz_grid = exp(log(spread(zgrid,1,nx))*spread(xgrid,2,nz))
+			xz_grid = exp(log(spread(zgrid,1,nx))*spread(xgrid,2,nz))
 			! xz_grid = spread(zgrid,1,nx)*spread(xgrid,2,nz)
-			xz_grid(1,:)   = zgrid 	; xz_grid(2,1:3) = zgrid(1:3)	;	xz_grid(2,4:)  = zgrid(4)
+			! xz_grid(1,:)   = zgrid 	; xz_grid(2,1:3) = zgrid(1:3)	;	xz_grid(2,4:)  = zgrid(4)
 			print*, ' xgrid', xgrid
 			print*, ' zgrid', zgrid 
 			do xi=1,nx
