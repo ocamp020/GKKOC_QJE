@@ -832,9 +832,15 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		! CALL EGM_RETIREMENT_WORKING_PERIOD 
 
 	! Compute the value function using interpolation and save it
+		ValueFunction_exp = ValueFunction_Bench
 		CALL COMPUTE_VALUE_FUNCTION_LINEAR
 		!CALL COMPUTE_VALUE_FUNCTION_SPLINE  
 		ValueFunction_Bench = ValueFunction
+
+		print*, ' '
+		print*, '!!!!!!!!!!!!!!!!!!!!!!'
+		print*, sum(abs(ValueFunction_Bench-ValueFunction_exp))
+
 
 	! Profit Matrix
 		Pr_mat = Profit_Matrix(R,P)
