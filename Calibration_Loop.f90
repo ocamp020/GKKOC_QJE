@@ -12,7 +12,7 @@ Program Calibration_Loop
 	integer  :: n_beta, n_sigmaz, n_x_hi, n_a, n_b, i, j, k, l, m, ind
 	character(100) :: Result_Folder, log_file
 
-	Result_Folder = './Calibration_Loop_2/'
+	Result_Folder = './Calibration_Loop/'
 	call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	OPEN(UNIT=3, FILE=trim(Result_Folder)//'Calibration_Loop_Restuls.txt', STATUS='replace')
