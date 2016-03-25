@@ -1543,11 +1543,6 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 		Value_mat(age, ai, zi, lambdai, ei, xi) = Utility(Cons_mat(age,ai,zi,lambdai,ei,xi),Hours_mat(age,ai,zi,lambdai,ei,xi)) &
 			  & + beta*survP(age)* sum( pr_x(xi,:,zi)* (PrAprimelo*Value_mat(age+1, tklo, zi, lambdai, ei, :) &
 			  & 				                     +  PrAprimehi*Value_mat(age+1, tkhi, zi, lambdai, ei, :)) ) 
-
-		if (age.eq.MaxAge-1) then 
-			print*, 'Special report', 
-			aux = tklo + aux
-
         ! Value_mat(age, ai, zi, lambdai, ei, xi) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
         !               & * (1.0_DP-Hours_mat(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
         !               & + beta*survP(age)* sum(pr_x(xi,:,zi) * (PrAprimelo*Value_mat(age+1, tklo, zi, lambdai, ei, :)&
