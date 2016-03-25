@@ -251,8 +251,6 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	else
 		print*,"	Reading benchmark results from files"
 		CALL Write_Benchmark_Results(compute_bench)
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR 
-		CALL Write_Benchmark_Results(.true.)
 	end if 
 
 		print*,"	Computing satitics"
