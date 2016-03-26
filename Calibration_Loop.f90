@@ -55,7 +55,7 @@ Program Calibration_Loop
 	do l=1,n_a
 		a_x    = a_x_L    + real(l-1,8)*(a_x_H-a_x_L)/real(max((n_a-1),1),8)
 	do m=1,n_b
-		b_x    = b_x_L    + real(l-1,8)*(b_x_H-b_x_L)/real(max((n_b-1),1),8)
+		b_x    = b_x_L    + real(m-1,8)*(b_x_H-b_x_L)/real(max((n_b-1),1),8)
 
 		! Set Log File 
 			write(log_file,'(I3.1)') ind 
