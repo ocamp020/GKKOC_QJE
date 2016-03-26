@@ -2376,8 +2376,10 @@ SUBROUTINE COMPUTE_STATS()
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats.txt', STATUS='replace')
 		WRITE(UNIT=11, FMT=*) ' '
 		WRITE(UNIT=11, FMT=*) 'Z','Const_firms_by_z: ','Const_firms_z_x1 ','Const_firms_z_x1 ','Opt_K_x_1 ','Opt_K_x2_low_shock '
+		WRITE(UNIT=11, FMT=*) 'Benchmark'
 	else
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats.txt', STATUS='old', POSITION='append') 
+		WRITE(UNIT=11, FMT=*) 'Tax_Reform'
 	end if 
 		WRITE(UNIT=11, FMT=*) ' '
 		do zi=1,nz
