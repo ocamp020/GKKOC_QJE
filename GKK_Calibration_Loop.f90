@@ -169,7 +169,7 @@ PROGRAM GKK_Calibration_Loop
 	! Solve for the model and compute stats
 		CALL INITIALIZE
 		CALL FIND_DBN_EQ
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR 
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
 		CALL Firm_Value
 		CALL COMPUTE_STATS
 
