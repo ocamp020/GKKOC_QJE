@@ -87,12 +87,12 @@ PROGRAM main
 		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
 		! 0.96  0.112   5       3.07418882	0.8106354897	0.39135703	8.01261403	35.761943	61.0476523  0.1     0.0 	0.455
 
-		beta   	= 0.95_dp ! params(1)
+		beta   	= 0.96_dp ! params(1)
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= params(3) 
-		sigma_z_eps      = 0.07_dp ! params(4)
+		sigma_z_eps      = 0.112_dp ! params(4)
 		sigma_lambda_eps = params(5)
-		gamma  	= params(6)! 0.455_dp !
+		gamma  	= 0.455_dp !params(6)
 		
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
