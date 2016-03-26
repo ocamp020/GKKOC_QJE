@@ -92,7 +92,7 @@ PROGRAM main
 		rho_z  	= params(3) 
 		sigma_z_eps      = 0.112_dp ! params(4)
 		sigma_lambda_eps = params(5)
-		gamma  	= 0.44_dp !params(6)
+		gamma  	= 0.451_dp !params(6)
 		
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
