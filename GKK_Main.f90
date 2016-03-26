@@ -52,8 +52,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
-			compute_exp   = .true.
+			compute_bench = .true.
+			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Simul_Switch  = .false.
@@ -86,6 +86,9 @@ PROGRAM main
 		! Exponential shock mu=0.8, matuchenz=5, nz_aux=11, nz=9
 		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
 		! 0.96  0.112   5       3.07418882	0.8106354897	0.39135703	8.01261403	35.761943	61.0476523  0.1     0.0 	0.455
+		! Retirement Shock mu=0.9, matuchenz=5, nz_aux=11, nz=9
+		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
+		! 0.953 0.340   5       3.05129691	0.801885794 	0.3965338	8.11022612	 35.79579	61.4643909  0.1     0.0 	0.457
 
 		beta   	= 0.953_dp ! 0.96_dp ! params(1)
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
@@ -140,7 +143,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Ret_Shock/' 
+		Result_Folder = trim(Result_Folder)//'Ret_Shock_mu80/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
