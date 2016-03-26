@@ -52,8 +52,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
-			compute_exp   = .false.
+			compute_bench = .false.
+			compute_exp   = .true.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Simul_Switch  = .false.
@@ -84,8 +84,8 @@ PROGRAM main
 		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x
 		! 0.95	0.07	5		2.952165	0.79992289		0.38810872	8.55075051	35.073503	61.033801	0.1 	0.0
 		! Exponential shock mu=0.8, matuchenz=5, nz_aux=11, nz=9
-		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x
-		! 
+		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
+		! 0.96  0.112   5       3.07418882	0.8106354897	0.39135703	8.01261403	35.761943	61.0476523  0.1     0.0 	0.455
 
 		beta   	= 0.96_dp ! params(1)
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
