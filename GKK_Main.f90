@@ -84,7 +84,7 @@ PROGRAM main
 		beta   	= 0.95_dp ! params(1)
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= params(3) 
-		sigma_z_eps      = 0.15 ! params(4)
+		sigma_z_eps      = 0.13 ! params(4)
 		sigma_lambda_eps = params(5)
 		gamma  	= params(6)
 		
@@ -144,7 +144,7 @@ PROGRAM main
 		print*,'Labor Taxes: tauPl=',tauPl,'psi',psi
 		print*, 'Borrowing Constraint: Theta=',theta
 		print*, 'm tauchen for zgrid is ',mtauchen_z,'nz=',nz, 'amax=',amax, 'totpop=', totpop
-		print*, 'x_hi', x_hi, 'a_x', a_x, 'b_x', b_x
+		print*, 'x_hi', x_hi, 'a_x', a_x, 'b_x', b_x, 'sigmaz', sigma_z_eps
 
 
 	! Set parameters to be used in all simulations economy
