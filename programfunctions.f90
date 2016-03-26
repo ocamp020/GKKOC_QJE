@@ -2372,6 +2372,28 @@ SUBROUTINE COMPUTE_STATS()
 	constrained_firms_age_z = constrained_firms_age_z/size_by_age_z 
 	constrained_firms_age   = constrained_firms_age/size_by_age 
 
+	if (solving_bench.eq.1) then
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats.txt', STATUS='replace')
+		WRITE(UNIT=11, FMT=*) ' '
+		print*,'Z','Const_firms_by_z: ','Const_firms_z_x1 ','Const_firms_z_x1 ','Opt_K_x_1 ','Opt_K_x2_low_shock '
+	else
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats.txt', STATUS='old', POSITION='append') 
+	end if 
+		WRITE(UNIT=11, FMT=*) ' '
+		do zi=1,nz
+		WRITE(UNIT=11, FMT=*) zi, & 
+			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
+			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &
+			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
+			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) , & 
+			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
+		enddo 	
+
+		CLOSE(UNIT=11)
+		
+
+
+
 
 	! Distribution of firm wealth
 		do ai=1,na
@@ -2496,11 +2518,14 @@ SUBROUTINE COMPUTE_STATS()
 	print*,'Debt/GDP',External_Debt_GDP,'W/GDP',Wealth_Output,'Top 1% A',prct1_wealth,'Top 10% A',prct10_wealth
 	print*,'STD Labor Earnings',Std_Log_Earnings_25_60,'Mean Labor (hours 25-60)',meanhours_25_60,'MeanReturn',MeanReturn
 	print*,'PV_Wealth_Top_1%', FW_top_x_share(4), 'PV_Top_10%', FW_top_x_share(3)
-	print*,'Constrained firms by z:'
+	print*,'Z','Constrained_firms_by_z: ','Capital_high_shock','Capital_low_shock'
 	do zi=1,nz
-		print*, zi, 100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
-				(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) , & 
-				(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
+		print*, zi, & 
+			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
+			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &
+			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
+			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) , & 
+			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
 	enddo 
 	print*,'Moments',SSE_Moments 
 	!print*,''
@@ -5451,7 +5476,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) "Debt_Output"		  		, External_Debt_GDP
 			WRITE(UNIT=19, FMT=*) "Wealth_Output"		  	, Wealth_Output
 			WRITE(UNIT=19, FMT=*) "Mean_Assets"				, MeanWealth
-			WRITE(UNIT=19, FMT=*) "Bequest_Wealth"	        , Bequest_Wealth
+			WRITE(UNIT=19, FMT=*) "Bequest_Wealth"	        , Mean_Bequest/MeanWealth 
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_1%' 	, prct1_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_10%'	, prct10_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_20%'	, prct20_wealth
