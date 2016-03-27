@@ -56,7 +56,7 @@ PROGRAM main
 			compute_exp   = .true.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 	! Switch for separable and non-separable utility
@@ -76,6 +76,7 @@ PROGRAM main
 
 	! Set Parameters
 		Params =[0.962_dp, 0.0_dp, 0.50_dp, 0.387_dp, 0.29_dp, 0.4494_dp] ! alpha=0.4, zgrid 11, m5, alpha=0.4, dep005, mu=090, K/Y=3, Top1PVa=0.36
+		Params =[0.973_dp, 0.0_dp, 0.50_dp, 0.6567_dp,  0.30_dp,  0.4494_dp] ! mu=0.8
 		
 		! Multiplicative Shock
 		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x
@@ -94,19 +95,20 @@ PROGRAM main
 		! 0.957 0.530   5       3.0320955	0.80911831  	0.39959548	8.193043463	 35.30278	61.27262    0.1     0.0 	0.465
 		! Retirement Shock mu=0.8, matuchenz=5, nz_aux=11, nz=9, low X
 		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
-		! 0.965 0.335   1.80    
+		! 0.965 0.337   1.80    3.0843335	0.8088928 		0.4026798  	7.9693873  	35.1277 	64.44152  	0.1     0.0  	0.465
 
-		beta   	= 0.965_dp  ! params(1)
+
+		beta   	=   params(1) !0.965_dp
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= params(3) 
-		sigma_z_eps      = 0.337_dp ! 0.07_dp ! ! params(4)
+		sigma_z_eps      = params(4)! 0.337_dp ! 0.07_dp ! ! 
 		sigma_lambda_eps = params(5)
-		gamma  	=  0.465_dp ! params(6) ! 0.455_dp !
+		gamma  	=  params(6) ! 0.455_dp !  0.465_dp ! 
 		
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
 
-		x_hi	= 1.80_dp
+		x_hi	= 1.00_dp
 		x_lo	= 1.00_dp
 		a_x 	= 0.10_dp
 		b_x 	= 0.00_dp
@@ -149,7 +151,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Exp_Shock_mu80_low_x/' 
+		Result_Folder = trim(Result_Folder)//'Exp_Shock_mu80_test/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
