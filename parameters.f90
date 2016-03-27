@@ -26,7 +26,7 @@ MODULE parameters
 
     ! Entrepreneurial ability (z)
     REAL(DP)         	    :: rho_z, sigma_z_eps, mu_z
-    INTEGER(I4B), PARAMETER :: nz=11, nz_aux=11  ! Number of grid points
+    INTEGER(I4B), PARAMETER :: nz=9, nz_aux=11  ! Number of grid points
 
     ! Transitory entrepreneurial ablity (x)
     INTEGER(I4B), PARAMETER :: nx=2
@@ -41,7 +41,7 @@ MODULE parameters
 		! Final good producer
 		REAL(DP), PARAMETER  :: alpha=0.40_DP, Aprod=1.0_DP
 		! Intermediate good (or home production)
-		REAL(DP), PARAMETER  :: mu=0.80_DP
+		REAL(DP), PARAMETER  :: mu=0.70_DP
 		! Depreciation rate
 		REAL(DP), PARAMETER  :: DepRate=0.05_DP
 		! Financial constraints
