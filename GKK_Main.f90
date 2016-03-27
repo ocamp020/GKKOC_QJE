@@ -89,13 +89,17 @@ PROGRAM main
 		! Retirement Shock mu=0.9, matuchenz=5, nz_aux=11, nz=9
 		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
 		! 0.953 0.340   5       3.05129691	0.801885794 	0.3965338	8.11022612	 35.79579	61.4643909  0.1     0.0 	0.457
+		! Retirement Shock mu=0.8, matuchenz=5, nz_aux=11, nz=9
+		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
+		! 0.957 0.530   5       3.0320955	0.80911831  	0.39959548	8.193043463	 35.30278	61.27262    0.1     0.0 	0.465
 
-		beta   	= 0.957_dp ! 0.96_dp ! params(1)
+
+		beta   	= 0.96_dp  ! params(1)
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= params(3) 
-		sigma_z_eps      = 0.53_dp ! 0.07_dp ! 0.112_dp ! params(4)
+		sigma_z_eps      = 0.34_dp ! 0.07_dp ! 0.112_dp ! params(4)
 		sigma_lambda_eps = params(5)
-		gamma  	= 0.465_dp! params(6) ! 0.455_dp !
+		gamma  	= 0.455_dp! params(6) ! 0.455_dp !
 		
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
@@ -143,7 +147,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Ret_Shock_mu80/' 
+		Result_Folder = trim(Result_Folder)//'Exp_Shock_mu80_low_x/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
