@@ -4553,6 +4553,8 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	   
 	ENDDO
 
+	print* ' Initial states ready'
+
 	! SET INITIAL ASSET DISTRIBUTION
 	panela            = 1.0_DP
 
