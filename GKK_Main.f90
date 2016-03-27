@@ -52,7 +52,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
+			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
@@ -97,14 +97,14 @@ PROGRAM main
 		beta   	= 0.96_dp  ! params(1)
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= params(3) 
-		sigma_z_eps      = 0.33_dp ! 0.07_dp ! 0.112_dp ! params(4)
+		sigma_z_eps      = 0.112_dp ! 0.33_dp ! 0.07_dp ! ! params(4)
 		sigma_lambda_eps = params(5)
 		gamma  	= 0.455_dp ! params(6) ! 0.455_dp !
 		
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
 
-		x_hi	= 2.00_dp
+		x_hi	= 5.00_dp ! 2.00_dp
 		x_lo	= 1.00_dp
 		a_x 	= 0.10_dp
 		b_x 	= 0.00_dp
@@ -147,7 +147,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Exp_Shock_mu80_low_x/' 
+		Result_Folder = trim(Result_Folder)//'Exp_Shock_mu80/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
@@ -274,7 +274,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
 		endif
-		!!CALL SIMULATION_TOP(solving_bench)
+		CALL SIMULATION_TOP(solving_bench)
 
 	! Aggregate variables in benchmark economy
 		GBAR_bench  = GBAR
