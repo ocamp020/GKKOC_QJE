@@ -104,7 +104,7 @@ PROGRAM main
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
 
-		x_hi	= 2.50_dp
+		x_hi	= 2.30_dp
 		x_lo	= 1.00_dp
 		a_x 	= 0.10_dp
 		b_x 	= 0.00_dp
