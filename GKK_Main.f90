@@ -53,10 +53,10 @@ PROGRAM main
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
 			compute_bench = .false.
-			compute_exp   = .true.
+			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 	! Switch for separable and non-separable utility
@@ -98,19 +98,19 @@ PROGRAM main
 		! 0.965 0.337   1.80    3.0843335	0.8088928 		0.4026798  	7.9693873  	35.1277 	64.44152  	0.1     0.0  	0.465
 		! Retirement Shock mu=0.7, matuchenz=5, nz_aux=11, nz=9, low X
 		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
-		! 0.965 0.337   1.80    3.0843335	0.8088928 		0.4026798  	7.9693873  	35.1277 	64.44152  	0.1     0.0  	0.465
+		! 0.965 0.343   2.50    3.022731	0.814399 		0.396095  	8.234316  	35.623980 	63.19873  	0.1     0.0  	0.462
 
 		beta   	= 0.965_dp! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= params(3) 
-		sigma_z_eps      = 0.343_dp ! 0.07_dp ! ! params(4)
+		sigma_z_eps      = 0.337_dp ! 0.07_dp ! ! params(4)
 		sigma_lambda_eps = params(5)
-		gamma  	=  0.462_dp !  0.465_dp ! params(6) ! 
+		gamma  	=  0.465_dp !  0.465_dp ! params(6) ! 
 		
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
 
-		x_hi	= 2.50_dp
+		x_hi	= 1.80_dp
 		x_lo	= 1.00_dp
 		a_x 	= 0.10_dp
 		b_x 	= 0.00_dp
@@ -153,7 +153,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Exp_Shock_mu70_low_x/' 
+		Result_Folder = trim(Result_Folder)//'Exp_Shock_mu80_low_x/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
@@ -280,7 +280,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
 		endif
-		!! CALL SIMULATION_TOP(solving_bench)
+		CALL SIMULATION_TOP(solving_bench)
 
 	! Aggregate variables in benchmark economy
 		GBAR_bench  = GBAR
