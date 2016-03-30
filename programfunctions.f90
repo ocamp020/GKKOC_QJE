@@ -2506,7 +2506,6 @@ SUBROUTINE COMPUTE_STATS()
 
 
 	! Income and capital demand
-	print*, 'test 1'
 	do xi=1,nx 
 	do ei=1,ne
 	do lambdai=1,nlambda
@@ -2528,7 +2527,6 @@ SUBROUTINE COMPUTE_STATS()
 	enddo
 	enddo
 	enddo
-	print*, 'test 2'
 	if (solving_bench.eq.1) then
 		OPEN(UNIT=51, FILE=trim(Result_Folder)//'Labor_Income_bench', STATUS='replace')
 		OPEN(UNIT=52, FILE=trim(Result_Folder)//'Total_Income_bench', STATUS='replace')
@@ -2540,14 +2538,12 @@ SUBROUTINE COMPUTE_STATS()
 		OPEN(UNIT=53, FILE=trim(Result_Folder)//'K_L_Income_exp'    , STATUS='replace')
 		OPEN(UNIT=54, FILE=trim(Result_Folder)//'K_T_Income_exp'    , STATUS='replace')
 	end if 
-	print*, 'test 3'
 		WRITE(UNIT=51, FMT=*) Labor_Income
 		WRITE(UNIT=52, FMT=*) Total_Income 
 		WRITE(UNIT=53, FMT=*) K_L_Income 
 		WRITE(UNIT=54, FMT=*) K_T_Income 
 
 		CLOSE(UNIT=51); CLOSE(UNIT=52); CLOSE(UNIT=53); CLOSE(UNIT=54)
-		print*, 'test 4'
 
 		
 
