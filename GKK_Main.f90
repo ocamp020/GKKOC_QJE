@@ -81,18 +81,18 @@ PROGRAM main
 		! Multiplicative Shock
 		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x
 		! 0.95	0.25	3		3.079403947	0.789919246		0.387819464	7.99E-02	36.60252401	71.46784902	0.1 	0.4
-		! Exponential shock mu=0.9, matuchenz=5, nz_aux=11, nz=9
-		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x
-		! 0.95	0.07	5		2.952165	0.79992289		0.38810872	8.55075051	35.073503	61.033801	0.1 	0.0
-		! Exponential shock mu=0.8, matuchenz=5, nz_aux=11, nz=9
-		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
-		! 0.96  0.112   5       3.07418882	0.8106354897	0.39135703	8.01261403	35.761943	61.0476523  0.1     0.0 	0.455
 		! Retirement Shock mu=0.9, matuchenz=5, nz_aux=11, nz=9
 		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
 		! 0.953 0.340   5       3.05129691	0.801885794 	0.3965338	8.11022612	 35.79579	61.4643909  0.1     0.0 	0.457
 		! Retirement Shock mu=0.8, matuchenz=5, nz_aux=11, nz=9
 		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
 		! 0.957 0.530   5       3.0320955	0.80911831  	0.39959548	8.193043463	 35.30278	61.27262    0.1     0.0 	0.465
+		! Exponential shock mu=0.9, matuchenz=5, nz_aux=11, nz=9
+		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x
+		! 0.95	0.07	5		2.952165	0.79992289		0.38810872	8.55075051	35.073503	61.033801	0.1 	0.0
+		! Exponential shock mu=0.8, matuchenz=5, nz_aux=11, nz=9
+		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
+		! 0.96  0.112   5       3.07418882	0.8106354897	0.39135703	8.01261403	35.761943	61.0476523  0.1     0.0 	0.455
 		! Retirement Shock mu=0.8, matuchenz=5, nz_aux=11, nz=9, low X
 		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
 		! 0.965 0.337   1.80    3.0843335	0.8088928 		0.4026798  	7.9693873  	35.1277 	64.44152  	0.1     0.0  	0.465
@@ -280,7 +280,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
 		endif
-		CALL SIMULATION_TOP(solving_bench)
+		! CALL SIMULATION_TOP(solving_bench)
 
 	! Aggregate variables in benchmark economy
 		GBAR_bench  = GBAR

@@ -2014,7 +2014,8 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: FW_top_x(4),  prctile_FW(4), prctile_bq(7), a, b, c, CCDF_c
 	real(DP) :: DBN_bq(MaxAge,na,nz,nlambda,ne,nx)
 	character(100) :: rowname
-	INTEGER, dimension(max_age_category+1) :: age_limit
+	integer , dimension(max_age_category+1) :: age_limit
+	real(DP), dimension(MaxAge,na,nz,nlambda,ne,nx) :: Labor_Income, Total_Income, K_L_Income, K_T_Income
 
 	!$ call omp_set_num_threads(20)
 
@@ -2504,6 +2505,47 @@ SUBROUTINE COMPUTE_STATS()
 	
 
 
+	! Income and capital demand
+	do xi=1,nx 
+	do ei=1,ne
+	do lambdai=1,nlambda
+	do zi=1,nz
+	do ai=1,na 
+		! Working Period
+		do age=1,RetAge-1
+			Labor_Income(age,ai,zi,lambdai,ei,xi) =  RetY_lambda_e(lambdai,ei) 
+		enddo 
+		! Retirement Period
+		do age=1,RetAge-1
+			Labor_Income(age,ai,zi,lambdai,ei,xi) =  Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,wage)
+		enddo 
+		Total_Income(:,ai,zi,lambdai,ei,xi) = YGRID_t(ai,zi,xi) + Labor_Income(:,ai,zi,lambdai,ei,xi)
+		K_L_Income(:,ai,zi,lambdai,ei,xi)   = K_mat(ai,zi,xi)/Labor_Income(:,ai,zi,lambdai,ei,xi)
+		K_T_Income(:,ai,zi,lambdai,ei,xi)   = K_mat(ai,zi,xi)/Total_Income(:,ai,zi,lambdai,ei,xi)
+	enddo
+	enddo
+	enddo
+	enddo
+	enddo
+	if (solving_bench.eq.1) then
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Labor_Income_bench', STATUS='replace')
+		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Total_Income_bench', STATUS='replace')
+		OPEN(UNIT=13, FILE=trim(Result_Folder)//'K_L_Income_bench'  , STATUS='replace')
+		OPEN(UNIT=14, FILE=trim(Result_Folder)//'K_T_Income_bench'  , STATUS='replace')
+	else
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Labor_Income_exp'  , STATUS='replace')
+		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Total_Income_exp'  , STATUS='replace')
+		OPEN(UNIT=13, FILE=trim(Result_Folder)//'K_L_Income_exp'    , STATUS='replace')
+		OPEN(UNIT=14, FILE=trim(Result_Folder)//'K_T_Income_exp'    , STATUS='replace')
+	end if 
+		WRITE(UNIT=11, FMT=*) Labor_Income
+		WRITE(UNIT=12, FMT=*) Total_Income 
+		WRITE(UNIT=13, FMT=*) K_L_Income 
+		WRITE(UNIT=14, FMT=*) K_T_Income 
+
+		CLOSE(UNIT=11); CLOSE(UNIT=12); CLOSE(UNIT=13); CLOSE(UNIT=14)
+
+		
 
 
 
