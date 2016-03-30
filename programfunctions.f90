@@ -2514,11 +2514,11 @@ SUBROUTINE COMPUTE_STATS()
 	do ai=1,na 
 		! Working Period
 		do age=1,RetAge-1
-			Labor_Income(age,ai,zi,lambdai,ei,xi) =  RetY_lambda_e(lambdai,ei) 
+			Labor_Income(age,ai,zi,lambdai,ei,xi) =  Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,wage)
 		enddo 
 		! Retirement Period
 		do age=1,RetAge-1
-			Labor_Income(age,ai,zi,lambdai,ei,xi) =  Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,wage)
+			Labor_Income(age,ai,zi,lambdai,ei,xi) =  RetY_lambda_e(lambdai,ei) 
 		enddo 
 		Total_Income(:,ai,zi,lambdai,ei,xi) = YGRID_t(ai,zi,xi) + Labor_Income(:,ai,zi,lambdai,ei,xi)
 		K_L_Income(:,ai,zi,lambdai,ei,xi)   = K_mat(ai,zi,xi)/Labor_Income(:,ai,zi,lambdai,ei,xi)
