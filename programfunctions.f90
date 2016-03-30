@@ -2520,7 +2520,7 @@ SUBROUTINE COMPUTE_STATS()
 		do age=1,RetAge-1
 			Labor_Income(age,ai,zi,lambdai,ei,xi) =  RetY_lambda_e(lambdai,ei) 
 		enddo 
-		Total_Income(:,ai,zi,lambdai,ei,xi) = YGRID_t(ai,zi,xi) + Labor_Income(:,ai,zi,lambdai,ei,xi)
+		Total_Income(:,ai,zi,lambdai,ei,xi) = YGRID(ai,zi,xi) + Labor_Income(:,ai,zi,lambdai,ei,xi)
 		K_L_Income(:,ai,zi,lambdai,ei,xi)   = K_mat(ai,zi,xi)/Labor_Income(:,ai,zi,lambdai,ei,xi)
 		K_T_Income(:,ai,zi,lambdai,ei,xi)   = K_mat(ai,zi,xi)/Total_Income(:,ai,zi,lambdai,ei,xi)
 	enddo
