@@ -114,5 +114,13 @@ Calibration_Loop.a: Calibration_Loop.f90 $(Folder)/NRTYPE.o
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
 
+Simulation_Labor_Income.a: Simulation_Labor_Income.f90 $(Objects_Main)
+	gfortran $(omp_flag) -O2 -I$(Folder) Simulation_Labor_Income.f90 $(Objects_Main) -o $(Folder)/Simulation_Labor_Income.a
+	time $(Folder)/Simulation_Labor_Income.a
+
+#----------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------
+
 clean: 
 	cd $(Folder) ; pwd ; rm -f *.o *.mod *.a ; cd ..

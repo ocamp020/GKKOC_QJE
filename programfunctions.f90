@@ -2502,49 +2502,6 @@ SUBROUTINE COMPUTE_STATS()
 		enddo 
 
 			CLOSE(UNIT=11)
-	
-
-
-	! Income and capital demand
-	do xi=1,nx 
-	do ei=1,ne
-	do lambdai=1,nlambda
-	do zi=1,nz
-	do ai=1,na 
-		! Working Period
-		do age=1,RetAge-1
-			Labor_Income(age,ai,zi,lambdai,ei,xi) =  Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,wage)
-		enddo 
-		! Retirement Period
-		do age=1,RetAge-1
-			Labor_Income(age,ai,zi,lambdai,ei,xi) =  RetY_lambda_e(lambdai,ei) 
-		enddo 
-		Total_Income(:,ai,zi,lambdai,ei,xi) = YGRID(ai,zi,xi) + Labor_Income(:,ai,zi,lambdai,ei,xi)
-		K_L_Income(:,ai,zi,lambdai,ei,xi)   = K_mat(ai,zi,xi)/Labor_Income(:,ai,zi,lambdai,ei,xi)
-		K_T_Income(:,ai,zi,lambdai,ei,xi)   = K_mat(ai,zi,xi)/Total_Income(:,ai,zi,lambdai,ei,xi)
-	enddo
-	enddo
-	enddo
-	enddo
-	enddo
-	if (solving_bench.eq.1) then
-		OPEN(UNIT=51, FILE=trim(Result_Folder)//'Labor_Income_bench', STATUS='replace')
-		OPEN(UNIT=52, FILE=trim(Result_Folder)//'Total_Income_bench', STATUS='replace')
-		OPEN(UNIT=53, FILE=trim(Result_Folder)//'K_L_Income_bench'  , STATUS='replace')
-		OPEN(UNIT=54, FILE=trim(Result_Folder)//'K_T_Income_bench'  , STATUS='replace')
-	else
-		OPEN(UNIT=51, FILE=trim(Result_Folder)//'Labor_Income_exp'  , STATUS='replace')
-		OPEN(UNIT=52, FILE=trim(Result_Folder)//'Total_Income_exp'  , STATUS='replace')
-		OPEN(UNIT=53, FILE=trim(Result_Folder)//'K_L_Income_exp'    , STATUS='replace')
-		OPEN(UNIT=54, FILE=trim(Result_Folder)//'K_T_Income_exp'    , STATUS='replace')
-	end if 
-		WRITE(UNIT=51, FMT=*) Labor_Income
-		WRITE(UNIT=52, FMT=*) Total_Income 
-		WRITE(UNIT=53, FMT=*) K_L_Income 
-		WRITE(UNIT=54, FMT=*) K_T_Income 
-
-		CLOSE(UNIT=51); CLOSE(UNIT=52); CLOSE(UNIT=53); CLOSE(UNIT=54)
-
 		
 
 
@@ -4509,7 +4466,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	REAL(DP), DIMENSION(totpop) :: panela, panelPV_a, panelK 
 	INTEGER , DIMENSION(150,80) :: panelage_top, panelz_top, panelx_top
 	REAL(DP), DIMENSION(150,80) :: panela_top, panelK_top 
-	INTEGER 				    :: top_ind(80)
+	INTEGER 				    :: top_ind(80), ii
 
 	!$ call omp_set_num_threads(20)
 
@@ -4750,8 +4707,12 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
      		panelz_top(simutime-MaxSimuTime+150,:)   = panelz(top_ind)
      		panela_top(simutime-MaxSimuTime+150,:)   = panela(top_ind)
      		panelx_top(simutime-MaxSimuTime+150,:)   = panelx(top_ind)
-     		panelk_top(simutime-MaxSimuTime+150,:)   = min( theta*panela_top(simutime-MaxSimuTime+150,:) ,&
-     					& (mu*P*zgrid(panelz_top(simutime-MaxSimuTime+150,:))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+     		
+     		do ii=1,80
+     		panelk_top(simutime-MaxSimuTime+150,ii)  = min( theta*panela_top(simutime-MaxSimuTime+150,ii) ,&
+     			& (mu*P*xz_grid(panelx_top(simutime-MaxSimuTime+150,ii),panelz_top(simutime-MaxSimuTime+150,ii))**mu & 
+     				& /(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+     		enddo
      	endif
 	    print*, "Simulation period", simutime
 	ENDDO ! simutime
