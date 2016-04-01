@@ -105,6 +105,9 @@ Program Simulation_Labor_Income
 		else 
 			Y_L(i) = RetY_lambda_e(panel_lambda(i),panel_e(i))
 		endif 
+ 		!$omp critical
+		print*, i, Y_L(i)
+		!$omp end critical
 	enddo
 
 	! Write Results 
