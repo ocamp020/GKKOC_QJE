@@ -18,9 +18,9 @@ Program Simulation_Labor_Income
 
 	! Set Folders
 	print*, 'Setting up folders'
-	Results_Folder = './NSU_ZS_LT_Results/Theta_1.50/Factor_0.00/Exp_Shock_mu80/'
-	Bench_Folder  = './NSU_ZS_LT_Results/Theta_1.50/Factor_0.00/Exp_Shock_mu80/Bench_Files/'
-	Simul_Folder  = './NSU_ZS_LT_Results/Theta_1.50/Factor_0.00/Exp_Shock_mu80/Simul/'
+	Results_Folder = './NSU_ZS_LT_Results/Theta_1.50/Factor_0.00/Exp_Shock_mu80_low_x/'
+	Bench_Folder  = './NSU_ZS_LT_Results/Theta_1.50/Factor_0.00/Exp_Shock_mu80_low_x/Bench_Files/'
+	Simul_Folder  = './NSU_ZS_LT_Results/Theta_1.50/Factor_0.00/Exp_Shock_mu80_low_x/Simul/'
 	print*, 'Result_Folder', Results_Folder
 	print*, 'Bench_Folder' , Bench_Folder
 	print*, 'Simul_Folder' , Simul_Folder
@@ -116,6 +116,7 @@ Program Simulation_Labor_Income
 
 	print*, ' '
 	print*, 'Simulation of Labor Income Completed'
+	print*, ' '
 
 
 end Program Simulation_Labor_Income
