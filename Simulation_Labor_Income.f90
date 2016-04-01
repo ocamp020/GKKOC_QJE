@@ -1,6 +1,7 @@
 Program Simulation_Labor_Income
 	USE parameters
 	USE GLOBAL
+	USE omp_lib
 	
 	Implicit None
 	real(dp), dimension(totpop) :: Y_L, panel_a
@@ -8,6 +9,8 @@ Program Simulation_Labor_Income
 	real(dp) :: h_i
 	integer  :: tklo, tkhi, i
 	character(100) :: Results_Folder, Bench_Folder, Simul_Folder
+
+	!$ call omp_set_num_threads(20)
 
 	print*, ' '
 	print*, 'Simulation of labor income'
@@ -22,6 +25,8 @@ Program Simulation_Labor_Income
 	print*, 'Simul_Folder' , Simul_Folder
 
 	! Load Variables
+	print*, ' '
+	print*, 'Loading Variables'
 		! Wage
 		OPEN (UNIT=1,  FILE=trim(Bench_Folder)//'wage'  , STATUS='old', ACTION='read')
 		READ (UNIT=1,  FMT=*), wage
@@ -75,6 +80,10 @@ Program Simulation_Labor_Income
 		READ (UNIT=1,  FMT=*), panel_x
 		CLOSE(UNIT=1)
 
+	! Simulation
+	print*, ' '
+	print*, 'Simulating'
+	!$omp parallel do private(tklo,tkhi,h_i)
 	do i=1,totpop
 		if (panel_age(i).lt.RetAge) then 
 			if (panel_a(i) .ge. amax) then
@@ -98,6 +107,8 @@ Program Simulation_Labor_Income
 	enddo
 
 	! Write Results 
+	print*, ' '
+	print*, 'Writing Results'
 	OPEN  (UNIT=1,  FILE=trim(Simul_Folder)//'Y_L_bench'  , STATUS='replace')
 	WRITE (UNIT=1,  FMT=*) Y_L
 	CLOSE (unit=1)
