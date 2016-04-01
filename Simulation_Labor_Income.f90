@@ -105,9 +105,6 @@ Program Simulation_Labor_Income
 		else 
 			Y_L(i) = RetY_lambda_e(panel_lambda(i),panel_e(i))
 		endif 
- 		!$omp critical
-		print*, i, Y_L(i)
-		!$omp end critical
 	enddo
 
 	! Write Results 
@@ -116,6 +113,9 @@ Program Simulation_Labor_Income
 	OPEN  (UNIT=1,  FILE=trim(Simul_Folder)//'Y_L_bench'  , STATUS='replace')
 	WRITE (UNIT=1,  FMT=*) Y_L
 	CLOSE (unit=1)
+
+	print*, ' '
+	print*, 'Simulation of Labor Income Completed'
 
 
 end Program Simulation_Labor_Income
