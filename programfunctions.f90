@@ -4325,7 +4325,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		    	where(panelage==1) eligible = 0 
 	        endif 
 
-	 		! print*, "Simulation period", simutime
+	 		print*, "Simulation period", simutime
 		ENDDO ! simutime
 
 		! Mean of assets 
