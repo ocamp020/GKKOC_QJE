@@ -4774,8 +4774,8 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 		OPEN(UNIT=29, FILE=trim(Result_Folder)//'Simul/panele_top_bench'    	, STATUS='replace')
 		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/panel_lambda_top_bench'	, STATUS='replace')
 		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_YL_top_bench'	    , STATUS='replace')
-		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/panel_prc_all_top_bench'	, STATUS='replace')
-		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/panel_prc_cohort_top_bench', STATUS='replace')
+		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/prc_all_top_bench'		, STATUS='replace')
+		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/prc_cohort_top_bench'	, STATUS='replace')
 	else 
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_top_exp'			, STATUS='replace')
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_top_exp'		, STATUS='replace')
@@ -4785,8 +4785,8 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 		OPEN(UNIT=29, FILE=trim(Result_Folder)//'Simul/panele_top_exp'    		, STATUS='replace')
 		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/panel_lambda_top_exp'	, STATUS='replace')
 		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_YL_top_exp'	    , STATUS='replace')
-		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/panel_prc_all_top_exp'	, STATUS='replace')
-		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/panel_prc_cohort_top_exp', STATUS='replace')
+		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/prc_all_top_exp'			, STATUS='replace')
+		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/prc_cohort_top_exp'		, STATUS='replace')
 	endif 
 
 
@@ -4798,8 +4798,8 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	WRITE  (UNIT=29, FMT=*) panele_top
 	WRITE  (UNIT=30, FMT=*) panel_lambda_top
 	WRITE  (UNIT=31, FMT=*) panel_YL_top
-	WRITE  (UNIT=32, FMT=*) panel_prc_all_top
-	WRITE  (UNIT=33, FMT=*) panel_prc_cohort_top
+	WRITE  (UNIT=32, FMT=*) prc_all_top
+	WRITE  (UNIT=33, FMT=*) prc_cohort_top
 
 	close (unit=10); close (unit=11); close (unit=12); close (unit=27)
 	close (unit=28); close (unit=29); close (unit=30); close (unit=31)
