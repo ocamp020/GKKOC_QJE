@@ -218,5 +218,10 @@ if (any(log_2)) then
 	print*, 'Test 2'
 	endif 
 
+print*, ' '
+print*, 'Test Count'
+print*, xx
+print*, count(xx.eq.0), count(xx.eq.1), count(xx.gt.0), count(xx.gt.2)
+
 
 end program test

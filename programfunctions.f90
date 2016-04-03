@@ -4465,8 +4465,8 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	INTEGER , DIMENSION(totpop) :: panelage, panelz, panellambda, panele, panelx 
 	REAL(DP), DIMENSION(totpop) :: panela, panelPV_a, panelK 
 	INTEGER , DIMENSION(150,80) :: panelage_top, panelz_top, panelx_top, panel_lambda_top, panele_top
-	REAL(DP), DIMENSION(150,80) :: panela_top, panelK_top, panel_YL_top
-	INTEGER 				    :: top_ind(80), ii
+	REAL(DP), DIMENSION(150,80) :: panela_top, panelK_top, panel_YL_top, prc_all_top, prc_cohort_top 
+	INTEGER 				    :: top_ind(80), ii, age_top
 
 	!$ call omp_set_num_threads(20)
 
@@ -4479,17 +4479,17 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	! 		&    366537   , 15071340 , 1194864  , 11098872 , 12735017 , 2876272  , 5195770  , 4720772  , 12421325 , 12027769 ,&
 	! 		&    6114885  , 14643750 , 11624454 , 13317533 , 10460044 , 9292769  , 177466   , 9419824  , 17555631 , 16615490/)
 
-	! !!!!! mu=0.90
-	! top_ind = (/1027745 , 13370777 , 2578340  , 12721493 , 15992480 , 18145095 , 16807761 , 19835454 , &
-	! 		&	1008782 , 15573343 , 13542267 , 10183588 , 8499198  , 581691 , 16956902 , 3627601 , &
-	! 		&	228890  , 2303354  , 10011390 , 6598463  , 19291146 , 4607908 , 3569359 , 18948113 , &
-	! 		&	438627  , 16602216 , 17629307 , 7600599  , 5320870  , 14538305 , 4466878 , 19232273 , &
-	! 		&	2432177 , 1171329  , 19643948 , 12103728 , 18969224 , 6982625 , 2617874 , 2082088 , &
-	! 		&	6809880 , 14543207 , 740124   , 16396254 , 16520732 , 1113455 , 10505521 , 20976 , &
-	! 		&	8640468 , 14754253 , 6121212  , 9495368  , 1156346  , 4391606 , 18364374 , 5584757 , &
-	! 		&	994030  , 8291893  , 17072990 , 5949940  , 19500753 , 8362065 , 6324433 , 14349124 , &
-	! 		&	1573534 , 8811865  , 12648185 , 11772022 , 5427661  , 7602538 , 18051648 , 10116613 , &
-	! 		&	8870728 , 15281153 , 1712322  , 8022334  , 18616664 , 6582950 , 50271 , 10466269/)
+	!!!!! mu=0.90
+	top_ind = (/1027745 , 13370777 , 2578340  , 12721493 , 15992480 , 18145095 , 16807761 , 19835454 , &
+			&	1008782 , 15573343 , 13542267 , 10183588 , 8499198  , 581691 , 16956902 , 3627601 , &
+			&	228890  , 2303354  , 10011390 , 6598463  , 19291146 , 4607908 , 3569359 , 18948113 , &
+			&	438627  , 16602216 , 17629307 , 7600599  , 5320870  , 14538305 , 4466878 , 19232273 , &
+			&	2432177 , 1171329  , 19643948 , 12103728 , 18969224 , 6982625 , 2617874 , 2082088 , &
+			&	6809880 , 14543207 , 740124   , 16396254 , 16520732 , 1113455 , 10505521 , 20976 , &
+			&	8640468 , 14754253 , 6121212  , 9495368  , 1156346  , 4391606 , 18364374 , 5584757 , &
+			&	994030  , 8291893  , 17072990 , 5949940  , 19500753 , 8362065 , 6324433 , 14349124 , &
+			&	1573534 , 8811865  , 12648185 , 11772022 , 5427661  , 7602538 , 18051648 , 10116613 , &
+			&	8870728 , 15281153 , 1712322  , 8022334  , 18616664 , 6582950 , 50271 , 10466269/)
 
 	! !!!!! mu=0.80
 	! top_ind = (/10934920 , 19191064 , 18372413 , 14874704 , 12232037 , 856508   , 3890084  , 12453779 &
@@ -4503,17 +4503,17 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	!  		& , 11803640 , 19981873 , 6809880  , 18616664 , 50271    , 7602538  , 10116613 , 16956902 &
 	!  		& , 18579771 , 8870728  , 8022334  , 17072990 , 10466269 , 15281153 , 8640468  , 6582950/)
 
-	! mu=0.80 low X
-	top_ind = (/5303475 , 4303884 , 5477457 , 19232273 , 2700221 , 446556 , 14874704 , 17291508 , &
-			&	8876260 , 16788887 , 14349124 , 13542267 , 10582402 , 8811865 , 11772022 , 11619469 , &
-			&	15183198 , 9685770 , 15573343 , 16807761 , 2250467 , 1333514 , 17403161 , 6598463 , &
-			&	14350540 , 14538305 , 9719874 , 581691 , 9696683 , 740124 , 19835454 , 856508 , &
-			&	10011390 , 18145095 , 13907654 , 6177466 , 18948113 , 16396254 , 5949940 , 18051648 , &
-			&	13133920 , 2924727 , 5584757 , 1156346 , 10874669 , 10505521 , 6324433 , 8362065 , &
-			&	18969224 , 8499198 , 1573534 , 16602216 , 1113455 , 16520732 , 19500753 , 5427661 , &
-			&	18364374 , 1171329 , 12103728 , 6121212 , 11803640 , 19981873 , 12648185 , 994030 , &
-			&	8291893 , 1712322 , 6809880 , 18616664 , 10116613 , 50271 , 7602538 , 18579771 , &
-			&	16956902 , 8870728 , 17072990 , 8022334 , 8640468 , 15281153 , 10466269 , 6582950/) 	
+	! ! mu=0.80 low X
+	! top_ind = (/5303475 , 4303884 , 5477457 , 19232273 , 2700221 , 446556 , 14874704 , 17291508 , &
+	! 		&	8876260 , 16788887 , 14349124 , 13542267 , 10582402 , 8811865 , 11772022 , 11619469 , &
+	! 		&	15183198 , 9685770 , 15573343 , 16807761 , 2250467 , 1333514 , 17403161 , 6598463 , &
+	! 		&	14350540 , 14538305 , 9719874 , 581691 , 9696683 , 740124 , 19835454 , 856508 , &
+	! 		&	10011390 , 18145095 , 13907654 , 6177466 , 18948113 , 16396254 , 5949940 , 18051648 , &
+	! 		&	13133920 , 2924727 , 5584757 , 1156346 , 10874669 , 10505521 , 6324433 , 8362065 , &
+	! 		&	18969224 , 8499198 , 1573534 , 16602216 , 1113455 , 16520732 , 19500753 , 5427661 , &
+	! 		&	18364374 , 1171329 , 12103728 , 6121212 , 11803640 , 19981873 , 12648185 , 994030 , &
+	! 		&	8291893 , 1712322 , 6809880 , 18616664 , 10116613 , 50271 , 7602538 , 18579771 , &
+	! 		&	16956902 , 8870728 , 17072990 , 8022334 , 8640468 , 15281153 , 10466269 , 6582950/) 	
 
 	! ! mu=0.70 low X
 	! top_ind = (/1976071 , 13314394 , 4363214 , 12232037 , 446556 , 6236493 , 5564401 , 4303884 , &
@@ -4702,49 +4702,58 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 
 	    ! Record data of top agents
      	if (simutime.ge.(MaxSimuTime-149)) then 
-     		print*, "Selecting top agents - Period", simutime-MaxSimuTime+150
-     		panelage_top(simutime-MaxSimuTime+150,:) = panelage(top_ind)
-     		panelz_top(simutime-MaxSimuTime+150,:)   = panelz(top_ind)
-     		panela_top(simutime-MaxSimuTime+150,:)   = panela(top_ind)
-     		panelx_top(simutime-MaxSimuTime+150,:)   = panelx(top_ind)
-     		panele_top(simutime-MaxSimuTime+150,:)   = panele(top_ind)
-     		panel_lambda_top(simutime-MaxSimuTime+150,:)   = panellambda(top_ind)
+
+     		age_top = simutime-MaxSimuTime+150
+
+     		print*, "Selecting top agents - Period", age_top
+     		panelage_top(age_top,:) = panelage(top_ind)
+     		panelz_top(age_top,:)   = panelz(top_ind)
+     		panela_top(age_top,:)   = panela(top_ind)
+     		panelx_top(age_top,:)   = panelx(top_ind)
+     		panele_top(age_top,:)   = panele(top_ind)
+     		panel_lambda_top(age_top,:)   = panellambda(top_ind)
      		
      		!$omp parallel do private(tklo,tkhi,h_i)
      		do ii=1,80
-     		panelk_top(simutime-MaxSimuTime+150,ii)  = min( theta*panela_top(simutime-MaxSimuTime+150,ii) ,&
-     			& (mu*P*xz_grid(panelx_top(simutime-MaxSimuTime+150,ii),panelz_top(simutime-MaxSimuTime+150,ii))**mu & 
+
+     		prc_all_top(age_top,ii)    = 100.0_dp*real(count(panela.le.panela_top(age_top,ii)),8)/real(totpop,8)
+     		prc_cohort_top(age_top,ii) = 100,0_dp* &
+     							& real(count((panela.le.panela_top(age_top,ii)).and.(panelage.eq.panelage_top(age_top,ii))),8) &
+     							& /real(count(panelage.eq.panelage_top(age_top,ii)),8)
+
+     		panelk_top(age_top,ii)  = min( theta*panela_top(age_top,ii) ,&
+     			& (mu*P*xz_grid(panelx_top(age_top,ii),panelz_top(age_top,ii))**mu & 
      				& /(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
 
-			if (panelage_top(simutime-MaxSimuTime+150,ii).lt.RetAge) then 
-				if (panela_top(simutime-MaxSimuTime+150,ii) .ge. amax) then
+			if (panelage_top(age_top,ii).lt.RetAge) then 
+				if (panela_top(age_top,ii) .ge. amax) then
 		            tklo = na-1
-		        else if (panela_top(simutime-MaxSimuTime+150,ii) .lt. amin) then
+		        else if (panela_top(age_top,ii) .lt. amin) then
 		            tklo = 1
 		        else
-		            tklo = ((panela_top(simutime-MaxSimuTime+150,ii) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+		            tklo = ((panela_top(age_top,ii) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
 		        endif 
 		        
 		        tkhi = tklo + 1        
 
-		        h_i  = ((agrid(tkhi) - panela_top(simutime-MaxSimuTime+150,ii))*&
-		        	& hours(panelage_top(simutime-MaxSimuTime+150,ii),tklo,&
-		        	&	    panelz_top(simutime-MaxSimuTime+150,ii),panel_lambda_top(simutime-MaxSimuTime+150,ii),&
-		        	&	    panele_top(simutime-MaxSimuTime+150,ii),panelx_top(simutime-MaxSimuTime+150,ii)) &
-		            &  + (panela_top(simutime-MaxSimuTime+150,ii) - agrid(tklo))*&
-		            & hours(panelage_top(simutime-MaxSimuTime+150,ii),tkhi,&
-		        	&	    panelz_top(simutime-MaxSimuTime+150,ii),panel_lambda_top(simutime-MaxSimuTime+150,ii),&
-		        	&	    panele_top(simutime-MaxSimuTime+150,ii),panelx_top(simutime-MaxSimuTime+150,ii))  ) &
+		        h_i  = ((agrid(tkhi) - panela_top(age_top,ii))*&
+		        	& hours(panelage_top(age_top,ii),tklo,&
+		        	&	    panelz_top(age_top,ii),panel_lambda_top(age_top,ii),&
+		        	&	    panele_top(age_top,ii),panelx_top(age_top,ii)) &
+		            &  + (panela_top(age_top,ii) - agrid(tklo))*&
+		            & hours(panelage_top(age_top,ii),tkhi,&
+		        	&	    panelz_top(age_top,ii),panel_lambda_top(age_top,ii),&
+		        	&	    panele_top(age_top,ii),panelx_top(age_top,ii))  ) &
 		                                &  / ( agrid(tkhi) - agrid(tklo) )  
 
-				panel_YL_top(simutime-MaxSimuTime+150,ii) = psi*( Wage*&
-					& eff_un(panelage_top(simutime-MaxSimuTime+150,ii),panel_lambda_top(simutime-MaxSimuTime+150,ii),&
-		        	&	    panele_top(simutime-MaxSimuTime+150,ii))&
+				panel_YL_top(age_top,ii) = psi*( Wage*&
+					& eff_un(panelage_top(age_top,ii),panel_lambda_top(age_top,ii),&
+		        	&	    panele_top(age_top,ii))&
 					& *h_i)**(1.0_dp-tauPL)
 			else 
-				panel_YL_top(simutime-MaxSimuTime+150,ii) = RetY_lambda_e(panel_lambda_top(simutime-MaxSimuTime+150,ii),&
-		        	&	    panele_top(simutime-MaxSimuTime+150,ii))
+				panel_YL_top(age_top,ii) = RetY_lambda_e(panel_lambda_top(age_top,ii),&
+		        	&	    panele_top(age_top,ii))
 			endif 
 
      		enddo
@@ -4765,6 +4774,8 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 		OPEN(UNIT=29, FILE=trim(Result_Folder)//'Simul/panele_top_bench'    	, STATUS='replace')
 		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/panel_lambda_top_bench'	, STATUS='replace')
 		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_YL_top_bench'	    , STATUS='replace')
+		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/panel_prc_all_top_bench'	, STATUS='replace')
+		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/panel_prc_cohort_top_bench', STATUS='replace')
 	else 
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_top_exp'			, STATUS='replace')
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_top_exp'		, STATUS='replace')
@@ -4774,6 +4785,8 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 		OPEN(UNIT=29, FILE=trim(Result_Folder)//'Simul/panele_top_exp'    		, STATUS='replace')
 		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/panel_lambda_top_exp'	, STATUS='replace')
 		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_YL_top_exp'	    , STATUS='replace')
+		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/panel_prc_all_top_exp'	, STATUS='replace')
+		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/panel_prc_cohort_top_exp', STATUS='replace')
 	endif 
 
 
@@ -4785,9 +4798,12 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	WRITE  (UNIT=29, FMT=*) panele_top
 	WRITE  (UNIT=30, FMT=*) panel_lambda_top
 	WRITE  (UNIT=31, FMT=*) panel_YL_top
+	WRITE  (UNIT=32, FMT=*) panel_prc_all_top
+	WRITE  (UNIT=33, FMT=*) panel_prc_cohort_top
 
 	close (unit=10); close (unit=11); close (unit=12); close (unit=27)
 	close (unit=28); close (unit=29); close (unit=30); close (unit=31)
+	close (unit=32); close (unit=33)
 
 
 END SUBROUTINE SIMULATION_TOP
