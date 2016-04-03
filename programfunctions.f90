@@ -4742,8 +4742,8 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
      		panel_PV_top(paneli) = (   (agrid(tkhi) - panela_top(age_top,ii)) * V_Pr(panelage_top(age_top,ii),tklo,&
 				        	&	 panelz_top(age_top,ii),panel_lambda_top(age_top,ii),panele_top(age_top,ii),panelx_top(age_top,ii)) &
 			                &  +    (panela_top(age_top,ii) - agrid(tklo)) * V_Pr(panelage_top(age_top,ii),tkhi,&
-		        			&	 panelz_top(age_top,ii),panel_lambda_top(age_top,ii),panele_top(age_top,ii),panelx_top(age_top,ii)) &
-			                &  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*panela_top(age_top,ii)
+		        			&	 panelz_top(age_top,ii),panel_lambda_top(age_top,ii),panele_top(age_top,ii),panelx_top(age_top,ii)) )&
+			                &  / ( agrid(tkhi) - agrid(tklo) )   + (1.0_dp+R)*panela_top(age_top,ii)
 
 
 
