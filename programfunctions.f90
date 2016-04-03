@@ -4373,9 +4373,9 @@ SUBROUTINE  SIMULATION(bench_indx)
 	    endif    
 	    tkhi = tklo + 1        
 
-	    panelPV_a(paneli) = (   (agrid(tkhi) - currenta) * Firm_Wealth(age,tklo,currentzi,currentlambdai, currentei, currentxi)  &
-	                       &  + (currenta - agrid(tklo)) * Firm_Wealth(age,tkhi,currentzi,currentlambdai, currentei, currentxi)) &
-	                       &  / ( agrid(tkhi) - agrid(tklo) ) 
+	    panelPV_a(paneli) = (   (agrid(tkhi) - currenta) * V_Pr(age,tklo,currentzi,currentlambdai, currentei, currentxi)  &
+	                       &  + (currenta - agrid(tklo)) * V_Pr(age,tkhi,currentzi,currentlambdai, currentei, currentxi)) &
+	                       &  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*currenta 
 
 	    panelK(paneli)    = min( theta*currenta , (mu*P*xz_grid(currentxi,currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
@@ -4411,7 +4411,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		OPEN(UNIT=22, FILE=trim(Result_Folder)//'Simul/panelage_parents' 	, STATUS='replace')
 		OPEN(UNIT=23, FILE=trim(Result_Folder)//'Simul/panelage_sons'    	, STATUS='replace')
 
-		OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_Y_L_bench'    	, STATUS='replace')
+		OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_bench'    	, STATUS='replace')
 
 	else 
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
@@ -4422,7 +4422,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_exo'       , STATUS='replace')
 		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_exp' 	        , STATUS='replace')
 		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_exp'	        , STATUS='replace')
-		OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_Y_L_exp'    	, STATUS='replace')
+		OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_exp'    	, STATUS='replace')
 	endif 
 
 
@@ -4470,7 +4470,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	INTEGER , DIMENSION(totpop) :: panelage, panelz, panellambda, panele, panelx 
 	REAL(DP), DIMENSION(totpop) :: panela, panelPV_a, panelK 
 	INTEGER , DIMENSION(150,80) :: panelage_top, panelz_top, panelx_top, panel_lambda_top, panele_top
-	REAL(DP), DIMENSION(150,80) :: panela_top, panelK_top, panel_YL_top, prc_all_top, prc_cohort_top 
+	REAL(DP), DIMENSION(150,80) :: panela_top, panelK_top, panel_YL_top, prc_all_top, prc_cohort_top , panel_PV_top
 	INTEGER 				    :: top_ind(80), ii, age_top
 
 	!$ call omp_set_num_threads(20)
@@ -4720,6 +4720,15 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
      		
      		!$omp parallel do private(tklo,tkhi,h_i)
      		do ii=1,80
+     			if (panela_top(age_top,ii) .ge. amax) then
+		            tklo = na-1
+		        else if (panela_top(age_top,ii) .lt. amin) then
+		            tklo = 1
+		        else
+		            tklo = ((panela_top(age_top,ii) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+		        endif 
+		        
+		        tkhi = tklo + 1        
 
      		prc_all_top(age_top,ii)    = 100.0_dp*real(count(panela.le.panela_top(age_top,ii)),8)/real(totpop,8)
      		prc_cohort_top(age_top,ii) = 100.0_dp* &
@@ -4730,18 +4739,15 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
      			& (mu*P*xz_grid(panelx_top(age_top,ii),panelz_top(age_top,ii))**mu & 
      				& /(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
+     		panel_PV_top(paneli) = (   (agrid(tkhi) - panela_top(age_top,ii)) * V_Pr(panelage_top(age_top,ii),tklo,&
+				        	&	 panelz_top(age_top,ii),panel_lambda_top(age_top,ii),panele_top(age_top,ii),panelx_top(age_top,ii)) &
+			                &  +    (panela_top(age_top,ii) - agrid(tklo)) * V_Pr(panelage_top(age_top,ii),tkhi,&
+		        			&	 panelz_top(age_top,ii),panel_lambda_top(age_top,ii),panele_top(age_top,ii),panelx_top(age_top,ii)) &
+			                &  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*panela_top(age_top,ii)
+
+
 
 			if (panelage_top(age_top,ii).lt.RetAge) then 
-				if (panela_top(age_top,ii) .ge. amax) then
-		            tklo = na-1
-		        else if (panela_top(age_top,ii) .lt. amin) then
-		            tklo = 1
-		        else
-		            tklo = ((panela_top(age_top,ii) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-		        endif 
-		        
-		        tkhi = tklo + 1        
-
 		        h_i  = ((agrid(tkhi) - panela_top(age_top,ii))*&
 		        	& hours(panelage_top(age_top,ii),tklo,&
 		        	&	    panelz_top(age_top,ii),panel_lambda_top(age_top,ii),&
@@ -4781,6 +4787,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_YL_top_bench'	    , STATUS='replace')
 		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/prc_all_top_bench'		, STATUS='replace')
 		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/prc_cohort_top_bench'	, STATUS='replace')
+		OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/panel_PV_top_bench'    	, STATUS='replace')
 	else 
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_top_exp'			, STATUS='replace')
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_top_exp'		, STATUS='replace')
@@ -4792,6 +4799,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_YL_top_exp'	    , STATUS='replace')
 		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/prc_all_top_exp'			, STATUS='replace')
 		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/prc_cohort_top_exp'		, STATUS='replace')
+		OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/panel_PV_top_exp'    	, STATUS='replace')
 	endif 
 
 
@@ -4805,10 +4813,11 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	WRITE  (UNIT=31, FMT=*) panel_YL_top
 	WRITE  (UNIT=32, FMT=*) prc_all_top
 	WRITE  (UNIT=33, FMT=*) prc_cohort_top
+	WRITE  (UNIT=34, FMT=*) panel_PV_top
 
 	close (unit=10); close (unit=11); close (unit=12); close (unit=27)
 	close (unit=28); close (unit=29); close (unit=30); close (unit=31)
-	close (unit=32); close (unit=33)
+	close (unit=32); close (unit=33); close (unit=34)
 
 
 END SUBROUTINE SIMULATION_TOP

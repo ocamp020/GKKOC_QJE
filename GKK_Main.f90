@@ -56,7 +56,7 @@ PROGRAM main
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-		Simul_Switch  = .false.
+		Simul_Switch  = .true.
 
 
 	! Switch for separable and non-separable utility
@@ -280,7 +280,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
 		endif
-		CALL SIMULATION_TOP(solving_bench)
+		!! CALL SIMULATION_TOP(solving_bench)
 
 	! Aggregate variables in benchmark economy
 		GBAR_bench  = GBAR
