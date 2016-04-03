@@ -4099,11 +4099,11 @@ SUBROUTINE  SIMULATION(bench_indx)
 	integer, intent(in) :: bench_indx
 	integer  :: currentzi, currentlambdai, currentei, currentxi
 	REAL(DP) :: tempnoage, tempnoz, tempnolambda, tempnoe, tempnox, tempno, currenta, currentY
-	REAL(DP) :: start_timet, finish_timet
+	REAL(DP) :: start_timet, finish_timet, h_i
 	INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
 	INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
 	INTEGER , DIMENSION(totpop) :: panelage, panelz, panellambda, panele, panelx
-	REAL(DP), DIMENSION(totpop) :: panela, panelPV_a, panelK  
+	REAL(DP), DIMENSION(totpop) :: panela, panelPV_a, panelK, panel_Y_L  
 	! Intergenerational statistics
 	INTEGER , DIMENSION(totpop) 			  :: eligible, death_count
 	REAL(DP), DIMENSION(totpop) 			  :: panela_parents, panela_sons
@@ -4355,7 +4355,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		print*, ' '
 
 
-	!$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi)
+	!$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi,h_i)
 	DO paneli=1,totpop
 	    currenta 		= panela(paneli)
 	    age 			= panelage(paneli)
@@ -4378,6 +4378,16 @@ SUBROUTINE  SIMULATION(bench_indx)
 	                       &  / ( agrid(tkhi) - agrid(tklo) ) 
 
 	    panelK(paneli)    = min( theta*currenta , (mu*P*xz_grid(currentxi,currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+
+		if (age.lt.RetAge) then 
+	        h_i  = ((agrid(tkhi) - currenta)*hours(age,tklo,currentzi,currentlambdai,currentei,currentxi) &
+	           &  + (currenta - agrid(tklo))*hours(age,tkhi,currentzi,currentlambdai,currentei,currentxi) ) &
+	                                &  / ( agrid(tkhi) - agrid(tklo) )  
+
+			panel_Y_L(paneli) = psi*( Wage*eff_un(age,currentlambdai,currentei)*h_i)**(1.0_dp-tauPL)
+		else 
+			panel_Y_L(paneli) = RetY_lambda_e(currentlambdai,currentei)
+		endif 
 	           
 	ENDDO ! paneli
 
@@ -4396,10 +4406,12 @@ SUBROUTINE  SIMULATION(bench_indx)
 		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_bench'        , STATUS='replace')
 		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
 
-		OPEN   (UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_parents'   , STATUS='replace')
-		OPEN   (UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_sons'      , STATUS='replace')
-		OPEN   (UNIT=22, FILE=trim(Result_Folder)//'Simul/panelage_parents' , STATUS='replace')
-		OPEN   (UNIT=23, FILE=trim(Result_Folder)//'Simul/panelage_sons'    , STATUS='replace')
+		OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_parents'   	, STATUS='replace')
+		OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_sons'      	, STATUS='replace')
+		OPEN(UNIT=22, FILE=trim(Result_Folder)//'Simul/panelage_parents' 	, STATUS='replace')
+		OPEN(UNIT=23, FILE=trim(Result_Folder)//'Simul/panelage_sons'    	, STATUS='replace')
+
+		OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_Y_L_bench'    	, STATUS='replace')
 
 	else 
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
@@ -4410,6 +4422,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_exo'       , STATUS='replace')
 		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_exp' 	        , STATUS='replace')
 		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_exp'	        , STATUS='replace')
+		OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_Y_L_exp'    	, STATUS='replace')
 	endif 
 
 
@@ -4421,15 +4434,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 	WRITE  (UNIT=26, FMT=*) panelPV_a
 	WRITE  (UNIT=27, FMT=*) panelK
 	WRITE  (UNIT=28, FMT=*) panelx
+	WRITE  (UNIT=24, FMT=*) panel_Y_L
 
-	close (unit=10)
-	close (unit=11)
-	close (unit=12)
-	close (unit=13)
-	close (unit=14)
-	close (unit=26)
-	close (unit=27)
-	close (unit=28)
+	close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14)
+	close (unit=26); close (unit=27); close (unit=28); close (unit=24)
 
 	if (bench_indx==1) then
 		WRITE (UNIT=20, FMT=*) eligible_panela_parents
@@ -4437,10 +4445,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		WRITE (UNIT=22, FMT=*) eligible_panelage_parents
 		WRITE (UNIT=23, FMT=*) eligible_panelage_sons
 		
-		close (unit=20)
-		close (unit=21)
-		close (unit=22)
-		close (unit=23)
+		close (unit=20); close (unit=21); close (unit=22); close (unit=23)
 	endif
 
 
