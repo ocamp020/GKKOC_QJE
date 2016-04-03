@@ -4717,7 +4717,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
      		do ii=1,80
 
      		prc_all_top(age_top,ii)    = 100.0_dp*real(count(panela.le.panela_top(age_top,ii)),8)/real(totpop,8)
-     		prc_cohort_top(age_top,ii) = 100,0_dp* &
+     		prc_cohort_top(age_top,ii) = 100.0_dp* &
      							& real(count((panela.le.panela_top(age_top,ii)).and.(panelage.eq.panelage_top(age_top,ii))),8) &
      							& /real(count(panelage.eq.panelage_top(age_top,ii)),8)
 
