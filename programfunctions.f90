@@ -4495,6 +4495,8 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	! 		&	994030  , 8291893  , 17072990 , 5949940  , 19500753 , 8362065 , 6324433 , 14349124 , &
 	! 		&	1573534 , 8811865  , 12648185 , 11772022 , 5427661  , 7602538 , 18051648 , 10116613 , &
 	! 		&	8870728 , 15281153 , 1712322  , 8022334  , 18616664 , 6582950 , 50271 , 10466269/)
+	! mu=0.90 - PV top agents
+	! top_ind = (/ /)
 
 	! !!!!! mu=0.80
 	! top_ind = (/10934920 , 19191064 , 18372413 , 14874704 , 12232037 , 856508   , 3890084  , 12453779 &
@@ -4507,18 +4509,29 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	!  		& , 18364374 , 16520732 , 12648185 , 6121212  , 8291893  , 1712322  , 1171329  , 994030 &
 	!  		& , 11803640 , 19981873 , 6809880  , 18616664 , 50271    , 7602538  , 10116613 , 16956902 &
 	!  		& , 18579771 , 8870728  , 8022334  , 17072990 , 10466269 , 15281153 , 8640468  , 6582950/)
+	! mu=0.80 Top PV agents 
+	top_ind = (/12453779 , 1976071 , 10951084 , 16483537 , 2651087 , 16788887 , 15222029 , 6382250 , &
+				18115795 , 7391008 , 1279796 , 3890084 , 14786266 , 9929174 , 12964012 , 1810377 , &
+				12648185 , 6809880 , 13314394 , 15453836 , 7458265 , 5238510 , 19436994 , 17365614 , &
+				13157855 , 9685770 , 8576051 , 13711980 , 9635020 , 5303475 , 18220394 , 10776278 , &
+				10401571 , 731157 , 3355659 , 16716922 , 14350540 , 6518379 , 2490022 , 1114521 , &
+				19256884 , 18695486 , 16956902 , 18948113 , 11922119 , 82269 , 10582402 , 16602216 , &
+				6890905 , 16520732 , 10116613 , 6598463 , 8870728 , 17072990 , 2015564 , 994030 , &
+				8022334 , 10505521 , 10466269 , 19835454 , 6177466 , 15281153 , 9234150 , 18616664 , &
+				12789728 , 7602538 , 1922566 , 7097487 , 50271 , 7831184 , 12071579 , 10695927 , &
+				6582950 , 17957134 , 9696683 , 13796187 , 11803640 , 18579771 , 2250467 , 8640468/)
 
-	! mu=0.80 low X
-	top_ind = (/5303475 , 4303884 , 5477457 , 19232273 , 2700221 , 446556 , 14874704 , 17291508 , &
-			&	8876260 , 16788887 , 14349124 , 13542267 , 10582402 , 8811865 , 11772022 , 11619469 , &
-			&	15183198 , 9685770 , 15573343 , 16807761 , 2250467 , 1333514 , 17403161 , 6598463 , &
-			&	14350540 , 14538305 , 9719874 , 581691 , 9696683 , 740124 , 19835454 , 856508 , &
-			&	10011390 , 18145095 , 13907654 , 6177466 , 18948113 , 16396254 , 5949940 , 18051648 , &
-			&	13133920 , 2924727 , 5584757 , 1156346 , 10874669 , 10505521 , 6324433 , 8362065 , &
-			&	18969224 , 8499198 , 1573534 , 16602216 , 1113455 , 16520732 , 19500753 , 5427661 , &
-			&	18364374 , 1171329 , 12103728 , 6121212 , 11803640 , 19981873 , 12648185 , 994030 , &
-			&	8291893 , 1712322 , 6809880 , 18616664 , 10116613 , 50271 , 7602538 , 18579771 , &
-			&	16956902 , 8870728 , 17072990 , 8022334 , 8640468 , 15281153 , 10466269 , 6582950/) 	
+	! ! mu=0.80 low X
+	! top_ind = (/5303475 , 4303884 , 5477457 , 19232273 , 2700221 , 446556 , 14874704 , 17291508 , &
+	! 		&	8876260 , 16788887 , 14349124 , 13542267 , 10582402 , 8811865 , 11772022 , 11619469 , &
+	! 		&	15183198 , 9685770 , 15573343 , 16807761 , 2250467 , 1333514 , 17403161 , 6598463 , &
+	! 		&	14350540 , 14538305 , 9719874 , 581691 , 9696683 , 740124 , 19835454 , 856508 , &
+	! 		&	10011390 , 18145095 , 13907654 , 6177466 , 18948113 , 16396254 , 5949940 , 18051648 , &
+	! 		&	13133920 , 2924727 , 5584757 , 1156346 , 10874669 , 10505521 , 6324433 , 8362065 , &
+	! 		&	18969224 , 8499198 , 1573534 , 16602216 , 1113455 , 16520732 , 19500753 , 5427661 , &
+	! 		&	18364374 , 1171329 , 12103728 , 6121212 , 11803640 , 19981873 , 12648185 , 994030 , &
+	! 		&	8291893 , 1712322 , 6809880 , 18616664 , 10116613 , 50271 , 7602538 , 18579771 , &
+	! 		&	16956902 , 8870728 , 17072990 , 8022334 , 8640468 , 15281153 , 10466269 , 6582950/) 	
 
 	! ! mu=0.70 low X
 	! top_ind = (/1976071 , 13314394 , 4363214 , 12232037 , 446556 , 6236493 , 5564401 , 4303884 , &
@@ -4774,32 +4787,32 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 
 	print*, ' '
 	print*, 'Writing simulation results for top agents'
-	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
+	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/PV/' )
 
 	if (bench_indx.eq.1) then
-		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_top_bench'		, STATUS='replace')
-		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_top_bench'		, STATUS='replace')
-		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_top_bench'		, STATUS='replace')
-		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_top_bench'    	, STATUS='replace')
-		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_top_bench'    	, STATUS='replace')
-		OPEN(UNIT=29, FILE=trim(Result_Folder)//'Simul/panele_top_bench'    	, STATUS='replace')
-		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/panel_lambda_top_bench'	, STATUS='replace')
-		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_YL_top_bench'	    , STATUS='replace')
-		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/prc_all_top_bench'		, STATUS='replace')
-		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/prc_cohort_top_bench'	, STATUS='replace')
-		OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/panel_PV_top_bench'    	, STATUS='replace')
+		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/PV/panela_top_bench'		, STATUS='replace')
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/PV/panelage_top_bench'		, STATUS='replace')
+		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/PV/panelz_top_bench'		, STATUS='replace')
+		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/PV/panelK_top_bench'    	, STATUS='replace')
+		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/PV/panelx_top_bench'    	, STATUS='replace')
+		OPEN(UNIT=29, FILE=trim(Result_Folder)//'Simul/PV/panele_top_bench'    	, STATUS='replace')
+		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/PV/panel_lambda_top_bench'	, STATUS='replace')
+		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/PV/panel_YL_top_bench'	    , STATUS='replace')
+		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/PV/prc_all_top_bench'		, STATUS='replace')
+		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/PV/prc_cohort_top_bench'	, STATUS='replace')
+		OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/PV/panel_PV_top_bench'    	, STATUS='replace')
 	else 
-		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_top_exp'			, STATUS='replace')
-		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_top_exp'		, STATUS='replace')
-		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_top_exp'			, STATUS='replace')
-		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_top_exp' 	    	, STATUS='replace')
-		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_top_exp'  	    , STATUS='replace')
-		OPEN(UNIT=29, FILE=trim(Result_Folder)//'Simul/panele_top_exp'    		, STATUS='replace')
-		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/panel_lambda_top_exp'	, STATUS='replace')
-		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_YL_top_exp'	    , STATUS='replace')
-		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/prc_all_top_exp'			, STATUS='replace')
-		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/prc_cohort_top_exp'		, STATUS='replace')
-		OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/panel_PV_top_exp'    	, STATUS='replace')
+		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/PV/panela_top_exp'			, STATUS='replace')
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/PV/panelage_top_exp'		, STATUS='replace')
+		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/PV/panelz_top_exp'			, STATUS='replace')
+		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/PV/panelK_top_exp' 	    	, STATUS='replace')
+		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/PV/panelx_top_exp'  	    , STATUS='replace')
+		OPEN(UNIT=29, FILE=trim(Result_Folder)//'Simul/PV/panele_top_exp'    		, STATUS='replace')
+		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/PV/panel_lambda_top_exp'	, STATUS='replace')
+		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/PV/panel_YL_top_exp'	    , STATUS='replace')
+		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/PV/prc_all_top_exp'			, STATUS='replace')
+		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/PV/prc_cohort_top_exp'		, STATUS='replace')
+		OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/PV/panel_PV_top_exp'    	, STATUS='replace')
 	endif 
 
 
