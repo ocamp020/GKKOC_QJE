@@ -142,7 +142,7 @@ PROGRAM main
 
 	! Resutls Folder
 		write(Result_Folder,'(f4.2)') Threshold_Factor
-		write(string_theta,'(f4.2)')  theta
+		write(string_theta,'(f4.2)')  theta_folder
 
 		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './NSU_ZS_LT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
