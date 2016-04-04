@@ -100,10 +100,10 @@ PROGRAM main
 		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
 		! 0.965 0.343   2.50    3.022731	0.814399 		0.396095  	8.234316  	35.623980 	63.19873  	0.1     0.0  	0.462
 
-		beta   	= params(1) !
+		beta   	= 0.95_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
-		rho_z  	= params(3) 
-		sigma_z_eps      =  0.4_dp ! params(4) ! 0.01_dp ! ! 
+		rho_z  	= 0.1_dp ! params(3) 
+		sigma_z_eps      =  0.07_dp ! params(4) ! 0.01_dp ! ! 
 		sigma_lambda_eps = params(5)
 		gamma  	=  params(6) ! 0.455_dp !  0.465_dp ! 
 		
@@ -112,7 +112,7 @@ PROGRAM main
 
 		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
-		a_x 	= 0.05_dp
+		a_x 	= 0.10_dp
 		b_x 	= 0.00_dp
 
 		if (Log_Switch.eqv..true.) then
@@ -153,7 +153,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Ret_Shock_mu90/' 
+		Result_Folder = trim(Result_Folder)//'Exp_Shock_top_mu90/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
