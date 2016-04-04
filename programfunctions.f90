@@ -36,7 +36,7 @@ Subroutine Asset_Grid_Threshold(Y_a_threshold_in,agrid_t,na_t)
 	!real(dp), dimension(2)  :: par
 	real(dp)                   :: max_wealth, K
 
-	allocate( par(2) )
+	allocate( par(3) )
 	a_ind = 0
 	! If the threshold for wealth taxes is positive then agrid is adjusted
 	if (Y_a_threshold_in.gt.0.0_dp) then 
@@ -44,11 +44,12 @@ Subroutine Asset_Grid_Threshold(Y_a_threshold_in,agrid_t,na_t)
  		do zi=1,nz 
  		do xi=1,nx
 			! New points are added to agrid if there is an "a" st Y(a,z))=Y_threshold
-			K = min( theta*agrid(na) , (mu*P*xz_grid(xi,zi)/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+			K = min( theta(zi)*agrid(na) , (mu*P*xz_grid(xi,zi)/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 			max_wealth = (1.0_dp+R)*agrid(na) + P*(xz_grid(xi,zi)*K)**mu - (R+DepRate)*K 
 			if (Y_a_threshold_in.lt.max_wealth) then
 				a_ind		 = a_ind + 1 
 				par(2)       = xz_grid(xi,zi)
+				par(3)		 = theta(zi)
 				a_aux(a_ind) = zbrent_p(Y_a_res,0.0_dp,agrid(na),brent_tol,par) 
 				!a_aux(a_ind) = zbrent(Y_a_res,0.0_dp,agrid(na),brent_tol)
 			else 
@@ -89,12 +90,13 @@ end Subroutine Asset_Grid_Threshold
 		real(dp), intent(in)  :: a_in
 		real(dp), dimension(:), allocatable, intent(in) :: par
 		real(dp) :: Y_a_res
-		real(dp) :: Y_a_th, xz_in, K
+		real(dp) :: Y_a_th, xz_in, K, theta_in
 
-		Y_a_th = par(1)
-		xz_in  = par(2)
+		Y_a_th   = par(1)
+		xz_in    = par(2)
+		theta_in = par(3)
 
-		K = min( theta*a_in , (mu*P*xz_in/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K = min( theta_in*a_in , (mu*P*xz_in/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
 		Y_a_res = (1.0_dp+R)*a_in + P*(xz_in*K)**mu - (R+DepRate)*K  - Y_a_th
 
@@ -148,15 +150,16 @@ end Subroutine Asset_Grid_Threshold
 !
 ! Output: Y_a , real(dp), After tax wealth
 !
-	FUNCTION Y_a(a_in,xz_in)
+	FUNCTION Y_a(a_in,z_in,x_in)
 		IMPLICIT NONE   
-		real(DP), intent(in)  :: a_in, xz_in
+		real(DP), intent(in)  :: a_in
+		integer , intent(in)  :: z_in, x_in
 		real(DP)              :: Y_a, K, Pr
 
 		! Capital demand 
-		K   = min( theta*a_in , (mu*P*xz_in**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Profits 
-		Pr  = P*(xz_in*K)**mu - (R+DepRate)*K
+		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
 		Y_a = ( a_in +  ( Pr + R*a_in ) *(1.0_DP-tauK) )
 
@@ -180,16 +183,17 @@ end Subroutine Asset_Grid_Threshold
 !
 ! Output: MB_a , real(dp), marginal benefit from assets
 !
-	FUNCTION MB_a(a_in,xz_in)
+	FUNCTION MB_a(a_in,z_in,x_in)
 		IMPLICIT NONE   
-		real(DP), intent(in)  :: a_in, xz_in
+		real(DP), intent(in)  :: a_in
+		integer , intent(in)  :: x_in, z_in
 		real(DP) 			  :: MB_a
 		real(DP) :: K, Pr, Y_a, tauW
 
 		! Capital demand 
-		K   = min( theta*a_in , (mu*P*xz_in**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Profits 
-		Pr  = P*(xz_in*K)**mu - (R+DepRate)*K
+		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
 		Y_a = ( a_in +  ( Pr + R*a_in ) *(1.0_DP-tauK) )
 		if (Y_a.le.Y_a_threshold) then 
@@ -199,45 +203,47 @@ end Subroutine Asset_Grid_Threshold
 		end if
 
 		! After tax marginal benefit of assets
-		if (K.lt.theta*a_in) then 
+		if (K.lt.theta(z_in)*a_in) then 
 			MB_a = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW) 
 		else 
 			MB_a = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW) &
-         		& + (P*mu*((theta*xz_in)**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta)*(1.0_dp-tauK)*(1.0_dp-tauW)
+         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)*(1.0_dp-tauW)
 		endif 
 
 	END  FUNCTION MB_a
 
-	FUNCTION MB_a_at(a_in,xz_in)
+	FUNCTION MB_a_at(a_in,z_in,x_in)
 		IMPLICIT NONE   
-		real(DP), intent(in)  :: a_in, xz_in
+		real(DP), intent(in)  :: a_in
+		integer , intent(in)  :: x_in, z_in
 		real(DP)			  :: MB_a_at, K
 
 		! Capital demand 
-		K   = min( theta*a_in , (mu*P*xz_in**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
-		if (K.lt.theta*a_in) then 
+		if (K.lt.theta(z_in)*a_in) then 
 			MB_a_at = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at) 
 		else 
 			MB_a_at = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_at) &
-         		& + (P*mu*((theta*xz_in)**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta)*(1.0_dp-tauK)*(1.0_dp-tauW_at)
+         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)*(1.0_dp-tauW_at)
 		endif 
 
 	END  FUNCTION MB_a_at
 
-	FUNCTION MB_a_bt(a_in,xz_in)
+	FUNCTION MB_a_bt(a_in,z_in,x_in)
 		IMPLICIT NONE   
-		real(DP), intent(in) :: a_in, xz_in
+		real(DP), intent(in)  :: a_in
+		integer , intent(in)  :: x_in, z_in
 		real(DP)             :: MB_a_bt, K
 
 		! Capital demand 
-		K   = min( theta*a_in , (mu*P*xz_in**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
-		if (K.lt.theta*a_in) then 
+		if (K.lt.theta(z_in)*a_in) then 
 			MB_a_bt = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt) 
 		else 
 			MB_a_bt = (1.0_dp+R*(1.0_dp-tauK))*(1.0_dp-tauW_bt) &
-         		& + (P*mu*((theta*xz_in)**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta)*(1.0_dp-tauK)*(1.0_dp-tauW_bt)
+         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)*(1.0_dp-tauW_bt)
 		endif 
 
 	END  FUNCTION MB_a_bt
@@ -287,10 +293,10 @@ end Subroutine Asset_Grid_Threshold
 
 		do xp_ind=1,nx
 		! Compute marginal benefit of next period at a' (given zi)
-		MB_aprime(xp_ind) = MB_a(aprimet,xz_grid(xp_ind,z_in))
+		MB_aprime(xp_ind) = MB_a(aprimet,z_in,xp_ind)
 		 
 		! Compute asset income of next period at a' (given zi)
-		yprime(xp_ind)   = Y_a(aprimet,xz_grid(xp_ind,z_in))
+		yprime(xp_ind)   = Y_a(aprimet,z_in,xp_ind)
 		 
 		! Compute consumption of next period given a' (given zi, lambdai and ei)
 			! The value of c' comes from interpolating next period's consumption policy function
@@ -352,9 +358,9 @@ end Subroutine Asset_Grid_Threshold
 
 		do xp_ind=1,nx 
 		! Compute marginal benefit of next period at a' (given zi)
-		MB_aprime(xp_ind) = MB_a(aprimet,xz_grid(x_in,z_in))
+		MB_aprime(xp_ind) = MB_a(aprimet,z_in,x_in)
 		! Compute asset income of next period at a' (given zi)
-		yprime(xp_ind)    = Y_a(aprimet,xz_grid(x_in,z_in))
+		yprime(xp_ind)    = Y_a(aprimet,z_in,x_in)
 		enddo 
 
 		! Set auxiliary variable for FOC_HA
@@ -956,7 +962,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	                         & DBN_bench(age,ai,zi,lambdai,ei,xi) * (R*agrid(ai) + Pr_mat(ai,zi,xi) )
 
 	        tot_at_return_by_agegroup_by_z_bench(age_group_counter,zi) = tot_at_return_by_agegroup_by_z_bench(age_group_counter,zi)+&
-	                         & DBN_bench(age,ai,zi,lambdai,ei,xi) * (Y_a(agrid(ai),xz_grid(xi,zi))-1.0_dp)
+	                         & DBN_bench(age,ai,zi,lambdai,ei,xi) * (Y_a(agrid(ai),zi,xi)-1.0_dp)
 	       
 	        tot_lab_tax_by_agegroup_by_z_bench(age_group_counter,zi) =tot_lab_tax_by_agegroup_by_z_bench(age_group_counter,zi) + &
 	                & DBN_bench(age,ai,zi,lambdai,ei,xi) * ( wage_bench*eff_un(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi) - &
@@ -1283,7 +1289,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	                         & DBN1(age,ai,zi,lambdai,ei,xi) * (R*agrid(ai) + Pr_mat(ai,zi,xi) )
 
 	        tot_at_return_by_agegroup_by_z_exp(age_group_counter,zi) = tot_at_return_by_agegroup_by_z_exp(age_group_counter,zi)+&
-	                         & DBN1(age,ai,zi,lambdai,ei,xi) * (Y_a(agrid(ai),xz_grid(xi,zi))-1.0_dp)
+	                         & DBN1(age,ai,zi,lambdai,ei,xi) * (Y_a(agrid(ai),zi,xi)-1.0_dp)
 	       
 	        tot_lab_tax_by_agegroup_by_z_exp(age_group_counter,zi) = tot_lab_tax_by_agegroup_by_z_exp(age_group_counter,zi) + &
 	                         & DBN1(age,ai,zi,lambdai,ei,xi) * ( wage_exp * eff_un(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi) - &
@@ -1886,7 +1892,7 @@ SUBROUTINE FIND_DBN_EQ()
 
 	    	! Solve for new R 
 	    	!R = zbrent(Agg_Debt,0.0_dp,0.50_dp,brent_tol) 
-	    	if (theta .gt. 1.0_DP) then
+	    	if (sum(theta)/nz .gt. 1.0_DP) then
 	           brent_value = brent(-0.1_DP,0.1_DP,2.0_DP,Agg_Debt, brent_tol,R)
             else
                 R = 0.0_DP
@@ -2130,7 +2136,7 @@ SUBROUTINE COMPUTE_STATS()
 		do zi=1,nz
 		do xi=1,nx 
 		do ai=1,na 
-			YGRID(ai,zi,xi) = Y_a(agrid(ai),xz_grid(xi,zi))
+			YGRID(ai,zi,xi) = Y_a(agrid(ai),zi,xi)
 		enddo 
 		enddo 
 		enddo
@@ -2356,7 +2362,7 @@ SUBROUTINE COMPUTE_STATS()
         	size_by_age(age)       = size_by_age(age)       + DBN1(age,ai,zi,lambdai,ei,xi)
 			size_by_age_z(age,zi)  = size_by_age_z(age,zi)  + DBN1(age,ai,zi,lambdai,ei,xi)
 			leverage_age_z(age,zi) = leverage_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*K_mat(ai,zi,xi)/agrid(ai)
-			if (K_mat(ai,zi,xi).ge.(theta*agrid(ai))) then 
+			if (K_mat(ai,zi,xi).ge.(theta(zi)*agrid(ai))) then 
 				constrained_firms_age(age)      = constrained_firms_age(age)      + DBN1(age,ai,zi,lambdai,ei,xi)
 				constrained_firms_age_z(age,zi) = constrained_firms_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
 				constrained_firm_ind(age,ai,zi,lambdai,ei,xi) = 1
@@ -2905,13 +2911,13 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
     		MB_aprime_t   = MBGRID_t(ai,zi,:)
     		! Consumption on endogenous grid and implied asset income under tauW_bt
     		where(pr_x(xi,:,zi)/pr_x(xi,:,zi)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
-    			&	MB_aprime_t=MB_a_bt(agrid(ai),xz_grid(xi,zi))
+    			&	MB_aprime_t=MB_a_bt(agrid(ai),zi,xi)
     		EndoCons(ai)  =  (beta*survP(age)* 	&
     					& sum(pr_x(xi,:,zi)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! Consumption on endogenous grid and implied asset income under tauW_at
 	        where(pr_x(xi,:,zi)/pr_x(xi,:,zi)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
-	        	& MB_aprime_t=MB_a_at(agrid(ai),xz_grid(xi,zi))
+	        	& MB_aprime_t=MB_a_at(agrid(ai),zi,xi)
 	        EndoCons(na_t+sw)  = (beta*survP(age)*	&
 	        			& sum(pr_x(xi,:,zi)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
 	    	EndoYgrid(na_t+sw) = agrid_t(ai) +  EndoCons(na_t+sw) - RetY_lambda_e(lambdai,ei)
@@ -3000,13 +3006,13 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
     		MB_aprime_t   = MBGRID_t(ai,zi,:)
 	    	! Below threshold
 	    	where(pr_x(xi,:,zi)/pr_x(xi,:,zi)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
-	    		&	MB_aprime_t=MB_a_bt(agrid(ai),xz_grid(xi,zi))
+	    		&	MB_aprime_t=MB_a_bt(agrid(ai),zi,xi)
 			call EGM_Working_Period( MB_aprime_t , H_min , state_FOC , & 
 			      & EndoCons(ai), EndoHours(ai) , EndoYgrid(ai)  )
 			
 			! Above threshold
 			where(pr_x(xi,:,zi)/pr_x(xi,:,zi)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
-				& 	MB_aprime_t=MB_a_at(agrid(ai),xz_grid(xi,zi))
+				& 	MB_aprime_t=MB_a_at(agrid(ai),zi,xi)
 			call EGM_Working_Period( MB_aprime_t , H_min , state_FOC , & 
 			      & EndoCons(na_t+1), EndoHours(na_t+1) , EndoYgrid(na_t+1)  )
 
@@ -3343,7 +3349,7 @@ Function K_Matrix(R_in,P_in)
 	do h=1,nx
 	do j=1,nz
 	do i=1,na 
-		K_Matrix(i,j,h) = min( theta*agrid(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K_Matrix(i,j,h) = min( theta(j)*agrid(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 	enddo
 	enddo
 	enddo 
@@ -3361,7 +3367,7 @@ Function K_Matrix_t(R_in,P_in)
 	do h=1,nx
 	do j=1,nz
 	do i=1,na_t
-		K_Matrix_t(i,j,h) = min( theta*agrid_t(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K_Matrix_t(i,j,h) = min( theta(j)*agrid_t(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 	enddo
 	enddo
 	enddo 
@@ -3495,16 +3501,16 @@ SUBROUTINE FORM_Y_MB_GRID(TYGRID,TMBGRID,TYGRID_t,TMBGRID_t)
 	DO xi=1,nx 
 	DO zi=1,nz
 		DO ai=1,na
-			TYGRID(ai,zi,xi)  = Y_a(agrid(ai),xz_grid(xi,zi))
-			TMBGRID(ai,zi,xi) = MB_a(agrid(ai),xz_grid(xi,zi))
+			TYGRID(ai,zi,xi)  = Y_a(agrid(ai),zi,xi)
+			TMBGRID(ai,zi,xi) = MB_a(agrid(ai),zi,xi)
 		ENDDO 
 		if (Y_a_threshold.eq.0.0_dp) then
 			TYGRID_t  = TYGRID
 			TMBGRID_t = TMBGRID 
 		else 
 			DO ai=1,na_t
-				TYGRID_t(ai,zi,xi)  = Y_a(agrid_t(ai),xz_grid(xi,zi))
-				TMBGRID_t(ai,zi,xi) = MB_a(agrid_t(ai),xz_grid(xi,zi))
+				TYGRID_t(ai,zi,xi)  = Y_a(agrid_t(ai),zi,xi)
+				TMBGRID_t(ai,zi,xi) = MB_a(agrid_t(ai),zi,xi)
 			ENDDO
 		endif 
 	ENDDO
@@ -4379,7 +4385,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	                       &  + (currenta - agrid(tklo)) * V_Pr(age,tkhi,currentzi,currentlambdai, currentei, currentxi)) &
 	                       &  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*currenta 
 
-	    panelK(paneli)    = min( theta*currenta , (mu*P*xz_grid(currentxi,currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+	    panelK(paneli)    = min(theta(currentzi)*currenta,(mu*P*xz_grid(currentxi,currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
 		if (age.lt.RetAge) then 
 	        h_i  = ((agrid(tkhi) - currenta)*hours(age,tklo,currentzi,currentlambdai,currentei,currentxi) &
@@ -4778,7 +4784,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 
      		!$omp parallel do private(tklo,tkhi,h_i)
      		do ii=1,80   
-     		panelk_top(age_top,ii)  = min( theta*panela_top(age_top,ii) ,&
+     		panelk_top(age_top,ii)  = min( theta(panelz_top(age_top,ii))*panela_top(age_top,ii) ,&
      			& (mu*P*xz_grid(panelx_top(age_top,ii),panelz_top(age_top,ii))**mu & 
      				& /(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
@@ -5716,7 +5722,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 	logical :: Compute_bench
 	character(100) :: bench_folder, string_theta
 
-	write(string_theta,'(f4.2)')  theta
+	write(string_theta,'(f4.2)')  theta_folder
 
 	if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
 		bench_folder = './NSU_ZS_LT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
