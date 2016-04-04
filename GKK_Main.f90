@@ -277,7 +277,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		CALL WRITE_VARIABLES(1)
-		if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.00_dp).and.(Simul_Switch)) then 
+		if (Simul_Switch) then 
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
 		endif
