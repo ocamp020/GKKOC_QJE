@@ -3601,6 +3601,7 @@ SUBROUTINE  INITIALIZE()
 			enddo 
 			xz_grid = exp(log(spread(zgrid,1,nx))*spread(xgrid,2,nz))
 			xz_grid(1,:) = exp(log(zgrid)*xgrid(1)); xz_grid(2,1:4) = xz_grid(1,1:4); xz_grid(2,5:) = exp(log(zgrid(5:))*xgrid(2));
+			pr_x(1,1,1:4) = 1.0_dp ; pr_x(1,2,1:4) = 0.0_dp ; 
 			! xz_grid = spread(zgrid,1,nx)*spread(xgrid,2,nz)
 			! xz_grid(1,:)   = zgrid 	; xz_grid(2,1:3) = zgrid(1:3)	;	xz_grid(2,4:)  = zgrid(4)
 			! xz_grid(1,:) = zgrid; xz_grid(2,:) = 0.00_dp*zgrid
