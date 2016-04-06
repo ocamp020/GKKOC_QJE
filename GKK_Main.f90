@@ -102,6 +102,9 @@ PROGRAM main
 		! Retirement Shock mu=0.7, matuchenz=5, nz_aux=11, nz=9, low X
 		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
 		! 0.965 0.343   2.50    3.022731	0.814399 		0.396095  	8.234316  	35.623980 	63.19873  	0.1     0.0  	0.462
+		! New Exponential Shock that only affects high Z and includes Z-varying theta
+		! beta 		sigmaz 		x_hi 	rho_z 	gamma
+		! 0.954_dp 0.074_dp  	5.00_dp 0.1_dp 	0.457_dp
 
 		beta   	= 0.954_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
