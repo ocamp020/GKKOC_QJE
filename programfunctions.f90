@@ -4297,8 +4297,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	    
 			! DRAW Z and LAMBDA DISTRIBUTION FOR ONE-YEAR OLDS
 	     	age = panelage(paneli)   
-	     	IF (age .eq. 1) THEN  
-	     		print*,'Test 2'  
+	     	IF (age .eq. 1) THEN   
 				! Z      
 		       	tempnoz = omp_ran1() ! ran1(newiseed) 
 		       	zi=1
@@ -4387,7 +4386,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		    	where(panelage==1) eligible = 0 
 	        endif 
 
-	 		! print*, "Simulation period", simutime
+	 		print*, "Simulation period", simutime
 		ENDDO ! simutime
 		print*,' '
 		print*,'Averages'
