@@ -4665,16 +4665,16 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	       ei=ei+1
 	   ENDDO
 
-	   panelage(paneli)=age
-	   panelz(paneli)=zi
-	   panellambda(paneli)=lambdai
-	   panele(paneli)=ei
+	   panelage(paneli)		= age
+	   panelz(paneli)		= zi
+	   panellambda(paneli)	= lambdai
+	   panele(paneli)		= ei
 	   panelx(paneli)		= xi
 	   
 	ENDDO
-	print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8)
-	print*, 'Hello'
-	print*, ' Initial states ready'
+	!print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8)
+	!print*, 'Hello'
+	!print*, ' Initial states ready'
 
 	! SET INITIAL ASSET DISTRIBUTION
 	panela            = 1.0_DP
