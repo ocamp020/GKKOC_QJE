@@ -4630,7 +4630,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 
 	newiseed=-1
 
-	!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi)
+	!$omp parallel do private(tempnoage,age,tempnoz,zi,xi,tempnolambda,lambdai,tempnoe,ei)
 	DO paneli=1,totpop
 
 	! AGE
@@ -4673,7 +4673,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	   
 	ENDDO
 	print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8)
-
+	print*, 'Hello'
 	print*, ' Initial states ready'
 
 	! SET INITIAL ASSET DISTRIBUTION
@@ -4688,7 +4688,8 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	!call cpu_time(start_timet) 
 
 	DO simutime=1, MaxSimuTime
-		!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi, &
+
+		!$omp parallel do private(tempnoage,age,tempnoz,zi,xi,tempnolambda,lambdai,tempnoe,ei, &
 		!$omp& currenta,currentzi,currentlambdai,currentei,currentxi,tklo,tkhi,tempno)
 	    DO paneli=1,totpop
 	    
