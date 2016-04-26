@@ -2142,7 +2142,7 @@ SUBROUTINE COMPUTE_STATS()
 		enddo
 		CALL ComputeLaborUnits(Ebar, wage) 
 
-	MeanWealth 	 = 0.0_DP
+	MeanWealth 	 = 0.0_dp
 	MeanATReturn = 0.0_DP
 	MeanReturn 	 = 0.0_DP
 	MeanCons  	 = 0.0_DP
