@@ -118,6 +118,7 @@ PROGRAM main
 
 		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
+		x_0     = 0.00_dp
 		a_x 	= 0.10_dp
 		b_x 	= 0.00_dp
 
@@ -159,7 +160,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Exp_Shock_top_mu90/' 
+		Result_Folder = trim(Result_Folder)//'Ret_Shock/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )

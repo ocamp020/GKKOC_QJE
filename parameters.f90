@@ -29,8 +29,8 @@ MODULE parameters
     INTEGER(I4B), PARAMETER :: nz=9, nz_aux=11  ! Number of grid points
 
     ! Transitory entrepreneurial ablity (x)
-    INTEGER(I4B), PARAMETER :: nx=2
-    REAL(DP)                :: x_hi, x_lo, a_x, b_x
+    INTEGER(I4B), PARAMETER :: nx=3
+    REAL(DP)                :: x_hi, x_lo, x_0, a_x, b_x
 
  
 

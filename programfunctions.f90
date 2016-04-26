@@ -306,7 +306,7 @@ end Subroutine Asset_Grid_Threshold
 
 		! Evaluate square residual of Euler equation at current state (given by (ai,zi,lambdai,ei)) and savings given by a'
 		FOC_R	= ( (YGRID_t(a_in,z_in,x_in)+RetY_lambda_e(l_in,e_in)-aprimet)    &
-		           & - ( beta*survP(age_in) * sum( pr_x(x_in,:,z_in) * MB_aprime * cprime**(1.0_dp/euler_power) ) ) &
+		           & - ( beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * cprime**(1.0_dp/euler_power) ) ) &
 		           & **euler_power) ** 2.0_DP
 
 	END  FUNCTION FOC_R
@@ -398,7 +398,7 @@ end Subroutine Asset_Grid_Threshold
 					
 
 					! Evaluate the squared residual of the Euler equation for working period
-					FOC_WH   = ( (1.0_dp/ctemp)- (beta*survP(age_in) * sum( pr_x(x_in,:,z_in) * MB_aprime * E_MU_cp) ) ) **2.0_DP 
+					FOC_WH   = ( (1.0_dp/ctemp)- (beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * E_MU_cp) ) ) **2.0_DP 
 				else
 					! I have to evaluate the FOC in expectation over eindx prime given eindx
 					! Compute consumption and labor for eachvalue of eindx prime
@@ -421,7 +421,7 @@ end Subroutine Asset_Grid_Threshold
 
 					! Evaluate the squared residual of the Euler equation for working period
 					FOC_WH = ( ctemp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-ntemp)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
-						         & - beta*survP(age_in)* sum(pr_x(x_in,:,z_in)*MB_aprime*E_MU_cp)  )**2.0_DP
+						         & - beta*survP(age_in)* sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp)  )**2.0_DP
 				end if 
 			else ! Linear Taxes 
 				ntemp = max(0.0_DP , gamma - (1.0_DP-gamma)*(YGRID_t(a_in,z_in,x_in) - aprimet)/(psi*yh(age_in,l_in,e_in)) )
@@ -438,7 +438,7 @@ end Subroutine Asset_Grid_Threshold
 				enddo 
 
 				FOC_WH = ((ctemp**(gamma*(1.0_DP-sigma)-1))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
-						& - beta*survP(age_in)* sum( pr_x(x_in,:,z_in)*MB_aprime*E_MU_cp ) )**2.0_DP
+						& - beta*survP(age_in)* sum( pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp ) )**2.0_DP
 			end if 
 		else 
 			! Separable Utility
@@ -453,7 +453,7 @@ end Subroutine Asset_Grid_Threshold
 				enddo 
 
 				! Evaluate the squared residual of the Euler equation for working period
-				FOC_WH   = (ctemp - 1.0_dp/(beta*survP(age_in)*sum(pr_x(x_in,:,z_in)*MB_aprime*E_MU_cp))**(1.0_dp/sigma)) **2.0_DP 
+				FOC_WH   = (ctemp - 1.0_dp/(beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp))**(1.0_dp/sigma)) **2.0_DP 
 		end if 
 
 	END  FUNCTION FOC_WH
@@ -535,7 +535,7 @@ end Subroutine Asset_Grid_Threshold
 	    enddo 
 		! Compute square residual of Euler FOC
 			FOC_H_NSU = ( cons**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hoursin)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
-			         	& - beta*survP(age_in)*sum(pr_x(x_in,:,z_in)*MB_aprime*E_MU_cp)  )**2.0_DP
+			         	& - beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp)  )**2.0_DP
 
 	END  FUNCTION FOC_H_NSU
 
@@ -636,7 +636,7 @@ end Subroutine Asset_Grid_Threshold
 				        & (1.0_dp-Hours_t(age+1,ai,zi,lambdai,:,xp_ind))**((1.0_dp-sigma)*(1.0_dp-gamma))  )
 				enddo
 
-				C_euler = ( (beta*survP(age)*sum(pr_x(xi,:,zi)*MB_in*E_MU_cp))) **(1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
+				C_euler = ( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp))) **(1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
 				C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
 
 				if (C_euler.ge.C_foc) then
@@ -664,7 +664,7 @@ end Subroutine Asset_Grid_Threshold
 				do xp_ind=1,nx
 					E_MU_cp(xp_ind) = SUM(pr_e(ei,:) * Cons_t(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma) )
 				enddo
-				C_endo = 1.0_dp/( (beta*survP(age)*sum(pr_x(xi,:,zi)*MB_in*E_mu_cp)  ) **(1.0_dp/sigma) )
+				C_endo = 1.0_dp/( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_mu_cp)  ) **(1.0_dp/sigma) )
 				C_foc  = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
 
 				if (C_endo.ge.C_foc) then
@@ -686,20 +686,20 @@ end Subroutine Asset_Grid_Threshold
 				    & *  ( (1.0_DP-Hours_t(age+1, ai, zi, lambdai,:,xp_ind))**((1.0_DP-gamma)*(1.0_DP-sigma))))
 				enddo
 				  C_endo = ((gamma*psi*yh(age, lambdai,ei)/(1.0_DP-gamma))**((1.0_DP-gamma)*(1.0_DP-sigma)) &
-				    & *  beta*survP(age)*sum(pr_x(xi,:,zi)*MB_in*E_MU_cp)  )**(-1.0_DP/sigma)
+				    & *  beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp)  )**(-1.0_DP/sigma)
 
 				  H_endo = 1.0_DP - (1.0_DP-gamma)*C_endo/(gamma*psi*yh(age, lambdai,ei))   
 
 				  If (H_endo .lt. 0.0_DP) then
 				    H_endo = 0.0_DP 
-				    C_endo  = ( beta*survP(age)*sum(pr_x(xi,:,zi)*MB_in*E_MU_cp) )**(1.0_DP/(gamma*(1.0_DP-sigma)-1.0_DP))
+				    C_endo  = ( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) )**(1.0_DP/(gamma*(1.0_DP-sigma)-1.0_DP))
 				  endif 
 			else 
 				! Separable Utility
 				do xp_ind=1,nx
 					E_MU_cp(xp_ind) = sum( pr_e(ei,:) * (Cons_t(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma)) )
 				enddo
-				C_endo  = 1.0_DP/( beta*survP(age)*sum(pr_x(xi,:,zi)*MB_in*E_MU_cp) )**(1.0_DP/sigma)
+				C_endo  = 1.0_DP/( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) )**(1.0_DP/sigma)
 
 				H_endo = max(0.0_DP , 1.0_DP - (phi*C_endo**sigma/(psi*yh(age, lambdai,ei)))**(1.0_dp/gamma) )  
 
@@ -1405,18 +1405,18 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE()
 	DO lambdai=1,nlambda          
 	DO ei=1,ne   
 		DO ai=1,na  
-			ExpValueP(ai) = sum(ValueFunction(age+1, ai, zi, lambdai, ei,:) * pr_x(xi,:,zi))
+			ExpValueP(ai) = sum(ValueFunction(age+1, ai, zi, lambdai, ei,:) * pr_x(xi,:,zi,age))
         ENDDO    
 
   		if (NSU_Switch.eqv..true.) then
             CALL spline( agrid, ValueFunction(age+1,  :, zi, lambdai, ei, xi) , na , &
-      		& sum(pr_x(xi,:,zi)*gamma*MBGRID(1 ,zi,:)*Cons(age+1, 1,zi,lambdai,ei,:)**((1.0_DP-sigma)*gamma-1.0_DP)/(1_DP+tauC)), &
-        	& sum(pr_x(xi,:,zi)*gamma*MBGRID(na,zi,:)*Cons(age+1,na,zi,lambdai,ei,:)**((1.0_DP-sigma)*gamma-1.0_DP)/(1_DP+tauC)), &
+      		& sum(pr_x(xi,:,zi,age)*gamma*MBGRID(1 ,zi,:)*Cons(age+1, 1,zi,lambdai,ei,:)**((1.0_DP-sigma)*gamma-1.0_DP)/(1_DP+tauC)), &
+        	& sum(pr_x(xi,:,zi,age)*gamma*MBGRID(na,zi,:)*Cons(age+1,na,zi,lambdai,ei,:)**((1.0_DP-sigma)*gamma-1.0_DP)/(1_DP+tauC)), &
         	& ValueP2)  
         else 
         	CALL spline( agrid, ValueFunction(age+1,  :, zi, lambdai, ei, xi) , na , &
-      			& sum(pr_x(xi,:,zi)* gamma*MBGRID(1,zi,:) /Cons(age+1,  1, zi, lambdai, ei, :) **(sigma)/(1_DP+tauC)), &
-        		& sum(pr_x(xi,:,zi)* gamma*MBGRID(na,zi,:)/Cons(age+1, na, zi, lambdai, ei, :)**(sigma)/(1_DP+tauC)) , ValueP2)  
+      			& sum(pr_x(xi,:,zi,age)* gamma*MBGRID(1,zi,:) /Cons(age+1,  1, zi, lambdai, ei, :) **(sigma)/(1_DP+tauC)), &
+        		& sum(pr_x(xi,:,zi,age)* gamma*MBGRID(na,zi,:)/Cons(age+1, na, zi, lambdai, ei, :)**(sigma)/(1_DP+tauC)) , ValueP2)  
       	end if 
 	                  
         DO ai=1,na    
@@ -1444,7 +1444,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE()
         	DO xp_ind=1,nx 
         		ExpValueP_e(xp_ind) = sum(ValueFunction(age+1, ai, zi, lambdai, :, xp_ind) * pr_e(ei,:))
         	ENDDO    
-              ExpValueP(ai) = sum(ExpValueP_e * pr_x(xi,:,zi))
+              ExpValueP(ai) = sum(ExpValueP_e * pr_x(xi,:,zi,age))
         ENDDO
 
         if (NSU_Switch.eqv..true.) then
@@ -1465,7 +1465,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE()
 	        ENDDO
 	    endif 
 
-    	CALL spline( agrid, ExpValueP , na , sum(D_V_1  * pr_x(xi,:,zi)), sum(D_V_na * pr_x(xi,:,zi)), ValueP2)   
+    	CALL spline( agrid, ExpValueP , na , sum(D_V_1  * pr_x(xi,:,zi,age)), sum(D_V_na * pr_x(xi,:,zi,age)), ValueP2)   
 
         DO ai=1,na 
         	call splint( agrid, ExpValueP, ValueP2, na, Aprime(age,ai,zi,lambdai, ei, xi), ValueP(ai))   
@@ -1538,7 +1538,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 		PrAprimehi = max(PrAprimehi, 0.0_DP)    
 
 		Value_mat(age, ai, zi, lambdai, ei, xi) = Utility(Cons_mat(age,ai,zi,lambdai,ei,xi),Hours_mat(age,ai,zi,lambdai,ei,xi)) &
-			  & + beta*survP(age)* sum( pr_x(xi,:,zi)* (PrAprimelo*Value_mat(age+1, tklo, zi, lambdai, ei, :) &
+			  & + beta*survP(age)* sum( pr_x(xi,:,zi,age)* (PrAprimelo*Value_mat(age+1, tklo, zi, lambdai, ei, :) &
 			  & 				                     +  PrAprimehi*Value_mat(age+1, tkhi, zi, lambdai, ei, :)) ) 
         ! Value_mat(age, ai, zi, lambdai, ei, xi) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
         !               & * (1.0_DP-Hours_mat(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
@@ -1583,7 +1583,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 		enddo    
 
 		Value_mat(age, ai, zi, lambdai, ei, xi) = Utility(Cons_mat(age,ai,zi,lambdai,ei,xi),Hours_mat(age,ai,zi,lambdai,ei,xi))  &
-		   & + beta*survP(age)* sum( pr_x(xi,:,zi)*E_mu_cp )
+		   & + beta*survP(age)* sum( pr_x(xi,:,zi,age)*E_mu_cp )
 		! Value_mat(age, ai, zi, lambdai, ei) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
   !                      & * (1.0_DP-Hours_mat(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
   !                      & + beta*survP(age)* sum( pr_x(xi,:,zi)*E_mu_cp )
@@ -1806,10 +1806,10 @@ SUBROUTINE FIND_DBN_EQ()
 	        DO x2=1,nx
 		        DBN2(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) =  &
 		        	& DBN2(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) + DBN1(age1, a1, z1, lambda1, e1,x1) &
-		            & * survP(age1) * PrAprimelo(age1, a1, z1, lambda1, e1,x1) * pr_x(x1,x2,z1)     
+		            & * survP(age1) * PrAprimelo(age1, a1, z1, lambda1, e1,x1) * pr_x(x1,x2,z1,age1)     
 		        DBN2(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) =  &
 		          	& DBN2(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) + DBN1(age1, a1, z1, lambda1, e1,x1) &
-		            & * survP(age1) * PrAprimehi(age1, a1, z1, lambda1, e1,x1) * pr_x(x1,x2,z1)  
+		            & * survP(age1) * PrAprimehi(age1, a1, z1, lambda1, e1,x1) * pr_x(x1,x2,z1,age1)  
 	        ENDDO
 	    ENDDO
 	    ENDDO
@@ -1842,10 +1842,10 @@ SUBROUTINE FIND_DBN_EQ()
 	        DO e2=1,ne
 				DBN2(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) =  &
 	          		& DBN2(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) + DBN1(age1, a1, z1, lambda1, e1,x1) &
-	                & * survP(age1) * pr_e(e1,e2) * pr_x(x1,x2,z1) * PrAprimelo(age1, a1, z1, lambda1, e1,x1)     
+	                & * survP(age1) * pr_e(e1,e2) * pr_x(x1,x2,z1,age1) * PrAprimelo(age1, a1, z1, lambda1, e1,x1)     
 	            DBN2(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) =  &
 	          		& DBN2(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) + DBN1(age1, a1, z1, lambda1, e1,x1) &
-	                & * survP(age1) * pr_e(e1,e2) * pr_x(x1,x2,z1) * PrAprimehi(age1, a1, z1, lambda1, e1,x1) 
+	                & * survP(age1) * pr_e(e1,e2) * pr_x(x1,x2,z1,age1) * PrAprimehi(age1, a1, z1, lambda1, e1,x1) 
 	        ENDDO
 	        ENDDO
 	    ENDDO
@@ -2906,25 +2906,25 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    EndoYgrid = big_p 
 	    sw 		  = 0
     DO ai=1,na_t 
-		if (any((pr_x(xi,:,zi)/pr_x(xi,:,zi)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8)) then 
+		if (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8)) then 
 			sw 			  = sw+1	
     		MB_aprime_t   = MBGRID_t(ai,zi,:)
     		! Consumption on endogenous grid and implied asset income under tauW_bt
-    		where(pr_x(xi,:,zi)/pr_x(xi,:,zi)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
+    		where(pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
     			&	MB_aprime_t=MB_a_bt(agrid(ai),zi,xi)
     		EndoCons(ai)  =  (beta*survP(age)* 	&
-    					& sum(pr_x(xi,:,zi)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
+    					& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! Consumption on endogenous grid and implied asset income under tauW_at
-	        where(pr_x(xi,:,zi)/pr_x(xi,:,zi)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
+	        where(pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
 	        	& MB_aprime_t=MB_a_at(agrid(ai),zi,xi)
 	        EndoCons(na_t+sw)  = (beta*survP(age)*	&
-	        			& sum(pr_x(xi,:,zi)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
+	        			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
 	    	EndoYgrid(na_t+sw) = agrid_t(ai) +  EndoCons(na_t+sw) - RetY_lambda_e(lambdai,ei)
 	    else 
 	    	! Consumption on endogenous grid and implied asset income
 	    	EndoCons(ai)  = (beta*survP(age)* 	&
-	    				& sum(pr_x(xi,:,zi)*MBGRID_t(ai,zi,:)*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
+	    				& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	    end if 
 	ENDDO ! ai
@@ -3001,17 +3001,17 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    sw 		  = 0                    
         DO ai=1,na_t
         state_FOC  = (/age,ai,zi,lambdai,ei,xi/)
-		if (any(pr_x(xi,:,zi)/pr_x(xi,:,zi)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8)) then 
+		if (any(pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8)) then 
 			sw 			  = sw+1	
     		MB_aprime_t   = MBGRID_t(ai,zi,:)
 	    	! Below threshold
-	    	where(pr_x(xi,:,zi)/pr_x(xi,:,zi)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
+	    	where(pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
 	    		&	MB_aprime_t=MB_a_bt(agrid(ai),zi,xi)
 			call EGM_Working_Period( MB_aprime_t , H_min , state_FOC , & 
 			      & EndoCons(ai), EndoHours(ai) , EndoYgrid(ai)  )
 			
 			! Above threshold
-			where(pr_x(xi,:,zi)/pr_x(xi,:,zi)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
+			where(pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
 				& 	MB_aprime_t=MB_a_at(agrid(ai),zi,xi)
 			call EGM_Working_Period( MB_aprime_t , H_min , state_FOC , & 
 			      & EndoCons(na_t+1), EndoHours(na_t+1) , EndoYgrid(na_t+1)  )
@@ -3589,34 +3589,49 @@ SUBROUTINE  INITIALIZE()
 	! Transitory investment productivity x
 		if (nx.gt.1) then
 			print*, 'X probability '
-			xgrid = (/x_hi , x_lo /)
-			do zi=1,nz 
-				pr_x(1,1,zi) = max(0.0_dp , 1.0_dp - a_x*exp(b_x*zgrid(zi))/(1.0_dp+exp(b_x*zgrid(zi))) )
-				pr_x(1,2,zi) = min(1.0_dp ,          a_x*exp(b_x*zgrid(zi))/(1.0_dp+exp(b_x*zgrid(zi))) )
-				pr_x(2,1,zi) = 0.0_dp 
-				pr_x(2,2,zi) = 1.0_dp 
-				Gx(1,zi)     = 0.5_dp 
-				Gx(2,zi)     = 0.5_dp 
-				pr_x(1,1,1:4) = 1.0_dp ; pr_x(1,2,1:4) = 0.0_dp ; 
-				print*,'z=',zi,'Pr(x_hi)=', pr_x(1,1,zi),'Pr(x_lo)=', pr_x(1,2,zi)
-			enddo 
-			xz_grid = exp(log(spread(zgrid,1,nx))*spread(xgrid,2,nz))
-			xz_grid(1,:) = exp(log(zgrid)*xgrid(1)); xz_grid(2,1:4) = xz_grid(1,1:4); xz_grid(2,5:) = exp(log(zgrid(5:))*xgrid(2));
-			! xz_grid = spread(zgrid,1,nx)*spread(xgrid,2,nz)
-			! xz_grid(1,:)   = zgrid 	; xz_grid(2,1:3) = zgrid(1:3)	;	xz_grid(2,4:)  = zgrid(4)
-			! xz_grid(1,:) = zgrid; xz_grid(2,:) = 0.00_dp*zgrid
-			print*, ' xgrid', xgrid
-			print*, ' zgrid', zgrid 
-			do xi=1,nx
-			print*, 'xzgrid', xz_grid(xi,:)
-			enddo
-			! print*, 'xgrid error'
-			! STOP 
+			xgrid = (/x_hi , x_lo , x_0/)
+			! Working period
+				! Low z types stay in x=1 until retirement
+				pr_x(1,1,1:4,1:RetAge-2) = 1.00_dp 
+				pr_x(1,2,1:4,1:RetAge-2) = 0.00_dp 
+				pr_x(1,3,1:4,1:RetAge-2) = 0.00_dp
+				! High z types have 5% probability of going from x=1 to x=2
+				pr_x(1,1,5:nz,1:RetAge-2) = 0.95_dp 
+				pr_x(1,2,5:nz,1:RetAge-2) = 0.05_dp 
+				pr_x(1,3,5:nz,1:RetAge-2) = 0.00_dp
+				! x=2 is an absorbing state for all
+				pr_x(2,1,:,1:RetAge-2) = 0.00_dp 
+				pr_x(2,2,:,1:RetAge-2) = 1.00_dp 
+				pr_x(2,3,:,1:RetAge-2) = 0.00_dp
+				! x=3 is never reached but arbitrary transitions are included
+				pr_x(3,1,:,1:RetAge-2) = 0.00_dp 
+				pr_x(3,2,:,1:RetAge-2) = 1.00_dp 
+				pr_x(3,3,:,1:RetAge-2) = 0.00_dp
+			!Retirement Period
+				pr_x(:,1,:,RetAge-1:) = 0.00_dp 
+				pr_x(:,2,:,RetAge-1:) = 0.00_dp 
+				pr_x(:,3,:,RetAge-1:) = 1.00_dp
+			! Gx is not used. So it is initialized to an arbitrary value
+				Gx(1,:,:) = 0.50_dp ; Gx(2,:,:) = 0.50_dp ; Gx(3,:,:) = 0.00_dp ;
+			! xz grid
+				xz_grid(1,:)   = exp(log(zgrid)*xgrid(1))
+				xz_grid(2,1:4) = xz_grid(1,1:4); xz_grid(2,5:) = exp(log(zgrid(5:))*xgrid(2));
+				xz_grid(3,:)   = 0.0_dp
+				! xz_grid = spread(zgrid,1,nx)*spread(xgrid,2,nz)
+				! xz_grid(1,:)   = zgrid 	; xz_grid(2,1:3) = zgrid(1:3)	;	xz_grid(2,4:)  = zgrid(4)
+				! xz_grid(1,:) = zgrid; xz_grid(2,:) = 0.00_dp*zgrid
+				print*, ' xgrid', xgrid
+				print*, ' zgrid', zgrid 
+				do xi=1,nx
+				print*, 'xzgrid', xz_grid(xi,:)
+				enddo
+				! print*, 'xgrid error'
+				! STOP 
 		else 
 			xgrid = 1.0_dp
 			xz_grid(1,:) = zgrid 
-			pr_x(1,1,:)  = 1.0_dp
-			Gx(1,:)      = 1.0_dp
+			pr_x(1,1,:,:)  = 1.0_dp
+			Gx(1,:,:)      = 1.0_dp
 		endif 
 
 		! Obtain CDF of invariant distribution and transition matrix
@@ -3627,14 +3642,16 @@ SUBROUTINE  INITIALIZE()
 			        cdf_pr_z(ee0,ee1) = sum(pr_z(ee0,1:ee1))
 			    ENDDO
 			ENDDO
+			do age=1,MaxAge
 			do zi=1,nz
 				DO ee0 = 1,nx
-				    cdf_Gx(ee0,zi) = sum(Gx(1:ee0,zi))
+				    cdf_Gx(ee0,zi,age) = sum(Gx(1:ee0,zi,age))
 				    DO ee1 = 1,nx
-				        cdf_pr_x(ee0,ee1,zi) = sum(pr_x(ee0,1:ee1,zi))
+				        cdf_pr_x(ee0,ee1,zi,age) = sum(pr_x(ee0,1:ee1,zi,age))
 				    ENDDO
 				ENDDO
 			enddo 
+			enddo
 			! Labor income permanent component
 			DO ee0 = 1,nlambda
 			    cdf_Glambda(ee0) = sum(Glambda(1:ee0))
@@ -4023,7 +4040,7 @@ SUBROUTINE  Firm_Value()
 				Prob_hi = max(Prob_hi, 0.0_DP)    
 
 				V_Pr(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi) + survP(age)/(1.0_dp+MeanReturn) &
-			  		&  * sum( pr_x(xi,:,zi) * (Prob_lo*V_Pr(age+1,tklo,zi,lambdai,ei,:)+Prob_hi*V_Pr(age+1,tkhi,zi,lambdai,ei,:) ) ) 
+			  		&  * sum( pr_x(xi,:,zi,age) * (Prob_lo*V_Pr(age+1,tklo,zi,lambdai,ei,:)+Prob_hi*V_Pr(age+1,tkhi,zi,lambdai,ei,:) ) ) 
 
 			enddo
 	enddo
@@ -4078,7 +4095,7 @@ SUBROUTINE  Firm_Value()
 				V_spline_W(xi_p) = sum( pr_e(ei,:)*( Prob_lo*V_Pr(age+1,tklo,zi,lambdai,:,xi_p) + Prob_hi*V_Pr(age+1,tkhi,zi,lambdai,:,xi_p)) )
 			enddo
 
-			V_Pr(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi) + survP(age)/(1.0_dp+MeanReturn) * sum(pr_x(xi,:,zi)*V_spline_W)
+			V_Pr(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi) + survP(age)/(1.0_dp+MeanReturn) * sum(pr_x(xi,:,zi,age)*V_spline_W)
 
 		enddo
 	enddo
@@ -4280,7 +4297,7 @@ SUBROUTINE  SIMULATION(bench_indx)
        			currentxi = panelx(paneli)
        			tempno 	  = ran1(newiseed)   
 	            xi 		  = 1
-	            DO WHILE (tempno .gt. cdf_pr_x(currentxi,xi,zi))
+	            DO WHILE (tempno .gt. cdf_pr_x(currentxi,xi,zi,age-1))
 	               xi = xi+1
 	            ENDDO            
 	            panelx(paneli)=xi          
@@ -4742,7 +4759,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
        			currentxi = panelx(paneli)
        			tempno 	  = ran1(newiseed)   
 	            xi 		  = 1
-	            DO WHILE (tempno .gt. cdf_pr_x(currentxi,xi,zi))
+	            DO WHILE (tempno .gt. cdf_pr_x(currentxi,xi,zi,age-1))
 	               xi = xi+1
 	            ENDDO            
 	            panelx(paneli)=xi          

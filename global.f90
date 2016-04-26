@@ -42,9 +42,10 @@ MODULE global
 		REAL(DP), DIMENSION(nz,nz) :: pr_z, cdf_pr_z
 		! grid (xgrid), invariant distribution (Gx), CDF of invariant distribution (cdf_Gx)
 		REAL(DP), DIMENSION(nx)    :: xgrid 
-		REAL(DP), DIMENSION(nx,nz) :: Gx, cdf_Gx, xz_grid
+		REAL(DP), DIMENSION(nx,nz,MaxAge) :: Gx, cdf_Gx
+		REAl(DP), DIMENSION(nx,nz) :: xz_grid
 		! transition matrix (pr_x), CDF of transition matrix (by row) (cdf_pr_x)
-		REAL(DP), DIMENSION(nx,nx,nz) :: pr_x, cdf_pr_x
+		REAL(DP), DIMENSION(nx,nx,nz,MaxAge) :: pr_x, cdf_pr_x
 
 	! Retirement income 
 	REAL(DP), DIMENSION(nlambda,ne) :: phi_lambda_e   ! phi_lambda_e is the income replacement ratio used to compute SS payments
