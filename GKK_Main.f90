@@ -287,7 +287,6 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
 		endif
-		CALL SIMULATION_TOP(solving_bench)
 
 	! Aggregate variables in benchmark economy
 		GBAR_bench  = GBAR

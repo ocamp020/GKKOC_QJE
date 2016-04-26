@@ -4124,7 +4124,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	IMPLICIT NONE
 	integer, intent(in) :: bench_indx
 	integer  :: currentzi, currentlambdai, currentei, currentxi
-	REAL(DP) :: tempnoage, tempnoz, tempnolambda, tempnoe, tempnox, tempno, currenta, currentY
+	REAL(DP) :: tempnoage, tempnoz, tempnolambda, tempnoe, tempnox, tempno, currenta, currentY, thread_num
 	REAL(DP) :: start_timet, finish_timet, h_i
 	INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
 	INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
@@ -4137,8 +4137,22 @@ SUBROUTINE  SIMULATION(bench_indx)
 	INTEGER , DIMENSION(totpop) 			  :: panelage_parents, panelage_sons
 	INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_parents, eligible_panelage_sons
 	INTEGER                     			  :: n_eligible
+	! Top Agents 
+	INTEGER       :: top_ind(80), panel_top_ind(totpop), top_ind_aux(80), n_top
+	REAL(DP)      :: top_A(80), A_cut, A_hi, A_low
+	character(10) :: top_folder
 
 	!$ call omp_set_num_threads(20)
+
+		! Set Seeds for each thread
+	!$OMP parallel
+    !$OMP critical
+		thread_num = omp_get_thread_num()
+		newiseed   = -5 - thread_num
+		tempno     = omp_ran1(newiseed)
+       	! write(*,'("inside critical myt=",i4,f12.8)') thread_num,tempno,newiseed
+    !$OMP end critical
+    !$OMP end parallel
 
 	print*,'SIMULATION STARTED'
 
@@ -4160,17 +4174,18 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	newiseed=-1
 
+	!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi)
 	DO paneli=1,totpop
 
 	! AGE
-	   tempnoage = ran1(newiseed)
+	   tempnoage = omp_ran1() ! ran1(newiseed)
 	   age=1
 	   DO WHILE (tempnoage*totpop .gt. cdfrequirednumberby_age(age))
 	       age=age+1
 	   ENDDO
 
 	! Z   
-	   tempnoz = ran1(newiseed)
+	   tempnoz = omp_ran1() ! ran1(newiseed)
 	   zi=1
 	   DO WHILE (tempnoz .gt. cdf_Gz(zi))
 	       zi=zi+1
@@ -4180,14 +4195,14 @@ SUBROUTINE  SIMULATION(bench_indx)
 	   xi=1
 	 
 	! LAMBDA  
-	   tempnolambda = ran1(newiseed) 
+	   tempnolambda = omp_ran1() ! ran1(newiseed) 
 	   lambdai=1
 	   DO WHILE (tempnolambda .gt. cdf_Glambda(lambdai))
 	       lambdai=lambdai+1
 	   ENDDO
 
 	! E   
-	   tempnoe = ran1(newiseed)   
+	   tempnoe = omp_ran1() ! ran1(newiseed)   
 	   ei=1
 	   DO WHILE (tempnoe .gt. cdf_Ge_byage(age,ei))
 	       ei=ei+1
@@ -4201,6 +4216,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	   panelx(paneli)		= xi
 	   
 	ENDDO
+	print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8)
 
 	! SET INITIAL ASSET DISTRIBUTION
 	panela            = 1.0_DP
@@ -4216,7 +4232,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 	death_count = 0
 
 	DO simutime=1, MaxSimuTime
-
+		!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi, &
+		!$omp& currenta,currentzi,currentlambdai,currentei,currentxi,tklo,tkhi,tempno)
 	   	DO paneli=1,totpop
 	    
 	       	currenta  		= panela(paneli)
@@ -4254,7 +4271,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	             
 			! DRAW NEXT PERIOD'S AGE DBN
-	      	tempnoage = ran1(newiseed)  
+	      	tempnoage = omp_ran1() ! ran1(newiseed)  
 	  
 	      	IF (tempnoage .gt. survP(age)) THEN
 				panelage(paneli)   = 1
@@ -4268,7 +4285,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     	age = panelage(paneli)   
 	     	IF (age .eq. 1) THEN    
 				! Z      
-		       	tempnoz = ran1(newiseed) 
+		       	tempnoz = omp_ran1() ! ran1(newiseed) 
 		       	zi=1
 				DO WHILE (tempnoz .gt. cdf_pr_z(currentzi,zi))
 					zi=zi+1
@@ -4278,7 +4295,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		       	xi = 1
 	       
 				! LAMBDA  
-				tempnolambda = ran1(newiseed) 
+				tempnolambda = omp_ran1() ! ran1(newiseed) 
 				lambdai=1
 				DO WHILE (tempnolambda .gt. cdf_pr_lambda(currentlambdai,lambdai))
 					lambdai=lambdai+1
@@ -4295,7 +4312,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
        		else  IF (age .gt. 1) THEN
        			currentxi = panelx(paneli)
-       			tempno 	  = ran1(newiseed)   
+       			tempno 	  = omp_ran1() ! ran1(newiseed)   
 	            xi 		  = 1
 	            DO WHILE (tempno .gt. cdf_pr_x(currentxi,xi,zi,age-1))
 	               xi = xi+1
@@ -4304,7 +4321,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	            IF (age.lt.RetAge) THEN
 		            currentei = panele(paneli)   
-		            tempno 	  = ran1(newiseed)   
+		            tempno 	  = omp_ran1() ! ran1(newiseed)   
 		            ei 		  = 1
 		            DO WHILE (tempno .gt. cdf_pr_e(currentei,ei))
 		               ei = ei+1
@@ -4351,8 +4368,11 @@ SUBROUTINE  SIMULATION(bench_indx)
 		    	where(panelage==1) eligible = 0 
 	        endif 
 
-	 		print*, "Simulation period", simutime
+	 		! print*, "Simulation period", simutime
 		ENDDO ! simutime
+		print*,' '
+		print*,'Averages'
+		print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8), sum(panela)/real(totpop,8)
 
 		! Mean of assets 
 			panela_parents = panela_parents/3.0_dp 
@@ -4378,6 +4398,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		print*, ' '
 		print*, 'n_eligible', sum(eligible)
+		print*, 'panela_parents', sum(eligible_panela_parents)/n_eligible, 'panela_sons', sum(eligible_panela_sons)/n_eligible
+		print*, 'panelage_parents', sum(eligible_panelage_parents)/n_eligible, 'panelage_sons', sum(eligible_panelage_sons)/n_eligible
 		print*, ' '
 
 
@@ -4474,6 +4496,82 @@ SUBROUTINE  SIMULATION(bench_indx)
 		close (unit=20); close (unit=21); close (unit=22); close (unit=23)
 	endif
 
+	print*, 'Identifying top agents'
+	! Top Agents - Assets
+		n_top = totpop 
+		A_hi  = maxval(panela)
+		A_low = minval(panela)
+		A_cut = (A_hi+A_low)/2.0_dp 
+		do while (n_top.ne.80)
+			n_top = count(panela.ge.A_cut)
+			if (n_top.gt.80) then
+				A_low = A_cut 
+			endif 
+			if (n_top.lt.80) then
+				A_hi  = A_cut 
+			endif 
+			A_cut = (A_hi+A_low)/2.0_dp 
+			print*, A_cut, n_top, count(panela.ge.A_cut) 
+		enddo 
+		print*,' '
+		print*,'A_cut final:'
+		print*, A_cut, n_top, count(panela.ge.A_cut) 
+
+		panel_top_ind = (/(paneli, paneli=1,totpop, 1)/)
+		top_ind = pack(panel_top_ind  , (panela.ge.A_cut) )
+		top_A   = pack(panela         , (panela.gt.A_cut) )
+		! Sort by assets
+		call Sort(80,top_A,top_A,top_ind_aux)
+		top_ind = top_ind(top_ind_aux)
+		! Test print
+		print*,' '
+		print*,'Top Agents and Top Assets'
+		do paneli=1,80
+			print*, top_ind(paneli),top_A(paneli)
+		enddo
+		print*,'Max(A)', maxval(panela)
+
+		top_folder = 'Top_A/'
+		call SIMULATION_TOP(bench_indx,top_ind,top_folder)
+
+	! Top Agents - PV
+		n_top = totpop 
+		A_hi  = maxval(panelPV_a)
+		A_low = minval(panelPV_a)
+		A_cut = (A_hi+A_low)/2.0_dp 
+		do while (n_top.ne.80)
+			n_top = count(panelPV_a.ge.A_cut)
+			if (n_top.gt.80) then
+				A_low = A_cut 
+			endif 
+			if (n_top.lt.80) then
+				A_hi  = A_cut 
+			endif 
+			A_cut = (A_hi+A_low)/2.0_dp 
+			print*, A_cut, n_top, count(panelPV_a.ge.A_cut) 
+		enddo 
+		print*,' '
+		print*,'A_cut final:'
+		print*, A_cut, n_top, count(panelPV_a.ge.A_cut) 
+
+		panel_top_ind = (/(paneli, paneli=1,totpop, 1)/)
+		top_ind = pack(panel_top_ind  , (panelPV_a.ge.A_cut) )
+		top_A   = pack(panelPV_a      , (panelPV_a.gt.A_cut) )
+		! Sort by assets
+		call Sort(80,top_A,top_A,top_ind_aux)
+		top_ind = top_ind(top_ind_aux)
+		! Test print
+		print*,' '
+		print*,'Top Agents and Top PV'
+		do paneli=1,80
+			print*, top_ind(paneli),top_A(paneli)
+		enddo
+		print*,'Max(PV)', maxval(panelPV_a)
+
+		top_folder = 'Top_PV/'
+		call SIMULATION_TOP(bench_indx,top_ind,top_folder)
+
+
 
 END SUBROUTINE SIMULATION
 
@@ -4482,12 +4580,13 @@ END SUBROUTINE SIMULATION
 !========================================================================================
 !========================================================================================
 
-SUBROUTINE  SIMULATION_TOP(bench_indx)
+SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	use parameters
 	use global
 	use omp_lib
 	IMPLICIT NONE
-	integer, intent(in) :: bench_indx
+	integer      , intent(in) :: bench_indx, top_ind(80)
+	character(10), intent(in) :: folder
 	integer  :: currentzi, currentlambdai, currentei, currentxi
 	REAL(DP) :: tempnoage, tempnoz, tempnolambda, tempnoe, tempnox, tempno, currenta, currentY
 	REAL(DP) :: start_timet, finish_timet, h_i
@@ -4498,110 +4597,18 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	INTEGER , DIMENSION(150,80) :: panelage_top, panelz_top, panelx_top, panel_lambda_top, panele_top
 	REAL(DP), DIMENSION(150,80) :: panela_top, panelK_top, panel_YL_top, panel_PV_top
 	REAL(DP), DIMENSION(150,80) :: prc_all_top, prc_cohort_top, prc_PV_all_top, prc_PV_cohort_top
-	INTEGER 				    :: top_ind(80), ii, age_top
+	INTEGER 				    :: ii, age_top, thread_num
 
 	!$ call omp_set_num_threads(20)
+	!$OMP parallel
+    !$OMP critical
+		thread_num = omp_get_thread_num()
+		newiseed   = -5 - thread_num
+		tempno     = omp_ran1(newiseed)
+       	! write(*,'("inside critical myt=",i4,f12.8)') thread_num,tempno,newiseed
+    !$OMP end critical
+    !$OMP end parallel
 
-	! top_ind = (/ 12989503 , 16359499 , 17210684 , 2112354  , 2286434  , 16526136 , 7438210  , 6869588  , 19078203 , 15606788 ,&
-	! 		&    2225856  , 12531737 , 11062763 , 19793497 , 16188809 , 18407385 , 11304514 , 6412028  , 1148323 , 8595835 ,&
-	! 		&    14145270 , 18478397 , 2737060  , 1032430  , 7474392  , 12080222 , 7661199  , 8814829  , 7723389 , 168007 ,&
-	! 		&    17158184 , 9059254  , 4597720  , 11328153 , 9623802  , 877507   , 9864235  , 5559945  , 16345916 , 7342133 ,&
-	! 		&    16218846 , 13141854 , 9039802  , 16373055 , 14633731 , 3949499  , 8253465  , 48763    , 18557196 , 19577804 ,&
-	! 		&    19590912 , 6845111  , 10804332 , 10151506 , 3053807  , 18567572 , 6728883  , 13320399 , 2160040 , 7239959 ,&
-	! 		&    366537   , 15071340 , 1194864  , 11098872 , 12735017 , 2876272  , 5195770  , 4720772  , 12421325 , 12027769 ,&
-	! 		&    6114885  , 14643750 , 11624454 , 13317533 , 10460044 , 9292769  , 177466   , 9419824  , 17555631 , 16615490/)
-
-	! !!!!! mu=0.90
-	top_ind = (/1027745 , 13370777 , 2578340  , 12721493 , 15992480 , 18145095 , 16807761 , 19835454 , &
-			&	1008782 , 15573343 , 13542267 , 10183588 , 8499198  , 581691 , 16956902 , 3627601 , &
-			&	228890  , 2303354  , 10011390 , 6598463  , 19291146 , 4607908 , 3569359 , 18948113 , &
-			&	438627  , 16602216 , 17629307 , 7600599  , 5320870  , 14538305 , 4466878 , 19232273 , &
-			&	2432177 , 1171329  , 19643948 , 12103728 , 18969224 , 6982625 , 2617874 , 2082088 , &
-			&	6809880 , 14543207 , 740124   , 16396254 , 16520732 , 1113455 , 10505521 , 20976 , &
-			&	8640468 , 14754253 , 6121212  , 9495368  , 1156346  , 4391606 , 18364374 , 5584757 , &
-			&	994030  , 8291893  , 17072990 , 5949940  , 19500753 , 8362065 , 6324433 , 14349124 , &
-			&	1573534 , 8811865  , 12648185 , 11772022 , 5427661  , 7602538 , 18051648 , 10116613 , &
-			&	8870728 , 15281153 , 1712322  , 8022334  , 18616664 , 6582950 , 50271 , 10466269/)
-	! mu=0.90 - PV top agents
-	! top_ind = (/12789728 , 5584757 , 11283880 , 10196328 , 13314394 , 18115795 , 17072990 , 8291893 , &
-	! 		&	12964012 , 5238510 , 5949940 , 19256884 , 581691 , 8362065 , 19500753 , 1810377 , &
-	! 		&	2490022 , 14349124 , 8499198 , 731157 , 7600599 , 16483537 , 6382250 , 9570960 , &
-	! 		&	7097487 , 6890905 , 4294128 , 14543207 , 2015564 , 6518379 , 1114521 , 8811865 , &
-	! 		&	16716922 , 19436994 , 14350540 , 3355659 , 19232273 , 9234150 , 4391606 , 5427661 , &
-	! 		&	14754253 , 11772022 , 7831184 , 18051648 , 10776278 , 8576051 , 18948113 , 17957134 , &
-	! 		&	10582402 , 1922566 , 10695927 , 16602216 , 8870728 , 15281153 , 1712322 , 9696683 , &
-	! 		&	6324433 , 82269 , 16520732 , 12648185 , 6582950 , 12071579 , 11922119 , 1573534 , &
-	! 		&	6598463 , 10116613 , 6177466 , 994030 , 19835454 , 13796187 , 8022334 , 18579771 , &
-	! 		&	10505521 , 11803640 , 10466269 , 7602538 , 8640468 , 18616664 , 50271 , 2250467/)
-
-	! !!!!! mu=0.80
-	! top_ind = (/10934920 , 19191064 , 18372413 , 14874704 , 12232037 , 856508   , 3890084  , 12453779 &
- ! 			& , 14538305 , 10451948 , 4114901  , 2435436  , 2700221  , 17291508 , 12169724 , 5303475 &
-	!  		& , 6209117  , 581691   , 11619469 , 15183198 , 15453836 , 731157   , 1333514  , 13542267 &
-	!  		& , 446556   , 10582402 , 18145095 , 16788887 , 16396254 , 6598463  , 5949940  , 19835454 &
-	!  		& , 18051648 , 740124   , 14350540 , 5584757  , 2250467  , 10011390 , 8362065  , 18948113 &
-	!  		& , 10874669 , 12103728 , 16602216 , 1573534  , 1156346  , 5427661  , 6177466  , 13907654 &
-	!  		& , 6324433  , 19500753 , 10505521 , 18969224 , 8499198  , 1113455  , 2924727  , 13133920 &
-	!  		& , 18364374 , 16520732 , 12648185 , 6121212  , 8291893  , 1712322  , 1171329  , 994030 &
-	!  		& , 11803640 , 19981873 , 6809880  , 18616664 , 50271    , 7602538  , 10116613 , 16956902 &
-	!  		& , 18579771 , 8870728  , 8022334  , 17072990 , 10466269 , 15281153 , 8640468  , 6582950/)
-	! mu=0.80 Top PV agents 
-	! top_ind = (/12453779 , 1976071 , 10951084 , 16483537 , 2651087 , 16788887 , 15222029 , 6382250 , &
-	! 		&	18115795 , 7391008 , 1279796 , 3890084 , 14786266 , 9929174 , 12964012 , 1810377 , &
-	! 		&	12648185 , 6809880 , 13314394 , 15453836 , 7458265 , 5238510 , 19436994 , 17365614 , &
-	! 		&	13157855 , 9685770 , 8576051 , 13711980 , 9635020 , 5303475 , 18220394 , 10776278 , &
-	! 		&	10401571 , 731157 , 3355659 , 16716922 , 14350540 , 6518379 , 2490022 , 1114521 , &
-	! 		&	19256884 , 18695486 , 16956902 , 18948113 , 11922119 , 82269 , 10582402 , 16602216 , &
-	! 		&	6890905 , 16520732 , 10116613 , 6598463 , 8870728 , 17072990 , 2015564 , 994030 , &
-	! 		&	8022334 , 10505521 , 10466269 , 19835454 , 6177466 , 15281153 , 9234150 , 18616664 , &
-	! 		&	12789728 , 7602538 , 1922566 , 7097487 , 50271 , 7831184 , 12071579 , 10695927 , &
-	! 		&	6582950 , 17957134 , 9696683 , 13796187 , 11803640 , 18579771 , 2250467 , 8640468/)
-
-	! ! mu=0.80 low X
-	! top_ind = (/5303475 , 4303884 , 5477457 , 19232273 , 2700221 , 446556 , 14874704 , 17291508 , &
-	! 		&	8876260 , 16788887 , 14349124 , 13542267 , 10582402 , 8811865 , 11772022 , 11619469 , &
-	! 		&	15183198 , 9685770 , 15573343 , 16807761 , 2250467 , 1333514 , 17403161 , 6598463 , &
-	! 		&	14350540 , 14538305 , 9719874 , 581691 , 9696683 , 740124 , 19835454 , 856508 , &
-	! 		&	10011390 , 18145095 , 13907654 , 6177466 , 18948113 , 16396254 , 5949940 , 18051648 , &
-	! 		&	13133920 , 2924727 , 5584757 , 1156346 , 10874669 , 10505521 , 6324433 , 8362065 , &
-	! 		&	18969224 , 8499198 , 1573534 , 16602216 , 1113455 , 16520732 , 19500753 , 5427661 , &
-	! 		&	18364374 , 1171329 , 12103728 , 6121212 , 11803640 , 19981873 , 12648185 , 994030 , &
-	! 		&	8291893 , 1712322 , 6809880 , 18616664 , 10116613 , 50271 , 7602538 , 18579771 , &
-	! 		&	16956902 , 8870728 , 17072990 , 8022334 , 8640468 , 15281153 , 10466269 , 6582950/) 	
-	! mu=0.80 low X - PV Top agents
-	! top_ind = (/12381576 , 6382250 , 12840192 , 7458265 , 1810377 , 5238510 , 11283880 , 8288122 , &
-	! 		&	4294128 , 16483537 , 8291893 , 18115795 , 2651087 , 7784174 , 17365614 , 6809880 , &
-	! 		&	19436994 , 19981873 , 10951084 , 19849754 , 728547 , 18220394 , 12964012 , 13711980 , &
-	! 		&	8576051 , 731157 , 10401571 , 5462367 , 5303475 , 3355659 , 12648185 , 13157855 , &
-	! 		&	9635020 , 19256884 , 14350540 , 10776278 , 6518379 , 2490022 , 16716922 , 9685770 , &
-	! 		&	1114521 , 18948113 , 82269 , 10582402 , 6890905 , 10116613 , 16520732 , 18695486 , &
-	! 		&	6598463 , 11922119 , 16602216 , 8870728 , 16956902 , 17072990 , 994030 , 10505521 , &
-	! 		&	6177466 , 19835454 , 2015564 , 8022334 , 15281153 , 10466269 , 18616664 , 7602538 , &
-	! 		&	9234150 , 7097487 , 50271 , 1922566 , 17957134 , 7831184 , 12071579 , 12789728 , &
-	! 		&	6582950 , 10695927 , 13796187 , 9696683 , 11803640 , 2250467 , 18579771 , 8640468 /)
-
-
-	! mu90 Top Shock
-	! top_ind = (/18097497 , 1669173 , 15265829 , 10442073 , 10614920 , 14602310 , 10959608 , 1868747 , &
-	! 	&	919902 , 2684573 , 2503854 , 10906470 , 17977840 , 7167586 , 10448523 , 6512018 , &
-	! 	&	11803640 , 14349124 , 8022334 , 15972901 , 15570051 , 2481747 , 4156800 , 18012786 , &
-	! 	&	12366265 , 5706767 , 14833303 , 14641549 , 6888788 , 10893120 , 7747606 , 3656728 , &
-	! 	&	12700147 , 5259241 , 12340525 , 4257668 , 3184669 , 17106617 , 8688632 , 13765574 , &
-	! 	&	3589040 , 15108879 , 18143268 , 4879992 , 14216536 , 17352963 , 16620229 , 1006963 , &
-	! 	&	12918500 , 8526676 , 2711887 , 14637893 , 8294256 , 8584655 , 12969119 , 18842280 , &
-	! 	&	344598 , 11864223 , 12199519 , 2250467 , 1472309 , 1951621 , 13671853 , 9229436 , &
-	! 	&	222926 , 6225883 , 10877058 , 10405276 , 3144270 , 3346106 , 6341162 , 10668050 , &
-	! 	&	4227053 , 9039572 , 13133920 , 7902457 , 16548302 , 10840093 , 17072990 , 6582950/)
-	top_ind = (/11563843 , 13765574 , 3589040 , 15108879 , 14552379 , 9310350 , 17759517 , 16106521 , &
-		&	4879992 , 14216536 , 17352963 , 9737875 , 12885003 , 1669173 , 16620229 , 1006963 , &
-		&	12918500 , 7464638 , 5666156 , 902886 , 2711887 , 14637893 , 8294256 , 12969119 , &
-		&	7746290 , 344598 , 6301127 , 15211238 , 11864223 , 16351148 , 14833303 , 17142517 , &
-		&	19389792 , 12199519 , 1472309 , 5510883 , 343513 , 1951621 , 222926 , 6225883 , &
-		&	10877058 , 4312889 , 9208926 , 15972901 , 17981332 , 10405276 , 7832658 , 3144270 , &
-		&	3346106 , 6341162 , 17957134 , 2386144 , 1528650 , 3744263 , 18116271 , 9039572 , &
-		&	13133920 , 819770 , 16548302 , 1734905 , 1721706 , 6093106 , 17977840 , 4232683 , &
-		&	6582950 , 7167586 , 2250467 , 4227053 , 4257668 , 11803640 , 18842280 , 8584655 , &
-		&	18143268 , 13671853 , 17072990 , 8526676 , 9229436 , 7902457 , 10668050 , 10840093/)
 
 	print*,'SIMULATION STARTED (for top agents)'
 
@@ -4623,17 +4630,18 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 
 	newiseed=-1
 
+	!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi)
 	DO paneli=1,totpop
 
 	! AGE
-	   tempnoage = ran1(newiseed)
+	   tempnoage = omp_ran1() ! ran1(newiseed)
 	   age=1
 	   DO WHILE (tempnoage*totpop .gt. cdfrequirednumberby_age(age))
 	       age=age+1
 	   ENDDO
 
 	! Z   
-	   tempnoz = ran1(newiseed)
+	   tempnoz = omp_ran1() ! ran1(newiseed)
 	   zi=1
 	   DO WHILE (tempnoz .gt. cdf_Gz(zi))
 	       zi=zi+1
@@ -4644,14 +4652,14 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	   xi=1
 	 
 	! LAMBDA  
-	   tempnolambda = ran1(newiseed) 
+	   tempnolambda = omp_ran1() ! ran1(newiseed) 
 	   lambdai=1
 	   DO WHILE (tempnolambda .gt. cdf_Glambda(lambdai))
 	       lambdai=lambdai+1
 	   ENDDO
 
 	! E   
-	   tempnoe = ran1(newiseed)   
+	   tempnoe = omp_ran1() ! ran1(newiseed)   
 	   ei=1
 	   DO WHILE (tempnoe .gt. cdf_Ge_byage(age,ei))
 	       ei=ei+1
@@ -4664,6 +4672,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	   panelx(paneli)		= xi
 	   
 	ENDDO
+	print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8)
 
 	print*, ' Initial states ready'
 
@@ -4679,6 +4688,8 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	!call cpu_time(start_timet) 
 
 	DO simutime=1, MaxSimuTime
+		!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi, &
+		!$omp& currenta,currentzi,currentlambdai,currentei,currentxi,tklo,tkhi,tempno)
 	    DO paneli=1,totpop
 	    
 	       	currenta  		= panela(paneli)
@@ -4716,7 +4727,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 
 	             
 			! DRAW NEXT PERIOD'S AGE DBN
-	      	tempnoage = ran1(newiseed)  
+	      	tempnoage = omp_ran1() ! ran1(newiseed)  
 	  
 	      	IF (tempnoage .gt. survP(age)) THEN
 				panelage(paneli)   = 1
@@ -4730,7 +4741,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 	     	age = panelage(paneli)   
 	     	IF (age .eq. 1) THEN    
 				! Z      
-		       	tempnoz = ran1(newiseed) 
+		       	tempnoz = omp_ran1() ! ran1(newiseed) 
 		       	zi=1
 				DO WHILE (tempnoz .gt. cdf_pr_z(currentzi,zi))
 					zi=zi+1
@@ -4740,7 +4751,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 		       	xi = 1
 	       
 				! LAMBDA  
-				tempnolambda = ran1(newiseed) 
+				tempnolambda = omp_ran1() ! ran1(newiseed) 
 				lambdai=1
 				DO WHILE (tempnolambda .gt. cdf_pr_lambda(currentlambdai,lambdai))
 					lambdai=lambdai+1
@@ -4757,7 +4768,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 
        		else  IF (age .gt. 1) THEN
        			currentxi = panelx(paneli)
-       			tempno 	  = ran1(newiseed)   
+       			tempno 	  = omp_ran1() ! ran1(newiseed)   
 	            xi 		  = 1
 	            DO WHILE (tempno .gt. cdf_pr_x(currentxi,xi,zi,age-1))
 	               xi = xi+1
@@ -4766,7 +4777,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 
 	            IF (age.lt.RetAge) THEN
 		            currentei = panele(paneli)   
-		            tempno 	  = ran1(newiseed)   
+		            tempno 	  = omp_ran1() ! ran1(newiseed)   
 		            ei 		  = 1
 		            DO WHILE (tempno .gt. cdf_pr_e(currentei,ei))
 		               ei = ei+1
@@ -4800,7 +4811,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
 		    enddo 
 
 
-     		print*, "Selecting top agents - Period", age_top
+     		! print*, "Selecting top agents - Period", age_top
      		panelage_top(age_top,:) = panelage(top_ind)
      		panelz_top(age_top,:)   = panelz(top_ind)
      		panela_top(age_top,:)   = panela(top_ind)
@@ -4861,39 +4872,44 @@ SUBROUTINE  SIMULATION_TOP(bench_indx)
      	endif
 	    print*, "Simulation period", simutime
 	ENDDO ! simutime
+	print*,' '
+	print*,'Averages'
+	print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8), sum(panela)/real(totpop,8)
+
 
 	print*, ' '
 	print*, 'Writing simulation results for top agents'
-	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/Top_PV/' )
+	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' // trim(folder) )
+
 
 	if (bench_indx.eq.1) then
-		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Top_PV/panela_top_bench'			, STATUS='replace')
-		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Top_PV/panelage_top_bench'		, STATUS='replace')
-		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/Top_PV/panelz_top_bench'			, STATUS='replace')
-		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/Top_PV/panelK_top_bench'    		, STATUS='replace')
-		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/Top_PV/panelx_top_bench'   	 	, STATUS='replace')
-		OPEN(UNIT=29, FILE=trim(Result_Folder)//'Simul/Top_PV/panele_top_bench'    		, STATUS='replace')
-		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/Top_PV/panel_lambda_top_bench'	, STATUS='replace')
-		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/Top_PV/panel_YL_top_bench'	    , STATUS='replace')
-		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Top_PV/prc_all_top_bench'		, STATUS='replace')
-		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/Top_PV/prc_cohort_top_bench'	    , STATUS='replace')
-		OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/Top_PV/panel_PV_top_bench'    	, STATUS='replace')
-		OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/Top_PV/prc_PV_all_top_bench'		, STATUS='replace')
-		OPEN(UNIT=36, FILE=trim(Result_Folder)//'Simul/Top_PV/prc_PV_cohort_top_bench'	, STATUS='replace')
+		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panela_top_bench'			, STATUS='replace')
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panelage_top_bench'		, STATUS='replace')
+		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panelz_top_bench'			, STATUS='replace')
+		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panelK_top_bench'    		, STATUS='replace')
+		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panelx_top_bench'   	 	, STATUS='replace')
+		OPEN(UNIT=29, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panele_top_bench'    		, STATUS='replace')
+		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panel_lambda_top_bench'	, STATUS='replace')
+		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panel_YL_top_bench'	    , STATUS='replace')
+		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'prc_all_top_bench'			, STATUS='replace')
+		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'prc_cohort_top_bench'	    , STATUS='replace')
+		OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panel_PV_top_bench'    	, STATUS='replace')
+		OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'prc_PV_all_top_bench'		, STATUS='replace')
+		OPEN(UNIT=36, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'prc_PV_cohort_top_bench'	, STATUS='replace')
 	else 
-		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Top_PV/panela_top_exp'			, STATUS='replace')
-		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Top_PV/panelage_top_exp'		    , STATUS='replace')
-		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/Top_PV/panelz_top_exp'			, STATUS='replace')
-		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/Top_PV/panelK_top_exp' 	    	, STATUS='replace')
-		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/Top_PV/panelx_top_exp'  	        , STATUS='replace')
-		OPEN(UNIT=29, FILE=trim(Result_Folder)//'Simul/Top_PV/panele_top_exp'    		, STATUS='replace')
-		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/Top_PV/panel_lambda_top_exp'	    , STATUS='replace')
-		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/Top_PV/panel_YL_top_exp'	        , STATUS='replace')
-		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Top_PV/prc_all_top_exp'			, STATUS='replace')
-		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/Top_PV/prc_cohort_top_exp'		, STATUS='replace')
-		OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/Top_PV/panel_PV_top_exp'    	    , STATUS='replace')
-		OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/Top_PV/prc_PV_all_top_exp'		, STATUS='replace')
-		OPEN(UNIT=36, FILE=trim(Result_Folder)//'Simul/Top_PV/prc_PV_cohort_top_exp'	, STATUS='replace')
+		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panela_top_exp'			, STATUS='replace')
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panelage_top_exp'		    , STATUS='replace')
+		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panelz_top_exp'			, STATUS='replace')
+		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panelK_top_exp' 	    	, STATUS='replace')
+		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panelx_top_exp'	   	 	, STATUS='replace')
+		OPEN(UNIT=29, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panele_top_exp'    		, STATUS='replace')
+		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panel_lambda_top_exp'	    , STATUS='replace')
+		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panel_YL_top_exp'	        , STATUS='replace')
+		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'prc_all_top_exp'			, STATUS='replace')
+		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'prc_cohort_top_exp'		, STATUS='replace')
+		OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panel_PV_top_exp'    	    , STATUS='replace')
+		OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'prc_PV_all_top_exp'		, STATUS='replace')
+		OPEN(UNIT=36, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'prc_PV_cohort_top_exp'		, STATUS='replace')
 	endif 
 
 
@@ -6015,6 +6031,69 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 	CLOSE (unit=19)
 
 END SUBROUTINE Write_Experimental_Results
+
+
+!========================================================================================
+!========================================================================================
+
+    function omp_ran1(idum)
+        ! returns a uniform random number between 0 and 1
+        ! see numerical recipes
+        ! press,flannery,teukolsky & vetterling
+        ! cambridge university press 1986 pp 191-2-3
+        ! http://geco.mines.edu/prototype/Show_me_some_local_HPC_tutorials/examples/openmp/ranmod.f90
+        ! http://inside.mines.edu/~tkaiser/fortran//
+        ! https://people.sc.fsu.edu/~jburkardt/f_src/random_openmp/random_openmp.html
+        ! http://jblevins.org/log/openmp
+        implicit none
+        integer, intent(inout), optional :: idum
+        real(DP) :: omp_ran1
+        integer  :: m1,m2,m3,ia1,ia2,ia3,ic1,ic2,ic3
+        integer  :: iff
+        integer  :: ix1,ix2,ix3,j
+        real(DP) :: r(97),rm1,rm2
+        
+        parameter (m1=259200,ia1=7141,ic1=54773)
+        parameter (m2=134456,ia2=8121,ic2=28411)
+        parameter (m3=243000,ia3=4561,ic3=51349)
+        data iff /0/
+        
+        !$OMP THREADPRIVATE(iff,ix1,ix2,ix3,j,r,rm1,rm2) 
+        save iff,ix1,ix2,ix3,j,r,rm1,rm2
+        if(present(idum))then
+            if (idum<0.or.iff.eq.0)then
+                rm1=1.0_dp/m1
+                rm2=1.0_dp/m2
+                iff=1
+                ix1=mod(ic1-idum,m1)
+                ix1=mod(ia1*ix1+ic1,m1)
+                ix2=mod(ix1,m2)
+                ix1=mod(ia1*ix1+ic1,m1)
+                ix3=mod(ix1,m3)
+                do  j=1,97
+                    ix1=mod(ia1*ix1+ic1,m1)
+                    ix2=mod(ia2*ix2+ic2,m2)
+                    r(j)=(float(ix1)+float(ix2)*rm2)*rm1
+                enddo 
+                idum=1
+            endif
+        endif
+        
+        ix1=mod(ia1*ix1+ic1,m1)
+        ix2=mod(ia2*ix2+ic2,m2)
+        ix3=mod(ia3*ix3+ic3,m3)
+        j=1+(97*ix3)/m3
+
+        if(j>97.or.j<1)then
+            write(*,*)' error in omp_ran1 j=',j
+            stop
+        endif
+
+        omp_ran1=r(j)
+        r(j)=(float(ix1)+float(ix2)*rm2)*rm1
+        return
+    end function omp_ran1
+
 
 
 !========================================================================================
