@@ -4386,7 +4386,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		    	where(panelage==1) eligible = 0 
 	        endif 
 
-	 		print*, "Simulation period", simutime
+	 		! print*, "Simulation period", simutime
 		ENDDO ! simutime
 		print*,' '
 		print*,'Averages'
@@ -4889,7 +4889,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 
      		enddo
      	endif
-	    print*, "Simulation period", simutime
+	    ! print*, "Simulation period", simutime
 	ENDDO ! simutime
 	print*,' '
 	print*,'Averages'
