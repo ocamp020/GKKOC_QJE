@@ -4346,7 +4346,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		            ENDDO            
 		            panele(paneli)=ei 
 	            ENDIF 
-	            !$omp end critical          
+	            ! !$omp end critical          
 	     	ENDIF ! new age==1
 		ENDDO ! paneli
 
