@@ -3653,17 +3653,17 @@ SUBROUTINE  INITIALIZE()
 			enddo 
 			enddo
 
-			print*, ' '
-			print*, 'CDF of X'
-			do age=1,MaxAge 
-				print*, ' '
-				do zi=1,nz 
-					print*, 'Age=',age,'zi=',zi
-					do ee0=1,nx 
-						print*, cdf_pr_x(ee0,:,zi,age)
-					enddo 
-				enddo 
-			enddo 
+			! print*, ' '
+			! print*, 'CDF of X'
+			! do age=1,MaxAge 
+			! 	print*, ' '
+			! 	do zi=1,nz 
+			! 		print*, 'Age=',age,'zi=',zi
+			! 		do ee0=1,nx 
+			! 			print*, cdf_pr_x(ee0,:,zi,age)
+			! 		enddo 
+			! 	enddo 
+			! enddo 
 
 			! Labor income permanent component
 			DO ee0 = 1,nlambda
@@ -4326,15 +4326,17 @@ SUBROUTINE  SIMULATION(bench_indx)
 				panelx(paneli)		= xi
 
        		else  IF (age .gt. 1) THEN
+       			!$omp critical
        			print*,'Test 1'
        			currentxi = panelx(paneli)
        			tempno 	  = omp_ran1() ! ran1(newiseed)   
 	            xi 		  = 1
 	            DO WHILE (tempno .gt. cdf_pr_x(currentxi,xi,zi,age-1))
+	            	print*, 'tempno',tempno,'xi',xi
 	               xi = xi+1
 	            ENDDO            
 	            panelx(paneli)=xi          
-
+	            print*,'Test 1.1'
 	            IF (age.lt.RetAge) THEN
 		            currentei = panele(paneli)   
 		            tempno 	  = omp_ran1() ! ran1(newiseed)   
@@ -4343,7 +4345,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		               ei = ei+1
 		            ENDDO            
 		            panele(paneli)=ei 
-	            ENDIF           
+	            ENDIF 
+	            !$omp end critical          
 	     	ENDIF ! new age==1
 		ENDDO ! paneli
 
