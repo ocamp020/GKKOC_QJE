@@ -4326,17 +4326,17 @@ SUBROUTINE  SIMULATION(bench_indx)
 				panelx(paneli)		= xi
 
        		else  IF (age .gt. 1) THEN
-       			!$omp critical
-       			print*,'Test 1'
+       			! !$omp critical
+       			! print*,'Test 1'
        			currentxi = panelx(paneli)
        			tempno 	  = omp_ran1() ! ran1(newiseed)   
 	            xi 		  = 1
-	            DO WHILE (tempno .gt. cdf_pr_x(currentxi,xi,zi,age-1))
-	            	print*, 'tempno',tempno,'xi',xi
+	            DO WHILE (tempno .gt. cdf_pr_x(currentxi,xi,currentzi,age-1))
+	            	! print*, 'tempno',tempno,'xi',xi
 	               xi = xi+1
 	            ENDDO            
 	            panelx(paneli)=xi          
-	            print*,'Test 1.1'
+	            ! print*,'Test 1.1'
 	            IF (age.lt.RetAge) THEN
 		            currentei = panele(paneli)   
 		            tempno 	  = omp_ran1() ! ran1(newiseed)   
