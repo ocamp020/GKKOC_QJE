@@ -4789,7 +4789,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
        			currentxi = panelx(paneli)
        			tempno 	  = omp_ran1() ! ran1(newiseed)   
 	            xi 		  = 1
-	            DO WHILE (tempno .gt. cdf_pr_x(currentxi,xi,zi,age-1))
+	            DO WHILE (tempno .gt. cdf_pr_x(currentxi,xi,currentzi,age-1))
 	               xi = xi+1
 	            ENDDO            
 	            panelx(paneli)=xi          
