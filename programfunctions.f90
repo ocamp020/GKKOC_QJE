@@ -3652,6 +3652,19 @@ SUBROUTINE  INITIALIZE()
 				ENDDO
 			enddo 
 			enddo
+
+			print*, ' '
+			print*, 'CDF of X'
+			do age=1,MaxAge 
+				print*, ' '
+				do zi=1,nz 
+					print*, 'Age=',age,'zi=',zi
+					do ee0=1,nx 
+						print*, cdf_pr_x(ee0,:,zi,age)
+					enddo 
+				enddo 
+			enddo 
+
 			! Labor income permanent component
 			DO ee0 = 1,nlambda
 			    cdf_Glambda(ee0) = sum(Glambda(1:ee0))
@@ -4218,6 +4231,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	ENDDO
 	print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8)
 
+
 	! SET INITIAL ASSET DISTRIBUTION
 	panela            = 1.0_DP
 
@@ -4230,7 +4244,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	!call cpu_time(start_timet) 
 	eligible    = 1 
 	death_count = 0
-
+	print*, 'Starting Simutime loop'
 	DO simutime=1, MaxSimuTime
 		!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi, &
 		!$omp& currenta,currentzi,currentlambdai,currentei,currentxi,tklo,tkhi,tempno)
@@ -4283,7 +4297,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 	    
 			! DRAW Z and LAMBDA DISTRIBUTION FOR ONE-YEAR OLDS
 	     	age = panelage(paneli)   
-	     	IF (age .eq. 1) THEN    
+	     	IF (age .eq. 1) THEN  
+	     		print*,'Test 2'  
 				! Z      
 		       	tempnoz = omp_ran1() ! ran1(newiseed) 
 		       	zi=1
@@ -4311,6 +4326,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				panelx(paneli)		= xi
 
        		else  IF (age .gt. 1) THEN
+       			print*,'Test 1'
        			currentxi = panelx(paneli)
        			tempno 	  = omp_ran1() ! ran1(newiseed)   
 	            xi 		  = 1
@@ -4672,9 +4688,9 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	   panelx(paneli)		= xi
 	   
 	ENDDO
-	!print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8)
-	!print*, 'Hello'
-	!print*, ' Initial states ready'
+	print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8)
+
+	print*, ' Initial states ready'
 
 	! SET INITIAL ASSET DISTRIBUTION
 	panela            = 1.0_DP
