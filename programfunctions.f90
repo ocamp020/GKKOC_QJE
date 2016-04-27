@@ -4354,28 +4354,28 @@ SUBROUTINE  SIMULATION(bench_indx)
 			! 1) They don't die during the first two recording periods
 			! 2) They they die between the third recording period and the recording periods for the next generation
 			! 3) They don't die again
-			if (simutime.eq.(MaxSimuTime-15)) then 
+			if (simutime.eq.(MaxSimuTime-34)) then 
 		    	panela_parents   = panela
 		    	! panelage_parents = panelage
 	        endif 
-	        if (simutime.eq.(MaxSimuTime-14)) then 
+	        if ((simutime.ge.(MaxSimuTime-(5+33))).and.(simutime.le.(MaxSimuTime-(5+31)))) then 
 		    	panela_parents   = panela_parents  + panela
 		    	! panelage_parents = panelage
 		    	where(panelage==1) eligible = 0 
 	        endif 
-	        if (simutime.eq.(MaxSimuTime-13)) then 
+	        if (simutime.eq.(MaxSimuTime-(5+30))) then 
 		    	panela_parents   = panela_parents   + panela
 		    	panelage_parents = panelage
 		    	where(panelage==1) eligible = 0 
 	        endif 
-	        if ((simutime.ge.(MaxSimuTime-12)).and.(simutime.le.(MaxSimuTime-2))) then
+	        if ((simutime.ge.(MaxSimuTime-(5+29))).and.(simutime.le.(MaxSimuTime-4))) then
 	        	where(panelage==1) death_count = death_count + 1
 	        endif
-	        if (simutime.eq.(MaxSimuTime-2)) then 
+	        if (simutime.eq.(MaxSimuTime-4)) then 
 		    	panela_sons   = panela
 		    	! panelage_sons = panelage 
 	        endif 
-	        if (simutime.eq.(MaxSimuTime-1)) then 
+	        if ((simutime.ge.(MaxSimuTime-3)).and.(simutime.le.(MaxSimuTime-1))) then 
 		    	panela_sons   = panela_sons   + panela
 		    	! panelage_sons = panelage 
 		    	where(panelage==1) eligible = 0 
@@ -4393,11 +4393,13 @@ SUBROUTINE  SIMULATION(bench_indx)
 		print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8), sum(panela)/real(totpop,8)
 
 		! Mean of assets 
-			panela_parents = panela_parents/3.0_dp 
-			panela_sons    = panela_sons/3.0_dp 
+			panela_parents = panela_parents/5.0_dp 
+			panela_sons    = panela_sons/5.0_dp 
 
 		! Clean eligibles 
 			where(death_count/=1) eligible = 0
+			where(panelage_sons.lt.34) eligible = 0
+			where(panelage_parents.lt.34) eligible = 0
 
 
 		! Get data on intergenerational mobility
