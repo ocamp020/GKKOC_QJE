@@ -45,7 +45,7 @@ PROGRAM main
 	! Capital Market
 		theta_folder = 1.50_dp
 		do zi=1,nz
-		theta(zi)        = 1.00_dp+(5.00_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+		theta(zi)        = 1.00_dp+(10.00_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 		enddo
 	! Threshold 
 		Threshold_Factor = 0.00_dp 
@@ -87,7 +87,7 @@ PROGRAM main
 		beta   	= 0.9480_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
-		sigma_z_eps      =  0.06_dp ! params(4) ! 0.01_dp ! ! 
+		sigma_z_eps      =  0.05_dp ! params(4) ! 0.01_dp ! ! 
 		sigma_lambda_eps = params(5)
 		gamma  	=  0.457_dp !  0.465_dp ! params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
