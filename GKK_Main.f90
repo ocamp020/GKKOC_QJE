@@ -45,7 +45,7 @@ PROGRAM main
 	! Capital Market
 		theta_folder = 1.50_dp
 		do zi=1,nz
-		theta(zi)        = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+		theta(zi)        = 1.00_dp+(10.00_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 		enddo
 	! Threshold 
 		Threshold_Factor = 0.00_dp 
@@ -55,11 +55,11 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
-			compute_exp   = .true.
+			compute_bench = .true.
+			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 	! Switch for separable and non-separable utility
@@ -79,23 +79,10 @@ PROGRAM main
 
 	! Set Parameters
 		Params =[0.962_dp, 0.0_dp, 0.50_dp, 0.387_dp, 0.29_dp, 0.4494_dp] ! alpha=0.4, zgrid 11, m5, alpha=0.4, dep005, mu=090, K/Y=3, Top1PVa=0.36
-		! Params =[0.973_dp, 0.0_dp, 0.50_dp, 0.6567_dp,  0.30_dp,  0.4494_dp] ! mu=0.8
-		
-		! Exponential shock mu=0.9, matuchenz=5, nz_aux=11, nz=9
-		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x
-		! 0.95	0.07	5		2.952165	0.79992289		0.38810872	8.55075051	35.073503	61.033801	0.1 	0.0
-		! Exponential shock mu=0.8, matuchenz=5, nz_aux=11, nz=9
-		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
-		! 0.96  0.112   5       3.07418882	0.8106354897	0.39135703	8.01261403	35.761943	61.0476523  0.1     0.0 	0.455
-		! Retirement Shock mu=0.8, matuchenz=5, nz_aux=11, nz=9, low X
-		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
-		! 0.965 0.337   1.80    3.0843335	0.8088928 		0.4026798  	7.9693873  	35.1277 	64.44152  	0.1     0.0  	0.465
-		! Retirement Shock mu=0.7, matuchenz=5, nz_aux=11, nz=9, low X
-		! beta	sigmaz	x_hi	W/GDP		STD_Earnings	Mean_Labor	MeanReturn	PV_Top_1%	PV_Top_10%	a_x 	b_x 	gamma 
-		! 0.965 0.343   2.50    3.022731	0.814399 		0.396095  	8.234316  	35.623980 	63.19873  	0.1     0.0  	0.462
+
 		! New Exponential Shock that only affects high Z and includes Z-varying theta
 		! beta 		sigmaz 		x_hi 	rho_z 	gamma
-		! 0.954_dp 0.074_dp  	5.00_dp 0.1_dp 	0.457_dp
+		! 0.948_dp 0.077_dp  	5.00_dp 0.1_dp 	0.457_dp
 
 		beta   	= 0.9480_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
@@ -103,6 +90,7 @@ PROGRAM main
 		sigma_z_eps      =  0.077_dp ! params(4) ! 0.01_dp ! ! 
 		sigma_lambda_eps = params(5)
 		gamma  	=  0.457_dp !  0.465_dp ! params(6) ! 
+		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
 		
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
@@ -151,7 +139,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Ret_Shock/' 
+		Result_Folder = trim(Result_Folder)//'Ret_Shock_theta10/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
