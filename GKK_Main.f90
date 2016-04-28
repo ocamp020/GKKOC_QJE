@@ -55,8 +55,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
-			compute_exp   = .true.
+			compute_bench = .false.
+			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Simul_Switch  = .true.
@@ -80,16 +80,19 @@ PROGRAM main
 	! Set Parameters
 		Params =[0.962_dp, 0.0_dp, 0.50_dp, 0.387_dp, 0.29_dp, 0.4494_dp] ! alpha=0.4, zgrid 11, m5, alpha=0.4, dep005, mu=090, K/Y=3, Top1PVa=0.36
 
-		! New Exponential Shock that only affects high Z and includes Z-varying theta
+		! New Exponential Shock that only affects high Z and includes Z-varying theta 2.5
 		! beta 		sigmaz 		x_hi 	rho_z 	gamma
 		! 0.948_dp 0.077_dp  	5.00_dp 0.1_dp 	0.457_dp
+		! New Exponential Shock that only affects high Z and includes Z-varying theta 10
+		! beta 		sigmaz 		x_hi 	rho_z 	gamma
+		! 0.948_dp 0.0585_dp  	5.00_dp 0.1_dp 	0.462_dp
 
 		beta   	= 0.948_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
-		sigma_z_eps      =  0.0585_dp ! params(4) ! 0.01_dp ! ! 
+		sigma_z_eps      =  0.077_dp ! params(4) ! 0.01_dp ! ! 
 		sigma_lambda_eps = params(5)
-		gamma  	=  0.462_dp !  0.465_dp ! params(6) ! 
+		gamma  	=  0.457_dp !  0.465_dp ! params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
 		
 		sigma  	= 4.0_dp
@@ -139,7 +142,8 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Ret_Shock_theta10/' 
+		Result_Folder = trim(Result_Folder)//'Ret_Shock/' 
+		! Result_Folder = trim(Result_Folder)//'Ret_Shock_theta10/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
