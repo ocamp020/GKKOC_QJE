@@ -45,7 +45,7 @@ PROGRAM main
 	! Capital Market
 		theta_folder = 1.50_dp
 		do zi=1,nz
-		theta(zi)        = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+		theta(zi)        = 1.00_dp+(10.00_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 		enddo
 	! Threshold 
 		Threshold_Factor = 0.00_dp 
@@ -90,9 +90,9 @@ PROGRAM main
 		beta   	= 0.948_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
-		sigma_z_eps      =  0.077_dp ! params(4) ! 0.01_dp ! ! 
+		sigma_z_eps      =  0.0585_dp ! params(4) ! 0.01_dp ! ! 
 		sigma_lambda_eps = params(5)
-		gamma  	=  0.457_dp !  0.465_dp ! params(6) ! 
+		gamma  	=  0.462_dp !  0.465_dp ! params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
 		
 		sigma  	= 4.0_dp
@@ -142,8 +142,8 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Ret_Shock/' 
-		! Result_Folder = trim(Result_Folder)//'Ret_Shock_theta10/' 
+		! Result_Folder = trim(Result_Folder)//'Ret_Shock/' 
+		Result_Folder = trim(Result_Folder)//'Ret_Shock_theta10/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
