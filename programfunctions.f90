@@ -4355,21 +4355,21 @@ SUBROUTINE  SIMULATION(bench_indx)
 			! 1) They don't die during the first two recording periods
 			! 2) They they die between the third recording period and the recording periods for the next generation
 			! 3) They don't die again
-			if (simutime.eq.(MaxSimuTime-34)) then 
+			if (simutime.eq.(MaxSimuTime-54)) then 
 		    	panela_parents   = panela
 		    	! panelage_parents = panelage
 	        endif 
-	        if ((simutime.ge.(MaxSimuTime-(5+33))).and.(simutime.le.(MaxSimuTime-(5+31)))) then 
+	        if ((simutime.ge.(MaxSimuTime-(5+53))).and.(simutime.le.(MaxSimuTime-(5+51)))) then 
 		    	panela_parents   = panela_parents  + panela
 		    	! panelage_parents = panelage
 		    	where(panelage==1) eligible = 0 
 	        endif 
-	        if (simutime.eq.(MaxSimuTime-(5+30))) then 
+	        if (simutime.eq.(MaxSimuTime-(5+50))) then 
 		    	panela_parents   = panela_parents   + panela
 		    	panelage_parents = panelage
 		    	where(panelage==1) eligible = 0 
 	        endif 
-	        if ((simutime.ge.(MaxSimuTime-(5+29))).and.(simutime.le.(MaxSimuTime-4))) then
+	        if ((simutime.ge.(MaxSimuTime-(5+49))).and.(simutime.le.(MaxSimuTime-4))) then
 	        	where(panelage==1) death_count = death_count + 1
 	        endif
 	        if (simutime.eq.(MaxSimuTime-4)) then 
@@ -4399,8 +4399,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		! Clean eligibles 
 			where(death_count/=1) eligible = 0
-			where(panelage_sons.lt.34) eligible = 0
-			where(panelage_parents.lt.34) eligible = 0
+			where(panelage_sons.lt.25) eligible = 0
+			where(panelage_sons.gt.41) eligible = 0
+			where(panelage_parents.lt.25) eligible = 0
+			where(panelage_parents.gt.41) eligible = 0
 
 
 		! Get data on intergenerational mobility
