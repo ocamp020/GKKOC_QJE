@@ -3591,27 +3591,22 @@ SUBROUTINE  INITIALIZE()
 		if (nx.gt.1) then
 			print*, 'X probability '
 			xgrid = (/x_hi , x_lo , x_0/)
-			! Working period
-				! Low z types stay in x=1 until retirement
-				pr_x(1,1,1:4,1:RetAge-2) = 1.00_dp 
-				pr_x(1,2,1:4,1:RetAge-2) = 0.00_dp 
-				pr_x(1,3,1:4,1:RetAge-2) = 0.00_dp
-				! High z types have 5% probability of going from x=1 to x=2
-				pr_x(1,1,5:nz,1:RetAge-2) = 0.95_dp 
-				pr_x(1,2,5:nz,1:RetAge-2) = 0.05_dp 
-				pr_x(1,3,5:nz,1:RetAge-2) = 0.00_dp
-				! x=2 is an absorbing state for all
-				pr_x(2,1,:,1:RetAge-2) = 0.00_dp 
-				pr_x(2,2,:,1:RetAge-2) = 1.00_dp 
-				pr_x(2,3,:,1:RetAge-2) = 0.00_dp
-				! x=3 is never reached but arbitrary transitions are included
-				pr_x(3,1,:,1:RetAge-2) = 0.00_dp 
-				pr_x(3,2,:,1:RetAge-2) = 1.00_dp 
-				pr_x(3,3,:,1:RetAge-2) = 0.00_dp
-			!Retirement Period
-				pr_x(:,1,:,RetAge-1:) = 0.00_dp 
-				pr_x(:,2,:,RetAge-1:) = 0.00_dp 
-				pr_x(:,3,:,RetAge-1:) = 1.00_dp
+			! Low z types stay in x=1 until retirement
+				pr_x(1,1,1:4,:) = 0.97_dp 
+				pr_x(1,2,1:4,:) = 0.00_dp 
+				pr_x(1,3,1:4,:) = 0.03_dp
+			! High z types have 5% probability of going from x=1 to x=2
+				pr_x(1,1,5:nz,:) = 0.92_dp 
+				pr_x(1,2,5:nz,:) = 0.05_dp 
+				pr_x(1,3,5:nz,:) = 0.03_dp
+			! x=2 goes to x=3 with probability 3%
+				pr_x(2,1,:,:) = 0.00_dp 
+				pr_x(2,2,:,:) = 0.97_dp 
+				pr_x(2,3,:,:) = 0.03_dp
+			! x=3 is an absorbing state
+				pr_x(3,1,:,:) = 0.00_dp 
+				pr_x(3,2,:,:) = 0.00_dp 
+				pr_x(3,3,:,:) = 1.00_dp
 			! Gx is not used. So it is initialized to an arbitrary value
 				Gx(1,:,:) = 0.50_dp ; Gx(2,:,:) = 0.50_dp ; Gx(3,:,:) = 0.00_dp ;
 			! xz grid

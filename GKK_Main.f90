@@ -45,7 +45,7 @@ PROGRAM main
 	! Capital Market
 		theta_folder = 1.50_dp
 		do zi=1,nz
-		theta(zi)        = 1.00_dp+(10.00_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+		theta(zi)        = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 		enddo
 	! Threshold 
 		Threshold_Factor = 0.00_dp 
@@ -55,11 +55,11 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
+			compute_bench = .true.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 	! Switch for separable and non-separable utility
