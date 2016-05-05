@@ -56,10 +56,10 @@ PROGRAM main
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
 			compute_bench = .true.
-			compute_exp   = .false.
+			compute_exp   = .true.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-		Simul_Switch  = .false.
+		Simul_Switch  = .true.
 
 
 	! Switch for separable and non-separable utility
@@ -87,7 +87,7 @@ PROGRAM main
 		! beta 		sigmaz 		x_hi 	rho_z 	gamma
 		! 0.948_dp 0.0585_dp  	5.00_dp 0.1_dp 	0.462_dp
 
-		beta   	= 0.948_dp ! params(1) !
+		beta   	= 0.9485_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
 		sigma_z_eps      =  0.0665_dp ! params(4) ! 0.01_dp ! ! 
