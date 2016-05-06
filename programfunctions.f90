@@ -4158,7 +4158,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	INTEGER 						     :: IGM_index, n_eligible, thread 
 	! Intergenerational statistics 40-60
 	REAL(DP), DIMENSION(totpop) 	     :: assets_dad_2, assets_son_2
-	INTEGER , DIMENSION(totpop) 	     :: age_dad_2, age_son_2
+	INTEGER , DIMENSION(totpop) 	     :: age_dad_4060, age_son_2
 	REAL(DP), DIMENSION(2,200000,20)     :: IGM_matrix_2
 	REAL(DP), DIMENSION(2,200000*20)     :: IGM_matrix_flat_2
 	REAL(DP), DIMENSION(:) , allocatable :: panela_dad_2, panela_son_2
@@ -4261,7 +4261,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	age_dad = 0 ; age_son = 0 ; assets_dad = 0.0_dp ; assets_son = 0.0_dp ;
 	IGM_index = 1 ; IGM_matrix = 0.0_dp ; 
-	age_dad_2 = 0 ; age_son_2 = 0 ; assets_dad_2 = 0.0_dp ; assets_son_2 = 0.0_dp ;
+	age_dad_4060 = 0 ; age_son_2 = 0 ; assets_dad_2 = 0.0_dp ; assets_son_2 = 0.0_dp ;
 	IGM_index_2 = 1 ; IGM_matrix_2 = 0.0_dp
 	
 	print*, 'Starting Simutime loop'
@@ -4404,7 +4404,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     	endif 
 		     	! Reset variables if son dies before 60
 		     	if ((age.eq.1).and.(age_son_2(paneli).lt.41)) then 
-		     		age_dad(paneli)    = 0
+		     		age_dad_4060(paneli)    = 0
 		     		! age_son_2(paneli)    = 0 
 		     		! assets_dad_2(paneli) = 0.0_dp ; assets_son_2(paneli) = 0.0_dp
 		     	endif 
