@@ -4373,30 +4373,33 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     		if ((age.ge.11).and.(age.le.31)) then 
 		     		age_son(paneli)    = age 
 		     		assets_son(paneli) = currenta + assets_son(paneli)
-		     		!$omp critical
-		     		print*, ' Potential Agent', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
-		     		!$omp end critical
+		     		! !$omp critical
+		     		! print*, ' Potential Agent', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
+		     		! !$omp end critical
 		     	endif 
 		     	! Reset variables if son dies before 50
 		     	if ((age.eq.1).and.(age_son(paneli).lt.31)) then 
-		     		!$omp critical
-		     		print*, ' Agent died', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
-		     		!$omp end critical
+		     		! !$omp critical
+		     		! print*, ' Agent died', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
+		     		! !$omp end critical
 		     		age_dad(paneli)    = 0 		; age_son(paneli)    = 0 
 		     		assets_dad(paneli) = 0.0_dp ; assets_son(paneli) = 0.0_dp
 		     	endif 
-		     	! Save results 
-		     	if ((age.eq.31).and.(age_dad(paneli).eq.31)) then 
+		     	! Generation change and Save results 
+		     	if (age.eq.31) then 
 		     		!$omp critical
+		     		if (age_dad(paneli).eq.31) then  
 		     		IGM_matrix(1,IGM_index) = assets_dad(paneli)
 		     		IGM_matrix(2,IGM_index) = assets_son(paneli)
+		     		IGM_index = IGM_index + 1
+		     		print*, ' Save result', IGM_index-1
+		     		endif 
+		     		!$omp end critical
 		     		age_dad(paneli)    = age_son(paneli)
 		     		assets_dad(paneli) = assets_son(paneli)
 		     		age_son(paneli)    = 0 
 		     		assets_son(paneli) = 0.0_dp
-		     		IGM_index = IGM_index + 1
-		     		print*, ' Save result', IGM_index-1
-		     		!$omp end critical
+		     		
 		     	endif 
 	     	endif
 
@@ -4473,6 +4476,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8), sum(panela)/real(totpop,8)
 
 		! IGM 30-50
+			! Get mean of assets
+			IGM_matrix = IGM_matrix/real(21,8) 
 			! Get number of eligibles
 			n_eligible = count(IGM_matrix(1,:).gt.0.0_dp)
 			! Allocate variables
