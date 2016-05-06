@@ -4402,11 +4402,11 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     		age_son_2(paneli)    = age 
 		     		assets_son_2(paneli) = currenta + assets_son_2(paneli)
 		     	endif 
-		     	! ! Reset variables if son dies before 60
-		     	! if ((age.eq.1).and.(age_son_2(paneli).lt.41)) then 
-		     	! 	age_dad_2(paneli)    = 0 	  ; age_son_2(paneli)    = 0 
-		     	! 	assets_dad_2(paneli) = 0.0_dp ; assets_son_2(paneli) = 0.0_dp
-		     	! endif 
+		     	! Reset variables if son dies before 60
+		     	if ((age.eq.1).and.(age_son_2(paneli).lt.41)) then 
+		     		age_dad_2(paneli)    = 0 	  ; age_son_2(paneli)    = 0 
+		     		assets_dad_2(paneli) = 0.0_dp ; assets_son_2(paneli) = 0.0_dp
+		     	endif 
 		     	! ! Save results 
 		     	! if ((age.eq.41).and.(age_dad_2(paneli).eq.41)) then 
 		     	! 	thread = omp_get_thread_num()
