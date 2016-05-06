@@ -4645,14 +4645,14 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		! call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_3050' )
 		! OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panela_parents' , STATUS='replace')
-		! OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050panela_sons'     , STATUS='replace')
+		! OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panela_sons'     , STATUS='replace')
 		! WRITE (UNIT=20, FMT=*) panela_dad
 		! WRITE (UNIT=21, FMT=*) panela_son
 		! close (unit=20); close (unit=21); 
 
 		call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_4060' )
 		OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_4060/panela_parents' , STATUS='replace')
-		OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060panela_sons'     , STATUS='replace')
+		OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060/panela_sons'     , STATUS='replace')
 		WRITE (UNIT=20, FMT=*) panela_dad_2
 		WRITE (UNIT=21, FMT=*) panela_son_2
 		close (unit=20); close (unit=21); 
