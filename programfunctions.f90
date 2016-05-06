@@ -4379,6 +4379,9 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     	endif 
 		     	! Reset variables if son dies before 50
 		     	if ((age.eq.1).and.(age_son(paneli).lt.31)) then 
+		     		!$omp critical
+		     		print*, ' Agent died', IGM_index-1,'thread', thread, 'age_son',age_son(paneli)
+		     		!$omp end critical
 		     		age_dad(paneli)    = 0 		; age_son(paneli)    = 0 
 		     		assets_dad(paneli) = 0.0_dp ; assets_son(paneli) = 0.0_dp
 		     	endif 
