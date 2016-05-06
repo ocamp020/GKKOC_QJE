@@ -4259,8 +4259,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	age_dad = 0 ; age_son = 0 ; assets_dad = 0.0_dp ; assets_son = 0.0_dp ;
 	IGM_index = 1 ; IGM_matrix = 0.0_dp ; 
-	age_dad_2 = 0 ; age_son_2 = 0 ; assets_dad_2 = 0.0_dp ; assets_son_2 = 0.0_dp ;
-	IGM_index_2 = 1 ; IGM_matrix_2 = 0.0_dp
+	! age_dad_2 = 0 ; age_son_2 = 0 ; assets_dad_2 = 0.0_dp ; assets_son_2 = 0.0_dp ;
+	! IGM_index_2 = 1 ; IGM_matrix_2 = 0.0_dp
 	
 	print*, 'Starting Simutime loop'
 	DO simutime=1, MaxSimuTime
@@ -4375,15 +4375,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	     	! Inter-Generation Mobility 30-50
 	     	if (IGM_index.le.4000000) then
-	     		! Update variables for agents between 30-50 
-	     		if ((age.ge.11).and.(age.le.31)) then 
-		     		age_son(paneli)    = age 
-		     		assets_son(paneli) = currenta + assets_son(paneli)
-		     		! !$omp critical
-		     		! print*, ' Potential Agent', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
-		     		! !$omp end critical
-		     	endif 
-		     	! Reset variables if son dies before 50
+	     		! Reset variables if son dies before 50
 		     	if ((age.eq.1).and.(age_son(paneli).lt.31)) then 
 		     		! !$omp critical
 		     		! print*, ' Agent died', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
@@ -4391,15 +4383,24 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     		age_dad(paneli)    = 0 		; age_son(paneli)    = 0 
 		     		assets_dad(paneli) = 0.0_dp ; assets_son(paneli) = 0.0_dp
 		     	endif 
+	     		! Update age of current "son"
+	     			age_son(paneli)    = age 
+	     		! Update variables for agents between 30-50 
+	     		if ((age.ge.11).and.(age.le.31)) then 
+		     		assets_son(paneli) = currenta + assets_son(paneli)
+		     		! !$omp critical
+		     		! print*, ' Potential Agent', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
+		     		! !$omp end critical
+		     	endif 
 		     	! Generation change and Save results 
 		     	if (age.eq.31) then 
 		     		!$omp critical
 		     		!print*, ' Son is 50:', IGM_index, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli)
 		     		if ((age_dad(paneli).eq.31).and.(simutime.gt.1800)) then  
-		     		IGM_matrix(1,IGM_index) = assets_dad(paneli)
-		     		IGM_matrix(2,IGM_index) = assets_son(paneli)
-		     		IGM_index = IGM_index + 1
-		     		! print*, ' Save result', IGM_index-1
+			     		IGM_matrix(1,IGM_index) = assets_dad(paneli)
+			     		IGM_matrix(2,IGM_index) = assets_son(paneli)
+			     		IGM_index = IGM_index + 1
+			     		! print*, ' Save result', IGM_index-1
 		     		endif 
 		     		!$omp end critical
 		     		age_dad(paneli)    = 31
@@ -4410,15 +4411,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	     	! ! Inter-Generation Mobility 40-60
 	     	! if (IGM_index_2.le.4000000) then
-	     	! 	! Update variables for agents between 40-60 
-	     	! 	if ((age.ge.21).and.(age.le.41)) then 
-		     ! 		age_son_2(paneli)    = age 
-		     ! 		assets_son_2(paneli) = currenta + assets_son_2(paneli)
-		     ! 		! !$omp critical
-		     ! 		! print*, ' Potential Agent', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
-		     ! 		! !$omp end critical
-		     ! 	endif 
-		     ! 	! Reset variables if son dies before 60
+	     	! 	! Reset variables if son dies before 60
 		     ! 	if ((age.eq.1).and.(age_son(paneli).lt.41)) then 
 		     ! 		! !$omp critical
 		     ! 		! print*, ' Agent died', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
@@ -4426,6 +4419,16 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     ! 		age_dad_2(paneli)    = 0 	  ; age_son_2(paneli)    = 0 
 		     ! 		assets_dad_2(paneli) = 0.0_dp ; assets_son_2(paneli) = 0.0_dp
 		     ! 	endif 
+		     ! 	! Update age of current "son"
+		     ! 		age_son_2(paneli)    = age 
+	     	! 	! Update variables for agents between 40-60 
+	     	! 	if ((age.ge.21).and.(age.le.41)) then 
+		     ! 		assets_son_2(paneli) = currenta + assets_son_2(paneli)
+		     ! 		! !$omp critical
+		     ! 		! print*, ' Potential Agent', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
+		     ! 		! !$omp end critical
+		     ! 	endif 
+		     	
 		     ! 	! Generation change and Save results 
 		     ! 	if (age.eq.41) then 
 		     ! 		!$omp critical
