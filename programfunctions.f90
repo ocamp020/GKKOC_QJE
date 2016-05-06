@@ -4433,14 +4433,14 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     	if (age.eq.41) then 
 		     		!$omp critical
 		     		!print*, ' Son is 60:', IGM_index_2, 'age_son',age_son_2(paneli), 'age_dad',age_dad_2(paneli)
-		     		if ((age_dad_2(paneli).eq.41).and.(simutime.gt.1700)) then  
+		     		if ((age_dad_2(paneli).eq.41).and.(simutime.gt.1800)) then  
 		     		IGM_matrix_2(1,IGM_index_2) = assets_dad_2(paneli)
 		     		IGM_matrix_2(2,IGM_index_2) = assets_son_2(paneli)
 		     		IGM_index_2 = IGM_index_2 + 1
 		     		! print*, ' Save result', IGM_index-1
 		     		endif 
 		     		!$omp end critical
-		     		age_dad_2(paneli)    = 31
+		     		age_dad_2(paneli)    = 41
 		     		assets_dad_2(paneli) = assets_son_2(paneli)
 		     		assets_son_2(paneli) = 0.0_dp    		
 		     	endif 
