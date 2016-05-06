@@ -4134,8 +4134,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 	use omp_lib
 	IMPLICIT NONE
 	integer, intent(in) :: bench_indx
-	integer  :: currentzi, currentlambdai, currentei, currentxi
-	REAL(DP) :: tempnoage, tempnoz, tempnolambda, tempnoe, tempnox, tempno, currenta, currentY, thread_num
+	integer  :: currentzi, currentlambdai, currentei, currentxi, thread_num
+	REAL(DP) :: tempnoage, tempnoz, tempnolambda, tempnoe, tempnox, tempno, currenta, currentY
 	REAL(DP) :: start_timet, finish_timet, h_i
 	INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
 	INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
@@ -4368,30 +4368,30 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     	ENDIF ! new age==1
 
 	     	if (simutime.gt.1500) then 
-	     	! ! Inter-Generation Mobility 30-50
-	     	! if (IGM_index.lt.200000) then
-	     	! 	! Update variables for agents between 30-50 
-	     	! 	if ((age.ge.11).and.(age.le.31)) then 
-		     ! 		age_son(paneli)    = age 
-		     ! 		assets_son(paneli) = currenta + assets_son(paneli)
-		     ! 	endif 
-		     ! 	! Reset variables if son dies before 50
-		     ! 	if ((age.eq.1).and.(age_son(paneli).lt.31)) then 
-		     ! 		age_dad(paneli)    = 0 		; age_son(paneli)    = 0 
-		     ! 		assets_dad(paneli) = 0.0_dp ; assets_son(paneli) = 0.0_dp
-		     ! 	endif 
-		     ! 	! Save results 
-		     ! 	if ((age.eq.31).and.(age_dad(paneli).eq.31)) then 
-		     ! 		thread = omp_get_thread_num()
-		     ! 		IGM_matrix(1,IGM_index,thread) = assets_dad(paneli)
-		     ! 		IGM_matrix(2,IGM_index,thread) = assets_son(paneli)
-		     ! 		age_dad(paneli)    = age_son(paneli)
-		     ! 		assets_dad(paneli) = assets_son(paneli)
-		     ! 		age_son(paneli)    = 0 
-		     ! 		assets_son(paneli) = 0.0_dp
-		     ! 		IGM_index = IGM_index + 1
-		     ! 	endif 
-	     	! endif
+	     	! Inter-Generation Mobility 30-50
+	     	if (IGM_index.lt.200000) then
+	     		! Update variables for agents between 30-50 
+	     		if ((age.ge.11).and.(age.le.31)) then 
+		     		age_son(paneli)    = age 
+		     		assets_son(paneli) = currenta + assets_son(paneli)
+		     	endif 
+		     	! Reset variables if son dies before 50
+		     	if ((age.eq.1).and.(age_son(paneli).lt.31)) then 
+		     		age_dad(paneli)    = 0 		; age_son(paneli)    = 0 
+		     		assets_dad(paneli) = 0.0_dp ; assets_son(paneli) = 0.0_dp
+		     	endif 
+		     	! Save results 
+		     	if ((age.eq.31).and.(age_dad(paneli).eq.31)) then 
+		     		thread = omp_get_thread_num()
+		     		IGM_matrix(1,IGM_index,thread) = assets_dad(paneli)
+		     		IGM_matrix(2,IGM_index,thread) = assets_son(paneli)
+		     		age_dad(paneli)    = age_son(paneli)
+		     		assets_dad(paneli) = assets_son(paneli)
+		     		age_son(paneli)    = 0 
+		     		assets_son(paneli) = 0.0_dp
+		     		IGM_index = IGM_index + 1
+		     	endif 
+	     	endif
 
 	     	! ! Inter-Generation Mobility 40-60
 	     	! if (IGM_index_2.lt.200000) then
