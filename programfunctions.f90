@@ -4158,7 +4158,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	INTEGER 						     :: IGM_index, n_eligible, thread 
 	! Intergenerational statistics 40-60
 	REAL(DP), DIMENSION(totpop) 	     :: assets_dad_2, assets_son_2
-	INTEGER , DIMENSION(totpop) 	     :: age_dad_4060, age_son_2
+	INTEGER , DIMENSION(totpop) 	     :: age_dad_2, age_son_2
 	REAL(DP), DIMENSION(2,200000,20)     :: IGM_matrix_2
 	REAL(DP), DIMENSION(2,200000*20)     :: IGM_matrix_flat_2
 	REAL(DP), DIMENSION(:) , allocatable :: panela_dad_2, panela_son_2
@@ -4261,7 +4261,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	age_dad = 0 ; age_son = 0 ; assets_dad = 0.0_dp ; assets_son = 0.0_dp ;
 	IGM_index = 1 ; IGM_matrix = 0.0_dp ; 
-	age_dad_4060 = 0 ; age_son_2 = 0 ; assets_dad_2 = 0.0_dp ; assets_son_2 = 0.0_dp ;
+	age_dad_2 = 0 ; age_son_2 = 0 ; assets_dad_2 = 0.0_dp ; assets_son_2 = 0.0_dp ;
 	IGM_index_2 = 1 ; IGM_matrix_2 = 0.0_dp
 	
 	print*, 'Starting Simutime loop'
@@ -4371,7 +4371,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	     	if (simutime.gt.1500) then 
 	     	! Inter-Generation Mobility 30-50
-	     	if (IGM_index.lt.200000) then
+	     	if (IGM_index.le.200000) then
 	     		! Update variables for agents between 30-50 
 	     		if ((age.ge.11).and.(age.le.31)) then 
 		     		age_son(paneli)    = age 
@@ -4396,30 +4396,29 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     	endif
 
 	     	! Inter-Generation Mobility 40-60
-	     	if (IGM_index_2.lt.200000) then
-	     		! Update variables for agents between 40-60 
-	     		if ((age.ge.21).and.(age.le.41)) then 
-		     		age_son_2(paneli)    = age 
-		     		assets_son_2(paneli) = currenta + assets_son_2(paneli)
-		     	endif 
-		     	! Reset variables if son dies before 60
-		     	if ((age.eq.1).and.(age_son_2(paneli).lt.41)) then 
-		     		age_dad_4060(paneli)    = 0
-		     		! age_son_2(paneli)    = 0 
-		     		! assets_dad_2(paneli) = 0.0_dp ; assets_son_2(paneli) = 0.0_dp
-		     	endif 
-		     	! ! Save results 
-		     	! if ((age.eq.41).and.(age_dad_2(paneli).eq.41)) then 
-		     	! 	thread = omp_get_thread_num()
-		     	! 	IGM_matrix_2(1,IGM_index_2,thread) = assets_dad_2(paneli)
-		     	! 	IGM_matrix_2(2,IGM_index_2,thread) = assets_son_2(paneli)
-		     	! 	age_dad_2(paneli)    = age_son_2(paneli)
-		     	! 	assets_dad_2(paneli) = assets_son_2(paneli)
-		     	! 	age_son_2(paneli)    = 0 
-		     	! 	assets_son_2(paneli) = 0.0_dp
-		     	! 	IGM_index_2 = IGM_index_2 + 1
-		     	! endif 
-	     	endif
+	     	! if (IGM_index_2.le.200000) then
+	     	! 	! Update variables for agents between 40-60 
+	     	! 	if ((age.ge.21).and.(age.le.41)) then 
+		     ! 		age_son_2(paneli)    = age 
+		     ! 		assets_son_2(paneli) = currenta + assets_son_2(paneli)
+		     ! 	endif 
+		     ! 	! Reset variables if son dies before 60
+		     ! 	if ((age.eq.1).and.(age_son_2(paneli).lt.41)) then 
+		     ! 		age_dad_2(paneli)    = 0      ; age_son_2(paneli)    = 0 
+		     ! 		assets_dad_2(paneli) = 0.0_dp ; assets_son_2(paneli) = 0.0_dp
+		     ! 	endif 
+		     ! 	! Save results 
+		     ! 	if ((age.eq.41).and.(age_dad_2(paneli).eq.41)) then 
+		     ! 		thread = omp_get_thread_num()
+		     ! 		IGM_matrix_2(1,IGM_index_2,thread) = assets_dad_2(paneli)
+		     ! 		IGM_matrix_2(2,IGM_index_2,thread) = assets_son_2(paneli)
+		     ! 		age_dad_2(paneli)    = age_son_2(paneli)
+		     ! 		assets_dad_2(paneli) = assets_son_2(paneli)
+		     ! 		age_son_2(paneli)    = 0 
+		     ! 		assets_son_2(paneli) = 0.0_dp
+		     ! 		IGM_index_2 = IGM_index_2 + 1
+		     ! 	endif 
+	     	! endif
 
 	     	endif 
 
@@ -4468,19 +4467,19 @@ SUBROUTINE  SIMULATION(bench_indx)
 		print*,'Averages'
 		print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8), sum(panela)/real(totpop,8)
 
-		! ! IGM 30-50
-		! ! Collapse IGM_matrix
-		! 	IGM_matrix_flat(1,:) = reshape(IGM_matrix(1,:,:),(/200000*20/))
-		! 	IGM_matrix_flat(2,:) = reshape(IGM_matrix(2,:,:),(/200000*20/))
-		! ! Get number of eligibles
-		! 	n_eligible = count(IGM_matrix_flat(1,:).gt.0.0_dp)
-		! ! Allocate variables
-		! 	allocate(panela_dad(n_eligible), panela_son(n_eligible))
-		! 	panela_dad = pack(IGM_matrix_flat(1,:) , (IGM_matrix_flat(1,:).gt.0.0_dp))
-		! 	panela_son = pack(IGM_matrix_flat(2,:) , (IGM_matrix_flat(2,:).gt.0.0_dp))
-		! ! Print
-		! 	print*, 'IGM 30-50'
-		! 	print*, 'n_eligible', n_eligible, 'mean_panel_dad', sum(panela_dad)/n_eligible, 'mean_panel_son', sum(panela_son)/n_eligible
+		! IGM 30-50
+		! Collapse IGM_matrix
+			IGM_matrix_flat(1,:) = reshape(IGM_matrix(1,:,:),(/200000*20/))
+			IGM_matrix_flat(2,:) = reshape(IGM_matrix(2,:,:),(/200000*20/))
+		! Get number of eligibles
+			n_eligible = count(IGM_matrix_flat(1,:).gt.0.0_dp)
+		! Allocate variables
+			allocate(panela_dad(n_eligible), panela_son(n_eligible))
+			panela_dad = pack(IGM_matrix_flat(1,:) , (IGM_matrix_flat(1,:).gt.0.0_dp))
+			panela_son = pack(IGM_matrix_flat(2,:) , (IGM_matrix_flat(2,:).gt.0.0_dp))
+		! Print
+			print*, 'IGM 30-50'
+			print*, 'n_eligible', n_eligible, 'mean_panel_dad', sum(panela_dad)/n_eligible, 'mean_panel_son', sum(panela_son)/n_eligible
 		! ! IGM 40-60
 		! ! Collapse IGM_matrix
 		! 	IGM_matrix_flat_2(1,:) = reshape(IGM_matrix_2(1,:,:),(/200000*20/))
@@ -4628,10 +4627,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 		WRITE (UNIT=21, FMT=*) panela_son
 		close (unit=20); close (unit=21); 
 
-		call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_4060' )
-		WRITE (UNIT=20, FMT=*) panela_dad_2
-		WRITE (UNIT=21, FMT=*) panela_son_2
-		close (unit=20); close (unit=21); 
+		! call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_4060' )
+		! WRITE (UNIT=20, FMT=*) panela_dad_2
+		! WRITE (UNIT=21, FMT=*) panela_son_2
+		! close (unit=20); close (unit=21); 
 		
 	endif
 
