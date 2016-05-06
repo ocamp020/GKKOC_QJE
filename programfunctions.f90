@@ -4399,7 +4399,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     		IGM_matrix(1,IGM_index) = assets_dad(paneli)
 		     		IGM_matrix(2,IGM_index) = assets_son(paneli)
 		     		IGM_index = IGM_index + 1
-		     		print*, ' Save result', IGM_index-1
+		     		! print*, ' Save result', IGM_index-1
 		     		endif 
 		     		!$omp end critical
 		     		age_dad(paneli)    = 31
