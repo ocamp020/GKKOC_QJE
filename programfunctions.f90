@@ -4367,6 +4367,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	            ! !$omp end critical          
 	     	ENDIF ! new age==1
 
+	     	if (simutime.gt.1500) then 
 	     	! Inter-Generation Mobility 30-50
 	     	if (IGM_index.lt.200000) then
 	     		! Update variables for agents between 30-50 
@@ -4416,6 +4417,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     		IGM_index_2 = IGM_index_2 + 1
 		     	endif 
 	     	endif
+
+	     	endif 
 
 		ENDDO ! paneli
 
@@ -4563,8 +4566,6 @@ SUBROUTINE  SIMULATION(bench_indx)
 	print*, ' '
 	print*, 'Writing simulation results'
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
-	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_3050' )
-	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_4060' )
 
 	if (bench_indx.eq.1) then
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_bench'		, STATUS='replace')
@@ -4612,17 +4613,23 @@ SUBROUTINE  SIMULATION(bench_indx)
 	close (unit=26); close (unit=27); close (unit=28); close (unit=24)
 
 	if (bench_indx==1) then
+
 		! WRITE (UNIT=20, FMT=*) eligible_panela_parents
 		! WRITE (UNIT=21, FMT=*) eligible_panela_sons
 		! WRITE (UNIT=22, FMT=*) eligible_panelage_parents
 		! WRITE (UNIT=23, FMT=*) eligible_panelage_sons
+		! close (unit=20); close (unit=21); close (unit=22); close (unit=23)
 
+		call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_3050' )
 		WRITE (UNIT=20, FMT=*) panela_dad
 		WRITE (UNIT=21, FMT=*) panela_son
-		WRITE (UNIT=22, FMT=*) panela_dad_2
-		WRITE (UNIT=23, FMT=*) panela_son_2
+		close (unit=20); close (unit=21); 
+
+		call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_4060' )
+		WRITE (UNIT=20, FMT=*) panela_dad_2
+		WRITE (UNIT=21, FMT=*) panela_son_2
+		close (unit=20); close (unit=21); 
 		
-		close (unit=20); close (unit=21); close (unit=22); close (unit=23)
 	endif
 
 	print*, 'Identifying top agents'
