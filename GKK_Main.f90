@@ -59,7 +59,7 @@ PROGRAM main
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 	! Switch for separable and non-separable utility
