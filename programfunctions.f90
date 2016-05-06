@@ -4152,15 +4152,13 @@ SUBROUTINE  SIMULATION(bench_indx)
 	! Intergenerational statistics 30-50
 	REAL(DP), DIMENSION(totpop) 	     :: assets_dad, assets_son
 	INTEGER , DIMENSION(totpop) 	     :: age_dad, age_son
-	REAL(DP), DIMENSION(2,200000,20)     :: IGM_matrix
-	REAL(DP), DIMENSION(2,200000*20)     :: IGM_matrix_flat
+	REAL(DP), DIMENSION(2,4000000)       :: IGM_matrix
 	REAL(DP), DIMENSION(:) , allocatable :: panela_dad, panela_son
-	INTEGER 						     :: IGM_index, n_eligible, thread 
+	INTEGER 						     :: IGM_index, n_eligible
 	! Intergenerational statistics 40-60
 	REAL(DP), DIMENSION(totpop) 	     :: assets_dad_2, assets_son_2
 	INTEGER , DIMENSION(totpop) 	     :: age_dad_2, age_son_2
-	REAL(DP), DIMENSION(2,200000,20)     :: IGM_matrix_2
-	REAL(DP), DIMENSION(2,200000*20)     :: IGM_matrix_flat_2
+	REAL(DP), DIMENSION(2,4000000)       :: IGM_matrix_2
 	REAL(DP), DIMENSION(:) , allocatable :: panela_dad_2, panela_son_2
 	INTEGER 						     :: IGM_index_2
 	! Top Agents 
@@ -4267,8 +4265,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	print*, 'Starting Simutime loop'
 	DO simutime=1, MaxSimuTime
 		!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi, &
-		!$omp& currenta,currentzi,currentlambdai,currentei,currentxi,tklo,tkhi,tempno, &
-		!$omp& thread, IGM_index, IGM_index_2)
+		!$omp& currenta,currentzi,currentlambdai,currentei,currentxi,tklo,tkhi,tempno)
 	   	DO paneli=1,totpop
 	    
 	       	currenta  		= panela(paneli)
@@ -4371,7 +4368,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	     	if (simutime.gt.1500) then 
 	     	! Inter-Generation Mobility 30-50
-	     	if (IGM_index.le.200000) then
+	     	if (IGM_index.le.4000000) then
 	     		! Update variables for agents between 30-50 
 	     		if ((age.ge.11).and.(age.le.31)) then 
 		     		age_son(paneli)    = age 
@@ -4380,29 +4377,28 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     	! Reset variables if son dies before 50
 		     	if ((age.eq.1).and.(age_son(paneli).lt.31)) then 
 		     		!$omp critical
-		     		print*, ' Agent died', IGM_index-1,'thread', thread, 'age_son',age_son(paneli)
+		     		print*, ' Agent died', IGM_index-1, 'age_son',age_son(paneli)
 		     		!$omp end critical
 		     		age_dad(paneli)    = 0 		; age_son(paneli)    = 0 
 		     		assets_dad(paneli) = 0.0_dp ; assets_son(paneli) = 0.0_dp
 		     	endif 
 		     	! Save results 
 		     	if ((age.eq.31).and.(age_dad(paneli).eq.31)) then 
-		     		thread = omp_get_thread_num()
-		     		IGM_matrix(1,IGM_index,thread) = assets_dad(paneli)
-		     		IGM_matrix(2,IGM_index,thread) = assets_son(paneli)
+		     		!$omp critical
+		     		IGM_matrix(1,IGM_index) = assets_dad(paneli)
+		     		IGM_matrix(2,IGM_index) = assets_son(paneli)
 		     		age_dad(paneli)    = age_son(paneli)
 		     		assets_dad(paneli) = assets_son(paneli)
 		     		age_son(paneli)    = 0 
 		     		assets_son(paneli) = 0.0_dp
 		     		IGM_index = IGM_index + 1
-		     		!$omp critical
-		     		print*, ' Save result', IGM_index-1,'thread', thread
+		     		print*, ' Save result', IGM_index-1
 		     		!$omp end critical
 		     	endif 
 	     	endif
 
 	     	! Inter-Generation Mobility 40-60
-	     	! if (IGM_index_2.le.200000) then
+	     	! if (IGM_index_2.le.4000000) then
 	     	! 	! Update variables for agents between 40-60 
 	     	! 	if ((age.ge.21).and.(age.le.41)) then 
 		     ! 		age_son_2(paneli)    = age 
