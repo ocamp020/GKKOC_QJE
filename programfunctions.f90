@@ -4373,11 +4373,14 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     		if ((age.ge.11).and.(age.le.31)) then 
 		     		age_son(paneli)    = age 
 		     		assets_son(paneli) = currenta + assets_son(paneli)
+		     		!$omp critical
+		     		print*, ' Potential Agent', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
+		     		!$omp end critical
 		     	endif 
 		     	! Reset variables if son dies before 50
 		     	if ((age.eq.1).and.(age_son(paneli).lt.31)) then 
 		     		!$omp critical
-		     		print*, ' Agent died', IGM_index-1, 'age_son',age_son(paneli)
+		     		print*, ' Agent died', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
 		     		!$omp end critical
 		     		age_dad(paneli)    = 0 		; age_son(paneli)    = 0 
 		     		assets_dad(paneli) = 0.0_dp ; assets_son(paneli) = 0.0_dp
