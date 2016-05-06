@@ -4396,29 +4396,29 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     	endif
 
 	     	! Inter-Generation Mobility 40-60
-	     	! if (IGM_index_2.lt.200000) then
-	     	! 	! Update variables for agents between 40-60 
-	     	! 	if ((age.ge.21).and.(age.le.41)) then 
-		     ! 		age_son_2(paneli)    = age 
-		     ! 		assets_son_2(paneli) = currenta + assets_son_2(paneli)
-		     ! 	endif 
-		     ! 	! Reset variables if son dies before 60
-		     ! 	if ((age.eq.1).and.(age_son_2(paneli).lt.41)) then 
-		     ! 		age_dad_2(paneli)    = 0 	  ; age_son_2(paneli)    = 0 
-		     ! 		assets_dad_2(paneli) = 0.0_dp ; assets_son_2(paneli) = 0.0_dp
-		     ! 	endif 
-		     ! 	! Save results 
-		     ! 	if ((age.eq.41).and.(age_dad_2(paneli).eq.41)) then 
-		     ! 		thread = omp_get_thread_num()
-		     ! 		IGM_matrix_2(1,IGM_index_2,thread) = assets_dad_2(paneli)
-		     ! 		IGM_matrix_2(2,IGM_index_2,thread) = assets_son_2(paneli)
-		     ! 		age_dad_2(paneli)    = age_son_2(paneli)
-		     ! 		assets_dad_2(paneli) = assets_son_2(paneli)
-		     ! 		age_son_2(paneli)    = 0 
-		     ! 		assets_son_2(paneli) = 0.0_dp
-		     ! 		IGM_index_2 = IGM_index_2 + 1
-		     ! 	endif 
-	     	! endif
+	     	if (IGM_index_2.lt.200000) then
+	     		! Update variables for agents between 40-60 
+	     		if ((age.ge.21).and.(age.le.41)) then 
+		     		age_son_2(paneli)    = age 
+		     		assets_son_2(paneli) = currenta + assets_son_2(paneli)
+		     	endif 
+		     	! ! Reset variables if son dies before 60
+		     	! if ((age.eq.1).and.(age_son_2(paneli).lt.41)) then 
+		     	! 	age_dad_2(paneli)    = 0 	  ; age_son_2(paneli)    = 0 
+		     	! 	assets_dad_2(paneli) = 0.0_dp ; assets_son_2(paneli) = 0.0_dp
+		     	! endif 
+		     	! ! Save results 
+		     	! if ((age.eq.41).and.(age_dad_2(paneli).eq.41)) then 
+		     	! 	thread = omp_get_thread_num()
+		     	! 	IGM_matrix_2(1,IGM_index_2,thread) = assets_dad_2(paneli)
+		     	! 	IGM_matrix_2(2,IGM_index_2,thread) = assets_son_2(paneli)
+		     	! 	age_dad_2(paneli)    = age_son_2(paneli)
+		     	! 	assets_dad_2(paneli) = assets_son_2(paneli)
+		     	! 	age_son_2(paneli)    = 0 
+		     	! 	assets_son_2(paneli) = 0.0_dp
+		     	! 	IGM_index_2 = IGM_index_2 + 1
+		     	! endif 
+	     	endif
 
 	     	endif 
 
