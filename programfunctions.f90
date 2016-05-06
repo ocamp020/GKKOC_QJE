@@ -4388,6 +4388,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     	! Generation change and Save results 
 		     	if (age.eq.31) then 
 		     		!$omp critical
+		     		print*, ' Son is 50:', IGM_index, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli)
 		     		if (age_dad(paneli).eq.31) then  
 		     		IGM_matrix(1,IGM_index) = assets_dad(paneli)
 		     		IGM_matrix(2,IGM_index) = assets_son(paneli)
