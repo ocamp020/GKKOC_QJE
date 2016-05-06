@@ -4395,28 +4395,28 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	     	! Inter-Generation Mobility 40-60
 	     	if (IGM_index_2.lt.200000) then
-	     		! Update variables for agents between 40-60 
-	     		if ((age.ge.21).and.(age.le.41)) then 
-		     		age_son_2(paneli)    = age 
-		     		assets_son_2(paneli) = currenta + assets_son_2(paneli)
-		     	endif 
-		     	! Reset variables if son dies before 60
-		     	if ((age.eq.1).and.(age_son_2(paneli).lt.41)) then 
-		     		age_dad_2(paneli)    = 0 	  ; age_son_2(paneli)    = 0 
-		     		assets_dad_2(paneli) = 0.0_dp ; assets_son_2(paneli) = 0.0_dp
-		     	endif 
-		     	! Save results 
-		     	if ((age.eq.31).and.(age_dad_2(paneli).eq.41)) then 
-		     		thread = omp_get_thread_num()
-		     		IGM_matrix_2(1,IGM_index_2,thread) = assets_dad_2(paneli)
-		     		IGM_matrix_2(2,IGM_index_2,thread) = assets_son_2(paneli)
-		     		age_dad_2(paneli)    = age_son_2(paneli)
-		     		assets_dad_2(paneli) = assets_son_2(paneli)
-		     		age_son_2(paneli)    = 0 
-		     		assets_son_2(paneli) = 0.0_dp
-		     		IGM_index_2 = IGM_index_2 + 1
-		     	endif 
-	     	endif
+	     	! 	! Update variables for agents between 40-60 
+	     	! 	if ((age.ge.21).and.(age.le.41)) then 
+		     ! 		age_son_2(paneli)    = age 
+		     ! 		assets_son_2(paneli) = currenta + assets_son_2(paneli)
+		     ! 	endif 
+		     ! 	! Reset variables if son dies before 60
+		     ! 	if ((age.eq.1).and.(age_son_2(paneli).lt.41)) then 
+		     ! 		age_dad_2(paneli)    = 0 	  ; age_son_2(paneli)    = 0 
+		     ! 		assets_dad_2(paneli) = 0.0_dp ; assets_son_2(paneli) = 0.0_dp
+		     ! 	endif 
+		     ! 	! Save results 
+		     ! 	if ((age.eq.31).and.(age_dad_2(paneli).eq.41)) then 
+		     ! 		thread = omp_get_thread_num()
+		     ! 		IGM_matrix_2(1,IGM_index_2,thread) = assets_dad_2(paneli)
+		     ! 		IGM_matrix_2(2,IGM_index_2,thread) = assets_son_2(paneli)
+		     ! 		age_dad_2(paneli)    = age_son_2(paneli)
+		     ! 		assets_dad_2(paneli) = assets_son_2(paneli)
+		     ! 		age_son_2(paneli)    = 0 
+		     ! 		assets_son_2(paneli) = 0.0_dp
+		     ! 		IGM_index_2 = IGM_index_2 + 1
+		     ! 	endif 
+	     	! endif
 
 	     	endif 
 
@@ -4465,32 +4465,32 @@ SUBROUTINE  SIMULATION(bench_indx)
 		print*,'Averages'
 		print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8), sum(panela)/real(totpop,8)
 
-		! IGM 30-50
-		! Collapse IGM_matrix
-			IGM_matrix_flat(1,:) = reshape(IGM_matrix(1,:,:),(/200000*20/))
-			IGM_matrix_flat(2,:) = reshape(IGM_matrix(2,:,:),(/200000*20/))
-		! Get number of eligibles
-			n_eligible = count(IGM_matrix_flat(1,:).gt.0.0_dp)
-		! Allocate variables
-			allocate(panela_dad(n_eligible), panela_son(n_eligible))
-			panela_dad = pack(IGM_matrix_flat(1,:) , (IGM_matrix_flat(1,:).gt.0.0_dp))
-			panela_son = pack(IGM_matrix_flat(2,:) , (IGM_matrix_flat(2,:).gt.0.0_dp))
-		! Print
-			print*, 'IGM 30-50'
-			print*, 'n_eligible', n_eligible, 'mean_panel_dad', sum(panela_dad)/n_eligible, 'mean_panel_son', sum(panela_son)/n_eligible
-		! IGM 40-60
-		! Collapse IGM_matrix
-			IGM_matrix_flat_2(1,:) = reshape(IGM_matrix_2(1,:,:),(/200000*20/))
-			IGM_matrix_flat_2(2,:) = reshape(IGM_matrix_2(2,:,:),(/200000*20/))
-		! Get number of eligibles
-			n_eligible = count(IGM_matrix_flat_2(1,:).gt.0.0_dp)
-		! Allocate variables
-			allocate(panela_dad_2(n_eligible), panela_son_2(n_eligible))
-			panela_dad_2 = pack(IGM_matrix_flat_2(1,:) , (IGM_matrix_flat_2(1,:).gt.0.0_dp))
-			panela_son_2 = pack(IGM_matrix_flat_2(2,:) , (IGM_matrix_flat_2(2,:).gt.0.0_dp))
-		! Print
-			print*, 'IGM 20-40'
-			print*, 'n_eligible', n_eligible, 'mean_panel_dad', sum(panela_dad_2)/n_eligible, 'mean_panel_son', sum(panela_son_2)/n_eligible
+		! ! IGM 30-50
+		! ! Collapse IGM_matrix
+		! 	IGM_matrix_flat(1,:) = reshape(IGM_matrix(1,:,:),(/200000*20/))
+		! 	IGM_matrix_flat(2,:) = reshape(IGM_matrix(2,:,:),(/200000*20/))
+		! ! Get number of eligibles
+		! 	n_eligible = count(IGM_matrix_flat(1,:).gt.0.0_dp)
+		! ! Allocate variables
+		! 	allocate(panela_dad(n_eligible), panela_son(n_eligible))
+		! 	panela_dad = pack(IGM_matrix_flat(1,:) , (IGM_matrix_flat(1,:).gt.0.0_dp))
+		! 	panela_son = pack(IGM_matrix_flat(2,:) , (IGM_matrix_flat(2,:).gt.0.0_dp))
+		! ! Print
+		! 	print*, 'IGM 30-50'
+		! 	print*, 'n_eligible', n_eligible, 'mean_panel_dad', sum(panela_dad)/n_eligible, 'mean_panel_son', sum(panela_son)/n_eligible
+		! ! IGM 40-60
+		! ! Collapse IGM_matrix
+		! 	IGM_matrix_flat_2(1,:) = reshape(IGM_matrix_2(1,:,:),(/200000*20/))
+		! 	IGM_matrix_flat_2(2,:) = reshape(IGM_matrix_2(2,:,:),(/200000*20/))
+		! ! Get number of eligibles
+		! 	n_eligible = count(IGM_matrix_flat_2(1,:).gt.0.0_dp)
+		! ! Allocate variables
+		! 	allocate(panela_dad_2(n_eligible), panela_son_2(n_eligible))
+		! 	panela_dad_2 = pack(IGM_matrix_flat_2(1,:) , (IGM_matrix_flat_2(1,:).gt.0.0_dp))
+		! 	panela_son_2 = pack(IGM_matrix_flat_2(2,:) , (IGM_matrix_flat_2(2,:).gt.0.0_dp))
+		! ! Print
+		! 	print*, 'IGM 20-40'
+		! 	print*, 'n_eligible', n_eligible, 'mean_panel_dad', sum(panela_dad_2)/n_eligible, 'mean_panel_son', sum(panela_son_2)/n_eligible
 
 
 		! ! Mean of assets 
