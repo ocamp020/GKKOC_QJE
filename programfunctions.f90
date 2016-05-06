@@ -4369,7 +4369,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     	if (simutime.gt.1500) then 
 	     	!$omp critical
 	     	if (paneli.eq.8393903) then 
-	     	print*, 'age',age, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli)
+	     	print*, 'age',age, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli), 'asset_son',assets_son(paneli),'assets_dad',assets_dad
 	     	endif 
 	     	!$omp end critical
 	     	! Inter-Generation Mobility 30-50
@@ -4403,7 +4403,6 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     		!$omp end critical
 		     		age_dad(paneli)    = 31
 		     		assets_dad(paneli) = assets_son(paneli)
-		     		age_son(paneli)    = 0 
 		     		assets_son(paneli) = 0.0_dp
 		     		
 		     	endif 
