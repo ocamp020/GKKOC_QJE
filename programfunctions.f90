@@ -4366,7 +4366,6 @@ SUBROUTINE  SIMULATION(bench_indx)
 	            ! !$omp end critical          
 	     	ENDIF ! new age==1
 
-	     	if (simutime.gt.1500) then 
 	     	!$omp critical
 	     	if (paneli.eq.8393903) then 
 	     	print*, 'IGM',IGM_index,'age',age, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli),&
@@ -4395,7 +4394,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     	if (age.eq.31) then 
 		     		!$omp critical
 		     		!print*, ' Son is 50:', IGM_index, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli)
-		     		if (age_dad(paneli).eq.31) then  
+		     		if ((age_dad(paneli).eq.31).and.(simutime.gt.1800)) then  
 		     		IGM_matrix(1,IGM_index) = assets_dad(paneli)
 		     		IGM_matrix(2,IGM_index) = assets_son(paneli)
 		     		IGM_index = IGM_index + 1
@@ -4434,7 +4433,6 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     ! 	endif 
 	     	! endif
 
-	     	endif 
 
 		ENDDO ! paneli
 
