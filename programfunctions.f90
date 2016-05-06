@@ -4392,6 +4392,9 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     		age_son(paneli)    = 0 
 		     		assets_son(paneli) = 0.0_dp
 		     		IGM_index = IGM_index + 1
+		     		!$omp critical
+		     		print*, ' Save result', IGM_index-1,'thread', thread
+		     		!$omp end critical
 		     	endif 
 	     	endif
 
@@ -4579,10 +4582,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_bench'        , STATUS='replace')
 		OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
 
-		OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panela_parents' , STATUS='replace')
-		OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050panela_sons'     , STATUS='replace')
-		OPEN(UNIT=22, FILE=trim(Result_Folder)//'Simul/IGM_4060/panela_parents' , STATUS='replace')
-		OPEN(UNIT=23, FILE=trim(Result_Folder)//'Simul/IGM_4060panela_sons'     , STATUS='replace')
+		! OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_parents' 	, STATUS='replace')
+		! OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_sons'    	, STATUS='replace')
 		! OPEN(UNIT=22, FILE=trim(Result_Folder)//'Simul/panelage_parents' 	, STATUS='replace')
 		! OPEN(UNIT=23, FILE=trim(Result_Folder)//'Simul/panelage_sons'    	, STATUS='replace')
 
@@ -4623,11 +4624,15 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! close (unit=20); close (unit=21); close (unit=22); close (unit=23)
 
 		call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_3050' )
+		OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panela_parents' , STATUS='replace')
+		OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050panela_sons'     , STATUS='replace')
 		WRITE (UNIT=20, FMT=*) panela_dad
 		WRITE (UNIT=21, FMT=*) panela_son
 		close (unit=20); close (unit=21); 
 
 		! call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_4060' )
+		! OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_4060/panela_parents' , STATUS='replace')
+		! OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060panela_sons'     , STATUS='replace')
 		! WRITE (UNIT=20, FMT=*) panela_dad_2
 		! WRITE (UNIT=21, FMT=*) panela_son_2
 		! close (unit=20); close (unit=21); 
