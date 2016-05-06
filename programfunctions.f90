@@ -4160,7 +4160,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	INTEGER , DIMENSION(totpop) 	     :: age_dad_2, age_son_2
 	REAL(DP), DIMENSION(2,4000000)       :: IGM_matrix_2
 	REAL(DP), DIMENSION(:) , allocatable :: panela_dad_2, panela_son_2
-	INTEGER 						     :: IGM_index_2
+	INTEGER 						     :: IGM_index_2, n_eligible
 	! Top Agents 
 	INTEGER       :: top_ind(80), panel_top_ind(totpop), top_ind_aux(80), n_top
 	REAL(DP)      :: top_A(80), A_cut, A_hi, A_low
@@ -4412,7 +4412,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     	! Inter-Generation Mobility 40-60
 	     	if (IGM_index_2.le.4000000) then
 	     		! Reset variables if son dies before 60
-		     	if ((age.eq.1).and.(age_son(paneli).lt.41)) then 
+		     	if ((age.eq.1).and.(age_son_2(paneli).lt.41)) then 
 		     		! !$omp critical
 		     		! print*, ' Agent died', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
 		     		! !$omp end critical
