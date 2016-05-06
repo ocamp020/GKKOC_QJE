@@ -4369,7 +4369,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     	if (simutime.gt.1500) then 
 	     	!$omp critical
 	     	if (paneli.eq.8393903) then 
-	     	print*, 'age',age, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli),&
+	     	print*, 'IGM',IGM_index,'age',age, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli),&
 	     			& 'asset_son',assets_son(paneli),'assets_dad',assets_dad(paneli)
 	     	endif 
 	     	!$omp end critical
