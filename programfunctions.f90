@@ -4470,15 +4470,12 @@ SUBROUTINE  SIMULATION(bench_indx)
 		print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8), sum(panela)/real(totpop,8)
 
 		! IGM 30-50
-		! Collapse IGM_matrix
-			IGM_matrix_flat(1,:) = reshape(IGM_matrix(1,:,:),(/200000*20/))
-			IGM_matrix_flat(2,:) = reshape(IGM_matrix(2,:,:),(/200000*20/))
-		! Get number of eligibles
-			n_eligible = count(IGM_matrix_flat(1,:).gt.0.0_dp)
-		! Allocate variables
+			! Get number of eligibles
+			n_eligible = count(IGM_matrix(1,:).gt.0.0_dp)
+			! Allocate variables
 			allocate(panela_dad(n_eligible), panela_son(n_eligible))
-			panela_dad = pack(IGM_matrix_flat(1,:) , (IGM_matrix_flat(1,:).gt.0.0_dp))
-			panela_son = pack(IGM_matrix_flat(2,:) , (IGM_matrix_flat(2,:).gt.0.0_dp))
+			panela_dad = pack(IGM_matrix(1,:) , (IGM_matrix(1,:).gt.0.0_dp))
+			panela_son = pack(IGM_matrix(2,:) , (IGM_matrix(2,:).gt.0.0_dp))
 		! Print
 			print*, 'IGM 30-50'
 			print*, 'n_eligible', n_eligible, 'mean_panel_dad', sum(panela_dad)/n_eligible, 'mean_panel_son', sum(panela_son)/n_eligible
