@@ -59,7 +59,7 @@ PROGRAM main
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 	! Switch for separable and non-separable utility
@@ -82,10 +82,7 @@ PROGRAM main
 
 		! New Exponential Shock that only affects high Z and includes Z-varying theta 2.5
 		! beta 		sigmaz 		x_hi 	rho_z 	gamma
-		! 0.948_dp 0.077_dp  	5.00_dp 0.1_dp 	0.457_dp
-		! New Exponential Shock that only affects high Z and includes Z-varying theta 10
-		! beta 		sigmaz 		x_hi 	rho_z 	gamma
-		! 0.948_dp 0.0585_dp  	5.00_dp 0.1_dp 	0.462_dp
+		! 0.9485_dp 0.0665_dp  	5.00_dp 0.1_dp 	0.470_dp
 
 		beta   	= 0.9485_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
@@ -142,7 +139,6 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		! Result_Folder = trim(Result_Folder)//'Ret_Shock/' 
 		Result_Folder = trim(Result_Folder)//'Model_1.2/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
