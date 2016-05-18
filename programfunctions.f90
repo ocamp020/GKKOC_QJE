@@ -4164,6 +4164,11 @@ SUBROUTINE  SIMULATION(bench_indx)
 	REAL(DP), DIMENSION(:) , allocatable :: panela_dad_2, panela_son_2, panelz_dad_2, panelz_son_2, panelr_dad_2, panelr_son_2
 	INTEGER 						     :: IGM_index_2
 
+	! Top Agents 
+	INTEGER       :: top_ind(80), panel_top_ind(totpop), top_ind_aux(80), n_top
+	REAL(DP)      :: top_A(80), A_cut, A_hi, A_low
+	character(10) :: top_folder
+
 	!$ call omp_set_num_threads(20)
 
 		! Set Seeds for each thread
