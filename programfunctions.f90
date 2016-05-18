@@ -4164,6 +4164,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 	REAL(DP), DIMENSION(:) , allocatable :: panela_dad_2, panela_son_2, panelz_dad_2, panelz_son_2, panelr_dad_2, panelr_son_2
 	INTEGER 						     :: IGM_index_2
 
+	REAL :: k_igm
+
 	! Top Agents 
 	INTEGER       :: top_ind(80), panel_top_ind(totpop), top_ind_aux(80), n_top
 	REAL(DP)      :: top_A(80), A_cut, A_hi, A_low
@@ -4268,7 +4270,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	print*, 'Starting Simutime loop'
 	DO simutime=1, MaxSimuTime
 		!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi, &
-		!$omp& currenta,currentzi,currentlambdai,currentei,currentxi,tklo,tkhi,tempno)
+		!$omp& currenta,currentzi,currentlambdai,currentei,currentxi,tklo,tkhi,tempno,k_igm)
 	   	DO paneli=1,totpop
 	    
 	       	currenta  		= panela(paneli)
@@ -4385,8 +4387,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     			age_son(paneli)    = age
 	     		! Update variables for agents between 30-50 
 	     		if ((age.ge.11).and.(age.le.31)) then 
+	     			k_igm = min(theta(panelz(paneli))*currenta,&
+	     					&(mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		     		assets_son(paneli) = panela(paneli) + assets_son(paneli)
-		     		return_son(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelk(paneli))**mu - (R+DepRate)*panelk(paneli) +&
+		     		return_son(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*k_igm)**mu - (R+DepRate)*k_igm +&
 	     								&   R*panela(paneli) )/panela(paneli) + return_son(paneli)
 		     		! !$omp critical
 		     		! print*, ' Potential Agent', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
@@ -4433,8 +4437,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     		age_son_2(paneli)    = age 
 	     		! Update variables for agents between 40-60 
 	     		if ((age.ge.21).and.(age.le.41)) then 
+	     			k_igm = min(theta(panelz(paneli))*currenta,&
+	     					& (mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		     		assets_son_2(paneli) = panela(paneli) + assets_son_2(paneli)
-		     		return_son_2(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelk(paneli))**mu - (R+DepRate)*panelk(paneli) +&
+		     		return_son_2(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*k_igm)**mu - (R+DepRate)*k_igm +&
 	     								&   R*panela(paneli) )/panela(paneli) + return_son_2(paneli)
 		     		! !$omp critical
 		     		! print*, ' Potential Agent', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
