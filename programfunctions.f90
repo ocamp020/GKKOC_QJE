@@ -4458,7 +4458,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			     		IGM_r_matrix_2(2,IGM_index_2) = return_son_2(paneli)
 			     		IGM_z_matrix_2(1,IGM_index_2) = z_dad_2(paneli)
 			     		IGM_z_matrix_2(2,IGM_index_2) = z_son_2(paneli)
-			     		IGM_index = IGM_index + 1
+			     		IGM_index_2 = IGM_index_2 + 1
 			     		! print*, ' Save result', IGM_index-1
 		     		endif 
 		     		!$omp end critical
