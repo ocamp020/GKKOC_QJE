@@ -4259,8 +4259,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	!call cpu_time(start_timet) 
 	
-	! eligible    = 1 
-	! death_count = 0
+	eligible    = 1 
+	death_count = 0
 
 	age_dad = 0 ; age_son = 0 ; assets_dad = 0.0_dp ; assets_son = 0.0_dp ;
 	IGM_index = 1 ; IGM_a_matrix = 0.0_dp ; IGM_r_matrix = 0.0_dp ; IGM_z_matrix = 0 ; 
