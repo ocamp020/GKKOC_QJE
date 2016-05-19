@@ -4452,12 +4452,12 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     		!$omp critical
 		     		!print*, ' Son is 50:', IGM_index, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli)
 		     		if ((age_dad_2(paneli).eq.41).and.(simutime.gt.1800)) then  
-			     		IGM_a_matrix(1,IGM_index) = assets_dad_2(paneli)
-			     		IGM_a_matrix(2,IGM_index) = assets_son_2(paneli)
-			     		IGM_r_matrix(1,IGM_index) = return_dad_2(paneli)
-			     		IGM_r_matrix(2,IGM_index) = return_son_2(paneli)
-			     		IGM_z_matrix(1,IGM_index) = z_dad_2(paneli)
-			     		IGM_z_matrix(2,IGM_index) = z_son_2(paneli)
+			     		IGM_a_matrix_2(1,IGM_index_2) = assets_dad_2(paneli)
+			     		IGM_a_matrix_2(2,IGM_index_2) = assets_son_2(paneli)
+			     		IGM_r_matrix_2(1,IGM_index_2) = return_dad_2(paneli)
+			     		IGM_r_matrix_2(2,IGM_index_2) = return_son_2(paneli)
+			     		IGM_z_matrix_2(1,IGM_index_2) = z_dad_2(paneli)
+			     		IGM_z_matrix_2(2,IGM_index_2) = z_son_2(paneli)
 			     		IGM_index = IGM_index + 1
 			     		! print*, ' Save result', IGM_index-1
 		     		endif 
