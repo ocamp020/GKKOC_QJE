@@ -4416,7 +4416,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     		assets_dad(paneli) = assets_son(paneli)
 		     		return_dad(paneli) = return_son(paneli)
 		     		z_dad(paneli)      = panelz(paneli)
-		     		assets_son(paneli) = 0.0_dp    		
+		     		assets_son(paneli) = 0.0_dp 
+		     		return_son(paneli) = 0.0_dp    		
 		     		z_son(paneli)      = 0
 		     	endif 
 	     	endif
@@ -4466,7 +4467,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     		assets_dad_2(paneli) = assets_son_2(paneli)
 		     		return_dad_2(paneli) = return_son_2(paneli)
 		     		z_dad_2(paneli)      = panelz(paneli)
-		     		assets_son_2(paneli) = 0.0_dp    		
+		     		assets_son_2(paneli) = 0.0_dp    
+		     		return_son(paneli)   = 0.0_dp
 		     		z_son_2(paneli)      = 0  		
 		     	endif 
 	     	endif
