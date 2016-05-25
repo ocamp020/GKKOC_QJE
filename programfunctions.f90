@@ -1900,7 +1900,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        endif
 
 	    	!!
-	    	print*, 'DBN_diff=', DBN_dist, "Agg_Debt", Agg_Debt(R)**0.5_dp, 'R=',R,'P=',P
+	    	! print*, 'DBN_diff=', DBN_dist, "Agg_Debt", Agg_Debt(R)**0.5_dp, 'R=',R,'P=',P
 	    	!!
 
 	    	! Solve the model at current aggregate values
