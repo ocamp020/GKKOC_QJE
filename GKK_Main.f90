@@ -189,6 +189,8 @@ PROGRAM main
 
 		! Optimal Tax
 		if (Opt_Tax) then 
+			call Solve_Benchmark(compute_bench,Simul_Switch)
+
 			folder_aux = Result_Folder
 			if (Opt_Tax_KW) then 
 				Result_Folder = trim(folder_aux)//'Opt_Tax_K/'
@@ -197,7 +199,7 @@ PROGRAM main
 			endif
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
-			call Solve_Benchmark(compute_bench,Simul_Switch)
+			
 			call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		endif 
 
