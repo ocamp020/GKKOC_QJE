@@ -1756,8 +1756,9 @@ SUBROUTINE FIND_DBN_EQ()
 	iter_indx = 1
 	!print*, 'Computing Equilibrium Distribution'
 	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. ( simutime .le. MaxSimuTime ) )
-		print*, 'DBN_dist=', DBN_dist, iter_indx
-		! print*, 'sum DBN1=', sum(DBN1)
+		
+		print*, 'DBN_dist=', DBN_dist
+
 	    DBN2=0.0_DP
 
 		! Everyone in MaxAge dies. Those who die, switch to z2, lambda2 and start at ne/2+1 and x=1

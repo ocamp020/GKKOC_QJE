@@ -71,7 +71,7 @@ real, dimension(3,4)       :: dbn_1, dbn_2, a_mat, z_mat
 real, dimension(3,3)       :: zz_mat
 real, dimension(3)         :: agrid
 real, dimension(4)         :: zgrid
-integer :: i,j
+integer :: i,j,k
 character(100) :: mydir 
 !real :: aaa = 3.25
 
@@ -82,6 +82,13 @@ real, dimension(2,2) :: aaa
 real, dimension(4)   :: bbb
 real(8), dimension(2) :: ccc
 logical :: log_1, log_2(2)
+
+type mytype
+   real(8), dimension(2,3,4,5,6,7) :: a
+end type mytype
+
+type(mytype), dimension(2,2,2) :: kk 
+real(8), dimension(2,2,2,2,3,4,5,6,7) :: kkk
 
 ! !answer = select (array)
 ! call select(array,answer)
@@ -222,6 +229,25 @@ print*, ' '
 print*, 'Test Count'
 print*, xx
 print*, count(xx.eq.0), count(xx.eq.1), count(xx.gt.0), count(xx.gt.2)
+
+print*, ' '
+print*, z_mat(1,:)
+print*, z_mat(1,(/2,1,2/))
+
+
+do i=1,2; do j=1,2; do k=1,2;
+kk(i,j,k)%a = 0.0
+enddo; enddo; enddo
+
+kk(1,1,1)%a(:,:,:,:,:,:)=10
+kk(1,1,2)%a(:,:,:,:,:,:)=11
+kk(1,2,1)%a(:,:,:,:,:,:)=12
+kk(1,2,2)%a(:,:,:,:,:,:)=13
+
+print*, ' '
+print*,'test kk'
+print*, kk
+
 
 
 end program test

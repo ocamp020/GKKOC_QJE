@@ -29,7 +29,7 @@ MODULE parameters
     INTEGER(I4B), PARAMETER :: nz=9, nz_aux=11  ! Number of grid points
 
     ! Transitory entrepreneurial ablity (x)
-    INTEGER(I4B), PARAMETER :: nx=3
+    INTEGER(I4B), PARAMETER :: nx=1
     REAL(DP)                :: x_hi, x_lo, x_0, a_x, b_x
 
  
@@ -56,11 +56,15 @@ MODULE parameters
 	INTEGER(I4B), PARAMETER  :: na=201, fine_na=801
 	REAL(DP)    , PARAMETER  :: a_theta=4.0_DP , amax=500000.0_DP, amin=0.0001_DP
 
+	! Non-Labor Income grid "Y_GRID"
+	INTEGER(I4B), PARAMETER  :: ny=201
+	REAL(DP)                 :: y_theta=4.0_DP , ymax=500000.0_DP, ymin=0.0001_DP	
+
 	
 
 	! Control for updates on stationary distribution
 		! Every "update_period" iterations policy functions are updated
-	INTEGER(I4B), PARAMETER :: update_period=5
+	INTEGER(I4B) 			:: update_period=25
 		! The distribution is iterated until convergence or until "MaxSimuTime" iterations
 	INTEGER(I4B), PARAMETER :: MaxSimuTime=2000 
 		! Age categories are established

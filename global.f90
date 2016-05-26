@@ -46,6 +46,7 @@ MODULE global
 		REAl(DP), DIMENSION(nx,nz) :: xz_grid
 		! transition matrix (pr_x), CDF of transition matrix (by row) (cdf_pr_x)
 		REAL(DP), DIMENSION(nx,nx,nz,MaxAge) :: pr_x, cdf_pr_x
+		REAL(DP), DIMENSION(nx,nz) :: pr_x_nb, cdf_x_nb
 
 	! Retirement income 
 	REAL(DP), DIMENSION(nlambda,ne) :: phi_lambda_e   ! phi_lambda_e is the income replacement ratio used to compute SS payments
@@ -57,14 +58,13 @@ MODULE global
 		REAL(DP), DIMENSION(MaxAge  , nlambda, ne) :: eff_un,  yh
 
 	! Policy function and value function (defined on the exogenous grid)
-    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Cons, Hours, Aprime
-    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Cons_bench, Hours_bench, Aprime_bench, Cons_exp, Hours_exp, Aprime_exp 
-    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: ValueFunction, ValueFunction_bench, ValueFunction_exp
-    REAL(DP), dimension(MaxAge, na, nz, nlambda, ne, nx) :: Cons_Eq_Welfare
-	! Policy function and value function (defined on the adjusted grid for breakpoints)
-	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_t, Hours_t, Aprime_t
-	!REAL(DP), DIMENSION(MaxAge,na+nz,nz,nlambda,ne) :: Cons_t, Hours_t, Aprime_t
- 
+    REAL(DP), DIMENSION(MaxAge, ny, nz, nlambda, ne, nx) :: Cons, Hours, Aprime, Kprime
+    REAL(DP), DIMENSION(MaxAge, ny, nz, nlambda, ne, nx) :: Cons_bench, Hours_bench, Cons_exp, Hours_exp
+    REAL(DP), DIMENSION(MaxAge, ny, nz, nlambda, ne, nx) :: Aprime_bench, Aprime_exp, Kprime_bench, Kprime_exp 
+    REAL(DP), DIMENSION(MaxAge, ny, nz, nlambda, ne, nx) :: ValueFunction, ValueFunction_bench, ValueFunction_exp
+    REAL(DP), DIMENSION(MaxAge, ny, nz, nlambda, ne, nx) :: Cons_Eq_Welfare
+    REAL(DP), DIMENSION(na, nz, nlambda) :: opt_K_nb, opt_K_nb_bench, opt_K_nb_exp 
+
  	! Aggregate variables
 	 	! Benchmark values of Q, N, E, Wage, R, G, Y
 	    REAL(DP) :: QBAR_bench, NBAR_bench, Ebar_bench, wage_bench, P_bench, GBAR_bench, Y_bench, W_bench, R_bench
@@ -72,37 +72,28 @@ MODULE global
 	    REAL(DP) :: QBAR_exp,   NBAR_exp,   Ebar_exp,   wage_exp,   P_exp,   GBAR_exp, GBAR_exp_old, Y_exp, R_exp
 	    ! Values for aggregate variables (used when solving a given economy)
 	    REAL(DP) :: P, Ebar , wage, NBAR, QBAR, YBAR, GBAR, R, SSC_Payments
-	    ! Wealth tax threshold as proportion of mean benchmark wealth
-	    REAL(DP) :: Wealth_factor, Threshold_Share
 
 	! Asset, resources and marginal benefit of wealth grids
 		! Note that these grids will change as we change tax rates and for each intermediate good price
 		! For each tax rate we weill have different Y grids
 		REAL(DP), DIMENSION(na)      :: agrid
 	    REAL(DP), DIMENSION(fine_na) :: fine_agrid
-	    REAL(DP), DIMENSION(na,nz,nx):: YGRID, MBGRID
-	    REAL(DP), DIMENSION(:,:,:), ALLOCATABLE :: YGRID_t, MBGRID_t
-	    REAL(DP), DIMENSION(:)    , ALLOCATABLE :: agrid_t
-	    INTEGER                      :: na_t
+	    REAL(DP), DIMENSION(ny)      :: YGRID
 
     ! Capital markets
-    	REAL(DP), DIMENSION(na,nz,nx) :: K_mat, Pr_mat, Wealth_mat
-    	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: V_Pr, V_Pr_bench, V_Pr_exp, Firm_Wealth
+    	REAL(DP), DIMENSION(MaxAge, ny, nz, nlambda, ne, nx) :: V_Pr, V_Pr_bench, V_Pr_exp, Firm_Wealth
 	
 	! Values for taxes in benchmark and experiment
-    REAL(DP) :: tauk_bench, tauPL_bench, psi_bench, tauw_bt_bench, tauw_at_bench, Y_a_threshold_bench 
-    REAL(DP) :: tauk_exp,   tauPL_exp,   psi_exp,   tauw_bt_exp,   tauw_at_exp,   Y_a_threshold_exp
+    REAL(DP) :: tauk_bench, tauPL_bench, psi_bench, tauw_bench
+    REAL(DP) :: tauk_exp,   tauPL_exp,   psi_exp,   tauw_exp
 
     ! Values for taxes (when solving an economy)
     REAL(DP) :: tauK
-    REAL(DP) :: tauW_bt, tauW_at ! Wealth taxes below threshold and above threshold
-    REAL(DP) :: Y_a_threshold = 0.0_dp ! Value of the threshold for change in tauW
+    REAL(DP) :: tauW
 
 	! Taxes
 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
-		REAL(DP) :: tauWmin_bt=0.00_DP, tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
-		REAL(DP) :: tauWmin_at=0.012_DP, tauWinc_at=0.002_DP ! Minimum tax above threshold and increments
-		REAL(DP) :: Threshold_Factor = 0.00_dp 
+		REAL(DP) :: tauWmin=0.012_DP, tauWinc=0.002_DP ! Minimum tax above threshold and increments
 	! Consumption tax
 		REAL(DP) :: tauC=0.075_DP
     ! Labor income tax: This is a progresive tax.
@@ -111,21 +102,18 @@ MODULE global
 
 
     ! Auxiliary variables to find wealth tax that balances the budget in experiment economy
-    REAL(DP) :: tauWindx, tauW_low_bt, tauW_up_bt, tauW_low_at, tauW_up_at
+    REAL(DP) :: tauWindx, tauW_low, tauW_up
 
-	! Counters for the age, and index of lamnbda, z, a and e
-    INTEGER :: age, lambdai, zi, ai, ei, xi    
-
-    ! Distribution of population by age, a, z, lambda, e
-    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) ::DBN1, DBN_bench, DBN_exp
+    ! Distribution of population by age, y, z, lambda, e
+    REAL(DP), DIMENSION(MaxAge, ny, nz, nlambda, ne, nx) ::DBN1, DBN_bench, DBN_exp
 
     ! Stats and distribution in equilibrium
 	    ! Distribution of assets
-	    REAL(DP), DIMENSION(na)  :: pr_a_dbn, cdf_a_dbn
+	    REAL(DP), DIMENSION(ny)  :: pr_y_dbn, cdf_y_dbn
 	    ! Mass of assets by a_grid (defined as a_grid(i)sum(DBN(:,i,:,:,:)))
-	    REAL(DP), DIMENSION(na)  :: tot_a_by_grid, cdf_tot_a_by_grid
+	    REAL(DP), DIMENSION(ny)  :: tot_y_by_grid, cdf_tot_y_by_grid
 	    ! Percentiles of the asset distribution and mass of total assets by them
-	    INTEGER , DIMENSION(100) ::  prctile_ai_ind
+	    INTEGER , DIMENSION(100) ::  prctile_Y_ind
 	    REAL(DP), DIMENSION(100) ::  cdf_tot_a_by_prctile, prctile_ai
     	! Other stats
 	    REAL(DP) :: pop_25_60 , tothours_25_60, pop_pos_earn_25_60, tot_log_earnings_25_60, mean_log_earnings_25_60 
