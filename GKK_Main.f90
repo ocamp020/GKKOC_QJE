@@ -58,7 +58,7 @@ PROGRAM main
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Simul_Switch  = .false.
 
 
@@ -489,6 +489,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	
 	print*,'Optimal Tax Loop'
 	If (Opt_Tax_KW) then
+		PRINT*,''
+		Print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
+		PRINT*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
 	    DO tauindx=0,40
             tauK        = real(tauindx,8)/100_DP
@@ -553,6 +556,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		CLOSE (UNIT=77)
 
 	else
+		PRINT*,''
+		Print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
+		PRINT*,''
     	! Set Y_a_threshold
 			call Find_TauW_Threshold(DBN_bench,W_bench)  
 			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
