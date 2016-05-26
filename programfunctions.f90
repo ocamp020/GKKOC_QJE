@@ -1716,13 +1716,14 @@ SUBROUTINE FIND_DBN_EQ()
 		! For each age and state vector bracket optimal a' between two grid points
 		! When at that age and state the optimal decision is approximated by selecting one the grid points
 		! The grid points are selected with probability proportional to their distance to the optimal a'
-	DO age=1,MaxAge
-	!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
+	
+	!$omp parallel do private(age,lambdai,ei,ai,xi,tklo,tkhi)
 	DO zi=1,nz
 	DO xi=1,nx
 	DO ai=1,na
 	DO lambdai=1,nlambda
 	DO ei=1, ne
+	DO age=1,MaxAge
         if ( Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
             tklo =na-1
         elseif (Aprime(age,ai,zi,lambdai, ei,xi) .lt. amin) then
@@ -1755,7 +1756,7 @@ SUBROUTINE FIND_DBN_EQ()
 	iter_indx = 1
 	!print*, 'Computing Equilibrium Distribution'
 	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. ( simutime .le. MaxSimuTime ) )
-		!print*, 'Eq. Distribution difference=', DBN_dist
+		print*, 'Eq. Distribution difference=', DBN_dist, iter_indx
 		! print*, 'sum DBN1=', sum(DBN1)
 	    DBN2=0.0_DP
 
@@ -1900,7 +1901,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        endif
 
 	    	!!
-	    	! print*, 'DBN_diff=', DBN_dist, "Agg_Debt", Agg_Debt(R)**0.5_dp, 'R=',R,'P=',P
+	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P
 	    	!!
 
 	    	! Solve the model at current aggregate values
@@ -1916,19 +1917,22 @@ SUBROUTINE FIND_DBN_EQ()
 				! Form YGRID for the capital income economy given interest rate "P"
 					CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 				! Solve for policy and value functions 
+					print*' EGM Start'
 					CALL EGM_RETIREMENT_WORKING_PERIOD 
+					print*' EGM End'
 	        
 				! Discretize policy function for assets (a')
 					! For each age and state vector bracket optimal a' between two grid points
 					! When at that age and state the optimal decision is approximated by selecting one the grid points
 					! The grid points are selected with probability proportional to their distance to the optimal a'
-				DO age=1,MaxAge
-				!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
+				
+				!$omp parallel do private(age,lambdai,ei,ai,xi,tklo,tkhi)
 				DO zi=1,nz
 				DO xi=1,nx
 				DO ai=1,na
 				DO lambdai=1,nlambda
 				DO ei=1, ne
+				DO age=1,MaxAge
 			        if ( Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
 			            tklo =na-1
 			        elseif (Aprime(age,ai,zi,lambdai, ei,xi) .lt. amin) then
