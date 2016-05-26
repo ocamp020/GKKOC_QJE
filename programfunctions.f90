@@ -2382,6 +2382,7 @@ SUBROUTINE COMPUTE_STATS()
 	constrained_firms_age_z = constrained_firms_age_z/size_by_age_z 
 	constrained_firms_age   = constrained_firms_age/size_by_age 
 
+	if (Tax_Reform) then 
 	if (solving_bench.eq.1) then
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats.txt', STATUS='replace')
 		WRITE(UNIT=11, FMT=*) ' '
@@ -2403,6 +2404,7 @@ SUBROUTINE COMPUTE_STATS()
 		WRITE(UNIT=11, FMT=*) 'Total', 100.0_dp*sum(constrained_firm_ind*DBN1)
 
 		CLOSE(UNIT=11)
+	endif
 		
 
 
