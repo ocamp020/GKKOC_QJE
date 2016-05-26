@@ -1757,7 +1757,7 @@ SUBROUTINE FIND_DBN_EQ()
 	!print*, 'Computing Equilibrium Distribution'
 	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. ( simutime .le. MaxSimuTime ) )
 		
-		print*, 'DBN_dist=', DBN_dist
+		! print*, 'DBN_dist=', DBN_dist
 
 	    DBN2=0.0_DP
 
