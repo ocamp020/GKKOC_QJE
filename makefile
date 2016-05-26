@@ -20,21 +20,21 @@ Objects_GO      = $(Folder)/GKK_Calibration.o \
                   $(Folder)/stateControl.o $(Folder)/genericParams.o $(Folder)/utilities.o \
                   $(Folder)/simplex.o $(Folder)/objective.o $(Folder)/minimize.o
 
-Flags    = -fbounds-check 
+Flags    = -fbounds-check -finline-functions
 omp_flag = -fopenmp
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
 
-# Compile all the modules in the main folder. Modules are saved as .f90 files. 
+# Compile all the modules in the main folder. Modules are saved as .f90 files. M
 $(Folder)/%.o: %.F90
-	gfortran -O2 -J$(Folder) -c $< -o $@
+	gfortran -O3 -J$(Folder) -c $< -o $@
 
 $(Folder)/%.o: %.f90
-	gfortran -O2 -J$(Folder) -c $< -o $@
+	gfortran -O3 -J$(Folder) -c $< -o $@
 
 $(Folder)/programfunctions.o: programfunctions.f90
-	gfortran $(omp_flag) -O2 -J$(Folder) -c programfunctions.f90 -o $(Folder)/programfunctions.o
+	gfortran $(omp_flag) -O3 -J$(Folder) -c programfunctions.f90 -o $(Folder)/programfunctions.o
 
 # Compile and execute programs
 Sergio_Simple.a: GKK_simple.f90 $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o
@@ -46,14 +46,19 @@ Sergio.a: GKK_Wealth_Tax_Sergio.f90 $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o $(Fold
 	$(Folder)/Sergio.a
 
 GKK_Main.a: GKK_Main.f90 $(Objects_Main) $(Objects_Opt_Tax)
-	gfortran $(omp_flag) -O2 -I$(Folder) GKK_Main.f90 $(Objects_Main) $(Objects_Opt_Tax) -o $(Folder)/GKK_Main.a
+	gfortran $(omp_flag) -O3 -I$(Folder) GKK_Main.f90 $(Objects_Main) $(Objects_Opt_Tax) -o $(Folder)/GKK_Main.a
 	time $(Folder)/GKK_Main.a
+
+GKK_Main_pg.a: profiler.f90 $(Objects_Main)
+	gfortran -pg $(omp_flag) -O3 -I$(Folder) profiler.f90 $(Objects_Main) -o $(Folder)/GKK_Main_pg.a
+	time $(Folder)/GKK_Main_pg.a
+	gprof $(Folder)/GKK_Main_pg.a
 
 GKK_Main_Server.a: GKK_Main.f90 $(Objects_Main)
 	gfortran -I$(Folder) GKK_Main.f90 $(Objects_Main) -o $(Folder)/GKK_Main.a
 
 GKK_Opt_Taxes.a: GKK_Optimal_Taxes.f90 $(Objects_Main) $(Objects_Opt_Tax)
-	gfortran $(omp_flag) -O2 -I$(Folder) GKK_Optimal_Taxes.f90 $(Objects_Main) $(Objects_Opt_Tax) -o $(Folder)/GKK_Opt_Taxes.a  
+	gfortran $(omp_flag) -O3 -I$(Folder) GKK_Optimal_Taxes.f90 $(Objects_Main) $(Objects_Opt_Tax) -o $(Folder)/GKK_Opt_Taxes.a  
 	time $(Folder)/GKK_Opt_Taxes.a
 
 CE_program.a: Consumption_Equivalent.f90 $(Objects_Main)
@@ -102,10 +107,10 @@ GKK_Calibration.a: $(GO_Folder)/GlobalSearch.f90 $(Objects_Main) $(Objects_GO)
 #----------------------------------------------------------------------------------
 
 GKK_Calibration_Loop.a: GKK_Calibration_Loop.f90 $(Objects_Main) $(Objects_Opt_Tax)
-	gfortran $(omp_flag) -O2 -I$(Folder) GKK_Calibration_Loop.f90 $(Objects_Main) $(Objects_Opt_Tax) -o $(Folder)/GKK_Calibration_Loop.a
+	gfortran $(omp_flag) -O3 -I$(Folder) GKK_Calibration_Loop.f90 $(Objects_Main) $(Objects_Opt_Tax) -o $(Folder)/GKK_Calibration_Loop.a
 
 Calibration_Loop.a: Calibration_Loop.f90 $(Folder)/NRTYPE.o
-	gfortran $(omp_flag) -O2 -I$(Folder) Calibration_Loop.f90 $(Folder)/NRTYPE.o -o $(Folder)/Calibration_Loop.a
+	gfortran $(omp_flag) -O3 -I$(Folder) Calibration_Loop.f90 $(Folder)/NRTYPE.o -o $(Folder)/Calibration_Loop.a
 	rm -f log_ind*
 	time $(Folder)/Calibration_Loop.a
 
@@ -115,7 +120,7 @@ Calibration_Loop.a: Calibration_Loop.f90 $(Folder)/NRTYPE.o
 #----------------------------------------------------------------------------------
 
 Simulation_Labor_Income.a: Simulation_Labor_Income.f90 $(Objects_Main)
-	gfortran $(omp_flag) -O2 -I$(Folder) Simulation_Labor_Income.f90 $(Objects_Main) -o $(Folder)/Simulation_Labor_Income.a
+	gfortran $(omp_flag) -O3 -I$(Folder) Simulation_Labor_Income.f90 $(Objects_Main) -o $(Folder)/Simulation_Labor_Income.a
 	time $(Folder)/Simulation_Labor_Income.a
 
 #----------------------------------------------------------------------------------

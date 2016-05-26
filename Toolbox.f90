@@ -15,6 +15,48 @@ MODULE Toolbox
 		! Spline
 		! Splint
 		
+! =============================================================================
+!
+! Linear_IP: Conducts Linear Interpolation to compute f(x) given a grid
+!              Given a function y=f(x) tabulated in xvec and yvec and a point x0,
+!              return the function value y0=f(x0) obtained from linear interpolations
+!              between x1<x<x2.
+!
+! Usage: y0 = Linear_IP(n,xvec,yvec,x0)
+!
+! Input: n_grid, integer ,                    Size of the grid
+!        x_grid, real(dp), dimension(n_grid), Values of the grid
+!        f_grid, real(dp), dimension(n_grid), Values of the objective function at the grid
+!        x     , real(dp),                  , Point for interpolation
+!
+! Output: y0, real(dp), Value of function at x.
+!
+! Remarks: Taken from Heer & Maussner (2nd Edition) - Original source in file Funcion.for
+
+    Function Linear_IP(n_grid,x_grid,f_grid,x)
+        implicit none
+        integer  :: n_grid, j
+        real(dp) :: x, x_grid(n_grid), f_grid(n_grid), Linear_IP
+
+    
+        ! if ((x.lt.x_grid(1)) .or. (x.gt.x_grid(n_grid))) then
+        !     Print *, "Linear Interpolation Error: Input off of grid!"
+        !     Linear_IP = x
+        !     Return
+        ! end if
+    
+        if (x.lt.x_grid(1)) then
+            Linear_IP = f_grid(1)
+        elseif (x.gt.x_grid(n_grid)) then
+            Linear_IP = f_grid(n_grid)
+        else
+            j = count(x_grid.le.x) ! this determines the lower bracket for x
+            Linear_IP=f_grid(j)+((f_grid(j+1)-f_grid(j))/(x_grid(j+1)-x_grid(j)))*(x-x_grid(j))
+        end if
+
+        Return
+
+    End Function Linear_IP
 
 !========================================================================================
 !========================================================================================
@@ -177,7 +219,7 @@ MODULE Toolbox
 				REAL(DP) :: func
 			END FUNCTION func
 		END INTERFACE
-		INTEGER(I4B), PARAMETER :: ITMAX=100
+		INTEGER(I4B), PARAMETER :: ITMAX=1000
 		REAL(DP), PARAMETER :: CGOLD=0.3819660_DP,ZEPS=1.0e-3_DP*epsilon(ax)
 		INTEGER(I4B) :: iter
 		REAL(DP) :: a,b,d,e,etemp,fu,fv,fw,fx,p,q,r,tol1,tol2,u,v,w,x,xm
@@ -357,9 +399,20 @@ MODULE Toolbox
 		a=x1
 		b=x2
 		fa=func(a)
+		if (fa<0.0_dp) then
+			zbrent = a 
+			print*, 'Lower bound is not low enough - This message is for Agg_Debt', a,fa
+			Return 
+		endif 
 		fb=func(b)
-		if ((fa > 0.0 .and. fb > 0.0) .or. (fa < 0.0 .and. fb < 0.0)) &
-			call nrerror('root must be bracketed for zbrent')
+		if (fb>0.0_dp) then 
+			zbrent = b
+			print*, 'Higher bound is not high enough - This message is for Agg_Debt' , b, fb 
+			Return 
+		endif 
+		! if ((fa > 0.0 .and. fb > 0.0) .or. (fa < 0.0 .and. fb < 0.0)) &
+		! 	call nrerror('root must be bracketed for zbrent')
+	
 		c=b
 		fc=fb
 		do iter=1,ITMAX
