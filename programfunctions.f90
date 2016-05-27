@@ -1916,9 +1916,7 @@ SUBROUTINE FIND_DBN_EQ()
 				! Form YGRID for the capital income economy given interest rate "P"
 					CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 				! Solve for policy and value functions 
-					print*,' EGM Start'
 					CALL EGM_RETIREMENT_WORKING_PERIOD 
-					print*,' EGM End'
 	        
 				! Discretize policy function for assets (a')
 					! For each age and state vector bracket optimal a' between two grid points
