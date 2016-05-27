@@ -406,8 +406,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	endif 
 	
 	CALL Write_Experimental_Results(compute_exp)
-	CALL Firm_Value
-	CALL Write_Experimental_Results(.true.)
+
 
 	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR

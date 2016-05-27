@@ -6307,7 +6307,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN (UNIT=17, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_bt', STATUS='old', ACTION='read')
 		OPEN (UNIT=18, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_at', STATUS='old', ACTION='read')
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr'   , STATUS='old', ACTION='read')
-		! OPEN (UNIT=20, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr_nb', STATUS='old', ACTION='read')
+		OPEN (UNIT=20, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr_nb', STATUS='old', ACTION='read')
 
 		READ (UNIT=1,  FMT=*), cons
 		READ (UNIT=2,  FMT=*), aprime
@@ -6328,7 +6328,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		READ (UNIT=17, FMT=*), tauW_bt
 		READ (UNIT=18, FMT=*), tauW_at
 		READ (UNIT=19, FMT=*), V_Pr
-		! READ (UNIT=20, FMT=*), V_Pr_nb
+		READ (UNIT=20, FMT=*), V_Pr_nb
 		print*, "Reading of experimental results completed"
 	endif 
 
@@ -6351,9 +6351,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 	CLOSE (unit=17)
 	CLOSE (unit=18)
 	CLOSE (unit=19)
-	if (compute_exp) then 
 	CLOSE (unit=20)
-	endif 
 
 END SUBROUTINE Write_Experimental_Results
 
