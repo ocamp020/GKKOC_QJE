@@ -4173,14 +4173,16 @@ SUBROUTINE  SIMULATION(bench_indx)
 	INTEGER , DIMENSION(totpop) 	     :: age_dad, age_son, z_dad, z_son
 	REAL(DP), DIMENSION(2,4000000)       :: IGM_a_matrix, IGM_r_matrix, IGM_pv_matrix
 	INTEGER , DIMENSION(2,4000000) 		 :: IGM_z_matrix
-	REAL(DP), DIMENSION(:) , allocatable :: panela_dad, panela_son, panelz_dad, panelz_son, panelr_dad, panelr_son, panelPV_dad, panelPV_son
+	REAL(DP), DIMENSION(:) , allocatable :: panela_dad, panela_son, panelz_dad, panelz_son
+	REAL(DP), DIMENSION(:) , allocatable :: panelr_dad, panelr_son, panelPV_dad, panelPV_son
 	INTEGER 						     :: IGM_index
 	! Intergenerational statistics 40-60
 	REAL(DP), DIMENSION(totpop) 	     :: assets_dad_2, assets_son_2, return_dad_2, return_son_2, PV_dad_2, PV_son_2
 	INTEGER , DIMENSION(totpop) 	     :: age_dad_2, age_son_2, z_dad_2, z_son_2
 	REAL(DP), DIMENSION(2,4000000)       :: IGM_a_matrix_2, IGM_r_matrix_2, IGM_pv_matrix_2
 	INTEGER , DIMENSION(2,4000000) 		 :: IGM_z_matrix_2
-	REAL(DP), DIMENSION(:) , allocatable :: panela_dad_2, panela_son_2, panelz_dad_2, panelz_son_2, panelr_dad_2, panelr_son_2, panelPV_dad_2, panelPV_son_2
+	REAL(DP), DIMENSION(:) , allocatable :: panela_dad_2, panela_son_2, panelz_dad_2, panelz_son_2
+	REAL(DP), DIMENSION(:) , allocatable :: panelr_dad_2, panelr_son_2, panelPV_dad_2, panelPV_son_2
 	INTEGER 						     :: IGM_index_2
 
 	REAL :: k_igm
@@ -4430,7 +4432,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				    PV_son(paneli)    = (   (agrid(tkhi) - panela(paneli)) * & 
 				    					&		V_Pr(age,tklo,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli))  &
 				                       	&  + (panela(paneli) - agrid(tklo)) * &
-				                       	&		V_Pr(age,tkhi,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli))  &
+				                       	&		V_Pr(age,tkhi,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli)) )  &
 				                       	&  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*panela(paneli)
 
 		     		! !$omp critical
@@ -4501,7 +4503,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				    PV_son_2(paneli)  = (   (agrid(tkhi) - panela(paneli)) * & 
 				    					&		V_Pr(age,tklo,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli))  &
 				                       	&  + (panela(paneli) - agrid(tklo)) * &
-				                       	&		V_Pr(age,tkhi,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli))  &
+				                       	&		V_Pr(age,tkhi,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli)) ) &
 				                       	&  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*panela(paneli)
 		     		! !$omp critical
 		     		! print*, ' Potential Agent', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
