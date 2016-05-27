@@ -259,7 +259,8 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		print*,"	Reading benchmark results from files"
 		CALL Write_Benchmark_Results(compute_bench)
 	end if 
-
+	CALL Firm_Value
+	CALL Write_Benchmark_Results(.true.)
 		print*,"	Computing satitics"
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
@@ -292,6 +293,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		Hours_bench         = Hours
 		Aprime_bench        = Aprime 
 		V_Pr_bench          = V_Pr
+		V_Pr_nb_bench       = V_Pr_nb 
 
 		write(*,*) "Benchmark variables"
 		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"P=",P,"wage=",wage,'R=',R
@@ -406,6 +408,8 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	endif 
 	
 	CALL Write_Experimental_Results(compute_exp)
+	CALL Firm_Value
+	CALL Write_Experimental_Results(.true.)
 
 	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
@@ -429,6 +433,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime
 		V_Pr_exp          = V_Pr 
+		V_Pr_nb_exp  	  = V_Pr_nb
 
 	! Compute moments
 	CALL COMPUTE_STATS

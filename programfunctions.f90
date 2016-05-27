@@ -6123,6 +6123,9 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN  (UNIT=4,  FILE=trim(bench_folder)//'v_pr'  , STATUS='replace')
 		WRITE (UNIT=4,  FMT=*) V_Pr
 		CLOSE (unit=4)
+		OPEN  (UNIT=4,  FILE=trim(bench_folder)//'v_pr_nb', STATUS='replace')
+		WRITE (UNIT=4,  FMT=*) V_Pr_nb
+		CLOSE (unit=4)
 
 		OPEN  (UNIT=5,  FILE=trim(bench_folder)//'DBN'   , STATUS='replace')
 		WRITE (UNIT=5,  FMT=*) DBN1 
@@ -6190,7 +6193,8 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN (UNIT=17, FILE=trim(bench_folder)//'tauW_bt' , STATUS='old', ACTION='read')
 		OPEN (UNIT=18, FILE=trim(bench_folder)//'tauW_at' , STATUS='old', ACTION='read')
 
-		OPEN (UNIT=19, FILE=trim(bench_folder)//'v_pr'    , STATUS='old', ACTION='read')		
+		OPEN (UNIT=19, FILE=trim(bench_folder)//'v_pr'    , STATUS='old', ACTION='read')
+		! OPEN (UNIT=20, FILE=trim(bench_folder)//'v_pr_nb' , STATUS='old', ACTION='read')		
 
 		READ (UNIT=1,  FMT=*), cons
 		READ (UNIT=2,  FMT=*), aprime
@@ -6213,26 +6217,12 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		READ (UNIT=18, FMT=*), tauW_at
 
 		READ (UNIT=19, FMT=*), V_Pr
+		! READ (UNIT=20, FMT=*), V_Pr_nb
 
-		CLOSE (unit=1)
-		CLOSE (unit=2)
-		CLOSE (unit=3)
-		CLOSE (unit=4)
-		CLOSE (unit=5)
-		CLOSE (unit=60)
-		CLOSE (unit=7)
-		CLOSE (unit=8)
-		CLOSE (unit=9)
-		CLOSE (unit=10)
-		CLOSE (unit=11)
-		CLOSE (unit=12)
-		CLOSE (unit=13)
-		CLOSE (unit=14)
-		CLOSE (unit=15)
-		CLOSE (unit=16)
-		CLOSE (unit=17)
-		CLOSE (unit=18)
-		CLOSE (unit=19)
+		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=5)
+		CLOSE (unit=60); CLOSE (unit=7); CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10)
+		CLOSE (unit=11); CLOSE (unit=12); CLOSE (unit=13); CLOSE (unit=14); CLOSE (unit=15)
+		CLOSE (unit=16); CLOSE (unit=17); CLOSE (unit=18); CLOSE (unit=19); !CLOSE (unit=20)
 
 		print*, "Reading of benchmark results completed"
 	END IF 
@@ -6288,6 +6278,8 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 
 		OPEN  (UNIT=19,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr'  , STATUS='replace')
 		WRITE (UNIT=19,  FMT=*) V_Pr
+		OPEN  (UNIT=20,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr_nb', STATUS='replace')
+		WRITE (UNIT=20,  FMT=*) V_Pr_nb
 
 		print*, "Writing of experimental results completed"
 
@@ -6312,6 +6304,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN (UNIT=17, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_bt', STATUS='old', ACTION='read')
 		OPEN (UNIT=18, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_at', STATUS='old', ACTION='read')
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr'   , STATUS='old', ACTION='read')
+		! OPEN (UNIT=20, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr_nb', STATUS='old', ACTION='read')
 
 		READ (UNIT=1,  FMT=*), cons
 		READ (UNIT=2,  FMT=*), aprime
@@ -6332,6 +6325,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		READ (UNIT=17, FMT=*), tauW_bt
 		READ (UNIT=18, FMT=*), tauW_at
 		READ (UNIT=19, FMT=*), V_Pr
+		READ (UNIT=20, FMT=*), V_Pr_nb
 		print*, "Reading of experimental results completed"
 	endif 
 
@@ -6354,6 +6348,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 	CLOSE (unit=17)
 	CLOSE (unit=18)
 	CLOSE (unit=19)
+	CLOSE (unit=20)
 
 END SUBROUTINE Write_Experimental_Results
 

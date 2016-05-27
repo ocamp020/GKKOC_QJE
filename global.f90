@@ -88,7 +88,7 @@ MODULE global
     ! Capital markets
     	REAL(DP), DIMENSION(na,nz,nx) :: K_mat, Pr_mat, Wealth_mat
     	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: V_Pr, V_Pr_bench, V_Pr_exp, Firm_Wealth
-    	REAL(DP), DIMENSION(na,nz,nlambda) :: V_Pr_nb, V_Pr_nb_bench, V_Pr_exp
+    	REAL(DP), DIMENSION(na,nz,nlambda) :: V_Pr_nb, V_Pr_nb_bench, V_Pr_nb_exp
 	
 	! Values for taxes in benchmark and experiment
     REAL(DP) :: tauk_bench, tauPL_bench, psi_bench, tauw_bt_bench, tauw_at_bench, Y_a_threshold_bench 
