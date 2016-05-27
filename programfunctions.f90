@@ -3989,8 +3989,8 @@ SUBROUTINE  Firm_Value()
 	use omp_lib
 
 	IMPLICIT NONE
-	integer  :: age, ai, zi, lambdai, ei, xi_p, tklo, tkhi
-	real(dp) :: dV_low, dV_high, spline_coeff(na), V_spline_R, sp_coeff_W(na,ne), V_spline_W(nx), Prob_lo, Prob_hi
+	integer  :: age, ai, zi, lambdai, ei, xi_p, tklo, tkhi, zp_ind
+	real(dp) :: dV_low, dV_high, spline_coeff(na), V_spline_R, sp_coeff_W(na,ne), V_spline_W(nx), Prob_lo, Prob_hi, V_Pr_aux(nz)
 
 	!$ call omp_set_num_threads(5)
 
@@ -4127,12 +4127,12 @@ SUBROUTINE  Firm_Value()
 	enddo
 
 	! Value for new borns
-	!$omp parallel do private(lambdai,ai)
+	!$omp parallel do private(lambdai,ai,zp_ind,V_Pr_aux)
 	do zi=1,nz 
 	do lambdai=1,nlambda
 	do ai=1,na 
 		do zp_ind=1,nz 
-			V_Pr_aux(zp_ind) = sum(pr_lambda(lambdao,:)*Firm_Wealth(1,ai,zp_ind,:,ne/2+1,1))
+			V_Pr_aux(zp_ind) = sum(pr_lambda(lambdai,:)*Firm_Wealth(1,ai,zp_ind,:,ne/2+1,1))
 		enddo 
 		V_Pr_nb(ai,zi,lambdai) = sum(pr_z(zi,:) * V_Pr_aux )
 	enddo 
