@@ -4429,8 +4429,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 				    endif    
 				    tkhi = tklo + 1        
 
-				    PV_son(paneli)    = (   (agrid(tkhi) - panela(paneli)) * & 
-				    					&		V_Pr(age,tklo,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli))  &
+				    PV_son(paneli)    = (    (agrid(tkhi) - panela(paneli)) * & 
+				    					&		V_Pr(age,tklo,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli))    &
 				                       	&  + (panela(paneli) - agrid(tklo)) * &
 				                       	&		V_Pr(age,tkhi,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli)) )  &
 				                       	&  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*panela(paneli)
