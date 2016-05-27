@@ -4542,7 +4542,9 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     	endif
 
 		ENDDO ! paneli
-
+		if (simutime.gt.MaxSimuTime-5) then 
+			print*, 'end of paneli', simutime 
+		endif 
 		! Save data on assets for the last periods
 		! Agents are eligible if:
 			! 1) They don't die during the first two recording periods
