@@ -6328,7 +6328,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		READ (UNIT=17, FMT=*), tauW_bt
 		READ (UNIT=18, FMT=*), tauW_at
 		READ (UNIT=19, FMT=*), V_Pr
-		READ (UNIT=20, FMT=*), V_Pr_nb
+		! READ (UNIT=20, FMT=*), V_Pr_nb
 		print*, "Reading of experimental results completed"
 	endif 
 
