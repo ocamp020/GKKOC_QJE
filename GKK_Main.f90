@@ -59,7 +59,7 @@ PROGRAM main
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 	! Switch for separable and non-separable utility
@@ -259,8 +259,6 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		print*,"	Reading benchmark results from files"
 		CALL Write_Benchmark_Results(compute_bench)
 	end if 
-	CALL Firm_Value
-	CALL Write_Benchmark_Results(.true.)
 		print*,"	Computing satitics"
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"

@@ -6353,7 +6353,9 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 	CLOSE (unit=17)
 	CLOSE (unit=18)
 	CLOSE (unit=19)
+	if (compute_exp) then 
 	CLOSE (unit=20)
+	endif 
 
 END SUBROUTINE Write_Experimental_Results
 
