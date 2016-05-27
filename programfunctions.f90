@@ -4394,12 +4394,6 @@ SUBROUTINE  SIMULATION(bench_indx)
 	            ! !$omp end critical          
 	     	ENDIF ! new age==1
 
-	     	! Save state of fathers in last period
-	     	if (simutime.eq.MaxSimuTime-1) then 
-	     		panelz_old = panelz 
-	     		panellambda_old = panellambda
-     		endif 
-
 	     	! Inter-Generation Mobility 30-50
 	     	if (IGM_index.le.4000000) then
 	     		! Reset variables if son dies before 50
@@ -4542,9 +4536,14 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     	endif
 
 		ENDDO ! paneli
-		if (simutime.gt.MaxSimuTime-5) then 
-			print*, 'end of paneli', simutime 
-		endif 
+		
+
+		! Save state of fathers in last period
+	     	if (simutime.eq.MaxSimuTime-1) then 
+	     		panelz_old = panelz 
+	     		panellambda_old = panellambda
+     		endif 
+
 		! Save data on assets for the last periods
 		! Agents are eligible if:
 			! 1) They don't die during the first two recording periods
