@@ -259,6 +259,16 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		print*,"	Reading benchmark results from files"
 		CALL Write_Benchmark_Results(compute_bench)
 	end if 
+
+		! Adjust grid to include breaking points
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		! Compute labor units 
+			CALL ComputeLaborUnits(Ebar, wage) 
+		! Compute Capital demand and Profits by (a,z)
+			K_mat  = K_Matrix(R,P)
+			Pr_mat = Profit_Matrix(R,P)
+		! Form YGRID for the capital income economy given interest rate "P"
+			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 		CALL GOVNT_BUDGET
 		print*,'GBAR Main', GBAR
 		STOP
