@@ -1371,115 +1371,115 @@ END SUBROUTINE  COMPUTE_WELFARE_GAIN
 !========================================================================================
 
 
-SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE()
-	IMPLICIT NONE
-	REAL(DP), DIMENSION(na) :: ValueP1, ValueP2, ValueP, ExpValueP
-	REAL(DP), DIMENSION(nx) :: ExpValueP_e, D_V_1, D_V_na
-	INTEGER                 :: xp_ind
+! SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE()
+! 	IMPLICIT NONE
+! 	REAL(DP), DIMENSION(na) :: ValueP1, ValueP2, ValueP, ExpValueP
+! 	REAL(DP), DIMENSION(nx) :: ExpValueP_e, D_V_1, D_V_na
+! 	INTEGER                 :: xp_ind
 
-	! Announce method of interpolation
-	! Interpolation is used to get value function at optimal a' (when computing expectations)
-	!print*,'VALUE FUNCTION SPLINE'
+! 	! Announce method of interpolation
+! 	! Interpolation is used to get value function at optimal a' (when computing expectations)
+! 	!print*,'VALUE FUNCTION SPLINE'
 
-	! Compute value function at grid nodes
-	! Final age
-	age=MaxAge
-	DO xi=1,xi
-	DO ai=1,na    
-    DO zi=1,nz
-    DO lambdai=1,nlambda          
-	DO ei=1,ne
-      	ValueFunction(age, ai, zi, lambdai, ei,xi) = Utility(Cons(age, ai, zi, lambdai, ei,xi),Hours(age, ai, zi, lambdai, ei,xi))
-		! print*,Cons(age, ai, zi, lambdai, ei),  ValueFunction(age, ai, zi, lambdai, ei) 
-		! pause
-	ENDDO ! ei          
-    ENDDO ! lambdai
-    ENDDO ! zi
-	ENDDO ! ai
-	ENDDO ! xi
+! 	! Compute value function at grid nodes
+! 	! Final age
+! 	age=MaxAge
+! 	DO xi=1,xi
+! 	DO ai=1,na    
+!     DO zi=1,nz
+!     DO lambdai=1,nlambda          
+! 	DO ei=1,ne
+!       	ValueFunction(age, ai, zi, lambdai, ei,xi) = Utility(Cons(age, ai, zi, lambdai, ei,xi),Hours(age, ai, zi, lambdai, ei,xi))
+! 		! print*,Cons(age, ai, zi, lambdai, ei),  ValueFunction(age, ai, zi, lambdai, ei) 
+! 		! pause
+! 	ENDDO ! ei          
+!     ENDDO ! lambdai
+!     ENDDO ! zi
+! 	ENDDO ! ai
+! 	ENDDO ! xi
 
-	! Retirement Period
-	DO xi=1,nx
-	DO age=MaxAge-1,RetAge,-1
-	DO zi=1,nz
-	DO lambdai=1,nlambda          
-	DO ei=1,ne   
-		DO ai=1,na  
-			ExpValueP(ai) = sum(ValueFunction(age+1, ai, zi, lambdai, ei,:) * pr_x(xi,:,zi,age))
-        ENDDO    
+! 	! Retirement Period
+! 	DO xi=1,nx
+! 	DO age=MaxAge-1,RetAge,-1
+! 	DO zi=1,nz
+! 	DO lambdai=1,nlambda          
+! 	DO ei=1,ne   
+! 		DO ai=1,na  
+! 			ExpValueP(ai) = sum(ValueFunction(age+1, ai, zi, lambdai, ei,:) * pr_x(xi,:,zi,age))
+!         ENDDO    
 
-  		if (NSU_Switch.eqv..true.) then
-            CALL spline( agrid, ValueFunction(age+1,  :, zi, lambdai, ei, xi) , na , &
-      		& sum(pr_x(xi,:,zi,age)*gamma*MBGRID(1 ,zi,:)*Cons(age+1, 1,zi,lambdai,ei,:)**((1.0_DP-sigma)*gamma-1.0_DP)/(1_DP+tauC)), &
-        	& sum(pr_x(xi,:,zi,age)*gamma*MBGRID(na,zi,:)*Cons(age+1,na,zi,lambdai,ei,:)**((1.0_DP-sigma)*gamma-1.0_DP)/(1_DP+tauC)), &
-        	& ValueP2)  
-        else 
-        	CALL spline( agrid, ValueFunction(age+1,  :, zi, lambdai, ei, xi) , na , &
-      			& sum(pr_x(xi,:,zi,age)* gamma*MBGRID(1,zi,:) /Cons(age+1,  1, zi, lambdai, ei, :) **(sigma)/(1_DP+tauC)), &
-        		& sum(pr_x(xi,:,zi,age)* gamma*MBGRID(na,zi,:)/Cons(age+1, na, zi, lambdai, ei, :)**(sigma)/(1_DP+tauC)) , ValueP2)  
-      	end if 
+!   		if (NSU_Switch.eqv..true.) then
+!             CALL spline( agrid, ValueFunction(age+1,  :, zi, lambdai, ei, xi) , na , &
+!       		& sum(pr_x(xi,:,zi,age)*gamma*MBGRID(1 ,zi,:)*Cons(age+1, 1,zi,lambdai,ei,:)**((1.0_DP-sigma)*gamma-1.0_DP)/(1_DP+tauC)), &
+!         	& sum(pr_x(xi,:,zi,age)*gamma*MBGRID(na,zi,:)*Cons(age+1,na,zi,lambdai,ei,:)**((1.0_DP-sigma)*gamma-1.0_DP)/(1_DP+tauC)), &
+!         	& ValueP2)  
+!         else 
+!         	CALL spline( agrid, ValueFunction(age+1,  :, zi, lambdai, ei, xi) , na , &
+!       			& sum(pr_x(xi,:,zi,age)* gamma*MBGRID(1,zi,:) /Cons(age+1,  1, zi, lambdai, ei, :) **(sigma)/(1_DP+tauC)), &
+!         		& sum(pr_x(xi,:,zi,age)* gamma*MBGRID(na,zi,:)/Cons(age+1, na, zi, lambdai, ei, :)**(sigma)/(1_DP+tauC)) , ValueP2)  
+!       	end if 
 	                  
-        DO ai=1,na    
-            call splint( agrid, ValueFunction(age+1, :, zi, lambdai, ei, xi), &
-                    & ValueP2, na, Aprime(age,ai,zi,lambdai, ei, xi), ValueP(ai))  
+!         DO ai=1,na    
+!             call splint( agrid, ValueFunction(age+1, :, zi, lambdai, ei, xi), &
+!                     & ValueP2, na, Aprime(age,ai,zi,lambdai, ei, xi), ValueP(ai))  
 
-            ValueFunction(age,ai,zi,lambdai,ei,xi) = Utility(Cons(age,ai,zi,lambdai,ei,xi),Hours(age,ai,zi,lambdai,ei,xi)) &
-              										& + beta*survP(age)* ValueP(ai)      
-        ENDDO ! ai
+!             ValueFunction(age,ai,zi,lambdai,ei,xi) = Utility(Cons(age,ai,zi,lambdai,ei,xi),Hours(age,ai,zi,lambdai,ei,xi)) &
+!               										& + beta*survP(age)* ValueP(ai)      
+!         ENDDO ! ai
 	              
-    ENDDO ! ei          
-	ENDDO ! lambdai
-    ENDDO ! zi
-	ENDDO ! age
-	ENDDO ! xi
+!     ENDDO ! ei          
+! 	ENDDO ! lambdai
+!     ENDDO ! zi
+! 	ENDDO ! age
+! 	ENDDO ! xi
    
 
-	! Working Period
-	DO xi=1,nx 
-	DO age=RetAge-1,1,-1
-    DO zi=1,nz
-    DO lambdai=1,nlambda          
-	DO ei=1,ne
-        DO ai=1,na
-        	DO xp_ind=1,nx 
-        		ExpValueP_e(xp_ind) = sum(ValueFunction(age+1, ai, zi, lambdai, :, xp_ind) * pr_e(ei,:))
-        	ENDDO    
-              ExpValueP(ai) = sum(ExpValueP_e * pr_x(xi,:,zi,age))
-        ENDDO
+! 	! Working Period
+! 	DO xi=1,nx 
+! 	DO age=RetAge-1,1,-1
+!     DO zi=1,nz
+!     DO lambdai=1,nlambda          
+! 	DO ei=1,ne
+!         DO ai=1,na
+!         	DO xp_ind=1,nx 
+!         		ExpValueP_e(xp_ind) = sum(ValueFunction(age+1, ai, zi, lambdai, :, xp_ind) * pr_e(ei,:))
+!         	ENDDO    
+!               ExpValueP(ai) = sum(ExpValueP_e * pr_x(xi,:,zi,age))
+!         ENDDO
 
-        if (NSU_Switch.eqv..true.) then
-	        DO xp_ind=1,nx 
-	        	D_V_1(xp_ind)  = (gamma*MBGRID(1,zi,xp_ind)/(1.0_DP+tauC)) * sum(pr_e(ei,:)* &
-			            & Cons(age+1, 1, zi, lambdai, :,xp_ind)**((1.0_DP-sigma)*gamma-1.0_DP) * &
-			            & (1.0_DP-Hours(age+1,1,zi,lambdai,:,xp_ind))**((1.0_DP-gamma)*(1.0_DP-sigma)))
-	        	D_V_na(xp_ind) = (gamma*MBGRID(na,zi,xp_ind)/(1.0_DP+tauC)) * sum(pr_e(ei,:)* &
-			            & Cons(age+1, na, zi, lambdai, :, xp_ind)**((1.0_DP-sigma)*gamma-1.0_DP) * &
-			            & (1.0_DP-Hours(age+1,na,zi,lambdai,:,xp_ind))**((1.0_DP-gamma)*(1.0_DP-sigma)))
-	        ENDDO
-	    else 
-	    	DO xp_ind=1,nx 
-	        	D_V_1(xp_ind)  = (gamma*MBGRID(1 ,zi,xp_ind)/(1.0_DP+tauC))*&
-	        			& sum(pr_e(ei,:) / Cons(age+1,  1, zi, lambdai, :,xp_ind)**(sigma) )
-	        	D_V_na(xp_ind) = (gamma*MBGRID(na,zi,xp_ind)/(1.0_DP+tauC))*&
-	        			& sum(pr_e(ei,:) / Cons(age+1, na, zi, lambdai, :,xp_ind)**(sigma) )
-	        ENDDO
-	    endif 
+!         if (NSU_Switch.eqv..true.) then
+! 	        DO xp_ind=1,nx 
+! 	        	D_V_1(xp_ind)  = (gamma*MBGRID(1,zi,xp_ind)/(1.0_DP+tauC)) * sum(pr_e(ei,:)* &
+! 			            & Cons(age+1, 1, zi, lambdai, :,xp_ind)**((1.0_DP-sigma)*gamma-1.0_DP) * &
+! 			            & (1.0_DP-Hours(age+1,1,zi,lambdai,:,xp_ind))**((1.0_DP-gamma)*(1.0_DP-sigma)))
+! 	        	D_V_na(xp_ind) = (gamma*MBGRID(na,zi,xp_ind)/(1.0_DP+tauC)) * sum(pr_e(ei,:)* &
+! 			            & Cons(age+1, na, zi, lambdai, :, xp_ind)**((1.0_DP-sigma)*gamma-1.0_DP) * &
+! 			            & (1.0_DP-Hours(age+1,na,zi,lambdai,:,xp_ind))**((1.0_DP-gamma)*(1.0_DP-sigma)))
+! 	        ENDDO
+! 	    else 
+! 	    	DO xp_ind=1,nx 
+! 	        	D_V_1(xp_ind)  = (gamma*MBGRID(1 ,zi,xp_ind)/(1.0_DP+tauC))*&
+! 	        			& sum(pr_e(ei,:) / Cons(age+1,  1, zi, lambdai, :,xp_ind)**(sigma) )
+! 	        	D_V_na(xp_ind) = (gamma*MBGRID(na,zi,xp_ind)/(1.0_DP+tauC))*&
+! 	        			& sum(pr_e(ei,:) / Cons(age+1, na, zi, lambdai, :,xp_ind)**(sigma) )
+! 	        ENDDO
+! 	    endif 
 
-    	CALL spline( agrid, ExpValueP , na , sum(D_V_1  * pr_x(xi,:,zi,age)), sum(D_V_na * pr_x(xi,:,zi,age)), ValueP2)   
+!     	CALL spline( agrid, ExpValueP , na , sum(D_V_1  * pr_x(xi,:,zi,age)), sum(D_V_na * pr_x(xi,:,zi,age)), ValueP2)   
 
-        DO ai=1,na 
-        	call splint( agrid, ExpValueP, ValueP2, na, Aprime(age,ai,zi,lambdai, ei, xi), ValueP(ai))   
+!         DO ai=1,na 
+!         	call splint( agrid, ExpValueP, ValueP2, na, Aprime(age,ai,zi,lambdai, ei, xi), ValueP(ai))   
         
-        	ValueFunction(age, ai, zi, lambdai, ei, xi) = Utility(Cons(age,ai,zi,lambdai,ei,xi),Hours(age,ai,zi,lambdai,ei,xi)) &
-        	                                         & + beta*survP(age)*ValueP(ai)
-		ENDDO ! ai
-	ENDDO ! ei          
-    ENDDO ! lambdai
-    ENDDO ! zi
-	ENDDO ! age
-	ENDDO ! xi
+!         	ValueFunction(age, ai, zi, lambdai, ei, xi) = Utility(Cons(age,ai,zi,lambdai,ei,xi),Hours(age,ai,zi,lambdai,ei,xi)) &
+!         	                                         & + beta*survP(age)*ValueP(ai)
+! 		ENDDO ! ai
+! 	ENDDO ! ei          
+!     ENDDO ! lambdai
+!     ENDDO ! zi
+! 	ENDDO ! age
+! 	ENDDO ! xi
 
-END SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE 
+! END SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE 
 
 
 !========================================================================================

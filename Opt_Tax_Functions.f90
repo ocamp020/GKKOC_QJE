@@ -61,7 +61,8 @@ FUNCTION EQ_WELFARE_GIVEN_TauK(tauk_in)
 		Y_a_threshold_exp = Y_a_threshold
 
 	! CALL COMPUTE_WELFARE_GAIN
-	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL Firm_Value
     	EQ_WELFARE_GIVEN_TAUK = - sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
 
 	!CALL COMPUTE_STATS
@@ -112,7 +113,8 @@ FUNCTION EQ_WELFARE_GIVEN_TauW(tauW_in)
 		Y_a_threshold_exp = Y_a_threshold
 
 	!CALL COMPUTE_WELFARE_GAIN
-	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL Firm_Value
     	EQ_WELFARE_GIVEN_TauW = - sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
     !CALL COMPUTE_STATS
 

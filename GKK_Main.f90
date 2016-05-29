@@ -54,11 +54,11 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
-		Opt_Tax       = .false.
-			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+		Opt_Tax       = .true.
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Simul_Switch  = .false.
 
 
@@ -635,7 +635,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	CALL GOVNT_BUDGET
 
 	! Compute value function and store policy functions, value function and distribution in file
-	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL Firm_Value
 	CALL Write_Experimental_Results(.true.)
 	
 	! Aggregate variable in experimental economy
