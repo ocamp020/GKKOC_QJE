@@ -260,7 +260,9 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL Write_Benchmark_Results(compute_bench)
 	end if 
 		CALL GOVNT_BUDGET
+		print*,'GBAR Main', GBAR
 		STOP
+
 		print*,"	Computing satitics"
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
