@@ -1607,7 +1607,7 @@ END SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR
 
 SUBROUTINE GOVNT_BUDGET()
 	IMPLICIT NONE
-	real(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, GBAR_W1, GBAR_W2
+	real(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C
 
 	! Initialize variables
 	GBAR 		 = 0.0_DP
@@ -1616,8 +1616,6 @@ SUBROUTINE GOVNT_BUDGET()
 	GBAR_L 		 = 0.0_DP
 	GBAR_C       = 0.0_DP
 	SSC_Payments = 0.0_DP
-	GBAR_W1 = 0.0_dp 
-	GBAR_W2 = 0.0_dp 
 
 	! Compute total expenditure = total revenue
 		! For each state accumulate tax income weighted by equilibrium distribution
@@ -1645,11 +1643,6 @@ SUBROUTINE GOVNT_BUDGET()
 
       	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei,xi) * tauC * cons(age, ai, zi, lambdai,ei,xi)
 
-      	GBAR_W1 = GBAR_W1 + DBN1(age,ai,zi,lambdai,ei,xi) * &
-	            & (( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  )  )
-
-		GBAR_W2 = GBAR_W2 + DBN1(age,ai,zi,lambdai,ei,xi) * &
-	            & ( YGRID(ai,zi,xi) )
 	    
 	ENDDO
 	ENDDO
@@ -1685,7 +1678,7 @@ SUBROUTINE GOVNT_BUDGET()
 	print*,'GBAR=',GBAR,'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=', GBAR_L/Ebar 
 	print*, 'GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C
 	print*, 'Tau_K=', tauK, 'Tau_W_bt=', tauW_bt, 'Tau_W_at=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
-	print*, 'GBAR_C',sum(DBN1*Cons)*tauC, 'GBAR_W', GBAR_W1, GBAR_W2
+	print*, 'Tax Revenue over GDP', (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR, 'Capital Tax / Total Tax', GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
 	print*, ' '
 
 	if (solving_bench.eq.1) then 
@@ -1695,6 +1688,7 @@ SUBROUTINE GOVNT_BUDGET()
 		WRITE(UNIT=11, FMT=*) 'GBAR=',GBAR,'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=', GBAR_L/Ebar 
 		WRITE(UNIT=11, FMT=*) 'GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C
 		WRITE(UNIT=11, FMT=*) 'Tau_K=', tauK, 'Tau_W=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
+		WRITE(UNIT=11, FMT=*) 'Tax Revenue over GDP', (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR, 'Capital Tax / Total Tax', GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
 	endif 
 END  SUBROUTINE GOVNT_BUDGET
 
