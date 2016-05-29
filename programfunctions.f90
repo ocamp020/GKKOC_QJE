@@ -1678,6 +1678,15 @@ SUBROUTINE GOVNT_BUDGET()
 	print*, 'GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C
 	print*, 'Tau_K=', tauK, 'Tau_W=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
 	print*, ' '
+
+	if (solving_bench.eq.1) then 
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Govnt_Budget_Bench.txt', STATUS='replace')
+		WRITE(UNIT=11, FMT=*) ' '
+		WRITE(UNIT=11, FMT=*) "Government Budget - Revenues and taxes"
+		WRITE(UNIT=11, FMT=*) 'GBAR=',GBAR,'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=', GBAR_L/Ebar 
+		WRITE(UNIT=11, FMT=*) 'GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C
+		WRITE(UNIT=11, FMT=*) 'Tau_K=', tauK, 'Tau_W=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
+	endif 
 END  SUBROUTINE GOVNT_BUDGET
 
 !========================================================================================
