@@ -59,7 +59,7 @@ PROGRAM main
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-		Simul_Switch  = .false.
+		Simul_Switch  = .true.
 
 
 	! Switch for separable and non-separable utility
@@ -454,10 +454,10 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	! if (((theta.eq.1.0_dp).or.(theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp).and.(Simul_Switch)) then 
-	!  	print*,"	Experiment Simulation"
-	! 	CALL SIMULATION(solving_bench)
-	! endif
+	if ((Simul_Switch)) then 
+	 	print*,"	Experiment Simulation"
+		CALL SIMULATION(solving_bench)
+	endif
 
 
 	print*,'---------------------------'
