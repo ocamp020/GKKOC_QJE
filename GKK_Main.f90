@@ -263,10 +263,10 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		CALL WRITE_VARIABLES(1)
-		if (Simul_Switch) then 
-			print*,"	Simulation"
-			CALL SIMULATION(solving_bench)
-		endif
+		! if (Simul_Switch) then 
+		! 	print*,"	Simulation"
+		! 	CALL SIMULATION(solving_bench)
+		! endif
 
 	! Aggregate variables in benchmark economy
 		GBAR_bench  = GBAR
