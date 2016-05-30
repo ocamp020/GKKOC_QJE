@@ -3,8 +3,7 @@
 
 %% Clear and load required files
    % Clear and close
-        close all;
-        clear
+        close all; clear all; clc
 
    % Load files for excel in mac
         javaaddpath('poi_library/poi-3.8-20120326.jar');
@@ -13,32 +12,77 @@
         javaaddpath('poi_library/xmlbeans-2.3.0.jar');
         javaaddpath('poi_library/dom4j-1.6.1.jar');
         javaaddpath('poi_library/stax-api-1.0.1.jar');
-
-        
-%% Parameters 
-    theta = 1.5 ;
-    Threshold_Factor = 0.0;
     
-    Progressive_Tax_Switch = 0 ;
-    NSU_Switch = 1 ;
+    % Line style
+    set(groot,'defaultAxesLineStyleOrder','-|--|-.|:')
 
         
-%% Fixed Parameters
+%% Fixed Parameters 
+
+% Number of agents for plots
+    N_plots = 20000000 ;
 
 % Grids
     n_a = 201 ; 
-    n_z = 7   ;
+    n_z = 9   ;
     n_l = 5   ;
     n_e = 5   ;
     
     Max_Age = 81 ;
     Ret_Age = 45 ;
 
+% Age brackets 
+    age = [5 , 15, 25, 35, 45, 55, Max_Age ];
+    age_limit = [0, 5, 15, 25, 35, 45, 55, Max_Age ];
+    %%%    24, 34, 44, 54, 64, 74, 80
+    n_age = numel(age) ;
+    
+    prc         = [10 25 50 60 75 80 90 95 99 99.9] ;
+
+%% Fixed Parameters
+    X_Switch  = 1.2;
+
+    EBAR_data = 8.8891*10^12/(122.46*10^6) ; % 2013 total compensation of employees' devided by number of HH's in 2013
+
+    theta_folder = 1.5 ;
+    R_gap        = 0.00 ;
+    Threshold_Factor = 0.0;
+    
+% Fixed Parameters
+    if X_Switch==1
+        n_x = 2   ;
+        x_grid(1) = 5.0 ; x_grid(2) = 1 ;
+        theta = 1 + (2.5-1)*(0:8)/8 ;
+    elseif X_Switch==0
+        n_x = 1   ;
+        x_grid(1) = 1 ;
+        theta = 1.5*ones(1,n_z) ;
+    elseif X_Switch==2
+        n_x = 2   ;
+        x_grid(1) = 5.0 ; x_grid(2) = 1 ;
+        theta = 1.5*ones(1,n_z) ;
+    elseif X_Switch==1.1 || X_Switch==1.2
+        n_x = 3   ;
+        x_grid(1) = 5.0 ; x_grid(2) = 1 ; x_grid(3) = 0 ;
+        theta = 1 + (2.5-1)*(0:8)/8 ;
+    elseif X_Switch==2.1
+        n_x = 3   ;
+        x_grid(1) = 5.0 ; x_grid(2) = 1 ; x_grid(3) = 0 ;
+        theta = 1.5*ones(1,n_z) ;
+    elseif X_Switch==3.1
+        n_x = 3   ;
+        x_grid(1) = 1.0 ; x_grid(2) = 5 ; x_grid(3) = 0 ;
+        theta = 1 + (10-1)*(0:8)/8 ;
+    end
+    
+    mu = 0.9 ;
+    Dep_Rate = 0.05 ;
+    
+
+
 % Utility and technology
     sigma = 4.00  ;
-    gamma = 0.4494; 
-    mu    = 0.9   ;
-    delta = 0     ;
+    gamma = 0.4494;
     
 % Taxes
 	tauC    = 0.075         ;
@@ -49,67 +93,377 @@
     % psi   = 0.77      ;
     tauPL = 0.0         ;
     psi   = 0.776       ;
-    tauW  = 0.017072675596579098 ;
+    tauW  = 0.0126127644280288 ;
         
-% Age brackets 
-    age = [5 , 15, 25, 35, 45, 55, Max_Age ];
-    age_limit = [0, 5, 15, 25, 35, 45, 55, Max_Age ];
-    %%%    24, 34, 44, 54, 64, 74, 80
-    n_age = numel(age) ;
-    
-% Percentiles
-    prctl = [10, 25, 50, 75, 90, 99, 99.9];
-    
-% Other parameters
-    if theta==1.0
-        Params =[0.9415,  0.00,  0.50,  0.65,  0.34,  0.4494]; % tauL=0.224, tauC=0.075 calibration
-    elseif theta==1.50
-        if mu==0.85
-        Params= [0.945, 0.00, 0.50, 0.7889, 0.34, 0.4494]; % mu=0.85 calibration, targetting 0.34, 0.69, vartheta1.5 
-        else 
-        Params= [0.9412, 0.0, 0.50, 0.640, 0.34, 0.4494]; % mu=0.9 calibration, targetting 0.34, 0.69, vartheta1.5
-        end
-    elseif theta==1.60
-        Params= [0.9409, 0.0, 0.50, 0.640, 0.34, 0.4494]; % mu=0.9 calibration, targetting 0.34, 0.69, vartheta1.6
-    elseif theta==2.00
-        Params= [0.9405, 0.0, 0.50, 0.639, 0.34, 0.4494]; % mu=0.9 calibration, targetting 0.34, 0.69, vartheta2
-    elseif theta==2.50
-        Params= [0.9400, 0.0, 0.50, 0.639, 0.34, 0.4494]; % mu=0.9 calibration, targetting 0.34, 0.69, vartheta2.5
-    else
-        disp('No parameters for this theta, changing to default parameters (theta=1)')
-        Params =[0.9436, 0.0, 0.50, 0.70444445, 0.34, 0.4494]; % tauL=0.224, tauC=0.075 calibration
-    end
-
-    beta   = Params(1) ;
-    mu_z   = Params(2) ;
-    rho_z  = Params(3) ;
-    sigma_z_eps      = Params(4) ;
-    sigma_lambda_eps = Params(5) ;
-    gamma  = Params(6) ;
     
 %% Result_Folders
-cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Presentation/'
 
-    if ((Progressive_Tax_Switch==0)&&(NSU_Switch==1))
-        Result_Folder = strcat('../../NSU_F_LT_Results/Theta_',num2str(theta,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/') ;
-        Simul_Folder  = strcat('../../NSU_F_LT_Results/Theta_',num2str(theta,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Simul/') ;
-        Bench_Folder  = strcat('../../NSU_F_LT_Results/Theta_',num2str(theta,'%.2f'),'/Bench_Files/') ;
-    elseif ((Progressive_Tax_Switch==1)&&(NSU_Switch==1))
-        Result_Folder = strcat('../../NSU_F_PT_Results/Theta_',num2str(theta,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/') ;
-        Simul_Folder  = strcat('../../NSU_F_PT_Results/Theta_',num2str(theta,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Simul/') ;
-        Bench_Folder  = strcat('../../NSU_F_PT_Results/Theta_',num2str(theta,'%.2f'),'/Bench_Files/') ;
-    elseif ((Progressive_Tax_Switch==0)&&(NSU_Switch==0))
-        Result_Folder = strcat('../../SU_F_LT_Results/Theta_',num2str(theta,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/') ;
-        Simul_Folder  = strcat('../../SU_F_LT_Results/Theta_',num2str(theta,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Simul/') ;
-        Bench_Folder  = strcat('../../SU_F_LT_Results/Theta_',num2str(theta,'%.2f'),'/Bench_Files/') ;
-    elseif ((Progressive_Tax_Switch==1)&&(NSU_Switch==0))
-        Result_Folder = strcat('../../SU_F_PT_Results/Theta_',num2str(theta,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/') ;
-        Simul_Folder  = strcat('../../SU_F_PT_Results/Theta_',num2str(theta,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Simul/') ;
-        Bench_Folder  = strcat('../../SU_F_PT_Results/Theta_',num2str(theta,'%.2f'),'/Bench_Files/') ;
-    end
+if X_Switch==0
+    mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents/')
+    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents/'
+    Result_Folder = strcat('../../../../NSU_F_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Markov_Cut/') ;
+    Simul_Folder  = strcat('../../../../NSU_F_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Markov_Cut/Simul/') ;
+    Bench_Folder  = strcat('../../../../NSU_F_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Markov_Cut/Bench_Files/') ;
+    Exp_Folder  = strcat('../../../../NSU_F_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Markov_Cut/Exp_Files/') ;
+    Top_Folder    = strcat('../../../../NSU_F_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Markov_Cut/Simul/Top_A/') ;
+    mkdir('markov_cut/presentation')
+    mkdir('markov_cut/presentation/png')
+    cd 'markov_cut/presentation'
+    Tables_file     = 'Tables_Presentation_Model_0.xls' ;
+    
+elseif X_Switch==1
+    
+        cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_zs/'
+        Result_Folder = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_mu90/') ;
+        Simul_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_mu90/Simul/') ;
+        Bench_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_mu90/Bench_Files/') ;
+        Exp_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_mu90/Exp_Files/') ;
+        Top_Folder    = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_mu90/Simul/Top_A/') ;
+        mkdir('top_mu90/presentation')
+        mkdir('top_mu90/presentation/png')
+        cd 'top_mu90/presentation'
+        Tables_file     = 'Tables_Presentation_Model_1.xls' ;
+    
+elseif X_Switch==2
+    mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/')
+    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/'
+        Result_Folder = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_rho1/') ;
+        Simul_Folder  = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_rho1/Simul/') ;
+        Bench_Folder  = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_rho1/Bench_Files/') ;
+        Exp_Folder  = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_rho1/Exp_Files/') ;
+        Top_Folder    = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_rho1/Simul/Top_A/') ;
+        mkdir('r_gap_0/presentation')
+        mkdir('r_gap_0/presentation/png')
+        cd 'r_gap_0/presentation'
+        Tables_file     = 'Tables_Presentation_Model_2.xls' ;
+    
+elseif X_Switch==1.1
+   mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M11/')
+    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M11/'
+        Result_Folder = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock_theta25/') ;
+        Simul_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock_theta25/Simul/') ;
+        Bench_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock_theta25/Bench_Files/') ;
+        Exp_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock_theta25/Exp_Files/') ;
+        Top_Folder    = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock_theta25/Simul/Top_A/') ;
+        mkdir('theta25/presentation')
+        mkdir('theta25/presentation/png')
+        cd 'theta25/presentation'
+        Tables_file     = 'Tables_Presentation_Model_11.xls' ;
+    
+elseif X_Switch==1.2
+   mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M1.2/')
+    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M1.2/'
+        Result_Folder = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2/') ;
+        Simul_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2/Simul/') ;
+        Bench_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2/Bench_Files/') ;
+        Exp_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2/Exp_Files/') ;
+        Top_Folder    = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2/Simul/Top_A/') ;
+        mkdir('theta_2.5/presentation')
+        mkdir('theta_2.5/presentation/png')
+        cd 'theta_2.5/presentation'
+        Tables_file     = 'Tables_Presentation_Model_12.xls' ;
+    
+elseif X_Switch==2.1
+    mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/')
+    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/'
+        Result_Folder = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock/') ;
+        Simul_Folder  = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock/Simul/') ;
+        Bench_Folder  = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock/Bench_Files/') ;
+        Exp_Folder  = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock/Exp_Files/') ;
+        Top_Folder    = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock/Simul/Top_A/') ;
+        mkdir('r_gap_0_ret_shock/presentation')
+        mkdir('r_gap_0_ret_shock/presentation/png')
+        cd 'r_gap_0_ret_shock/presentation'
+        Tables_file     = 'Tables_Presentation_Model_21.xls' ;
+elseif X_Switch==3.1
+    mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M3/')
+    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M3/'
+        Result_Folder = strcat('../../../../NSU_M3_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_3_exp/') ;
+        Simul_Folder  = strcat('../../../../NSU_M3_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_3_exp/Simul/') ;
+        Bench_Folder  = strcat('../../../../NSU_M3_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_3_exp/Bench_Files/') ;
+        Exp_Folder  = strcat('../../../../NSU_M3_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_3_exp/Exp_Files/') ;
+        Top_Folder    = strcat('../../../../NSU_M3_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_3_exp/Simul/Top_A/') ;
+        mkdir('exp_shock/presentation')
+        mkdir('exp_shock/presentation/png')
+        cd 'exp_shock/presentation'
+        Tables_file     = 'Tables_Presentation_Model_13.xls' ;
+    
+end
+      
+
+
+%% Return percentiles table
+
+    % Bench return 
+        eval(['load ',Result_Folder,'zgrid']); eval(['load ',Bench_Folder,'P']); eval(['load ',Bench_Folder,'R']); eval(['load ',Bench_Folder,'EBAR'])
+        EBAR_bench = EBAR*0.727853584919652;
+
+        if X_Switch~=0
+        eval(['load ',Simul_Folder,'panelx_bench'])      ; panel_x   = panelx_bench(1:N_plots)      ; clear panelx_bench       ;
+        else
+        panel_x = ones(size(panel_age)) ;
+        end
+        eval(['load ',Simul_Folder,'panelz_bench'])      ; panel_z   = panelz_bench(1:N_plots)      ; clear panelz_bench       ;
+        eval(['load ',Simul_Folder,'panela_bench'])      ; panel_a   = panela_bench(1:N_plots)      ; clear panela_bench       ;    
+        eval(['load ',Simul_Folder,'panelK_bench'])      ; panel_K   = panelK_bench(1:N_plots)      ; clear panelK_bench       ;
+
+        %  X_grid
+        if X_Switch==1 || X_Switch==2
+            % panel_xz  = exp(log(zgrid(panel_z)).*x_grid(panel_x)) ;
+            panel_xz = NaN(size(panel_a)) ;
+            panel_xz(panel_z<=4)  = exp(log(zgrid(panel_z(panel_z<=4))).*x_grid(1)) ;
+            panel_xz(panel_z>4)   = exp(log(zgrid(panel_z(panel_z>4))).*x_grid(panel_x(panel_z>4))) ;
+        elseif X_Switch==0
+            panel_xz = zgrid(panel_z) ;
+        elseif X_Switch==1.1 || X_Switch==1.2 || X_Switch==2.1
+            panel_xz = NaN(size(panel_a)) ;
+            panel_xz(panel_z<=4)  = exp(log(zgrid(panel_z(panel_z<=4))).*x_grid(1)) ;
+            panel_xz(panel_z>4)   = exp(log(zgrid(panel_z(panel_z>4))).*x_grid(panel_x(panel_z>4))) ;
+            pabe_xz(panel_x==3)   = 0 ;
+        elseif X_Switch==3.1
+            panel_xz = NaN(size(panel_a)) ;
+            panel_xz(panel_x==1)  = zgrid(panel_z(panel_x==1)) ;
+            panel_xz(panel_x==2)  = exp(log(zgrid(panel_z(panel_x==2))).*x_grid(2)) ;
+            panel_xz(panel_x==3)  = 0 ;
+        end
+
+        % Profits
+        if X_Switch==1 || X_Switch==0 || X_Switch==1.1 || X_Switch==1.2 || X_Switch==3.1
+            panel_Pr = P*(panel_xz.*panel_K).^mu - (R+Dep_Rate)*panel_K ;
+        elseif X_Switch==2 || X_Switch==2.1
+            panel_Pr = P*(panel_xz.*panel_K).^mu - (R+R_gap+Dep_Rate)*max(panel_K-panel_a,0) - (R+Dep_Rate)*min(panel_a,panel_K);
+        end        
+
+        % Return 
+            panel_Ret_K = (R*panel_a + panel_Pr)./panel_a ;
+
+        clear panel_xz panel_K panel_a panel_z panel_x
         
-%% Excel file
-    Tables_file = 'Tables_Burhan.xls' ;
+        
+    % Bench tax reform 
+        eval(['load ',Result_Folder,'zgrid']); eval(['load ',Exp_Folder,'Exp_results_P']); eval(['load ',Exp_Folder,'Exp_results_R']); eval(['load ',Exp_Folder,'Exp_results_EBAR'])
+        EBAR_bench = EBAR*0.727853584919652;
+        P = Exp_results_P; R = Exp_results_R ;
+
+        if X_Switch~=0
+        eval(['load ',Simul_Folder,'panelx_exp'])      ; panel_x   = panelx_exp(1:N_plots)      ; clear panelx_exp       ;
+        else
+        panel_x = ones(size(panel_age)) ;
+        end
+        eval(['load ',Simul_Folder,'panelz_exp'])      ; panel_z   = panelz_exp(1:N_plots)      ; clear panelz_exp       ;
+        eval(['load ',Simul_Folder,'panela_exp'])      ; panel_a   = panela_exp(1:N_plots)      ; clear panela_exp       ;    
+        eval(['load ',Simul_Folder,'panelK_exp'])      ; panel_K   = panelK_exp(1:N_plots)      ; clear panelK_exp       ;
+
+        %  X_grid
+        if X_Switch==1 || X_Switch==2
+            % panel_xz  = exp(log(zgrid(panel_z)).*x_grid(panel_x)) ;
+            panel_xz = NaN(size(panel_a)) ;
+            panel_xz(panel_z<=4)  = exp(log(zgrid(panel_z(panel_z<=4))).*x_grid(1)) ;
+            panel_xz(panel_z>4)   = exp(log(zgrid(panel_z(panel_z>4))).*x_grid(panel_x(panel_z>4))) ;
+        elseif X_Switch==0
+            panel_xz = zgrid(panel_z) ;
+        elseif X_Switch==1.1 || X_Switch==1.2 || X_Switch==2.1
+            panel_xz = NaN(size(panel_a)) ;
+            panel_xz(panel_z<=4)  = exp(log(zgrid(panel_z(panel_z<=4))).*x_grid(1)) ;
+            panel_xz(panel_z>4)   = exp(log(zgrid(panel_z(panel_z>4))).*x_grid(panel_x(panel_z>4))) ;
+            pabe_xz(panel_x==3)   = 0 ;
+        elseif X_Switch==3.1
+            panel_xz = NaN(size(panel_a)) ;
+            panel_xz(panel_x==1)  = zgrid(panel_z(panel_x==1)) ;
+            panel_xz(panel_x==2)  = exp(log(zgrid(panel_z(panel_x==2))).*x_grid(2)) ;
+            panel_xz(panel_x==3)  = 0 ;
+        end
+
+        % Profits
+        if X_Switch==1 || X_Switch==0 || X_Switch==1.1 || X_Switch==1.2 || X_Switch==3.1
+            panel_Pr = P*(panel_xz.*panel_K).^mu - (R+Dep_Rate)*panel_K ;
+        elseif X_Switch==2 || X_Switch==2.1
+            panel_Pr = P*(panel_xz.*panel_K).^mu - (R+R_gap+Dep_Rate)*max(panel_K-panel_a,0) - (R+Dep_Rate)*min(panel_a,panel_K);
+        end        
+
+        % Return 
+            panel_Ret_W    = (R*panel_a + panel_Pr)./panel_a ;
+            panel_Ret_at_W = ((1+R)*panel_a+panel_Pr)*(1-tauW)./panel_a-1 ;
+            
+
+        clear panel_xz panel_K panel_a panel_z panel_x
+        
+        
+    % Percentiles
+        prc_Ret_K    = prctile(panel_Ret_K,[10,50,90,95,99]);
+        prc_Ret_at_K = prc_Ret_K*(1-tauK) ;
+        prc_Ret_W    = prctile(panel_Ret_W,[10,50,90,95,99]);
+        prc_Ret_at_W = prctile(panel_Ret_at_W,[10,50,90,95,99]);
+        
+    % Table 
+    col_title = {'Return','p10','p50','p90','p95','p99'};
+    row_title = {'Benchmark';'Tax Reform';'Benchmark AT';'Tax Reform AT'};
+    Mat = [col_title; row_title num2cell([prc_Ret_K;prc_Ret_W;prc_Ret_at_K;prc_Ret_at_W])]
+    status = xlwrite(Tables_file,Mat,'Return_Percentile') ;
+    
+    
+%% Change in composition of top X% by Z
+
+    % Load PV wealth and Z
+        eval(['load ',Simul_Folder,'panelz_bench']) ;  eval(['load ',Simul_Folder,'panelPV_a_bench']) ;
+        eval(['load ',Simul_Folder,'panelz_exp'])   ;  eval(['load ',Simul_Folder,'panelPV_a_exp'])   ;
+	% Get Percentiles
+        prc_PV_K = prctile(panelPV_a_bench,[50 90 95 99]);
+        prc_PV_W = prctile(panelPV_a_exp,[50 90 95 99]);
+    % Get composition by top x%
+        ii = 1;
+        for i=numel(prc_PV_K):-1:1
+            ind_K = panelPV_a_bench>=prc_PV_K(i) ;
+            ind_W = panelPV_a_exp>=prc_PV_W(i) ;
+            for z=1:n_z
+                z_share_top_x_K(ii,z) = 100*sum(panelz_bench(ind_K)==z)/sum(ind_K) ;
+                z_share_top_x_W(ii,z) = 100*sum(panelz_exp(ind_W)==z)/sum(ind_W) ;
+            end
+            ii= ii+1
+        end 
+	% Tables
+        col_title = {'Top X%','z1','z2','z3','z4','z5','z6','z7','z8','z9'};
+        row_title = {'Top 1%';'Top 5%';'Top 10%';'Top 50%'};
+        Mat = [{'Benchmark'} cell(1,n_z); col_title; row_title num2cell(z_share_top_x_K);
+               {'Tax_Reform'} cell(1,n_z); col_title; row_title num2cell(z_share_top_x_W);
+               {'Difference'} cell(1,n_z); col_title; row_title num2cell(z_share_top_x_W-z_share_top_x_K)]
+        status = xlwrite(Tables_file,Mat,'Z shares in Top x') ;
+        
+        
+%% Gini Coefficient with Burhan's data 
+% I use Deaton's formulas for the gini. 
+% The formulas are found in Deaton (1997) "The analysis of household surveys"
+% The formulas are in page 139.
+
+    % Benchmark
+        eval(['load ',Simul_Folder,'panelPV_a_bench']) ; 
+        N  = numel(panelPV_a_bench) ;
+        mu_g = mean(panelPV_a_bench)  ;
+        panela_bench_sort = sort(panelPV_a_bench,'descend') ;
+        index = 1:N ;
+        G_bench = (N+1)/(N-1) - 2*sum(panela_bench_sort.*index)/(mu_g*N*(N-1)) ;
+    % Experiment 
+        eval(['load ',Simul_Folder,'panelPV_a_exp']) ; 
+        N  = numel(panelPV_a_exp) ;
+        mu_g = mean(panelPV_a_exp)  ;
+        panela_exp_sort = sort(panelPV_a_exp,'descend') ;
+        index = 1:N ;
+        G_exp = (N+1)/(N-1) - 2*sum(panela_exp_sort.*index)/(mu_g*N*(N-1)) ;
+    % Optimal Tau K
+        eval(['load ',Result_Folder,'Opt_Tax_K/Simul/','panelPV_a_exp']) ; 
+        N  = numel(panelPV_a_exp) ;
+        mu_g = mean(panelPV_a_exp)  ;
+        panela_exp_sort = sort(panelPV_a_exp,'descend') ;
+        index = 1:N ;
+        G_opt_K = (N+1)/(N-1) - 2*sum(panela_exp_sort.*index)/(mu_g*N*(N-1)) ;
+    % Optimal Tau W
+        eval(['load ',Result_Folder,'Opt_Tax_W/Simul/','panelPV_a_exp']) ; 
+        N  = numel(panelPV_a_exp) ;
+        mu_g = mean(panelPV_a_exp)  ;
+        panela_exp_sort = sort(panelPV_a_exp,'descend') ;
+        index = 1:N ;
+        G_opt_W = (N+1)/(N-1) - 2*sum(panela_exp_sort.*index)/(mu_g*N*(N-1)) ;
+
+    % Save results
+        cols = {' ','Bench','Exp','Opt_tau_K','Opt_tau_W'};
+        rows = {'Gini'} ;
+        Mat = [cols; rows num2cell([G_bench G_exp G_opt_K G_opt_W])]
+
+        status = xlwrite(Tables_file,Mat,'Gini') ;
+
+       
+%% Pareto Tail
+
+    % Vermuelen Data
+    load /Users/s-ocampo/Dropbox/RA_Guvenen/Wealth_Tax/CGGK_CODES/Sergio/Graphs/Vermeulen_Data/USA_IM1.dat
+    V_Data = USA_IM1;  clear USA_IM1;
+    V_Data = V_Data(:,2:4) ;
+    [panel_a_V,ind_V] = sort(V_Data(:,2)); weights_a_V = V_Data(ind_V,3); type_a_V = V_Data(ind_V,1);
+    panel_aux = panel_a_V; type_aux = type_a_V ;
+    i = 1;
+    while numel(panel_aux)>=1
+        panel_V(i)   = panel_aux(1)                              ;
+        weights_V(i) = sum(weights_a_V(panel_a_V==panel_aux(1))) ;
+        type_V(i)    = type_aux(1)                               ;
+        type_aux     = type_aux(panel_aux~=panel_aux(1))         ;
+        panel_aux    = panel_aux(panel_aux~=panel_aux(1))        ;
+        i=i+1;
+    end 
+        % Select only observations with positive wealth
+        weights_V = weights_V(panel_V>0); type_V = type_V(panel_V>0);
+        panel_V = 1.3572*panel_V(panel_V>0); 
+    
+    % Bench Files
+        eval(['load ',Bench_Folder,'EBAR'])         ; EBAR_bench = EBAR*0.727853584919652 ;
+        
+            eval(['load ',Simul_Folder,'panelPV_a_bench']) ; 
+            wealth_bench = EBAR_data/EBAR_bench * sort(panelPV_a_bench) ;
+        
+    % Pareto Tail
+        w_min = [1 1000000];
+        for ii=1:numel(w_min)
+            % Bench
+                %x_bench   = -log(wealth_bench(wealth_bench>w_min(ii)))     ;
+                %y_bench   =  log(((numel(x_bench)):-1:1)/(numel(x_bench))) ;
+                [y_bench,x_bench] = ecdf(wealth_bench(wealth_bench>w_min(ii))) ;
+                x_bench = -log(x_bench(2:end)) ; y_bench = log(1-y_bench(1:end-1)) ;
+                %x_bench = log(wealth_bench(wealth_bench>w_min(ii)));
+                %y_bench = log(1-[0:numel(x_bench)-1]/numel(x_bench));
+            % Vermuelen
+                x_V_s     = -log(panel_V((panel_V>w_min(ii))&(type_V==1))) ;
+                y_V_s     = log(cumsum(weights_V((panel_V>w_min(ii))&(type_V==1)),'reverse')/sum(weights_V(panel_V>w_min(ii)))) ;
+                x_V_f     = -log(panel_V((panel_V>w_min(ii))&(type_V==0))) ;
+                y_V_f     = log(cumsum(weights_V((panel_V>w_min(ii))&(type_V==0)),'reverse')/sum(weights_V(panel_V>w_min(ii)))) ;
+                x_V       = -log(panel_V(panel_V>w_min(ii))) ;
+                y_V       = log(cumsum(weights_V((panel_V>w_min(ii))),'reverse')/sum(weights_V(panel_V>w_min(ii)))) ;
+            % Maximum Likelihood
+            a_ml(ii)  = sum(weights_V(panel_V>w_min(ii))) / sum(weights_V(panel_V>w_min(ii)).*log(panel_V(panel_V>w_min(ii))/w_min(ii))) ;
+            % Regression
+            mdl_b     = fitlm(x_bench',y_bench')         ;
+            C_b       = mdl_b.Coefficients.Estimate(1)   ;
+            a_b(ii)   = mdl_b.Coefficients.Estimate(2)   ; 
+            mdl_V_s   = fitlm(x_V_s',y_V_s')             ;      
+            C_V_s     = mdl_V_s.Coefficients.Estimate(1) ;
+            a_V_s(ii) = mdl_V_s.Coefficients.Estimate(2) ;
+            mdl_V     = fitlm(x_V',y_V')                 ;
+            C_V       = mdl_V.Coefficients.Estimate(1)   ;
+            a_V(ii)   = mdl_V.Coefficients.Estimate(2)   ;
+            xx        = linspace(min(-x_V),max(-x_V),3)  ;
+            % Select x_bench and y_bench
+            x_bench_2 = [x_bench(1:200:end-600) ; x_bench(end-599:10:end-50) ; x_bench(end-50:end)];
+            y_bench_2 = [y_bench(1:200:end-600) ; y_bench(end-599:10:end-50) ; y_bench(end-50:end)];
+            % Figure
+            fig_title = ['Pareto Tail Above $',num2str(w_min(ii))] ;
+            figure; hold on; 
+            % scatter(-x_V_s,y_V_s); scatter(-x_V_f,y_V_f,'*'); 
+            plot(-x_V,y_V,'o','color',[0    0.4470    0.7410]);              plot(xx,C_V-a_V(ii)*xx,'color',[0    0.4470    0.7410],'linewidth',1.5); 
+            plot(-x_bench_2,y_bench_2,'d','color',[0.8500    0.3250    0.0980]); plot(xx,C_b-a_b(ii)*xx,'color',[0.8500    0.3250    0.0980],'linewidth',1.5); hold off;
+            title(fig_title); xlabel('Wealth (log scale)'); ylabel('Log Counter-CDF'); xlim([log(w_min(ii)),max(-x_V_f)]);
+            if w_min(ii)~=1000000
+                ww = linspace(log(w_min(ii)),log(panel_V(end)),5) ;
+            else
+                ww = log([1e6 10e6 100e6 1e9 10e9 50e9]);
+            end 
+            set(gca,'XTick',ww); set(gca,'XTickLabel',exp(ww)); ylim([-16 0])
+            legend('US Data','Regression Line','Model','Regression Line','location','NorthEast')
+            file_name_pdf = ['Pareto_Tail_$',num2str(w_min(ii)),'_PV.pdf'] ;
+            file_name_png = ['png/Pareto_Tail_$',num2str(w_min(ii)),'_PV.png'] ;
+            print('-dpdf',file_name_pdf) ; print('-dpng',file_name_png) ;
+            % Table
+            AA(:,ii) = [w_min(ii) ; a_b(ii) ; a_V_s(ii) ; a_V(ii) ; a_ml(ii) ] ; 
+        end
+        
+        bench_name = {'Bench',' ',' '} ;
+        blank_row  = cell(1,3) ;
+        
+        row_name = {'w_min';'alpha_bench';'alpha_survey';'alpha_survey_forbes';'alpha_ml'} ;
+        Mat = [blank_row ; row_name num2cell(AA)]
+        status = xlwrite(Tables_file,Mat,'Pareto_Tail_PV') ;
+        
+    
+clear panela_bench panelPV_a_bench wealth_bench y_bench x_bench
+        
+
     
 %% Composition of Z by welth percentile.
     % Each table shows the composition of the top x% into Z categories

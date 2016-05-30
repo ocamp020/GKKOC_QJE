@@ -54,12 +54,12 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
-		Opt_Tax       = .false.
-			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-		Simul_Switch  = .true.
+		Opt_Tax       = .true.
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
+		Simul_Switch  = .false.
 
 
 	! Switch for separable and non-separable utility
@@ -200,7 +200,13 @@ PROGRAM main
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
 			
-			call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
+			! call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
+			print*, Result_Folder
+			CALL Write_Experimental_Results(.false.)
+			CALL SIMULATION(0)
+
+
+
 		endif 
 
 
