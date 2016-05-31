@@ -531,8 +531,6 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	    ENDDO 
 
 	    CLOSE (unit=77) 
-	    print*,'Negative tax rates done'
-	    STOP
 
 
 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
@@ -681,6 +679,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	!  	print*,"	Optimal Tax Simulation"
 	! 	CALL SIMULATION(solving_bench)
 	! endif
+	CALL SIMULATION(0)
 
 end Subroutine Solve_Opt_Tax
 
