@@ -283,8 +283,8 @@ end
         end        
 
         % Return 
-            panel_Ret_W    = (R*panel_a + panel_Pr)./panel_a ;
-            panel_Ret_at_W = ((1+R)*panel_a+panel_Pr)*(1-tauW)./panel_a-1 ;
+            panel_Ret_W    = 100*(R*panel_a + panel_Pr)./panel_a ;
+            panel_Ret_at_W = 100*(((1+R)*panel_a+panel_Pr)*(1-tauW)./panel_a-1) ;
             
 
         clear panel_xz panel_K panel_a panel_z panel_x
