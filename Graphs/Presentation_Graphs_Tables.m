@@ -206,6 +206,7 @@ end
         eval(['load ',Simul_Folder,'panelz_bench'])      ; panel_z   = panelz_bench(1:N_plots)      ; clear panelz_bench       ;
         eval(['load ',Simul_Folder,'panela_bench'])      ; panel_a   = panela_bench(1:N_plots)      ; clear panela_bench       ;    
         eval(['load ',Simul_Folder,'panelK_bench'])      ; panel_K   = panelK_bench(1:N_plots)      ; clear panelK_bench       ;
+        eval(['load ',Simul_Folder,'panelage_bench'])    
 
         %  X_grid
         if X_Switch==1 || X_Switch==2
@@ -301,6 +302,21 @@ end
     Mat = [col_title; row_title num2cell([prc_Ret_K;prc_Ret_W;prc_Ret_at_K;prc_Ret_at_W])]
     status = xlwrite(Tables_file,Mat,'Return_Percentile') ;
     
+    
+    % Table by agregroups with extra percentiles - Benchmark
+    Mat = NaN(8,7);
+    Mat(1,:) = prctile(panel_Ret_K,[10 25 50 75 90 95 99]);    
+    for age_group_counter=1:7
+        indx1 = ((panelage_bench>age_limit(age_group_counter)).*(panelage_bench<=age_limit(age_group_counter+1)));
+        indx1 = indx1>0;
+        Mat(1+age_group_counter,:) = prctile(panel_Ret_K(indx1),[10 25 50 75 90 95 99]);
+        clear indx1
+    end
+    
+    col_title = {'age_group','p10','p25','p50','p75','p90','p95','p99'};
+    row_title = {'Pop';'Age1';'Age2';'Age3';'Age4';'Age5';'Age6';'Age7'};
+    Mat = [col_title;row_title num2cell(Mat)]
+    status = xlwrite(Tables_file,Mat,'Ret_Prc_age_group') ;
     
 %% Change in composition of top X% by Z
 
