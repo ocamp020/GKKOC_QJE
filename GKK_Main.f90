@@ -58,7 +58,7 @@ PROGRAM main
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Simul_Switch  = .false.
 
 
@@ -200,12 +200,11 @@ PROGRAM main
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
 			
-			! call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
-			print*, Result_Folder
-			CALL Write_Experimental_Results(.false.)
-			CALL SIMULATION(0)
-
-
+			call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
+			
+			! print*, Result_Folder
+			! CALL Write_Experimental_Results(.false.)
+			! CALL SIMULATION(0)
 
 		endif 
 
@@ -500,9 +499,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		PRINT*,''
 		Print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
-	    DO tauindx=0,40
-            tauK        = real(tauindx,8)/100_DP
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='replace')
+	    DO tauindx=1,5
+            tauK        = -real(tauindx,8)/100_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
             ! Compute moments
@@ -532,6 +531,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	    ENDDO 
 
 	    CLOSE (unit=77) 
+	    STOP
 
 
 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
@@ -571,9 +571,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			call Find_TauW_Threshold(DBN_bench,W_bench)  
 			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 			Wealth_factor = Y_a_threshold/W_bench
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
-	    DO tauindx=0,40
-            tauw_at     = real(tauindx,8)/1000_DP
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_2.txt', STATUS='replace')
+	    DO tauindx=1,5
+            tauw_at     = -real(tauindx,8)/1000_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
             ! Compute moments
@@ -603,6 +603,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	    ENDDO 
 
 	    CLOSE (unit=77)
+	    STOP
 
 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w.txt', STATUS='replace')
 

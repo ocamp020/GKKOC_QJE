@@ -464,6 +464,216 @@ end
 clear panela_bench panelPV_a_bench wealth_bench y_bench x_bench
         
 
+%% Optimal Tax Graphs
+
+% Load stats for tau K tau W
+    eval(['load ',Result_Folder,'Opt_Tax_K/','Stats_by_tau_k.txt']) ; 
+    eval(['load ',Result_Folder,'Opt_Tax_W/','Stats_by_tau_w.txt']) ; 
+    % ORDER OF THINGS
+        % 1. tauk, 2. tauw, 3. taul, 4. GBAR_K/(GBAR+SSC), 5. KBAR, 6. QBAR, 7. NBAR, 8. YBAR
+        % 9. %Y , 10. wage, 11. VBAR, 12. CE2_NB, 13. CE2, 14. KBAR/Y, 
+        % 15. Top1%, 16. Top10%, 17. std(log(E)), 18. Av. Hours
+    axes1 = axes(...
+      'FontName','Times New Roman',...
+      'FontSize',18);
+  
+    G_K_Frac_k = Stats_by_tau_k(:,4) ;
+    G_K_Frac_w = Stats_by_tau_w(:,4) ;
+    
+
+% Aggregate variabls as a function of Borrowing/wealth tax revenue
+    figure;
+    hold on
+    plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,5)/Stats_by_tau_k(1,5)-1),'r')
+    plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,5)/Stats_by_tau_w(1,5)-1),'b')
+    plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,6)/Stats_by_tau_k(1,6)-1),'r-d')
+    plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,6)/Stats_by_tau_w(1,6)-1),'b-d')
+    plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,7)/Stats_by_tau_k(1,7)-1),'ro')
+    plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,7)/Stats_by_tau_w(1,7)-1),'bo')
+    plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,8)/Stats_by_tau_k(1,8)-1),'rd')
+    plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,8)/Stats_by_tau_w(1,8)-1),'bd')
+    grid on
+    hold off
+    legend(' KBAR, \tau_K', 'KBAR, \tau_W', 'QBAR, \tau_K', 'QBAR, \tau_W', ...
+        'NBAR, \tau_K', 'NBAR, \tau_W', 'YBAR, \tau_K', 'YBAR, \tau_W','Location','SouthWest')
+    xlabel('GBAR_K')
+
+    hgsave('1fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
+    print -dpdf 1fig_KBAR_QBAR_by_CAP_TAX_REV.pdf
+    print -dps  1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
+    print -dpng 1fig_KBAR_QBAR_by_CAP_TAX_REV.png
+    
+    % KBAR & QBAR graph
+        figure;
+        hold on
+        plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,5)/Stats_by_tau_k(1,5)-1))
+        plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,5)/Stats_by_tau_w(1,5)-1))
+        xlabel('Tax Revenue from K / Total Tax Revenue')
+        ylabel('Percent Change')
+        h = legend('$\bar k, \tau_k$' , '$\bar k, \tau_a$','Location','SouthWest');
+        set(h,'Interpreter','latex','FontSize',20)
+        grid on
+        axis([min(G_K_Frac_w) max(G_K_Frac_w)  -50 0 ])
+
+
+        hgsave('1.1fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
+        print -dpdf 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.pdf
+        print -dps 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
+
+        plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,6)/Stats_by_tau_k(1,6)-1))
+        plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,6)/Stats_by_tau_w(1,6)-1))
+        h2 = legend('$\bar k, \tau_k$' , '$\bar k, \tau_a$','$\bar Q, \tau_k$' , '$\bar Q, \tau_a$','Location','SouthWest');
+        set(h2,'Interpreter','latex','FontSize',20)
+
+        hgsave('1.2fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
+        print -dpdf 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.pdf
+        print -dps 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.eps
+
+
+% Wage by capital/Wealth tax revenue
+    figure
+    hold on
+    plot(G_K_Frac_k, (Stats_by_tau_k(:,10)),'r')
+    plot(G_K_Frac_w, (Stats_by_tau_w(:,10)),'b')
+    grid on
+    hold off
+    legend('\tau_K', '\tau_W')
+    xlabel('GBAR_K')
+    title('Wage')
+    [maxvalK indxK] = max((Stats_by_tau_k(:,11)-Stats_by_tau_k(1,11)));
+    text(Stats_by_tau_k(indxK,4)+0.0, maxvalK -0.15,['Opt. \tau_K = ' ,num2str(100*Stats_by_tau_k(indxK,1)),'%'])
+
+    [maxvalW indxW] = max((Stats_by_tau_w(:,10)-Stats_by_tau_w(1,11)));
+    text(Stats_by_tau_w(indxW,4)+0.0, maxvalW +0.05,['Opt. \tau_W = ' ,num2str(100*Stats_by_tau_w(indxW,2)),'%'])
+
+
+    hgsave('1fig_Wage_by_CAP_TAX_REV.fig')
+    print -dpdf 1fig_Wage_by_CAP_TAX_REV.pdf
+    print -dps  1fig_Wage_by_CAP_TAX_REV.eps
+    print -dpng 1fig_Wage_by_CAP_TAX_REV.png
+    
+    % After-tax wage
+        figure
+        hold on
+        plot(G_K_Frac_k, (Stats_by_tau_k(:,10).*(1-Stats_by_tau_k(:,3))))
+        plot(G_K_Frac_w, (Stats_by_tau_w(:,10).*(1-Stats_by_tau_w(:,3))))
+        
+        [x,wagemax_indx_tauK] = max(Stats_by_tau_k(:,10).*(1-Stats_by_tau_k(:,3)));
+        [x,wagemax_indx_tauW] = max(Stats_by_tau_w(:,10).*(1-Stats_by_tau_w(:,3)));
+        display('    tauK      tauW   that maximizes after-tax wage')
+        disp([Stats_by_tau_k(wagemax_indx_tauK,1) Stats_by_tau_w(wagemax_indx_tauW,2)])
+        hgsave('1fig_Wage_by_CAP_TAX_REV.fig')
+        print -dpdf 1fig_AT_Wage_by_CAP_TAX_REV.pdf
+        print -dps  1fig_AT_Wage_by_CAP_TAX_REV.eps
+        print -dpng 1fig_AT_Wage_by_CAP_TAX_REV.png
+
+% Average utilities (relavite to no taxes)
+    figure
+    hold on
+    plot(G_K_Frac_k, (Stats_by_tau_k(:,11)-Stats_by_tau_k(1,11)),'r')
+    plot(G_K_Frac_w, (Stats_by_tau_w(:,11)-Stats_by_tau_w(1,11)),'b')
+    grid on; hold off
+    xlabel('GBAR_K')
+    title('Average Utility')
+
+    [maxvalK indxK] = max((Stats_by_tau_k(:,11)-Stats_by_tau_k(1,11)));
+    text(Stats_by_tau_k(indxK,4)+0.01, maxvalK -0.10,['Opt. \tau_K = ' ,num2str(100*Stats_by_tau_k(indxK,1)),'%'])
+
+    [maxvalW indxW] = max((Stats_by_tau_w(:,11)-Stats_by_tau_w(1,11)));
+    text(Stats_by_tau_w(indxW,4)+0.0, maxvalW +0.05,['Opt. \tau_W = ' ,num2str(100*Stats_by_tau_w(indxW,2)),'%'])
+
+    hgsave('1fig_Average_Utility_by_CAP_TAX_REV.fig')
+    print -dpdf 1fig_Average_Utility_by_CAP_TAX_REV.pdf
+    print -dps  1fig_Average_Utility_by_CAP_TAX_REV.eps
+    print -dpng 1fig_Average_Utility_by_CAP_TAX_REV.png
+
+CE2_NB_k =100*( (Stats_by_tau_k(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigma)))-1);
+CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigma)))-1);
+
+% CE Newborn computed using average utilities (relavite to no taxes)
+    figure
+    hold on
+    plot(G_K_Frac_k, (CE2_NB_k-CE2_NB_k(1)),'r')
+    plot(G_K_Frac_w, (CE2_NB_w-CE2_NB_w(1)),'b')
+    grid on; hold off;
+    xlabel('GBAR_K')
+    title('CE Newborn computed using average utilities')
+
+    [maxvalK indxK] = max((CE2_NB_k-CE2_NB_k(1)));
+    text(Stats_by_tau_k(indxK,4)+0.01, maxvalK -0.10,['Opt. \tau_K = ' ,num2str(100*Stats_by_tau_k(indxK,1)),'%'])
+
+    [maxvalW indxW] = max((CE2_NB_w-CE2_NB_w(1)));
+    text(Stats_by_tau_w(indxW,4)+0.0, maxvalW +0.05,['Opt. \tau_W = ' ,num2str(100*Stats_by_tau_w(indxW,2)),'%'])
+
+    hgsave('2fig_CE_NEWBORN_by_CAP_TAX_REV.fig')
+    print -dpdf 2fig_CE_NEWBORN_by_CAP_TAX_REV.pdf
+    print -dps  2fig_CE_NEWBORN_by_CAP_TAX_REV.eps
+    print -dpng 2fig_CE_NEWBORN_by_CAP_TAX_REV.png
+
+% CE Newborn computed using average utilities (in levels)
+    figure
+    hold on
+    plot(G_K_Frac_k, (CE2_NB_k ),'r')
+    plot(G_K_Frac_w, (CE2_NB_w ),'b')
+    grid on; hold off;
+    xlabel('GBAR_K')
+    title('CE Newborn computed using average utilities')
+
+    [maxvalK indxK] = max((CE2_NB_k ));
+    text(Stats_by_tau_k(indxK,4)+0.01, maxvalK -0.10,['Opt. \tau_K = ' ,num2str(100*Stats_by_tau_k(indxK,1)),'%'])
+
+    [maxvalW indxW] = max((CE2_NB_w ));
+    text(Stats_by_tau_w(indxW,4)+0.0, maxvalW +0.05,['Opt. \tau_W = ' ,num2str(100*Stats_by_tau_w(indxW,2)),'%'])
+
+
+    hgsave('3fig_CE_NEWBORN_by_CAP_TAX_REV.fig')
+    print -dpdf 3fig_CE_NEWBORN_by_CAP_TAX_REV.pdf
+    print -dps  3fig_CE_NEWBORN_by_CAP_TAX_REV.eps
+    print -dpng 3fig_CE_NEWBORN_by_CAP_TAX_REV.png
+
+
+% Burhan's graphs on welfare by tau
+    [x,tauindx ] = min(abs(Stats_by_tau_k(:,1) - 0.25)) ;
+
+    figure
+    axes1 = axes(...
+      'FontName','Times New Roman',...
+      'FontSize',14);
+    hold on
+    plot(G_K_Frac_k, (CE2_NB_k-CE2_NB_k(tauindx)),'r', 'linewidth',2)
+    plot(G_K_Frac_k, zeros(size(G_K_Frac_k)),'k--', 'linewidth',2)
+    grid on
+    xlabel('Tax Revenue from K / Total Tax Revenue')
+    ylabel('$CE_2$ Welfare Change from \textbf{Benchmark}','Interpreter','latex')
+    plot(G_K_Frac_k(tauindx)*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 0],'k--', 'linewidth',2)
+    axis([min(G_K_Frac_k) max(G_K_Frac_k)  min(CE2_NB_k-CE2_NB_k(tauindx))-1 max(CE2_NB_w-CE2_NB_k(tauindx))+1 ])
+
+    annotation('textarrow',[0.74 0.72],[0.39 0.36], 'string','Cap. Income Tax Economy','linewidth',2,'FontSize',12)
+    annotation('textarrow',[0.57 0.62],[0.39 0.44], 'string','Benchmark, \tau_k = 25%','linewidth',2,'FontSize',12)
+    annotation('textarrow',[0.44+0.127 0.49+0.127],[0.17 0.12], 'string','0.45','linewidth',2,'FontSize',12)
+
+
+    hgsave('1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
+    print -dpdf 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
+    print -dps 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
+
+    annotation('textarrow',[0.2 0.15],[0.71 0.76], 'string','Opt. \tau_k = 1.62%','linewidth',2,'FontSize',12)
+    hgsave('1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
+    print -dpdf 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
+    print -dps 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
+
+    plot(G_K_Frac_w, (CE2_NB_w-CE2_NB_k(tauindx)),'b', 'linewidth',2)
+    annotation('textarrow',[0.47 0.47],[0.81 0.86], 'string','Opt. \tau_a = 1.54%','linewidth',2,'FontSize',12)
+
+
+    hgsave('1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
+    print -dpdf 1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
+    print -dps 1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
+
+
+
+
+%% ==============================================================================
     
 %% Composition of Z by welth percentile.
     % Each table shows the composition of the top x% into Z categories
