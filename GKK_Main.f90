@@ -499,8 +499,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		PRINT*,''
 		Print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_3.txt', STATUS='replace')
-	    DO tauindx=-10,-6!40
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_4.txt', STATUS='replace')
+	    DO tauindx=-15,-10!40
             tauK        = real(tauindx,8)/100_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
