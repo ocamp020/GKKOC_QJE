@@ -54,10 +54,10 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
-			compute_bench = .false.
+		Tax_Reform    = .true.
+			compute_bench = .true.
 			compute_exp   = .false.
-		Opt_Tax       = .true.
+		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Simul_Switch  = .false.
 
@@ -139,7 +139,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Model_1.2/' 
+		Result_Folder = trim(Result_Folder)//'Model_1.2/mu80/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
@@ -499,9 +499,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		PRINT*,''
 		Print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='replace')
-	    DO tauindx=1,5
-            tauK        = -real(tauindx,8)/100_DP
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
+	    DO tauindx=-5,40
+            tauK        = real(tauindx,8)/100_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
             ! Compute moments
@@ -531,7 +531,6 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	    ENDDO 
 
 	    CLOSE (unit=77) 
-	    STOP
 
 
 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
@@ -571,9 +570,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			call Find_TauW_Threshold(DBN_bench,W_bench)  
 			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 			Wealth_factor = Y_a_threshold/W_bench
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_2.txt', STATUS='replace')
-	    DO tauindx=1,5
-            tauw_at     = -real(tauindx,8)/1000_DP
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
+	    DO tauindx=-5,40
+            tauw_at     = real(tauindx,8)/1000_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
             ! Compute moments
@@ -603,7 +602,6 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	    ENDDO 
 
 	    CLOSE (unit=77)
-	    STOP
 
 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w.txt', STATUS='replace')
 
