@@ -54,10 +54,10 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
-			compute_bench = .true.
+		Tax_Reform    = .false.
+			compute_bench = .false.
 			compute_exp   = .false.
-		Opt_Tax       = .false.
+		Opt_Tax       = .true.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Simul_Switch  = .false.
 
@@ -84,12 +84,12 @@ PROGRAM main
 		! beta 		sigmaz 		x_hi 	rho_z 	gamma
 		! 0.9485_dp 0.0665_dp  	5.00_dp 0.1_dp 	0.470_dp
 
-		beta   	= 0.95_dp ! params(1) !
+		beta   	= 0.9485_dp! 0.95_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
-		sigma_z_eps      =  0.115_dp ! params(4) ! 0.01_dp ! ! 
+		sigma_z_eps      =  0.0665_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
 		sigma_lambda_eps = params(5)
-		gamma  	=  0.471_dp !  0.465_dp ! params(6) ! 
+		gamma  	=  0.470_dp !  0.471_dp ! params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
 		
 		sigma  	= 4.0_dp
@@ -570,8 +570,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			call Find_TauW_Threshold(DBN_bench,W_bench)  
 			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 			Wealth_factor = Y_a_threshold/W_bench
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
-	    DO tauindx=-5,40
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_2.txt', STATUS='replace')
+	    DO tauindx=-5,-1!40
             tauw_at     = real(tauindx,8)/1000_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
@@ -602,6 +602,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	    ENDDO 
 
 	    CLOSE (unit=77)
+	    STOP
 
 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w.txt', STATUS='replace')
 
