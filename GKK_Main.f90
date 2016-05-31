@@ -500,7 +500,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		Print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
 		PRINT*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_4.txt', STATUS='replace')
-	    DO tauindx=-15,-10!40
+	    DO tauindx=-25,-16!40
             tauK        = real(tauindx,8)/100_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
@@ -571,7 +571,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 			Wealth_factor = Y_a_threshold/W_bench
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_2.txt', STATUS='replace')
-	    DO tauindx=-10,-1!40
+	    DO tauindx=-25,-1!40
             tauw_at     = real(tauindx,8)/1000_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
