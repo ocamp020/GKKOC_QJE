@@ -58,7 +58,7 @@ PROGRAM main
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Simul_Switch  = .true.
 
 
@@ -500,7 +500,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		Print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
 		PRINT*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_4.txt', STATUS='replace')
-	    DO tauindx=-25,-16!40
+	    DO tauindx=-25,-11!40
             tauK        = real(tauindx,8)/100_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
