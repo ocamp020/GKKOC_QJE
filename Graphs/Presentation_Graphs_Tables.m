@@ -452,8 +452,10 @@ end
             fig_title = ['Pareto Tail Above $',num2str(w_min(ii))] ;
             figure; hold on; 
             % scatter(-x_V_s,y_V_s); scatter(-x_V_f,y_V_f,'*'); 
-            plot(-x_V,y_V,'o','color',[0    0.4470    0.7410]);              plot(xx,C_V-a_V(ii)*xx,'color',[0    0.4470    0.7410],'linewidth',1.5); 
-            plot(-x_bench_2,y_bench_2,'d','color',[0.8500    0.3250    0.0980]); plot(xx,C_b-a_b(ii)*xx,'color',[0.8500    0.3250    0.0980],'linewidth',1.5); hold off;
+%             plot(-x_V,y_V,'o','color',[0    0.4470    0.7410]);              plot(xx,C_V-a_V(ii)*xx,'color',[0    0.4470    0.7410],'linewidth',1.5); 
+%             plot(-x_bench_2,y_bench_2,'d','color',[0.8500    0.3250    0.0980]); plot(xx,C_b-a_b(ii)*xx,'color',[0.8500    0.3250    0.0980],'linewidth',1.5); hold off;
+            plot(-x_V,y_V,'or');             plot(xx,C_V-a_V(ii)*xx,'r','linewidth',1.5); 
+            plot(-x_bench_2,y_bench_2,'db'); plot(xx,C_b-a_b(ii)*xx,'b','linewidth',1.5); hold off;
             title(fig_title); xlabel('Wealth (log scale)'); ylabel('Log Counter-CDF'); xlim([log(w_min(ii)),max(-x_V_f)]);
             if w_min(ii)~=1000000
                 ww = linspace(log(w_min(ii)),log(panel_V(end)),5) ;
@@ -489,9 +491,7 @@ clear panela_bench panelPV_a_bench wealth_bench y_bench x_bench
         % 1. tauk, 2. tauw, 3. taul, 4. GBAR_K/(GBAR+SSC), 5. KBAR, 6. QBAR, 7. NBAR, 8. YBAR
         % 9. %Y , 10. wage, 11. VBAR, 12. CE2_NB, 13. CE2, 14. KBAR/Y, 
         % 15. Top1%, 16. Top10%, 17. std(log(E)), 18. Av. Hours
-    axes1 = axes(...
-      'FontName','Times New Roman',...
-      'FontSize',18);
+    axes1 = axes('FontName','Times New Roman','FontSize',18);
   
     G_K_Frac_k = Stats_by_tau_k(:,4) ;
     G_K_Frac_w = Stats_by_tau_w(:,4) ;
@@ -522,22 +522,21 @@ clear panela_bench panelPV_a_bench wealth_bench y_bench x_bench
     % KBAR & QBAR graph
         figure;
         hold on
-        plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,5)/Stats_by_tau_k(1,5)-1))
-        plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,5)/Stats_by_tau_w(1,5)-1))
+        plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,5)/Stats_by_tau_k(26,5)-1),'r', 'linewidth',2)
+        plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,5)/Stats_by_tau_w(26,5)-1),'b', 'linewidth',2)
         xlabel('Tax Revenue from K / Total Tax Revenue')
         ylabel('Percent Change')
         h = legend('$\bar k, \tau_k$' , '$\bar k, \tau_a$','Location','SouthWest');
         set(h,'Interpreter','latex','FontSize',20)
         grid on
-        axis([min(G_K_Frac_w) max(G_K_Frac_w)  -50 0 ])
-
+        axis([min(G_K_Frac_k) max(G_K_Frac_k)  -40 20 ])
 
         hgsave('1.1fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
         print -dpdf 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.pdf
         print -dps 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
 
-        plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,6)/Stats_by_tau_k(1,6)-1))
-        plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,6)/Stats_by_tau_w(1,6)-1))
+        plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,6)/Stats_by_tau_k(26,6)-1),'-dr', 'linewidth',1.5)
+        plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,6)/Stats_by_tau_w(26,6)-1),'-db', 'linewidth',1.5)
         h2 = legend('$\bar k, \tau_k$' , '$\bar k, \tau_a$','$\bar Q, \tau_k$' , '$\bar Q, \tau_a$','Location','SouthWest');
         set(h2,'Interpreter','latex','FontSize',20)
 
@@ -663,23 +662,26 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigm
     ylabel('$CE_2$ Welfare Change from \textbf{Benchmark}','Interpreter','latex')
     plot(G_K_Frac_k(tauindx)*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 0],'k--', 'linewidth',2)
     axis([min(G_K_Frac_k) max(G_K_Frac_k)  min(CE2_NB_k-CE2_NB_k(tauindx))-1 max(CE2_NB_w-CE2_NB_k(tauindx))+1 ])
-
-    annotation('textarrow',[0.74 0.72],[0.39 0.36], 'string','Cap. Income Tax Economy','linewidth',2,'FontSize',12)
-    annotation('textarrow',[0.57 0.62],[0.39 0.44], 'string','Benchmark, \tau_k = 25%','linewidth',2,'FontSize',12)
-    annotation('textarrow',[0.44+0.127 0.49+0.127],[0.17 0.12], 'string','0.45','linewidth',2,'FontSize',12)
+    axes1 = axes('FontName','Times New Roman','FontSize',18);
+    
+    annotation('textarrow',[0.57 0.62],[0.51 0.54], 'string','Cap. Income Tax Economy','linewidth',2,'FontSize',12)
+    annotation('textarrow',[0.67 0.72],[0.39 0.44], 'string','Benchmark, \tau_k = 25%','linewidth',2,'FontSize',12)
+    annotation('textarrow',[0.54+0.127 0.59+0.127],[0.17 0.12], 'string','0.45','linewidth',2,'FontSize',12)
 
 
     hgsave('1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
     print -dpdf 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
     print -dps 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
-    annotation('textarrow',[0.2 0.15],[0.71 0.76], 'string','Opt. \tau_k = 1.62%','linewidth',2,'FontSize',12)
+%     plot(-0.3243*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
+    annotation('textarrow',[0.24 0.21],[0.73 0.69], 'string','Opt. \tau_k = -18.3%','linewidth',2,'FontSize',12)
     hgsave('1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
     print -dpdf 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
     print -dps 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
     plot(G_K_Frac_w, (CE2_NB_w-CE2_NB_k(tauindx)),'b', 'linewidth',2)
-    annotation('textarrow',[0.47 0.47],[0.81 0.86], 'string','Opt. \tau_a = 1.54%','linewidth',2,'FontSize',12)
+%     plot(0.6380*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
+    annotation('textarrow',[0.86 0.86],[0.81 0.86], 'string','Opt. \tau_a = 2.64%','linewidth',2,'FontSize',12)
 
 
     hgsave('1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
