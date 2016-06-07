@@ -420,8 +420,57 @@ end
         end 
     end
     end
-    status = xlwrite(Tables_file,CE_by_agegroup_z,'CE by Z') ;
+    col_title = {'Age','z1','z2','z3','z4','z5','z6','z7','z8','z9'};
+    row_title = {'Age1';'Age2';'Age3';'Age4';'Age5';'Age6';'Age7'};
+    Mat = [col_title;row_title num2cell(CE_by_agegroup_z)]
+    status = xlwrite(Tables_file,Mat,'CE by Z') ;
+    col_title = {'Top X%','z1 x1','z1 x2','z1 x3','z2 x1','z2 x2','z2 x3','z3 x1','z3 x2','z3 x3',...
+                              'z4 x1','z4 x2','z4 x3','z5 x1','z5 x2','z5 x3','z6 x1','z6 x2','z6 x3',...
+                              'z7 x1','z7 x2','z7 x3','z8 x1','z8 x2','z8 x3','z9 x1','z9 x2','z9 x3'};
+    row_title = {'Age1';'Age2';'Age3';'Age4';'Age5';'Age6';'Age7'};
+    Mat = [col_title;row_title num2cell(CE_by_agegroup_xz)]
     status = xlwrite(Tables_file,CE_by_agegroup_xz,'CE by XZ') ;
+    
+    CE_mat = NaN(n_a,n_z,5) ;
+    for age=1:5
+        for z=1:n_z
+            for i=1:n_a
+                CE_mat(i,z,age) = 100*sum(sum(sum(Cons_Eq_Welfare(age,i,z,:,:,:).*DBN(age,i,z,:,:,:))))/sum(sum(sum(DBN(age,i,z,:,:,:)))) ; 
+            end
+        end
+    end
+    Mat=[];
+    for i=1:5
+    Mat = [Mat NaN(n_a,1) CE_mat(:,:,i)];
+    end 
+    status = xlwrite(Tables_file,Mat,'CE by asset') ;
+    
+
+    
+%% Mean wealth by age
+
+    % Load Distribution
+        eval(['load ',Bench_Folder,'DBN'])
+        DBN = reshape(DBN,[Max_Age,n_a,n_z,n_l,n_e,n_x]) ;
+        
+    % A grid
+        eval(['load ',Result_Folder,'agrid']);
+        A_mat = repmat(agrid,[Max_Age,1,n_z,n_l,n_e,n_x]);
+        
+    % Mean wealth by age
+    Wealth_by_age= NaN(Max_Age,n_z) ;
+    
+    for i=1:Max_Age
+        for z=1:n_z
+        Wealth_by_age(i,z) = sum(sum(sum(sum(sum(A_mat(i,:,z,:,:,:).*DBN(i,:,z,:,:,:))))))/sum(sum(sum(sum(sum(DBN(i,:,z,:,:,:))))));
+        end
+    end 
+    col_title = {'Age','z1','z2','z3','z4','z5','z6','z7','z8','z9'};
+    row_title = num2cell([20:100]');
+    Mat= [col_title;row_title num2cell(Wealth_by_age)]
+    status = xlwrite(Tables_file,Mat,'Asset by age-Z') ;
+    
+    
 
         
 %% Gini Coefficient with Burhan's data 
