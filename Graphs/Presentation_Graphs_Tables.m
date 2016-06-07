@@ -319,20 +319,27 @@ end
     status = xlwrite(Tables_file,Mat,'Ret_Prc_age_group') ;
     
 %% Change in composition of top X% by Z
+    Switch_PV = 1;
 
     % Load PV wealth and Z
         eval(['load ',Simul_Folder,'panelz_bench']) ; eval(['load ',Simul_Folder,'panelx_bench']) ; 
-        eval(['load ',Simul_Folder,'panelz_exp'])   ; eval(['load ',Simul_Folder,'panelx_exp'])   ; 
+        eval(['load ',Simul_Folder,'panelz_exp'])   ; eval(['load ',Simul_Folder,'panelx_exp'])   ;
+        if Switch_PV==1
         eval(['load ',Simul_Folder,'panelPV_a_bench']) ; eval(['load ',Simul_Folder,'panelPV_a_exp'])   ;
+        Wealth_K = panelPV_a_bench; Wealth_W = panelPV_a_exp;
+        else
+        eval(['load ',Simul_Folder,'panela_bench']) ; eval(['load ',Simul_Folder,'panela_exp'])   ;
+        Wealth_K = panela_bench; Wealth_W = panela_exp;
+        end
         
 	% Get Percentiles
-        prc_PV_K = prctile(panelPV_a_bench,[50 90 95 99]);
-        prc_PV_W = prctile(panelPV_a_exp,[50 90 95 99]);
+        prc_K = prctile(Wealth_K,[50 90 95 99]);
+        prc_W = prctile(Wealth_W,[50 90 95 99]);
     % Get composition by top x%
         ii = 1;
         for i=numel(prc_PV_K):-1:1
-            ind_K = panelPV_a_bench>=prc_PV_K(i) ;
-            ind_W = panelPV_a_exp>=prc_PV_W(i) ;
+            ind_K = Wealth_K>=prc_K(i) ;
+            ind_W = Wealth_W>=prc_W(i) ;
             for z=1:n_z
                 z_share_top_x_K(ii,z) = 100*sum(panelz_bench(ind_K)==z)/sum(ind_K) ;
                 z_share_top_x_W(ii,z) = 100*sum(panelz_exp(ind_W)==z)/sum(ind_W) ;
@@ -344,14 +351,19 @@ end
         row_title = {'Top 1%';'Top 5%';'Top 10%';'Top 50%'};
         Mat = [{'Benchmark'} cell(1,n_z); col_title; row_title num2cell(z_share_top_x_K);
                {'Tax_Reform'} cell(1,n_z); col_title; row_title num2cell(z_share_top_x_W);
-               {'Difference'} cell(1,n_z); col_title; row_title num2cell(z_share_top_x_W-z_share_top_x_K)]
-        status = xlwrite(Tables_file,Mat,'Z shares in Top x') ;
+               {'Difference'} cell(1,n_z); col_title; row_title num2cell(z_share_top_x_W-z_share_top_x_K);
+               {'% Difference'} cell(1,n_z); col_title; row_title num2cell(100*(z_share_top_x_W./z_share_top_x_K-1))]
+        if Switch_PV==1 
+            status = xlwrite(Tables_file,Mat,'Z shares in Top x - Present Value') ;
+        else
+            status = xlwrite(Tables_file,Mat,'Z shares in Top x - Book Value') ;
+        end 
         
    % Composition by xz
         ii = 1;
         for i=numel(prc_PV_K):-1:1
-            ind_K = panelPV_a_bench>=prc_PV_K(i) ;
-            ind_W = panelPV_a_exp>=prc_PV_W(i) ;
+            ind_K = Wealth_K>=prc_K(i) ;
+            ind_W = Wealth_W>=prc_W(i) ;
             xz = 1 ;
             for z=1:n_z
                 for x=1:n_x
@@ -370,8 +382,13 @@ end
         row_title = {'Top 1%';'Top 5%';'Top 10%';'Top 50%'};
         Mat = [{'Benchmark'} cell(1,n_z*n_x); col_title; row_title num2cell(xz_share_top_x_K);
                {'Tax_Reform'} cell(1,n_z*n_x); col_title; row_title num2cell(xz_share_top_x_W);
-               {'Difference'} cell(1,n_z*n_x); col_title; row_title num2cell(xz_share_top_x_W-xz_share_top_x_K)]
-        status = xlwrite(Tables_file,Mat,'Z shares in Top x') ;
+               {'Difference'} cell(1,n_z*n_x); col_title; row_title num2cell(xz_share_top_x_W-xz_share_top_x_K);
+               {'% Difference'} cell(1,n_z*n_x); col_title; row_title num2cell(100*(xz_share_top_x_W./xz_share_top_x_K-1))]
+        if Switch_PV==1 
+            status = xlwrite(Tables_file,Mat,'XZ shares in Top x - Present Value') ;
+        else
+            status = xlwrite(Tables_file,Mat,'XZ shares in Top x - Book Value') ;
+        end 
 
 %% Tax Reform welfare by age group and productivity
 
