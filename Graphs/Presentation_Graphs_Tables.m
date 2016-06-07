@@ -82,7 +82,7 @@
 
 % Utility and technology
     sigma = 4.00  ;
-    gamma = 0.4494;
+    gamma = 0.470;
     
 % Taxes
 	tauC    = 0.075         ;
@@ -321,8 +321,10 @@ end
 %% Change in composition of top X% by Z
 
     % Load PV wealth and Z
-        eval(['load ',Simul_Folder,'panelz_bench']) ;  eval(['load ',Simul_Folder,'panelPV_a_bench']) ;
-        eval(['load ',Simul_Folder,'panelz_exp'])   ;  eval(['load ',Simul_Folder,'panelPV_a_exp'])   ;
+        eval(['load ',Simul_Folder,'panelz_bench']) ; eval(['load ',Simul_Folder,'panelx_bench']) ; 
+        eval(['load ',Simul_Folder,'panelz_exp'])   ; eval(['load ',Simul_Folder,'panelx_exp'])   ; 
+        eval(['load ',Simul_Folder,'panelPV_a_bench']) ; eval(['load ',Simul_Folder,'panelPV_a_exp'])   ;
+        
 	% Get Percentiles
         prc_PV_K = prctile(panelPV_a_bench,[50 90 95 99]);
         prc_PV_W = prctile(panelPV_a_exp,[50 90 95 99]);
@@ -335,7 +337,7 @@ end
                 z_share_top_x_K(ii,z) = 100*sum(panelz_bench(ind_K)==z)/sum(ind_K) ;
                 z_share_top_x_W(ii,z) = 100*sum(panelz_exp(ind_W)==z)/sum(ind_W) ;
             end
-            ii= ii+1
+            ii= ii+1;
         end 
 	% Tables
         col_title = {'Top X%','z1','z2','z3','z4','z5','z6','z7','z8','z9'};
@@ -345,6 +347,65 @@ end
                {'Difference'} cell(1,n_z); col_title; row_title num2cell(z_share_top_x_W-z_share_top_x_K)]
         status = xlwrite(Tables_file,Mat,'Z shares in Top x') ;
         
+   % Composition by xz
+        ii = 1;
+        for i=numel(prc_PV_K):-1:1
+            ind_K = panelPV_a_bench>=prc_PV_K(i) ;
+            ind_W = panelPV_a_exp>=prc_PV_W(i) ;
+            xz = 1 ;
+            for z=1:n_z
+                for x=1:n_x
+                xz_share_top_x_K(ii,xz) = 100*sum(panelz_bench(ind_K)==z & panelx_bench(ind_K)==x)/sum(ind_K) ;
+                xz_share_top_x_W(ii,xz) = 100*sum(panelz_exp(ind_W)==z & panelx_exp(ind_W)==x)/sum(ind_W) ;
+                xz = xz+1;
+                end
+            end
+            ii= ii+1;
+        end 
+        
+    % Tables
+        col_title = {'Top X%','z1 x1','z1 x2','z1 x3','z2 x1','z2 x2','z2 x3','z3 x1','z3 x2','z3 x3',...
+                              'z4 x1','z4 x2','z4 x3','z5 x1','z5 x2','z5 x3','z6 x1','z6 x2','z6 x3',...
+                              'z7 x1','z7 x2','z7 x3','z8 x1','z8 x2','z8 x3','z9 x1','z9 x2','z9 x3'};
+        row_title = {'Top 1%';'Top 5%';'Top 10%';'Top 50%'};
+        Mat = [{'Benchmark'} cell(1,n_z*n_x); col_title; row_title num2cell(xz_share_top_x_K);
+               {'Tax_Reform'} cell(1,n_z*n_x); col_title; row_title num2cell(xz_share_top_x_W);
+               {'Difference'} cell(1,n_z*n_x); col_title; row_title num2cell(xz_share_top_x_W-xz_share_top_x_K)]
+        status = xlwrite(Tables_file,Mat,'Z shares in Top x') ;
+
+%% Tax Reform welfare by age group and productivity
+
+    % Load Distribution
+        eval(['load ',Bench_Folder,'DBN'])
+        DBN = reshape(DBN,[Max_Age,n_a,n_z,n_l,n_e,n_x]) ;
+
+    % Consumption equivalent welfare CE1
+        eval(['load ',Bench_Folder,'value']); ValueFunction_bench = reshape(value,[Max_Age,n_a,n_z,n_l,n_e,n_x]) ; clear value
+        eval(['load ',Exp_Folder,'Exp_results_value']); ValueFunction_exp = reshape(Exp_results_value,[Max_Age,n_a,n_z,n_l,n_e,n_x]) ; clear Exp_results_value
+    Cons_Eq_Welfare=(ValueFunction_exp./ValueFunction_bench).^ ( 1 / ( gamma* (1-sigma)) )-1 ;
+    
+                                 
+    CE_by_agegroup_z  = NaN(n_age,n_z);
+    CE_by_agegroup_xz = NaN(n_age,n_z*n_x);
+    for age_group_counter=1:n_age
+        ii=1 ;
+    for zi=1:n_z
+        CE_by_agegroup_z(age_group_counter,zi)= ...
+             100*sum(sum(sum(sum(sum(Cons_Eq_Welfare(age_limit(age_group_counter)+1:age_limit(age_group_counter+1),:,zi,:,:,:).* ...
+                    DBN(age_limit(age_group_counter)+1:age_limit(age_group_counter+1),:,zi,:,:,:))))))/ ...
+                 sum(sum(sum(sum(sum( DBN(age_limit(age_group_counter)+1:age_limit(age_group_counter+1),:,zi,:,:,:)))))) ;
+        for xi=1:n_x
+            CE_by_agegroup_xz(age_group_counter,ii) = ...
+             100*sum(sum(sum(sum(sum(Cons_Eq_Welfare(age_limit(age_group_counter)+1:age_limit(age_group_counter+1),:,zi,:,:,xi).* ...
+                    DBN(age_limit(age_group_counter)+1:age_limit(age_group_counter+1),:,zi,:,:,xi))))))/ ...
+                 sum(sum(sum(sum(sum( DBN(age_limit(age_group_counter)+1:age_limit(age_group_counter+1),:,zi,:,:,xi)))))) ;
+            ii=ii+1;
+        end 
+    end
+    end
+    status = xlwrite(Tables_file,CE_by_agegroup_z,'CE by Z') ;
+    status = xlwrite(Tables_file,CE_by_agegroup_xz,'CE by XZ') ;
+
         
 %% Gini Coefficient with Burhan's data 
 % I use Deaton's formulas for the gini. 
@@ -491,34 +552,18 @@ clear panela_bench panelPV_a_bench wealth_bench y_bench x_bench
         % 1. tauk, 2. tauw, 3. taul, 4. GBAR_K/(GBAR+SSC), 5. KBAR, 6. QBAR, 7. NBAR, 8. YBAR
         % 9. %Y , 10. wage, 11. VBAR, 12. CE2_NB, 13. CE2, 14. KBAR/Y, 
         % 15. Top1%, 16. Top10%, 17. std(log(E)), 18. Av. Hours
-    axes1 = axes('FontName','Times New Roman','FontSize',18);
+    aa = Stats_by_tau_k(:,4) ;
+    aa = aa*0.16004634619224012/(0.16004634619224012+0.12643367375356479);
+    Stats_by_tau_k(:,4) = aa ;
+    aa = Stats_by_tau_w(:,4) ;
+    aa = aa*0.16004634619224012/(0.16004634619224012+0.12643367375356479);
+    Stats_by_tau_w(:,4) = aa ;
+    
   
     G_K_Frac_k = Stats_by_tau_k(:,4) ;
     G_K_Frac_w = Stats_by_tau_w(:,4) ;
     
 
-% Aggregate variabls as a function of Borrowing/wealth tax revenue
-    figure;
-    hold on
-    plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,5)/Stats_by_tau_k(1,5)-1),'r')
-    plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,5)/Stats_by_tau_w(1,5)-1),'b')
-    plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,6)/Stats_by_tau_k(1,6)-1),'r-d')
-    plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,6)/Stats_by_tau_w(1,6)-1),'b-d')
-    plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,7)/Stats_by_tau_k(1,7)-1),'ro')
-    plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,7)/Stats_by_tau_w(1,7)-1),'bo')
-    plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,8)/Stats_by_tau_k(1,8)-1),'rd')
-    plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,8)/Stats_by_tau_w(1,8)-1),'bd')
-    grid on
-    hold off
-    legend(' KBAR, \tau_K', 'KBAR, \tau_W', 'QBAR, \tau_K', 'QBAR, \tau_W', ...
-        'NBAR, \tau_K', 'NBAR, \tau_W', 'YBAR, \tau_K', 'YBAR, \tau_W','Location','SouthWest')
-    xlabel('GBAR_K')
-
-    hgsave('1fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
-    print -dpdf 1fig_KBAR_QBAR_by_CAP_TAX_REV.pdf
-    print -dps  1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
-    print -dpng 1fig_KBAR_QBAR_by_CAP_TAX_REV.png
-    
     % KBAR & QBAR graph
         figure;
         hold on
@@ -544,109 +589,8 @@ clear panela_bench panelPV_a_bench wealth_bench y_bench x_bench
         print -dpdf 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.pdf
         print -dps 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.eps
 
-
-% Wage by capital/Wealth tax revenue
-    figure
-    hold on
-    plot(G_K_Frac_k, (Stats_by_tau_k(:,10)),'r')
-    plot(G_K_Frac_w, (Stats_by_tau_w(:,10)),'b')
-    grid on
-    hold off
-    legend('\tau_K', '\tau_W')
-    xlabel('GBAR_K')
-    title('Wage')
-    [maxvalK indxK] = max((Stats_by_tau_k(:,11)-Stats_by_tau_k(1,11)));
-    text(Stats_by_tau_k(indxK,4)+0.0, maxvalK -0.15,['Opt. \tau_K = ' ,num2str(100*Stats_by_tau_k(indxK,1)),'%'])
-
-    [maxvalW indxW] = max((Stats_by_tau_w(:,10)-Stats_by_tau_w(1,11)));
-    text(Stats_by_tau_w(indxW,4)+0.0, maxvalW +0.05,['Opt. \tau_W = ' ,num2str(100*Stats_by_tau_w(indxW,2)),'%'])
-
-
-    hgsave('1fig_Wage_by_CAP_TAX_REV.fig')
-    print -dpdf 1fig_Wage_by_CAP_TAX_REV.pdf
-    print -dps  1fig_Wage_by_CAP_TAX_REV.eps
-    print -dpng 1fig_Wage_by_CAP_TAX_REV.png
-    
-    % After-tax wage
-        figure
-        hold on
-        plot(G_K_Frac_k, (Stats_by_tau_k(:,10).*(1-Stats_by_tau_k(:,3))))
-        plot(G_K_Frac_w, (Stats_by_tau_w(:,10).*(1-Stats_by_tau_w(:,3))))
-        
-        [x,wagemax_indx_tauK] = max(Stats_by_tau_k(:,10).*(1-Stats_by_tau_k(:,3)));
-        [x,wagemax_indx_tauW] = max(Stats_by_tau_w(:,10).*(1-Stats_by_tau_w(:,3)));
-        display('    tauK      tauW   that maximizes after-tax wage')
-        disp([Stats_by_tau_k(wagemax_indx_tauK,1) Stats_by_tau_w(wagemax_indx_tauW,2)])
-        hgsave('1fig_Wage_by_CAP_TAX_REV.fig')
-        print -dpdf 1fig_AT_Wage_by_CAP_TAX_REV.pdf
-        print -dps  1fig_AT_Wage_by_CAP_TAX_REV.eps
-        print -dpng 1fig_AT_Wage_by_CAP_TAX_REV.png
-
-% Average utilities (relavite to no taxes)
-    figure
-    hold on
-    plot(G_K_Frac_k, (Stats_by_tau_k(:,11)-Stats_by_tau_k(1,11)),'r')
-    plot(G_K_Frac_w, (Stats_by_tau_w(:,11)-Stats_by_tau_w(1,11)),'b')
-    grid on; hold off
-    xlabel('GBAR_K')
-    title('Average Utility')
-
-    [maxvalK indxK] = max((Stats_by_tau_k(:,11)-Stats_by_tau_k(1,11)));
-    text(Stats_by_tau_k(indxK,4)+0.01, maxvalK -0.10,['Opt. \tau_K = ' ,num2str(100*Stats_by_tau_k(indxK,1)),'%'])
-
-    [maxvalW indxW] = max((Stats_by_tau_w(:,11)-Stats_by_tau_w(1,11)));
-    text(Stats_by_tau_w(indxW,4)+0.0, maxvalW +0.05,['Opt. \tau_W = ' ,num2str(100*Stats_by_tau_w(indxW,2)),'%'])
-
-    hgsave('1fig_Average_Utility_by_CAP_TAX_REV.fig')
-    print -dpdf 1fig_Average_Utility_by_CAP_TAX_REV.pdf
-    print -dps  1fig_Average_Utility_by_CAP_TAX_REV.eps
-    print -dpng 1fig_Average_Utility_by_CAP_TAX_REV.png
-
 CE2_NB_k =100*( (Stats_by_tau_k(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigma)))-1);
 CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigma)))-1);
-
-% CE Newborn computed using average utilities (relavite to no taxes)
-    figure
-    hold on
-    plot(G_K_Frac_k, (CE2_NB_k-CE2_NB_k(1)),'r')
-    plot(G_K_Frac_w, (CE2_NB_w-CE2_NB_w(1)),'b')
-    grid on; hold off;
-    xlabel('GBAR_K')
-    title('CE Newborn computed using average utilities')
-
-    [maxvalK indxK] = max((CE2_NB_k-CE2_NB_k(1)));
-    text(Stats_by_tau_k(indxK,4)+0.01, maxvalK -0.10,['Opt. \tau_K = ' ,num2str(100*Stats_by_tau_k(indxK,1)),'%'])
-
-    [maxvalW indxW] = max((CE2_NB_w-CE2_NB_w(1)));
-    text(Stats_by_tau_w(indxW,4)+0.0, maxvalW +0.05,['Opt. \tau_W = ' ,num2str(100*Stats_by_tau_w(indxW,2)),'%'])
-
-    hgsave('2fig_CE_NEWBORN_by_CAP_TAX_REV.fig')
-    print -dpdf 2fig_CE_NEWBORN_by_CAP_TAX_REV.pdf
-    print -dps  2fig_CE_NEWBORN_by_CAP_TAX_REV.eps
-    print -dpng 2fig_CE_NEWBORN_by_CAP_TAX_REV.png
-
-% CE Newborn computed using average utilities (in levels)
-    figure
-    hold on
-    plot(G_K_Frac_k, (CE2_NB_k ),'r')
-    plot(G_K_Frac_w, (CE2_NB_w ),'b')
-    grid on; hold off;
-    xlabel('GBAR_K')
-    title('CE Newborn computed using average utilities')
-
-    [maxvalK indxK] = max((CE2_NB_k ));
-    text(Stats_by_tau_k(indxK,4)+0.01, maxvalK -0.10,['Opt. \tau_K = ' ,num2str(100*Stats_by_tau_k(indxK,1)),'%'])
-
-    [maxvalW indxW] = max((CE2_NB_w ));
-    text(Stats_by_tau_w(indxW,4)+0.0, maxvalW +0.05,['Opt. \tau_W = ' ,num2str(100*Stats_by_tau_w(indxW,2)),'%'])
-
-
-    hgsave('3fig_CE_NEWBORN_by_CAP_TAX_REV.fig')
-    print -dpdf 3fig_CE_NEWBORN_by_CAP_TAX_REV.pdf
-    print -dps  3fig_CE_NEWBORN_by_CAP_TAX_REV.eps
-    print -dpng 3fig_CE_NEWBORN_by_CAP_TAX_REV.png
-
-
 % Burhan's graphs on welfare by tau
     [x,tauindx ] = min(abs(Stats_by_tau_k(:,1) - 0.25)) ;
 
@@ -662,26 +606,25 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigm
     ylabel('$CE_2$ Welfare Change from \textbf{Benchmark}','Interpreter','latex')
     plot(G_K_Frac_k(tauindx)*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 0],'k--', 'linewidth',2)
     axis([min(G_K_Frac_k) max(G_K_Frac_k)  min(CE2_NB_k-CE2_NB_k(tauindx))-1 max(CE2_NB_w-CE2_NB_k(tauindx))+1 ])
-    axes1 = axes('FontName','Times New Roman','FontSize',18);
     
     annotation('textarrow',[0.57 0.62],[0.51 0.54], 'string','Cap. Income Tax Economy','linewidth',2,'FontSize',12)
     annotation('textarrow',[0.67 0.72],[0.39 0.44], 'string','Benchmark, \tau_k = 25%','linewidth',2,'FontSize',12)
-    annotation('textarrow',[0.54+0.127 0.59+0.127],[0.17 0.12], 'string','0.45','linewidth',2,'FontSize',12)
+    annotation('textarrow',[0.54+0.127 0.59+0.127],[0.17 0.12], 'string','0.25','linewidth',2,'FontSize',12)
 
 
     hgsave('1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
     print -dpdf 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
     print -dps 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
-%     plot(-0.3243*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
+%     plot(-0.1812*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
     annotation('textarrow',[0.24 0.21],[0.73 0.69], 'string','Opt. \tau_k = -18.3%','linewidth',2,'FontSize',12)
     hgsave('1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
     print -dpdf 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
     print -dps 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
     plot(G_K_Frac_w, (CE2_NB_w-CE2_NB_k(tauindx)),'b', 'linewidth',2)
-%     plot(0.6380*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
-    annotation('textarrow',[0.86 0.86],[0.81 0.86], 'string','Opt. \tau_a = 2.64%','linewidth',2,'FontSize',12)
+%     plot(0.3564*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
+    annotation('textarrow',[0.83 0.86],[0.81 0.86], 'string','Opt. \tau_a = 2.64%','linewidth',2,'FontSize',12)
 
 
     hgsave('1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
@@ -1215,10 +1158,15 @@ end
         % 1. tauk, 2. tauw, 3. taul, 4. GBAR_K/(GBAR+SSC), 5. KBAR, 6. QBAR, 7. NBAR, 8. YBAR
         % 9. %Y , 10. wage, 11. VBAR, 12. CE2_NB, 13. CE2, 14. KBAR/Y, 
         % 15. Top1%, 16. Top10%, 17. std(log(E)), 18. Av. Hours
-    axes1 = axes(...
-      'FontName','Times New Roman',...
-      'FontSize',18);
+    
   
+    aa = Stats_by_tau_k(:,4) ;
+    aa = aa*0.16004634619224012/(0.16004634619224012+0.12643367375356479);
+    Stats_by_tau_k(:,4) = aa ;
+    aa = Stats_by_tau_w(:,4) ;
+    aa = aa*0.16004634619224012/(0.16004634619224012+0.12643367375356479);
+    Stats_by_tau_w(:,4) = aa ;
+    
     G_K_Frac_k = Stats_by_tau_k(:,4) ;
     G_K_Frac_w = Stats_by_tau_w(:,4) ;
     
@@ -1390,8 +1338,8 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigm
     plot(G_K_Frac_k(tauindx)*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 0],'k--', 'linewidth',2)
     axis([min(G_K_Frac_k) max(G_K_Frac_k)  min(CE2_NB_k-CE2_NB_k(tauindx))-1 max(CE2_NB_w-CE2_NB_k(tauindx))+1 ])
 
-    annotation('textarrow',[0.76 0.73],[0.52 0.49], 'string','Cap. Income Tax Economy','linewidth',2,'FontSize',12)
-    annotation('textarrow',[0.60 0.65],[0.5 0.55], 'string','Benchmark, \tau_k = 25%','linewidth',2,'FontSize',12)
+    annotation('textarrow',[0.71 0.68],[0.55 0.52], 'string','Cap. Income Tax Economy','linewidth',2,'FontSize',12)
+    annotation('textarrow',[0.68 0.73],[0.39 0.44], 'string','Benchmark, \tau_k = 25%','linewidth',2,'FontSize',12)
     annotation('textarrow',[0.60 0.65],[0.17 0.12], 'string','0.28','linewidth',2,'FontSize',12)
 
 
