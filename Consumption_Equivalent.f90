@@ -98,10 +98,6 @@ Program Consumption_Equivalent
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		! Bench_Folder
-		Result_Folder = trim(Result_Folder)//'Model_1.2/' 
-		Bench_Folder  = trim(Result_Folder)//'Bench_Files/'
-
 		Result_Folder = trim(Result_Folder)//'Model_1.2/Opt_Tax_K/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
@@ -109,7 +105,8 @@ Program Consumption_Equivalent
 		call system( 'mkdir -p ' // trim(Result_Folder)//'CE_Files/' )
 		print*, "Results are stored in directory: ", Result_Folder
 
-	
+	! Bench_Folder
+		Bench_Folder = trim(Result_Folder)//'Bench_Files/'
 
 	! Initialize program and load functions
 		print*,"	Initializing program"
@@ -283,7 +280,7 @@ Program Consumption_Equivalent
 	CE_hl_NB_exp 		= sum(CE_hl(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
 	CE_hd_NB_exp 		= sum(CE_hd(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
 
-	OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'CE_output_opt_tax_K.txt'  , STATUS='replace')
+	OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'CE_output_opt_tax_k.txt'  , STATUS='replace')
 	WRITE (UNIT=1,  FMT=*) 'Benchmark - Aggregate'
 	WRITE (UNIT=1,  FMT=*) 'CE',CE_total_bench, 'CE_c',CE_c_bench,'CE_h',CE_h_bench
 	WRITE (UNIT=1,  FMT=*) 'CE_c',CE_c_bench,'CE_cl',CE_cl_bench,'CE_cd',CE_cd_bench
@@ -310,29 +307,29 @@ Program Consumption_Equivalent
 
 	CLOSE (unit=1)
 
-	OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'CE_Files/CE_total'  , STATUS='replace')
-	OPEN  (UNIT=2,  FILE=trim(Result_Folder)//'CE_Files/CE_c'  , STATUS='replace')
-	OPEN  (UNIT=3,  FILE=trim(Result_Folder)//'CE_Files/CE_cl'  , STATUS='replace')
-	OPEN  (UNIT=4,  FILE=trim(Result_Folder)//'CE_Files/CE_cd'  , STATUS='replace')
-	OPEN  (UNIT=5,  FILE=trim(Result_Folder)//'CE_Files/CE_h'  , STATUS='replace')
-	OPEN  (UNIT=6,  FILE=trim(Result_Folder)//'CE_Files/CE_hl'  , STATUS='replace')
-	OPEN  (UNIT=7,  FILE=trim(Result_Folder)//'CE_Files/CE_hd'  , STATUS='replace')
+	! OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'CE_Files/CE_total'  , STATUS='replace')
+	! OPEN  (UNIT=2,  FILE=trim(Result_Folder)//'CE_Files/CE_c'  , STATUS='replace')
+	! OPEN  (UNIT=3,  FILE=trim(Result_Folder)//'CE_Files/CE_cl'  , STATUS='replace')
+	! OPEN  (UNIT=4,  FILE=trim(Result_Folder)//'CE_Files/CE_cd'  , STATUS='replace')
+	! OPEN  (UNIT=5,  FILE=trim(Result_Folder)//'CE_Files/CE_h'  , STATUS='replace')
+	! OPEN  (UNIT=6,  FILE=trim(Result_Folder)//'CE_Files/CE_hl'  , STATUS='replace')
+	! OPEN  (UNIT=7,  FILE=trim(Result_Folder)//'CE_Files/CE_hd'  , STATUS='replace')
 	
-	WRITE (UNIT=1,  FMT=*) CE_total
-	WRITE (UNIT=2,  FMT=*) CE_c
-	WRITE (UNIT=3,  FMT=*) CE_cl
-	WRITE (UNIT=4,  FMT=*) CE_cd
-	WRITE (UNIT=5,  FMT=*) CE_h
-	WRITE (UNIT=6,  FMT=*) CE_hl
-	WRITE (UNIT=7,  FMT=*) CE_hd
+	! WRITE (UNIT=1,  FMT=*) CE_total
+	! WRITE (UNIT=2,  FMT=*) CE_c
+	! WRITE (UNIT=3,  FMT=*) CE_cl
+	! WRITE (UNIT=4,  FMT=*) CE_cd
+	! WRITE (UNIT=5,  FMT=*) CE_h
+	! WRITE (UNIT=6,  FMT=*) CE_hl
+	! WRITE (UNIT=7,  FMT=*) CE_hd
 	
-	CLOSE (unit=1)
-	CLOSE (unit=2)
-	CLOSE (unit=3)
-	CLOSE (unit=4)
-	CLOSE (unit=5)
-	CLOSE (unit=6)
-	CLOSE (unit=7)
+	! CLOSE (unit=1)
+	! CLOSE (unit=2)
+	! CLOSE (unit=3)
+	! CLOSE (unit=4)
+	! CLOSE (unit=5)
+	! CLOSE (unit=6)
+	! CLOSE (unit=7)
 	
 
 
