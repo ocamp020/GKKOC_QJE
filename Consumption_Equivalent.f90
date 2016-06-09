@@ -5,19 +5,58 @@ Program Consumption_Equivalent
 	use Toolbox
 	Implicit None
 	character(100) :: Bench_Folder
-	real(dp), dimension(MaxAge,na,nz,nlambda,ne) :: Cons_bench, Hours_bench, Aprime_bench, Value_bench
-	real(dp), dimension(MaxAge,na,nz,nlambda,ne) :: Cons_exp, Hours_exp, Aprime_exp, Value_exp
-	real(dp), dimension(MaxAge,na,nz,nlambda,ne) :: CE_total, CE_c, CE_cl, CE_cd, CE_h, CE_hl, CE_hd
-	real(dp), dimension(MaxAge,na,nz,nlambda,ne) :: Value_aux
+	character(4)   :: string_theta
+	character(100) :: folder_aux
+	! Compute benchmark or load results
+		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
+	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: Cons_bench, Hours_bench, Aprime_bench, Value_bench
+	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: Cons_exp, Hours_exp, Aprime_exp, Value_exp
+	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: CE_total, CE_c, CE_cl, CE_cd, CE_h, CE_hl, CE_hd
+	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: Value_aux
 	real(dp) :: C_bench, C_exp, H_bench, H_exp
 	real(dp) :: CE_total_bench, CE_c_bench, CE_cl_bench, CE_cd_bench, CE_h_bench, CE_hl_bench, CE_hd_bench
 	real(dp) :: CE_total_NB_bench, CE_c_NB_bench, CE_cl_NB_bench, CE_cd_NB_bench, CE_h_NB_bench, CE_hl_NB_bench, CE_hd_NB_bench
 	real(dp) :: CE_total_exp, CE_c_exp, CE_cl_exp, CE_cd_exp, CE_h_exp, CE_hl_exp, CE_hd_exp
 	real(dp) :: CE_total_NB_exp, CE_c_NB_exp, CE_cl_NB_exp, CE_cd_NB_exp, CE_h_NB_exp, CE_hl_NB_exp, CE_hd_NB_exp
 
+	! Switch for solving benchmark or just reading resutls
+		Calibration_Switch = .false.
+		! If compute_bench==.true. then just read resutls
+		! If compute_bench==.false. then solve for benchmark and store results
+		Tax_Reform    = .false.
+			compute_bench = .false.
+			compute_exp   = .false.
+		Opt_Tax       = .false.
+			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+		Simul_Switch  = .false.
+
+
+	! Switch for separable and non-separable utility
+		! If NSU_Switch==.true. then do non-separable utility
+		! If NSU_Switch==.false. then do separable utility
+		NSU_Switch = .true.
+
+	! Switch for log utility 
+		! If Log_Switch==.true. then utility is log
+		! If Log_Switch==.false. then utility is not log
+		Log_Switch = .false.
+
+	! Switch for labor taxes
+		! If Progressive_Tax_Switch==.true. then use progressive taxes
+		! If Progressive_Tax_Switch==.false. then use linear taxes
+		Progressive_Tax_Switch = .false.
+
+
+	! Capital Market
+		theta_folder = 1.50_dp
+		do zi=1,nz
+		theta(zi)        = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+		enddo
+	! Threshold 
+		Threshold_Factor = 0.00_dp 
 
 	! Set Parameters 
-		Params =[ 0.9436, 0.00, 0.50, 0.70444445, 0.34, 0.4494 ] ! tauL=0.224, tauC=0.075 calibration
+		Params =[ 0.9485_dp, 0.00_dp, 0.1_dp, 0.0665_dp, 0.29_dp,0.470_dp] ! tauL=0.224, tauC=0.075 calibration
 		beta   = params(1)
 		mu_z   = params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  = params(3) 
@@ -25,6 +64,13 @@ Program Consumption_Equivalent
 		sigma_lambda_eps = params(5)
 		gamma  = params(6)
 		sigma  = 4.0_dp
+
+		x_hi	= 5.00_dp
+		x_lo	= 1.00_dp
+		x_0     = 0.00_dp
+		a_x 	= 0.10_dp
+		b_x 	= 0.00_dp
+
 
 	! Taxes
 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
@@ -40,28 +86,27 @@ Program Consumption_Equivalent
 
 	! Resutls Folder
 		write(Result_Folder,'(f4.2)') Threshold_Factor
+		write(string_theta,'(f4.2)')  theta_folder
 
-		if ((TauPL.eq.0.0_dp).and.(sigma.ne.1.0_dp)) then 
-			Result_Folder = './NSU_LT_Results/Factor_'//trim(Result_Folder)//'/'
-		else if ((TauPL.ne.0.0_dp).and.(sigma.ne.1.0_dp)) then 
-			Result_Folder = './NSU_PT_Results/Factor_'//trim(Result_Folder)//'/'
-		else if ((TauPL.eq.0.0_dp).and.(sigma.eq.1.0_dp)) then 
-			Result_Folder = './SU_LT_Results/Factor_'//trim(Result_Folder)//'/'
-		else if ((TauPL.ne.0.0_dp).and.(sigma.eq.1.0_dp)) then 
-			Result_Folder = './SU_PT_Results/Factor_'//trim(Result_Folder)//'/'
-		end if 
+		
+		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
+			Result_Folder = './NSU_ZS_LT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
+		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
+			Result_Folder = './NSU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
+		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
+			Result_Folder = './SU_ZS_LT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
+		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
+			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
+		end if
+
+		Result_Folder = trim(Result_Folder)//'Model_1.2/' 
+
+		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
+		call system( 'mkdir -p ' // trim(Result_Folder) )
 		print*, "Results are stored in directory: ", Result_Folder
 
 	! Bench_Folder
-		if ((TauPL.eq.0.0_dp).and.(sigma.ne.1.0_dp)) then 
-			Bench_Folder = './NSU_LT_Results/Bench_Files/'
-		else if ((TauPL.ne.0.0_dp).and.(sigma.ne.1.0_dp)) then 
-			Bench_Folder = './NSU_PT_Results/Bench_Files/'
-		else if ((TauPL.eq.0.0_dp).and.(sigma.eq.1.0_dp)) then 
-			Bench_Folder = './SU_LT_Results/Bench_Files/'
-		else if ((TauPL.ne.0.0_dp).and.(sigma.eq.1.0_dp)) then 
-			Bench_Folder = './SU_PT_Results/Bench_Files/'
-		end if 
+		Bench_Folder = Result_Folder//'Bench_Files/'
 
 	! Initialize program and load functions
 		print*,"	Initializing program"
@@ -78,27 +123,33 @@ Program Consumption_Equivalent
 		Y_a_threshold = 0.00_DP 
 
 	print*,"	Reading benchmark results from files"
-		CALL Write_Benchmark_Results(1)
+		CALL Write_Benchmark_Results(.false.)
 
 	! Aggregate variables in benchmark economy
 		GBAR_bench  = GBAR
 		QBAR_bench  = QBAR 
 		NBAR_bench  = NBAR 
 		Ebar_bench  = EBAR
-		rr_bench    = rr
+		P_bench     = P
+		R_bench     = R
 		wage_bench  = wage
 		Y_bench     = YBAR
 		tauK_bench  = tauK
 		tauPL_bench = tauPL
-		psi_bench   = psi_bench
+		psi_bench   = psi
 		DBN_bench   = DBN1
+		tauw_bt_bench = tauW_bt
 		tauw_at_bench = tauW_at
 		Y_a_threshold_bench = Y_a_threshold
 
-		Cons_bench   = Cons 
-		Hours_bench  = Hours
-		Aprime_bench = Aprime
-		Value_bench  = ValueFunction
+		DBN_bench           = DBN1
+		ValueFunction_bench = ValueFunction
+		Cons_bench          = Cons           
+		Hours_bench         = Hours
+		Aprime_bench        = Aprime 
+		V_Pr_bench          = V_Pr
+		V_Pr_nb_bench       = V_Pr_nb 
+
 
 		CALL ComputeLaborUnits(EBAR, wage) 
 
@@ -107,54 +158,31 @@ Program Consumption_Equivalent
 	Print*,'Loading experiment'
 	PRINT*,''
 
-	tauK = 0.0_DP
-	Y_a_threshold = Threshold_Factor*Ebar_bench 
-	tauW_at = 0.017072675596579098_dp
+	print*,"	Reading benchmark results from files"
+		CALL Write_Experimental_Results(.false.)
+	! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
 
-	OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'Exp_results_cons'  , STATUS='old', ACTION='read')
-	OPEN  (UNIT=2,  FILE=trim(Result_Folder)//'Exp_results_aprime', STATUS='old', ACTION='read')
-	OPEN  (UNIT=3,  FILE=trim(Result_Folder)//'Exp_results_hours' , STATUS='old', ACTION='read')
-	OPEN  (UNIT=4,  FILE=trim(Result_Folder)//'Exp_results_value' , STATUS='old', ACTION='read')
-	OPEN  (UNIT=5,  FILE=trim(Result_Folder)//'Exp_results_DBN'   , STATUS='old', ACTION='read')
-	OPEN  (UNIT=60, FILE=trim(Result_Folder)//'Exp_results_GBAR'  , STATUS='old', ACTION='read')
-	OPEN  (UNIT=7,  FILE=trim(Result_Folder)//'Exp_results_EBAR'  , STATUS='old', ACTION='read')
-	OPEN  (UNIT=8,  FILE=trim(Result_Folder)//'Exp_results_NBAR'  , STATUS='old', ACTION='read')
-	OPEN  (UNIT=9,  FILE=trim(Result_Folder)//'Exp_results_QBAR'  , STATUS='old', ACTION='read')
-	OPEN  (UNIT=10, FILE=trim(Result_Folder)//'Exp_results_rr'    , STATUS='old', ACTION='read')
-	OPEN  (UNIT=11, FILE=trim(Result_Folder)//'Exp_results_wage'  , STATUS='old', ACTION='read')
-	OPEN  (UNIT=12, FILE=trim(Result_Folder)//'Exp_results_YBAR'  , STATUS='old', ACTION='read')
-
-	READ (UNIT=1,  FMT=*), cons_exp
-	READ (UNIT=2,  FMT=*), aprime_exp
-	READ (UNIT=3,  FMT=*), hours_exp
-	READ (UNIT=4,  FMT=*), Value_exp
-	READ (UNIT=5,  FMT=*), DBN_exp
-	READ (UNIT=60, FMT=*), GBAR_exp
-	READ (UNIT=7,  FMT=*), EBAR_exp
-	READ (UNIT=8,  FMT=*), NBAR_exp
-	READ (UNIT=9,  FMT=*), QBAR_exp
-	READ (UNIT=10, FMT=*), rr_exp
-	READ (UNIT=11, FMT=*), wage_exp
-	READ (UNIT=12, FMT=*), Y_exp
-
-	CLOSE (unit=1)
-	CLOSE (unit=2)
-	CLOSE (unit=3)
-	CLOSE (unit=4)
-	CLOSE (unit=5)
-	CLOSE (unit=60)
-	CLOSE (unit=7)
-	CLOSE (unit=8)
-	CLOSE (unit=9)
-	CLOSE (unit=10)
-	CLOSE (unit=11)
-	CLOSE (unit=12)
-
-	tauK_exp  = tauK
-	tauPL_exp = tauPL
-	psi_exp   = psi
-	tauw_at_exp = tauW_at
-	Y_a_threshold_exp = Y_a_threshold
+		ValueFunction_exp = ValueFunction
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime
+		V_Pr_exp          = V_Pr 
+		V_Pr_nb_exp  	  = V_Pr_nb
 
 !====================================================================================================
 	PRINT*,''
@@ -182,19 +210,8 @@ Program Consumption_Equivalent
 	Cons    = Cons_exp 
 	Aprime  = Aprime_exp
 	Hours   = Hours_bench 
-	tauK    = tauK_exp
-	tauW_at = tauW_at_exp 
-	GBAR  	= GBAR_exp
-	QBAR  	= QBAR_exp
-	NBAR  	= NBAR_exp
-	Ebar  	= EBAR_exp
-	rr   	= rr_exp
-	wage  	= wage_exp
-	YBAR    = Y_exp
-	Y_a_threshold = Y_a_threshold_exp
 
-	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-	Value_aux = ValueFunction
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,Value_aux)
 
 	CE_c  = 100.0_dp*((Value_aux/Value_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
@@ -211,35 +228,13 @@ Program Consumption_Equivalent
 	Cons    = Cons_exp
 	Aprime  = Aprime_exp
 	Hours   = Hours_bench 
-	tauK    = tauK_bench
-	tauW_at = tauW_at_bench 
-	GBAR  	= GBAR_bench
-	QBAR  	= QBAR_bench
-	NBAR  	= NBAR_bench
-	Ebar  	= EBAR_bench
-	rr   	= rr_bench
-	wage  	= wage_bench
-	YBAR    = Y_bench
-	Y_a_threshold = Y_a_threshold_bench
-
-	CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-	Value_aux = ValueFunction
+	
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,Value_aux)
 
 	Cons    = Cons_bench 
 	Aprime  = Aprime_bench
 	Hours   = Hours_exp
-	tauK    = tauK_bench
-	tauW_at = tauW_at_bench 
-	GBAR  	= GBAR_bench
-	QBAR  	= QBAR_bench
-	NBAR  	= NBAR_bench
-	Ebar  	= EBAR_bench
-	rr   	= rr_bench
-	wage  	= wage_bench
-	YBAR    = Y_bench
-	Y_a_threshold = Y_a_threshold_bench
-
-	CALL COMPUTE_VALUE_FUNCTION_SPLINE
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
 
 	CE_h  = 100.0_dp*((Value_exp/Value_aux)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
