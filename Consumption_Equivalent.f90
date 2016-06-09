@@ -396,7 +396,7 @@ Program Consumption_Equivalent
 	print*,  'CE2_cd'	, CE2_nb_cd 	, CE2_pop_cd
 	print*,  'CE2_h'	, CE2_nb_h 		, CE2_pop_h 	, 100*((1+CE2_nb_hl/100)*(1+CE2_nb_hd/100)-1)
 	print*,  'CE2_hl'	, CE2_nb_hl 	, CE2_pop_hl
-	print*,  'CE2_hd'	, CE2_nb_hd 	, CE2_pop_hl 
+	print*,  'CE2_hd'	, CE2_nb_hd 	, CE2_pop_hd 
 	print*, ' '
 	
 
