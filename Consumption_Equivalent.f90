@@ -9,8 +9,6 @@ Program Consumption_Equivalent
 	character(100) :: folder_aux
 	! Compute benchmark or load results
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
-	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: Cons_bench, Hours_bench, Aprime_bench, Value_bench
-	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: Cons_exp, Hours_exp, Aprime_exp, Value_exp
 	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: CE_total, CE_c, CE_cl, CE_cd, CE_h, CE_hl, CE_hd
 	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: Value_aux
 	real(dp) :: C_bench, C_exp, H_bench, H_exp
@@ -19,6 +17,7 @@ Program Consumption_Equivalent
 	real(dp) :: CE_total_exp, CE_c_exp, CE_cl_exp, CE_cd_exp, CE_h_exp, CE_hl_exp, CE_hd_exp
 	real(dp) :: CE_total_NB_exp, CE_c_NB_exp, CE_cl_NB_exp, CE_cd_NB_exp, CE_h_NB_exp, CE_hl_NB_exp, CE_hd_NB_exp
 
+	print*, 'CE Program starting'
 	! Switch for solving benchmark or just reading resutls
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
@@ -200,7 +199,7 @@ Program Consumption_Equivalent
 	Print*,'Consumption Equivalent - Total'
 	PRINT*,''
 
-	CE_total = 100.0_dp*((Value_exp/Value_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+	CE_total = 100.0_dp*((ValueFunction_exp/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
 !====================================================================================================
 	PRINT*,''
@@ -213,11 +212,11 @@ Program Consumption_Equivalent
 
 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,Value_aux)
 
-	CE_c  = 100.0_dp*((Value_aux/Value_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+	CE_c  = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
 	CE_cl = 100_dp*(C_exp/C_bench - 1.0_dp)
 
-	CE_cd = 100.0_dp*((Value_aux/Value_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_bench/C_exp - 1.0_dp ) ;
+	CE_cd = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_bench/C_exp - 1.0_dp ) ;
 
 !====================================================================================================
 	PRINT*,''
@@ -236,11 +235,11 @@ Program Consumption_Equivalent
 	Hours   = Hours_exp
 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
 
-	CE_h  = 100.0_dp*((Value_exp/Value_aux)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+	CE_h  = 100.0_dp*((ValueFunction_exp/Value_aux)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
 	CE_hl = 100_dp*(((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
 
-	CE_hd = 100.0_dp*((ValueFunction/Value_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) &
+	CE_hd = 100.0_dp*((ValueFunction/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) &
 	        &  * ((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
 
 !====================================================================================================
@@ -256,13 +255,13 @@ Program Consumption_Equivalent
 	CE_hl_bench 	= sum(CE_hl*DBN_bench )
 	CE_hd_bench 	= sum(CE_hd*DBN_bench )
 
-	CE_total_NB_bench 	= sum(CE_total(1,:,:,:,:)*DBN_bench(1,:,:,:,:))/sum(DBN_bench(1,:,:,:,:))
-	CE_c_NB_bench 		= sum(CE_c(1,:,:,:,:)*DBN_bench(1,:,:,:,:))/sum(DBN_bench(1,:,:,:,:))
-	CE_cl_NB_bench 		= sum(CE_cl(1,:,:,:,:)*DBN_bench(1,:,:,:,:))/sum(DBN_bench(1,:,:,:,:))
-	CE_cd_NB_bench 		= sum(CE_cd(1,:,:,:,:)*DBN_bench(1,:,:,:,:))/sum(DBN_bench(1,:,:,:,:))
-	CE_h_NB_bench 		= sum(CE_h(1,:,:,:,:)*DBN_bench(1,:,:,:,:))/sum(DBN_bench(1,:,:,:,:))
-	CE_hl_NB_bench 		= sum(CE_hl(1,:,:,:,:)*DBN_bench(1,:,:,:,:))/sum(DBN_bench(1,:,:,:,:))
-	CE_hd_NB_bench 		= sum(CE_hd(1,:,:,:,:)*DBN_bench(1,:,:,:,:))/sum(DBN_bench(1,:,:,:,:))
+	CE_total_NB_bench 	= sum(CE_total(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_c_NB_bench 		= sum(CE_c(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_cl_NB_bench 		= sum(CE_cl(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_cd_NB_bench 		= sum(CE_cd(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_h_NB_bench 		= sum(CE_h(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_hl_NB_bench 		= sum(CE_hl(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_hd_NB_bench 		= sum(CE_hd(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
 
 	CE_total_exp 	= sum(CE_total*DBN_exp )
 	CE_c_exp 		= sum(CE_c*DBN_exp )
@@ -272,13 +271,13 @@ Program Consumption_Equivalent
 	CE_hl_exp 		= sum(CE_hl*DBN_exp )
 	CE_hd_exp 		= sum(CE_hd*DBN_exp )
 
-	CE_total_NB_exp 	= sum(CE_total(1,:,:,:,:)*DBN_exp(1,:,:,:,:))/sum(DBN_exp(1,:,:,:,:))
-	CE_c_NB_exp 		= sum(CE_c(1,:,:,:,:)*DBN_exp(1,:,:,:,:))/sum(DBN_exp(1,:,:,:,:))
-	CE_cl_NB_exp 		= sum(CE_cl(1,:,:,:,:)*DBN_exp(1,:,:,:,:))/sum(DBN_exp(1,:,:,:,:))
-	CE_cd_NB_exp 		= sum(CE_cd(1,:,:,:,:)*DBN_exp(1,:,:,:,:))/sum(DBN_exp(1,:,:,:,:))
-	CE_h_NB_exp 		= sum(CE_h(1,:,:,:,:)*DBN_exp(1,:,:,:,:))/sum(DBN_exp(1,:,:,:,:))
-	CE_hl_NB_exp 		= sum(CE_hl(1,:,:,:,:)*DBN_exp(1,:,:,:,:))/sum(DBN_exp(1,:,:,:,:))
-	CE_hd_NB_exp 		= sum(CE_hd(1,:,:,:,:)*DBN_exp(1,:,:,:,:))/sum(DBN_exp(1,:,:,:,:))
+	CE_total_NB_exp 	= sum(CE_total(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_c_NB_exp 		= sum(CE_c(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_cl_NB_exp 		= sum(CE_cl(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_cd_NB_exp 		= sum(CE_cd(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_h_NB_exp 		= sum(CE_h(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_hl_NB_exp 		= sum(CE_hl(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_hd_NB_exp 		= sum(CE_hd(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
 
 	OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'CE_output.txt'  , STATUS='replace')
 	WRITE (UNIT=1,  FMT=*) 'Benchmark - Aggregate'

@@ -62,7 +62,8 @@ GKK_Opt_Taxes.a: GKK_Optimal_Taxes.f90 $(Objects_Main) $(Objects_Opt_Tax)
 	time $(Folder)/GKK_Opt_Taxes.a
 
 CE_program.a: Consumption_Equivalent.f90 $(Objects_Main)
-	gfortran -I$(Folder) Consumption_Equivalent.f90 $(Objects_Main) -o $(Folder)/CE_program.a
+	gfortran $(omp_flag) -I$(Folder) Consumption_Equivalent.f90 $(Objects_Main) -o $(Folder)/CE_program.a
+	time $(Folder)/CE_program.a
 
 GKK_Simul.a: GKK_Simul.f90 NRTYPE.o $(Objects_Main)
 	gfortran -I$(Folder) GKK_Simul.f90 $(Objects_Main) -o $(Folder)/GKK_Simul.a
