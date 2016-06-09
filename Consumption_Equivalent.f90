@@ -209,8 +209,7 @@ Program Consumption_Equivalent
 				&	/sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
 				& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
-	CE2_pop_total = 100.0_dp*&
-				& ((sum(ValueFunction_exp*DBN_exp)/sum(ValueFunction_bench*DBN_bench)))&
+	CE2_pop_total = 100.0_dp*((sum(ValueFunction_exp*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
 				& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
 !====================================================================================================
