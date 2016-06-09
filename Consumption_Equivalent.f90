@@ -102,10 +102,11 @@ Program Consumption_Equivalent
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
+		call system( 'mkdir -p ' // trim(Result_Folder)//'CE_Files/' )
 		print*, "Results are stored in directory: ", Result_Folder
 
 	! Bench_Folder
-		Bench_Folder = Result_Folder//'Bench_Files/'
+		Bench_Folder = trim(Result_Folder)//'Bench_Files/'
 
 	! Initialize program and load functions
 		print*,"	Initializing program"
