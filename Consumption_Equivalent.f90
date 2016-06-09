@@ -11,6 +11,8 @@ Program Consumption_Equivalent
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
 	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: CE_total, CE_c, CE_cl, CE_cd, CE_h, CE_hl, CE_hd
 	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: Value_aux
+	real(dp) :: CE2_nb_total, CE2_nb_c, CE2_nb_cl, CE2_nb_cd, CE2_nb_h, CE2_nb_hl, CE2_nb_hd
+	real(dp) :: CE2_pop_total, CE2_pop_c, CE2_pop_cl, CE2_pop_cd, CE2_pop_h, CE2_pop_hl, CE2_pop_hd
 	real(dp) :: C_bench, C_exp, H_bench, H_exp
 	real(dp) :: CE_total_bench, CE_c_bench, CE_cl_bench, CE_cd_bench, CE_h_bench, CE_hl_bench, CE_hd_bench
 	real(dp) :: CE_total_NB_bench, CE_c_NB_bench, CE_cl_NB_bench, CE_cd_NB_bench, CE_h_NB_bench, CE_hl_NB_bench, CE_hd_NB_bench
@@ -202,6 +204,15 @@ Program Consumption_Equivalent
 
 	CE_total = 100.0_dp*((ValueFunction_exp/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
+	CE2_nb_total = 100.0_dp*&
+				& ((sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))&
+				&	/sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
+				& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+
+	CE2_pop_total = 100.0_dp*&
+				& ((sum(ValueFunction_exp*DBN_exp)/sum(ValueFunction_bench*DBN_bench)))&
+				& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+
 !====================================================================================================
 	PRINT*,''
 	Print*,'Consumption Equivalent - Consumption'
@@ -218,6 +229,24 @@ Program Consumption_Equivalent
 	CE_cl = 100_dp*(C_exp/C_bench - 1.0_dp)
 
 	CE_cd = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_bench/C_exp - 1.0_dp ) ;
+
+	CE2_nb_c  = 100.0_dp*((sum(Value_aux(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/&
+		&                  sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
+		&                  **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+
+	CE2_nb_cl = 100_dp*(C_exp/C_bench - 1.0_dp)
+
+	CE2_nb_cd = 100.0_dp*((sum(Value_aux(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/&
+		&				   sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
+		& 					**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_bench/C_exp - 1.0_dp ) ;
+
+	CE2_pop_c  = 100.0_dp*((sum(Value_aux*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
+		& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+
+	CE2_pop_cl = 100_dp*(C_exp/C_bench - 1.0_dp)
+
+	CE2_pop_cd = 100.0_dp*((sum(Value_aux*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
+		& **(1.0_dp/((1.0_dp-sigma)*gamma)) * C_bench/C_exp - 1.0_dp ) ;
 
 !====================================================================================================
 	PRINT*,''
@@ -241,6 +270,26 @@ Program Consumption_Equivalent
 	CE_hl = 100_dp*(((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
 
 	CE_hd = 100.0_dp*((ValueFunction/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) &
+	        &  * ((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
+
+	CE2_nb_h  = 100.0_dp*((sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/&
+			&				sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
+			& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+
+	CE2_nb_hl = 100_dp*(((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
+
+	CE2_nb_hd = 100.0_dp*((sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/&
+			& sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
+			& **(1.0_dp/((1.0_dp-sigma)*gamma)) &
+	        &  * ((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
+
+	CE2_pop_h  = 100.0_dp*((sum(ValueFunction_exp*DBN_exp)/sum(Value_aux*DBN_bench))&
+			& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+
+	CE2_pop_hl = 100_dp*(((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
+
+	CE2_pop_hd = 100.0_dp*((sum(ValueFunction*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
+			& **(1.0_dp/((1.0_dp-sigma)*gamma)) &
 	        &  * ((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
 
 !====================================================================================================
@@ -303,6 +352,16 @@ Program Consumption_Equivalent
 	WRITE (UNIT=1,  FMT=*) 'CE',CE_total_NB_exp, 'CE_c',CE_c_NB_exp,'CE_h',CE_h_NB_exp
 	WRITE (UNIT=1,  FMT=*) 'CE_c',CE_c_NB_exp,'CE_cl',CE_cl_NB_exp,'CE_cd',CE_cd_NB_exp
 	WRITE (UNIT=1,  FMT=*) 'CE_h',CE_h_NB_exp,'CE_hl',CE_hl_NB_exp,'CE_hd',CE_hd_NB_exp
+	WRITE (UNIT=1,  FMT=*)' '
+
+	WRITE (UNIT=1,  FMT=*) 'CE2 '	, 'NB '			, 'Pop '
+	WRITE (UNIT=1,  FMT=*) 'CE2'	, CE2_nb_total 	, CE2_pop_total
+	WRITE (UNIT=1,  FMT=*) 'CE2_c'	, CE2_nb_c 		, CE2_pop_c 		
+	WRITE (UNIT=1,  FMT=*) 'CE2_cl'	, CE2_nb_cl		, CE2_pop_cl
+	WRITE (UNIT=1,  FMT=*) 'CE2_cd'	, CE2_nb_cd 	, CE2_pop_cd
+	WRITE (UNIT=1,  FMT=*) 'CE2_h'	, CE2_nb_h 		, CE2_pop_h
+	WRITE (UNIT=1,  FMT=*) 'CE2_hl'	, CE2_nb_hl 	, CE2_pop_hl
+	WRITE (UNIT=1,  FMT=*) 'CE2_hd'	, CE2_nb_hd 	, CE2_pop_hl 
 	WRITE (UNIT=1,  FMT=*)' '
 
 	CLOSE (unit=1)
