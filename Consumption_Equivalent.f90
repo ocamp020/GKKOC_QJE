@@ -271,13 +271,13 @@ Program Consumption_Equivalent
 	CE_hd = 100.0_dp*((ValueFunction/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) &
 	        &  * ((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
 
-	CE2_nb_h  = 100.0_dp*((sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/&
+	CE2_nb_h  = 100.0_dp*((sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/&
 			&				sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
 			& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
 	CE2_nb_hl = 100_dp*(((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
 
-	CE2_nb_hd = 100.0_dp*((sum(ValueFunction(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/&
+	CE2_nb_hd = 100.0_dp*((sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/&
 			& sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
 			& **(1.0_dp/((1.0_dp-sigma)*gamma)) &
 	        &  * ((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
