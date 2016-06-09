@@ -100,7 +100,7 @@ Program Consumption_Equivalent
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Model_1.2/Opt_Tax_K/' 
+		Result_Folder = trim(Result_Folder)//'Model_1.2/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
@@ -328,7 +328,7 @@ Program Consumption_Equivalent
 	CE_hl_NB_exp 		= sum(CE_hl(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
 	CE_hd_NB_exp 		= sum(CE_hd(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
 
-	OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'CE_output_opt_tax_k.txt'  , STATUS='replace')
+	OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'CE_output.txt'  , STATUS='replace')
 	WRITE (UNIT=1,  FMT=*) 'Benchmark - Aggregate'
 	WRITE (UNIT=1,  FMT=*) 'CE',CE_total_bench, 'CE_c',CE_c_bench,'CE_h',CE_h_bench
 	WRITE (UNIT=1,  FMT=*) 'CE_c',CE_c_bench,'CE_cl',CE_cl_bench,'CE_cd',CE_cd_bench
