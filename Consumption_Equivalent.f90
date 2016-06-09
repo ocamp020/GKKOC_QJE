@@ -360,7 +360,7 @@ Program Consumption_Equivalent
 	WRITE (UNIT=1,  FMT=*) 'CE2_cd'	, CE2_nb_cd 	, CE2_pop_cd
 	WRITE (UNIT=1,  FMT=*) 'CE2_h'	, CE2_nb_h 		, CE2_pop_h
 	WRITE (UNIT=1,  FMT=*) 'CE2_hl'	, CE2_nb_hl 	, CE2_pop_hl
-	WRITE (UNIT=1,  FMT=*) 'CE2_hd'	, CE2_nb_hd 	, CE2_pop_hl 
+	WRITE (UNIT=1,  FMT=*) 'CE2_hd'	, CE2_nb_hd 	, CE2_pop_hd 
 	WRITE (UNIT=1,  FMT=*)' '
 
 	CLOSE (unit=1)
