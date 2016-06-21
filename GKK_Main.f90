@@ -87,7 +87,7 @@ PROGRAM main
 		beta   	= 0.9485_dp! 0.95_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
-		sigma_z_eps      =  0.08_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
+		sigma_z_eps      =  0.07_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
 		sigma_lambda_eps = params(5)
 		gamma  	=  0.470_dp !  0.471_dp ! params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
