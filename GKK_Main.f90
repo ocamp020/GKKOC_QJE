@@ -89,7 +89,7 @@ PROGRAM main
 		rho_z  	= 0.1_dp ! params(3) 
 		sigma_z_eps      =  0.072_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
 		sigma_lambda_eps = 0.32_dp ! params(5)
-		gamma  	=  0.47_dp !  0.471_dp ! params(6) ! 
+		gamma  	=  0.48_dp !  0.471_dp ! params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
 		
 		sigma  	= 4.0_dp
