@@ -57,7 +57,12 @@ Program Consumption_Equivalent
 		Threshold_Factor = 0.00_dp 
 
 	! Set Parameters 
-		Params =[ 0.9485_dp, 0.00_dp, 0.1_dp, 0.0665_dp, 0.29_dp,0.470_dp] ! tauL=0.224, tauC=0.075 calibration
+		! Present value calibration
+		Params =[ 0.9485_dp, 0.00_dp, 0.1_dp, 0.0665_dp, 0.29_dp , 0.470_dp] ! tauL=0.224, tauC=0.075 calibration
+		! Book value calibration
+		Params =[ 0.9475_dp, 0.00_dp, 0.1_dp, 0.072_dp , 0.305_dp, 0.46_dp ] ! tauL=0.224, tauC=0.075 calibration
+		
+
 		beta   = params(1)
 		mu_z   = params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  = params(3) 
@@ -100,7 +105,7 @@ Program Consumption_Equivalent
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Model_1.2/' 
+		Result_Folder = trim(Result_Folder)//'Model_1.2_bv/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
