@@ -6197,6 +6197,10 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		WRITE (UNIT=12, FMT=*) tauW_at
 		CLOSE (UNIT=12)
 
+		OPEN  (UNIT=12, FILE=trim(bench_folder)//'SSC_Payments'  , STATUS='replace')
+		WRITE (UNIT=12, FMT=*) SSC_Payments
+		CLOSE (UNIT=12)
+
 		print*, "Writing of benchmark results completed"
 	ELSE 
 		OPEN (UNIT=1,  FILE=trim(bench_folder)//'cons'  , STATUS='old', ACTION='read')
@@ -6222,6 +6226,8 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN (UNIT=19, FILE=trim(bench_folder)//'v_pr'    , STATUS='old', ACTION='read')
 		! OPEN (UNIT=20, FILE=trim(bench_folder)//'v_pr_nb' , STATUS='old', ACTION='read')		
 
+		OPEN (UNIT=21, FILE=trim(bench_folder)//'SSC_Payments' , STATUS='old', ACTION='read')
+
 		READ (UNIT=1,  FMT=*), cons
 		READ (UNIT=2,  FMT=*), aprime
 		READ (UNIT=3,  FMT=*), hours
@@ -6244,11 +6250,13 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 
 		READ (UNIT=19, FMT=*), V_Pr
 		! READ (UNIT=20, FMT=*), V_Pr_nb
+		READ (UNIT=21, FMT=*), SSC_Payments
 
 		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=5)
 		CLOSE (unit=60); CLOSE (unit=7); CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10)
 		CLOSE (unit=11); CLOSE (unit=12); CLOSE (unit=13); CLOSE (unit=14); CLOSE (unit=15)
 		CLOSE (unit=16); CLOSE (unit=17); CLOSE (unit=18); CLOSE (unit=19); !CLOSE (unit=20)
+		CLOSE (unit=21)
 
 		print*, "Reading of benchmark results completed"
 	END IF 

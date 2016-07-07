@@ -151,17 +151,17 @@ elseif X_Switch==1.1
         Tables_file     = 'Tables_Presentation_Model_11.xls' ;
     
 elseif X_Switch==1.2
-   mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M1.2/')
-    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M1.2/'
-        Result_Folder = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2/') ;
-        Simul_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2/Simul/') ;
-        Bench_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2/Bench_Files/') ;
-        Exp_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2/Exp_Files/') ;
-        Top_Folder    = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2/Simul/Top_A/') ;
-        mkdir('theta_2.5/presentation')
-        mkdir('theta_2.5/presentation/png')
-        cd 'theta_2.5/presentation'
-        Tables_file     = 'Tables_Presentation_Model_12.xls' ;
+   mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M1.2_bv/')
+    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M1.2_bv/'
+        Result_Folder = strcat('../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/') ;
+        Simul_Folder  = strcat('../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/') ;
+        Bench_Folder  = strcat('../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Bench_Files/') ;
+        Exp_Folder  = strcat('../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Exp_Files/') ;
+        Top_Folder    = strcat('../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/Top_A/') ;
+        mkdir('presentation')
+        mkdir('presentation/png')
+        cd 'presentation'
+        Tables_file     = 'Tables_Presentation_Model_12_bv.xls' ;
     
 elseif X_Switch==2.1
     mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/')
@@ -319,7 +319,7 @@ end
     status = xlwrite(Tables_file,Mat,'Ret_Prc_age_group') ;
     
 %% Change in composition of top X% by Z
-    Switch_PV = 1;
+    Switch_PV = 0;
 
     % Load PV wealth and Z
         eval(['load ',Simul_Folder,'panelz_bench']) ; eval(['load ',Simul_Folder,'panelx_bench']) ; 
@@ -337,7 +337,7 @@ end
         prc_W = prctile(Wealth_W,[50 90 95 99]);
     % Get composition by top x%
         ii = 1;
-        for i=numel(prc_PV_K):-1:1
+        for i=numel(prc_K):-1:1
             ind_K = Wealth_K>=prc_K(i) ;
             ind_W = Wealth_W>=prc_W(i) ;
             for z=1:n_z
@@ -361,7 +361,7 @@ end
         
    % Composition by xz
         ii = 1;
-        for i=numel(prc_PV_K):-1:1
+        for i=numel(prc_K):-1:1
             ind_K = Wealth_K>=prc_K(i) ;
             ind_W = Wealth_W>=prc_W(i) ;
             xz = 1 ;
@@ -479,31 +479,31 @@ end
 % The formulas are in page 139.
 
     % Benchmark
-        eval(['load ',Simul_Folder,'panelPV_a_bench']) ; 
-        N  = numel(panelPV_a_bench) ;
-        mu_g = mean(panelPV_a_bench)  ;
-        panela_bench_sort = sort(panelPV_a_bench,'descend') ;
+        eval(['load ',Simul_Folder,'panela_bench']) ; 
+        N  = numel(panela_bench) ;
+        mu_g = mean(panela_bench)  ;
+        panela_bench_sort = sort(panela_bench,'descend') ;
         index = 1:N ;
         G_bench = (N+1)/(N-1) - 2*sum(panela_bench_sort.*index)/(mu_g*N*(N-1)) ;
     % Experiment 
-        eval(['load ',Simul_Folder,'panelPV_a_exp']) ; 
-        N  = numel(panelPV_a_exp) ;
-        mu_g = mean(panelPV_a_exp)  ;
-        panela_exp_sort = sort(panelPV_a_exp,'descend') ;
+        eval(['load ',Simul_Folder,'panela_exp']) ; 
+        N  = numel(panela_exp) ;
+        mu_g = mean(panela_exp)  ;
+        panela_exp_sort = sort(panela_exp,'descend') ;
         index = 1:N ;
         G_exp = (N+1)/(N-1) - 2*sum(panela_exp_sort.*index)/(mu_g*N*(N-1)) ;
     % Optimal Tau K
-        eval(['load ',Result_Folder,'Opt_Tax_K/Simul/','panelPV_a_exp']) ; 
-        N  = numel(panelPV_a_exp) ;
-        mu_g = mean(panelPV_a_exp)  ;
-        panela_exp_sort = sort(panelPV_a_exp,'descend') ;
+        eval(['load ',Result_Folder,'Opt_Tax_K/Simul/','panela_exp']) ; 
+        N  = numel(panela_exp) ;
+        mu_g = mean(panela_exp)  ;
+        panela_exp_sort = sort(panela_exp,'descend') ;
         index = 1:N ;
         G_opt_K = (N+1)/(N-1) - 2*sum(panela_exp_sort.*index)/(mu_g*N*(N-1)) ;
     % Optimal Tau W
-        eval(['load ',Result_Folder,'Opt_Tax_W/Simul/','panelPV_a_exp']) ; 
-        N  = numel(panelPV_a_exp) ;
-        mu_g = mean(panelPV_a_exp)  ;
-        panela_exp_sort = sort(panelPV_a_exp,'descend') ;
+        eval(['load ',Result_Folder,'Opt_Tax_W/Simul/','panela_exp']) ; 
+        N  = numel(panela_exp) ;
+        mu_g = mean(panela_exp)  ;
+        panela_exp_sort = sort(panela_exp,'descend') ;
         index = 1:N ;
         G_opt_W = (N+1)/(N-1) - 2*sum(panela_exp_sort.*index)/(mu_g*N*(N-1)) ;
 
@@ -539,8 +539,8 @@ end
     % Bench Files
         eval(['load ',Bench_Folder,'EBAR'])         ; EBAR_bench = EBAR*0.727853584919652 ;
         
-            eval(['load ',Simul_Folder,'panelPV_a_bench']) ; 
-            wealth_bench = EBAR_data/EBAR_bench * sort(panelPV_a_bench) ;
+            eval(['load ',Simul_Folder,'panela_bench']) ; 
+            wealth_bench = EBAR_data/EBAR_bench * sort(panela_bench) ;
         
     % Pareto Tail
         w_min = [1 1000000];
@@ -619,10 +619,10 @@ clear panela_bench panelPV_a_bench wealth_bench y_bench x_bench
         % 9. %Y , 10. wage, 11. VBAR, 12. CE2_NB, 13. CE2, 14. KBAR/Y, 
         % 15. Top1%, 16. Top10%, 17. std(log(E)), 18. Av. Hours
     aa = Stats_by_tau_k(:,4) ;
-    aa = aa*0.16004634619224012/(0.16004634619224012+0.12643367375356479);
+    aa = aa*0.16316577543219390/(0.16316577543219390+0.12869127919744788);
     Stats_by_tau_k(:,4) = aa ;
     aa = Stats_by_tau_w(:,4) ;
-    aa = aa*0.16004634619224012/(0.16004634619224012+0.12643367375356479);
+    aa = aa*0.16316577543219390/(0.16316577543219390+0.12869127919744788);
     Stats_by_tau_w(:,4) = aa ;
     
   
@@ -633,21 +633,21 @@ clear panela_bench panelPV_a_bench wealth_bench y_bench x_bench
     % KBAR & QBAR graph
         figure;
         hold on
-        plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,5)/Stats_by_tau_k(26,5)-1),'r', 'linewidth',2)
-        plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,5)/Stats_by_tau_w(26,5)-1),'b', 'linewidth',2)
+        plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,5)/Stats_by_tau_k(41,5)-1),'r', 'linewidth',2)
+        plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,5)/Stats_by_tau_w(41,5)-1),'b', 'linewidth',2)
         xlabel('Tax Revenue from K / Total Tax Revenue')
         ylabel('Percent Change')
         h = legend('$\bar k, \tau_k$' , '$\bar k, \tau_a$','Location','SouthWest');
         set(h,'Interpreter','latex','FontSize',20)
         grid on
-        axis([min(G_K_Frac_k) max(G_K_Frac_k)  -40 20 ])
+        axis([min(G_K_Frac_k) max(G_K_Frac_k)  -40 40 ])
 
         hgsave('1.1fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
         print -dpdf 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.pdf
         print -dps 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
 
-        plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,6)/Stats_by_tau_k(26,6)-1),'-dr', 'linewidth',1.5)
-        plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,6)/Stats_by_tau_w(26,6)-1),'-db', 'linewidth',1.5)
+        plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,6)/Stats_by_tau_k(41,6)-1),'-dr', 'linewidth',1.5)
+        plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,6)/Stats_by_tau_w(41,6)-1),'-db', 'linewidth',1.5)
         h2 = legend('$\bar k, \tau_k$' , '$\bar k, \tau_a$','$\bar Q, \tau_k$' , '$\bar Q, \tau_a$','Location','SouthWest');
         set(h2,'Interpreter','latex','FontSize',20)
 
@@ -655,8 +655,8 @@ clear panela_bench panelPV_a_bench wealth_bench y_bench x_bench
         print -dpdf 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.pdf
         print -dps 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.eps
 
-CE2_NB_k =100*( (Stats_by_tau_k(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigma)))-1);
-CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigma)))-1);
+CE2_NB_k =100*( (Stats_by_tau_k(:,11)./Stats_by_tau_k(41+25,11)).^(1/(gamma*(1-sigma)))-1);
+CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(41+25,11)).^(1/(gamma*(1-sigma)))-1);
 % Burhan's graphs on welfare by tau
     [x,tauindx ] = min(abs(Stats_by_tau_k(:,1) - 0.25)) ;
 
@@ -666,31 +666,31 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigm
       'FontSize',14);
     hold on
     plot(G_K_Frac_k, (CE2_NB_k-CE2_NB_k(tauindx)),'r', 'linewidth',2)
-    plot(G_K_Frac_k, zeros(size(G_K_Frac_k)),'k--', 'linewidth',2)
+    plot(G_K_Frac_w, zeros(size(G_K_Frac_k)),'k--', 'linewidth',2)
     grid on
     xlabel('Tax Revenue from K / Total Tax Revenue')
     ylabel('$CE_2$ Welfare Change from \textbf{Benchmark}','Interpreter','latex')
     plot(G_K_Frac_k(tauindx)*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 0],'k--', 'linewidth',2)
-    axis([min(G_K_Frac_k) max(G_K_Frac_k)  min(CE2_NB_k-CE2_NB_k(tauindx))-1 max(CE2_NB_w-CE2_NB_k(tauindx))+1 ])
+    axis([min(G_K_Frac_k) max(G_K_Frac_w)  min(CE2_NB_k-CE2_NB_k(tauindx))-1 max(CE2_NB_w-CE2_NB_k(tauindx))+1 ])
     
-    annotation('textarrow',[0.57 0.62],[0.51 0.54], 'string','Cap. Income Tax Economy','linewidth',2,'FontSize',12)
-    annotation('textarrow',[0.67 0.72],[0.39 0.44], 'string','Benchmark, \tau_k = 25%','linewidth',2,'FontSize',12)
-    annotation('textarrow',[0.54+0.127 0.59+0.127],[0.17 0.12], 'string','0.25','linewidth',2,'FontSize',12)
+    annotation('textarrow',[0.52 0.57],[0.54 0.56], 'string','Cap. Income Tax Economy','linewidth',2,'FontSize',12)
+    annotation('textarrow',[0.63 0.68],[0.36 0.41], 'string','Benchmark, \tau_k = 25%','linewidth',2,'FontSize',12)
+    annotation('textarrow',[0.51+0.127 0.56+0.127],[0.17 0.12], 'string','0.25','linewidth',2,'FontSize',12)
 
 
     hgsave('1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
     print -dpdf 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
     print -dps 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
-%     plot(-0.1812*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
-    annotation('textarrow',[0.24 0.21],[0.73 0.69], 'string','Opt. \tau_k = -18.3%','linewidth',2,'FontSize',12)
+%     plot(-0.3416*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
+    annotation('textarrow',[0.21 0.18],[0.76 0.72], 'string','Opt. \tau_k = -34.4%','linewidth',2,'FontSize',12)
     hgsave('1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
     print -dpdf 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
     print -dps 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
     plot(G_K_Frac_w, (CE2_NB_w-CE2_NB_k(tauindx)),'b', 'linewidth',2)
-%     plot(0.3564*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
-    annotation('textarrow',[0.83 0.86],[0.81 0.86], 'string','Opt. \tau_a = 2.64%','linewidth',2,'FontSize',12)
+%     plot(0.4107*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 10],'k--', 'linewidth',2)
+    annotation('textarrow',[0.80 0.83],[0.82 0.87], 'string','Opt. \tau_a = 3.06%','linewidth',2,'FontSize',12)
 
 
     hgsave('1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
