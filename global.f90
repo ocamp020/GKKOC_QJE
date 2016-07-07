@@ -67,7 +67,7 @@ MODULE global
  
  	! Aggregate variables
 	 	! Benchmark values of Q, N, E, Wage, R, G, Y
-	    REAL(DP) :: QBAR_bench, NBAR_bench, Ebar_bench, wage_bench, P_bench, GBAR_bench, Y_bench, W_bench, R_bench
+	    REAL(DP) :: QBAR_bench, NBAR_bench, Ebar_bench, wage_bench, P_bench, GBAR_bench, Y_bench, W_bench, R_bench, SSC_Payments_bench
 	    ! Experiment values of Q, N, E, Wage, R, G, Y
 	    REAL(DP) :: QBAR_exp,   NBAR_exp,   Ebar_exp,   wage_exp,   P_exp,   GBAR_exp, GBAR_exp_old, Y_exp, R_exp
 	    ! Values for aggregate variables (used when solving a given economy)
