@@ -55,7 +55,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
+			compute_bench = .true.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
@@ -78,15 +78,15 @@ PROGRAM main
 		Progressive_Tax_Switch = .false.
 
 	! Set Parameters
-		Params =[0.962_dp, 0.0_dp, 0.50_dp, 0.387_dp, 0.29_dp, 0.4494_dp] ! alpha=0.4, zgrid 11, m5, alpha=0.4, dep005, mu=090, K/Y=3, Top1PVa=0.36
+		! Calibration to book value and rho_z=0.1
+		Params =[ 0.9475_dp, 0.00_dp, 0.1_dp, 0.072_dp , 0.305_dp, 0.46_dp ] ! tauL=0.224, tauC=0.075 calibration
+		! Calibration to book value and rho_z=0.2
+		Params =[ 0.9475_dp, 0.00_dp, 0.2_dp, 0.072_dp , 0.305_dp, 0.46_dp ] ! tauL=0.224, tauC=0.075 calibration
 
-		! New Exponential Shock that only affects high Z and includes Z-varying theta 2.5
-		! beta 		sigmaz 		x_hi 	rho_z 	gamma
-		! 0.9485_dp 0.0665_dp  	5.00_dp 0.1_dp 	0.470_dp
 
 		beta   	= 0.9475_dp! 0.95_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
-		rho_z  	= 0.1_dp ! params(3) 
+		rho_z  	= 0.2_dp ! params(3) 
 		sigma_z_eps      =  0.072_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
 		sigma_lambda_eps = 0.305_dp ! params(5)
 		gamma  	=  0.46_dp !  0.471_dp ! params(6) ! 
@@ -139,7 +139,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Model_1.2_bv/' 
+		Result_Folder = trim(Result_Folder)//'Model_1.2_bv_rho2/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
