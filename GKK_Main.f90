@@ -55,8 +55,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
-			compute_exp   = .true.
+			compute_bench = .false.
+			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Simul_Switch  = .true.
@@ -83,7 +83,7 @@ PROGRAM main
 		! Calibration to book value and rho_z=0.2
 		Params =[ 0.9472_dp, 0.00_dp, 0.2_dp, 0.070_dp , 0.307_dp, 0.46_dp ] 
 		! Calibration to book value and rho_z=0.3
-		Params =[ 0.9472_dp, 0.00_dp, 0.3_dp, 0.070_dp , 0.307_dp, 0.46_dp ] 
+		Params =[ 0.947_dp, 0.00_dp, 0.3_dp, 0.070_dp , 0.307_dp, 0.46_dp ] 
 
 
 		beta   	= 0.947_dp! 0.95_dp ! params(1) !
