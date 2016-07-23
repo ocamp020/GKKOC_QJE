@@ -2557,6 +2557,7 @@ SUBROUTINE COMPUTE_STATS()
 	! This is only for agents with positive hours worked
 		Frisch_Elasticity = 0.0_dp
 		Size_Frisch       = 0.0_dp 
+		Frisch_Aux        = 0.0_dp 
 		DO xi=1,nx
 		DO ei=1, ne
 		DO lambdai=1,nlambda
@@ -2567,6 +2568,7 @@ SUBROUTINE COMPUTE_STATS()
 			Size_Frisch = Size_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)
 			Frisch_Elasticity = Frisch_Elasticity + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
 			& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
+			Frisch_Aux = Frisch_Aux + DBN1(age,ai,zi,lambdai,ei,xi)*(1-HOURS(age,ai,zi,lambdai,ei,xi))/HOURS(age,ai,zi,lambdai,ei,xi)
 			endif 
 		ENDDO
 		ENDDO
@@ -2575,6 +2577,10 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO
 		ENDDO
 		Frisch_Elasticity = Frisch_Elasticity/Size_Frisch
+		Frisch_Aux		  = (1.0_dp-(1.0_dp-sigma)*gamma)/sigma*Frisch_Aux/Size_Frisch
+		print*,' '
+		print*,'Frisch Elasiticity'
+		print*,Frisch_Elasticity,Frisch_Aux,Size_Frisch
 		
 
 
