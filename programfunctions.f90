@@ -1607,7 +1607,6 @@ END SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR
 
 SUBROUTINE GOVNT_BUDGET()
 	IMPLICIT NONE
-	real(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C
 
 	! Initialize variables
 	GBAR 		 = 0.0_DP
@@ -1616,6 +1615,7 @@ SUBROUTINE GOVNT_BUDGET()
 	GBAR_L 		 = 0.0_DP
 	GBAR_C       = 0.0_DP
 	SSC_Payments = 0.0_DP
+	Tot_Lab_Inc  = 0.0_DP
 
 	! Compute total expenditure = total revenue
 		! For each state accumulate tax income weighted by equilibrium distribution
@@ -1643,7 +1643,7 @@ SUBROUTINE GOVNT_BUDGET()
 
       	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei,xi) * tauC * cons(age, ai, zi, lambdai,ei,xi)
 
-	    
+	    Tot_Lab_Inc = Tot_Lab_Inc + DBN1(age,ai,zi,lambdai,ei,xi) * yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi) 
 	ENDDO
 	ENDDO
 	ENDDO
@@ -1680,18 +1680,25 @@ SUBROUTINE GOVNT_BUDGET()
 	print*, 'Tau_K=', tauK, 'Tau_W_bt=', tauW_bt, 'Tau_W_at=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
 	print*, 'Tax Revenue over GDP', (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
 	print*, 'Capital Tax / Total Tax', GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+	print*, 'Labor Tax / Total Tax', GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+	print*, 'Labor Tax / GDP', GBAR_L/YBAR
+	print*, 'Average Labor Tax', GBAR_L/Tot_Lab_Inc
 	print*, ' '
 
 	if (solving_bench.eq.1) then 
-		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Govnt_Budget_Bench.txt', STATUS='replace')
-		WRITE(UNIT=11, FMT=*) ' '
-		WRITE(UNIT=11, FMT=*) "Government Budget - Revenues and taxes"
-		WRITE(UNIT=11, FMT=*) 'GBAR=',GBAR,'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=', GBAR_L/Ebar 
-		WRITE(UNIT=11, FMT=*) 'GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C
-		WRITE(UNIT=11, FMT=*) 'Tau_K=', tauK, 'Tau_W=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
-		WRITE(UNIT=11, FMT=*) 'Tax Revenue over GDP', (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
-		WRITE(UNIT=11, FMT=*) 'Capital Tax / Total Tax', GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
-		Close(UNIT=11)
+	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Govnt_Budget_Bench.txt', STATUS='replace')
+	WRITE(UNIT=11, FMT=*) ' '
+	WRITE(UNIT=11, FMT=*) "Government Budget - Revenues and taxes"
+	WRITE(UNIT=11, FMT=*) 'GBAR=',GBAR,'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=', GBAR_L/Ebar 
+	WRITE(UNIT=11, FMT=*) 'GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C
+	WRITE(UNIT=11, FMT=*) 'Tau_K=', tauK, 'Tau_W=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
+	WRITE(UNIT=11, FMT=*) 'Tax Revenue over GDP', (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
+	WRITE(UNIT=11, FMT=*) 'Capital Tax / Total Tax', GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+	WRITE(UNIT=11, FMT=*) 'Capital Tax / GDP', GBAR_K/YBAR
+	WRITE(UNIT=11, FMT=*) 'Labor Tax / Total Tax', GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+	WRITE(UNIT=11, FMT=*) 'Labor Tax / GDP', GBAR_L/YBAR
+	WRITE(UNIT=11, FMT=*) 'Average Labor Tax 2', GBAR_L/Tot_Lab_Inc
+	Close(UNIT=11)
 	endif 
 END  SUBROUTINE GOVNT_BUDGET
 
@@ -2474,6 +2481,20 @@ SUBROUTINE COMPUTE_STATS()
 			CLOSE(UNIT=11)
 
 	! Distribution of bequest
+		Bequest_Wealth=0.0_DP
+		DO xi=1,nx
+		DO zi=1,nz
+		DO ai=1,na
+		DO lambdai=1,nlambda
+		DO ei=1, ne
+		   Bequest_Wealth = Bequest_Wealth  +   DBN1(1, ai, zi, lambdai, ei, xi) * agrid(ai)
+		ENDDO
+		ENDDO
+		ENDDO    
+		ENDDO 
+		ENDDO  
+
+
 		! Distribution of bequest (matrix)	
 		do ai=1,MaxAge
 			DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
@@ -2494,8 +2515,8 @@ SUBROUTINE COMPUTE_STATS()
 		end if 
 			WRITE(UNIT=11, FMT=*) ' '
 			WRITE(UNIT=11, FMT=*) 'Bequest_Stats'
-			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/Wealth= '		, Mean_Bequest/MeanWealth 
-			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/PV_Wealth= '	, Mean_Bequest/Mean_Firm_Wealth 
+			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/Wealth= '		, Bequest_Wealth/MeanWealth 
+			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/PV_Wealth= '	, Bequest_Wealth/Mean_Firm_Wealth 
 			WRITE(UNIT=11, FMT=*) 'Bequests_Above_Threshold= '	, Threshold_Share_bq
 			WRITE(UNIT=11, FMT=*) 'Bequest_Revenue/YBAR= '		, 0
 			WRITE(UNIT=11, FMT=*) 'Top_x% ','x_percentile ','x_percentile/YBAR'
@@ -2528,6 +2549,30 @@ SUBROUTINE COMPUTE_STATS()
 		enddo 
 
 			CLOSE(UNIT=11)
+
+
+	! Frisch Elasticity 
+	! This is only for agents with positive hours worked
+		Frisch_Elasticity = 0.0_dp
+		Size_Frisch       = 0.0_dp 
+		DO xi=1,nx
+		DO ei=1, ne
+		DO lambdai=1,nlambda
+		DO zi=1,nz
+		DO ai=1,na
+		DO age=1,RetAge-1
+			if (HOURS(age,ai,zi,lambdai,ei,xi).gt.0.0_dp) then 
+			Size_Frisch = Size_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)
+			Frisch_Elasticity = Frisch_Elasticity + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
+			& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
+			endif 
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		Frisch_Elasticity = Frisch_Elasticity/Size_Frisch
 		
 
 
@@ -6053,7 +6098,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) "Debt_Output"		  		, External_Debt_GDP
 			WRITE(UNIT=19, FMT=*) "Wealth_Output"		  	, Wealth_Output
 			WRITE(UNIT=19, FMT=*) "Mean_Assets"				, MeanWealth
-			WRITE(UNIT=19, FMT=*) "Bequest_Wealth"	        , Mean_Bequest/MeanWealth 
+			WRITE(UNIT=19, FMT=*) "Bequest_Wealth"	        , Bequest_Wealth/MeanWealth 
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_1%' 	, prct1_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_10%'	, prct10_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_20%'	, prct20_wealth
@@ -6078,17 +6123,21 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_40%'		, FW_top_x_share(1)
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Bequest'
-			WRITE(UNIT=19, FMT=*) 'Mean_Bequest/Wealth='	, Mean_Bequest/MeanWealth 
-			WRITE(UNIT=19, FMT=*) 'Mean_Bequest/PV_Wealth='	, Mean_Bequest/Mean_Firm_Wealth 
-			WRITE(UNIT=19, FMT=*) 'BQ_Above_Threshold='		, Threshold_Share_bq
-			WRITE(UNIT=19, FMT=*) 'Bequest_Revenue/YBAR='	, 0
-			WRITE(UNIT=19, FMT=*) 'BQ_p10/YBAR'				, BQ_top_x(1)/YBAR
-			WRITE(UNIT=19, FMT=*) 'BQ_p30/YBAR'				, BQ_top_x(2)/YBAR
-			WRITE(UNIT=19, FMT=*) 'BQ_p50/YBAR'				, BQ_top_x(3)/YBAR
-			WRITE(UNIT=19, FMT=*) 'BQ_p70/YBAR'				, BQ_top_x(4)/YBAR
-			WRITE(UNIT=19, FMT=*) 'BQ_p90/YBAR'				, BQ_top_x(5)/YBAR
-			WRITE(UNIT=19, FMT=*) 'BQ_p98/YBAR'				, BQ_top_x(6)/YBAR
-			WRITE(UNIT=19, FMT=*) 'BQ_p99/YBAR'				, BQ_top_x(7)/YBAR
+			WRITE(UNIT=19, FMT=*) 'Mean_Bequest/Wealth'	, Bequest_Wealth/MeanWealth 
+			WRITE(UNIT=19, FMT=*) 'Mean_Bequest/PV_Wealth'	, Bequest_Wealth/Mean_Firm_Wealth 
+			WRITE(UNIT=19, FMT=*) ' '
+			WRITE(UNIT=19, FMT=*) 'Labor'
+			WRITE(UNIT=19, FMT=*) 'Fraction_of_workers'	, Size_Frisch/sum(DBN1(1:RetAge-1,:,:,:,:,:))
+			WRITE(UNIT=19, FMT=*) 'Frisch_Elasticity'	   , Frisch_Elasticity
+			WRITE(UNIT=19, FMT=*) ' '
+			WRITE(UNIT=19, FMT=*) 'Taxes'
+			WRITE(UNIT=19, FMT=*) 'Tax_Rev/GDP'	, (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
+			WRITE(UNIT=19, FMT=*) 'Capital_Tax/Total_Tax'	, GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+			WRITE(UNIT=19, FMT=*) 'Capital_Tax/_GDP'	, GBAR_K/YBAR
+			WRITE(UNIT=19, FMT=*) 'Labor_Tax/Total_Tax'	, GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+			WRITE(UNIT=19, FMT=*) 'Labor_Tax/GDP'	, GBAR_L/YBAR
+			WRITE(UNIT=19, FMT=*) 'Average_Labor_Tax'	, GBAR_L/Tot_Lab_Inc
+			WRITE(UNIT=19, FMT=*) ' '
 		CLOSE(Unit=19)
 	if (bench_indx.ne.1) then
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='old', POSITION='append') 

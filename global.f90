@@ -155,5 +155,11 @@ MODULE global
 
 	! top certain percentiles of the PV_a distribution
     REAL(DP) :: FW_top_x_share(6) 
+
+    ! Frisch Elasticity
+    real(DP) :: Frisch_Elasticity, Size_Frisch
+
+    ! Extra tax information
+    real(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, Tot_Lab_Inc
    
 END MODULE global
