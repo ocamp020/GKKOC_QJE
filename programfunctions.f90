@@ -2571,7 +2571,7 @@ SUBROUTINE COMPUTE_STATS()
 			Frisch_Elasticity = Frisch_Elasticity + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
 			& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
 			Frisch_Aux = Frisch_Aux + DBN1(age,ai,zi,lambdai,ei,xi)*(1-HOURS(age,ai,zi,lambdai,ei,xi))/HOURS(age,ai,zi,lambdai,ei,xi)
-			if (HOURS(age,ai,zi,lambdai,ei,xi).lt.0.001_dp) then 
+			if (HOURS(age,ai,zi,lambdai,ei,xi).gt.0.4_dp) then 
 			Frisch_Aux_2 = Frisch_Aux_2 + DBN1(age,ai,zi,lambdai,ei,xi)
 			endif 
 			endif 
