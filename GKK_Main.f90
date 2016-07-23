@@ -265,6 +265,13 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	else
 		print*,"	Reading benchmark results from files"
 		CALL Write_Benchmark_Results(compute_bench)
+		CALL Write_Benchmark_Results(compute_bench)
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		K_mat  = K_Matrix(R,P)
+		Pr_mat = Profit_Matrix(R,P)
+		CALL ComputeLaborUnits(EBAR,wage)
+		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		CALL GOVNT_BUDGET
 	end if 
 		print*,"	Computing satitics"
 		CALL COMPUTE_STATS
@@ -415,6 +422,12 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	endif 
 	
 	CALL Write_Experimental_Results(compute_exp)
+	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+	K_mat  = K_Matrix(R,P)
+	Pr_mat = Profit_Matrix(R,P)
+	CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+	CALL ComputeLaborUnits(EBAR,wage)
+	CALL GOVNT_BUDGET
 
 
 	! Aggregate variable in experimental economy
