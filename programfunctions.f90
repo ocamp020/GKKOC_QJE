@@ -2047,6 +2047,7 @@ SUBROUTINE COMPUTE_STATS()
 	character(100) :: rowname
 	integer , dimension(max_age_category+1) :: age_limit
 	real(DP), dimension(MaxAge,na,nz,nlambda,ne,nx) :: Labor_Income, Total_Income, K_L_Income, K_T_Income
+	real(DP) :: Frisch_Aux
 
 	!$ call omp_set_num_threads(20)
 
