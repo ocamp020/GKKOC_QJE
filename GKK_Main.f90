@@ -265,7 +265,6 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	else
 		print*,"	Reading benchmark results from files"
 		CALL Write_Benchmark_Results(compute_bench)
-		CALL Write_Benchmark_Results(compute_bench)
 		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		K_mat  = K_Matrix(R,P)
 		Pr_mat = Profit_Matrix(R,P)
