@@ -2570,10 +2570,12 @@ SUBROUTINE COMPUTE_STATS()
 			Size_Frisch = Size_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)
 			Frisch_Elasticity = Frisch_Elasticity + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
 			& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
-			Frisch_Aux = Frisch_Aux + DBN1(age,ai,zi,lambdai,ei,xi)*(1-HOURS(age,ai,zi,lambdai,ei,xi))/HOURS(age,ai,zi,lambdai,ei,xi)
-			
-			Frisch_Aux_2 = Frisch_Aux_2 + DBN1(age,ai,zi,lambdai,ei,xi)*HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi))
-			
+			! Frisch_Aux = Frisch_Aux + DBN1(age,ai,zi,lambdai,ei,xi)*(1-HOURS(age,ai,zi,lambdai,ei,xi))/HOURS(age,ai,zi,lambdai,ei,xi)
+			if (HOURS(age,ai,zi,lambdai,ei,xi).gt.0.1_dp) then 
+			Frisch_Aux = Frisch_Aux + DBN1(age,ai,zi,lambdai,ei,xi)
+			Frisch_Aux_2 = Frisch_Aux_2 + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
+			& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
+			endif 
 			endif 
 		ENDDO
 		ENDDO
@@ -2583,7 +2585,7 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO
 		Frisch_Elasticity = Frisch_Elasticity/Size_Frisch
 		Frisch_Aux		  = Frisch_Aux/Size_Frisch
-		Frisch_Aux_2      = Frisch_Aux_2/Size_Frisch
+		Frisch_Aux_2      = Frisch_Aux_2/Frisch_Aux
 		print*,' '
 		print*,'Frisch Elasiticity'
 		print*,Frisch_Elasticity,Frisch_Aux,Frisch_Aux_2,Size_Frisch
