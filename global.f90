@@ -157,7 +157,7 @@ MODULE global
     REAL(DP) :: FW_top_x_share(6) 
 
     ! Frisch Elasticity
-    real(DP) :: Frisch_Elasticity, Size_Frisch
+    real(DP) :: Frisch_Elasticity, Size_Frisch, Hours_Frisch, Frisch_Elasticity_2
 
     ! Extra tax information
     real(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, Tot_Lab_Inc

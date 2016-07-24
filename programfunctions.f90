@@ -2558,25 +2558,19 @@ SUBROUTINE COMPUTE_STATS()
 	! This is only for agents with positive hours worked
 		Frisch_Elasticity = 0.0_dp
 		Size_Frisch       = 0.0_dp 
-		Frisch_Aux        = 0.0_dp 
-		Frisch_Aux_2      = 0.0_dp 
+		Hours_Frisch	  = 0.0_dp
 		DO xi=1,nx
 		DO ei=1, ne
 		DO lambdai=1,nlambda
 		DO zi=1,nz
 		DO ai=1,na
 		DO age=1,RetAge-1
-			if (HOURS(age,ai,zi,lambdai,ei,xi).gt.0.001_dp) then 
-			Size_Frisch = Size_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)
-			Frisch_Elasticity = Frisch_Elasticity + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
-			& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
-			! Frisch_Aux = Frisch_Aux + DBN1(age,ai,zi,lambdai,ei,xi)*(1-HOURS(age,ai,zi,lambdai,ei,xi))/HOURS(age,ai,zi,lambdai,ei,xi)
-			if (HOURS(age,ai,zi,lambdai,ei,xi).gt.0.001_dp) then 
-			Frisch_Aux = Frisch_Aux + DBN1(age,ai,zi,lambdai,ei,xi)
-			Frisch_Aux_2 = Frisch_Aux_2 + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
-			& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
-			endif 
-			endif 
+		if (HOURS(age,ai,zi,lambdai,ei,xi).gt.0.001_dp) then 
+		Size_Frisch = Size_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)
+		Frisch_Elasticity = Frisch_Elasticity + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
+		& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
+		Hours_Frisch = Hours_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)*HOURS(age,ai,zi,lambdai,ei,xi)
+		endif 
 		ENDDO
 		ENDDO
 		ENDDO
@@ -2584,11 +2578,9 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO
 		ENDDO
 		Frisch_Elasticity = Frisch_Elasticity/Size_Frisch
-		Frisch_Aux		  = Frisch_Aux
-		Frisch_Aux_2      = Frisch_Aux_2/Frisch_Aux
-		print*,' '
-		print*,'Frisch Elasiticity'
-		print*,Frisch_Elasticity,Frisch_Aux/Size_Frisch,Frisch_Aux_2,Size_Frisch
+		Hours_Frisch 	  = Hours_Frisch/Size_Frisch
+		Frisch_Elasticity_2 = (1.0_dp-tauPL)/( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * Hours_Frisch/(1-Hours_Frisch) - tauPL )
+		print*, 'Frisch_Elasticity',Frisch_Elasticity,Frisch_Elasticity_2,Hours_Frisch, Size_Frisch
 		
 
 
@@ -6144,7 +6136,9 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Labor'
 			WRITE(UNIT=19, FMT=*) 'Fraction_of_workers'		, Size_Frisch/sum(DBN1(1:RetAge-1,:,:,:,:,:))
-			WRITE(UNIT=19, FMT=*) 'Frisch_Elasticity'	   	, Frisch_Elasticity
+			WRITE(UNIT=19, FMT=*) 'Av.Hours'				, Hours_Frisch
+			WRITE(UNIT=19, FMT=*) 'Av.Frisch_Elasticity'   	, Frisch_Elasticity
+			WRITE(UNIT=19, FMT=*) 'Frisch_Elasticity_Av'   	, Frisch_Elasticity_2
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Taxes'
 			WRITE(UNIT=19, FMT=*) 'Tax_Rev/GDP'				, (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
