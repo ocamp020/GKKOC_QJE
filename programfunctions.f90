@@ -2584,11 +2584,11 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO
 		ENDDO
 		Frisch_Elasticity = Frisch_Elasticity/Size_Frisch
-		Frisch_Aux		  = Frisch_Aux/Size_Frisch
+		Frisch_Aux		  = Frisch_Aux
 		Frisch_Aux_2      = Frisch_Aux_2/Frisch_Aux
 		print*,' '
 		print*,'Frisch Elasiticity'
-		print*,Frisch_Elasticity,Frisch_Aux,Frisch_Aux_2,Size_Frisch
+		print*,Frisch_Elasticity,Frisch_Aux/Size_Frisch,Frisch_Aux_2,Size_Frisch
 		
 
 
