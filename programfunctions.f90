@@ -2566,7 +2566,7 @@ SUBROUTINE COMPUTE_STATS()
 		DO zi=1,nz
 		DO ai=1,na
 		DO age=1,RetAge-1
-			if (HOURS(age,ai,zi,lambdai,ei,xi).gt.0.0_dp) then 
+			if (HOURS(age,ai,zi,lambdai,ei,xi).gt.0.001_dp) then 
 			Size_Frisch = Size_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)
 			Frisch_Elasticity = Frisch_Elasticity + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
 			& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
