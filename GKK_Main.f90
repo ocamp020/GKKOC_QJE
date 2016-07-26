@@ -87,10 +87,10 @@ PROGRAM main
 		! Calibration to book value and rho_z=0.1 and x_hi=10
 
 
-		beta   	= 0.95_dp! 0.95_dp ! params(1) !
+		beta   	= 0.948_dp! 0.95_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
-		sigma_z_eps      =  0.035_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
+		sigma_z_eps      =  0.037_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
 		sigma_lambda_eps = 0.305_dp ! params(5)
 		gamma  	=  0.46_dp !  0.471_dp ! params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
