@@ -55,11 +55,11 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
-			compute_exp   = .false.
+			compute_bench = .false.
+			compute_exp   = .true.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-		Simul_Switch  = .false.
+		Simul_Switch  = .true.
 
 
 	! Switch for separable and non-separable utility
@@ -90,7 +90,7 @@ PROGRAM main
 		beta   	= 0.9473_dp! 0.95_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
-		sigma_z_eps      =  0.0353_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
+		sigma_z_eps      =  0.0352_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
 		sigma_lambda_eps = 0.307_dp ! params(5)
 		gamma  	=  0.46_dp !  0.471_dp ! params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
@@ -313,6 +313,9 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		write(*,*) "Benchmark variables"
 		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"P=",P,"wage=",wage,'R=',R
 
+		! Deallocate variables
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
 end Subroutine Solve_Benchmark
 
 
@@ -479,6 +482,9 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	print*," "
 	print*,"Wealth_factor=",Wealth_factor
 	print*," "
+
+	! Deallocate variables
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
 end Subroutine Solve_Experiment
 
