@@ -85,7 +85,7 @@ PROGRAM main
 		! Calibration to book value and rho_z=0.3
 		Params =[ 0.947_dp, 0.00_dp, 0.3_dp, 0.0669_dp , 0.307_dp, 0.46_dp ] 
 		! Calibration to book value and rho_z=0.1 and x_hi=10
-
+		Params =[ 0.9473_dp, 0.00_dp, 0.1_dp, 0.0352_dp , 0.307_dp, 0.46_dp ] 
 
 		beta   	= 0.9473_dp! 0.95_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
