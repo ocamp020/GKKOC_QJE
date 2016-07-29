@@ -151,17 +151,14 @@ elseif X_Switch==1.1
         Tables_file     = 'Tables_Presentation_Model_11.xls' ;
     
 elseif X_Switch==1.2
-   mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M1.2_bv/')
-    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M1.2_bv/'
+   mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/')
+    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/'
         Result_Folder = strcat('../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/') ;
         Simul_Folder  = strcat('../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/') ;
         Bench_Folder  = strcat('../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Bench_Files/') ;
-        Exp_Folder  = strcat('../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Exp_Files/') ;
+        Exp_Folder    = strcat('../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Exp_Files/') ;
         Top_Folder    = strcat('../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/Top_A/') ;
-        mkdir('presentation')
-        mkdir('presentation/png')
-        cd 'presentation'
-        Tables_file     = 'Tables_Presentation_Model_12_bv.xls' ;
+        Tables_file   = 'Tables_Presentation_Model_12_bv.xls' ;
     
 elseif X_Switch==2.1
     mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/')
@@ -591,9 +588,10 @@ end
             end 
             set(gca,'XTick',ww); set(gca,'XTickLabel',exp(ww)); ylim([-16 0])
             legend('US Data','Regression Line','Model','Regression Line','location','NorthEast')
-            file_name_pdf = ['Pareto_Tail_$',num2str(w_min(ii)),'_PV.pdf'] ;
-            file_name_png = ['png/Pareto_Tail_$',num2str(w_min(ii)),'_PV.png'] ;
-            print('-dpdf',file_name_pdf) ; print('-dpng',file_name_png) ;
+            file_name_eps = ['Pareto_Tail_$',num2str(w_min(ii)),'_Presentation.eps'] ;
+            file_name_png = ['png/Pareto_Tail_$',num2str(w_min(ii)),'_Presentation.png'] ;
+            file_name_fg = ['fig/Pareto_Tail_$',num2str(w_min(ii)),'_Presentation.fig'] ;
+            print('-depsc',file_name_eps) ; print('-dpng',file_name_png) ; savefig(file_name_fig);
             % Table
             AA(:,ii) = [w_min(ii) ; a_b(ii) ; a_V_s(ii) ; a_V(ii) ; a_ml(ii) ] ; 
         end
@@ -643,8 +641,7 @@ clear panela_bench panelPV_a_bench wealth_bench y_bench x_bench
         axis([min(G_K_Frac_k) max(G_K_Frac_k)  -40 40 ])
 
         hgsave('1.1fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
-        print -dpdf 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.pdf
-        print -dps 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
+        print -depsc 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
 
         plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,6)/Stats_by_tau_k(41,6)-1),'-dr', 'linewidth',1.5)
         plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,6)/Stats_by_tau_w(41,6)-1),'-db', 'linewidth',1.5)
@@ -652,8 +649,7 @@ clear panela_bench panelPV_a_bench wealth_bench y_bench x_bench
         set(h2,'Interpreter','latex','FontSize',20)
 
         hgsave('1.2fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
-        print -dpdf 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.pdf
-        print -dps 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.eps
+        print -depsc 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.eps
 
 CE2_NB_k =100*( (Stats_by_tau_k(:,11)./Stats_by_tau_k(41+25,11)).^(1/(gamma*(1-sigma)))-1);
 CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(41+25,11)).^(1/(gamma*(1-sigma)))-1);
@@ -679,14 +675,12 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(41+25,11)).^(1/(gamma*(1-s
 
 
     hgsave('1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
-    print -dpdf 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
-    print -dps 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
+    print -depsc 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
 %     plot(-0.3416*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
     annotation('textarrow',[0.21 0.18],[0.76 0.72], 'string','Opt. \tau_k = -34.4%','linewidth',2,'FontSize',12)
     hgsave('1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
-    print -dpdf 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
-    print -dps 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
+    print -depsc 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
     plot(G_K_Frac_w, (CE2_NB_w-CE2_NB_k(tauindx)),'b', 'linewidth',2)
 %     plot(0.4107*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 10],'k--', 'linewidth',2)
@@ -694,8 +688,11 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(41+25,11)).^(1/(gamma*(1-s
 
 
     hgsave('1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
-    print -dpdf 1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
-    print -dps 1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
+    print -depsc 1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
+    
+    
+    
+    return 
 
 
 
@@ -1081,7 +1078,7 @@ end
     figure;
     plot(wealth_grid,[Pareto_ben Pareto_exp]); xlim([wealth_grid(1),wealth_grid(end)])
     xlabel('Log(Wealth)'); legend('Bench','Exp','location','northeast')
-    print('-dpdf','Wealth_Pareto.pdf') ;
+    print('-depsc','Wealth_Pareto.eps') ;
     
     GDP_pc = 54629 ;
     wealth_bench = sort(panela_bench) ; wealth_bench = GDP_pc/YBAR * wealth_bench ;
@@ -1105,7 +1102,7 @@ end
         figure; hold on; plot(-x,y,'linewidth',2); plot(xx,cons_bench(ii)-alpha_bench(ii)*xx,'-k'); hold off;
         title(fig_title); xlabel('ln(Wealth/W(min))'); ylabel('ln(1-CDF(W))'); xlim([min(-x),max(-x)]);
         file_name = ['Pareto_Tail_Top_',num2str(ind(ii)),'%_bench.fig'] ;
-        savefig(file_name); %print('-dpdf',file_name) ;
+        savefig(file_name); %print('-depsc',file_name) ;
         % Tax Reform
         w_min =  wealth_exp(nn(ii))                    ;
         x     = -log(wealth_exp(nn(ii):end)/w_min)     ;
@@ -1156,7 +1153,7 @@ end
     legend('Bench','Exp','location','northeast'); title('Percentiles of Wealth Dist.')
     subplot(2,1,2); plot(prctl_vec,(prctl_W_exp-prctl_W_ben));
     xlabel('percentiles'); title('Change in Percentiles of Wealth Dist.')
-    print('-dpdf','Wealth_Prctl.pdf') ;
+    print('-depsc','Wealth_Prctl.eps') ;
     
 
     
@@ -1255,7 +1252,7 @@ end
     xlabel('GBAR_K')
 
     hgsave('1fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
-    print -dpdf 1fig_KBAR_QBAR_by_CAP_TAX_REV.pdf
+    print -depsc 1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
     print -dps  1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
     print -dpng 1fig_KBAR_QBAR_by_CAP_TAX_REV.png
     
@@ -1273,7 +1270,7 @@ end
 
 
         hgsave('1.1fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
-        print -dpdf 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.pdf
+        print -depsc 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
         print -dps 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
 
         plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,6)/Stats_by_tau_k(1,6)-1))
@@ -1282,7 +1279,7 @@ end
         set(h2,'Interpreter','latex','FontSize',20)
 
         hgsave('1.2fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
-        print -dpdf 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.pdf
+        print -depsc 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.eps
         print -dps 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.eps
 
 
@@ -1304,7 +1301,7 @@ end
 
 
     hgsave('1fig_Wage_by_CAP_TAX_REV.fig')
-    print -dpdf 1fig_Wage_by_CAP_TAX_REV.pdf
+    print -depsc 1fig_Wage_by_CAP_TAX_REV.eps
     print -dps  1fig_Wage_by_CAP_TAX_REV.eps
     print -dpng 1fig_Wage_by_CAP_TAX_REV.png
     
@@ -1319,7 +1316,7 @@ end
         display('    tauK      tauW   that maximizes after-tax wage')
         disp([Stats_by_tau_k(wagemax_indx_tauK,1) Stats_by_tau_w(wagemax_indx_tauW,2)])
         hgsave('1fig_Wage_by_CAP_TAX_REV.fig')
-        print -dpdf 1fig_AT_Wage_by_CAP_TAX_REV.pdf
+        print -depsc 1fig_AT_Wage_by_CAP_TAX_REV.eps
         print -dps  1fig_AT_Wage_by_CAP_TAX_REV.eps
         print -dpng 1fig_AT_Wage_by_CAP_TAX_REV.png
 
@@ -1339,7 +1336,7 @@ end
     text(Stats_by_tau_w(indxW,4)+0.0, maxvalW +0.05,['Opt. \tau_W = ' ,num2str(100*Stats_by_tau_w(indxW,2)),'%'])
 
     hgsave('1fig_Average_Utility_by_CAP_TAX_REV.fig')
-    print -dpdf 1fig_Average_Utility_by_CAP_TAX_REV.pdf
+    print -depsc 1fig_Average_Utility_by_CAP_TAX_REV.eps
     print -dps  1fig_Average_Utility_by_CAP_TAX_REV.eps
     print -dpng 1fig_Average_Utility_by_CAP_TAX_REV.png
 
@@ -1362,7 +1359,7 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigm
     text(Stats_by_tau_w(indxW,4)+0.0, maxvalW +0.05,['Opt. \tau_W = ' ,num2str(100*Stats_by_tau_w(indxW,2)),'%'])
 
     hgsave('2fig_CE_NEWBORN_by_CAP_TAX_REV.fig')
-    print -dpdf 2fig_CE_NEWBORN_by_CAP_TAX_REV.pdf
+    print -depsc 2fig_CE_NEWBORN_by_CAP_TAX_REV.eps
     print -dps  2fig_CE_NEWBORN_by_CAP_TAX_REV.eps
     print -dpng 2fig_CE_NEWBORN_by_CAP_TAX_REV.png
 
@@ -1383,7 +1380,7 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigm
 
 
     hgsave('3fig_CE_NEWBORN_by_CAP_TAX_REV.fig')
-    print -dpdf 3fig_CE_NEWBORN_by_CAP_TAX_REV.pdf
+    print -depsc 3fig_CE_NEWBORN_by_CAP_TAX_REV.eps
     print -dps  3fig_CE_NEWBORN_by_CAP_TAX_REV.eps
     print -dpng 3fig_CE_NEWBORN_by_CAP_TAX_REV.png
 
@@ -1410,12 +1407,12 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigm
 
 
     hgsave('1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
-    print -dpdf 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
+    print -depsc 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
     print -dps 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
     annotation('textarrow',[0.2 0.15],[0.71 0.76], 'string','Opt. \tau_k = 1.62%','linewidth',2,'FontSize',12)
     hgsave('1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
-    print -dpdf 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
+    print -depsc 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
     print -dps 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
     plot(G_K_Frac_w, (CE2_NB_w-CE2_NB_k(tauindx)),'b', 'linewidth',2)
@@ -1423,7 +1420,7 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigm
 
 
     hgsave('1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
-    print -dpdf 1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.pdf
+    print -depsc 1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
     print -dps 1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
 
@@ -1466,7 +1463,7 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(26,11)).^(1/(gamma*(1-sigm
     grid on
 
     hgsave('1fig_diff_savings_rate_age1.fig')
-    print -dpdf 1fig_diff_savings_rate_age1.pdf
+    print -depsc 1fig_diff_savings_rate_age1.eps
     print -dps  1fig_diff_savings_rate_age1.eps
     print -dpng 1fig_diff_savings_rate_age1.png
 naa=40;
@@ -1481,7 +1478,7 @@ xlabel('wealth')
 title('Welfare Gain for age=20, z=1')
 axis([0 100 -15 25])
 grid on
-print -dpdf 1fig_Welfare_Gain_by_Wealth_for_Age1_z1.pdf
+print -depsc 1fig_Welfare_Gain_by_Wealth_for_Age1_z1.eps
 hgsave('1fig_Welfare_Gain_by_Wealth_for_Age1_z1.fig')
 print -dps  1fig_Welfare_Gain_by_Wealth_for_Age1_z1.eps
 print -dpng 1fig_Welfare_Gain_by_Wealth_for_Age1_z1.png
@@ -1500,7 +1497,7 @@ title('Welfare Gain for age=20, z=4')
 axis([0 100 -15 25])
 grid on
 
-print -dpdf 1fig_Welfare_Gain_by_Wealth_for_Age1_z4.pdf
+print -depsc 1fig_Welfare_Gain_by_Wealth_for_Age1_z4.eps
 hgsave('1fig_Welfare_Gain_by_Wealth_for_Age1_z4.fig')
 print -dps  1fig_Welfare_Gain_by_Wealth_for_Age1_z4.eps
 print -dpng 1fig_Welfare_Gain_by_Wealth_for_Age1_z4.png
@@ -1519,7 +1516,7 @@ title('Welfare Gain for age=20, z=7')
 axis([0 100 -15 25])
 grid on
 
-print -dpdf 1fig_Welfare_Gain_by_Wealth_for_Age1_z7.pdf
+print -depsc 1fig_Welfare_Gain_by_Wealth_for_Age1_z7.eps
 hgsave('1fig_Welfare_Gain_by_Wealth_for_Age1_z7.fig')
 print -dps  1fig_Welfare_Gain_by_Wealth_for_Age1_z7.eps
 print -dpng 1fig_Welfare_Gain_by_Wealth_for_Age1_z7.png
@@ -1535,7 +1532,7 @@ xlabel('wealth')
 title('Welfare Gain for age=35, z=1')
 axis([0 100 -15 25])
 grid on
-print -dpdf 1fig_Welfare_Gain_by_Wealth_for_Age16_z1.pdf
+print -depsc 1fig_Welfare_Gain_by_Wealth_for_Age16_z1.eps
 hgsave('1fig_Welfare_Gain_by_Wealth_for_Age16_z1.fig')
 print -dps  1fig_Welfare_Gain_by_Wealth_for_Age16_z1.eps
 print -dpng 1fig_Welfare_Gain_by_Wealth_for_Age16_z1.png
@@ -1550,7 +1547,7 @@ xlabel('wealth')
 title('Welfare Gain for age=35, z=4')
 axis([0 100 -15 25])
 grid on
-print -dpdf 1fig_Welfare_Gain_by_Wealth_for_Age16_z4.pdf
+print -depsc 1fig_Welfare_Gain_by_Wealth_for_Age16_z4.eps
 hgsave('1fig_Welfare_Gain_by_Wealth_for_Age16_z4.fig')
 print -dps  1fig_Welfare_Gain_by_Wealth_for_Age16_z4.eps
 print -dpng 1fig_Welfare_Gain_by_Wealth_for_Age16_z4.png
@@ -1565,7 +1562,7 @@ xlabel('wealth')
 title('Welfare Gain for age=35, z=7')
 axis([0 100 -15 25])
 grid on
-print -dpdf 1fig_Welfare_Gain_by_Wealth_for_Age16_z7.pdf
+print -depsc 1fig_Welfare_Gain_by_Wealth_for_Age16_z7.eps
 hgsave('1fig_Welfare_Gain_by_Wealth_for_Age16_z7.fig')
 print -dps  1fig_Welfare_Gain_by_Wealth_for_Age16_z7.eps
 print -dpng 1fig_Welfare_Gain_by_Wealth_for_Age16_z7.png
@@ -1580,7 +1577,7 @@ xlabel('wealth')
 title('Welfare Gain for age=50, z=1')
 axis([0 100 -15 25])
 grid on
-print -dpdf 1fig_Welfare_Gain_by_Wealth_for_Age31_z1.pdf
+print -depsc 1fig_Welfare_Gain_by_Wealth_for_Age31_z1.eps
 hgsave('1fig_Welfare_Gain_by_Wealth_for_Age31_z1.fig')
 print -dps  1fig_Welfare_Gain_by_Wealth_for_Age31_z1.eps
 print -dpng 1fig_Welfare_Gain_by_Wealth_for_Age31_z1.png
@@ -1595,7 +1592,7 @@ xlabel('wealth')
 title('Welfare Gain for age=50, z=4')
 axis([0 100 -15 25])
 grid on
-print -dpdf 1fig_Welfare_Gain_by_Wealth_for_Age31_z4.pdf
+print -depsc 1fig_Welfare_Gain_by_Wealth_for_Age31_z4.eps
 hgsave('1fig_Welfare_Gain_by_Wealth_for_Age31_z4.fig')
 print -dps  1fig_Welfare_Gain_by_Wealth_for_Age31_z4.eps
 print -dpng 1fig_Welfare_Gain_by_Wealth_for_Age31_z4.png
@@ -1610,7 +1607,7 @@ xlabel('wealth')
 title('Welfare Gain for age=50, z=7')
 axis([0 100 -15 25])
 grid on
-print -dpdf 1fig_Welfare_Gain_by_Wealth_for_Age31_z7.pdf
+print -depsc 1fig_Welfare_Gain_by_Wealth_for_Age31_z7.eps
 hgsave('1fig_Welfare_Gain_by_Wealth_for_Age31_z7.fig')
 print -dps  1fig_Welfare_Gain_by_Wealth_for_Age31_z7.eps
 print -dpng 1fig_Welfare_Gain_by_Wealth_for_Age31_z7.png
@@ -1635,7 +1632,7 @@ grid on
 
 
 hgsave('1fig_diff_savings_rate_age16.fig')
-print -dpdf 1fig_diff_savings_rate_age16.pdf
+print -depsc 1fig_diff_savings_rate_age16.eps
 print -dps  1fig_diff_savings_rate_age16.eps
 print -dpng 1fig_diff_savings_rate_age16.png
 
@@ -1657,7 +1654,7 @@ grid on; hold off;
 
 
 hgsave('1fig_diff_savings_rate_age31.fig')
-print -dpdf 1fig_diff_savings_rate_age31.pdf
+print -depsc 1fig_diff_savings_rate_age31.eps
 print -dps  1fig_diff_savings_rate_age31.eps
 print -dpng 1fig_diff_savings_rate_age31.png
 
@@ -2148,7 +2145,7 @@ print -dpng 1fig_diff_savings_rate_age31.png
         plot([20:100]',Constrained_firms_age,'linewidth',2);
         legend('Capital Tax','Wealth_Tax','location','southeast'); 
         xlabel('age'); xlim([20,100]); ylim([0 1]); title('Percentage of Constrained Firms')
-        print('-dpdf','Constrained_Firms_Age.pdf') ;
+        print('-depsc','Constrained_Firms_Age.eps') ;
         
         figure;
         for z=1:n_z
@@ -2156,7 +2153,7 @@ print -dpng 1fig_diff_savings_rate_age31.png
             aa = ['Cons. Firms (Z',num2str(z),')'] ; title(aa); xlabel('age'); xlim([20,100]); ylim([0 1]);
         end 
             legend('K Tax','W Tax','location','south');
-        print('-dpdf','Constrained_Firms_Age_Z.pdf') ;
+        print('-depsc','Constrained_Firms_Age_Z.eps') ;
 
 
 
