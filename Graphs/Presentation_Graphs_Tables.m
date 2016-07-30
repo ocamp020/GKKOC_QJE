@@ -1251,7 +1251,7 @@ end
         'NBAR, \tau_K', 'NBAR, \tau_W', 'YBAR, \tau_K', 'YBAR, \tau_W','Location','SouthWest')
     xlabel('GBAR_K')
 
-    hgsave('1fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
+    hgsave('fig/1fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
     print -depsc 1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
     print -dps  1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
     print -dpng 1fig_KBAR_QBAR_by_CAP_TAX_REV.png
@@ -1269,18 +1269,18 @@ end
         axis([min(G_K_Frac_w) max(G_K_Frac_w)  -50 0 ])
 
 
-        hgsave('1.1fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
+        hgsave('fig/1.1fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
         print -depsc 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
-        print -dps 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
+        print -dpng png/1.1fig_KBAR_QBAR_by_CAP_TAX_REV.png
 
         plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,6)/Stats_by_tau_k(1,6)-1))
         plot(G_K_Frac_w, 100*(Stats_by_tau_w(:,6)/Stats_by_tau_w(1,6)-1))
         h2 = legend('$\bar k, \tau_k$' , '$\bar k, \tau_a$','$\bar Q, \tau_k$' , '$\bar Q, \tau_a$','Location','SouthWest');
         set(h2,'Interpreter','latex','FontSize',20)
 
-        hgsave('1.2fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
+        hgsave('fig/1.2fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
         print -depsc 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.eps
-        print -dps 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.eps
+        print -dpng png/1.2fig_KBAR_QBAR_by_CAP_TAX_REV.png
 
 
 % Wage by capital/Wealth tax revenue
@@ -1300,9 +1300,8 @@ end
     text(Stats_by_tau_w(indxW,4)+0.0, maxvalW +0.05,['Opt. \tau_W = ' ,num2str(100*Stats_by_tau_w(indxW,2)),'%'])
 
 
-    hgsave('1fig_Wage_by_CAP_TAX_REV.fig')
+    hgsave('fig/1fig_Wage_by_CAP_TAX_REV.fig')
     print -depsc 1fig_Wage_by_CAP_TAX_REV.eps
-    print -dps  1fig_Wage_by_CAP_TAX_REV.eps
     print -dpng 1fig_Wage_by_CAP_TAX_REV.png
     
     % After-tax wage
