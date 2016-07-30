@@ -590,7 +590,7 @@ end
             legend('US Data','Regression Line','Model','Regression Line','location','NorthEast')
             file_name_eps = ['Pareto_Tail_$',num2str(w_min(ii)),'_Presentation.eps'] ;
             file_name_png = ['png/Pareto_Tail_$',num2str(w_min(ii)),'_Presentation.png'] ;
-            file_name_fg = ['fig/Pareto_Tail_$',num2str(w_min(ii)),'_Presentation.fig'] ;
+            file_name_fig = ['fig/Pareto_Tail_$',num2str(w_min(ii)),'_Presentation.fig'] ;
             print('-depsc',file_name_eps) ; print('-dpng',file_name_png) ; savefig(file_name_fig);
             % Table
             AA(:,ii) = [w_min(ii) ; a_b(ii) ; a_V_s(ii) ; a_V(ii) ; a_ml(ii) ] ; 
@@ -640,7 +640,7 @@ clear panela_bench panelPV_a_bench wealth_bench y_bench x_bench
         grid on
         axis([min(G_K_Frac_k) max(G_K_Frac_k)  -40 40 ])
 
-        hgsave('1.1fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
+        hgsave('fig/1.1fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
         print -depsc 1.1fig_KBAR_QBAR_by_CAP_TAX_REV.eps
 
         plot(G_K_Frac_k, 100*(Stats_by_tau_k(:,6)/Stats_by_tau_k(41,6)-1),'-dr', 'linewidth',1.5)
@@ -648,7 +648,7 @@ clear panela_bench panelPV_a_bench wealth_bench y_bench x_bench
         h2 = legend('$\bar k, \tau_k$' , '$\bar k, \tau_a$','$\bar Q, \tau_k$' , '$\bar Q, \tau_a$','Location','SouthWest');
         set(h2,'Interpreter','latex','FontSize',20)
 
-        hgsave('1.2fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
+        hgsave('fig/1.2fig_KBAR_QBAR_by_CAP_TAX_REV.fig')
         print -depsc 1.2fig_KBAR_QBAR_by_CAP_TAX_REV.eps
 
 CE2_NB_k =100*( (Stats_by_tau_k(:,11)./Stats_by_tau_k(41+25,11)).^(1/(gamma*(1-sigma)))-1);
@@ -674,12 +674,12 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(41+25,11)).^(1/(gamma*(1-s
     annotation('textarrow',[0.51+0.127 0.56+0.127],[0.17 0.12], 'string','0.25','linewidth',2,'FontSize',12)
 
 
-    hgsave('1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
+    hgsave('fig/1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
     print -depsc 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
 %     plot(-0.3416*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
     annotation('textarrow',[0.21 0.18],[0.76 0.72], 'string','Opt. \tau_k = -34.4%','linewidth',2,'FontSize',12)
-    hgsave('1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
+    hgsave('fig/1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
     print -depsc 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
     plot(G_K_Frac_w, (CE2_NB_w-CE2_NB_k(tauindx)),'b', 'linewidth',2)
@@ -687,7 +687,7 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(41+25,11)).^(1/(gamma*(1-s
     annotation('textarrow',[0.80 0.83],[0.82 0.87], 'string','Opt. \tau_a = 3.06%','linewidth',2,'FontSize',12)
 
 
-    hgsave('1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
+    hgsave('fig/1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
     print -depsc 1.3.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
     
     
