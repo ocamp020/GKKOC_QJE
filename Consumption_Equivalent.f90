@@ -4,9 +4,10 @@ Program Consumption_Equivalent
 	use programfunctions
 	use Toolbox
 	Implicit None
-	character(100) :: Bench_Folder
+	character(100) :: Bench_Folder, Result_Folder_aux
 	character(4)   :: string_theta
 	character(100) :: folder_aux
+	integer        :: i
 	! Compute benchmark or load results
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
 	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: CE_total, CE_c, CE_cl, CE_cd, CE_h, CE_hl, CE_hd
@@ -106,6 +107,7 @@ Program Consumption_Equivalent
 		end if
 
 		Result_Folder = trim(Result_Folder)//'Model_1.2_bv/' 
+		Result_Folder_aux = Result_Folder
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
@@ -159,6 +161,21 @@ Program Consumption_Equivalent
 
 
 		CALL ComputeLaborUnits(EBAR, wage) 
+
+
+!====================================================================================================
+do i=1,3
+
+	if (i.eq.1) then 
+		! Tax Reform
+		Result_Folder = Result_Folder 
+	elseif (i.eq.2)
+		! Optimal tax: Capital
+		Result_Folder = trim(Result_Folder_aux)//'Opt_Tax_K/' 
+	elseif (i.eq.3)
+		! Optimal tax: Wealth
+		Result_Folder = trim(Result_Folder_aux)//'Opt_Tax_W/' 
+	endif 
 
 !====================================================================================================
 	PRINT*,''
@@ -333,7 +350,27 @@ Program Consumption_Equivalent
 	CE_hl_NB_exp 		= sum(CE_hl(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
 	CE_hd_NB_exp 		= sum(CE_hd(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
 
-	OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'CE_output.txt'  , STATUS='replace')
+
+	if (i.eq.1) then 
+		! Tax Reform
+		OPEN  (UNIT=1,  FILE=trim(Result_Folder_aux)//'CE_output.txt'  , STATUS='replace')
+		WRITE (UNIT=1,  FMT=*) ' '
+		WRITE (UNIT=1,  FMT=*) 'Consumption Equivalent Welfare - Tax Reform'
+		WRITE (UNIT=1,  FMT=*) ' '
+	elseif (i.eq.2)
+		! Optimal tax: Capital
+		OPEN  (UNIT=1,  FILE=trim(Result_Folder_aux)//'CE_output_otk.txt'  , STATUS='replace')
+		WRITE (UNIT=1,  FMT=*) ' '
+		WRITE (UNIT=1,  FMT=*) 'Consumption Equivalent Welfare - Optimal Capital Taxes'
+		WRITE (UNIT=1,  FMT=*) ' '
+	elseif (i.eq.3)
+		! Optimal tax: Wealth
+		OPEN  (UNIT=1,  FILE=trim(Result_Folder_aux)//'CE_output_otw.txt'  , STATUS='replace')
+		WRITE (UNIT=1,  FMT=*) ' '
+		WRITE (UNIT=1,  FMT=*) 'Consumption Equivalent Welfare - Optimal Wealth Taxes'
+		WRITE (UNIT=1,  FMT=*) ' '
+	endif 
+
 	WRITE (UNIT=1,  FMT=*) 'Benchmark - Aggregate'
 	WRITE (UNIT=1,  FMT=*) 'CE',CE_total_bench, 'CE_c',CE_c_bench,'CE_h',CE_h_bench
 	WRITE (UNIT=1,  FMT=*) 'CE_c',CE_c_bench,'CE_cl',CE_cl_bench,'CE_cd',CE_cd_bench
@@ -358,12 +395,22 @@ Program Consumption_Equivalent
 	WRITE (UNIT=1,  FMT=*) 'CE_h',CE_h_NB_exp,'CE_hl',CE_hl_NB_exp,'CE_hd',CE_hd_NB_exp
 	WRITE (UNIT=1,  FMT=*)' '
 
-	WRITE (UNIT=1,  FMT=*) 'CE2 '	, 'NB '			, 'Pop '
-	WRITE (UNIT=1,  FMT=*) 'CE2'	, CE2_nb_total 	, CE2_pop_total
-	WRITE (UNIT=1,  FMT=*) 'CE2_c'	, CE2_nb_c 		, CE2_pop_c 		
+	WRITE (UNIT=1,  FMT=*) 'CE1 '	, 'NB '				, 'Pop '			, 'Test' 	
+	WRITE (UNIT=1,  FMT=*) 'CE1'	, CE_total_NB_bench , CE_total_bench 	, 100*((1+CE_c_NB_bench/100)*(1+CE_h_NB_bench/100)-1)
+	WRITE (UNIT=1,  FMT=*) 'CE1_c'	, CE_c_NB_bench 	, CE_c_bench 		, 100*((1+CE_cl_NB_bench/100)*(1+CE_cd_NB_bench/100)-1)		
+	WRITE (UNIT=1,  FMT=*) 'CE1_cl'	, CE_cl_NB_bench	, CE_cl_bench
+	WRITE (UNIT=1,  FMT=*) 'CE_cd'	, CE_cd_NB_bench 	, CE_cd_bench
+	WRITE (UNIT=1,  FMT=*) 'CE1_h'	, CE_h_NB_bench 	, CE_h_bench 		, 100*((1+CE_hl_NB_bench/100)*(1+CE_hd_NB_bench/100)-1)		
+	WRITE (UNIT=1,  FMT=*) 'CE1_hl'	, CE_hl_NB_bench 	, CE_hl_bench
+	WRITE (UNIT=1,  FMT=*) 'CE1_hd'	, CE_hd_NB_bench 	, CE_hd_bench 
+	WRITE (UNIT=1,  FMT=*)' '
+
+	WRITE (UNIT=1,  FMT=*) 'CE2 '	, 'NB '			, 'Pop '		, 'Test' 	
+	WRITE (UNIT=1,  FMT=*) 'CE2'	, CE2_nb_total 	, CE2_pop_total , 100*((1+CE2_nb_c/100)*(1+CE2_nb_h/100)-1)
+	WRITE (UNIT=1,  FMT=*) 'CE2_c'	, CE2_nb_c 		, CE2_pop_c 	, 100*((1+CE2_nb_cl/100)*(1+CE2_nb_cd/100)-1)		
 	WRITE (UNIT=1,  FMT=*) 'CE2_cl'	, CE2_nb_cl		, CE2_pop_cl
 	WRITE (UNIT=1,  FMT=*) 'CE2_cd'	, CE2_nb_cd 	, CE2_pop_cd
-	WRITE (UNIT=1,  FMT=*) 'CE2_h'	, CE2_nb_h 		, CE2_pop_h
+	WRITE (UNIT=1,  FMT=*) 'CE2_h'	, CE2_nb_h 		, CE2_pop_h 	, 100*((1+CE2_nb_hl/100)*(1+CE2_nb_hd/100)-1)
 	WRITE (UNIT=1,  FMT=*) 'CE2_hl'	, CE2_nb_hl 	, CE2_pop_hl
 	WRITE (UNIT=1,  FMT=*) 'CE2_hd'	, CE2_nb_hd 	, CE2_pop_hd 
 	WRITE (UNIT=1,  FMT=*)' '
@@ -394,6 +441,27 @@ Program Consumption_Equivalent
 	! CLOSE (unit=6)
 	! CLOSE (unit=7)
 
+	if (i.eq.1) then 
+		! Tax Reform
+		print*, 'Consumption Equivalent Welfare - Tax Reform'
+	elseif (i.eq.2)
+		! Optimal tax: Capital
+		print*, 'Consumption Equivalent Welfare - Optimal Capital Taxes'
+	elseif (i.eq.3)
+		! Optimal tax: Wealth
+		print*, 'Consumption Equivalent Welfare - Optimal Wealth Taxes'
+	endif 
+
+	print*,' '
+	print*, 'CE1 '	, 'NB '				, 'Pop '			, 'Test' 	
+	print*, 'CE1'	, CE_total_NB_bench , CE_total_bench 	, 100*((1+CE_c_NB_bench/100)*(1+CE_h_NB_bench/100)-1)
+	print*, 'CE1_c'	, CE_c_NB_bench 	, CE_c_bench 		, 100*((1+CE_cl_NB_bench/100)*(1+CE_cd_NB_bench/100)-1)		
+	print*, 'CE1_cl', CE_cl_NB_bench	, CE_cl_bench
+	print*, 'CE_cd'	, CE_cd_NB_bench 	, CE_cd_bench
+	print*, 'CE1_h'	, CE_h_NB_bench 	, CE_h_bench 		, 100*((1+CE_hl_NB_bench/100)*(1+CE_hd_NB_bench/100)-1)		
+	print*, 'CE1_hl', CE_hl_NB_bench 	, CE_hl_bench
+	print*, 'CE1_hd', CE_hd_NB_bench 	, CE_hd_bench 
+	print*,' '
 	print*,  'CE2 '		, 'NB '			, 'Pop '		, 'Test '
 	print*,  'CE2'		, CE2_nb_total 	, CE2_pop_total , 100*((1+CE2_nb_c/100)*(1+CE2_nb_h/100)-1)
 	print*,  'CE2_c'	, CE2_nb_c 		, CE2_pop_c 	, 100*((1+CE2_nb_cl/100)*(1+CE2_nb_cd/100)-1)
@@ -404,7 +472,7 @@ Program Consumption_Equivalent
 	print*,  'CE2_hd'	, CE2_nb_hd 	, CE2_pop_hd 
 	print*, ' '
 	
-
+enddo 
 
 
 end Program Consumption_Equivalent
