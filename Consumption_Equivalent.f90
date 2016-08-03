@@ -169,10 +169,10 @@ do i=1,3
 	if (i.eq.1) then 
 		! Tax Reform
 		Result_Folder = Result_Folder 
-	elseif (i.eq.2)
+	elseif (i.eq.2) then 
 		! Optimal tax: Capital
 		Result_Folder = trim(Result_Folder_aux)//'Opt_Tax_K/' 
-	elseif (i.eq.3)
+	elseif (i.eq.3) then 
 		! Optimal tax: Wealth
 		Result_Folder = trim(Result_Folder_aux)//'Opt_Tax_W/' 
 	endif 
@@ -357,13 +357,13 @@ do i=1,3
 		WRITE (UNIT=1,  FMT=*) ' '
 		WRITE (UNIT=1,  FMT=*) 'Consumption Equivalent Welfare - Tax Reform'
 		WRITE (UNIT=1,  FMT=*) ' '
-	elseif (i.eq.2)
+	elseif (i.eq.2) then 
 		! Optimal tax: Capital
 		OPEN  (UNIT=1,  FILE=trim(Result_Folder_aux)//'CE_output_otk.txt'  , STATUS='replace')
 		WRITE (UNIT=1,  FMT=*) ' '
 		WRITE (UNIT=1,  FMT=*) 'Consumption Equivalent Welfare - Optimal Capital Taxes'
 		WRITE (UNIT=1,  FMT=*) ' '
-	elseif (i.eq.3)
+	elseif (i.eq.3) then 
 		! Optimal tax: Wealth
 		OPEN  (UNIT=1,  FILE=trim(Result_Folder_aux)//'CE_output_otw.txt'  , STATUS='replace')
 		WRITE (UNIT=1,  FMT=*) ' '
@@ -444,10 +444,10 @@ do i=1,3
 	if (i.eq.1) then 
 		! Tax Reform
 		print*, 'Consumption Equivalent Welfare - Tax Reform'
-	elseif (i.eq.2)
+	elseif (i.eq.2) then 
 		! Optimal tax: Capital
 		print*, 'Consumption Equivalent Welfare - Optimal Capital Taxes'
-	elseif (i.eq.3)
+	elseif (i.eq.3) then 
 		! Optimal tax: Wealth
 		print*, 'Consumption Equivalent Welfare - Optimal Wealth Taxes'
 	endif 
