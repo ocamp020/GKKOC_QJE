@@ -251,7 +251,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	! Solve for the model and compute stats
 	print*,"	Initializing program"
 		CALL INITIALIZE
-		CALL Write_Benchmark_Results(compute_bench)
+		! CALL Write_Benchmark_Results(.false.)
 	if (compute_bench) then
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
