@@ -55,7 +55,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
+			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
@@ -314,7 +314,9 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"P=",P,"wage=",wage,'R=',R
 
 		! Deallocate variables
+		if (compute_bench.eqv..false.) then 
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+		endif 
 
 end Subroutine Solve_Benchmark
 
