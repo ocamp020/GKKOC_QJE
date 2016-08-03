@@ -55,7 +55,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
+			compute_bench = .true.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
@@ -87,18 +87,18 @@ PROGRAM main
 		! Calibration to book value and rho_z=0.1 and x_hi=10
 		Params =[ 0.9473_dp, 0.00_dp, 0.1_dp, 0.0352_dp , 0.307_dp, 0.46_dp ] 
 		
-		beta   	= 0.9473_dp! 0.95_dp ! params(1) !
+		beta   	= 0.9475_dp! 0.95_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
-		sigma_z_eps      =  0.0352_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
-		sigma_lambda_eps = 0.307_dp ! params(5)
+		sigma_z_eps      =  0.072_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
+		sigma_lambda_eps = 0.305_dp ! params(5)
 		gamma  	=  0.46_dp !  0.471_dp ! params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
 		
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
 
-		x_hi	= 10.00_dp
+		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
 		x_0     = 0.00_dp
 		a_x 	= 0.10_dp
@@ -142,7 +142,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Model_1.2_bv_x10/' 
+		Result_Folder = trim(Result_Folder)//'Model_1.2_bv/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
