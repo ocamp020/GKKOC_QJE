@@ -37,7 +37,7 @@ PROGRAM main
 	! Variables to measure running time
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
-		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
+		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch, Opt_Threshold
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -54,12 +54,14 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+		Opt_Threshold = .true.
 		Simul_Switch  = .false.
+
 
 
 	! Switch for separable and non-separable utility
@@ -209,6 +211,17 @@ PROGRAM main
 			! CALL Write_Experimental_Results(.false.)
 			! CALL SIMULATION(0)
 
+		endif 
+
+		if (Opt_Threshold) then 
+			call Solve_Benchmark(compute_bench,Simul_Switch)
+
+			folder_aux = Result_Folder
+			Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold/'
+			call system( 'mkdir -p ' // trim(Result_Folder) )
+
+			
+			call Solve_Opt_Threshold
 		endif 
 
 
@@ -708,6 +721,139 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	CALL SIMULATION(0)
 
 end Subroutine Solve_Opt_Tax
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Subroutine Solve_Opt_Threshold
+	use parameters 
+	use global
+	use Opt_Tax_Parameters
+	use Opt_Tax_Functions
+	use Toolbox
+	use omp_lib
+	implicit none 
+	real(DP) :: OPT_Threshold
+
+
+	!====================================================================================================
+	PRINT*,''
+	Print*,'--------------- SOLVING OPTIMAL TAXES -----------------'
+	PRINT*,''
+	
+	! Experiment economy
+		solving_bench=0
+	
+	! Set initial taxes for finding optimal ones
+		tauK     = 0.0_DP
+		tauW_at  = 0.0_DP
+		Opt_TauK = 0.0_DP
+		Opt_TauW = 0.0_DP
+		maxbrentvaluet=-10000.0_DP
+	
+	print*,'Optimal Tax Loop'
+
+		DO Threshold_Factor = 1,10
+	
+		PRINT*,''
+		Print*,'--------------- OPTIMAL WEALTH TAXES - Threshold -----------------'
+		PRINT*,''
+    	! Set Y_a_threshold
+			call Find_TauW_Threshold(DBN_bench,W_bench)  
+			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
+			Wealth_factor = Y_a_threshold/W_bench
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold.txt', STATUS='replace')
+	    DO tauindx=25,50
+            tauw_at     = real(tauindx,8)/1000_DP
+            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+
+            ! Compute moments
+			CALL COMPUTE_STATS
+
+		    if (brentvaluet .gt. maxbrentvaluet) then
+		        maxbrentvaluet = brentvaluet
+				OPT_tauW = tauW_at
+				OPT_psi  = psi
+				OPT_Threshold = Threshold_Factor
+			endif
+
+			! Print Results 
+		    print*, 'tauW=', tauW_at, 'YBAR=', YBAR, & 
+		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+		      
+		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
+		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
+		      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
+		      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
+		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
+		      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
+		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+		      & Threshold_Factor
+	    ENDDO 
+
+	    ENDDO
+
+	    CLOSE (unit=77)
+
+
+	! Evaluate optimal point in grid
+		tauW_at = OPT_tauW
+		psi 	= OPT_psi
+		Threshold_Factor = OPT_Threshold
+			! Set Y_a_threshold
+			call Find_TauW_Threshold(DBN_bench,W_bench)  
+			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
+			Wealth_factor = Y_a_threshold/W_bench
+
+
+	CALL FIND_DBN_EQ
+	CALL GOVNT_BUDGET
+
+	! Compute value function and store policy functions, value function and distribution in file
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL Firm_Value
+	CALL Write_Experimental_Results(.true.)
+	
+	! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+		ValueFunction_exp = ValueFunction
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime 
+
+	! Compute moments
+	CALL COMPUTE_STATS
+	
+	! Compute welfare gain between economies
+	CALL COMPUTE_WELFARE_GAIN
+
+	! Write experimental results in output.txt
+	CALL WRITE_VARIABLES(0)
+
+	CALL SIMULATION(0)
+
+end Subroutine Solve_Opt_Threshold
 
 !========================================================================================
 !========================================================================================
