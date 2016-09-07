@@ -755,7 +755,7 @@ Subroutine Solve_Opt_Threshold
 	
 	print*,'Optimal Tax Loop'
 
-		DO Threshold_Factor = 1,10
+		DO Threshold_Factor = 0,10
 	
 		PRINT*,''
 		Print*,'--------------- OPTIMAL WEALTH TAXES - Threshold -----------------'
