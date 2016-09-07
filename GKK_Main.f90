@@ -736,6 +736,7 @@ Subroutine Solve_Opt_Threshold
 	use omp_lib
 	implicit none 
 	real(DP) :: OPT_Threshold
+	INTEGER  :: Threshold_ind
 
 
 	!====================================================================================================
@@ -755,7 +756,9 @@ Subroutine Solve_Opt_Threshold
 	
 	print*,'Optimal Tax Loop'
 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold.txt', STATUS='replace')
-		DO Threshold_Factor = 0,10
+		DO Threshold_ind = 0,10
+
+		Threshold_Factor = real(Threshold_ind,8)
 	
 		PRINT*,''
 		Print*,'--------------- OPTIMAL WEALTH TAXES - Threshold -----------------'
