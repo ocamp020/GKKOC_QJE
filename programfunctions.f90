@@ -69,6 +69,7 @@ Subroutine Asset_Grid_Threshold(Y_a_threshold_in,agrid_t,na_t)
  		allocate( agrid_t(1:na_t) )
  		agrid_t = agrid
 	end if
+	print*, 'a_aux=',a_aux
 
 	! Allocate variables that depend on na_t
 		! Grids for Y and MB
