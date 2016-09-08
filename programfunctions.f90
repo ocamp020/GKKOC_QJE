@@ -2982,6 +2982,10 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    sw 		  = 0
     DO ai=1,na_t 
 		if (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8)) then 
+			print*, ' '
+			print*, ' Threshold test'
+			print*, ' ', (pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold))
+			print*, ' '
 			sw 			  = sw+1	
     		MB_aprime_t   = MBGRID_t(ai,zi,:)
     		! Consumption on endogenous grid and implied asset income under tauW_bt
