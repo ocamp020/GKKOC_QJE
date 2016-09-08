@@ -2983,7 +2983,8 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
     DO ai=1,na_t 
 		if (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8)) then 
 			print*, ' '
-			print*, ' Threshold test'
+			print*, ' Threshold test - Retirement'
+			print*, ' Current State', age, ai, zi, lambdai, ei, xi
 			print*, ' ', (pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold))
 			print*, ' '
 			sw 			  = sw+1	
