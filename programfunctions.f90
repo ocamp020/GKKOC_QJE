@@ -2982,14 +2982,6 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    sw 		  = 0
     DO ai=1,na_t 
 		if (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8)) then 
-			print*, ' '
-			print*, ' Threshold test - Retirement'
-			print*, ' Current State', age, ai, zi, lambdai, ei, xi
-			print*, ' ', (pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold))
-			print*, ' ', (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8))
-			print*, ' ', MBGRID_t(ai,zi,:)
-			print*, ' ', MB_a_bt(agrid(ai),zi,xi)
-			print*, ' '
 			sw 			  = sw+1	
     		MB_aprime_t   = MBGRID_t(ai,zi,:)
     		! Consumption on endogenous grid and implied asset income under tauW_bt
@@ -3004,6 +2996,18 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	        EndoCons(na_t+sw)  = (beta*survP(age)*	&
 	        			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
 	    	EndoYgrid(na_t+sw) = agrid_t(ai) +  EndoCons(na_t+sw) - RetY_lambda_e(lambdai,ei)
+
+	    	print*, ' '
+			print*, ' Threshold test - Retirement'
+			print*, ' Current State', age, ai, zi, lambdai, ei, xi
+			print*, ' ', (pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold))
+			print*, ' ', (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8))
+			print*, ' ', MBGRID_t(ai,zi,:)
+			print*, ' ', MB_a_bt(agrid(ai),zi,xi)
+			print*, ' ', MB_a_at(agrid(ai),zi,xi)
+			print*, ' ', EndoCons(ai)
+			print*, ' ', EndoCons(na_t+sw)
+			print*, ' '
 	    else 
 	    	! Consumption on endogenous grid and implied asset income
 	    	EndoCons(ai)  = (beta*survP(age)* 	&
