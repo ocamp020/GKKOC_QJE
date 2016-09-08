@@ -756,9 +756,10 @@ Subroutine Solve_Opt_Threshold
 	
 	print*,'Optimal Tax Loop'
 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold.txt', STATUS='replace')
-		DO Threshold_ind = 0,10
+		DO Threshold_ind = 1,10
 
-		Threshold_Factor = real(Threshold_ind,8)
+		Threshold_Factor = real(Threshold_ind,8)/2.0_dp
+		print*, ' Threshold_Factor=',Threshold_Factor
 	
 		PRINT*,''
 		Print*,'--------------- OPTIMAL WEALTH TAXES - Threshold -----------------'
