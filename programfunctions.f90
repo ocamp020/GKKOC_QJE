@@ -2986,6 +2986,9 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			print*, ' Threshold test - Retirement'
 			print*, ' Current State', age, ai, zi, lambdai, ei, xi
 			print*, ' ', (pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold))
+			print*, ' ', (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8))
+			print*, ' ', MBGRID_t(ai,zi,:)
+			print*, ' ', MB_a_bt(agrid(ai),zi,xi)
 			print*, ' '
 			sw 			  = sw+1	
     		MB_aprime_t   = MBGRID_t(ai,zi,:)
