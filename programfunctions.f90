@@ -3051,18 +3051,18 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	
 	! Sort endogenous grid for interpolation
 	call Sort(na_t+nx*nz+1,EndoYgrid,EndoYgrid_sort,sort_ind)
-	print*,' Yendo'
-	print*, EndoYgrid
-	print*,' Yendo_sort'
-	print*, EndoYgrid_sort
-	print*,' indices'
-	print*, sort_ind
+	! print*,' Yendo'
+	! print*, EndoYgrid
+	! print*,' Yendo_sort'
+	! print*, EndoYgrid_sort
+	! print*,' indices'
+	! print*, sort_ind
 
 	EndoYgrid = EndoYgrid_sort
 	EndoCons = EndoCons(sort_ind)
 
-	print*, ' '
-	print*, ' isnan(endocons)', any(isnan(EndoCons))
+	! print*, ' '
+	! print*, ' isnan(endocons)', any(isnan(EndoCons))
 
 	! Find  decision rules on exogenous grids
 		! decision rules are obtained taking care of extrapolations
@@ -3140,7 +3140,6 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	ENDDO ! zi
     ENDDO !age
 
-STOP
 	!------RETIREMENT PERIOD ENDS------------------------------------------------------------
 	!========================================================================================
 	
@@ -3216,7 +3215,7 @@ STOP
 		! !$omp end critical
 
     ! Sort endogenous grid for interpolation
-	call Sort(na_t+1,EndoYgrid,EndoYgrid,sort_ind)
+	call Sort(na_t+nx*nz+1,EndoYgrid,EndoYgrid,sort_ind)
 	EndoHours = EndoHours(sort_ind)
 	EndoCons  = EndoCons(sort_ind)
 ! 	print*, ' '
