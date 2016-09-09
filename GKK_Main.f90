@@ -758,7 +758,7 @@ Subroutine Solve_Opt_Threshold
 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold.txt', STATUS='replace')
 		DO Threshold_ind = 1,10
 
-		Threshold_Factor = real(Threshold_ind,8)/2.0_dp
+		Threshold_Factor = real(Threshold_ind,8)
 		print*, ' Threshold_Factor=',Threshold_Factor
 	
 		PRINT*,''
