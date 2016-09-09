@@ -3057,7 +3057,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	print*, EndoYgrid_sort
 	print*,' indices'
 	print*, sort_ind
-	STOP
+
 	EndoYgrid = EndoYgrid_sort
 	EndoCons = EndoCons(sort_ind)
 
