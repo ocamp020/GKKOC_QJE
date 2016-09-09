@@ -3088,6 +3088,9 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	        	print*, YGRID_t(ai,zi,xi)
 	        	print*,' Linear Interpolation',Linear_Int(EndoYgrid(1:na_t+sw), EndoCons(1:na_t+sw),na_t+sw, YGRID_t(ai,zi,xi))
 	        	print*,' Aprime=',Aprime_t(age,ai,zi,lambdai,ei,xi)
+	        	call Sort(na_t+1,EndoYgrid,EndoYgrid,sort_ind)
+	        	print*,' Yendo'
+	        	print*, EndoYgrid(1:na_t+sw)
 	        	STOP
 	        endif 
 		ENDDO ! ai  
