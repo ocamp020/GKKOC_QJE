@@ -696,9 +696,9 @@ end Subroutine Asset_Grid_Threshold
 				    C_endo  = ( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) )**(1.0_DP/(gamma*(1.0_DP-sigma)-1.0_DP))
 				endif 
 
-				print*,' '
-				print*,' 	Inside EGM'
-				print*,' 	Consumption_t+1=',Cons_t(age+1,ai,zi,lambdai,:,:)
+				! print*,' '
+				! print*,' 	Inside EGM'
+				! print*,' 	Consumption_t+1=',Cons_t(age+1,ai,zi,lambdai,:,:)
 			else 
 				! Separable Utility
 				do xp_ind=1,nx
