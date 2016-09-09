@@ -2975,7 +2975,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	
 	! Rest of retirement
 	DO age=MaxAge-1,RetAge,-1
-	!$omp parallel do private(lambdai,ei,ai,xi,EndoCons,EndoYgrid,sw,sort_ind,tempai,state_FOC,par_FOC)
+	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai,state_FOC,par_FOC,MB_aprime_t)
     DO zi=1,nz
     DO xi=1,nx
     DO lambdai=1,nlambda
@@ -3030,8 +3030,9 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    	print*,' '
 			print*,' '
 			print*,' '
-			print*,' Endo Consumption in retirement', age,'a',zi,lambdai,ei,xi
+			print*,' Endo Consumption in retirement', age,ai,zi,lambdai,ei,xi
 			print*,' ',EndoCons(ai),' ',EndoCons(na_t+1:)
+			print*,' sw=',sw
 			print*,' '
 			print*,' ',EndoCons
 			STOP
@@ -3102,8 +3103,8 @@ STOP
 	!========================================================================================
 	!------Working Period Starts-------------------------------------------------------------
 
-	DO age=RetAge-1,1,-1
-	!$omp parallel do private(lambdai,ei,ai,xi,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai,C_foc,state_FOC,par_FOC)
+	DO age=RetAge-1,1,-1,
+	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai,C_foc,state_FOC,par_FOC,MB_aprime_t)
     DO zi=1,nz
     DO xi=1,nx
     DO lambdai=1,nlambda
