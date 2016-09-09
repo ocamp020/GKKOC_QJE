@@ -3051,6 +3051,13 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	
 	! Sort endogenous grid for interpolation
 	call Sort(na_t+1,EndoYgrid,EndoYgrid_sort,sort_ind)
+	print*,' Yendo'
+	print*, EndoYgrid
+	print*,' Yendo_sort'
+	print*, EndoYgrid_sort
+	print*,' indices'
+	print*, sort_ind
+	STOP
 	EndoYgrid = EndoYgrid_sort
 	EndoCons = EndoCons(sort_ind)
 
