@@ -3025,6 +3025,12 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	    end if 
 	ENDDO ! ai
+
+		print*,' '
+		print*,' '
+		print*,' '
+		print*,' Endo Consumption in retirement', age,'a',zi,lambdai,ei,xi
+		print*,' ',EndoCons
 	
 	! Sort endogenous grid for interpolation
 	call Sort(na_t+1,EndoYgrid,EndoYgrid,sort_ind)
@@ -3075,12 +3081,6 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			ai = ai + 1
 		ENDDO  
 	              
-
-		print*,' '
-		print*,' '
-		print*,' '
-		print*,' Consumption in retirement', age,'a',zi,lambdai,ei,xi
-		print*,' ',Cons_t(age,:,zi,lambdai,ei,xi)
     ENDDO ! ei     
     ENDDO ! lambda
     ENDDO ! xi 
