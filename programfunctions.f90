@@ -698,7 +698,7 @@ end Subroutine Asset_Grid_Threshold
 
 				print*,' '
 				print*,' 	Inside EGM'
-				print*,' 	Consumption_t+1='Cons_t(age+1,ai,zi,lambdai,:,:)
+				print*,' 	Consumption_t+1=',Cons_t(age+1,ai,zi,lambdai,:,:)
 			else 
 				! Separable Utility
 				do xp_ind=1,nx
