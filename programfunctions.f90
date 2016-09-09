@@ -3093,6 +3093,8 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	        	call Sort(na_t+1,EndoYgrid,EndoYgrid_sort,sort_ind)
 	        	print*,' Yendo'
 	        	print*, EndoYgrid_sort
+	        	print*,' indices'
+	        	print*, sort_ind
 	        	STOP
 	        endif 
 		ENDDO ! ai  
