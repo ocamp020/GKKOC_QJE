@@ -691,10 +691,14 @@ end Subroutine Asset_Grid_Threshold
 
 				  H_endo = 1.0_DP - (1.0_DP-gamma)*C_endo/(gamma*psi*yh(age, lambdai,ei))   
 
-				  If (H_endo .lt. 0.0_DP) then
+				If (H_endo .lt. 0.0_DP) then
 				    H_endo = 0.0_DP 
 				    C_endo  = ( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) )**(1.0_DP/(gamma*(1.0_DP-sigma)-1.0_DP))
-				  endif 
+				endif 
+
+				print*,' '
+				print*,' 	Inside EGM'
+				print*,' 	Consumption_t+1='Cons_t(age+1,ai,zi,lambdai,:,:)
 			else 
 				! Separable Utility
 				do xp_ind=1,nx
@@ -2985,14 +2989,20 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			sw 			  = sw+1	
     		MB_aprime_t   = MBGRID_t(ai,zi,:)
     		! Consumption on endogenous grid and implied asset income under tauW_bt
-    		where(pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
-    			&	MB_aprime_t=MB_a_bt(agrid(ai),zi,xi)
+    		do xp_ind = 1,nx 	
+    			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
+    				MB_aprime_t(xp_ind) = MB_a_bt(agrid_t(ai),zi,xp_ind)
+    			endif
+    		enddo 
     		EndoCons(ai)  =  (beta*survP(age)* 	&
     					& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! Consumption on endogenous grid and implied asset income under tauW_at
-	        where(pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
-	        	& MB_aprime_t=MB_a_at(agrid(ai),zi,xi)
+	        do xp_ind = 1,nx 	
+    			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
+    				MB_aprime_t(xp_ind) = MB_a_at(agrid_t(ai),zi,xp_ind)
+    			endif
+    		enddo 
 	        EndoCons(na_t+sw)  = (beta*survP(age)*	&
 	        			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
 	    	EndoYgrid(na_t+sw) = agrid_t(ai) +  EndoCons(na_t+sw) - RetY_lambda_e(lambdai,ei)
@@ -3092,14 +3102,20 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			sw 			  = sw+1	
     		MB_aprime_t   = MBGRID_t(ai,zi,:)
 	    	! Below threshold
-	    	where(pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
-	    		&	MB_aprime_t=MB_a_bt(agrid(ai),zi,xi)
+    		do xp_ind = 1,nx 	
+    			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
+    				MB_aprime_t(xp_ind) = MB_a_bt(agrid_t(ai),zi,xp_ind)
+    			endif
+    		enddo 
 			call EGM_Working_Period( MB_aprime_t , H_min , state_FOC , & 
 			      & EndoCons(ai), EndoHours(ai) , EndoYgrid(ai)  )
 			
 			! Above threshold
-			where(pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8) &
-				& 	MB_aprime_t=MB_a_at(agrid(ai),zi,xi)
+			do xp_ind = 1,nx 	
+    			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
+    				MB_aprime_t(xp_ind) = MB_a_at(agrid_t(ai),zi,xp_ind)
+    			endif
+    		enddo 
 			call EGM_Working_Period( MB_aprime_t , H_min , state_FOC , & 
 			      & EndoCons(na_t+sw), EndoHours(na_t+sw) , EndoYgrid(na_t+sw)  )
 
