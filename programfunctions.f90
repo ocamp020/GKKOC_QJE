@@ -3104,7 +3104,7 @@ STOP
 	!------Working Period Starts-------------------------------------------------------------
 
 	DO age=RetAge-1,1,-1
-	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai,, &
+	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai, &
 	!$omp& C_foc,state_FOC,par_FOC,MB_aprime_t)
     DO zi=1,nz
     DO xi=1,nx
