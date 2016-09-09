@@ -3114,6 +3114,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			print*, ' ', MBGRID_t(ai,zi,:)
 			print*, ' ', MB_a_bt(agrid(ai),zi,xi)
 			print*, ' ', MB_a_at(agrid(ai),zi,xi)
+			print*, ' ', MB_aprime_t
 			print*, ' ', EndoCons(ai)
 			print*, ' ', EndoCons(na_t+sw)
 			print*, ' '
