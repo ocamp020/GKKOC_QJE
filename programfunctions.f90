@@ -2976,8 +2976,8 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	
 	! Rest of retirement
 	DO age=MaxAge-1,RetAge,-1
-	! !$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
-	! !$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
+	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
+	!$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
     DO zi=1,nz
     DO xi=1,nx
     DO lambdai=1,nlambda
@@ -3084,33 +3084,33 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 				ENDIF                   
 	        endif 
 
-	        ! !$omp critical 
-	        if (isnan(Cons_t(age,ai,zi,lambdai,ei,xi))) then
-	        	print*,' '
-	        	print*,' '
-	        	print*,' '
-	        	print*,' isnan Consumption', age,ai,zi,lambdai,ei,xi
-	        	print*,' sw=',sw 
-	        	print*,' Yendo'
-	        	print*, EndoYgrid(1:na_t+sw)
-	        	print*,' Cendo'
-	        	print*, EndoCons(1:na_t+sw)
-	        	print*,' YGRID'
-	        	print*, YGRID_t(ai,zi,xi)
-	        	print*,' Linear Interpolation',Linear_Int(EndoYgrid(1:na_t+sw), EndoCons(1:na_t+sw),na_t+sw, YGRID_t(ai,zi,xi))
-	        	print*,' Aprime=',Aprime_t(age,ai,zi,lambdai,ei,xi)
-	        	call Sort(na_t+nx*nz+1,EndoYgrid,EndoYgrid_sort,sort_ind)
-	        	print*,' Yendo'
-	        	print*, EndoYgrid_sort
-	        	print*,' indices'
-	        	print*, sort_ind
-	        	print*, ' '
-	        	print*, ' ',minval(EndoYgrid),maxval(EndoYgrid)
-	        	print*, ' ',minval(EndoYgrid_sort),maxval(EndoYgrid_sort)
-	        	print*, ' The end'
-	        	STOP
-	        endif 
-	        ! !$omp end critical
+	        ! ! !$omp critical 
+	        ! if (isnan(Cons_t(age,ai,zi,lambdai,ei,xi))) then
+	        ! 	print*,' '
+	        ! 	print*,' '
+	        ! 	print*,' '
+	        ! 	print*,' isnan Consumption', age,ai,zi,lambdai,ei,xi
+	        ! 	print*,' sw=',sw 
+	        ! 	print*,' Yendo'
+	        ! 	print*, EndoYgrid(1:na_t+sw)
+	        ! 	print*,' Cendo'
+	        ! 	print*, EndoCons(1:na_t+sw)
+	        ! 	print*,' YGRID'
+	        ! 	print*, YGRID_t(ai,zi,xi)
+	        ! 	print*,' Linear Interpolation',Linear_Int(EndoYgrid(1:na_t+sw), EndoCons(1:na_t+sw),na_t+sw, YGRID_t(ai,zi,xi))
+	        ! 	print*,' Aprime=',Aprime_t(age,ai,zi,lambdai,ei,xi)
+	        ! 	call Sort(na_t+nx*nz+1,EndoYgrid,EndoYgrid_sort,sort_ind)
+	        ! 	print*,' Yendo'
+	        ! 	print*, EndoYgrid_sort
+	        ! 	print*,' indices'
+	        ! 	print*, sort_ind
+	        ! 	print*, ' '
+	        ! 	print*, ' ',minval(EndoYgrid),maxval(EndoYgrid)
+	        ! 	print*, ' ',minval(EndoYgrid_sort),maxval(EndoYgrid_sort)
+	        ! 	print*, ' The end'
+	        ! 	STOP
+	        ! endif 
+	        ! ! !$omp end critical
 		ENDDO ! ai  
 
         ai=1           
