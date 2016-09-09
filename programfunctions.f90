@@ -3009,17 +3009,17 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	        			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
 	    	EndoYgrid(na_t+sw) = agrid_t(ai) +  EndoCons(na_t+sw) - RetY_lambda_e(lambdai,ei)
 
-	    	print*, ' '
-			print*, ' Threshold test - Retirement'
-			print*, ' Current State', age, ai, zi, lambdai, ei, xi
-			print*, ' ', (pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold))
-			print*, ' ', (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8))
-			print*, ' ', MBGRID_t(ai,zi,:)
-			print*, ' ', MB_a_bt(agrid(ai),zi,xi)
-			print*, ' ', MB_a_at(agrid(ai),zi,xi)
-			print*, ' ', EndoCons(ai)
-			print*, ' ', EndoCons(na_t+sw)
-			print*, ' '
+	  !   	print*, ' '
+			! print*, ' Threshold test - Retirement'
+			! print*, ' Current State', age, ai, zi, lambdai, ei, xi
+			! print*, ' ', (pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold))
+			! print*, ' ', (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8))
+			! print*, ' ', MBGRID_t(ai,zi,:)
+			! print*, ' ', MB_a_bt(agrid(ai),zi,xi)
+			! print*, ' ', MB_a_at(agrid(ai),zi,xi)
+			! print*, ' ', EndoCons(ai)
+			! print*, ' ', EndoCons(na_t+sw)
+			! print*, ' '
 	    else 
 	    	! Consumption on endogenous grid and implied asset income
 	    	EndoCons(ai)  = (beta*survP(age)* 	&
@@ -3028,29 +3028,30 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    end if 
 
 
-	    if (any(isnan(EndoCons))) then 
-	    	print*,' '
-			print*,' '
-			print*,' '
-			print*,' Endo Consumption in retirement', age,ai,zi,lambdai,ei,xi
-			print*,' ',EndoCons(ai),(beta*survP(age)* 	&
-	    				& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
-			print*,' MBGRID_t=',MBGRID_t(ai,zi,:)
-			print*,' cons(t+1)=',Cons_t(age+1,ai,zi,lambdai,ei,:)
-			print*,' Size(endoCons)=',size(EndoCons)
-			print*,' sw=',sw,'na_t=',na_t
-			print*,' Threshold_test=',(any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8))
-			print*,' '
-			print*,' ',EndoCons
-			print*,' '
-			STOP
-		endif 
+	 !    if (any(isnan(EndoCons))) then 
+	 !    	print*,' '
+		! 	print*,' '
+		! 	print*,' '
+		! 	print*,' Endo Consumption in retirement', age,ai,zi,lambdai,ei,xi
+		! 	print*,' ',EndoCons(ai),(beta*survP(age)* 	&
+	 !    				& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
+		! 	print*,' MBGRID_t=',MBGRID_t(ai,zi,:)
+		! 	print*,' cons(t+1)=',Cons_t(age+1,ai,zi,lambdai,ei,:)
+		! 	print*,' Size(endoCons)=',size(EndoCons)
+		! 	print*,' sw=',sw,'na_t=',na_t
+		! 	print*,' Threshold_test=',(any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8))
+		! 	print*,' '
+		! 	print*,' ',EndoCons
+		! 	print*,' '
+		! 	STOP
+		! endif 
 	ENDDO ! ai
 
 		
 	
 	! Sort endogenous grid for interpolation
-	call Sort(na_t+1,EndoYgrid,EndoYgrid,sort_ind)
+	call Sort(na_t+1,EndoYgrid,EndoYgrid_sort,sort_ind)
+	EndoYgrid = EndoYgrid_sort
 	EndoCons = EndoCons(sort_ind)
 
 	print*, ' '
