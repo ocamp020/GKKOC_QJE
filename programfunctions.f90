@@ -3184,18 +3184,18 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    	!print*, ' '
 	    	!print*, State_FOC 
 	    	!print*, MB_a_bt(agrid_t(ai),zgrid(zi)), MB_a_at(agrid_t(ai),zgrid(zi))
-	    	print*, ' '
-			print*, ' Threshold test - Working Period'
-			print*, ' Current State', age, ai, zi, lambdai, ei, xi
-			print*, ' ', (pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold))
-			print*, ' ', (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8))
-			print*, ' ', MBGRID_t(ai,zi,:)
-			print*, ' ', MB_a_bt(agrid(ai),zi,xi)
-			print*, ' ', MB_a_at(agrid(ai),zi,xi)
-			print*, ' ', MB_aprime_t
-			print*, ' ', EndoCons(ai)
-			print*, ' ', EndoCons(na_t+sw)
-			print*, ' '
+	  !   	print*, ' '
+			! print*, ' Threshold test - Working Period'
+			! print*, ' Current State', age, ai, zi, lambdai, ei, xi
+			! print*, ' ', (pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold))
+			! print*, ' ', (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8))
+			! print*, ' ', MBGRID_t(ai,zi,:)
+			! print*, ' ', MB_a_bt(agrid(ai),zi,xi)
+			! print*, ' ', MB_a_at(agrid(ai),zi,xi)
+			! print*, ' ', MB_aprime_t
+			! print*, ' ', EndoCons(ai)
+			! print*, ' ', EndoCons(na_t+sw)
+			! print*, ' '
 		else 
 			! Usual EGM
 			call EGM_Working_Period( MBGRID_t(ai,zi,:) , H_min , state_FOC , & 
