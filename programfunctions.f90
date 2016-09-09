@@ -3095,6 +3095,10 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	        	print*, EndoYgrid_sort
 	        	print*,' indices'
 	        	print*, sort_ind
+	        	print*, ' '
+	        	print*, ' ',min(EndoYgrid),max(EndoYgrid)
+	        	print*, ' ',min(EndoYgrid_sort),max(EndoYgrid_sort)
+	        	print*, ' The end'
 	        	STOP
 	        endif 
 		ENDDO ! ai  
