@@ -3072,7 +3072,22 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 				IF (Cons_t(age,ai,zi,lambdai,ei,xi) .le. 0.0_DP)  THEN
 				    print*,'r1: Cons(age, ai, zi, lambdai,ei)=',Cons_t(age, ai, zi, lambdai, ei,xi)
 				ENDIF                   
-	        endif                                                         
+	        endif 
+
+	        if (isnan(Cons_t(age,ai,zi,lambdai,ei,xi))) then
+	        	print*,' '
+	        	print*,' '
+	        	print*,' '
+	        	print*,' isnan Consumption', age,ai,zi,lambdai,ei,xi
+	        	print*,' sw=',sw 
+	        	print*,' Yendo'
+	        	print*, EndoYgrid(1:na_t+sw)
+	        	print*,' Cendo'
+	        	print*, EndoCons(1:na_t+sw)
+	        	print*,' YGRID'
+	        	print*, YGRID_t(ai,zi,xi)
+	        	STOP
+	        endif 
 		ENDDO ! ai  
 
         ai=1           
