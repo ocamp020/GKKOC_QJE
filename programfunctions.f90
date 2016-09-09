@@ -3031,10 +3031,12 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			print*,' '
 			print*,' '
 			print*,' Endo Consumption in retirement', age,ai,zi,lambdai,ei,xi
-			print*,' ',EndoCons(ai),' ',EndoCons(na_t+1:)
-			print*,' sw=',sw
+			print*,' ',EndoCons(ai),' Size(endoCons)=',size(EndoCons)
+			print*,' sw=',sw,'na_t=',na_t,
+			print*,' Threshold_test=',(any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8))
 			print*,' '
 			print*,' ',EndoCons
+			print*,' '
 			STOP
 		endif 
 	ENDDO ! ai
