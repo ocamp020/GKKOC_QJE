@@ -2925,14 +2925,14 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	IMPLICIT NONE
 	REAL(DP) :: brentvalue, C_foc, H_min, euler_power
 	INTEGER  :: tempai, sw 
-	REAL(DP), DIMENSION(na_t+1)  	:: EndoCons, EndoYgrid, EndoHours
-	INTEGER , DIMENSION(na_t+1)     :: sort_ind 
+	REAL(DP), DIMENSION(na_t+nz*nx+1)  	:: EndoCons, EndoYgrid, EndoHours
+	INTEGER , DIMENSION(na_t+nz*nx+1)     :: sort_ind 
 	REAL(DP), DIMENSION(na_t,nz,nx) :: Wealth_mat
 	REAL(DP), DIMENSION(6)       	:: state_FOC
 	REAL(DP), DIMENSION(7)       	:: par_FOC
 	REAL(DP), DIMENSION(nx)       	:: MB_aprime_t
 	integer  :: age, ai, zi, lambdai, ei, xi, xp_ind
-	real(dp), dimension(na_t) :: EndoYgrid_sort
+	real(dp), dimension(na_t+nz*nx+1) :: EndoYgrid_sort
 
 	!$ call omp_set_num_threads(nz)
 
