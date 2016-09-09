@@ -3076,6 +3076,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 				ENDIF                   
 	        endif 
 
+	        !$omp critical 
 	        if (isnan(Cons_t(age,ai,zi,lambdai,ei,xi))) then
 	        	print*,' '
 	        	print*,' '
@@ -3101,6 +3102,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	        	print*, ' The end'
 	        	STOP
 	        endif 
+	        !$omp end critical
 		ENDDO ! ai  
 
         ai=1           
