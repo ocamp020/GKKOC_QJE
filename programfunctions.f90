@@ -3071,7 +3071,13 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			ENDIF                   
 			ai = ai + 1
 		ENDDO  
-	               
+	              
+
+		print*,' '
+		print*,' '
+		print*,' '
+		print*,' Consumption in retirement', age,'a',zi,lambdai,ei,xi
+		print*,' ',Cons_t(age,:,zi,lambdai,ei,xi)
     ENDDO ! ei     
     ENDDO ! lambda
     ENDDO ! xi 
