@@ -3050,7 +3050,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 		
 	
 	! Sort endogenous grid for interpolation
-	call Sort(na_t+1,EndoYgrid,EndoYgrid_sort,sort_ind)
+	call Sort(na_t+nx*nz+1,EndoYgrid,EndoYgrid_sort,sort_ind)
 	print*,' Yendo'
 	print*, EndoYgrid
 	print*,' Yendo_sort'
