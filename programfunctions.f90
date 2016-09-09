@@ -3024,13 +3024,21 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    				& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	    end if 
+
+
+	    if (any(isnan(EndoCons))) then 
+	    	print*,' '
+			print*,' '
+			print*,' '
+			print*,' Endo Consumption in retirement', age,'a',zi,lambdai,ei,xi
+			print*,' ',EndoCons(ai),' ',EndoCons(na_t+1:)
+			print*,' '
+			print*,' '
+			print*,' ',
+		endif 
 	ENDDO ! ai
 
-		print*,' '
-		print*,' '
-		print*,' '
-		print*,' Endo Consumption in retirement', age,'a',zi,lambdai,ei,xi
-		print*,' ',EndoCons
+		
 	
 	! Sort endogenous grid for interpolation
 	call Sort(na_t+1,EndoYgrid,EndoYgrid,sort_ind)
