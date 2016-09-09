@@ -3030,6 +3030,9 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	call Sort(na_t+1,EndoYgrid,EndoYgrid,sort_ind)
 	EndoCons = EndoCons(sort_ind)
 
+	print*, ' '
+	print*, ' isnan(endocons)', any(isnan(EndoCons))
+
 	! Find  decision rules on exogenous grids
 		! decision rules are obtained taking care of extrapolations
 		tempai=1           
