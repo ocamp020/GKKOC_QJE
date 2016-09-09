@@ -2976,8 +2976,8 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	
 	! Rest of retirement
 	DO age=MaxAge-1,RetAge,-1
-	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
-	!$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
+	! !$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
+	! !$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
     DO zi=1,nz
     DO xi=1,nx
     DO lambdai=1,nlambda
@@ -3076,7 +3076,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 				ENDIF                   
 	        endif 
 
-	        !$omp critical 
+	        ! !$omp critical 
 	        if (isnan(Cons_t(age,ai,zi,lambdai,ei,xi))) then
 	        	print*,' '
 	        	print*,' '
@@ -3102,7 +3102,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	        	print*, ' The end'
 	        	STOP
 	        endif 
-	        !$omp end critical
+	        ! !$omp end critical
 		ENDDO ! ai  
 
         ai=1           
