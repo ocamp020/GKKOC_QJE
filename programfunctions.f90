@@ -3033,8 +3033,6 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			print*,' Endo Consumption in retirement', age,'a',zi,lambdai,ei,xi
 			print*,' ',EndoCons(ai),' ',EndoCons(na_t+1:)
 			print*,' '
-			print*,' '
-			print*,' ',
 		endif 
 	ENDDO ! ai
 
