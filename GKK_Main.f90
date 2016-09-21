@@ -285,11 +285,11 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		Pr_mat = Profit_Matrix(R,P)
 		CALL ComputeLaborUnits(EBAR,wage)
 		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
-			tauK = 0.0_dp 
-			call Find_TauW_Threshold(DBN1,W_bench)  
-			print*,' ' 
-			print*,'W_Bench=',W_bench
-			STOP
+			! tauK = 0.0_dp 
+			! call Find_TauW_Threshold(DBN1,W_bench)  
+			! print*,' ' 
+			! print*,'W_Bench=',W_bench
+			! STOP
 		CALL GOVNT_BUDGET
 	end if 
 		print*,"	Computing satitics"
