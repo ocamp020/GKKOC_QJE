@@ -54,12 +54,12 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
+		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-		Opt_Threshold = .true.
+		Opt_Threshold = .false.
 		Simul_Switch  = .false.
 
 
@@ -285,6 +285,11 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		Pr_mat = Profit_Matrix(R,P)
 		CALL ComputeLaborUnits(EBAR,wage)
 		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+			tauK = 0.0_dp 
+			call Find_TauW_Threshold(DBN1,W_bench)  
+			print*,' ' 
+			print*,'W_Bench=',W_bench
+			STOP
 		CALL GOVNT_BUDGET
 	end if 
 		print*,"	Computing satitics"
