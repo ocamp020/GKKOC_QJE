@@ -1027,6 +1027,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			print*, ' '
 
 			psi = 0.776_dp
+			psi = 1.0_dp 
     	
 		    DO tauindx=00,20,2
 	            tauw_at     = real(tauindx,8)/1000_DP
