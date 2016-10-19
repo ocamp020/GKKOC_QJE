@@ -37,7 +37,8 @@ PROGRAM main
 	! Variables to measure running time
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
-		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch, Opt_Threshold
+		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
+		logical  :: Opt_Threshold, Opt_Tau_C
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -901,7 +902,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 	implicit none 
 	logical, intent(in) :: Opt_Tax_KW
 	real(DP) :: OPT_tauC
-	INTEGER  :: tauE_ind
+	INTEGER  :: tauC_ind
 
 
 	!====================================================================================================
@@ -981,7 +982,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
 		tauK = OPT_tauK
 		psi  = OPT_psi
-		tauE = OPT_tauC
+		tauC = OPT_tauC
 		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.02_dp,Opt_TauK+0.02_dp) 
 
 		tauK     = OPT_tauK
@@ -1016,11 +1017,11 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
-    	DO tauE_ind = 0,10
+    	DO tauC_ind = 0,10
 
     		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax.txt', STATUS='old', POSITION='append')
 
-			tauE = real(tauE_ind,8)/10.0_dp
+			tauC = real(tauC_ind,8)/10.0_dp
 			print*, ' '
 			print*, ' Consumption Taxes=',tauC
 			print*, ' '
