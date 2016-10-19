@@ -1021,7 +1021,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
     		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax.txt', STATUS='old', POSITION='append')
 
-			tauC = real(tauC_ind,8)/10.0_dp
+			tauC = real(tauC_ind,8)/1000.0_dp
 			print*, ' '
 			print*, ' Consumption Taxes=',tauC
 			print*, ' '
