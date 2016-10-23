@@ -1693,6 +1693,9 @@ SUBROUTINE GOVNT_BUDGET()
 
 	if (solving_bench.eq.1) then 
 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Govnt_Budget_Bench.txt', STATUS='replace')
+	else
+	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Govnt_Budget_Exp.txt', STATUS='replace')
+	endif 
 	WRITE(UNIT=11, FMT=*) ' '
 	WRITE(UNIT=11, FMT=*) "Government Budget - Revenues and taxes"
 	WRITE(UNIT=11, FMT=*) 'GBAR=',GBAR,'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=', GBAR_L/Ebar 
@@ -1706,7 +1709,7 @@ SUBROUTINE GOVNT_BUDGET()
 	WRITE(UNIT=11, FMT=*) 'Average Labor Tax', GBAR_L/Tot_Lab_Inc
 	WRITE(UNIT=11, FMT=*) 'Total Labor Income', Tot_Lab_Inc , 'EBAR', EBAR
 	Close(UNIT=11)
-	endif 
+	
 END  SUBROUTINE GOVNT_BUDGET
 
 !========================================================================================
