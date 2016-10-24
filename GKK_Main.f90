@@ -1014,12 +1014,12 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		PRINT*,''
 		Print*,'--------------- OPTIMAL WEALTH TAXES - Consumption Taxes -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_2.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_3.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
-    	DO tauC_ind = 325,475,50
+    	DO tauC_ind = 525,675,50
 
-    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_2.txt', STATUS='old', POSITION='append')
+    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_3.txt', STATUS='old', POSITION='append')
 
 			tauC = real(tauC_ind,8)/1000.0_dp
 			print*, ' '
@@ -1027,9 +1027,9 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			print*, ' '
 
 			psi = 0.776_dp
-			psi = 1.0_dp 
+			psi = 1.27_dp 
     	
-		    DO tauindx=00,20,2
+		    DO tauindx=00,10,2
 	            tauw_at     = real(tauindx,8)/1000_DP
 	            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
@@ -1045,7 +1045,8 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
 				! Print Results 
 			    print*, 'tauW=', tauW_at, 'YBAR=', YBAR, & 
-			    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+			    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
+			    	  & 'tauC=', tauC,'psi=',psi
 			      
 			    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
 			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
@@ -1065,7 +1066,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 	    ENDDO
 
 
-	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_cons_tax_2.txt', STATUS='replace')
+	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_cons_tax_3.txt', STATUS='replace')
 
 		tauW_at = OPT_tauW
 		psi 	= OPT_psi
