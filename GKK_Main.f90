@@ -1014,12 +1014,12 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		PRINT*,''
 		Print*,'--------------- OPTIMAL WEALTH TAXES - Consumption Taxes -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_3.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_4.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
-    	DO tauC_ind = 525,675,50
+    	DO tauC_ind = 725,875,50
 
-    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_3.txt', STATUS='old', POSITION='append')
+    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_4.txt', STATUS='old', POSITION='append')
 
 			tauC = real(tauC_ind,8)/1000.0_dp
 			print*, ' '
@@ -1027,7 +1027,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			print*, ' '
 
 			psi = 0.776_dp
-			psi = 1.27_dp 
+			psi = 1.50_dp 
     	
 		    DO tauindx=00,10,2
 	            tauw_at     = real(tauindx,8)/1000_DP
@@ -1066,7 +1066,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 	    ENDDO
 
 
-	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_cons_tax_3.txt', STATUS='replace')
+	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_cons_tax_4.txt', STATUS='replace')
 
 		tauW_at = OPT_tauW
 		psi 	= OPT_psi
