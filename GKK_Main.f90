@@ -1017,7 +1017,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_4.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
-    	DO tauC_ind = 725,875,50
+    	DO tauC_ind = 680,740,20
 
     		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_4.txt', STATUS='old', POSITION='append')
 
