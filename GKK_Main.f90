@@ -1028,7 +1028,9 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
 			psi = 0.776_dp
 			psi = 1.50_dp 
-    	
+
+			CALL Write_Experimental_Results(compute_exp)
+			
 		    DO tauindx=00,10,2
 	            tauw_at     = real(tauindx,8)/1000_DP
 	            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
