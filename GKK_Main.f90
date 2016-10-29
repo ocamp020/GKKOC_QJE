@@ -1017,7 +1017,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_4.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
-    	DO tauC_ind = 675,740,20
+    	DO tauC_ind = 680,740,20
 
     		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_4.txt', STATUS='old', POSITION='append')
 
@@ -1073,7 +1073,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		tauW_at = OPT_tauW
 		psi 	= OPT_psi
 		tauC    = OPT_tauC
-		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.002_dp,Opt_TauW+0.002_dp) 
+		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.001_dp,Opt_TauW+0.001_dp) 
 
 		tauW_at = OPT_tauW
 		OPT_psi  = psi
