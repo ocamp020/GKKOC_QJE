@@ -1727,7 +1727,7 @@ SUBROUTINE FIND_DBN_EQ()
 	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi
 
 	!$ call omp_set_num_threads(nz)
-	DBN_criteria = 1.0E-08_DP
+	DBN_criteria = 2.0E-07_DP
 
 	! Solve the model at current aggregate values
 		! Find the threshold for wealth taxes (a_bar)
