@@ -11,10 +11,11 @@ Program Consumption_Equivalent
 	! Compute benchmark or load results
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
 	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: CE_total, CE_c, CE_cl, CE_cd, CE_h, CE_hl, CE_hd
+	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: CE_nb_cl, CE_nb_cd, CE_nb_hl, CE_nb_hd
 	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: Value_aux
 	real(dp) :: CE2_nb_total, CE2_nb_c, CE2_nb_cl, CE2_nb_cd, CE2_nb_h, CE2_nb_hl, CE2_nb_hd
 	real(dp) :: CE2_pop_total, CE2_pop_c, CE2_pop_cl, CE2_pop_cd, CE2_pop_h, CE2_pop_hl, CE2_pop_hd
-	real(dp) :: C_bench, C_exp, H_bench, H_exp
+	real(dp) :: C_bench, C_exp, H_bench, H_exp, C_NB_bench, C_NB_exp, H_NB_bench, H_NB_exp
 	real(dp) :: CE_total_bench, CE_c_bench, CE_cl_bench, CE_cd_bench, CE_h_bench, CE_hl_bench, CE_hd_bench
 	real(dp) :: CE_total_NB_bench, CE_c_NB_bench, CE_cl_NB_bench, CE_cd_NB_bench, CE_h_NB_bench, CE_hl_NB_bench, CE_hd_NB_bench
 	real(dp) :: CE_total_exp, CE_c_exp, CE_cl_exp, CE_cd_exp, CE_h_exp, CE_hl_exp, CE_hd_exp
@@ -205,9 +206,13 @@ do i=1,3
 
 	C_bench = sum(Cons_bench*DBN_bench)
 	C_exp   = sum(Cons_exp*DBN_exp)
+	C_NB_bench = sum(Cons_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:)))
+	C_NB_exp   = sum(Cons_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:)))
 
 	H_bench = sum(Hours_bench*DBN_bench)
 	H_exp   = sum(Hours_exp*DBN_exp)
+	H_NB_bench = sum(Hours_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:)))
+	H_NB_exp   = sum(Hours_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:)))
 
 !====================================================================================================
 	PRINT*,''
@@ -235,22 +240,31 @@ do i=1,3
 
 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,Value_aux)
 
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	CE_c  = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	CE_cl = 100_dp*(C_exp/C_bench - 1.0_dp)
 
 	CE_cd = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_bench/C_exp - 1.0_dp ) ;
 
-	CE2_nb_c  = 100.0_dp*((sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/&
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CE_nb_cl = 100_dp*(C_NB_exp/C_NB_bench - 1.0_dp)
+
+	CE_nb_cd = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_NB_bench/C_NB_exp - 1.0_dp ) ;
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CE2_nb_c = 100.0_dp*((sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/&
 		&                  sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
 		&                  **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
-	CE2_nb_cl = 100_dp*(C_exp/C_bench - 1.0_dp)
+	CE2_nb_cl = 100_dp*(C_NB_exp/C_NB_bench - 1.0_dp)
 
 	CE2_nb_cd = 100.0_dp*((sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/&
 		&				   sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
-		& 					**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_bench/C_exp - 1.0_dp ) ;
+		& 					**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_NB_bench/C_NB_exp - 1.0_dp ) ;
 
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	CE2_pop_c  = 100.0_dp*((sum(Value_aux*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
 		& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
@@ -276,24 +290,34 @@ do i=1,3
 	Hours   = Hours_exp
 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
 
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	CE_h  = 100.0_dp*((ValueFunction_exp/Value_aux)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	CE_hl = 100_dp*(((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
 
 	CE_hd = 100.0_dp*((ValueFunction/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) &
 	        &  * ((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
 
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CE_nb_hl = 100_dp*(((1.0_dp-H_NB_exp)/(1.0_dp-H_NB_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
+
+	CE_nb_hd = 100.0_dp*((ValueFunction/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) &
+	        &  * ((1.0_dp-H_NB_bench)/(1.0_dp-H_NB_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	CE2_nb_h  = 100.0_dp*((sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/&
 			&				sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
 			& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
-	CE2_nb_hl = 100_dp*(((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
+	CE2_nb_hl = 100_dp*(((1.0_dp-H_NB_exp)/(1.0_dp-H_NB_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
 
 	CE2_nb_hd = 100.0_dp*((sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/&
 			& sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
 			& **(1.0_dp/((1.0_dp-sigma)*gamma)) &
-	        &  * ((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
+	        &  * ((1.0_dp-H_NB_bench)/(1.0_dp-H_NB_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
 
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	CE2_pop_h  = 100.0_dp*((sum(ValueFunction_exp*DBN_exp)/sum(Value_aux*DBN_bench))&
 			& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
@@ -318,11 +342,11 @@ do i=1,3
 
 	CE_total_NB_bench 	= sum(CE_total(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
 	CE_c_NB_bench 		= sum(CE_c(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-	CE_cl_NB_bench 		= sum(CE_cl(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-	CE_cd_NB_bench 		= sum(CE_cd(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_cl_NB_bench 		= sum(CE_nb_cl(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_cd_NB_bench 		= sum(CE_nb_cd(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
 	CE_h_NB_bench 		= sum(CE_h(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-	CE_hl_NB_bench 		= sum(CE_hl(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-	CE_hd_NB_bench 		= sum(CE_hd(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_hl_NB_bench 		= sum(CE_nb_hl(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_hd_NB_bench 		= sum(CE_nb_hd(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
 
 	CE_total_exp 	= sum(CE_total*DBN_exp )
 	CE_c_exp 		= sum(CE_c*DBN_exp )
@@ -334,11 +358,11 @@ do i=1,3
 
 	CE_total_NB_exp 	= sum(CE_total(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
 	CE_c_NB_exp 		= sum(CE_c(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
-	CE_cl_NB_exp 		= sum(CE_cl(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
-	CE_cd_NB_exp 		= sum(CE_cd(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_cl_NB_exp 		= sum(CE_nb_cl(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_cd_NB_exp 		= sum(CE_nb_cd(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
 	CE_h_NB_exp 		= sum(CE_h(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
-	CE_hl_NB_exp 		= sum(CE_hl(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
-	CE_hd_NB_exp 		= sum(CE_hd(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_hl_NB_exp 		= sum(CE_nb_hl(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_hd_NB_exp 		= sum(CE_nb_hd(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
 
 
 	if (i.eq.1) then 
