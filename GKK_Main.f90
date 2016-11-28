@@ -1019,7 +1019,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
     	CALL Write_Experimental_Results(.false.)
 
-    	DO tauC_ind = 760,800,10
+    	DO tauC_ind = 750,800,10
 
     		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_6.txt', STATUS='old', POSITION='append')
 
