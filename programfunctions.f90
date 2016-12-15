@@ -4332,30 +4332,30 @@ SUBROUTINE  SIMULATION(bench_indx)
 		INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
 		INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
 		INTEGER , DIMENSION(totpop) :: panelage, panelz, panellambda, panele, panelx, panelz_old, panellambda_old
-		REAL(DP), DIMENSION(totpop) :: panela, panelPV_a, panelK, panel_Y_L   
+		REAL(SP), DIMENSION(totpop) :: panela, panelPV_a, panelK, panel_Y_L   
 
 		! Intergenerational statistics
 		INTEGER , DIMENSION(totpop) 			  :: eligible, death_count
-		REAL(DP), DIMENSION(totpop) 			  :: panela_parents, panela_sons
-		REAL(DP), DIMENSION(:)      , allocatable :: eligible_panela_parents, eligible_panela_sons
+		REAL(SP), DIMENSION(totpop) 			  :: panela_parents, panela_sons
+		REAL(SP), DIMENSION(:)      , allocatable :: eligible_panela_parents, eligible_panela_sons
 		INTEGER , DIMENSION(totpop) 			  :: panelage_parents, panelage_sons
 		INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_parents, eligible_panelage_sons
 		INTEGER                     			  :: n_eligible
 		! Intergenerational statistics 30-50
-		REAL(DP), DIMENSION(totpop) 	     :: assets_dad, assets_son, return_dad, return_son, PV_dad, PV_son
+		REAL(SP), DIMENSION(totpop) 	     :: assets_dad, assets_son, return_dad, return_son, PV_dad, PV_son
 		INTEGER , DIMENSION(totpop) 	     :: age_dad, age_son, z_dad, z_son
-		REAL(DP), DIMENSION(2,4000000)       :: IGM_a_matrix, IGM_r_matrix, IGM_pv_matrix
+		REAL(SP), DIMENSION(2,4000000)       :: IGM_a_matrix, IGM_r_matrix, IGM_pv_matrix
 		INTEGER , DIMENSION(2,4000000) 		 :: IGM_z_matrix
-		REAL(DP), DIMENSION(:) , allocatable :: panela_dad, panela_son, panelz_dad, panelz_son
-		REAL(DP), DIMENSION(:) , allocatable :: panelr_dad, panelr_son, panelPV_dad, panelPV_son
+		REAL(SP), DIMENSION(:) , allocatable :: panela_dad, panela_son, panelz_dad, panelz_son
+		REAL(SP), DIMENSION(:) , allocatable :: panelr_dad, panelr_son, panelPV_dad, panelPV_son
 		INTEGER 						     :: IGM_index
 		! Intergenerational statistics 40-60
-		REAL(DP), DIMENSION(totpop) 	     :: assets_dad_2, assets_son_2, return_dad_2, return_son_2, PV_dad_2, PV_son_2
+		REAL(SP), DIMENSION(totpop) 	     :: assets_dad_2, assets_son_2, return_dad_2, return_son_2, PV_dad_2, PV_son_2
 		INTEGER , DIMENSION(totpop) 	     :: age_dad_2, age_son_2, z_dad_2, z_son_2
-		REAL(DP), DIMENSION(2,4000000)       :: IGM_a_matrix_2, IGM_r_matrix_2, IGM_pv_matrix_2
+		REAL(SP), DIMENSION(2,4000000)       :: IGM_a_matrix_2, IGM_r_matrix_2, IGM_pv_matrix_2
 		INTEGER , DIMENSION(2,4000000) 		 :: IGM_z_matrix_2
-		REAL(DP), DIMENSION(:) , allocatable :: panela_dad_2, panela_son_2, panelz_dad_2, panelz_son_2
-		REAL(DP), DIMENSION(:) , allocatable :: panelr_dad_2, panelr_son_2, panelPV_dad_2, panelPV_son_2
+		REAL(SP), DIMENSION(:) , allocatable :: panela_dad_2, panela_son_2, panelz_dad_2, panelz_son_2
+		REAL(SP), DIMENSION(:) , allocatable :: panelr_dad_2, panelr_son_2, panelPV_dad_2, panelPV_son_2
 		INTEGER 						     :: IGM_index_2
 
 		REAL :: k_igm
@@ -5088,10 +5088,10 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
 	INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
 	INTEGER , DIMENSION(totpop) :: panelage, panelz, panellambda, panele, panelx, panelz_old, panellambda_old 
-	REAL(DP), DIMENSION(totpop) :: panela, panelPV_a, panelK 
+	REAL(SP), DIMENSION(totpop) :: panela, panelPV_a, panelK 
 	INTEGER , DIMENSION(150,80) :: panelage_top, panelz_top, panelx_top, panel_lambda_top, panele_top
-	REAL(DP), DIMENSION(150,80) :: panela_top, panelK_top, panel_YL_top, panel_PV_top
-	REAL(DP), DIMENSION(150,80) :: prc_all_top, prc_cohort_top, prc_PV_all_top, prc_PV_cohort_top
+	REAL(SP), DIMENSION(150,80) :: panela_top, panelK_top, panel_YL_top, panel_PV_top
+	REAL(SP), DIMENSION(150,80) :: prc_all_top, prc_cohort_top, prc_PV_all_top, prc_PV_cohort_top
 	INTEGER 				    :: ii, age_top, thread_num
 
 	!$ call omp_set_num_threads(20)
