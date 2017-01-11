@@ -4357,7 +4357,11 @@ SUBROUTINE  SIMULATION(bench_indx)
 		REAL(SP), DIMENSION(:) , allocatable :: panela_dad_2, panela_son_2, panelz_dad_2, panelz_son_2
 		REAL(SP), DIMENSION(:) , allocatable :: panelr_dad_2, panelr_son_2, panelPV_dad_2, panelPV_son_2
 		INTEGER 						     :: IGM_index_2
-
+		! Average Return by age group
+		REAL(SP), DIMENSION(totpop) 	     :: ret_aux=0.0_sp, ret_20_25 , ret_26_30 , ret_31_35 , ret_36_40 
+		REAL(SP), DIMENSION(totpop) 	     :: ret_41_45 , ret_46_50 , ret_51_55 , ret_56_60 , ret_61_65 , ret_66_70
+		REAL(SP) 						 	 :: K_aux, Std_Dev_Return_Age(10)
+		
 		REAL :: k_igm
 
 		! Top Agents 
@@ -4708,6 +4712,44 @@ SUBROUTINE  SIMULATION(bench_indx)
 			     	endif 
 		     	endif
 
+		     	! Average Return by age group
+		     	K_aux = min(theta(panelz(paneli))*panela(paneli),&
+		     			&(mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+	     		ret_aux(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
+	     								&   R*panela(paneli) )/panela(paneli) + ret_aux(paneli)
+	     		if (age.eq.5) then
+	     			ret_20_25(paneli) = ret_aux(paneli)/6.0_dp 
+	     			ret_aux(paneli)   = 0.0_dp 
+     			elseif (age.eq.10) then 
+     				ret_25_30(paneli) = ret_aux(paneli)/5.0_dp 
+	     			ret_aux(paneli)   = 0.0_dp 
+     			elseif (age.eq.15) then 
+     				ret_31_35(paneli) = ret_aux(paneli)/5.0_dp 
+	     			ret_aux(paneli)   = 0.0_dp 
+     			elseif (age.eq.20) then 
+     				ret_36_40(paneli) = ret_aux(paneli)/5.0_dp 
+	     			ret_aux(paneli)   = 0.0_dp 
+     			elseif (age.eq.25) then 
+     				ret_41_45(paneli) = ret_aux(paneli)/5.0_dp 
+	     			ret_aux(paneli)   = 0.0_dp 
+     			elseif (age.eq.30) then 
+     				ret_46_50(paneli) = ret_aux(paneli)/5.0_dp 
+	     			ret_aux(paneli)   = 0.0_dp 
+     			elseif (age.eq.35) then 
+     				ret_51_55(paneli) = ret_aux(paneli)/5.0_dp 
+	     			ret_aux(paneli)   = 0.0_dp 
+     			elseif (age.eq.40) then 
+     				ret_56_60(paneli) = ret_aux(paneli)/5.0_dp 
+	     			ret_aux(paneli)   = 0.0_dp 
+     			elseif (age.eq.45) then 
+     				ret_61_65(paneli) = ret_aux(paneli)/5.0_dp 
+	     			ret_aux(paneli)   = 0.0_dp 
+     			elseif (age.eq.50) then 
+     				ret_66_70(paneli) = ret_aux(paneli)/5.0_dp 
+	     			ret_aux(paneli)   = 0.0_dp 
+     			endif 
+		
+
 			ENDDO ! paneli
 			
 
@@ -4844,6 +4886,25 @@ SUBROUTINE  SIMULATION(bench_indx)
 			print*, ' '
 
 
+			! Std Dev of return by age
+			Std_Dev_Return_Age(1)  = sqrt( sum( (ret_20_25-sum(ret_20_25)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(2)  = sqrt( sum( (ret_26_30-sum(ret_26_30)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(3)  = sqrt( sum( (ret_31_35-sum(ret_31_35)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(4)  = sqrt( sum( (ret_36_40-sum(ret_36_40)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(5)  = sqrt( sum( (ret_41_45-sum(ret_41_45)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(6)  = sqrt( sum( (ret_46_50-sum(ret_46_50)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(7)  = sqrt( sum( (ret_51_55-sum(ret_51_55)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(8)  = sqrt( sum( (ret_56_60-sum(ret_56_60)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(9)  = sqrt( sum( (ret_61_65-sum(ret_61_65)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(10) = sqrt( sum( (ret_66_70-sum(ret_66_70)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
+
+
+			print*, ' '
+			print*, 'Std Dev of Return by Age'
+			print*, ' 20-25 ',' 26-30 ',' 31-35 ',' 36-40 ',' 41-45 ',' 46-50 ',' 51-55 ',' 56-60 ',' 61-65 ',' 66-70 '
+			print*, Std_Dev_Return_Age
+			print*, ' '
+
 		!$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi,h_i)
 		DO paneli=1,totpop
 		    currenta 		= panela(paneli)
@@ -4904,6 +4965,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_bench'        , STATUS='replace')
 			OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
 			OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_bench'    	, STATUS='replace')
+			OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/std_ret_age_bench'   , STATUS='replace')
 		else 
 			OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
 			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_exp'		, STATUS='replace')
@@ -4914,6 +4976,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_exp' 	        , STATUS='replace')
 			OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_exp'	        , STATUS='replace')
 			OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_exp'    	, STATUS='replace')
+			OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/std_ret_age_exp'     , STATUS='replace')
 		endif 
 
 
@@ -4926,9 +4989,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 		WRITE  (UNIT=27, FMT=*) panelK
 		WRITE  (UNIT=28, FMT=*) panelx
 		WRITE  (UNIT=24, FMT=*) panel_Y_L
+		WRITE  (UNIT=30, FMT=*) Std_Dev_Return_Age
 
 		close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14)
-		close (unit=26); close (unit=27); close (unit=28); close (unit=24); 
+		close (unit=26); close (unit=27); close (unit=28); close (unit=24); close (unit=30) 
 
 		if (bench_indx==1) then
 			OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_parents' 	, STATUS='replace')
