@@ -3727,9 +3727,11 @@ SUBROUTINE ComputeLaborUnits(Ebart,Waget)
     	RetY_lambda_e = phi_lambda_e  * Ebar_bench
 	ENDIF
 
+	if (solving_bench .eq. 1) then 
 	OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'Ret_Y'  , STATUS='replace')
 	WRITE (UNIT=1,  FMT=*) RetY_lambda_e
 	CLOSE (unit=1)
+	endif 
 
 END SUBROUTINE ComputeLaborUnits
 
