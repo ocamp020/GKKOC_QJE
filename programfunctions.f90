@@ -4718,34 +4718,34 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     		ret_aux(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
 	     								&   R*panela(paneli) )/panela(paneli) + ret_aux(paneli)
 	     		if (age.eq.5) then
-	     			ret_20_25(paneli) = ret_aux(paneli)/6.0_dp 
+	     			ret_20_25(paneli) = ret_aux(paneli)/6.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
      			elseif (age.eq.10) then 
-     				ret_25_30(paneli) = ret_aux(paneli)/5.0_dp 
+     				ret_25_30(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
      			elseif (age.eq.15) then 
-     				ret_31_35(paneli) = ret_aux(paneli)/5.0_dp 
+     				ret_31_35(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
      			elseif (age.eq.20) then 
-     				ret_36_40(paneli) = ret_aux(paneli)/5.0_dp 
+     				ret_36_40(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
      			elseif (age.eq.25) then 
-     				ret_41_45(paneli) = ret_aux(paneli)/5.0_dp 
+     				ret_41_45(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
      			elseif (age.eq.30) then 
-     				ret_46_50(paneli) = ret_aux(paneli)/5.0_dp 
+     				ret_46_50(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
      			elseif (age.eq.35) then 
-     				ret_51_55(paneli) = ret_aux(paneli)/5.0_dp 
+     				ret_51_55(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
      			elseif (age.eq.40) then 
-     				ret_56_60(paneli) = ret_aux(paneli)/5.0_dp 
+     				ret_56_60(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
      			elseif (age.eq.45) then 
-     				ret_61_65(paneli) = ret_aux(paneli)/5.0_dp 
+     				ret_61_65(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
      			elseif (age.eq.50) then 
-     				ret_66_70(paneli) = ret_aux(paneli)/5.0_dp 
+     				ret_66_70(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
      			endif 
 		
