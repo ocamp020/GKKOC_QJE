@@ -688,7 +688,7 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 	! Deallocate variables
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
-end Subroutine Solve_Experiment
+end Subroutine Solve_Experiment_tauC
 
 
 !========================================================================================
