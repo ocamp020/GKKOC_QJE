@@ -4887,16 +4887,16 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 
 			! Std Dev of return by age
-			Std_Dev_Return_Age(1)  = sqrt( sum( (ret_20_25-sum(ret_20_25)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(2)  = sqrt( sum( (ret_26_30-sum(ret_26_30)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(3)  = sqrt( sum( (ret_31_35-sum(ret_31_35)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(4)  = sqrt( sum( (ret_36_40-sum(ret_36_40)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(5)  = sqrt( sum( (ret_41_45-sum(ret_41_45)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(6)  = sqrt( sum( (ret_46_50-sum(ret_46_50)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(7)  = sqrt( sum( (ret_51_55-sum(ret_51_55)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(8)  = sqrt( sum( (ret_56_60-sum(ret_56_60)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(9)  = sqrt( sum( (ret_61_65-sum(ret_61_65)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(10) = sqrt( sum( (ret_66_70-sum(ret_66_70)/totpop)^2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(1)  = sqrt( sum( (ret_20_25-sum(ret_20_25)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(2)  = sqrt( sum( (ret_26_30-sum(ret_26_30)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(3)  = sqrt( sum( (ret_31_35-sum(ret_31_35)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(4)  = sqrt( sum( (ret_36_40-sum(ret_36_40)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(5)  = sqrt( sum( (ret_41_45-sum(ret_41_45)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(6)  = sqrt( sum( (ret_46_50-sum(ret_46_50)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(7)  = sqrt( sum( (ret_51_55-sum(ret_51_55)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(8)  = sqrt( sum( (ret_56_60-sum(ret_56_60)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(9)  = sqrt( sum( (ret_61_65-sum(ret_61_65)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(10) = sqrt( sum( (ret_66_70-sum(ret_66_70)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
 
 
 			print*, ' '
