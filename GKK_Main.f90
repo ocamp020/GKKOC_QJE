@@ -57,12 +57,12 @@ PROGRAM main
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
 			compute_bench = .false.
-			compute_exp   = .false.
+			compute_exp   = .true.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 
@@ -189,7 +189,11 @@ PROGRAM main
 		! Tax Reform experiment
 		if (Tax_Reform) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
-			call Solve_Experiment(compute_exp,Simul_Switch)
+			
+			! call Solve_Experiment(compute_exp,Simul_Switch)
+
+			Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
+			call Solve_Experiment_tauC(compute_exp,Simul_Switch)
 
 			compute_bench = .false.
 		endif 
@@ -528,6 +532,164 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
 end Subroutine Solve_Experiment
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
+	use parameters
+	use global 
+	use programfunctions
+	use Toolbox
+	use omp_lib
+	implicit none 
+	logical, intent(in) :: compute_exp, Simul_Switch
+	real(dp)            :: tauCmin=0.075_dp, tauCindx=0.0_dp, tauCinc=0.05_dp, tauC_up, tauC_low
+
+	!====================================================================================================
+	PRINT*,''
+	Print*,'--------------- SOLVING EXPERIMENT WITH BEST PARAMETERS -----------------'
+	PRINT*,''
+	print*,'Wealth Tax Economy'
+	
+	! Experiment economy
+		solving_bench=0
+	! Set capital taxes to zero
+		tauK = 0.0_DP
+	! Set Y_a_threshold
+		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
+		!Y_a_threshold = 0.0_dp ! big_p   !8.1812138704441200
+		call Find_TauW_Threshold(DBN_bench,W_bench)  
+		Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
+		Wealth_factor = Y_a_threshold/W_bench
+
+	if (compute_exp) then 
+		! Find wealth taxes that balances budget
+		print*, "	Computing Wealth Tax to balance the budget"
+			! Set initial value for G in experimental economy and for wealth taxes
+			GBAR_exp = 0.0_DP
+			tauC  = tauCmin
+			tauCindx = 0.0_DP
+			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
+			DO WHILE (GBAR_exp .lt. GBAR_bench)
+				! Set old G and new value of tauW
+				GBAR_exp_old = GBAR_exp
+				tauC = tauCmin + tauCindx * tauCinc
+				! Solve the model
+				CALL FIND_DBN_EQ
+				CALL GOVNT_BUDGET
+
+				! Get new G
+				GBAR_exp = GBAR 
+				! Iteratioins  
+				tauCindx = tauCindx + 1.0_DP   
+				write(*,*) "Bracketing GBAR: tauC=", tauC*100
+				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+			ENDDO
+
+			! Set tauW as weighted average of point in  the grid to balance budget more precisely
+				tauC_up  = tauC
+				tauC_low = tauC  -  tauCinc
+				tauC     = tauC_low + tauCinc * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				print*,''
+				print*,'GBAR bracketed by taxes:'
+				print*,'tauC_low =', tauC_low*100, '% tauC_up=', tauC_up*100, '% tauC=', tauC*100, "%"
+				print*,''
+
+			! Solve (again) experimental economy
+				CALL FIND_DBN_EQ
+				CALL GOVNT_BUDGET
+
+			! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
+				GBAR_exp = GBAR
+				print*,"Gbar at midpoint of bracket and GBAR at benchmark"
+				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+				print*,''
+				print*,'Bisection for TauW:'
+				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.001 ) ! as long as the difference is greater than 0.1% continue
+				    if (GBAR_exp .gt. GBAR_bench ) then
+				        tauC_up  = tauC
+				    else
+				        tauC_low = tauC
+				    endif
+				    tauC = (tauC_low + tauC_up)/2.0_DP
+				    CALL FIND_DBN_EQ
+				    CALL GOVNT_BUDGET
+				    GBAR_exp = GBAR
+				    print*,'tauC_low =', tauC_low*100, '% tauC_up=', tauC_up*100, '% tauC=', tauC*100, "%"
+					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+				ENDDO
+
+		! Compute value function and store policy functions, value function and distribution in file
+		! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL Firm_Value
+
+	endif 
+	
+	CALL Write_Experimental_Results(compute_exp)
+	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+	K_mat  = K_Matrix(R,P)
+	Pr_mat = Profit_Matrix(R,P)
+	CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+	CALL ComputeLaborUnits(EBAR,wage)
+	CALL GOVNT_BUDGET
+
+
+	! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+		ValueFunction_exp = ValueFunction
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime
+		V_Pr_exp          = V_Pr 
+		V_Pr_nb_exp  	  = V_Pr_nb
+
+	! Compute moments
+	CALL COMPUTE_STATS
+	
+	! Compute welfare gain between economies
+	CALL COMPUTE_WELFARE_GAIN
+
+	! Write experimental results in output.txt
+	CALL WRITE_VARIABLES(0)
+	if ((Simul_Switch)) then 
+	 	print*,"	Experiment Simulation"
+		CALL SIMULATION(solving_bench)
+	endif
+
+
+	print*,'---------------------------'
+	print*,''
+	print*,'Output Gain Prct=', 100.0_DP*(Y_exp/Y_bench-1.0) 
+	print*,''
+	print*,'---------------------------'
+
+	print*," "
+	print*,"Wealth_factor=",Wealth_factor
+	print*," "
+
+	! Deallocate variables
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+end Subroutine Solve_Experiment
+
 
 !========================================================================================
 !========================================================================================
