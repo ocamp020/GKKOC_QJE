@@ -4721,7 +4721,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     			ret_20_25(paneli) = ret_aux(paneli)/6.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
      			elseif (age.eq.10) then 
-     				ret_25_30(paneli) = ret_aux(paneli)/5.0_sp 
+     				ret_26_30(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
      			elseif (age.eq.15) then 
      				ret_31_35(paneli) = ret_aux(paneli)/5.0_sp 
