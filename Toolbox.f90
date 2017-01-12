@@ -376,6 +376,55 @@ MODULE Toolbox
 		return
 	End Subroutine Sort	
 
+
+!========================================================================================
+!========================================================================================
+! perctile: Gets the p-th percentile from a distribution or sample
+!
+! Usage: pct = Percentile(p,n,X,PDF)
+!
+! Input: p   , real(8)   , The percentile to be found
+!		 n   , integer(4), The number of elements in X
+!        X   , real(8)   , An array containing the range of the distribution or the sample of observations
+!        PDF , real(8)   , Optional, An array containing the PDF, if not provided a uniform is assumed
+
+!
+! Output: pct, real(8), the value of X that better approximates the percentile p
+!
+
+	real(dp) function Percentile(p,n,X,PDF)
+		real(dp), intent(in)                          :: p
+		integer , intent(in)  						  :: n
+		real(dp), intent(in) , dimension(n) 		  :: X 
+		real(dp), optional, intent(in) , dimension(n) :: PDF
+		real(dp) 									  :: a, b, c, CDF_c
+
+		if( .not. present(PDF) ) PDF = 1.0_dp/real(n,dp)
+
+		a = minval(X)
+		b = maxval(X)
+		c = (1-p)*a+p*b
+		CDF_c = sum(PDF,X<=c)
+		do while ((abs(CCDF_c-p)>0.0001_dp).and.(b-a>1e-8))
+			if (CDF_c>p) then 
+				b = c 
+				c = (a+b)/2.0_dp
+				CDF_c = sum(PDF,X<=c)
+			else 
+				a = c 
+				c = (a+b)/2.0_dp
+				CDF_c = sum(PDF,X>=c)
+			endif
+			!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', abs(CCDF_c-prctile_bq(i))
+		enddo 
+		
+		Percentile = c 
+
+		return
+	End function Percentile
+
+
+
 !========================================================================================
 !========================================================================================
 

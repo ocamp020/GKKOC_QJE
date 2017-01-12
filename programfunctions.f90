@@ -4360,9 +4360,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 		REAL(SP), DIMENSION(:) , allocatable :: panelr_dad_2, panelr_son_2, panelPV_dad_2, panelPV_son_2
 		INTEGER 						     :: IGM_index_2
 		! Average Return by age group
-		REAL(SP), DIMENSION(totpop) 	     :: ret_aux=0.0_sp, ret_20_25 , ret_26_30 , ret_31_35 , ret_36_40 
+		REAL(SP), DIMENSION(totpop) 	     :: ret_aux=0.0_sp, ret_20, ret_21_25 , ret_26_30 , ret_31_35 , ret_36_40 
 		REAL(SP), DIMENSION(totpop) 	     :: ret_41_45 , ret_46_50 , ret_51_55 , ret_56_60 , ret_61_65 , ret_66_70
-		REAL(SP) 						 	 :: K_aux, Std_Dev_Return_Age(10), Mean_Return_Age(10)
+		REAL(SP) 						 	 :: K_aux, Std_Dev_Return_Age(11), Mean_Return_Age(11), prc_Return_Age(11,9), prctile_ret(9)
+		INTEGER 							 :: i_age, i_pct
 		
 		REAL :: k_igm
 
@@ -4719,34 +4720,37 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     			&(mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 	     		ret_aux(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
 	     								&   R*panela(paneli) )/panela(paneli) + ret_aux(paneli)
-	     		if (age.eq.5) then
-	     			ret_20_25(paneli) = ret_aux(paneli)/6.0_sp 
+	     		if (age.eq.1) then
+	     			ret_20(paneli)    = ret_aux(paneli) 
 	     			ret_aux(paneli)   = 0.0_dp 
-     			elseif (age.eq.10) then 
+	     		elseif (age.eq.6) then
+	     			ret_21_25(paneli) = ret_aux(paneli)/6.0_sp 
+	     			ret_aux(paneli)   = 0.0_dp 
+     			elseif (age.eq.11) then 
      				ret_26_30(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
      			elseif (age.eq.15) then 
      				ret_31_35(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
-     			elseif (age.eq.20) then 
+     			elseif (age.eq.21) then 
      				ret_36_40(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
-     			elseif (age.eq.25) then 
+     			elseif (age.eq.26) then 
      				ret_41_45(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
-     			elseif (age.eq.30) then 
+     			elseif (age.eq.31) then 
      				ret_46_50(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
-     			elseif (age.eq.35) then 
+     			elseif (age.eq.36) then 
      				ret_51_55(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
-     			elseif (age.eq.40) then 
+     			elseif (age.eq.41) then 
      				ret_56_60(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
-     			elseif (age.eq.45) then 
+     			elseif (age.eq.46) then 
      				ret_61_65(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
-     			elseif (age.eq.50) then 
+     			elseif (age.eq.51) then 
      				ret_66_70(paneli) = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)   = 0.0_dp 
      			endif 
@@ -4889,31 +4893,52 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 
 			! Std Dev of return by age
-			Std_Dev_Return_Age(1)  = sqrt( sum( (ret_20_25-sum(ret_20_25)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(2)  = sqrt( sum( (ret_26_30-sum(ret_26_30)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(3)  = sqrt( sum( (ret_31_35-sum(ret_31_35)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(4)  = sqrt( sum( (ret_36_40-sum(ret_36_40)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(5)  = sqrt( sum( (ret_41_45-sum(ret_41_45)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(6)  = sqrt( sum( (ret_46_50-sum(ret_46_50)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(7)  = sqrt( sum( (ret_51_55-sum(ret_51_55)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(8)  = sqrt( sum( (ret_56_60-sum(ret_56_60)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(9)  = sqrt( sum( (ret_61_65-sum(ret_61_65)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(10) = sqrt( sum( (ret_66_70-sum(ret_66_70)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(1)  = sqrt( sum( (ret_20   -sum(ret_20)   /totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(2)  = sqrt( sum( (ret_20_25-sum(ret_20_25)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(3)  = sqrt( sum( (ret_26_30-sum(ret_26_30)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(4)  = sqrt( sum( (ret_31_35-sum(ret_31_35)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(5)  = sqrt( sum( (ret_36_40-sum(ret_36_40)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(6)  = sqrt( sum( (ret_41_45-sum(ret_41_45)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(7)  = sqrt( sum( (ret_46_50-sum(ret_46_50)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(8)  = sqrt( sum( (ret_51_55-sum(ret_51_55)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(9)  = sqrt( sum( (ret_56_60-sum(ret_56_60)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(10) = sqrt( sum( (ret_61_65-sum(ret_61_65)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(11) = sqrt( sum( (ret_66_70-sum(ret_66_70)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
 
-			Mean_Return_Age(1)  = sum(ret_20_25)/totpop
-			Mean_Return_Age(2)  = sum(ret_26_30)/totpop
-			Mean_Return_Age(3)  = sum(ret_31_35)/totpop
-			Mean_Return_Age(4)  = sum(ret_36_40)/totpop
-			Mean_Return_Age(5)  = sum(ret_41_45)/totpop
-			Mean_Return_Age(6)  = sum(ret_46_50)/totpop
-			Mean_Return_Age(7)  = sum(ret_51_55)/totpop
-			Mean_Return_Age(8)  = sum(ret_56_60)/totpop
-			Mean_Return_Age(9)  = sum(ret_61_65)/totpop
-			Mean_Return_Age(10) = sum(ret_66_70)/totpop
+			! Mean of return by age
+			Mean_Return_Age(1)  = sum(ret_20)   /totpop
+			Mean_Return_Age(2)  = sum(ret_20_25)/totpop
+			Mean_Return_Age(3)  = sum(ret_26_30)/totpop
+			Mean_Return_Age(4)  = sum(ret_31_35)/totpop
+			Mean_Return_Age(5)  = sum(ret_36_40)/totpop
+			Mean_Return_Age(6)  = sum(ret_41_45)/totpop
+			Mean_Return_Age(7)  = sum(ret_46_50)/totpop
+			Mean_Return_Age(8)  = sum(ret_51_55)/totpop
+			Mean_Return_Age(9)  = sum(ret_56_60)/totpop
+			Mean_Return_Age(10) = sum(ret_61_65)/totpop
+			Mean_Return_Age(11) = sum(ret_66_70)/totpop
+
+			! Percentiles of return by age
+			prctile_ret = (/0.999_dp, 0.99_dp, 0.95_dp, 0.90_dp, 0.75_dp, 0.50_dp, 0.25_dp, 0.10_dp, 0.01_dp/)
+
+			do i_pct=1,9 
+				prc_Return_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),totpop,ret_20)
+				prc_Return_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),totpop,ret_21_25)
+				prc_Return_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),totpop,ret_26_30)
+				prc_Return_Age(4 ,i_pct) = Percentile(prctile_ret(i_pct),totpop,ret_31_35)
+				prc_Return_Age(5 ,i_pct) = Percentile(prctile_ret(i_pct),totpop,ret_36_40)
+				prc_Return_Age(6 ,i_pct) = Percentile(prctile_ret(i_pct),totpop,ret_41_45)
+				prc_Return_Age(7 ,i_pct) = Percentile(prctile_ret(i_pct),totpop,ret_46_50)
+				prc_Return_Age(8 ,i_pct) = Percentile(prctile_ret(i_pct),totpop,ret_51_55)
+				prc_Return_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),totpop,ret_56_60)
+				prc_Return_Age(10,i_pct) = Percentile(prctile_ret(i_pct),totpop,ret_61_65)
+				prc_Return_Age(11,i_pct) = Percentile(prctile_ret(i_pct),totpop,ret_66_70)
+			enddo 
+
 
 			print*, ' '
 			print*, 'Std Dev of Return by Age'
-			print*, ' 20-25 ',' 26-30 ',' 31-35 ',' 36-40 ',' 41-45 ',' 46-50 ',' 51-55 ',' 56-60 ',' 61-65 ',' 66-70 '
+			print*, ' 20 ',' 21-25 ',' 26-30 ',' 31-35 ',' 36-40 ',' 41-45 ',' 46-50 ',' 51-55 ',' 56-60 ',' 61-65 ',' 66-70 '
 			print*, Std_Dev_Return_Age
 			print*, Mean_Return_Age
 			print*, ' '
