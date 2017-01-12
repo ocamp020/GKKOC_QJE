@@ -4362,7 +4362,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! Average Return by age group
 		REAL(SP), DIMENSION(totpop) 	     :: ret_aux=0.0_sp, ret_20, ret_21_25 , ret_26_30 , ret_31_35 , ret_36_40 
 		REAL(SP), DIMENSION(totpop) 	     :: ret_41_45 , ret_46_50 , ret_51_55 , ret_56_60 , ret_61_65 , ret_66_70
-		REAL(SP) 						 	 :: K_aux, Std_Dev_Return_Age(11), Mean_Return_Age(11), prc_Return_Age(11,9), prctile_ret(9)
+		REAL(SP) 						 	 :: K_aux, Std_Dev_Return_Age(11), Mean_Return_Age(11), prc_Return_Age(11,9)
+		REAL(DP)  							 :: prctile_ret(9)
 		INTEGER 							 :: i_age, i_pct
 		
 		REAL :: k_igm
