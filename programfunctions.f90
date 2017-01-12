@@ -4895,7 +4895,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 			! Std Dev of return by age
 			Std_Dev_Return_Age(1)  = sqrt( sum( (ret_20   -sum(ret_20)   /totpop)**2.0_dp ) /real(totpop-1,SP)  )
-			Std_Dev_Return_Age(2)  = sqrt( sum( (ret_20_25-sum(ret_20_25)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
+			Std_Dev_Return_Age(2)  = sqrt( sum( (ret_21_25-sum(ret_21_25)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
 			Std_Dev_Return_Age(3)  = sqrt( sum( (ret_26_30-sum(ret_26_30)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
 			Std_Dev_Return_Age(4)  = sqrt( sum( (ret_31_35-sum(ret_31_35)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
 			Std_Dev_Return_Age(5)  = sqrt( sum( (ret_36_40-sum(ret_36_40)/totpop)**2.0_dp ) /real(totpop-1,SP)  )
@@ -4908,7 +4908,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 			! Mean of return by age
 			Mean_Return_Age(1)  = sum(ret_20)   /totpop
-			Mean_Return_Age(2)  = sum(ret_20_25)/totpop
+			Mean_Return_Age(2)  = sum(ret_21_25)/totpop
 			Mean_Return_Age(3)  = sum(ret_26_30)/totpop
 			Mean_Return_Age(4)  = sum(ret_31_35)/totpop
 			Mean_Return_Age(5)  = sum(ret_36_40)/totpop
