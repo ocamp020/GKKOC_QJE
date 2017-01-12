@@ -392,20 +392,24 @@ MODULE Toolbox
 ! Output: pct, real(8), the value of X that better approximates the percentile p
 !
 
-	real(dp) function Percentile(p,n,X,PDF)
+	real(dp) function Percentile(p,n,X,PDF_in)
 		real(dp), intent(in)                          :: p
 		integer , intent(in)  						  :: n
 		real(dp), intent(in) , dimension(n) 		  :: X 
-		real(dp), optional, intent(in) , dimension(n) :: PDF
-		real(dp) 									  :: a, b, c, CDF_c
+		real(dp), optional, intent(in) , dimension(n) :: PDF_in
+		real(dp) 									  :: a, b, c, CDF_c, PDF(n)
 
-		if( .not. present(PDF) ) PDF = 1.0_dp/real(n,dp)
+		if( .not. present(PDF_in) ) then 
+			PDF = 1.0_dp/real(n,dp)
+		else 
+			PDF = PDF_in
+		endif 
 
 		a = minval(X)
 		b = maxval(X)
 		c = (1-p)*a+p*b
 		CDF_c = sum(PDF,X<=c)
-		do while ((abs(CCDF_c-p)>0.0001_dp).and.(b-a>1e-8))
+		do while ((abs(CDF_c-p)>0.0001_dp).and.(b-a>1e-8))
 			if (CDF_c>p) then 
 				b = c 
 				c = (a+b)/2.0_dp
@@ -415,7 +419,7 @@ MODULE Toolbox
 				c = (a+b)/2.0_dp
 				CDF_c = sum(PDF,X>=c)
 			endif
-			!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', abs(CCDF_c-prctile_bq(i))
+			!print*, 'a',a,'c',c,'b',b,'CDF',CDF_c,'Error', abs(CDF_c-prctile_bq(i))
 		enddo 
 		
 		Percentile = c 
