@@ -4942,7 +4942,11 @@ SUBROUTINE  SIMULATION(bench_indx)
 			print*, ' 20 ',' 21-25 ',' 26-30 ',' 31-35 ',' 36-40 ',' 41-45 ',' 46-50 ',' 51-55 ',' 56-60 ',' 61-65 ',' 66-70 '
 			print*, Std_Dev_Return_Age
 			print*, Mean_Return_Age
+			do i_pct=1,9 
+				print*, prc_Return_Age(:,i_pct)
+			enddo 
 			print*, ' '
+			print*, prc_Return_Age
 
 		!$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi,h_i)
 		DO paneli=1,totpop
@@ -5005,7 +5009,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 			OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
 			OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_bench'    	, STATUS='replace')
 			OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/std_ret_age_bench'   , STATUS='replace')
-			OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/mean_age_bench'      , STATUS='replace')
+			OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/mean_ret_age_bench'  , STATUS='replace')
+			OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/pct_ret_age_bench'   , STATUS='replace')
 		else 
 			OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
 			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_exp'		, STATUS='replace')
@@ -5018,6 +5023,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_exp'    	, STATUS='replace')
 			OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/std_ret_age_exp'     , STATUS='replace')
 			OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/mean_ret_age_exp'    , STATUS='replace')
+			OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/pct_ret_age_exp'     , STATUS='replace')
 		endif 
 
 
@@ -5032,9 +5038,11 @@ SUBROUTINE  SIMULATION(bench_indx)
 		WRITE  (UNIT=24, FMT='(F12.4)') panel_Y_L
 		WRITE  (UNIT=30, FMT='(F12.4)') Std_Dev_Return_Age
 		WRITE  (UNIT=31, FMT='(F12.4)') Mean_Return_Age
+		WRITE  (UNIT=32, FMT='(F12.4)') prc_Return_Age
 
 		close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14)
-		close (unit=26); close (unit=27); close (unit=28); close (unit=24); close (unit=30); close (unit=31) 
+		close (unit=26); close (unit=27); close (unit=28); close (unit=24)
+		close (unit=30); close (unit=31); close (unit=32) 
 
 		if (bench_indx==1) then
 			OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_parents' 	, STATUS='replace')
