@@ -4995,17 +4995,17 @@ SUBROUTINE  SIMULATION(bench_indx)
 		endif 
 
 
-		WRITE  (UNIT=10, '(F12.4)') panela
+		WRITE  (UNIT=10, FMT='(F12.4)') panela
 		WRITE  (UNIT=11, FMT=*) panelage 
 		WRITE  (UNIT=12, FMT=*) panelz 
 		WRITE  (UNIT=13, FMT=*) panellambda 
 		WRITE  (UNIT=14, FMT=*) panele 
-		WRITE  (UNIT=26, '(F12.4)') panelPV_a
-		WRITE  (UNIT=27, '(F12.4)') panelK
+		WRITE  (UNIT=26, FMT='(F12.4)') panelPV_a
+		WRITE  (UNIT=27, FMT='(F12.4)') panelK
 		WRITE  (UNIT=28, FMT=*) panelx
-		WRITE  (UNIT=24, '(F12.4)') panel_Y_L
-		WRITE  (UNIT=30, '(F12.4)') Std_Dev_Return_Age
-		WRITE  (UNIT=31, '(F12.4)') Mean_Return_Age
+		WRITE  (UNIT=24, FMT='(F12.4)') panel_Y_L
+		WRITE  (UNIT=30, FMT='(F12.4)') Std_Dev_Return_Age
+		WRITE  (UNIT=31, FMT='(F12.4)') Mean_Return_Age
 
 		close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14)
 		close (unit=26); close (unit=27); close (unit=28); close (unit=24); close (unit=30); close (unit=31) 
@@ -5015,8 +5015,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 			OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_sons'    	, STATUS='replace')
 			OPEN(UNIT=22, FILE=trim(Result_Folder)//'Simul/panelage_parents' 	, STATUS='replace')
 			OPEN(UNIT=23, FILE=trim(Result_Folder)//'Simul/panelage_sons'    	, STATUS='replace')
-			WRITE (UNIT=20, '(F12.4)') eligible_panela_parents
-			WRITE (UNIT=21, '(F12.4)') eligible_panela_sons
+			WRITE (UNIT=20, FMT='(F12.4)') eligible_panela_parents
+			WRITE (UNIT=21, FMT='(F12.4)') eligible_panela_sons
 			WRITE (UNIT=22, FMT=*) eligible_panelage_parents
 			WRITE (UNIT=23, FMT=*) eligible_panelage_sons
 			close (unit=20); close (unit=21); close (unit=22); close (unit=23)
@@ -5024,18 +5024,18 @@ SUBROUTINE  SIMULATION(bench_indx)
 			call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_3050' )
 			OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panela_parents' , STATUS='replace')
 			OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panela_sons'     , STATUS='replace')
-			WRITE (UNIT=20, '(F12.4)') panela_dad
-			WRITE (UNIT=21, '(F12.4)') panela_son
+			WRITE (UNIT=20, FMT='(F12.4)') panela_dad
+			WRITE (UNIT=21, FMT='(F12.4)') panela_son
 			close (unit=20); close (unit=21); 
 			OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelr_parents' , STATUS='replace')
 			OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelr_sons'     , STATUS='replace')
-			WRITE (UNIT=20, '(F12.4)') panelr_dad
-			WRITE (UNIT=21, '(F12.4)') panelr_son
+			WRITE (UNIT=20, FMT='(F12.4)') panelr_dad
+			WRITE (UNIT=21, FMT='(F12.4)') panelr_son
 			close (unit=20); close (unit=21); 
 			OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelpv_parents' , STATUS='replace')
 			OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelpv_sons'     , STATUS='replace')
-			WRITE (UNIT=20, '(F12.4)') panelpv_dad
-			WRITE (UNIT=21, '(F12.4)') panelpv_son
+			WRITE (UNIT=20, FMT='(F12.4)') panelpv_dad
+			WRITE (UNIT=21, FMT='(F12.4)') panelpv_son
 			close (unit=20); close (unit=21); 
 			OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelz_parents' , STATUS='replace')
 			OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelz_sons'     , STATUS='replace')
@@ -5046,18 +5046,18 @@ SUBROUTINE  SIMULATION(bench_indx)
 			call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_4060' )
 			OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_4060/panela_parents' , STATUS='replace')
 			OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060/panela_sons'     , STATUS='replace')
-			WRITE (UNIT=20, '(F12.4)') panela_dad_2
-			WRITE (UNIT=21, '(F12.4)') panela_son_2
+			WRITE (UNIT=20, FMT='(F12.4)') panela_dad_2
+			WRITE (UNIT=21, FMT='(F12.4)') panela_son_2
 			close (unit=20); close (unit=21); 
 			OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelr_parents' , STATUS='replace')
 			OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelr_sons'     , STATUS='replace')
-			WRITE (UNIT=20, '(F12.4)') panelr_dad
-			WRITE (UNIT=21, '(F12.4)') panelr_son
+			WRITE (UNIT=20, FMT='(F12.4)') panelr_dad
+			WRITE (UNIT=21, FMT='(F12.4)') panelr_son
 			close (unit=20); close (unit=21); 
 			OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelpv_parents' , STATUS='replace')
 			OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelpv_sons'     , STATUS='replace')
-			WRITE (UNIT=20, '(F12.4)') panelpv_dad
-			WRITE (UNIT=21, '(F12.4)') panelpv_son
+			WRITE (UNIT=20, FMT='(F12.4)') panelpv_dad
+			WRITE (UNIT=21, FMT='(F12.4)') panelpv_son
 			close (unit=20); close (unit=21); 
 			OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelz_parents' , STATUS='replace')
 			OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelz_sons'     , STATUS='replace')
@@ -5501,19 +5501,19 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	endif 
 
 
-	WRITE  (UNIT=10, '(F12.4)') panela_top
+	WRITE  (UNIT=10, FMT='(F12.4)') panela_top
 	WRITE  (UNIT=11, FMT=*) panelage_top  
 	WRITE  (UNIT=12, FMT=*) panelz_top 
-	WRITE  (UNIT=27, '(F12.4)') panelK_top
+	WRITE  (UNIT=27, FMT='(F12.4)') panelK_top
 	WRITE  (UNIT=28, FMT=*) panelx_top
 	WRITE  (UNIT=29, FMT=*) panele_top
 	WRITE  (UNIT=30, FMT=*) panel_lambda_top
-	WRITE  (UNIT=31, '(F12.4)') panel_YL_top
-	WRITE  (UNIT=32, '(F12.4)') prc_all_top
-	WRITE  (UNIT=33, '(F12.4)') prc_cohort_top
-	WRITE  (UNIT=34, '(F12.4)') panel_PV_top
-	WRITE  (UNIT=35, '(F12.4)') prc_PV_all_top
-	WRITE  (UNIT=36, '(F12.4)') prc_PV_cohort_top
+	WRITE  (UNIT=31, FMT='(F12.4)') panel_YL_top
+	WRITE  (UNIT=32, FMT='(F12.4)') prc_all_top
+	WRITE  (UNIT=33, FMT='(F12.4)') prc_cohort_top
+	WRITE  (UNIT=34, FMT='(F12.4)') panel_PV_top
+	WRITE  (UNIT=35, FMT='(F12.4)') prc_PV_all_top
+	WRITE  (UNIT=36, FMT='(F12.4)') prc_PV_cohort_top
 
 	close (unit=10); close (unit=11); close (unit=12); close (unit=27)
 	close (unit=28); close (unit=29); close (unit=30); close (unit=31)
