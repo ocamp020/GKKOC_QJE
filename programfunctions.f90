@@ -5135,9 +5135,9 @@ SUBROUTINE  SIMULATION(bench_indx)
 			Std_Dev_Return_K_Age(7)  = sqrt( sum( (ret_k_46_50-sum(ret_k_46_50, Ind_K_46_50==1)/sum(Ind_K_46_50)**2.0_dp) , Ind_K_46_50==1) & 
 										&	/real(sum(Ind_K_46_50)-1,DP)  )
 			Std_Dev_Return_K_Age(8)  = sqrt( sum( (ret_k_51_55-sum(ret_k_51_55, Ind_K_51_55==1)/sum(Ind_K_51_55)**2.0_dp) , Ind_K_51_55==1) & 
-										&	/real(sum(Ind_K_56_55)-1,DP)  )
+										&	/real(sum(Ind_K_51_55)-1,DP)  )
 			Std_Dev_Return_K_Age(9)  = sqrt( sum( (ret_k_56_60-sum(ret_k_56_60, Ind_K_56_60==1)/sum(Ind_K_56_60)**2.0_dp) , Ind_K_56_60==1) & 
-										&	/real(sum(Ind_K_51_60)-1,DP)  )
+										&	/real(sum(Ind_K_56_60)-1,DP)  )
 			Std_Dev_Return_K_Age(10) = sqrt( sum( (ret_k_61_65-sum(ret_k_61_65, Ind_K_61_65==1)/sum(Ind_K_61_65)**2.0_dp) , Ind_K_61_65==1) & 
 										&	/real(sum(Ind_K_61_65)-1,DP)  )
 			Std_Dev_Return_K_Age(11) = sqrt( sum( (ret_k_66_70-sum(ret_k_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)**2.0_dp) , Ind_K_66_70==1) & 
