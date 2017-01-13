@@ -53,14 +53,14 @@ SUBROUTINE  SIMULATION(bench_indx)
 		REAL(SP), DIMENSION(totpop) 	     :: ret_41_45 , ret_46_50 , ret_51_55 , ret_56_60 !, ret_61_65 , ret_66_70
 		REAL(SP), DIMENSION(totpop) 	     :: ret_w_aux=0.0_sp, ret_w_20, ret_w_21_25 , ret_w_26_30 , ret_w_31_35 , ret_w_36_40 
 		REAL(SP), DIMENSION(totpop) 	     :: ret_w_41_45 , ret_w_46_50 , ret_w_51_55 , ret_w_56_60 !, ret_w_61_65 , ret_w_66_70
-		REAL(SP), DIMENSION(totpop) 	     :: ret_k_aux=0.0_sp, ret_k_20=0.0_sp, ret_k_21_25=0.0_sp, ret_k_26_30=0.0_sp
-		REAL(SP), DIMENSION(totpop) 	     :: ret_k_31_35=0.0_sp, ret_k_36_40=0.0_sp, ret_k_41_45=0.0_sp , ret_k_46_50=0.0_sp
-		REAL(SP), DIMENSION(totpop) 	     :: ret_k_51_55=0.0_sp , ret_k_56_60=0.0_sp !, ret_k_61_65=0.0_sp , ret_k_66_70=0.0_sp
-		REAL(SP), DIMENSION(totpop) 	     :: ret_k_w_aux=0.0_sp, ret_k_w_20=0.0_sp, ret_k_w_21_25=0.0_sp, ret_k_w_26_30=0.0_sp
-		REAL(SP), DIMENSION(totpop) 	     :: ret_k_w_31_35=0.0_sp, ret_k_w_36_40=0.0_sp, ret_k_w_41_45=0.0_sp, ret_k_w_46_50=0.0_sp
-		REAL(SP), DIMENSION(totpop) 	     :: ret_k_w_51_55=0.0_sp, ret_k_w_56_60=0.0_sp!, ret_k_w_61_65=0.0_sp, ret_k_w_66_70=0.0_sp
-		INTEGER , DIMENSION(totpop) 	     :: Ind_K=0, Ind_K_20, Ind_K_21_25 , Ind_K_26_30 , Ind_K_31_35 , Ind_K_36_40 
-		INTEGER , DIMENSION(totpop) 	     :: Ind_K_41_45 , Ind_K_46_50 , Ind_K_51_55 , Ind_K_56_60 !, Ind_K_61_65 , Ind_K_66_70
+		! REAL(SP), DIMENSION(totpop) 	     :: ret_k_aux=0.0_sp, ret_k_20=0.0_sp, ret_k_21_25=0.0_sp, ret_k_26_30=0.0_sp
+		! REAL(SP), DIMENSION(totpop) 	     :: ret_k_31_35=0.0_sp, ret_k_36_40=0.0_sp, ret_k_41_45=0.0_sp , ret_k_46_50=0.0_sp
+		! REAL(SP), DIMENSION(totpop) 	     :: ret_k_51_55=0.0_sp , ret_k_56_60=0.0_sp !, ret_k_61_65=0.0_sp , ret_k_66_70=0.0_sp
+		! REAL(SP), DIMENSION(totpop) 	     :: ret_k_w_aux=0.0_sp, ret_k_w_20=0.0_sp, ret_k_w_21_25=0.0_sp, ret_k_w_26_30=0.0_sp
+		! REAL(SP), DIMENSION(totpop) 	     :: ret_k_w_31_35=0.0_sp, ret_k_w_36_40=0.0_sp, ret_k_w_41_45=0.0_sp, ret_k_w_46_50=0.0_sp
+		! REAL(SP), DIMENSION(totpop) 	     :: ret_k_w_51_55=0.0_sp, ret_k_w_56_60=0.0_sp!, ret_k_w_61_65=0.0_sp, ret_k_w_66_70=0.0_sp
+		! INTEGER , DIMENSION(totpop) 	     :: Ind_K=0, Ind_K_20, Ind_K_21_25 , Ind_K_26_30 , Ind_K_31_35 , Ind_K_36_40 
+		! INTEGER , DIMENSION(totpop) 	     :: Ind_K_41_45 , Ind_K_46_50 , Ind_K_51_55 , Ind_K_56_60 !, Ind_K_61_65 , Ind_K_66_70
 		REAL(SP), DIMENSION(totpop) 	     :: cum_assets, cum_K
 		REAL(SP) 						 	 :: Std_Dev_Return_Age(11)    , Mean_Return_Age(11)    , prc_Return_Age(11,9)
 		REAL(SP) 						 	 :: Std_Dev_Return_W_Age(11)  , Mean_Return_W_Age(11)  , prc_Return_W_Age(11,9)
@@ -429,14 +429,14 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     		ret_w_aux(paneli)   = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
 	     								&   R*panela(paneli) ) + ret_w_aux(paneli)
 	     		cum_assets(paneli)  = panela(paneli) + cum_assets(paneli)
-	     		if (K_aux.gt.0.0_dp) then 
-	     		ret_k_aux(paneli)   = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
-	     								&   R*panela(paneli) )/K_aux + ret_k_aux(paneli)
-	     		ret_k_w_aux(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
-	     								&   R*panela(paneli) ) + ret_k_w_aux(paneli)
-	     		cum_K(paneli)       = K_aux + cum_K(paneli)
-	     		ind_K(paneli) 		= 1 + ind_K(paneli)
-	     		endif 
+	     		! if (K_aux.gt.0.0_dp) then 
+	     		! ret_k_aux(paneli)   = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
+	     		! 						&   R*panela(paneli) )/K_aux + ret_k_aux(paneli)
+	     		! ret_k_w_aux(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
+	     		! 						&   R*panela(paneli) ) + ret_k_w_aux(paneli)
+	     		! cum_K(paneli)       = K_aux + cum_K(paneli)
+	     		! ind_K(paneli) 		= 1 + ind_K(paneli)
+	     		! endif 
 
 	     		if (age.eq.1) then
 	     			ret_20(paneli)        = ret_aux(paneli) 
@@ -444,135 +444,135 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     			ret_w_20(paneli)      = ret_w_aux(paneli)/cum_assets(paneli)
 	     			ret_w_aux(paneli)     = 0.0_sp 
 	     			cum_assets(paneli)    = 0.0_sp 
-	     			if (cum_K(paneli).gt.0.0_sp) then 
-	     			ret_k_20(paneli)      = ret_k_aux(paneli)/ind_K(paneli)
-	     			ret_k_w_20(paneli)    = ret_k_w_aux(paneli)/cum_K(paneli)
-	     			ind_K_20(paneli)      = 1
-	     			endif 
-	     			ret_k_aux(paneli)     = 0.0_sp 
-	     			ret_k_w_aux(paneli)   = 0.0_sp 
-	     			cum_K(paneli)         = 0.0_sp
-	     			ind_K(paneli)         = 0
+	     			! if (cum_K(paneli).gt.0.0_sp) then 
+	     			! ret_k_20(paneli)      = ret_k_aux(paneli)/ind_K(paneli)
+	     			! ret_k_w_20(paneli)    = ret_k_w_aux(paneli)/cum_K(paneli)
+	     			! ind_K_20(paneli)      = 1
+	     			! endif 
+	     			! ret_k_aux(paneli)     = 0.0_sp 
+	     			! ret_k_w_aux(paneli)   = 0.0_sp 
+	     			! cum_K(paneli)         = 0.0_sp
+	     			! ind_K(paneli)         = 0
 	     		elseif (age.eq.6) then
 	     			ret_21_25(paneli)     = ret_aux(paneli)/6.0_sp 
 	     			ret_aux(paneli)       = 0.0_sp 
 	     			ret_w_21_25(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
 	     			ret_w_aux(paneli)     = 0.0_sp 
 	     			cum_assets(paneli)    = 0.0_sp 
-	     			if (cum_K(paneli).gt.0.0_sp) then 
-	     			ret_k_21_25(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
-	     			ret_k_w_21_25(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	     			ind_K_21_25(paneli)   = 1
-	     			endif 
-	     			ret_k_aux(paneli)     = 0.0_sp 
-	     			ret_k_w_aux(paneli)   = 0.0_sp 
-	     			cum_K(paneli)         = 0.0_sp
-	     			ind_K(paneli)         = 0
+	     			! if (cum_K(paneli).gt.0.0_sp) then 
+	     			! ret_k_21_25(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
+	     			! ret_k_w_21_25(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	     			! ind_K_21_25(paneli)   = 1
+	     			! endif 
+	     			! ret_k_aux(paneli)     = 0.0_sp 
+	     			! ret_k_w_aux(paneli)   = 0.0_sp 
+	     			! cum_K(paneli)         = 0.0_sp
+	     			! ind_K(paneli)         = 0
      			elseif (age.eq.11) then 
      				ret_26_30(paneli)     = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)       = 0.0_sp 
 	     			ret_w_26_30(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
 	     			ret_w_aux(paneli)     = 0.0_sp 
 	     			cum_assets(paneli)    = 0.0_sp 
-	     			if (cum_K(paneli).gt.0.0_sp) then 
-	     			ret_k_26_30(paneli)   = ret_k_aux(paneli)/ind_K(paneli)
-	     			ret_k_w_26_30(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	     			ind_K_26_30(paneli)   = 1
-	     			endif 
-	     			ret_k_aux(paneli)     = 0.0_sp 
-	     			ret_k_w_aux(paneli)   = 0.0_sp 
-	     			cum_K(paneli)         = 0.0_sp
-	     			ind_K(paneli)         = 0
+	     			! if (cum_K(paneli).gt.0.0_sp) then 
+	     			! ret_k_26_30(paneli)   = ret_k_aux(paneli)/ind_K(paneli)
+	     			! ret_k_w_26_30(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	     			! ind_K_26_30(paneli)   = 1
+	     			! endif 
+	     			! ret_k_aux(paneli)     = 0.0_sp 
+	     			! ret_k_w_aux(paneli)   = 0.0_sp 
+	     			! cum_K(paneli)         = 0.0_sp
+	     			! ind_K(paneli)         = 0
      			elseif (age.eq.15) then 
      				ret_31_35(paneli)     = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)       = 0.0_sp 
 	     			ret_w_31_35(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
 	     			ret_w_aux(paneli)     = 0.0_sp
 	     			cum_assets(paneli)    = 0.0_sp 
-	     			if (cum_K(paneli).gt.0.0_sp) then 
-	     			ret_k_31_35(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
-	     			ret_k_w_31_35(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	     			ind_K_31_35(paneli)   = 1
-	     			endif 
-	     			ret_k_aux(paneli)     = 0.0_sp 
-	     			ret_k_w_aux(paneli)   = 0.0_sp 
-	     			cum_K(paneli)         = 0.0_sp
-	     			ind_K(paneli)         = 0
+	     			! if (cum_K(paneli).gt.0.0_sp) then 
+	     			! ret_k_31_35(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
+	     			! ret_k_w_31_35(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	     			! ind_K_31_35(paneli)   = 1
+	     			! endif 
+	     			! ret_k_aux(paneli)     = 0.0_sp 
+	     			! ret_k_w_aux(paneli)   = 0.0_sp 
+	     			! cum_K(paneli)         = 0.0_sp
+	     			! ind_K(paneli)         = 0
      			elseif (age.eq.21) then 
      				ret_36_40(paneli)     = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)       = 0.0_sp 
 	     			ret_w_36_40(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
 	     			ret_w_aux(paneli)     = 0.0_sp 
 	     			cum_assets(paneli)    = 0.0_sp 
-	     			if (cum_K(paneli).gt.0.0_sp) then 
-	     			ret_k_36_40(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
-	     			ret_k_w_36_40(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	     			ind_K_36_40(paneli)   = 1
-	     			endif 
-	     			ret_k_aux(paneli)     = 0.0_sp 
-	     			ret_k_w_aux(paneli)   = 0.0_sp 
-	     			cum_K(paneli)         = 0.0_sp
-	     			ind_K(paneli)         = 0
+	     			! if (cum_K(paneli).gt.0.0_sp) then 
+	     			! ret_k_36_40(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
+	     			! ret_k_w_36_40(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	     			! ind_K_36_40(paneli)   = 1
+	     			! endif 
+	     			! ret_k_aux(paneli)     = 0.0_sp 
+	     			! ret_k_w_aux(paneli)   = 0.0_sp 
+	     			! cum_K(paneli)         = 0.0_sp
+	     			! ind_K(paneli)         = 0
      			elseif (age.eq.26) then 
      				ret_41_45(paneli)     = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)       = 0.0_sp 
 	     			ret_w_41_45(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
 	     			ret_w_aux(paneli)     = 0.0_sp 
 	     			cum_assets(paneli)    = 0.0_sp 
-	     			if (cum_K(paneli).gt.0.0_sp) then 
-	     			ret_k_41_45(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
-	     			ret_k_w_41_45(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	     			ind_K_41_45(paneli)   = 1
-	     			endif 
-	     			ret_k_aux(paneli)     = 0.0_sp 
-	     			ret_k_w_aux(paneli)   = 0.0_sp 
-	     			cum_K(paneli)         = 0.0_sp
-	     			ind_K(paneli)         = 0
+	     			! if (cum_K(paneli).gt.0.0_sp) then 
+	     			! ret_k_41_45(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
+	     			! ret_k_w_41_45(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	     			! ind_K_41_45(paneli)   = 1
+	     			! endif 
+	     			! ret_k_aux(paneli)     = 0.0_sp 
+	     			! ret_k_w_aux(paneli)   = 0.0_sp 
+	     			! cum_K(paneli)         = 0.0_sp
+	     			! ind_K(paneli)         = 0
      			elseif (age.eq.31) then 
      				ret_46_50(paneli)     = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)       = 0.0_sp 
 	     			ret_w_46_50(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
 	     			ret_w_aux(paneli)     = 0.0_sp 
 	     			cum_assets(paneli)    = 0.0_sp 
-	     			if (cum_K(paneli).gt.0.0_sp) then 
-	     			ret_k_46_50(paneli)   = ret_k_aux(paneli)/ind_K(paneli)
-	     			ret_k_w_46_50(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	     			ind_K_46_50(paneli)   = 1
-	     			endif 
-	     			ret_k_aux(paneli)     = 0.0_sp 
-	     			ret_k_w_aux(paneli)   = 0.0_sp 
-	     			cum_K(paneli)         = 0.0_sp
-	     			ind_K(paneli)         = 0
+	     			! if (cum_K(paneli).gt.0.0_sp) then 
+	     			! ret_k_46_50(paneli)   = ret_k_aux(paneli)/ind_K(paneli)
+	     			! ret_k_w_46_50(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	     			! ind_K_46_50(paneli)   = 1
+	     			! endif 
+	     			! ret_k_aux(paneli)     = 0.0_sp 
+	     			! ret_k_w_aux(paneli)   = 0.0_sp 
+	     			! cum_K(paneli)         = 0.0_sp
+	     			! ind_K(paneli)         = 0
      			elseif (age.eq.36) then 
      				ret_51_55(paneli)     = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)       = 0.0_sp 
 	     			ret_w_51_55(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
 	     			ret_w_aux(paneli)     = 0.0_sp 
 	     			cum_assets(paneli)    = 0.0_sp 
-	     			if (cum_K(paneli).gt.0.0_sp) then 
-	     			ret_k_51_55(paneli)   = ret_k_aux(paneli)/ind_K(paneli)
-	     			ret_k_w_51_55(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	     			ind_K_51_55(paneli)   = 1
-	     			endif 
-	     			ret_k_aux(paneli)     = 0.0_sp 
-	     			ret_k_w_aux(paneli)   = 0.0_sp 
-	     			cum_K(paneli)         = 0.0_sp
-	     			ind_K(paneli)         = 0
+	     			! if (cum_K(paneli).gt.0.0_sp) then 
+	     			! ret_k_51_55(paneli)   = ret_k_aux(paneli)/ind_K(paneli)
+	     			! ret_k_w_51_55(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	     			! ind_K_51_55(paneli)   = 1
+	     			! endif 
+	     			! ret_k_aux(paneli)     = 0.0_sp 
+	     			! ret_k_w_aux(paneli)   = 0.0_sp 
+	     			! cum_K(paneli)         = 0.0_sp
+	     			! ind_K(paneli)         = 0
      			elseif (age.eq.41) then 
      				ret_56_60(paneli)     = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)       = 0.0_sp 
 	     			ret_w_56_60(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
 	     			ret_w_aux(paneli)     = 0.0_sp 
 	     			cum_assets(paneli)    = 0.0_sp 
-	     			if (cum_K(paneli).gt.0.0_sp) then 
-	     			ret_k_56_60(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
-	     			ret_k_w_56_60(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	     			ind_K_56_60(paneli)   = 1
-	     			endif 
-	     			ret_k_aux(paneli)     = 0.0_sp 
-	     			ret_k_w_aux(paneli)   = 0.0_sp 
-	     			cum_K(paneli)         = 0.0_sp
-	     			ind_K(paneli)         = 0
+	     			! if (cum_K(paneli).gt.0.0_sp) then 
+	     			! ret_k_56_60(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
+	     			! ret_k_w_56_60(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	     			! ind_K_56_60(paneli)   = 1
+	     			! endif 
+	     			! ret_k_aux(paneli)     = 0.0_sp 
+	     			! ret_k_w_aux(paneli)   = 0.0_sp 
+	     			! cum_K(paneli)         = 0.0_sp
+	     			! ind_K(paneli)         = 0
      			! elseif (age.eq.46) then 
      			! 	ret_61_65(paneli)     = ret_aux(paneli)/5.0_sp 
 	     		! 	ret_aux(paneli)       = 0.0_sp 
