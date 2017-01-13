@@ -393,11 +393,11 @@ MODULE Toolbox
 !
 
 	real(dp) function Percentile(p,n,X,PDF_in)
-		real(dp), intent(in)                          :: p
+		real(sp), intent(in)                          :: p
 		integer , intent(in)  						  :: n
-		real(dp), intent(in) , dimension(n) 		  :: X 
-		real(dp), optional, intent(in) , dimension(n) :: PDF_in
-		real(dp) 									  :: a, b, c, CDF_c, PDF(n)
+		real(sp), intent(in) , dimension(n) 		  :: X 
+		real(sp), optional, intent(in) , dimension(n) :: PDF_in
+		real(sp) 									  :: a, b, c, CDF_c, PDF(n)
 
 		if( .not. present(PDF_in) ) then 
 			PDF = 1.0_dp/real(n,dp)
