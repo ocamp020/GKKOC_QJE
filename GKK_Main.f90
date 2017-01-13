@@ -183,9 +183,9 @@ PROGRAM main
 
 	! Call routines
 		! Calibration
-		if (Calibration_Switch) then 
-			CALL CALIBRATION_TRIALS
-		endif 
+		! if (Calibration_Switch) then 
+		! 	CALL CALIBRATION_TRIALS
+		! endif 
 
 		! Tax Reform experiment
 		if (Tax_Reform) then 
@@ -1325,100 +1325,100 @@ end Subroutine Solve_Opt_Tau_C
 !========================================================================================
 
 
-SUBROUTINE CALIBRATION_TRIALS
-	use parameters
-	use global 
-	use programfunctions
-	use Toolbox
-	use omp_lib
+! SUBROUTINE CALIBRATION_TRIALS
+! 	use parameters
+! 	use global 
+! 	use programfunctions
+! 	use Toolbox
+! 	use omp_lib
 
-	IMPLICIT NONE
-	real(DP)::  beta_L, beta_H, sigmaz_L, sigmaz_H, x_hi_L, x_hi_H
-	integer :: parindx1,  parindx2, parindx3, parindx4, parindx5, parindx6, n_beta, n_sigmaz, n_x_hi
-	real(DP), dimension(6):: paramsL, paramsH
-	real(DP), dimension(3) :: opt_par
+! 	IMPLICIT NONE
+! 	real(DP)::  beta_L, beta_H, sigmaz_L, sigmaz_H, x_hi_L, x_hi_H
+! 	integer :: parindx1,  parindx2, parindx3, parindx4, parindx5, parindx6, n_beta, n_sigmaz, n_x_hi
+! 	real(DP), dimension(6):: paramsL, paramsH
+! 	real(DP), dimension(3) :: opt_par
 
-	!$ call omp_set_num_threads(3)
+! 	!$ call omp_set_num_threads(3)
 
-	print*,'SOLVING CALIBRATION'
-	print*,'-----------------------------------------------------------------------'
-
-
-	! CALIBRATION STARTS
-
-	beta_L=0.952_dp
-	beta_H=0.957_dp
-
-	sigmaz_L = 0.11_dp
-	sigmaz_H = 0.15_dp
-
-	x_hi_L  = 3.0_dp 
-	x_hi_H  = 3.0_dp
+! 	print*,'SOLVING CALIBRATION'
+! 	print*,'-----------------------------------------------------------------------'
 
 
-	n_beta   = 3
-	n_sigmaz = 3
-	n_x_hi   = 1
+! 	! CALIBRATION STARTS
 
-	Min_SSE_Moments=1000000.0_DP
+! 	beta_L=0.952_dp
+! 	beta_H=0.957_dp
 
-	DO parindx1=1,n_beta
-	DO parindx6=1,n_x_hi
-	DO parindx5=1,n_sigmaz
+! 	sigmaz_L = 0.11_dp
+! 	sigmaz_H = 0.15_dp
 
-	    beta  		= beta_L  	+ real(parindx1-1,8) *(beta_H-beta_L)/max(real(n_beta-1,8),1.0_DP)
-	    sigma_z_eps = sigmaz_L 	+ real(parindx5-1,8)*(sigmaz_H-sigmaz_L) / max(real(n_sigmaz-1,8),1.0_DP)
-	    x_hi 		= x_hi_L 	+ real(parindx6-1,8)*(x_hi_H-x_hi_L) / max(real(n_x_hi-1,8),1.0_DP)
+! 	x_hi_L  = 3.0_dp 
+! 	x_hi_H  = 3.0_dp
 
-	    print*, ' '
-	    print*,'parameters=', beta, sigma_z_eps, x_hi
+
+! 	n_beta   = 3
+! 	n_sigmaz = 3
+! 	n_x_hi   = 1
+
+! 	Min_SSE_Moments=1000000.0_DP
+
+! 	DO parindx1=1,n_beta
+! 	DO parindx6=1,n_x_hi
+! 	DO parindx5=1,n_sigmaz
+
+! 	    beta  		= beta_L  	+ real(parindx1-1,8) *(beta_H-beta_L)/max(real(n_beta-1,8),1.0_DP)
+! 	    sigma_z_eps = sigmaz_L 	+ real(parindx5-1,8)*(sigmaz_H-sigmaz_L) / max(real(n_sigmaz-1,8),1.0_DP)
+! 	    x_hi 		= x_hi_L 	+ real(parindx6-1,8)*(x_hi_H-x_hi_L) / max(real(n_x_hi-1,8),1.0_DP)
+
+! 	    print*, ' '
+! 	    print*,'parameters=', beta, sigma_z_eps, x_hi
 	        
 	    
-		! Benchmark economy
-			solving_bench=1
+! 		! Benchmark economy
+! 			solving_bench=1
 
-		! Set taxes for benchmark economy
-			tauK = 0.25_DP
-			tauW_bt = 0.00_DP
-			tauW_at = 0.00_DP
-			Y_a_threshold = 0.00_DP 
+! 		! Set taxes for benchmark economy
+! 			tauK = 0.25_DP
+! 			tauW_bt = 0.00_DP
+! 			tauW_at = 0.00_DP
+! 			Y_a_threshold = 0.00_DP 
 
-	    CALL INITIALIZE
-	    CALL FIND_DBN_EQ
-	    CALL Firm_Value
-	    CALL COMPUTE_MOMENTS
-	    SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP  + (1.0_DP-FW_top_x_share(4)/0.357_DP)**2.0_DP  & !+ (FW_top_x_share(3)-0.75_DP)**2.0_DP &
-	                   & + (1.0_DP-Std_Log_Earnings_25_60 / 0.8_DP)**2.0_DP + (1.0_DP-meanhours_25_60/0.4_DP)**2.0_DP !&
-	                   !& + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
+! 	    CALL INITIALIZE
+! 	    CALL FIND_DBN_EQ
+! 	    CALL Firm_Value
+! 	    CALL COMPUTE_MOMENTS
+! 	    SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP  + (1.0_DP-FW_top_x_share(4)/0.357_DP)**2.0_DP  & !+ (FW_top_x_share(3)-0.75_DP)**2.0_DP &
+! 	                   & + (1.0_DP-Std_Log_Earnings_25_60 / 0.8_DP)**2.0_DP + (1.0_DP-meanhours_25_60/0.4_DP)**2.0_DP !&
+! 	                   !& + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
 	                   
-	!    SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
-		print*, ' '
-		print*,'parameters=',beta, sigma_z_eps, x_hi,'SSE_Moments =',SSE_Moments
-		print*,'Wealth_Output', Wealth_Output,'Top 1%',FW_top_x_share(4),'Std_Log_E',Std_Log_Earnings_25_60,'meanhours',meanhours_25_60
+! 	!    SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
+! 		print*, ' '
+! 		print*,'parameters=',beta, sigma_z_eps, x_hi,'SSE_Moments =',SSE_Moments
+! 		print*,'Wealth_Output', Wealth_Output,'Top 1%',FW_top_x_share(4),'Std_Log_E',Std_Log_Earnings_25_60,'meanhours',meanhours_25_60
 
-	    IF (SSE_Moments .lt. Min_SSE_Moments ) THEN
-	        Min_SSE_Moments =SSE_Moments
-	        !params= [ beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma ]
-	        opt_par = [beta, sigma_z_eps, x_hi]
-	        Min_Moments = [  Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, MeanReturn  ]
-	    ENDIF
-	    !CALL WRITE_TO_FILE
+! 	    IF (SSE_Moments .lt. Min_SSE_Moments ) THEN
+! 	        Min_SSE_Moments =SSE_Moments
+! 	        !params= [ beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma ]
+! 	        opt_par = [beta, sigma_z_eps, x_hi]
+! 	        Min_Moments = [  Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, MeanReturn  ]
+! 	    ENDIF
+! 	    !CALL WRITE_TO_FILE
 	    
-	ENDDO
-	ENDDO
-	ENDDO
+! 	ENDDO
+! 	ENDDO
+! 	ENDDO
 
-	print*, opt_par
-	print*, Min_Moments
+! 	print*, opt_par
+! 	print*, Min_Moments
 
-	! beta=params(1)
-	! mu_z=params(2)
-	! rho_z=params(3)
-	! sigma_z_eps =params(4)
-	! sigma_lambda_eps = params(5)
-	! gamma= params(6)
+! 	! beta=params(1)
+! 	! mu_z=params(2)
+! 	! rho_z=params(3)
+! 	! sigma_z_eps =params(4)
+! 	! sigma_lambda_eps = params(5)
+! 	! gamma= params(6)
 
-END SUBROUTINE CALIBRATION_TRIALS
+! END SUBROUTINE CALIBRATION_TRIALS
 
 !====================================================================
 
