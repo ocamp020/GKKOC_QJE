@@ -705,6 +705,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	use global
 	use Opt_Tax_Parameters
 	use Opt_Tax_Functions
+	use programfunctions
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -928,6 +929,7 @@ Subroutine Solve_Opt_Threshold
 	use Opt_Tax_Parameters
 	use Opt_Tax_Functions
 	use Simulation_Module
+	use programfunctions
 	use Toolbox
 	use omp_lib
 	implicit none 
@@ -1067,6 +1069,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 	use Opt_Tax_Parameters
 	use Opt_Tax_Functions
 	use Simulation_Module
+	use programfunctions
 	use Toolbox
 	use omp_lib
 	implicit none 
