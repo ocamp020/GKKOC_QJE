@@ -30,6 +30,7 @@ PROGRAM main
 	USE parameters
 	USE GLOBAL
 	use programfunctions
+	use Simulation_Module
 	use Toolbox
 	use omp_lib
 
@@ -268,6 +269,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
+	use Simulation_Module
 	use Toolbox
 	use omp_lib
 	implicit none 
@@ -374,6 +376,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
+	use Simulation_Module
 	use Toolbox
 	use omp_lib
 	implicit none 
@@ -542,6 +545,7 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
+	use Simulation_Module
 	use Toolbox
 	use omp_lib
 	implicit none 
@@ -701,6 +705,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	use global
 	use Opt_Tax_Parameters
 	use Opt_Tax_Functions
+	use Simulation_Module
 	use Toolbox
 	use omp_lib
 	implicit none 
@@ -922,6 +927,7 @@ Subroutine Solve_Opt_Threshold
 	use global
 	use Opt_Tax_Parameters
 	use Opt_Tax_Functions
+	use Simulation_Module
 	use Toolbox
 	use omp_lib
 	implicit none 
@@ -1060,6 +1066,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 	use global
 	use Opt_Tax_Parameters
 	use Opt_Tax_Functions
+	use Simulation_Module
 	use Toolbox
 	use omp_lib
 	implicit none 

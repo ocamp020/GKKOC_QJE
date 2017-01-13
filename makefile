@@ -14,7 +14,7 @@ simple: Sergio_Simple.a
 Folder       = ./Compiled_Files
 GO_Folder    = ./Global_Opt
 Objects_Main    = $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o $(Folder)/Toolbox.o \
-                  $(Folder)/parameters.o $(Folder)/global.o $(Folder)/programfunctions.o
+                  $(Folder)/parameters.o $(Folder)/global.o $(Folder)/programfunctions.o $(Folder)/Simulation_Module.o
 Objects_Opt_Tax = $(Folder)/Opt_Tax_Parameters.o $(Folder)/Opt_Tax_Functions.o
 Objects_GO      = $(Folder)/GKK_Calibration.o \
                   $(Folder)/stateControl.o $(Folder)/genericParams.o $(Folder)/utilities.o \
@@ -35,6 +35,9 @@ $(Folder)/%.o: %.f90
 
 $(Folder)/programfunctions.o: programfunctions.f90
 	gfortran $(omp_flag) -O3 -J$(Folder) -c programfunctions.f90 -o $(Folder)/programfunctions.o
+
+$(Folder)/Simulation_Module.o: Simulation_Module.f90
+	gfortran $(omp_flag) -O3 -J$(Folder) -c Simulation_Module.f90 -o $(Folder)/Simulation_Module.o
 
 # Compile and execute programs
 Sergio_Simple.a: GKK_simple.f90 $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o
