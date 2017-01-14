@@ -393,19 +393,19 @@ MODULE Toolbox
 !
 
 	real(dp) function Percentile(p,n,X,PDF_in)
-		real(sp), intent(in)                          :: p
+		real(dp), intent(in)                          :: p
 		integer , intent(in)  						  :: n
-		real(sp), intent(in) , dimension(n) 		  :: X 
-		real(sp), optional, intent(in) , dimension(n) :: PDF_in
-		real(sp) 									  :: a, b, c, CDF_c, PDF(n)
+		real(dp), intent(in) , dimension(n) 		  :: X 
+		real(dp), optional, intent(in) , dimension(n) :: PDF_in
+		real(dp) 									  :: a, b, c, CDF_c, PDF(n)
 
 		if (n.lt.100) then 
-			Percentile = 0.0_sp 
+			Percentile = 0.0_dp 
 			print*, 'Percentile: Not enough observations n=',n
 			return 
 		else 
 		if( .not. present(PDF_in) ) then 
-			PDF = 1.0_sp/real(n,dp)
+			PDF = 1.0_dp/real(n,dp)
 		else 
 			PDF = PDF_in
 		endif 
@@ -414,19 +414,19 @@ MODULE Toolbox
 		b = maxval(X)
 		c = (1-p)*a+p*b
 		CDF_c = sum(PDF,X<=c)
-		do while ((abs(CDF_c-p)>0.0001_sp).and.(b-a>1e-8))
+		do while ((abs(CDF_c-p)>0.0001_dp).and.(abs(b-a)>1e-6))
+			print*, 'a',a,'c',c,'b',b,'CDF',CDF_c,'Error', abs(CDF_c-p)
 			if (CDF_c>p) then 
 				b = c 
-				c = (a+b)/2.0_dp
+				c = (c+b)/2.0_dp
 				CDF_c = sum(PDF,X<=c)
 			else 
 				a = c 
-				c = (a+b)/2.0_dp
+				c = (c+b)/2.0_dp
 				CDF_c = sum(PDF,X<=c)
 			endif
-			print*, 'a',a,'c',c,'b',b,'CDF',CDF_c,'Error', abs(CDF_c-p)
 		enddo 
-		print*, ' Percentile found', c, CDF_c
+		! print*, ' Percentile found', c, CDF_c
 		
 		Percentile = c 
 

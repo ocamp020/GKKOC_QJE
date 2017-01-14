@@ -50,24 +50,24 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! INTEGER 						     :: IGM_index_2
 		! Average Return by age group
 		INTEGER , PARAMETER  				 :: ret_size=100000
-		REAL(SP), DIMENSION(ret_size) 	     :: ret_aux=0.0_sp, ret_20, ret_21_25 , ret_26_30 , ret_31_35 , ret_36_40 
-		REAL(SP), DIMENSION(ret_size) 	     :: ret_41_45 , ret_46_50 , ret_51_55 , ret_56_60 , ret_61_65 , ret_66_70
-		REAL(SP), DIMENSION(ret_size) 	     :: ret_w_aux=0.0_sp, ret_w_20, ret_w_21_25 , ret_w_26_30 , ret_w_31_35 , ret_w_36_40 
-		REAL(SP), DIMENSION(ret_size) 	     :: ret_w_41_45 , ret_w_46_50 , ret_w_51_55 , ret_w_56_60 , ret_w_61_65 , ret_w_66_70
-		REAL(SP), DIMENSION(ret_size) 	     :: ret_k_aux=0.0_sp, ret_k_20=0.0_sp, ret_k_21_25=0.0_sp, ret_k_26_30=0.0_sp
-		REAL(SP), DIMENSION(ret_size) 	     :: ret_k_31_35=0.0_sp, ret_k_36_40=0.0_sp, ret_k_41_45=0.0_sp , ret_k_46_50=0.0_sp
-		REAL(SP), DIMENSION(ret_size) 	     :: ret_k_51_55=0.0_sp , ret_k_56_60=0.0_sp , ret_k_61_65=0.0_sp , ret_k_66_70=0.0_sp
-		REAL(SP), DIMENSION(ret_size) 	     :: ret_k_w_aux=0.0_sp, ret_k_w_20=0.0_sp, ret_k_w_21_25=0.0_sp, ret_k_w_26_30=0.0_sp
-		REAL(SP), DIMENSION(ret_size) 	     :: ret_k_w_31_35=0.0_sp, ret_k_w_36_40=0.0_sp, ret_k_w_41_45=0.0_sp, ret_k_w_46_50=0.0_sp
-		REAL(SP), DIMENSION(ret_size) 	     :: ret_k_w_51_55=0.0_sp, ret_k_w_56_60=0.0_sp, ret_k_w_61_65=0.0_sp, ret_k_w_66_70=0.0_sp
+		REAL(DP), DIMENSION(ret_size) 	     :: ret_aux=0.0_sp, ret_20, ret_21_25 , ret_26_30 , ret_31_35 , ret_36_40 
+		REAL(DP), DIMENSION(ret_size) 	     :: ret_41_45 , ret_46_50 , ret_51_55 , ret_56_60 , ret_61_65 , ret_66_70
+		REAL(DP), DIMENSION(ret_size) 	     :: ret_w_aux=0.0_sp, ret_w_20, ret_w_21_25 , ret_w_26_30 , ret_w_31_35 , ret_w_36_40 
+		REAL(DP), DIMENSION(ret_size) 	     :: ret_w_41_45 , ret_w_46_50 , ret_w_51_55 , ret_w_56_60 , ret_w_61_65 , ret_w_66_70
+		REAL(DP), DIMENSION(ret_size) 	     :: ret_k_aux=0.0_sp, ret_k_20=0.0_sp, ret_k_21_25=0.0_sp, ret_k_26_30=0.0_sp
+		REAL(DP), DIMENSION(ret_size) 	     :: ret_k_31_35=0.0_sp, ret_k_36_40=0.0_sp, ret_k_41_45=0.0_sp , ret_k_46_50=0.0_sp
+		REAL(DP), DIMENSION(ret_size) 	     :: ret_k_51_55=0.0_sp , ret_k_56_60=0.0_sp , ret_k_61_65=0.0_sp , ret_k_66_70=0.0_sp
+		REAL(DP), DIMENSION(ret_size) 	     :: ret_k_w_aux=0.0_sp, ret_k_w_20=0.0_sp, ret_k_w_21_25=0.0_sp, ret_k_w_26_30=0.0_sp
+		REAL(DP), DIMENSION(ret_size) 	     :: ret_k_w_31_35=0.0_sp, ret_k_w_36_40=0.0_sp, ret_k_w_41_45=0.0_sp, ret_k_w_46_50=0.0_sp
+		REAL(DP), DIMENSION(ret_size) 	     :: ret_k_w_51_55=0.0_sp, ret_k_w_56_60=0.0_sp, ret_k_w_61_65=0.0_sp, ret_k_w_66_70=0.0_sp
 		INTEGER , DIMENSION(ret_size) 	     :: Ind_K=0, Ind_K_20, Ind_K_21_25 , Ind_K_26_30 , Ind_K_31_35 , Ind_K_36_40 
 		INTEGER , DIMENSION(ret_size) 	     :: Ind_K_41_45 , Ind_K_46_50 , Ind_K_51_55 , Ind_K_56_60 , Ind_K_61_65 , Ind_K_66_70
-		REAL(SP), DIMENSION(ret_size) 	     :: cum_assets, cum_K
-		REAL(SP) 						 	 :: Std_Dev_Return_Age(11)    , Mean_Return_Age(11)    , prc_Return_Age(11,9)
-		REAL(SP) 						 	 :: Std_Dev_Return_W_Age(11)  , Mean_Return_W_Age(11)  , prc_Return_W_Age(11,9)
-		REAL(SP) 						 	 :: Std_Dev_Return_K_Age(11)  , Mean_Return_K_Age(11)  , prc_Return_K_Age(11,9)
-		REAL(SP) 						 	 :: Std_Dev_Return_K_W_Age(11), Mean_Return_K_W_Age(11), prc_Return_K_W_Age(11,9)
-		REAL(SP)  							 :: K_aux, prctile_ret(9)
+		REAL(DP), DIMENSION(ret_size) 	     :: cum_assets, cum_K
+		REAL(DP) 						 	 :: Std_Dev_Return_Age(11)    , Mean_Return_Age(11)    , prc_Return_Age(11,9)
+		REAL(DP) 						 	 :: Std_Dev_Return_W_Age(11)  , Mean_Return_W_Age(11)  , prc_Return_W_Age(11,9)
+		REAL(DP) 						 	 :: Std_Dev_Return_K_Age(11)  , Mean_Return_K_Age(11)  , prc_Return_K_Age(11,9)
+		REAL(DP) 						 	 :: Std_Dev_Return_K_W_Age(11), Mean_Return_K_W_Age(11), prc_Return_K_W_Age(11,9)
+		REAL(DP)  							 :: K_aux, prctile_ret(9)
 		INTEGER 							 :: i_pct
 		
 		REAL :: k_igm
