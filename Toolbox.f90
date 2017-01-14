@@ -399,6 +399,11 @@ MODULE Toolbox
 		real(sp), optional, intent(in) , dimension(n) :: PDF_in
 		real(sp) 									  :: a, b, c, CDF_c, PDF(n)
 
+		if (n.lt.100) then 
+			Percentile = 0.0_sp 
+			print*, 'Percentile: Not enough observations n=',n
+			return 
+		else 
 		if( .not. present(PDF_in) ) then 
 			PDF = 1.0_dp/real(n,dp)
 		else 
@@ -425,6 +430,8 @@ MODULE Toolbox
 		Percentile = c 
 
 		return
+
+		endif 
 	End function Percentile
 
 

@@ -49,7 +49,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! REAL(SP), DIMENSION(:) , allocatable :: panelr_dad_2, panelr_son_2, panelPV_dad_2, panelPV_son_2
 		! INTEGER 						     :: IGM_index_2
 		! Average Return by age group
-		INTEGER , PARAMETER  				 :: ret_size=1000
+		INTEGER , PARAMETER  				 :: ret_size=100000
 		REAL(SP), DIMENSION(ret_size) 	     :: ret_aux=0.0_sp, ret_20, ret_21_25 , ret_26_30 , ret_31_35 , ret_36_40 
 		REAL(SP), DIMENSION(ret_size) 	     :: ret_41_45 , ret_46_50 , ret_51_55 , ret_56_60 , ret_61_65 , ret_66_70
 		REAL(SP), DIMENSION(ret_size) 	     :: ret_w_aux=0.0_sp, ret_w_20, ret_w_21_25 , ret_w_26_30 , ret_w_31_35 , ret_w_36_40 
@@ -743,7 +743,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			print*, 'panelage_parents', sum(eligible_panelage_parents)/n_eligible, 'panelage_sons', sum(eligible_panelage_sons)/n_eligible
 			print*, ' '
 
-
+			print*, 'Start of std dev of return by age'
 			! Std Dev of return by age
 			Std_Dev_Return_Age(1)  = sqrt( sum( (ret_20   -sum(ret_20)   /ret_size)**2.0_sp ) /real(ret_size-1,SP)  )
 			Std_Dev_Return_Age(2)  = sqrt( sum( (ret_21_25-sum(ret_21_25)/ret_size)**2.0_sp ) /real(ret_size-1,SP)  )
@@ -814,7 +814,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 										& Ind_K_61_65==1) / real(sum(Ind_K_61_65)-1,SP)  )
 			Std_Dev_Return_K_W_Age(11) = sqrt( sum( (ret_k_w_66_70-sum(ret_k_w_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)**2.0_sp) , &
 										& Ind_K_66_70==1) / real(sum(Ind_K_66_70)-1,SP)  )
+			print*, 'End of std dev of return by age'
 
+			print*, ' '
+			print*, 'Start of mean of return by age'
 			! Mean of return by age
 			Mean_Return_Age(1)  = sum(ret_20)   /ret_size
 			Mean_Return_Age(2)  = sum(ret_21_25)/ret_size
@@ -863,11 +866,16 @@ SUBROUTINE  SIMULATION(bench_indx)
 			Mean_Return_K_W_Age(9)  = sum(ret_k_w_56_60, Ind_K_56_60==1)/sum(Ind_K_56_60)
 			Mean_Return_K_W_Age(10) = sum(ret_k_w_61_65, Ind_K_61_65==1)/sum(Ind_K_61_65)
 			Mean_Return_K_W_Age(11) = sum(ret_k_w_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)
+			print*, 'End of mean of return by age'
+
+			print*, ' '
+			print*, 'Start of pcrt of return by age'
 
 			! Percentiles of return by age
 			prctile_ret = (/0.999_sp, 0.99_sp, 0.95_sp, 0.90_sp, 0.75_sp, 0.50_sp, 0.25_sp, 0.10_sp, 0.01_sp/)
 
 			do i_pct=1,9 
+				print*, 'Ret prc=', prctile_ret(i_pct)
 				prc_Return_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_20)
 				prc_Return_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_21_25)
 				prc_Return_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_26_30)
@@ -879,7 +887,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				prc_Return_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_56_60)
 				prc_Return_Age(10,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_61_65)
 				prc_Return_Age(11,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_66_70)
-
+				print*, 'Ret W prc=', prctile_ret(i_pct)
 				prc_Return_W_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_20)
 				prc_Return_W_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_21_25)
 				prc_Return_W_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_26_30)
@@ -891,7 +899,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				prc_Return_W_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_56_60)
 				prc_Return_W_Age(10,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_61_65)
 				prc_Return_W_Age(11,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_66_70)
-
+				print*, 'Ret K prc=', prctile_ret(i_pct)
 				prc_Return_K_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_20   ),pack(ret_20   ,Ind_K_20   ==1))
 				prc_Return_K_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_21_25),pack(ret_21_25,Ind_K_21_25==1))
 				prc_Return_K_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_26_30),pack(ret_26_30,Ind_K_26_30==1))
@@ -903,7 +911,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				prc_Return_K_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_56_60),pack(ret_56_60,Ind_K_56_60==1))
 				prc_Return_K_Age(10,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_61_65),pack(ret_61_65,Ind_K_61_65==1))
 				prc_Return_K_Age(11,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_66_70),pack(ret_66_70,Ind_K_66_70==1))
-
+				print*, 'Ret K W prc=', prctile_ret(i_pct)
 				prc_Return_K_W_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_20   ),pack(ret_w_20   ,Ind_K_20   ==1))
 				prc_Return_K_W_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_21_25),pack(ret_w_21_25,Ind_K_21_25==1))
 				prc_Return_K_W_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_26_30),pack(ret_w_26_30,Ind_K_26_30==1))
@@ -916,6 +924,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 				prc_Return_K_W_Age(10,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_61_65),pack(ret_w_61_65,Ind_K_61_65==1))
 				prc_Return_K_W_Age(11,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_66_70),pack(ret_w_66_70,Ind_K_66_70==1))
 			enddo 
+			print*, 'End of prc of return by age'
+
 
 			if (bench_indx.eq.1) then
 			OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Return_Stats_by_Age_bench.txt', STATUS='replace')
