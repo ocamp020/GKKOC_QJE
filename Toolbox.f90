@@ -422,7 +422,7 @@ MODULE Toolbox
 			else 
 				a = c 
 				c = (a+b)/2.0_dp
-				CDF_c = sum(PDF,X>=c)
+				CDF_c = sum(PDF,X<=c)
 			endif
 			print*, 'a',a,'c',c,'b',b,'CDF',CDF_c,'Error', abs(CDF_c-p)
 		enddo 
