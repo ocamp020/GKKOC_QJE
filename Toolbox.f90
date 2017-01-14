@@ -405,7 +405,7 @@ MODULE Toolbox
 			return 
 		else 
 		if( .not. present(PDF_in) ) then 
-			PDF = 1.0_dp/real(n,dp)
+			PDF = 1.0_sp/real(n,dp)
 		else 
 			PDF = PDF_in
 		endif 
@@ -414,7 +414,7 @@ MODULE Toolbox
 		b = maxval(X)
 		c = (1-p)*a+p*b
 		CDF_c = sum(PDF,X<=c)
-		do while ((abs(CDF_c-p)>0.0001_dp).and.(b-a>1e-8))
+		do while ((abs(CDF_c-p)>0.0001_sp).and.(b-a>1e-6))
 			if (CDF_c>p) then 
 				b = c 
 				c = (a+b)/2.0_dp
@@ -424,8 +424,9 @@ MODULE Toolbox
 				c = (a+b)/2.0_dp
 				CDF_c = sum(PDF,X>=c)
 			endif
-			!print*, 'a',a,'c',c,'b',b,'CDF',CDF_c,'Error', abs(CDF_c-prctile_bq(i))
+			print*, 'a',a,'c',c,'b',b,'CDF',CDF_c,'Error', abs(CDF_c-p)
 		enddo 
+		print*, ' Percentile found', c, CDF_c
 		
 		Percentile = c 
 
