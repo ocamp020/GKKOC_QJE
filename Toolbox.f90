@@ -414,7 +414,7 @@ MODULE Toolbox
 		b = maxval(X)
 		c = (1-p)*a+p*b
 		CDF_c = sum(PDF,X<=c)
-		do while ((abs(CDF_c-p)>0.0001_sp).and.(b-a>1e-6))
+		do while ((abs(CDF_c-p)>0.0001_sp).and.(b-a>1e-8))
 			if (CDF_c>p) then 
 				b = c 
 				c = (a+b)/2.0_dp
