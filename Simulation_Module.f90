@@ -49,7 +49,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! REAL(SP), DIMENSION(:) , allocatable :: panelr_dad_2, panelr_son_2, panelPV_dad_2, panelPV_son_2
 		! INTEGER 						     :: IGM_index_2
 		! Average Return by age group
-		INTEGER , PARAMETER  				 :: ret_size=2500000
+		INTEGER , PARAMETER  				 :: ret_size=2000000
 		REAL(DP), DIMENSION(ret_size) 	     :: ret_aux=0.0_sp, ret_20, ret_21_25 , ret_26_30 , ret_31_35 , ret_36_40 
 		REAL(DP), DIMENSION(ret_size) 	     :: ret_41_45 , ret_46_50 , ret_51_55 , ret_56_60 , ret_61_65 , ret_66_70
 		REAL(DP), DIMENSION(ret_size) 	     :: ret_w_aux=0.0_sp, ret_w_20, ret_w_21_25 , ret_w_26_30 , ret_w_31_35 , ret_w_36_40 
