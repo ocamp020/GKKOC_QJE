@@ -655,7 +655,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		        endif 
 
 		 		
-		 		! print*, "Simulation period", simutime
+		 		print*, "Simulation period", simutime
 
 		 		
 			ENDDO ! simutime
