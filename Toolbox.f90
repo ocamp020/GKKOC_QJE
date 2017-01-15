@@ -393,6 +393,7 @@ MODULE Toolbox
 !
 
 	real(dp) function Percentile(p,n,X,PDF_in)
+		implicit none
 		real(dp), intent(in)                          :: p
 		integer , intent(in)  						  :: n
 		real(dp), intent(in) , dimension(n) 		  :: X 
@@ -418,11 +419,11 @@ MODULE Toolbox
 			print*, 'a',a,'c',c,'b',b,'CDF',CDF_c,'Error', abs(CDF_c-p)
 			if (CDF_c>p) then 
 				b = c 
-				c = (c+b)/2.0_dp
+				c = (a+b)/2.0_dp
 				CDF_c = sum(PDF,X<=c)
 			else 
 				a = c 
-				c = (c+b)/2.0_dp
+				c = (a+b)/2.0_dp
 				CDF_c = sum(PDF,X<=c)
 			endif
 		enddo 
