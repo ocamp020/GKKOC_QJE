@@ -456,7 +456,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 	     			cum_K(paneli)         = 0.0_sp
 	     			ind_K(paneli)         = 0
 	     		elseif (age.eq.6) then
-	     			ret_21_25(paneli)     = ret_aux(paneli)/6.0_sp 
+	     			ret_21_25(paneli)     = ret_aux(paneli)/5.0_sp 
 	     			ret_aux(paneli)       = 0.0_sp 
 	     			ret_w_21_25(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
 	     			ret_w_aux(paneli)     = 0.0_sp 
@@ -900,29 +900,29 @@ SUBROUTINE  SIMULATION(bench_indx)
 				prc_Return_W_Age(10,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_61_65)
 				prc_Return_W_Age(11,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_66_70)
 				print*, 'Ret K prc=', prctile_ret(i_pct)
-				prc_Return_K_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_20   ),pack(ret_20   ,Ind_K_20   ==1))
-				prc_Return_K_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_21_25),pack(ret_21_25,Ind_K_21_25==1))
-				prc_Return_K_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_26_30),pack(ret_26_30,Ind_K_26_30==1))
-				prc_Return_K_Age(4 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_31_35),pack(ret_31_35,Ind_K_31_35==1))
-				prc_Return_K_Age(5 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_36_40),pack(ret_36_40,Ind_K_36_40==1))
-				prc_Return_K_Age(6 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_41_45),pack(ret_41_45,Ind_K_41_45==1))
-				prc_Return_K_Age(7 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_46_50),pack(ret_46_50,Ind_K_46_50==1))
-				prc_Return_K_Age(8 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_51_55),pack(ret_51_55,Ind_K_51_55==1))
-				prc_Return_K_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_56_60),pack(ret_56_60,Ind_K_56_60==1))
-				prc_Return_K_Age(10,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_61_65),pack(ret_61_65,Ind_K_61_65==1))
-				prc_Return_K_Age(11,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_66_70),pack(ret_66_70,Ind_K_66_70==1))
+				prc_Return_K_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_20   ),pack(ret_k_20   ,Ind_K_20   ==1))
+				prc_Return_K_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_21_25),pack(ret_k_21_25,Ind_K_21_25==1))
+				prc_Return_K_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_26_30),pack(ret_k_26_30,Ind_K_26_30==1))
+				prc_Return_K_Age(4 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_31_35),pack(ret_k_31_35,Ind_K_31_35==1))
+				prc_Return_K_Age(5 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_36_40),pack(ret_k_36_40,Ind_K_36_40==1))
+				prc_Return_K_Age(6 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_41_45),pack(ret_k_41_45,Ind_K_41_45==1))
+				prc_Return_K_Age(7 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_46_50),pack(ret_k_46_50,Ind_K_46_50==1))
+				prc_Return_K_Age(8 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_51_55),pack(ret_k_51_55,Ind_K_51_55==1))
+				prc_Return_K_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_56_60),pack(ret_k_56_60,Ind_K_56_60==1))
+				prc_Return_K_Age(10,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_61_65),pack(ret_k_61_65,Ind_K_61_65==1))
+				prc_Return_K_Age(11,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_66_70),pack(ret_k_66_70,Ind_K_66_70==1))
 				print*, 'Ret K W prc=', prctile_ret(i_pct)
-				prc_Return_K_W_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_20   ),pack(ret_w_20   ,Ind_K_20   ==1))
-				prc_Return_K_W_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_21_25),pack(ret_w_21_25,Ind_K_21_25==1))
-				prc_Return_K_W_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_26_30),pack(ret_w_26_30,Ind_K_26_30==1))
-				prc_Return_K_W_Age(4 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_31_35),pack(ret_w_31_35,Ind_K_31_35==1))
-				prc_Return_K_W_Age(5 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_36_40),pack(ret_w_36_40,Ind_K_36_40==1))
-				prc_Return_K_W_Age(6 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_41_45),pack(ret_w_41_45,Ind_K_41_45==1))
-				prc_Return_K_W_Age(7 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_46_50),pack(ret_w_46_50,Ind_K_46_50==1))
-				prc_Return_K_W_Age(8 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_51_55),pack(ret_w_51_55,Ind_K_51_55==1))
-				prc_Return_K_W_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_56_60),pack(ret_w_56_60,Ind_K_56_60==1))
-				prc_Return_K_W_Age(10,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_61_65),pack(ret_w_61_65,Ind_K_61_65==1))
-				prc_Return_K_W_Age(11,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_66_70),pack(ret_w_66_70,Ind_K_66_70==1))
+				prc_Return_K_W_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_20   ),pack(ret_k_w_20   ,Ind_K_20   ==1))
+				prc_Return_K_W_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_21_25),pack(ret_k_w_21_25,Ind_K_21_25==1))
+				prc_Return_K_W_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_26_30),pack(ret_k_w_26_30,Ind_K_26_30==1))
+				prc_Return_K_W_Age(4 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_31_35),pack(ret_k_w_31_35,Ind_K_31_35==1))
+				prc_Return_K_W_Age(5 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_36_40),pack(ret_k_w_36_40,Ind_K_36_40==1))
+				prc_Return_K_W_Age(6 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_41_45),pack(ret_k_w_41_45,Ind_K_41_45==1))
+				prc_Return_K_W_Age(7 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_46_50),pack(ret_k_w_46_50,Ind_K_46_50==1))
+				prc_Return_K_W_Age(8 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_51_55),pack(ret_k_w_51_55,Ind_K_51_55==1))
+				prc_Return_K_W_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_56_60),pack(ret_k_w_56_60,Ind_K_56_60==1))
+				prc_Return_K_W_Age(10,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_61_65),pack(ret_k_w_61_65,Ind_K_61_65==1))
+				prc_Return_K_W_Age(11,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_66_70),pack(ret_k_w_66_70,Ind_K_66_70==1))
 			enddo 
 			print*, 'End of prc of return by age'
 
@@ -966,6 +966,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 				WRITE(UNIT=10, FMT=*) prc_Return_K_W_Age(:,i_pct)
 			enddo 
 			WRITE(UNIT=10, FMT=*) ' '
+			WRITE(UNIT=10, FMT=*) sum(Ind_K_20   ),sum(Ind_K_21_25),sum(Ind_K_26_30),sum(Ind_K_31_35),sum(Ind_K_36_40),&
+								& sum(Ind_K_41_45),sum(Ind_K_46_50),sum(Ind_K_51_55),sum(Ind_K_56_60),sum(Ind_K_61_65),sum(Ind_K_66_70)
 
 			CLOSE(UNIT=10)
 
