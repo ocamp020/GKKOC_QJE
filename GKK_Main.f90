@@ -63,7 +63,7 @@ PROGRAM main
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
-		Simul_Switch  = .true.
+		Simul_Switch  = .False.
 
 
 
