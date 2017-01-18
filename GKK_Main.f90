@@ -58,7 +58,7 @@ PROGRAM main
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
 			compute_bench = .false.
-			compute_exp   = .true.
+			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
@@ -191,11 +191,11 @@ PROGRAM main
 		if (Tax_Reform) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
 			
-			! call Solve_Experiment(compute_exp,Simul_Switch)
+			call Solve_Experiment(compute_exp,Simul_Switch)
 
-			Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
-			call system( 'mkdir -p ' // trim(Result_Folder) )
-			call Solve_Experiment_tauC(compute_exp,Simul_Switch)
+			! Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
+			! call system( 'mkdir -p ' // trim(Result_Folder) )
+			! call Solve_Experiment_tauC(compute_exp,Simul_Switch)
 
 			compute_bench = .false.
 		endif 
@@ -516,7 +516,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	if ((Simul_Switch)) then 
+	if ((.true.)) then 
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
 	endif
