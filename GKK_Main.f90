@@ -58,7 +58,7 @@ PROGRAM main
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
 			compute_bench = .false.
-			compute_exp   = .false.
+			compute_exp   = .true.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
@@ -672,13 +672,6 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 	! Compute welfare gain between economies
 	CALL COMPUTE_WELFARE_GAIN
 
-	! Write experimental results in output.txt
-	CALL WRITE_VARIABLES(0)
-	if ((Simul_Switch)) then 
-	 	print*,"	Experiment Simulation"
-		CALL SIMULATION(solving_bench)
-	endif
-
 
 	print*,'---------------------------'
 	print*,''
@@ -689,6 +682,14 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 	print*," "
 	print*,"Wealth_factor=",Wealth_factor
 	print*," "
+
+	! Write experimental results in output.txt
+	CALL WRITE_VARIABLES(0)
+	Simul_Switch = .true.
+	if ((Simul_Switch)) then 
+	 	print*,"	Experiment Simulation"
+		CALL SIMULATION(solving_bench)
+	endif
 
 	! Deallocate variables
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
