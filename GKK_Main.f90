@@ -685,8 +685,7 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	Simul_Switch = .true.
-	if ((Simul_Switch)) then 
+	if (.true.) then 
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
 	endif
