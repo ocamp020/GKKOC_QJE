@@ -207,7 +207,7 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 	print*,'Results from GOVNT_BUDGET'
 	print*, 'GBAR_bench',GBAR_bench, 'GBAR=',GBAR, 'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=',GBAR_L/Ebar 
 	print*, 'GBAR_NL  =',GBAR_NL, 'BT_EARNINGS=',BT_EARNINGS,'A_EARNINGS=',A_EARNINGS 
-	PRINT*,'PSI=',psi, 'tauK=', tauK, 'tauW_at=',tauW_at
+	PRINT*,'PSI=',psi, 'tauK=', tauK, 'tauW_at=',tauW_at, 'tauC', tauC
 
 	! OBTAIN NEW PSI IF GOVETNMENT BUDGET DOES NOT BALANCE
 	if (solving_bench .eq. 0) then

@@ -169,6 +169,7 @@ elseif X_Switch==1.2
         Exp_Folder      = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Tau_C_Experiment/Exp_Files/') ;
         Top_Folder      = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/Top_A/') ;
         Tables_file     = 'Tables_Presentation_Model_12_bv_tauC.xls' ;
+        tauW = 0 ;
     
 elseif X_Switch==2.1
     mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/')
@@ -489,14 +490,14 @@ end
         eval(['load ',Simul_Folder,'panela_bench']) ; 
         N  = numel(panela_bench) ;
         mu_g = mean(panela_bench)  ;
-        panela_bench_sort = sort(panela_bench,'descend') ;
+        panela_bench_sort = sort(panela_bench,'descend')' ;
         index = 1:N ;
         G_bench = (N+1)/(N-1) - 2*sum(panela_bench_sort.*index)/(mu_g*N*(N-1)) ;
     % Experiment 
         eval(['load ',Simul_Folder_Exp,'panela_exp']) ; 
         N  = numel(panela_exp) ;
         mu_g = mean(panela_exp)  ;
-        panela_exp_sort = sort(panela_exp,'descend') ;
+        panela_exp_sort = sort(panela_exp,'descend')' ;
         index = 1:N ;
         G_exp = (N+1)/(N-1) - 2*sum(panela_exp_sort.*index)/(mu_g*N*(N-1)) ;
     % Optimal Tau K
