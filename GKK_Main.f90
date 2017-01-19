@@ -56,14 +56,14 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
+		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
 		Opt_Tau_C = .true.
-		Simul_Switch  = .false.
+		Simul_Switch  = .true.
 
 
 

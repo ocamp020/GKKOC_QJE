@@ -828,7 +828,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			Std_Dev_Return_W_Age(9)  = sqrt( sum( (ret_w_56_60-sum(ret_w_56_60)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
 			Std_Dev_Return_W_Age(10) = sqrt( sum( (ret_w_61_65-sum(ret_w_61_65)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
 			Std_Dev_Return_W_Age(11) = sqrt( sum( (ret_w_66_70-sum(ret_w_66_70)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-			Std_Dev_Return_Age(12)   = sqrt( sum( ((panelRet  -sum(panelRet*panela)/sum(panela)   )**2.0_dp)*panela ) /sum(panela)  )
+			Std_Dev_Return_W_Age(12) = sqrt( sum( ((panelRet  -sum(panelRet*panela)/sum(panela)   )**2.0_dp)*panela ) /sum(panela)  )
 
 			Std_Dev_Return_K_Age(1)  = sqrt( sum( (ret_k_20   -sum(ret_k_20   , Ind_K_20   ==1)/sum(Ind_K_20   )**2.0_dp) , Ind_K_20   ==1) & 
 										&	/real(sum(Ind_K_20)   -1,DP)  )
