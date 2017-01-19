@@ -877,8 +877,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 										& Ind_K_61_65==1) / real(sum(Ind_K_61_65)-1,DP)  )
 			Std_Dev_Return_K_W_Age(11) = sqrt( sum( (ret_k_w_66_70-sum(ret_k_w_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)**2.0_dp) , &
 										& Ind_K_66_70==1) / real(sum(Ind_K_66_70)-1,DP)  )
-			Std_Dev_Return_K_W_Age(12) = sqrt( sum( ((pack(panelRet_K,(panelx.lt.3)) -sum(panelRet_K*panelK,(panelx.lt.3)) /sum(panelK,(panelx.lt.3))&
-										&	)**2.0_dp)*pack(panelK,(panelx.lt.3)) ) /sum(panelK,(panelx.lt.3))  )
+			Std_Dev_Return_K_W_Age(12) = sqrt( sum( ((pack(panelRet_K,(panelx.lt.3)) -sum(panelRet_K*panelK,(panelx.lt.3)) & 
+									& /sum(panelK,(panelx.lt.3)) )**2.0_dp)*pack(panelK,(panelx.lt.3)) ) /sum(panelK,(panelx.lt.3)))
 			print*, 'End of std dev of return by age'
 
 			print*, ' '
@@ -956,7 +956,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				prc_Return_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_56_60)
 				prc_Return_Age(10,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_61_65)
 				prc_Return_Age(11,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_66_70)
-				prc_Return_Age(12,i_pct) = Percentile(prctile_ret(i_pct),totpop  ,panelRet )
+				prc_Return_Age(12,i_pct) = Percentile(prctile_ret(i_pct),totpop  ,real(panelRet,DP) )
 				print*, 'Ret W prc=', prctile_ret(i_pct)
 				prc_Return_W_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_20)
 				prc_Return_W_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_21_25)
@@ -969,7 +969,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				prc_Return_W_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_56_60)
 				prc_Return_W_Age(10,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_61_65)
 				prc_Return_W_Age(11,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_66_70)
-				prc_Return_W_Age(12,i_pct) = Percentile(prctile_ret(i_pct),totpop  ,panelRet   ,panela/sum(panela))
+				prc_Return_W_Age(12,i_pct) = Percentile(prctile_ret(i_pct),totpop  ,real(panelRet,DP),real(panela/sum(panela),DP)
 				print*, 'Ret K prc=', prctile_ret(i_pct)
 				prc_Return_K_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_20   ),pack(ret_k_20   ,Ind_K_20   ==1))
 				prc_Return_K_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_21_25),pack(ret_k_21_25,Ind_K_21_25==1))
@@ -982,7 +982,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				prc_Return_K_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_56_60),pack(ret_k_56_60,Ind_K_56_60==1))
 				prc_Return_K_Age(10,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_61_65),pack(ret_k_61_65,Ind_K_61_65==1))
 				prc_Return_K_Age(11,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_66_70),pack(ret_k_66_70,Ind_K_66_70==1))
-				prc_Return_K_Age(12,i_pct) = Percentile(prctile_ret(i_pct),count((panelx.lt.3)),pack(panelRet_K,(panelx.lt.3)))
+				prc_Return_K_Age(12,i_pct) = Percentile(prctile_ret(i_pct),count((panelx.lt.3)),real(pack(panelRet_K,(panelx.lt.3)),DP))
 				print*, 'Ret K W prc=', prctile_ret(i_pct)
 				prc_Return_K_W_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_20   ),pack(ret_k_w_20   ,Ind_K_20   ==1))
 				prc_Return_K_W_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_21_25),pack(ret_k_w_21_25,Ind_K_21_25==1))
@@ -995,8 +995,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 				prc_Return_K_W_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_56_60),pack(ret_k_w_56_60,Ind_K_56_60==1))
 				prc_Return_K_W_Age(10,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_61_65),pack(ret_k_w_61_65,Ind_K_61_65==1))
 				prc_Return_K_W_Age(11,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_66_70),pack(ret_k_w_66_70,Ind_K_66_70==1))
-				prc_Return_K_W_Age(12,i_pct) = Percentile(prctile_ret(i_pct),count((panelx.lt.3)),pack(panelRet_K,(panelx.lt.3)),&
-												&	pack(panelK,(panelx.lt.3))/sum(panelK,(panelx.lt.3)))
+				prc_Return_K_W_Age(12,i_pct) = Percentile(prctile_ret(i_pct),count((panelx.lt.3)),real(pack(panelRet_K,(panelx.lt.3)),DP),&
+												&	real(pack(panelK,(panelx.lt.3))/sum(panelK,(panelx.lt.3)),DP))
 			enddo 
 			print*, 'End of prc of return by age'
 
