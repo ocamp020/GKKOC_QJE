@@ -63,7 +63,7 @@ PROGRAM main
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
-		Simul_Switch  = .False.
+		Simul_Switch  = .true.
 
 
 
@@ -516,7 +516,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	if ((.true.)) then 
+	if ((Simul_Switch)) then 
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
 	endif
@@ -685,7 +685,7 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	if (.true.) then 
+	if ((Simul_Switch)) then 
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
 	endif

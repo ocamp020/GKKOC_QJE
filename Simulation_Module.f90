@@ -23,7 +23,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
 		INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
 		INTEGER , DIMENSION(totpop) :: panelage, panelz, panellambda, panele, panelx, panelz_old, panellambda_old
-		REAL(SP), DIMENSION(totpop) :: panela, panelPV_a, panelK, panel_Y_L   
+		REAL(SP), DIMENSION(totpop) :: panela, panelPV_a, panelK, panel_Y_L, panelRet, panelRet_K=0.0_sp 
 
 		! Intergenerational statistics
 		INTEGER , DIMENSION(totpop) 			  :: eligible, death_count
@@ -63,10 +63,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 		INTEGER , DIMENSION(ret_size) 	     :: Ind_K=0, Ind_K_20, Ind_K_21_25 , Ind_K_26_30 , Ind_K_31_35 , Ind_K_36_40 
 		INTEGER , DIMENSION(ret_size) 	     :: Ind_K_41_45 , Ind_K_46_50 , Ind_K_51_55 , Ind_K_56_60 , Ind_K_61_65 , Ind_K_66_70
 		REAL(DP), DIMENSION(ret_size) 	     :: cum_assets, cum_K
-		REAL(DP) 						 	 :: Std_Dev_Return_Age(11)    , Mean_Return_Age(11)    , prc_Return_Age(11,9)
-		REAL(DP) 						 	 :: Std_Dev_Return_W_Age(11)  , Mean_Return_W_Age(11)  , prc_Return_W_Age(11,9)
-		REAL(DP) 						 	 :: Std_Dev_Return_K_Age(11)  , Mean_Return_K_Age(11)  , prc_Return_K_Age(11,9)
-		REAL(DP) 						 	 :: Std_Dev_Return_K_W_Age(11), Mean_Return_K_W_Age(11), prc_Return_K_W_Age(11,9)
+		REAL(DP) 						 	 :: Std_Dev_Return_Age(12)    , Mean_Return_Age(12)    , prc_Return_Age(12,9)
+		REAL(DP) 						 	 :: Std_Dev_Return_W_Age(12)  , Mean_Return_W_Age(12)  , prc_Return_W_Age(12,9)
+		REAL(DP) 						 	 :: Std_Dev_Return_K_Age(12)  , Mean_Return_K_Age(12)  , prc_Return_K_Age(12,9)
+		REAL(DP) 						 	 :: Std_Dev_Return_K_W_Age(12), Mean_Return_K_W_Age(12), prc_Return_K_W_Age(12,9)
 		REAL(DP)  							 :: K_aux, prctile_ret(9)
 		INTEGER 							 :: i_pct
 		
@@ -664,6 +664,64 @@ SUBROUTINE  SIMULATION(bench_indx)
 			print*,'Averages'
 			print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8), sum(panela)/real(totpop,8)
 
+
+		print*, ' '
+		print*, 'Compute variables for final cross-section'
+		!$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi,h_i)
+		DO paneli=1,totpop
+		    currenta 		= panela(paneli)
+		    age 			= panelage(paneli)
+		    currentzi 		= panelz(paneli)
+		    currentlambdai 	= panellambda(paneli) 
+		    currentei 		= panele(paneli)
+		    currentxi 		= panelx(paneli)
+
+		    if (currenta .ge. amax) then
+		        tklo = na-1
+		    elseif (currenta .lt. amin) then
+	            tklo = 1
+	        else
+	            tklo = ((currenta - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+		    endif    
+		    tkhi = tklo + 1   
+
+		    panelK(paneli)    = min(theta(currentzi)*currenta,(mu*P*xz_grid(currentxi,currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+
+			if (age.lt.RetAge) then 
+		        h_i  = ((agrid(tkhi) - currenta)*hours(age,tklo,currentzi,currentlambdai,currentei,currentxi) &
+		           &  + (currenta - agrid(tklo))*hours(age,tkhi,currentzi,currentlambdai,currentei,currentxi) ) &
+		                                &  / ( agrid(tkhi) - agrid(tklo) )  
+
+				panel_Y_L(paneli) = psi*( Wage*eff_un(age,currentlambdai,currentei)*h_i)**(1.0_dp-tauPL)
+			else 
+				panel_Y_L(paneli) = RetY_lambda_e(currentlambdai,currentei)
+			endif 
+
+			if (age.eq.1) then 
+				currentzi = panelz_old(paneli)
+				currentlambdai = panellambda_old(paneli)
+				panelPV_a(paneli) = (   (agrid(tkhi) - currenta) * V_Pr_nb(tklo,currentzi,currentlambdai)  &
+		                       &  + (currenta - agrid(tklo)) * V_Pr_nb(tkhi,currentzi,currentlambdai)) &
+		                       &  / ( agrid(tkhi) - agrid(tklo) )
+		    else 
+		    	
+		    	panelPV_a(paneli) = (   (agrid(tkhi) - currenta) * V_Pr(age,tklo,currentzi,currentlambdai, currentei, currentxi)  &
+		                       &  + (currenta - agrid(tklo)) * V_Pr(age,tkhi,currentzi,currentlambdai, currentei, currentxi)) &
+		                       &  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*currenta 
+		    endif 
+
+		    panelRet(paneli) 	= ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
+	     								&   R*panela(paneli) )/panela(paneli)
+		    if (panelx(paneli).lt.3) then 
+		    panelRet_K(paneli) 	= ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
+	     								&   R*panela(paneli) )/panelK(paneli)
+		    endif 
+	     	 
+		           
+		ENDDO ! paneli
+
+
+
 			! IGM 30-50
 				! Get mean of assets and return
 				IGM_a_matrix  = IGM_a_matrix/real(21,8) 
@@ -757,6 +815,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			Std_Dev_Return_Age(9)  = sqrt( sum( (ret_56_60-sum(ret_56_60)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
 			Std_Dev_Return_Age(10) = sqrt( sum( (ret_61_65-sum(ret_61_65)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
 			Std_Dev_Return_Age(11) = sqrt( sum( (ret_66_70-sum(ret_66_70)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+			Std_Dev_Return_Age(12) = sqrt( sum( (panelRet -sum(panelRet) /totpop  )**2.0_dp ) /real(totpop-1,DP  )  )
 
 			Std_Dev_Return_W_Age(1)  = sqrt( sum( (ret_w_20   -sum(ret_w_20)   /ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
 			Std_Dev_Return_W_Age(2)  = sqrt( sum( (ret_w_21_25-sum(ret_w_21_25)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
@@ -769,6 +828,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			Std_Dev_Return_W_Age(9)  = sqrt( sum( (ret_w_56_60-sum(ret_w_56_60)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
 			Std_Dev_Return_W_Age(10) = sqrt( sum( (ret_w_61_65-sum(ret_w_61_65)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
 			Std_Dev_Return_W_Age(11) = sqrt( sum( (ret_w_66_70-sum(ret_w_66_70)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+			Std_Dev_Return_Age(12)   = sqrt( sum( ((panelRet  -sum(panelRet*panela)/sum(panela)   )**2.0_dp)*panela ) /sum(panela)  )
 
 			Std_Dev_Return_K_Age(1)  = sqrt( sum( (ret_k_20   -sum(ret_k_20   , Ind_K_20   ==1)/sum(Ind_K_20   )**2.0_dp) , Ind_K_20   ==1) & 
 										&	/real(sum(Ind_K_20)   -1,DP)  )
@@ -792,6 +852,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 										&	/real(sum(Ind_K_61_65)-1,DP)  )
 			Std_Dev_Return_K_Age(11) = sqrt( sum( (ret_k_66_70-sum(ret_k_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)**2.0_dp) , Ind_K_66_70==1) & 
 										&	/real(sum(Ind_K_66_70)-1,DP)  )
+			Std_Dev_Return_K_Age(12) = sqrt( sum( (pack(panelRet_K,(panelx.lt.3)) -sum(panelRet_K,(panelx.lt.3)) /count((panelx.lt.3))&
+										&	)**2.0_dp ) /real(count((panelx.lt.3))-1,DP  )  )
 
 			Std_Dev_Return_K_W_Age(1)  = sqrt( sum( (ret_k_w_20   -sum(ret_k_w_20   , Ind_K_20   ==1)/sum(Ind_K_20   )**2.0_dp) , &
 										& Ind_K_20   ==1) / real(sum(Ind_K_20)   -1,DP)  )
@@ -815,6 +877,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 										& Ind_K_61_65==1) / real(sum(Ind_K_61_65)-1,DP)  )
 			Std_Dev_Return_K_W_Age(11) = sqrt( sum( (ret_k_w_66_70-sum(ret_k_w_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)**2.0_dp) , &
 										& Ind_K_66_70==1) / real(sum(Ind_K_66_70)-1,DP)  )
+			Std_Dev_Return_K_W_Age(12) = sqrt( sum( ((pack(panelRet_K,(panelx.lt.3)) -sum(panelRet_K*panelK,(panelx.lt.3)) /sum(panelK,(panelx.lt.3))&
+										&	)**2.0_dp)*pack(panelK,(panelx.lt.3)) ) /sum(panelK,(panelx.lt.3))  )
 			print*, 'End of std dev of return by age'
 
 			print*, ' '
@@ -831,6 +895,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			Mean_Return_Age(9)  = sum(ret_56_60)/ret_size
 			Mean_Return_Age(10) = sum(ret_61_65)/ret_size
 			Mean_Return_Age(11) = sum(ret_66_70)/ret_size
+			Mean_Return_Age(12) = sum(panelRet) /totpop
 
 			Mean_Return_W_Age(1)  = sum(ret_w_20)   /ret_size
 			Mean_Return_W_Age(2)  = sum(ret_w_21_25)/ret_size
@@ -843,6 +908,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			Mean_Return_W_Age(9)  = sum(ret_w_56_60)/ret_size
 			Mean_Return_W_Age(10) = sum(ret_w_61_65)/ret_size
 			Mean_Return_W_Age(11) = sum(ret_w_66_70)/ret_size
+			Mean_Return_W_Age(12) = sum(panelRet*panela)/sum(panela)
 
 			Mean_Return_K_Age(1)  = sum(ret_k_20   , Ind_K_20   ==1)/sum(Ind_K_20   )
 			Mean_Return_K_Age(2)  = sum(ret_k_21_25, Ind_K_21_25==1)/sum(Ind_K_21_25)
@@ -855,6 +921,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			Mean_Return_K_Age(9)  = sum(ret_k_56_60, Ind_K_56_60==1)/sum(Ind_K_56_60)
 			Mean_Return_K_Age(10) = sum(ret_k_61_65, Ind_K_61_65==1)/sum(Ind_K_61_65)
 			Mean_Return_K_Age(11) = sum(ret_k_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)
+			Mean_Return_K_Age(12) = sum(panelRet_K,(panelx.lt.3)) /count((panelx.lt.3))
 
 			Mean_Return_K_W_Age(1)  = sum(ret_k_w_20   , Ind_K_20   ==1)/sum(Ind_K_20   )
 			Mean_Return_K_W_Age(2)  = sum(ret_k_w_21_25, Ind_K_21_25==1)/sum(Ind_K_21_25)
@@ -867,6 +934,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			Mean_Return_K_W_Age(9)  = sum(ret_k_w_56_60, Ind_K_56_60==1)/sum(Ind_K_56_60)
 			Mean_Return_K_W_Age(10) = sum(ret_k_w_61_65, Ind_K_61_65==1)/sum(Ind_K_61_65)
 			Mean_Return_K_W_Age(11) = sum(ret_k_w_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)
+			Mean_Return_K_W_Age(12) = sum(panelRet_K*panelK,(panelx.lt.3)) /sum(panelK,(panelx.lt.3))
 			print*, 'End of mean of return by age'
 
 			print*, ' '
@@ -888,6 +956,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				prc_Return_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_56_60)
 				prc_Return_Age(10,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_61_65)
 				prc_Return_Age(11,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_66_70)
+				prc_Return_Age(12,i_pct) = Percentile(prctile_ret(i_pct),totpop  ,panelRet )
 				print*, 'Ret W prc=', prctile_ret(i_pct)
 				prc_Return_W_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_20)
 				prc_Return_W_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_21_25)
@@ -900,6 +969,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				prc_Return_W_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_56_60)
 				prc_Return_W_Age(10,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_61_65)
 				prc_Return_W_Age(11,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_66_70)
+				prc_Return_W_Age(12,i_pct) = Percentile(prctile_ret(i_pct),totpop  ,panelRet   ,panela/sum(panela))
 				print*, 'Ret K prc=', prctile_ret(i_pct)
 				prc_Return_K_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_20   ),pack(ret_k_20   ,Ind_K_20   ==1))
 				prc_Return_K_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_21_25),pack(ret_k_21_25,Ind_K_21_25==1))
@@ -912,6 +982,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				prc_Return_K_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_56_60),pack(ret_k_56_60,Ind_K_56_60==1))
 				prc_Return_K_Age(10,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_61_65),pack(ret_k_61_65,Ind_K_61_65==1))
 				prc_Return_K_Age(11,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_66_70),pack(ret_k_66_70,Ind_K_66_70==1))
+				prc_Return_K_Age(12,i_pct) = Percentile(prctile_ret(i_pct),count((panelx.lt.3)),pack(panelRet_K,(panelx.lt.3)))
 				print*, 'Ret K W prc=', prctile_ret(i_pct)
 				prc_Return_K_W_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_20   ),pack(ret_k_w_20   ,Ind_K_20   ==1))
 				prc_Return_K_W_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_21_25),pack(ret_k_w_21_25,Ind_K_21_25==1))
@@ -924,9 +995,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 				prc_Return_K_W_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_56_60),pack(ret_k_w_56_60,Ind_K_56_60==1))
 				prc_Return_K_W_Age(10,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_61_65),pack(ret_k_w_61_65,Ind_K_61_65==1))
 				prc_Return_K_W_Age(11,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_66_70),pack(ret_k_w_66_70,Ind_K_66_70==1))
+				prc_Return_K_W_Age(12,i_pct) = Percentile(prctile_ret(i_pct),count((panelx.lt.3)),pack(panelRet_K,(panelx.lt.3)),&
+												&	pack(panelK,(panelx.lt.3))/sum(panelK,(panelx.lt.3)))
 			enddo 
 			print*, 'End of prc of return by age'
-
 
 			if (bench_indx.eq.1) then
 			OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Return_Stats_by_Age_bench.txt', STATUS='replace')
@@ -936,7 +1008,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 			WRITE(UNIT=10, FMT=*) ' '
 			WRITE(UNIT=10, FMT=*) 'Std Dev of Return by Age'
-			WRITE(UNIT=10, FMT=*) '20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 '
+			WRITE(UNIT=10, FMT=*) '20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 ','All '
 			WRITE(UNIT=10, FMT=*) Std_Dev_Return_Age
 			WRITE(UNIT=10, FMT=*) Mean_Return_Age
 			do i_pct=1,9 
@@ -944,7 +1016,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			enddo 
 			WRITE(UNIT=10, FMT=*) ' '
 			WRITE(UNIT=10, FMT=*) 'Std Dev of Return W by Age'
-			WRITE(UNIT=10, FMT=*) ' 20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 '
+			WRITE(UNIT=10, FMT=*) ' 20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 ','All '
 			WRITE(UNIT=10, FMT=*) Std_Dev_Return_W_Age
 			WRITE(UNIT=10, FMT=*) Mean_Return_W_Age
 			do i_pct=1,9 
@@ -952,7 +1024,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			enddo 
 			WRITE(UNIT=10, FMT=*) ' '
 			WRITE(UNIT=10, FMT=*) 'Std Dev of Return K by Age'
-			WRITE(UNIT=10, FMT=*) ' 20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 '
+			WRITE(UNIT=10, FMT=*) ' 20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 ','All '
 			WRITE(UNIT=10, FMT=*) Std_Dev_Return_K_Age
 			WRITE(UNIT=10, FMT=*) Mean_Return_K_Age
 			do i_pct=1,9 
@@ -960,7 +1032,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			enddo 
 			WRITE(UNIT=10, FMT=*) ' '
 			WRITE(UNIT=10, FMT=*) 'Std Dev of Return K W by Age'
-			WRITE(UNIT=10, FMT=*) ' 20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 '
+			WRITE(UNIT=10, FMT=*) ' 20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 ','All '
 			WRITE(UNIT=10, FMT=*) Std_Dev_Return_K_W_Age
 			WRITE(UNIT=10, FMT=*) Mean_Return_K_W_Age
 			do i_pct=1,9 
@@ -971,51 +1043,6 @@ SUBROUTINE  SIMULATION(bench_indx)
 								& sum(Ind_K_41_45),sum(Ind_K_46_50),sum(Ind_K_51_55),sum(Ind_K_56_60),sum(Ind_K_61_65),sum(Ind_K_66_70)
 
 			CLOSE(UNIT=10)
-
-		!$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi,h_i)
-		DO paneli=1,totpop
-		    currenta 		= panela(paneli)
-		    age 			= panelage(paneli)
-		    currentzi 		= panelz(paneli)
-		    currentlambdai 	= panellambda(paneli) 
-		    currentei 		= panele(paneli)
-		    currentxi 		= panelx(paneli)
-
-		    if (currenta .ge. amax) then
-		        tklo = na-1
-		    elseif (currenta .lt. amin) then
-	            tklo = 1
-	        else
-	            tklo = ((currenta - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-		    endif    
-		    tkhi = tklo + 1   
-
-		    panelK(paneli)    = min(theta(currentzi)*currenta,(mu*P*xz_grid(currentxi,currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-
-			if (age.lt.RetAge) then 
-		        h_i  = ((agrid(tkhi) - currenta)*hours(age,tklo,currentzi,currentlambdai,currentei,currentxi) &
-		           &  + (currenta - agrid(tklo))*hours(age,tkhi,currentzi,currentlambdai,currentei,currentxi) ) &
-		                                &  / ( agrid(tkhi) - agrid(tklo) )  
-
-				panel_Y_L(paneli) = psi*( Wage*eff_un(age,currentlambdai,currentei)*h_i)**(1.0_dp-tauPL)
-			else 
-				panel_Y_L(paneli) = RetY_lambda_e(currentlambdai,currentei)
-			endif 
-
-			if (age.eq.1) then 
-				currentzi = panelz_old(paneli)
-				currentlambdai = panellambda_old(paneli)
-				panelPV_a(paneli) = (   (agrid(tkhi) - currenta) * V_Pr_nb(tklo,currentzi,currentlambdai)  &
-		                       &  + (currenta - agrid(tklo)) * V_Pr_nb(tkhi,currentzi,currentlambdai)) &
-		                       &  / ( agrid(tkhi) - agrid(tklo) )
-		    else 
-		    	
-		    	panelPV_a(paneli) = (   (agrid(tkhi) - currenta) * V_Pr(age,tklo,currentzi,currentlambdai, currentei, currentxi)  &
-		                       &  + (currenta - agrid(tklo)) * V_Pr(age,tkhi,currentzi,currentlambdai, currentei, currentxi)) &
-		                       &  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*currenta 
-		    endif 
-		           
-		ENDDO ! paneli
 
 
 		print*, ' '
