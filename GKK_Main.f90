@@ -56,14 +56,14 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
-			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
-		Opt_Tau_C = .false.
-		Simul_Switch  = .true.
+		Opt_Tau_C = .true.
+		Simul_Switch  = .false.
 
 
 
@@ -1104,7 +1104,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
-    	DO tauC_ind = 0,10
+    	DO tauC_ind = 1,10
 
     		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax.txt', STATUS='old', POSITION='append')
 
@@ -1113,9 +1113,9 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			print*, ' Consumption Taxes=',tauC
 			print*, ' '
 
-			psi = 0.776_dp
+			! psi = 0.776_dp
 
-		    DO tauindx=-50,-30,2
+		    DO tauindx=-50,-20,5
 	            tauK        = real(tauindx,8)/100_DP
 	            brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
@@ -1156,7 +1156,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		tauK = OPT_tauK
 		psi  = OPT_psi
 		tauC = OPT_tauC
-		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.02_dp,Opt_TauK+0.02_dp) 
+		! call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.05_dp,Opt_TauK+0.05_dp) 
 
 		tauK     = OPT_tauK
 		OPT_psi  = psi

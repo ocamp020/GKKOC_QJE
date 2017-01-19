@@ -99,8 +99,8 @@
 %% Result_Folders
 
 if X_Switch==0
-    mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents/')
-    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents/'
+    mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents/')
+    cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents/'
     Result_Folder = strcat('../../../../NSU_F_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Markov_Cut/') ;
     Simul_Folder  = strcat('../../../../NSU_F_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Markov_Cut/Simul/') ;
     Bench_Folder  = strcat('../../../../NSU_F_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Markov_Cut/Bench_Files/') ;
@@ -113,7 +113,7 @@ if X_Switch==0
     
 elseif X_Switch==1
     
-        cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_zs/'
+        cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_zs/'
         Result_Folder = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_mu90/') ;
         Simul_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_mu90/Simul/') ;
         Bench_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_mu90/Bench_Files/') ;
@@ -125,8 +125,8 @@ elseif X_Switch==1
         Tables_file     = 'Tables_Presentation_Model_1.xls' ;
     
 elseif X_Switch==2
-    mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/')
-    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/'
+    mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/')
+    cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/'
         Result_Folder = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_rho1/') ;
         Simul_Folder  = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_rho1/Simul/') ;
         Bench_Folder  = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Exp_Shock_top_rho1/Bench_Files/') ;
@@ -138,8 +138,8 @@ elseif X_Switch==2
         Tables_file     = 'Tables_Presentation_Model_2.xls' ;
     
 elseif X_Switch==1.1
-   mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M11/')
-    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M11/'
+   mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M11/')
+    cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M11/'
         Result_Folder = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock_theta25/') ;
         Simul_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock_theta25/Simul/') ;
         Bench_Folder  = strcat('../../../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock_theta25/Bench_Files/') ;
@@ -151,18 +151,28 @@ elseif X_Switch==1.1
         Tables_file     = 'Tables_Presentation_Model_11.xls' ;
     
 elseif X_Switch==1.2
-   mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/')
-    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/'
+   mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/')
+    cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/'
         Result_Folder = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/') ;
         Simul_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/') ;
         Bench_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Bench_Files/') ;
         Exp_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Exp_Files/') ;
         Top_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/Top_A/') ;
         Tables_file   = 'Tables_Presentation_Model_12_bv.xls' ;
+        
+   mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/')
+    cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/'
+        Result_Folder   = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/') ;
+        Simul_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/') ;
+        Simul_Folder_Exp= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Tau_C_Experiment/Simul/') ;
+        Bench_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Bench_Files/') ;
+        Exp_Folder      = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Tau_C_Experiment/Exp_Files/') ;
+        Top_Folder      = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/Top_A/') ;
+        Tables_file     = 'Tables_Presentation_Model_12_bv_tauC.xls' ;
     
 elseif X_Switch==2.1
-    mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/')
-    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/'
+    mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/')
+    cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/'
         Result_Folder = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock/') ;
         Simul_Folder  = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock/Simul/') ;
         Bench_Folder  = strcat('../../../../NSU_F2_LT_Results/R_gap_',num2str(R_gap,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Ret_Shock/Bench_Files/') ;
@@ -173,8 +183,8 @@ elseif X_Switch==2.1
         cd 'r_gap_0_ret_shock/presentation'
         Tables_file     = 'Tables_Presentation_Model_21.xls' ;
 elseif X_Switch==3.1
-    mkdir('/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M3/')
-    cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M3/'
+    mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M3/')
+    cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_M3/'
         Result_Folder = strcat('../../../../NSU_M3_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_3_exp/') ;
         Simul_Folder  = strcat('../../../../NSU_M3_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_3_exp/Simul/') ;
         Bench_Folder  = strcat('../../../../NSU_M3_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_3_exp/Bench_Files/') ;
@@ -244,13 +254,13 @@ end
         P = Exp_results_P; R = Exp_results_R ;
 
         if X_Switch~=0
-        eval(['load ',Simul_Folder,'panelx_exp'])      ; panel_x   = panelx_exp(1:N_plots)      ; clear panelx_exp       ;
+        eval(['load ',Simul_Folder_Exp,'panelx_exp'])      ; panel_x   = panelx_exp(1:N_plots)      ; clear panelx_exp       ;
         else
         panel_x = ones(size(panel_age)) ;
         end
-        eval(['load ',Simul_Folder,'panelz_exp'])      ; panel_z   = panelz_exp(1:N_plots)      ; clear panelz_exp       ;
-        eval(['load ',Simul_Folder,'panela_exp'])      ; panel_a   = panela_exp(1:N_plots)      ; clear panela_exp       ;    
-        eval(['load ',Simul_Folder,'panelK_exp'])      ; panel_K   = panelK_exp(1:N_plots)      ; clear panelK_exp       ;
+        eval(['load ',Simul_Folder_Exp,'panelz_exp'])      ; panel_z   = panelz_exp(1:N_plots)      ; clear panelz_exp       ;
+        eval(['load ',Simul_Folder_Exp,'panela_exp'])      ; panel_a   = panela_exp(1:N_plots)      ; clear panela_exp       ;    
+        eval(['load ',Simul_Folder_Exp,'panelK_exp'])      ; panel_K   = panelK_exp(1:N_plots)      ; clear panelK_exp       ;
 
         %  X_grid
         if X_Switch==1 || X_Switch==2
@@ -320,12 +330,12 @@ end
 
     % Load PV wealth and Z
         eval(['load ',Simul_Folder,'panelz_bench']) ; eval(['load ',Simul_Folder,'panelx_bench']) ; 
-        eval(['load ',Simul_Folder,'panelz_exp'])   ; eval(['load ',Simul_Folder,'panelx_exp'])   ;
+        eval(['load ',Simul_Folder_Exp,'panelz_exp'])   ; eval(['load ',Simul_Folder_Exp,'panelx_exp'])   ;
         if Switch_PV==1
-        eval(['load ',Simul_Folder,'panelPV_a_bench']) ; eval(['load ',Simul_Folder,'panelPV_a_exp'])   ;
+        eval(['load ',Simul_Folder,'panelPV_a_bench']) ; eval(['load ',Simul_Folder_Exp,'panelPV_a_exp'])   ;
         Wealth_K = panelPV_a_bench; Wealth_W = panelPV_a_exp;
         else
-        eval(['load ',Simul_Folder,'panela_bench']) ; eval(['load ',Simul_Folder,'panela_exp'])   ;
+        eval(['load ',Simul_Folder,'panela_bench']) ; eval(['load ',Simul_Folder_Exp,'panela_exp'])   ;
         Wealth_K = panela_bench; Wealth_W = panela_exp;
         end
         
@@ -483,7 +493,7 @@ end
         index = 1:N ;
         G_bench = (N+1)/(N-1) - 2*sum(panela_bench_sort.*index)/(mu_g*N*(N-1)) ;
     % Experiment 
-        eval(['load ',Simul_Folder,'panela_exp']) ; 
+        eval(['load ',Simul_Folder_Exp,'panela_exp']) ; 
         N  = numel(panela_exp) ;
         mu_g = mean(panela_exp)  ;
         panela_exp_sort = sort(panela_exp,'descend') ;
@@ -515,7 +525,7 @@ end
 %% Pareto Tail
 
     % Vermuelen Data
-    load /Users/s-ocampo/Dropbox/RA_Guvenen/Wealth_Tax/CGGK_CODES/Sergio/Graphs/Vermeulen_Data/USA_IM1.dat
+    load /Users/ocamp020/Dropbox/RA_Guvenen/Wealth_Tax/CGGK_CODES/Sergio/Graphs/Vermeulen_Data/USA_IM1.dat
     V_Data = USA_IM1;  clear USA_IM1;
     V_Data = V_Data(:,2:4) ;
     [panel_a_V,ind_V] = sort(V_Data(:,2)); weights_a_V = V_Data(ind_V,3); type_a_V = V_Data(ind_V,1);
@@ -703,7 +713,7 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(41+25,11)).^(1/(gamma*(1-s
     % Each table shows the composition of the top x% into Z categories
 
     eval(['load ',Simul_Folder,'panela_bench']) ;    eval(['load ',Simul_Folder,'panelz_bench']);
-    eval(['load ',Simul_Folder,'panela_exp'])   ;    eval(['load ',Simul_Folder,'panelz_exp'])  ;
+    eval(['load ',Simul_Folder_Exp,'panela_exp'])   ;    eval(['load ',Simul_Folder_Exp,'panelz_exp'])  ;
     
     table_bench = NaN(10,n_z+1) ; table_exp = table_bench ;
        
@@ -899,8 +909,8 @@ col_names = {' ','Moments',' ','prc_return','age1','age2','age3','age4','age5','
 for j = 1:3
     if j==1
         % Experiment
-        eval(['load ',Simul_Folder,'panelage_exp']) ; eval(['load ',Simul_Folder,'panela_exp']) ; 
-        eval(['load ',Simul_Folder,'panel_return_exp']) ; eval(['load ',Simul_Folder,'panel_at_return_exp']) ;
+        eval(['load ',Simul_Folder_Exp,'panelage_exp']) ; eval(['load ',Simul_Folder_Exp,'panela_exp']) ; 
+        eval(['load ',Simul_Folder_Exp,'panel_return_exp']) ; eval(['load ',Simul_Folder_Exp,'panel_at_return_exp']) ;
     elseif j==2
         % Opt Tax K
         eval(['load ',Result_Folder,'Opt_Tax_K/Simul/','panelage_exp']) ; eval(['load ',Result_Folder,'Opt_Tax_K/Simul/','panela_exp']) ; 
