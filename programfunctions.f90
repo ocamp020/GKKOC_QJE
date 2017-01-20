@@ -1887,7 +1887,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    ENDDO
 	    ENDDO
 	    
-	    
+	    DBN2 = 0.8*DBN1 + 0.2*DBN2
 	    DBN_dist = maxval(abs(DBN2-DBN1))
 	    ! print*, DBN_dist
 	    DBN1 = DBN2
