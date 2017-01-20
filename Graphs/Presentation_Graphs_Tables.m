@@ -326,6 +326,42 @@ end
     Mat = [col_title;row_title num2cell(Mat)]
     status = xlwrite(Tables_file,Mat,'Ret_Prc_age_group') ;
     
+    
+%% Top wealth shares
+
+percentile = [0.9999,0.999,0.995,0.99,0.90];
+
+eval(['load ',Simul_Folder,'panela_bench'])      ; panel_a   = panela_bench(1:N_plots)      ; clear panela_bench       ;
+
+prc = prctile(panel_a,percentile*100);
+
+for i=1:5
+    
+    share(i,1) = sum(panel_a(panel_a>=prc(i)))/sum(panel_a) ;
+    
+end 
+
+eval(['load ',Simul_Folder_Exp,'panela_exp'])      ; panel_a   = panela_exp(1:N_plots)      ; clear panela_exp       ;
+
+prc = prctile(panel_a,percentile*100);
+
+for i=1:5
+    
+    share(i,2) = sum(panel_a(panel_a>=prc(i)))/sum(panel_a) ;
+    
+end 
+
+
+
+
+share=share*100;
+
+disp(share) 
+    
+
+status = xlwrite(Tables_file,share,'Wealth_Shares') ;
+
+
 %% Change in composition of top X% by Z
     Switch_PV = 0;
 
