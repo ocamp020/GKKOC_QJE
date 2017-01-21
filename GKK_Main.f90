@@ -56,11 +56,11 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
+		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
-			Opt_Tax_KW    = .True. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
 		Opt_Tau_C = .true.
 		Simul_Switch  = .false.
@@ -325,6 +325,8 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		CALL WRITE_VARIABLES(1)
+		print*,"	Efficiency Computation"
+		CALL Hsieh_Klenow_Efficiency(solving_bench)
 		if (Simul_Switch) then 
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
@@ -516,6 +518,8 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
+	print*,"	Efficiency Computation"
+		CALL Hsieh_Klenow_Efficiency(solving_bench)
 	if ((Simul_Switch)) then 
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
@@ -685,6 +689,8 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
+	print*,"	Efficiency Computation"
+		CALL Hsieh_Klenow_Efficiency(solving_bench)
 	if ((Simul_Switch)) then 
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
@@ -1101,21 +1107,21 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		PRINT*,''
 		Print*,'--------------- OPTIMAL CAPITAL TAXES - Consumption Taxes -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax_1.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax_2.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
-    	DO tauC_ind = 100,200,5
+    	DO tauC_ind = 11,20,1
 
-    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax_1.txt', STATUS='old', POSITION='append')
+    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax_2.txt', STATUS='old', POSITION='append')
 
-			tauC = real(tauC_ind,8)/100.0_dp
+			tauC = real(tauC_ind,8)/10.0_dp
 			print*, ' '
 			print*, ' Consumption Taxes=',tauC
 			print*, ' '
 
 			! psi = 0.776_dp
 
-		    DO tauindx=-50,-20,5
+		    DO tauindx=-80,-50,5
 	            tauK        = real(tauindx,8)/100_DP
 	            brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
@@ -1151,7 +1157,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 	    ENDDO
 
 
-	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k_cons_tax_1.txt', STATUS='replace')
+	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k_cons_tax_2.txt', STATUS='replace')
 
 		tauK = OPT_tauK
 		psi  = OPT_psi

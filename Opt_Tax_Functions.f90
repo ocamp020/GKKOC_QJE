@@ -37,7 +37,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauK(tauk_in)
 	tauW_at = 0.0_DP
 
 	GBAR_exp = 0.0_DP
-	DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.001 ) ! as long as the difference is greater than 0.05% continue
+	DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.003 ) ! as long as the difference is greater than 0.05% continue
 	    CALL FIND_DBN_EQ
 	    CALL GOVNT_BUDGET_OPT
 	    GBAR_exp = GBAR    

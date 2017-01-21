@@ -2916,7 +2916,77 @@ SUBROUTINE COMPUTE_MOMENTS
 END SUBROUTINE COMPUTE_MOMENTS
 
 
+!========================================================================================
+!========================================================================================
+!========================================================================================
 
+SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
+	IMPLICIT NONE
+	integer, intent(in) :: bench_indx
+	real(dp), dimension(na,nz,nx) :: K_Mat, TFPR_i=0.0_dp
+	real(dp) :: TFP, TFP_star, TFPR_bar, size
+	integer  :: i_a, i_z, i_x
+
+	size = sum(DBN1(:,:,:,:,:,1:2))
+
+	K_mat  = K_Matrix(R,P)
+
+	TFPR_bar = 0.0_dp
+	do i_a = 1,na
+	do i_z = 1,nz 
+	do i_x = 1,2
+		TFPR_i(i_a,i_z,i_x) = P * xz_grid(i_x,i_z)** mu * K_mat(i_a,i_z,i_x**(mu-1.0_dp)
+		TFPR_bar = TFPR_bar + sum(DBN1(:,i_a,i_z,:,:,i_x))/size * K_mat(i_a,i_z,i_x) / (mu*alpha*QBAR**alpha*NBAR)
+	enddo 
+	enddo 
+	enddo
+	TFPR_bar = 1.0_dp / TFPR_bar
+
+	TFP 	 = 0.0_dp
+	TFP_star = 0.0_dp
+	do i_a = 1,na
+	do i_z = 1,nz 
+	do i_x = 1,2
+		TFP      = TFP      + sum(DBN1(:,i_a,i_z,:,:,i_x))/size*&
+					&	( xz_grid(i_x,i_z) * TFPR_bar / TFPR_i(i_a,i_z,i_x) )**(mu/(1.0_dp-mu))
+		TFP_star = TFP_star + sum(DBN1(:,i_a,i_z,:,:,i_x))/size*%
+					&	( xz_grid(i_x,i_z)  								  )**(mu/(1.0_dp-mu))
+	enddo 
+	enddo 
+	enddo
+	TFP 	 = TFP ** (alpha*(1.0_dp-mu)/mu)
+	TFP_star = TFP_star ** (alpha*(1.0_dp-mu)/mu)
+
+	if (bench_indx.eq.1) then
+	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Hsieh_Klenow_Efficiency_bench.txt', STATUS='replace')
+	else
+	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Hsieh_Klenow_Efficiency_exp.txt'  , STATUS='replace')
+	endif 
+
+	WRITE(UNIT=10, FMT=*) ' '
+	WRITE(UNIT=10, FMT=*) 'Efficiency Measure'
+	WRITE(UNIT=10, FMT=*) 'TFP ','TFP_star ','Eff_Gain '
+	WRITE(UNIT=10, FMT=*)  TFP  , TFP_star  , TFP_star/TFP
+
+	CLOSE(UNIT=10)
+
+	if (bench_indx.eq.1) then
+	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Bench_Files/TFPR_bench', STATUS='replace')
+	else
+	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Exp_Files/TFPR_exp'  , STATUS='replace')
+	endif 
+
+	WRITE(UNIT=10, FMT=*)  TFPR_i
+
+	CLOSE(UNIT=10)
+
+	print*, ' '
+	print*, 'Efficiency Measure'
+	print*, 'TFP ','TFP_star ','Eff_Gain '
+	print*,  TFP  , TFP_star  , TFP_star/TFP
+
+
+END SUBROUTINE Hsieh_Klenow_Efficiency
 
 
 !========================================================================================
@@ -2929,7 +2999,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	REAL(DP) :: brentvalue, C_foc, H_min, euler_power
 	INTEGER  :: tempai, sw 
 	REAL(DP), DIMENSION(na_t+nz*nx+1)  	:: EndoCons, EndoYgrid, EndoHours
-	INTEGER , DIMENSION(na_t+nz*nx+1)     :: sort_ind 
+	INTEGER , DIMENSION(na_t+nz*nx+1)   :: sort_ind 
 	REAL(DP), DIMENSION(na_t,nz,nx) :: Wealth_mat
 	REAL(DP), DIMENSION(6)       	:: state_FOC
 	REAL(DP), DIMENSION(7)       	:: par_FOC
