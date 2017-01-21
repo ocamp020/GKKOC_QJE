@@ -193,9 +193,9 @@ PROGRAM main
 			
 			call Solve_Experiment(compute_exp,Simul_Switch)
 
-			! Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
-			! call system( 'mkdir -p ' // trim(Result_Folder) )
-			! call Solve_Experiment_tauC(compute_exp,Simul_Switch)
+			Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
+			call system( 'mkdir -p ' // trim(Result_Folder) )
+			call Solve_Experiment_tauC(compute_exp,Simul_Switch)
 
 			compute_bench = .false.
 		endif 
