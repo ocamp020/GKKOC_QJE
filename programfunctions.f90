@@ -2927,7 +2927,7 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	real(dp) :: TFP, TFP_star, TFPR_bar, size
 	integer  :: i_a, i_z, i_x
 
-	size = sum(DBN1(:,:,:,:,:,1:2))
+	size = 1.0_dp ! sum(DBN1(:,:,:,:,:,1:2))
 
 	K_mat  = K_Matrix(R,P)
 
