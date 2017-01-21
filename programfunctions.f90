@@ -2924,7 +2924,7 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	IMPLICIT NONE
 	integer, intent(in) :: bench_indx
 	real(dp), dimension(na,nz,nx) :: K_Mat, TFPR_i=0.0_dp
-	real(dp) :: TFP, TFP_star, TFPR_bar, size
+	real(dp) :: TFP, TFP_star, TFPR_bar, size, K
 	integer  :: i_a, i_z, i_x
 
 	size = 1.0_dp ! sum(DBN1(:,:,:,:,:,1:2))
@@ -2932,11 +2932,13 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	K_mat  = K_Matrix(R,P)
 
 	TFPR_bar = 0.0_dp
+	K 		 = 0.0_dp 
 	do i_a = 1,na
 	do i_z = 1,nz 
 	do i_x = 1,2
 		TFPR_i(i_a,i_z,i_x) = P * xz_grid(i_x,i_z)** mu * K_mat(i_a,i_z,i_x)**(mu-1.0_dp)
 		TFPR_bar = TFPR_bar + sum(DBN1(:,i_a,i_z,:,:,i_x))/size * K_mat(i_a,i_z,i_x) / (mu*alpha*QBAR**alpha*NBAR)
+		K 		 = K    	+ sum(DBN1(:,i_a,i_z,:,:,i_x))      * K_mat(i_a,i_z,i_x) 
 	enddo 
 	enddo 
 	enddo
@@ -2969,8 +2971,8 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	WRITE(UNIT=10, FMT=*)  TFP  , TFP_star  , TFP_star/TFP
 	WRITE(UNIT=10, FMT=*) ' '
 	WRITE(UNIT=10, FMT=*) 'Check'
-	WRITE(UNIT=10, FMT=*) 'YBAR ','TFP*K^a*N^(1-a) '
-	WRITE(UNIT=10, FMT=*) YBAR , TFP*MeanWealth**alpha*NBAR**(1.0_DP-alpha) 
+	WRITE(UNIT=10, FMT=*) 'YBAR ','TFP*K^a*N^(1-a) ','Q ',' TFP*K ','MeanWealth ','K '
+	WRITE(UNIT=10, FMT=*) YBAR , TFP*K**alpha*NBAR**(1.0_DP-alpha),QBAR,TFP**(1.0_dp/alpha)*K,MeanWealth,K
 
 	CLOSE(UNIT=10)
 
@@ -2990,8 +2992,8 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	print*,  TFP  , TFP_star  , TFP_star/TFP
 	print*, ' '
 	print*, 'Check'
-	print*, 'YBAR ','TFP*K^a*N^(1-a) '
-	print*, YBAR , TFP*MeanWealth**alpha*NBAR**(1.0_DP-alpha)
+	print*, 'YBAR ','TFP*K^a*N^(1-a) ','Q ',' TFP*K ','MeanWealth ','K '
+	print*, YBAR , TFP*K**alpha*NBAR**(1.0_DP-alpha),QBAR,TFP**(1.0_dp/alpha)*K,MeanWealth,K
 
 
 END SUBROUTINE Hsieh_Klenow_Efficiency
