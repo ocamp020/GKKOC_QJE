@@ -2935,7 +2935,7 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	do i_a = 1,na
 	do i_z = 1,nz 
 	do i_x = 1,2
-		TFPR_i(i_a,i_z,i_x) = P * xz_grid(i_x,i_z)** mu * K_mat(i_a,i_z,i_x**(mu-1.0_dp)
+		TFPR_i(i_a,i_z,i_x) = P * xz_grid(i_x,i_z)** mu * K_mat(i_a,i_z,i_x)**(mu-1.0_dp)
 		TFPR_bar = TFPR_bar + sum(DBN1(:,i_a,i_z,:,:,i_x))/size * K_mat(i_a,i_z,i_x) / (mu*alpha*QBAR**alpha*NBAR)
 	enddo 
 	enddo 
@@ -2949,7 +2949,7 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	do i_x = 1,2
 		TFP      = TFP      + sum(DBN1(:,i_a,i_z,:,:,i_x))/size*&
 					&	( xz_grid(i_x,i_z) * TFPR_bar / TFPR_i(i_a,i_z,i_x) )**(mu/(1.0_dp-mu))
-		TFP_star = TFP_star + sum(DBN1(:,i_a,i_z,:,:,i_x))/size*%
+		TFP_star = TFP_star + sum(DBN1(:,i_a,i_z,:,:,i_x))/size*&
 					&	( xz_grid(i_x,i_z)  								  )**(mu/(1.0_dp-mu))
 	enddo 
 	enddo 
