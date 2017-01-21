@@ -2967,6 +2967,10 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	WRITE(UNIT=10, FMT=*) 'Efficiency Measure'
 	WRITE(UNIT=10, FMT=*) 'TFP ','TFP_star ','Eff_Gain '
 	WRITE(UNIT=10, FMT=*)  TFP  , TFP_star  , TFP_star/TFP
+	WRITE(UNIT=10, FMT=*) ' '
+	WRITE(UNIT=10, FMT=*) 'Check'
+	WRITE(UNIT=10, FMT=*) 'YBAR ','TFP*K^a*N^(1-a) '
+	WRITE(UNIT=10, FMT=*) YBAR , TFP*MeanWealth**alpha*NBAR**(1.0_DP-alpha) 
 
 	CLOSE(UNIT=10)
 
@@ -2984,6 +2988,10 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	print*, 'Efficiency Measure'
 	print*, 'TFP ','TFP_star ','Eff_Gain '
 	print*,  TFP  , TFP_star  , TFP_star/TFP
+	print*, ' '
+	print*, 'Check'
+	print*, 'YBAR ','TFP*K^a*N^(1-a) '
+	print*, YBAR , TFP*MeanWealth**alpha*NBAR**(1.0_DP-alpha)
 
 
 END SUBROUTINE Hsieh_Klenow_Efficiency
