@@ -1110,7 +1110,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax_2.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
-    	DO tauC_ind = 11,20,1
+    	DO tauC_ind = 10,20,1
 
     		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax_2.txt', STATUS='old', POSITION='append')
 
@@ -1119,7 +1119,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			print*, ' Consumption Taxes=',tauC
 			print*, ' '
 
-			! psi = 0.776_dp
+			psi = 1.8_dp
 
 		    DO tauindx=-80,-50,5
 	            tauK        = real(tauindx,8)/100_DP
@@ -1318,6 +1318,9 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
+
+	print*,"	Efficiency Computation"
+		CALL Hsieh_Klenow_Efficiency(solving_bench)
 
 	CALL SIMULATION(0)
 
