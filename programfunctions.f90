@@ -1786,7 +1786,7 @@ SUBROUTINE FIND_DBN_EQ()
 	simutime = 1
 	iter_indx = 1
 	!print*, 'Computing Equilibrium Distribution'
-	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. ( simutime .le. 500 ) )
+	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. ( simutime .le. 700 ) )
 		! print*, 'DBN_dist=', DBN_dist
 
 	    DBN2=0.0_DP
@@ -1887,7 +1887,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    ENDDO
 	    ENDDO
 	    
-	    DBN2 = 0.9*DBN1 + 0.1*DBN2
+	    DBN2 = 0.95*DBN1 + 0.05*DBN2
 	    DBN_dist = maxval(abs(DBN2-DBN1))
 	    ! print*, DBN_dist
 	    DBN1 = DBN2
