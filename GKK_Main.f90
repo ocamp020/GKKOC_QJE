@@ -1154,6 +1154,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		    ENDDO 
 
 	    	CLOSE (unit=77) 
+	    	Call Write_Experimental_Results(.true.)
 	    ENDDO
 
 
@@ -1187,7 +1188,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
 
 		CLOSE (UNIT=77)
-		SUBROUTINE Write_Experimental_Results(1)
+		Call Write_Experimental_Results(.true.)
 
 
 	else 
@@ -1244,7 +1245,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			      & tauC
 		    ENDDO 
 		    CLOSE (unit=77)
-		    SUBROUTINE Write_Experimental_Results(1)
+		    Call Write_Experimental_Results(.true.)
 
 	    ENDDO
 
@@ -1279,6 +1280,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
 
 		CLOSE (UNIT=77)
+		Call Write_Experimental_Results(.true.)
 	endif 
 
 
