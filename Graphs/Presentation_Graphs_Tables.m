@@ -78,6 +78,8 @@
     mu = 0.9 ;
     Dep_Rate = 0.05 ;
     
+    alpha = 0.4 ; 
+    
 
 
 % Utility and technology
@@ -151,25 +153,51 @@ elseif X_Switch==1.1
         Tables_file     = 'Tables_Presentation_Model_11.xls' ;
     
 elseif X_Switch==1.2
-   mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/')
-    cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/'
-        Result_Folder = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/') ;
-        Simul_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/') ;
-        Bench_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Bench_Files/') ;
-        Exp_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Exp_Files/') ;
-        Top_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/Top_A/') ;
-        Tables_file   = 'Tables_Presentation_Model_12_bv.xls' ;
+%    mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/')
+%     cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/'
+%         Result_Folder = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/') ;
+%         Simul_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/') ;
+%         Bench_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Bench_Files/') ;
+%         Exp_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Exp_Files/') ;
+%         Otk_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Opt_Tax_K/Exp_Files/') ;
+%         Otk_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Opt_Tax_K/Simul/') ;
+%         Otw_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Opt_Tax_W/Exp_Files/') ;
+%         Otw_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Opt_Tax_W/Simul/');
+%         Etc_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Tau_C_Experiment/Exp_Files/') ;
+%         Etc_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Tau_C_Experiment/Simul/') ;
+%         Top_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/Top_A/') ;
+%         Tables_file   = 'Tables_Presentation_Model_12_bv.xls' ;
         
-   mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/')
-    cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/'
-        Result_Folder   = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/') ;
-        Simul_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/') ;
-        Simul_Folder_Exp= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Tau_C_Experiment/Simul/') ;
-        Bench_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Bench_Files/') ;
-        Exp_Folder      = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Tau_C_Experiment/Exp_Files/') ;
-        Top_Folder      = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/Top_A/') ;
-        Tables_file     = 'Tables_Presentation_Model_12_bv_tauC.xls' ;
-        tauW = 0 ;
+%    mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/')
+%     cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/'
+%         Result_Folder   = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/') ;
+%         Simul_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/') ;
+%         Simul_Folder_Exp= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Tau_C_Experiment/Simul/') ;
+%         Bench_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Bench_Files/') ;
+%         Exp_Folder      = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Tau_C_Experiment/Exp_Files/') ;
+%         Top_Folder      = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/Top_A/') ;
+%         Tables_file     = 'Tables_Presentation_Model_12_bv_tauC.xls' ;
+%         tauW = 0 ;
+
+
+   mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_ns/')
+    cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_ns/'
+        Result_Folder = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/') ;
+        Simul_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Simul/') ;
+        Bench_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Bench_Files/') ;
+        Exp_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Exp_Files/') ;
+        Otk_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Opt_Tax_K/Exp_Files/') ;
+        Otk_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Opt_Tax_K/Simul/') ;
+        Otw_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Opt_Tax_W/Exp_Files/') ;
+        Otw_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Opt_Tax_W/Simul/');
+        Etc_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Tau_C_Experiment/Exp_Files/') ;
+        Etc_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Tau_C_Experiment/Simul/') ;
+        Top_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Simul/Top_A/') ;
+        Tables_file   = 'Tables_Presentation_Model_12_ns.xls' ;
+        n_x = 1 ; 
+        x_grid = 1 ; 
+        X_Switch = 0 ;
+        
     
 elseif X_Switch==2.1
     mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Top_Agents_F2/')
@@ -198,8 +226,399 @@ elseif X_Switch==3.1
     
 end
       
-
-
+%% Hsieh & Klenow Efficiency
+    percentiles = [99.99 99.9 99 95 90 75 50 25 10 1] ;  
+    % Benchmark
+        % Read aggregate variables
+        eval(['load ',Bench_Folder,'P'])     ; eval(['load ',Bench_Folder,'R']);
+        eval(['load ',Bench_Folder,'QBAR'])  ; eval(['load ',Bench_Folder,'NBAR']);
+        eval(['load ',Bench_Folder,'DBN'])   ; DBN = reshape(DBN,[Max_Age,n_a,n_z,n_l,n_e,n_x]) ;
+        eval(['load ',Result_Folder,'zgrid']);
+        eval(['load ',Result_Folder,'agrid']); A_mat  = repmat(agrid,[Max_Age,1,n_z,n_l,n_e,n_x]);
+        % Read individual capital
+        eval(['load ',Simul_Folder,'panelage_bench']) ; panel_age = panelage_bench(1:N_plots)    ; clear panelage_bench     ;
+        eval(['load ',Simul_Folder,'panelz_bench'])   ; panel_z   = panelz_bench(1:N_plots)      ; clear panelz_bench       ;
+        eval(['load ',Simul_Folder,'panelK_bench'])   ; panel_K   = panelK_bench(1:N_plots)'     ; clear panelK_bench       ;
+        if X_Switch~=0
+        eval(['load ',Simul_Folder,'panelx_bench'])   ; panel_x   = panelx_bench(1:N_plots)      ; clear panelx_bench       ;
+        else
+        panel_x = ones(size(panel_age)) ;
+        end
+            %  X_grid
+            if X_Switch==1 || X_Switch==2
+                % panel_xz  = exp(log(zgrid(panel_z)).*x_grid(panel_x)) ;
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_z<=4)  = exp(log(zgrid(panel_z(panel_z<=4))).*x_grid(1)) ;
+                panel_xz(panel_z>4)   = exp(log(zgrid(panel_z(panel_z>4))).*x_grid(panel_x(panel_z>4))) ;
+            elseif X_Switch==0
+                panel_xz = zgrid(panel_z) ;
+            elseif X_Switch==1.1 || X_Switch==1.2 || X_Switch==2.1
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_z<=4)  = exp(log(zgrid(panel_z(panel_z<=4))).*x_grid(1)) ;
+                panel_xz(panel_z>4)   = exp(log(zgrid(panel_z(panel_z>4))).*x_grid(panel_x(panel_z>4))) ;
+                pabe_xz(panel_x==3)   = 0 ;
+            elseif X_Switch==3.1
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_x==1)  = zgrid(panel_z(panel_x==1)) ;
+                panel_xz(panel_x==2)  = exp(log(zgrid(panel_z(panel_x==2))).*x_grid(2)) ;
+                panel_xz(panel_x==3)  = 0 ;
+            end
+        % Compute TFP
+        DBN_zx = squeeze(sum(sum(sum(sum(DBN,5),4),2),1)) ; 
+        zx_grid = NaN(n_z,n_x) ; %zx_grid = zgrid ;
+            zx_grid(:    ,1) = exp(log(zgrid       ).*x_grid(1))  ;
+            zx_grid(1:4  ,2) = exp(log(zgrid(1:4)  ).*x_grid(1))  ;
+            zx_grid(5:n_z,2) = exp(log(zgrid(5:n_z)).*x_grid(2))  ;
+            zx_grid(:    ,3) = 0                                  ;
+        K_ben    = DBN(:)'*A_mat(:)      ;
+        TFP_ben  = QBAR/K_ben            ;
+        TFP_eff  = (DBN_zx(:)'*(zx_grid(:).^(mu/(1-mu))))^((1-mu)/mu) ;
+        TFPR_ben = P*panel_xz.^mu.*panel_K.^(mu-1) ; 
+            TFPR_ben(panel_x==3) = 0 ; 
+        TFPR_bar_ben = (sum( panel_K./(alpha*QBAR^alpha*NBAR^(1-alpha)) )/numel(panel_K))^-1 ;
+        mean_TFPR_ben = mean(TFPR_ben(panel_x<3)) ;
+        std_TFPR_ben  = std(TFPR_ben(panel_x<3))  ;
+        prc_TFPR_ben  = prctile(TFPR_ben(panel_x<3),percentiles) ;
+        TFP_2 = ( sum( (panel_xz(panel_x<3).*TFPR_bar_ben./TFPR_ben(panel_x<3)).^(mu/(1-mu)) )/numel(panel_K) )^((1-mu)/mu) ;
+        TFP_eff_2 = ( sum( (panel_xz).^(mu/(1-mu)) )/numel(panel_K) )^((1-mu)/mu) ;
+        % Graphs
+        h1 = histogram(log(TFPR_ben(panel_x<3)./TFPR_bar_ben),200);
+        h1.Normalization = 'probability'; h1.BinWidth = 0.025;
+        ww = log([1/2 3/4 1 2 4 6 8]) ;
+        set(gca,'XTick',ww); set(gca,'XTickLabel',exp(ww));
+        legend('TFPR','location','NorthEast')
+        file_name_eps = ['TFPR_hist_ben.eps'] ;
+        file_name_png = ['TFPR_hist_ben.png'] ;
+        file_name_fig = ['TFPR_hist_ben.fig'] ;
+        print('-depsc',file_name_eps) ; print('-dpng',file_name_png) ; savefig(file_name_fig)
+        hold on 
+        
+        h2 = histogram(log(TFPR_ben(panel_x<3 & panel_age==20)./TFPR_bar_ben),200);
+        h2.Normalization = 'probability'; h2.BinWidth = 0.025;
+        ww = log([1/2 3/4 1 2 4 6 8]) ;
+        set(gca,'XTick',ww); set(gca,'XTickLabel',exp(ww));
+        legend('TFPR','TFPR - age 20','location','NorthEast')
+        file_name_eps = ['TFPR_hist_20_ben.eps'] ;
+        file_name_png = ['TFPR_hist_20_ben.png'] ;
+        file_name_fig = ['TFPR_hist_20_ben.fig'] ;
+        print('-depsc',file_name_eps) ; print('-dpng',file_name_png) ; savefig(file_name_fig)
+            
+                
+    % Tau W Experiment 
+        % Read aggregate variables
+        eval(['load ',Exp_Folder,'Exp_results_P'])     ; eval(['load ',Exp_Folder,'Exp_results_R']);
+        eval(['load ',Exp_Folder,'Exp_results_QBAR'])  ; eval(['load ',Exp_Folder,'Exp_results_NBAR']);
+        eval(['load ',Exp_Folder,'Exp_results_DBN'])   ; 
+        P = Exp_results_P; R = Exp_results_R ; QBAR = Exp_results_QBAR ; NBAR = Exp_results_NBAR ; DBN = Exp_results_DBN ;
+        DBN = reshape(DBN,[Max_Age,n_a,n_z,n_l,n_e,n_x]) ;
+        % Read individual capital
+        eval(['load ',Simul_Folder,'panelage_exp']) ; panel_age = panelage_exp(1:N_plots)    ; clear panelage_exp     ;
+        eval(['load ',Simul_Folder,'panelz_exp'])   ; panel_z   = panelz_exp(1:N_plots)      ; clear panelz_exp       ;
+        eval(['load ',Simul_Folder,'panelK_exp'])   ; panel_K   = panelK_exp(1:N_plots)'     ; clear panelK_exp       ;
+        if X_Switch~=0
+        eval(['load ',Simul_Folder,'panelx_exp'])   ; panel_x   = panelx_exp(1:N_plots)      ; clear panelx_exp       ;
+        else
+        panel_x = ones(size(panel_age)) ;
+        end
+            %  X_grid
+            if X_Switch==1 || X_Switch==2
+                % panel_xz  = exp(log(zgrid(panel_z)).*x_grid(panel_x)) ;
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_z<=4)  = exp(log(zgrid(panel_z(panel_z<=4))).*x_grid(1)) ;
+                panel_xz(panel_z>4)   = exp(log(zgrid(panel_z(panel_z>4))).*x_grid(panel_x(panel_z>4))) ;
+            elseif X_Switch==0
+                panel_xz = zgrid(panel_z) ;
+            elseif X_Switch==1.1 || X_Switch==1.2 || X_Switch==2.1
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_z<=4)  = exp(log(zgrid(panel_z(panel_z<=4))).*x_grid(1)) ;
+                panel_xz(panel_z>4)   = exp(log(zgrid(panel_z(panel_z>4))).*x_grid(panel_x(panel_z>4))) ;
+                pabe_xz(panel_x==3)   = 0 ;
+            elseif X_Switch==3.1
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_x==1)  = zgrid(panel_z(panel_x==1)) ;
+                panel_xz(panel_x==2)  = exp(log(zgrid(panel_z(panel_x==2))).*x_grid(2)) ;
+                panel_xz(panel_x==3)  = 0 ;
+            end
+        % Compute TFP
+        K_exp    = DBN(:)'*A_mat(:)      ;
+        TFP_exp  = QBAR/K_exp            ;
+        TFPR_exp = P*panel_xz.^mu.*panel_K.^(mu-1) ; 
+            TFPR_exp(panel_x==3) = 0 ; 
+        TFPR_bar_exp = (sum( panel_K./(alpha*QBAR^alpha*NBAR^(1-alpha)) )/numel(panel_K))^-1 ;
+        mean_TFPR_exp = mean(TFPR_exp(panel_x<3)) ;
+        std_TFPR_exp  = std(TFPR_exp(panel_x<3))  ;
+        prc_TFPR_exp  = prctile(TFPR_exp(panel_x<3),percentiles) ;
+        TFP_2 = ( sum( (panel_xz(panel_x<3).*TFPR_bar_exp./TFPR_exp(panel_x<3)).^(mu/(1-mu)) )/numel(panel_K) )^((1-mu)/mu) ;
+        TFP_eff_2 = ( sum( (panel_xz).^(mu/(1-mu)) )/numel(panel_K) )^((1-mu)/mu) ;
+        % Graphs
+        figure;
+        h1 = histogram(log(TFPR_ben(panel_x<3)./TFPR_bar_ben),200);
+        h1.Normalization = 'probability'; h1.BinWidth = 0.025;
+        hold on
+        h2 = histogram(log(TFPR_exp(panel_x<3)./TFPR_bar_exp),200);
+        h2.Normalization = 'probability'; h2.BinWidth = 0.025;
+        ww = log([1/2 3/4 1 2 4 6 8]) ;
+        set(gca,'XTick',ww); set(gca,'XTickLabel',exp(ww));
+        legend('TFPR - Bench','TFPR - Exp','location','NorthEast')
+        file_name_eps = ['TFPR_hist_exp.eps'] ;
+        file_name_png = ['TFPR_hist_exp.png'] ;
+        file_name_fig = ['TFPR_hist_exp.fig'] ;
+        print('-depsc',file_name_eps) ; print('-dpng',file_name_png) ; savefig(file_name_fig)
+        
+        
+        figure;
+        h1 = histogram(log(TFPR_exp(panel_x<3)./TFPR_bar_exp),200);
+        h1.Normalization = 'probability'; h1.BinWidth = 0.025;
+        hold on
+        h2 = histogram(log(TFPR_exp(panel_x<3 & panel_age==20)./TFPR_bar_exp),200);
+        h2.Normalization = 'probability'; h2.BinWidth = 0.025;
+        ww = log([1/2 3/4 1 2 4 6 8]) ;
+        set(gca,'XTick',ww); set(gca,'XTickLabel',exp(ww));
+        legend('TFPR','TFPR - age 20','location','NorthEast')
+        file_name_eps = ['TFPR_hist_20_exp.eps'] ;
+        file_name_png = ['TFPR_hist_20_exp.png'] ;
+        file_name_fig = ['TFPR_hist_20_exp.fig'] ;
+        print('-depsc',file_name_eps) ; print('-dpng',file_name_png) ; savefig(file_name_fig)
+        
+    % Experient Consumption Taxes
+        % Read aggregate variables
+        eval(['load ',Etc_Folder,'Exp_results_P'])     ; eval(['load ',Etc_Folder,'Exp_results_R']);
+        eval(['load ',Etc_Folder,'Exp_results_QBAR'])  ; eval(['load ',Etc_Folder,'Exp_results_NBAR']);
+        eval(['load ',Etc_Folder,'Exp_results_DBN'])   ; 
+        P = Exp_results_P; R = Exp_results_R ; QBAR = Exp_results_QBAR ; NBAR = Exp_results_NBAR ; DBN = Exp_results_DBN ;
+        DBN = reshape(DBN,[Max_Age,n_a,n_z,n_l,n_e,n_x]) ;
+        % Read individual capital
+        eval(['load ',Etc_Sim_Folder,'panelage_exp']) ; panel_age = panelage_exp(1:N_plots)    ; clear panelage_exp     ;
+        eval(['load ',Etc_Sim_Folder,'panelz_exp'])   ; panel_z   = panelz_exp(1:N_plots)      ; clear panelz_exp       ;
+        eval(['load ',Etc_Sim_Folder,'panelK_exp'])   ; panel_K   = panelK_exp(1:N_plots)'     ; clear panelK_exp       ;
+        if X_Switch~=0
+        eval(['load ',Etc_Sim_Folder,'panelx_exp'])   ; panel_x   = panelx_exp(1:N_plots)      ; clear panelx_exp       ;
+        else
+        panel_x = ones(size(panel_age)) ;
+        end
+            %  X_grid
+            if X_Switch==1 || X_Switch==2
+                % panel_xz  = exp(log(zgrid(panel_z)).*x_grid(panel_x)) ;
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_z<=4)  = exp(log(zgrid(panel_z(panel_z<=4))).*x_grid(1)) ;
+                panel_xz(panel_z>4)   = exp(log(zgrid(panel_z(panel_z>4))).*x_grid(panel_x(panel_z>4))) ;
+            elseif X_Switch==0
+                panel_xz = zgrid(panel_z) ;
+            elseif X_Switch==1.1 || X_Switch==1.2 || X_Switch==2.1
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_z<=4)  = exp(log(zgrid(panel_z(panel_z<=4))).*x_grid(1)) ;
+                panel_xz(panel_z>4)   = exp(log(zgrid(panel_z(panel_z>4))).*x_grid(panel_x(panel_z>4))) ;
+                pabe_xz(panel_x==3)   = 0 ;
+            elseif X_Switch==3.1
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_x==1)  = zgrid(panel_z(panel_x==1)) ;
+                panel_xz(panel_x==2)  = exp(log(zgrid(panel_z(panel_x==2))).*x_grid(2)) ;
+                panel_xz(panel_x==3)  = 0 ;
+            end
+        % Compute TFP
+        K_etc    = DBN(:)'*A_mat(:)      ;
+        TFP_etc  = QBAR/K_etc            ;
+        TFPR_etc = P*panel_xz.^mu.*panel_K.^(mu-1) ; 
+            TFPR_etc(panel_x==3) = 0 ; 
+        TFPR_bar_etc = (sum( panel_K./(alpha*QBAR^alpha*NBAR^(1-alpha)) )/numel(panel_K))^-1 ;
+        mean_TFPR_etc = mean(TFPR_etc(panel_x<3)) ;
+        std_TFPR_etc  = std(TFPR_etc(panel_x<3))  ;
+        prc_TFPR_etc  = prctile(TFPR_etc(panel_x<3),percentiles) ;
+        TFP_2 = ( sum( (panel_xz(panel_x<3).*TFPR_bar_etc./TFPR_etc(panel_x<3)).^(mu/(1-mu)) )/numel(panel_K) )^((1-mu)/mu) ;
+        TFP_eff_2 = ( sum( (panel_xz).^(mu/(1-mu)) )/numel(panel_K) )^((1-mu)/mu) ;
+        % Graphs
+        figure;
+        h1 = histogram(log(TFPR_ben(panel_x<3)./TFPR_bar_ben),200);
+        h1.Normalization = 'probability'; h1.BinWidth = 0.025;
+        hold on
+        h2 = histogram(log(TFPR_etc(panel_x<3)./TFPR_bar_etc),200);
+        h2.Normalization = 'probability'; h2.BinWidth = 0.025;
+        ww = log([1/2 3/4 1 2 4 6 8]) ;
+        set(gca,'XTick',ww); set(gca,'XTickLabel',exp(ww));
+        legend('TFPR - Bench','TFPR - etc','location','NorthEast')
+        file_name_eps = ['TFPR_hist_etc.eps'] ;
+        file_name_png = ['TFPR_hist_etc.png'] ;
+        file_name_fig = ['TFPR_hist_etc.fig'] ;
+        print('-depsc',file_name_eps) ; print('-dpng',file_name_png) ; savefig(file_name_fig)
+        
+        
+        figure;
+        h1 = histogram(log(TFPR_etc(panel_x<3)./TFPR_bar_etc),200);
+        h1.Normalization = 'probability'; h1.BinWidth = 0.025;
+        hold on
+        h2 = histogram(log(TFPR_etc(panel_x<3 & panel_age==20)./TFPR_bar_etc),200);
+        h2.Normalization = 'probability'; h2.BinWidth = 0.025;
+        ww = log([1/2 3/4 1 2 4 6 8]) ;
+        set(gca,'XTick',ww); set(gca,'XTickLabel',exp(ww));
+        legend('TFPR','TFPR - age 20','location','NorthEast')
+        file_name_eps = ['TFPR_hist_20_etc.eps'] ;
+        file_name_png = ['TFPR_hist_20_etc.png'] ;
+        file_name_fig = ['TFPR_hist_20_etc.fig'] ;
+        print('-depsc',file_name_eps) ; print('-dpng',file_name_png) ; savefig(file_name_fig)
+        
+        
+    % Optimal Capital Taxes
+        % Read aggregate variables
+        eval(['load ',Otk_Folder,'Exp_results_P'])     ; eval(['load ',Otk_Folder,'Exp_results_R']);
+        eval(['load ',Otk_Folder,'Exp_results_QBAR'])  ; eval(['load ',Otk_Folder,'Exp_results_NBAR']);
+        eval(['load ',Otk_Folder,'Exp_results_DBN'])   ; 
+        P = Exp_results_P; R = Exp_results_R ; QBAR = Exp_results_QBAR ; NBAR = Exp_results_NBAR ; DBN = Exp_results_DBN ;
+        DBN = reshape(DBN,[Max_Age,n_a,n_z,n_l,n_e,n_x]) ;
+        % Read individual capital
+        eval(['load ',Otk_Sim_Folder,'panelage_exp']) ; panel_age = panelage_exp(1:N_plots)    ; clear panelage_exp     ;
+        eval(['load ',Otk_Sim_Folder,'panelz_exp'])   ; panel_z   = panelz_exp(1:N_plots)      ; clear panelz_exp       ;
+        eval(['load ',Otk_Sim_Folder,'panelK_exp'])   ; panel_K   = panelK_exp(1:N_plots)      ; clear panelK_exp       ;
+        if X_Switch~=0
+        eval(['load ',Otk_Sim_Folder,'panelx_exp'])   ; panel_x   = panelx_exp(1:N_plots)      ; clear panelx_exp       ;
+        else
+        panel_x = ones(size(panel_age)) ;
+        end
+            %  X_grid
+            if X_Switch==1 || X_Switch==2
+                % panel_xz  = exp(log(zgrid(panel_z)).*x_grid(panel_x)) ;
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_z<=4)  = exp(log(zgrid(panel_z(panel_z<=4))).*x_grid(1)) ;
+                panel_xz(panel_z>4)   = exp(log(zgrid(panel_z(panel_z>4))).*x_grid(panel_x(panel_z>4))) ;
+            elseif X_Switch==0
+                panel_xz = zgrid(panel_z) ;
+            elseif X_Switch==1.1 || X_Switch==1.2 || X_Switch==2.1
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_z<=4)  = exp(log(zgrid(panel_z(panel_z<=4))).*x_grid(1)) ;
+                panel_xz(panel_z>4)   = exp(log(zgrid(panel_z(panel_z>4))).*x_grid(panel_x(panel_z>4))) ;
+                pabe_xz(panel_x==3)   = 0 ;
+            elseif X_Switch==3.1
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_x==1)  = zgrid(panel_z(panel_x==1)) ;
+                panel_xz(panel_x==2)  = exp(log(zgrid(panel_z(panel_x==2))).*x_grid(2)) ;
+                panel_xz(panel_x==3)  = 0 ;
+            end
+        % Compute TFP
+        K_otk    = DBN(:)'*A_mat(:)      ;
+        TFP_otk  = QBAR/K_otk            ;
+        TFPR_otk = P*panel_xz.^mu.*panel_K.^(mu-1) ; 
+            TFPR_otk(panel_x==3) = 0 ; 
+        TFPR_bar_otk = (sum( panel_K./(alpha*QBAR^alpha*NBAR^(1-alpha)) )/numel(panel_K))^-1 ;
+        mean_TFPR_otk = mean(TFPR_otk(panel_x<3)) ;
+        std_TFPR_otk  = std(TFPR_otk(panel_x<3))  ;
+        prc_TFPR_otk  = prctile(TFPR_otk(panel_x<3),percentiles) ;
+        TFP_2 = ( sum( (panel_xz(panel_x<3).*TFPR_bar_otk./TFPR_otk(panel_x<3)).^(mu/(1-mu)) )/numel(panel_K) )^((1-mu)/mu) ;
+        TFP_eff_2 = ( sum( (panel_xz).^(mu/(1-mu)) )/numel(panel_K) )^((1-mu)/mu) ;
+        % Graphs
+        figure;
+        h1 = histogram(log(TFPR_ben(panel_x<3)./TFPR_bar_ben),200);
+        h1.Normalization = 'probability'; h1.BinWidth = 0.025;
+        hold on
+        h2 = histogram(log(TFPR_otk(panel_x<3)./TFPR_bar_otk),200);
+        h2.Normalization = 'probability'; h2.BinWidth = 0.025;
+        ww = log([1/2 3/4 1 2 4 6 8]) ;
+        set(gca,'XTick',ww); set(gca,'XTickLabel',exp(ww));
+        legend('TFPR - Bench','TFPR - otk','location','NorthEast')
+        file_name_eps = ['TFPR_hist_otk.eps'] ;
+        file_name_png = ['TFPR_hist_otk.png'] ;
+        file_name_fig = ['TFPR_hist_otk.fig'] ;
+        print('-depsc',file_name_eps) ; print('-dpng',file_name_png) ; savefig(file_name_fig)
+        
+        figure;
+        h1 = histogram(log(TFPR_otk(panel_x<3)./TFPR_bar_otk),200);
+        h1.Normalization = 'probability'; h1.BinWidth = 0.025;
+        hold on
+        h2 = histogram(log(TFPR_otk(panel_x<3 & panel_age==20)./TFPR_bar_otk),200);
+        h2.Normalization = 'probability'; h2.BinWidth = 0.025;
+        ww = log([1/2 3/4 1 2 4 6 8]) ;
+        set(gca,'XTick',ww); set(gca,'XTickLabel',exp(ww));
+        legend('TFPR','TFPR - age 20','location','NorthEast')
+        file_name_eps = ['TFPR_hist_20_otk.eps'] ;
+        file_name_png = ['TFPR_hist_20_otk.png'] ;
+        file_name_fig = ['TFPR_hist_20_otk.fig'] ;
+        print('-depsc',file_name_eps) ; print('-dpng',file_name_png) ; savefig(file_name_fig)
+        
+    % Optimal Wealth Taxes
+        % Read aggregate variables
+        eval(['load ',Otw_Folder,'Exp_results_P'])     ; eval(['load ',Otw_Folder,'Exp_results_R']);
+        eval(['load ',Otw_Folder,'Exp_results_QBAR'])  ; eval(['load ',Otw_Folder,'Exp_results_NBAR']);
+        eval(['load ',Otw_Folder,'Exp_results_DBN'])   ; 
+        P = Exp_results_P; R = Exp_results_R ; QBAR = Exp_results_QBAR ; NBAR = Exp_results_NBAR ; DBN = Exp_results_DBN ;
+        DBN = reshape(DBN,[Max_Age,n_a,n_z,n_l,n_e,n_x]) ;
+        % Read individual capital
+        eval(['load ',Otw_Sim_Folder,'panelage_exp']) ; panel_age = panelage_exp(1:N_plots)    ; clear panelage_exp     ;
+        eval(['load ',Otw_Sim_Folder,'panelz_exp'])   ; panel_z   = panelz_exp(1:N_plots)      ; clear panelz_exp       ;
+        eval(['load ',Otw_Sim_Folder,'panelK_exp'])   ; panel_K   = panelK_exp(1:N_plots)      ; clear panelK_exp       ;
+        if X_Switch~=0
+        eval(['load ',Otw_Sim_Folder,'panelx_exp'])   ; panel_x   = panelx_exp(1:N_plots)      ; clear panelx_exp       ;
+        else
+        panel_x = ones(size(panel_age)) ;
+        end
+            %  X_grid
+            if X_Switch==1 || X_Switch==2
+                % panel_xz  = exp(log(zgrid(panel_z)).*x_grid(panel_x)) ;
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_z<=4)  = exp(log(zgrid(panel_z(panel_z<=4))).*x_grid(1)) ;
+                panel_xz(panel_z>4)   = exp(log(zgrid(panel_z(panel_z>4))).*x_grid(panel_x(panel_z>4))) ;
+            elseif X_Switch==0
+                panel_xz = zgrid(panel_z) ;
+            elseif X_Switch==1.1 || X_Switch==1.2 || X_Switch==2.1
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_z<=4)  = exp(log(zgrid(panel_z(panel_z<=4))).*x_grid(1)) ;
+                panel_xz(panel_z>4)   = exp(log(zgrid(panel_z(panel_z>4))).*x_grid(panel_x(panel_z>4))) ;
+                pabe_xz(panel_x==3)   = 0 ;
+            elseif X_Switch==3.1
+                panel_xz = NaN(size(panel_z)) ;
+                panel_xz(panel_x==1)  = zgrid(panel_z(panel_x==1)) ;
+                panel_xz(panel_x==2)  = exp(log(zgrid(panel_z(panel_x==2))).*x_grid(2)) ;
+                panel_xz(panel_x==3)  = 0 ;
+            end
+        % Compute TFP
+        K_otw    = DBN(:)'*A_mat(:)      ;
+        TFP_otw  = QBAR/K_otw            ;
+        TFPR_otw = P*panel_xz.^mu.*panel_K.^(mu-1) ; 
+            TFPR_otw(panel_x==3) = 0 ; 
+        TFPR_bar_otw = (sum( panel_K./(alpha*QBAR^alpha*NBAR^(1-alpha)) )/numel(panel_K))^-1 ;
+        mean_TFPR_otw = mean(TFPR_otw(panel_x<3)) ;
+        std_TFPR_otw  = std(TFPR_otw(panel_x<3))  ;
+        prc_TFPR_otw  = prctile(TFPR_otw(panel_x<3),percentiles) ;
+        TFP_2 = ( sum( (panel_xz(panel_x<3).*TFPR_bar_otw./TFPR_otw(panel_x<3)).^(mu/(1-mu)) )/numel(panel_K) )^((1-mu)/mu) ;
+        TFP_eff_2 = ( sum( (panel_xz).^(mu/(1-mu)) )/numel(panel_K) )^((1-mu)/mu) ;
+        % Graphs
+        figure;
+        h1 = histogram(log(TFPR_ben(panel_x<3)./TFPR_bar_ben),200);
+        h1.Normalization = 'probability'; h1.BinWidth = 0.025;
+        hold on
+        h2 = histogram(log(TFPR_otw(panel_x<3)./TFPR_bar_otw),200);
+        h2.Normalization = 'probability'; h2.BinWidth = 0.025;
+        ww = log([1/2 3/4 1 2 4 6 8]) ;
+        set(gca,'XTick',ww); set(gca,'XTickLabel',exp(ww));
+        legend('TFPR - Bench','TFPR - otw','location','NorthEast')
+        file_name_eps = ['TFPR_hist_otw.eps'] ;
+        file_name_png = ['TFPR_hist_otw.png'] ;
+        file_name_fig = ['TFPR_hist_otw.fig'] ;
+        print('-depsc',file_name_eps) ; print('-dpng',file_name_png) ; savefig(file_name_fig)
+        
+        figure;
+        h1 = histogram(log(TFPR_otw(panel_x<3)./TFPR_bar_otw),200);
+        h1.Normalization = 'probability'; h1.BinWidth = 0.025;
+        hold on
+        h2 = histogram(log(TFPR_otw(panel_x<3 & panel_age==20)./TFPR_bar_otw),200);
+        h2.Normalization = 'probability'; h2.BinWidth = 0.025;
+        ww = log([1/2 3/4 1 2 4 6 8]) ;
+        set(gca,'XTick',ww); set(gca,'XTickLabel',exp(ww));
+        legend('TFPR','TFPR - age 20','location','NorthEast')
+        file_name_eps = ['TFPR_hist_20_otw.eps'] ;
+        file_name_png = ['TFPR_hist_20_otw.png'] ;
+        file_name_fig = ['TFPR_hist_20_otw.fig'] ;
+        print('-depsc',file_name_eps) ; print('-dpng',file_name_png) ; savefig(file_name_fig)
+        
+    % Table 
+    Mat = [TFP_ben , TFP_eff/TFP_ben , mean_TFPR_ben , std_TFPR_ben , prc_TFPR_ben ; 
+           TFP_exp , TFP_eff/TFP_exp , mean_TFPR_exp , std_TFPR_exp , prc_TFPR_exp ; 
+           TFP_etc , TFP_eff/TFP_etc , mean_TFPR_etc , std_TFPR_etc , prc_TFPR_etc ; 
+           TFP_otk , TFP_eff/TFP_otk , mean_TFPR_otk , std_TFPR_otk , prc_TFPR_otk ; 
+           TFP_otw , TFP_eff/TFP_otw , mean_TFPR_otw , std_TFPR_otw , prc_TFPR_otw ]; 
+    col_title = {' ','TFP','TFP Gain','Mean TFPR','StD TFPR','p99.99','p99.9','p99','p95','p90','p75','p50','p25','p10','p01'};
+    row_title = {'Benchmark';'TauW Reform tw';'TauW Reform tc';'Opt. TauK';'Opt. TauW'};
+    Mat = [col_title ; row_title , num2cell(Mat)] 
+    status = xlwrite(Tables_file,Mat,'Hsieh_Klenow_Eff') ;   
+        
+        
 %% Return percentiles table
 
     % Bench return 
@@ -214,7 +633,7 @@ end
         eval(['load ',Simul_Folder,'panelz_bench'])      ; panel_z   = panelz_bench(1:N_plots)      ; clear panelz_bench       ;
         eval(['load ',Simul_Folder,'panela_bench'])      ; panel_a   = panela_bench(1:N_plots)      ; clear panela_bench       ;    
         eval(['load ',Simul_Folder,'panelK_bench'])      ; panel_K   = panelK_bench(1:N_plots)      ; clear panelK_bench       ;
-        eval(['load ',Simul_Folder,'panelage_bench'])    
+        eval(['load ',Simul_Folder,'panelage_bench'])    ;
 
         %  X_grid
         if X_Switch==1 || X_Switch==2
