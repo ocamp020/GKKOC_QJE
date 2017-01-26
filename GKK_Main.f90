@@ -60,7 +60,7 @@ PROGRAM main
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
-			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .False. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
 		Opt_Tau_C = .true.
 		Simul_Switch  = .false.
@@ -1195,14 +1195,15 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		PRINT*,''
 		Print*,'--------------- OPTIMAL WEALTH TAXES - Consumption Taxes -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_7.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_8.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
     	CALL Write_Experimental_Results(.false.)
+    	psi = 1.8
 
-    	DO tauC_ind = 7,10,1
+    	DO tauC_ind = 10,15,1
 
-    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_7.txt', STATUS='old', POSITION='append')
+    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_8.txt', STATUS='old', POSITION='append')
 
 			tauC = real(tauC_ind,8)/10.0_dp
 			print*, ' '
@@ -1250,7 +1251,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 	    ENDDO
 
 
-	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_cons_tax_7.txt', STATUS='replace')
+	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_cons_tax_8.txt', STATUS='replace')
 
 		tauW_at = OPT_tauW
 		psi 	= OPT_psi
