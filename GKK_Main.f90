@@ -56,13 +56,13 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
-			compute_bench = .false.
-			compute_exp   = .false.
+		Tax_Reform    = .true.
+			compute_bench = .true.
+			compute_exp   = .true.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .False. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
-		Opt_Tau_C = .true.
+		Opt_Tau_C = .False.
 		Simul_Switch  = .false.
 
 
@@ -147,7 +147,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Model_1.2_bv/' 
+		Result_Folder = trim(Result_Folder)//'Model_1.2_bv_fine/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
