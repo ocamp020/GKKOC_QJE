@@ -20,7 +20,7 @@ Objects_GO      = $(Folder)/GKK_Calibration.o \
                   $(Folder)/stateControl.o $(Folder)/genericParams.o $(Folder)/utilities.o \
                   $(Folder)/simplex.o $(Folder)/objective.o $(Folder)/minimize.o
 
-Flags    = -fbounds-check -finline-functions -mcmodel=large
+Flags    =  -mcmodel=large #-fbounds-check -finline-functions
 omp_flag = -fopenmp
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
