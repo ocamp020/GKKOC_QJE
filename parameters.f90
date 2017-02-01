@@ -53,7 +53,7 @@ MODULE parameters
 
 
 	! Asset grid: nodes (na,fine_na), min (amin), max (amax), curvature (a_curv) 
-	INTEGER(I4B), PARAMETER  :: na=301, fine_na=801
+	INTEGER(I4B), PARAMETER  :: na=401, fine_na=801
 	REAL(DP)    , PARAMETER  :: a_theta=4.0_DP , amax=500000.0_DP, amin=0.0001_DP
 
 	
