@@ -34,10 +34,10 @@ $(Folder)/%.o: %.f90
 	gfortran -O3 -J$(Folder) -c $< -o $@
 
 $(Folder)/programfunctions.o: programfunctions.f90
-	gfortran $(omp_flag) -O3 -J$(Folder) -c programfunctions.f90 -o $(Folder)/programfunctions.o
+	gfortran $(omp_flag) -O3 $(Flags) -J$(Folder) -c programfunctions.f90 -o $(Folder)/programfunctions.o
 
 $(Folder)/Simulation_Module.o: Simulation_Module.f90
-	gfortran $(omp_flag) -O3 -J$(Folder) -c Simulation_Module.f90 -o $(Folder)/Simulation_Module.o
+	gfortran $(omp_flag) -O3 $(Flags) -J$(Folder) -c Simulation_Module.f90 -o $(Folder)/Simulation_Module.o
 
 # Compile and execute programs
 Sergio_Simple.a: GKK_simple.f90 $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o
@@ -49,7 +49,7 @@ Sergio.a: GKK_Wealth_Tax_Sergio.f90 $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o $(Fold
 	$(Folder)/Sergio.a
 
 GKK_Main.a: GKK_Main.f90 $(Objects_Main) $(Objects_Opt_Tax)
-	gfortran $(omp_flag) -O3 -I$(Folder) GKK_Main.f90 $(Objects_Main) $(Objects_Opt_Tax) -o $(Folder)/GKK_Main.a
+	gfortran $(omp_flag) $(Flags) -O3 -I$(Folder) GKK_Main.f90 $(Objects_Main) $(Objects_Opt_Tax) -o $(Folder)/GKK_Main.a
 	time $(Folder)/GKK_Main.a
 
 GKK_Main_pg.a: profiler.f90 $(Objects_Main)
