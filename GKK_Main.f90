@@ -291,8 +291,8 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		Y_a_threshold = 0.00_DP 
 
 		tauK = -1.00_dp 
-		tauC =  2.30_dp
-		psi  =  3.00_dp
+		tauC =  2.00_dp
+		psi  =  2.50_dp
 
 	! Solve for the model and compute stats
 	print*,"	Initializing program"
