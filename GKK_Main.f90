@@ -57,8 +57,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
-			compute_exp   = .true.
+			compute_bench = .true.
+			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .False. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
@@ -193,9 +193,9 @@ PROGRAM main
 			
 			! call Solve_Experiment(compute_exp,Simul_Switch)
 
-			Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
-			call system( 'mkdir -p ' // trim(Result_Folder) )
-			call Solve_Experiment_tauC(compute_exp,Simul_Switch)
+			! Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
+			! call system( 'mkdir -p ' // trim(Result_Folder) )
+			! call Solve_Experiment_tauC(compute_exp,Simul_Switch)
 
 			compute_bench = .false.
 		endif 
@@ -289,6 +289,10 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		tauW_bt = 0.00_DP
 		tauW_at = 0.00_DP
 		Y_a_threshold = 0.00_DP 
+
+		tauK = -1.50_dp 
+		tauC =  2.50_dp
+		psi  =  3.00_dp
 
 	! Solve for the model and compute stats
 	print*,"	Initializing program"
