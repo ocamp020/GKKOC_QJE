@@ -15,7 +15,7 @@ Folder       = ./Compiled_Files
 GO_Folder    = ./Global_Opt
 Objects_Main    = $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o $(Folder)/Toolbox.o \
                   $(Folder)/parameters.o $(Folder)/global.o $(Folder)/programfunctions.o $(Folder)/Simulation_Module.o
-Objects_Opt_Tax = $(Folder)/Opt_Tax_Parameters.o $(Folder)/Opt_Tax_Functions.o
+Objects_Opt_Tax = #$(Folder)/Opt_Tax_Parameters.o $(Folder)/Opt_Tax_Functions.o
 Objects_GO      = $(Folder)/GKK_Calibration.o \
                   $(Folder)/stateControl.o $(Folder)/genericParams.o $(Folder)/utilities.o \
                   $(Folder)/simplex.o $(Folder)/objective.o $(Folder)/minimize.o
