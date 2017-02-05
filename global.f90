@@ -57,10 +57,10 @@ MODULE global
 		REAL(DP), DIMENSION(MaxAge  , nlambda, ne) :: eff_un,  yh
 
 	! Policy function and value function (defined on the exogenous grid)
-    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Cons, Hours, Aprime
-    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Cons_bench, Hours_bench, Aprime_bench, Cons_exp, Hours_exp, Aprime_exp 
-    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: ValueFunction, ValueFunction_bench, ValueFunction_exp
-    REAL(DP), dimension(MaxAge, na, nz, nlambda, ne, nx) :: Cons_Eq_Welfare
+    REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons, Hours, Aprime
+    REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_bench, Hours_bench, Aprime_bench, Cons_exp, Hours_exp, Aprime_exp 
+    REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: ValueFunction, ValueFunction_bench, ValueFunction_exp
+    REAL(DP), dimension(:,:,:,:,:,:), allocatable :: Cons_Eq_Welfare
 	! Policy function and value function (defined on the adjusted grid for breakpoints)
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_t, Hours_t, Aprime_t
 	!REAL(DP), DIMENSION(MaxAge,na+nz,nz,nlambda,ne) :: Cons_t, Hours_t, Aprime_t
@@ -87,7 +87,7 @@ MODULE global
 
     ! Capital markets
     	REAL(DP), DIMENSION(na,nz,nx) :: K_mat, Pr_mat, Wealth_mat
-    	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: V_Pr, V_Pr_bench, V_Pr_exp, Firm_Wealth
+    	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: V_Pr, V_Pr_bench, V_Pr_exp, Firm_Wealth
     	REAL(DP), DIMENSION(na,nz,nlambda) :: V_Pr_nb, V_Pr_nb_bench, V_Pr_nb_exp
 	
 	! Values for taxes in benchmark and experiment
@@ -161,5 +161,25 @@ MODULE global
 
     ! Extra tax information
     real(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, Tot_Lab_Inc
+
+    !! Allocate variables
+    allocate( Cons(               MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( Hours(              MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( Aprime(             MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( Cons_bench(         MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( Hours_bench(        MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( Aprime_bench(       MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( Cons_exp(           MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( Hours_exp(          MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( Aprime_exp(         MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( ValueFunction(      MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( ValueFunction_bench(MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( ValueFunction_exp(  MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( Cons_Eq_Welfare(    MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( V_Pr(               MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( V_Pr_bench(         MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( V_Pr_exp(           MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( Firm_Wealth(        MaxAge,na,nz,nlambda,ne,nx) )
+
    
 END MODULE global
