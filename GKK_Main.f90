@@ -60,7 +60,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
+			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .False. ! true=tau_K false=tau_W
@@ -291,11 +291,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		tauK = 0.25_DP
 		tauW_bt = 0.00_DP
 		tauW_at = 0.00_DP
-		Y_a_threshold = 0.00_DP 
-
-		tauK = -1.00_dp 
-		tauC =  2.00_dp
-		psi  =  2.50_dp
+		Y_a_threshold = 0.00_DP
 
 	! Solve for the model and compute stats
 	print*,"	Initializing program"
