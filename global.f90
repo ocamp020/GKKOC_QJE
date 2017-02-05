@@ -162,6 +162,10 @@ MODULE global
     ! Extra tax information
     real(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, Tot_Lab_Inc
 
+
+Contains 
+
+Subroutine Allocate_Variables
     !! Allocate variables
     allocate( Cons(               MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Hours(              MaxAge,na,nz,nlambda,ne,nx) )
@@ -180,6 +184,6 @@ MODULE global
     allocate( V_Pr_bench(         MaxAge,na,nz,nlambda,ne,nx) )
     allocate( V_Pr_exp(           MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Firm_Wealth(        MaxAge,na,nz,nlambda,ne,nx) )
-
+end Subroutine Allocate_Variables
    
 END MODULE global

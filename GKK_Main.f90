@@ -44,6 +44,9 @@ PROGRAM main
 		character(4)   :: string_theta
 		character(100) :: folder_aux
 
+	! Allocate Variables
+	call Allocate_Variables
+
 	! Capital Market
 		theta_folder = 1.50_dp
 		do zi=1,nz
