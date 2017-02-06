@@ -60,7 +60,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
+			compute_bench = .true.
 			compute_exp   = .true.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
@@ -95,12 +95,12 @@ PROGRAM main
 		! Calibration to book value and rho_z=0.1 and x_hi=10
 		Params =[ 0.9473_dp, 0.00_dp, 0.1_dp, 0.0352_dp , 0.307_dp, 0.46_dp ] 
 		
-		beta   	= 0.9496_dp! 0.95_dp ! params(1) !
+		beta   	= 0.9475_dp! 0.95_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
-		sigma_z_eps      =  0.0723_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
-		sigma_lambda_eps = 0.3045_dp ! params(5)
-		gamma  	=  0.4605_dp !  0.471_dp ! params(6) ! 
+		sigma_z_eps      =  0.072_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
+		sigma_lambda_eps = 0.305_dp ! params(5)
+		gamma  	=  0.46_dp !  0.471_dp ! params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
 		
 		sigma  	= 4.0_dp
@@ -194,11 +194,11 @@ PROGRAM main
 		if (Tax_Reform) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
 			
-			! call Solve_Experiment(compute_exp,Simul_Switch)
+			call Solve_Experiment(compute_exp,Simul_Switch)
 
-			Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
-			call system( 'mkdir -p ' // trim(Result_Folder) )
-			call Solve_Experiment_tauC(compute_exp,Simul_Switch)
+			! Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
+			! call system( 'mkdir -p ' // trim(Result_Folder) )
+			! call Solve_Experiment_tauC(compute_exp,Simul_Switch)
 
 			compute_bench = .false.
 		endif 
