@@ -60,8 +60,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
-			compute_exp   = .false.
+			compute_bench = .false.
+			compute_exp   = .true.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .False. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
@@ -194,7 +194,7 @@ PROGRAM main
 		if (Tax_Reform) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
 			
-			! call Solve_Experiment(compute_exp,Simul_Switch)
+			call Solve_Experiment(compute_exp,Simul_Switch)
 
 			! Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
 			! call system( 'mkdir -p ' // trim(Result_Folder) )
