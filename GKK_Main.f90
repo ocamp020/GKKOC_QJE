@@ -1112,7 +1112,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		PRINT*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax.txt', STATUS='replace')
     	CLOSE (unit=77) 
-    	CALL Write_Experimental_Results(.false.)
+    	! CALL Write_Experimental_Results(.false.)
 
     	DO tauC_ind = 5,10,1
 
