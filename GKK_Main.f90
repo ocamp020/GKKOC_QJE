@@ -150,7 +150,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Model_1.2_bv_fine/' 
+		Result_Folder = trim(Result_Folder)//'Model_1.2_bv/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
@@ -240,7 +240,7 @@ PROGRAM main
 
 			folder_aux = Result_Folder
 			if (Opt_Tax_KW) then 
-				Result_Folder = trim(folder_aux)//'Opt_Tax_K_Tau_C/'
+				Result_Folder = trim(folder_aux)//'Opt_Tax_K_Tau_C_aux/'
 			else 
 				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Tau_C/'
 			endif
@@ -1110,13 +1110,14 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		PRINT*,''
 		Print*,'--------------- OPTIMAL CAPITAL TAXES - Consumption Taxes -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax_3.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax.txt', STATUS='replace')
     	CLOSE (unit=77) 
-    	CALL Write_Experimental_Results(.false.)
+    	! CALL Write_Experimental_Results(.false.)
+    	psi = 1.9
 
-    	DO tauC_ind = 15,15,1
+    	DO tauC_ind = 05,10,1
 
-    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax_3.txt', STATUS='old', POSITION='append')
+    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax.txt', STATUS='old', POSITION='append')
 
 			tauC = real(tauC_ind,8)/10.0_dp
 			print*, ' '
@@ -1162,7 +1163,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 	    ENDDO
 
 
-	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k_cons_tax_3.txt', STATUS='replace')
+	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k_cons_tax.txt', STATUS='replace')
 
 		tauK = OPT_tauK
 		psi  = OPT_psi
