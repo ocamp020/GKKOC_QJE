@@ -1110,13 +1110,13 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		PRINT*,''
 		Print*,'--------------- OPTIMAL CAPITAL TAXES - Consumption Taxes -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax_2.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax_3.txt', STATUS='replace')
     	CLOSE (unit=77) 
     	CALL Write_Experimental_Results(.false.)
 
-    	DO tauC_ind = 11,15,1
+    	DO tauC_ind = 15,15,1
 
-    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax_2.txt', STATUS='old', POSITION='append')
+    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_cons_tax_3.txt', STATUS='old', POSITION='append')
 
 			tauC = real(tauC_ind,8)/10.0_dp
 			print*, ' '
@@ -1162,7 +1162,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 	    ENDDO
 
 
-	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k_cons_tax_2.txt', STATUS='replace')
+	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k_cons_tax_3.txt', STATUS='replace')
 
 		tauK = OPT_tauK
 		psi  = OPT_psi
