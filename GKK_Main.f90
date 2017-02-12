@@ -59,7 +59,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
+		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
 		Opt_Tax       = .false.
@@ -328,8 +328,6 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		CALL WRITE_VARIABLES(1)
-		print*,"	Efficiency Computation"
-		CALL Hsieh_Klenow_Efficiency(solving_bench)
 		if (Simul_Switch) then 
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
@@ -364,6 +362,10 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 
 		write(*,*) "Benchmark variables"
 		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"P=",P,"wage=",wage,'R=',R
+
+		print*,"	Efficiency Computation"
+		CALL Hsieh_Klenow_Efficiency(solving_bench)
+
 
 		! Deallocate variables
 		if (compute_bench.eqv..false.) then 
@@ -521,8 +523,6 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	print*,"	Efficiency Computation"
-		CALL Hsieh_Klenow_Efficiency(solving_bench)
 	if ((Simul_Switch)) then 
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
@@ -538,6 +538,9 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	print*," "
 	print*,"Wealth_factor=",Wealth_factor
 	print*," "
+
+	print*,"	Efficiency Computation"
+		CALL Hsieh_Klenow_Efficiency(solving_bench)
 
 	! Deallocate variables
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
@@ -692,12 +695,13 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	print*,"	Efficiency Computation"
-		CALL Hsieh_Klenow_Efficiency(solving_bench)
 	if ((Simul_Switch)) then 
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
 	endif
+
+	print*,"	Efficiency Computation"
+		CALL Hsieh_Klenow_Efficiency(solving_bench)
 
 	! Deallocate variables
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
