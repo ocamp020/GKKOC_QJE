@@ -3760,7 +3760,7 @@ Function Agg_Debt(R_in)
 	enddo 
 	enddo 
 	enddo 
-	print*, '------------',Wealth, Kd, Agg_Debt, R_in 
+	print*, '------------',Wealth, Kd, Agg_Debt, R_in, theta, P
 	Agg_Debt = (Agg_Debt/Wealth)**2.0_dp
 
 
