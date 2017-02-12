@@ -2966,6 +2966,7 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	NBAR_aux  = NBAR 
 	K_aux     = K
 	theta     = big_p 
+	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	CALL FIND_DBN_EQ
 	theta     = theta_aux 
 	K         = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
