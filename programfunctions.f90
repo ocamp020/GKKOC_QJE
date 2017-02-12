@@ -1926,7 +1926,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
 	    	if (sum(theta)/nz .gt. 1.0_DP) then
 	    		P = min(P,1.0_dp)
-	           brent_value = brent(-0.1_DP,0.1_DP,10000.0_DP,Agg_Debt, brent_tol,R)
+	           brent_value = brent(-0.1_DP,0.01_DP,10000.0_DP,Agg_Debt, brent_tol,R)
             else
                 R = 0.0_DP
 	        endif
@@ -3760,7 +3760,7 @@ Function Agg_Debt(R_in)
 	enddo 
 	enddo 
 	enddo 
-	print*, '------------',Wealth, Kd, Agg_Debt, R_in, theta, P
+	print*, '------------',Wealth, Kd, Agg_Debt, R_in, P
 	Agg_Debt = (Agg_Debt/Wealth)**2.0_dp
 
 
