@@ -1923,7 +1923,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 
 	    	! Solve for new R 
-	    	R = zbrent(Agg_Debt,0.001_dp,1.00_dp,brent_tol) 
+	    	R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
 	    	! if (sum(theta)/nz .gt. 1.0_DP) then
 	    	! 	P = min(P,1.0_dp)
 	     !       brent_value = brent(-0.1_DP,0.1_DP,10000.0_DP,Agg_Debt, brent_tol,R)
