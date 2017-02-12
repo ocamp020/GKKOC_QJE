@@ -1923,13 +1923,13 @@ SUBROUTINE FIND_DBN_EQ()
 	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 
 	    	! Solve for new R 
-	    	!R = zbrent(Agg_Debt,0.0_dp,0.50_dp,brent_tol) 
-	    	if (sum(theta)/nz .gt. 1.0_DP) then
-	    		P = min(P,1.0_dp)
-	           brent_value = brent(-0.1_DP,0.1_DP,10000.0_DP,Agg_Debt, brent_tol,R)
-            else
-                R = 0.0_DP
-	        endif
+	    	R = zbrent(Agg_Debt,-0.1_dp,1.00_dp,brent_tol) 
+	    	! if (sum(theta)/nz .gt. 1.0_DP) then
+	    	! 	P = min(P,1.0_dp)
+	     !       brent_value = brent(-0.1_DP,0.1_DP,10000.0_DP,Agg_Debt, brent_tol,R)
+      !       else
+      !           R = 0.0_DP
+	     !    endif
 
 	    	!!
 	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P
@@ -3760,7 +3760,7 @@ Function Agg_Debt(R_in)
 	enddo 
 	enddo 
 	print*, '------------',Wealth, Agg_Debt, R_in 
-	Agg_Debt = (Agg_Debt/Wealth)**2.0_dp
+	Agg_Debt = (Agg_Debt/Wealth)!**2.0_dp
 
 
 end Function Agg_Debt
