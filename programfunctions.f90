@@ -3760,9 +3760,7 @@ Function Agg_Debt(R_in)
 	enddo 
 	enddo 
 	enddo 
-	do xi=1,nx 
-		print*, (mu*P*xz_grid(xi,:)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu))
-	enddo 
+	print*, (mu*P*xz_grid(1,5:)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu))
 	print*, '------------',Wealth, Kd, Agg_Debt, R_in, P
 	Agg_Debt = (Agg_Debt/Wealth)**2.0_dp
 
