@@ -1923,7 +1923,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 
 	    	! Solve for new R 
-	    	R = zbrent(Agg_Debt,-0.1_dp,1.00_dp,brent_tol) 
+	    	R = zbrent(Agg_Debt,0.001_dp,1.00_dp,brent_tol) 
 	    	! if (sum(theta)/nz .gt. 1.0_DP) then
 	    	! 	P = min(P,1.0_dp)
 	     !       brent_value = brent(-0.1_DP,0.1_DP,10000.0_DP,Agg_Debt, brent_tol,R)
@@ -3742,13 +3742,14 @@ Function Agg_Debt(R_in)
 	real(dp), intent(in) :: R_in
 	real(dp)             :: Agg_Debt
 	real(dp), dimension(na,nz,nx) :: DBN_azx, K_mat
-	real(dp)             :: Wealth 
+	real(dp)             :: Wealth , Kd
 
 	DBN_azx  = sum(sum(sum(DBN1,5),4),1)
 
 	Wealth   = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 
 	Agg_Debt = (sum(DBN_azx*(K_matrix(R_in,P)-spread(spread(agrid,2,nz),3,nx)))/Wealth)**2.0_DP 
+	Kd       = (sum(DBN_azx*(K_matrix(R_in,P))))
 
 	K_mat = K_matrix(R_in,P)
 	Agg_Debt = 0.0_dp
@@ -3759,7 +3760,7 @@ Function Agg_Debt(R_in)
 	enddo 
 	enddo 
 	enddo 
-	print*, '------------',Wealth, Agg_Debt, R_in 
+	print*, '------------',Wealth, Kd, Agg_Debt, R_in 
 	Agg_Debt = (Agg_Debt/Wealth)!**2.0_dp
 
 
