@@ -2965,12 +2965,12 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	QBAR_aux  = QBAR 
 	NBAR_aux  = NBAR 
 	K_aux     = K
-	theta     = 3.0_dp; print*, 'theta= ',theta
+	theta     = 3.0_dp; print*, ' '; print*, 'theta= ',theta(1); print*, ' '
 	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	CALL FIND_DBN_EQ
 	theta     = 10.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
-	theta     = 20.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
+	theta     = 15.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
 	theta     = 30.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
