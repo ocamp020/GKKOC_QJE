@@ -2925,7 +2925,7 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	integer, intent(in) :: bench_indx
 	real(dp), dimension(na,nz,nx) :: K_Mat, TFPR_i=0.0_dp
 	real(dp) :: TFP, TFP_star, TFPR_bar, size, K, theta_aux(nz),YBAR_aux,QBAR_aux,K_aux,NBAR_aux
-	integer  :: i_a, i_z, i_x
+	integer  :: i_a, i_z, i_x, i_theta
 
 	size = 1.0_dp ! sum(DBN1(:,:,:,:,:,1:2))
 
@@ -2965,17 +2965,11 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	QBAR_aux  = QBAR 
 	NBAR_aux  = NBAR 
 	K_aux     = K
-	theta     = 3.0_dp; print*, ' '; print*, 'theta= ',theta(1); print*, ' '
 	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+	do i_theta = 4,1000,2
+	theta     = real(i_theta,8); print*, ' '; print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
-	theta     = 10.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
-	CALL FIND_DBN_EQ
-	theta     = 15.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
-	CALL FIND_DBN_EQ
-	theta     = 20.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
-	CALL FIND_DBN_EQ
-	theta     = 30.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
-	CALL FIND_DBN_EQ
+	enddo 
 	theta     = big_p ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
 	theta     = theta_aux 
