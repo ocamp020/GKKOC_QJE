@@ -2972,9 +2972,9 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	CALL FIND_DBN_EQ
 	theta     = 15.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
-	theta     = 30.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
+	theta     = 20.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
-	theta     = 50.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
+	theta     = 30.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
 	theta     = big_p ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
