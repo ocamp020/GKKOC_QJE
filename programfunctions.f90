@@ -2968,15 +2968,15 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	theta     = 3.0_dp; print*, 'theta= ',theta
 	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	CALL FIND_DBN_EQ
-	theta     = 10.0_dp ; print*, 'theta= ',theta(1); print*, ' '
+	theta     = 10.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
-	theta     = 30.0_dp ; print*, 'theta= ',theta(1); print*, ' '
+	theta     = 20.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
-	theta     = 50.0_dp ; print*, 'theta= ',theta(1); print*, ' '
+	theta     = 30.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
-	theta     = 100.0_dp ; print*, 'theta= ',theta(1); print*, ' '
+	theta     = 50.0_dp ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
-	theta     = big_p ; print*, 'theta= ',theta(1); print*, ' '
+	theta     = big_p ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
 	theta     = theta_aux 
 	K         = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
