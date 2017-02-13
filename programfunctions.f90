@@ -1721,7 +1721,7 @@ SUBROUTINE FIND_DBN_EQ()
 	use omp_lib
 	IMPLICIT NONE
 	INTEGER:: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
-	REAL   :: DBN_dist, DBN_criteria,R_old
+	REAL   :: DBN_dist, DBN_criteria
 	real(dp)   ::BBAR, MeanWealth, brent_value
 	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, DBN2
 	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi
@@ -1887,7 +1887,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    ENDDO
 	    ENDDO
 	    
-	    DBN2 = 0.7*DBN1 + 0.3*DBN2
+	    DBN2 = 0.8*DBN1 + 0.2*DBN2
 	    DBN_dist = maxval(abs(DBN2-DBN1))
 	    ! print*, DBN_dist
 	    DBN1 = DBN2
@@ -1923,15 +1923,13 @@ SUBROUTINE FIND_DBN_EQ()
 	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 
 	    	! Solve for new R 
-	    	R_old = R
 	    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
 	    	if (sum(theta)/nz .gt. 1.0_DP) then
 	    		P = min(P,1.0_dp)
-	           brent_value = brent(-0.1_DP,-0.03_DP,1.0_DP,Agg_Debt, brent_tol,R)
+	           brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R)
             else
                 R = 0.0_DP
 	        endif
-	        ! R = 0.2*R_old + 0.8*R 
 
 	    	!!
 	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P
@@ -2967,7 +2965,19 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	QBAR_aux  = QBAR 
 	NBAR_aux  = NBAR 
 	K_aux     = K
-	theta     = big_p 
+	theta     = 3.0_dp 
+	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+	CALL FIND_DBN_EQ
+	theta     = 10.0_dp 
+	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+	CALL FIND_DBN_EQ
+	theta     = 100.0_dp 
+	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+	CALL FIND_DBN_EQ
+	theta     = 1000.0_dp 
+	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+	CALL FIND_DBN_EQ
+	theta     = big_p
 	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	CALL FIND_DBN_EQ
 	theta     = theta_aux 
