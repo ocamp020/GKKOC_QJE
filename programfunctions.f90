@@ -1931,7 +1931,7 @@ SUBROUTINE FIND_DBN_EQ()
             else
                 R = 0.0_DP
 	        endif
-	        R = 0.2*R_old + 0.8*R 
+	        ! R = 0.2*R_old + 0.8*R 
 
 	    	!!
 	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P
