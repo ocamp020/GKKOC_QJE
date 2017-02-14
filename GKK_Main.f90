@@ -363,14 +363,14 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		write(*,*) "Benchmark variables"
 		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"P=",P,"wage=",wage,'R=',R
 
-		print*,"	Efficiency Computation"
-		CALL Hsieh_Klenow_Efficiency(solving_bench)
-
-
 		! Deallocate variables
 		if (compute_bench.eqv..false.) then 
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 		endif 
+
+
+		! print*,"	Efficiency Computation"
+		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
 end Subroutine Solve_Benchmark
 
@@ -539,11 +539,13 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	print*,"Wealth_factor=",Wealth_factor
 	print*," "
 
-	print*,"	Efficiency Computation"
-		CALL Hsieh_Klenow_Efficiency(solving_bench)
 
 	! Deallocate variables
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+	print*,"	Efficiency Computation"
+		CALL Hsieh_Klenow_Efficiency(solving_bench)
+
 
 end Subroutine Solve_Experiment
 
@@ -700,11 +702,13 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 		CALL SIMULATION(solving_bench)
 	endif
 
-	print*,"	Efficiency Computation"
-		CALL Hsieh_Klenow_Efficiency(solving_bench)
 
 	! Deallocate variables
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+	print*,"	Efficiency Computation"
+		CALL Hsieh_Klenow_Efficiency(solving_bench)
+
 
 end Subroutine Solve_Experiment_tauC
 
