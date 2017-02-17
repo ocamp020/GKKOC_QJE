@@ -135,7 +135,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 	real(DP), intent(in) :: tauC_in
 	logical , intent(in) :: Opt_Tax_KW ! Find capital taxes if true, and wealth taxes if false
 	real(DP) :: EQ_WELFARE_GIVEN_TauC
-	real(DP) :: brentvaluet, tau_indicator
+	real(DP) :: brentvaluet, tau_indicator(1)
 
 	tauC = tauC_in 
 
