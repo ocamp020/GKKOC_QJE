@@ -137,7 +137,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 	real(DP) :: EQ_WELFARE_GIVEN_TauC
 	real(DP) :: brentvaluet, tau_indicator
 
-	tau_C = tauC_in 
+	tauC = tauC_in 
 
 	! Get capital and wealth taxes that balance the budget
 	if (Opt_Tax_KW) then 
@@ -312,7 +312,8 @@ END SUBROUTINE GOVNT_BUDGET_OPT
 
 Function diff_GBAR(tau_in,tau_indicator)
 	implicit none 
-	real(dp), intent(in) :: tau_in, tau_indicator 
+	real(dp), intent(in) :: tau_in
+	real(dp), dimension(:), intent(in) :: tau_indicator 
 
 	! Set taxes
 	if (tau_indicator.eq.1.0_dp) then 
