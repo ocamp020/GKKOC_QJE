@@ -204,11 +204,11 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 	!CLOSE (unit=3)
 	!
 	!print*,'tauW=', tauW, ' CE_NEWBORN=', CE_NEWBORN, 'Av. Util=',sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
-	print* ' '
+	print*, ' '
 	print*, 'tauC',tauC,'tauK',tauK,'tauW_at=', tauW_at,, 'Psi=', psi'Av_Utility_NEWBORN=', -EQ_WELFARE_GIVEN_TauC
-	print* ' '
+	print*, ' '
 
-END  FUNCTION EQ_WELFARE_GIVEN_TauW
+END  FUNCTION EQ_WELFARE_GIVEN_TauC
 
 
 !====================================================================
