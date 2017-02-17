@@ -317,7 +317,7 @@ Function diff_GBAR(tau_in,tau_indicator)
 	real(dp) :: diff_GBAR
 
 	! Set taxes
-	if (tau_indicator.eq.1.0_dp) then 
+	if (tau_indicator(1).eq.1.0_dp) then 
 		tauK = tau_in 
 	else 
 		tauW_at = tau_in
