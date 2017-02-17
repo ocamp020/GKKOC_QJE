@@ -228,6 +228,15 @@ END SUBROUTINE GOVNT_BUDGET_OPT
 !================================================================================
 
 
+! brent for a functon diff_GBAR
+
+! diff_GBAR
+
+! solve model
+! compute GBAR
+! diff_GBAR = (GBAR-gBAR_bench)**2 
+
+
 
 
 

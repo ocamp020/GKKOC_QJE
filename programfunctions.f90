@@ -2965,8 +2965,8 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	QBAR_aux  = QBAR 
 	NBAR_aux  = NBAR 
 	K_aux     = K
-	do i_theta = 8,1000,1
-	theta     = real(i_theta/2,8); print*, ' '; print*, 'theta= ',theta(1); print*, ' '
+	do i_theta = 9,1000,1
+	theta     = real(i_theta,8)/2.0_dp; print*, ' '; print*, 'theta= ',theta(1); print*, ' '
 	CALL FIND_DBN_EQ
 	enddo 
 	theta     = big_p ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
