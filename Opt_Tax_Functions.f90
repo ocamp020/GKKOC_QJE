@@ -128,6 +128,88 @@ FUNCTION EQ_WELFARE_GIVEN_TauW(tauW_in)
 
 END  FUNCTION EQ_WELFARE_GIVEN_TauW
 
+!================================================================================
+
+FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
+	IMPLICIT NONE 
+	real(DP), intent(in) :: tauC_in
+	logical , intent(in) :: Opt_Tax_KW ! Find capital taxes if true, and wealth taxes if false
+	real(DP) :: EQ_WELFARE_GIVEN_TauC
+	real(DP) :: brentvaluet, tau_indicator
+
+	tau_C = tauC_in 
+
+	! Get capital and wealth taxes that balance the budget
+	if (Opt_Tax_KW) then 
+		tauW_at = 0.0_dp 
+		tau_indicator = 1.0_dp 
+		! Solve model at current taxes 
+		CALL FIND_DBN_EQ
+	    CALL GOVNT_BUDGET
+	    GBAR_exp = GBAR  
+		! Bracket budget balancing taxes 
+		do while (GBAR_exp>GBAR_bench) 
+			tauK = tauK - 0.05_dp
+			CALL FIND_DBN_EQ
+		    CALL GOVNT_BUDGET
+		    GBAR_exp = GBAR  
+		enddo 
+		! Find budget balancing taxes	
+		brentvaluet = brent_p( tauK , tauK + 0.025 , tauK + 0.05_dp , diff_GBAR , brent_tol, tauK , tau_indicator ) 
+	else 
+		tauK = 0.0_dp 
+		tau_indicator = 0.0_dp 
+		! Solve model at current taxes 
+		CALL FIND_DBN_EQ
+	    CALL GOVNT_BUDGET
+	    GBAR_exp = GBAR  
+		! Bracket budget balancing taxes 
+		do while (GBAR_exp>GBAR_bench) 
+			tauW_at = tauW_at - 0.005_dp
+			CALL FIND_DBN_EQ
+		    CALL GOVNT_BUDGET
+		    GBAR_exp = GBAR  
+		enddo 
+		! Find budget balancing taxes	
+		brentvaluet = brent_p( tauW_at , tauW_at + 0.0025 , tauW_at + 0.005_dp , diff_GBAR , brent_tol, tauK , tau_indicator ) 
+	endif 
+
+
+	! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+	!CALL COMPUTE_WELFARE_GAIN
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL Firm_Value
+    	EQ_WELFARE_GIVEN_TauC = - sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+    !CALL COMPUTE_STATS
+
+	!OPEN   (UNIT=3, FILE='psi', STATUS='replace')
+	!print*,'Budget balancing psi=',psi
+	!WRITE(unit=3, FMT=*) psi
+	!CLOSE (unit=3)
+	!
+	!print*,'tauW=', tauW, ' CE_NEWBORN=', CE_NEWBORN, 'Av. Util=',sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+	print* ' '
+	print*, 'tauC',tauC,'tauK',tauK,'tauW_at=', tauW_at,, 'Psi=', psi'Av_Utility_NEWBORN=', -EQ_WELFARE_GIVEN_TauC
+	print* ' '
+
+END  FUNCTION EQ_WELFARE_GIVEN_TauW
+
 
 !====================================================================
 
@@ -228,15 +310,32 @@ END SUBROUTINE GOVNT_BUDGET_OPT
 !================================================================================
 
 
-! brent for a functon diff_GBAR
+Function diff_GBAR(tau_in,tau_indicator)
+	implicit none 
+	real(dp), intent(in) :: tau_in, tau_indicator 
 
-! diff_GBAR
+	! Set taxes
+	if (tau_indicator.eq.1.0_dp) then 
+		tauK = tau_in 
+	else 
+		tauW_at = tau_in
+	endif 
 
-! solve model
-! compute GBAR
-! diff_GBAR = (GBAR-gBAR_bench)**2 
+	! Solve the model
+	CALL FIND_DBN_EQ
+    CALL GOVNT_BUDGET
+    GBAR_exp = GBAR  
+
+    ! Get GBAR difference
+    diff_GBAR = (GBAR_exp-gBAR_bench)**2 
+
+    print*, ' '; print*, 'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' '
 
 
+end Function diff_GBAR
+
+
+!================================================================================
 
 
 
