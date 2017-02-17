@@ -152,7 +152,8 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 			tauK = tauK - 0.05_dp
 			CALL FIND_DBN_EQ
 		    CALL GOVNT_BUDGET
-		    GBAR_exp = GBAR  
+		    GBAR_exp = GBAR 
+		    print*, ' '; print*, 'tauC=',tauC,'tauK=',tauK,'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' ' 
 		enddo 
 		! Find budget balancing taxes	
 		brentvaluet = brent_p( tauK , tauK + 0.025 , tauK + 0.05_dp , diff_GBAR , brent_tol, tauK , tau_indicator ) 
@@ -169,6 +170,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 			CALL FIND_DBN_EQ
 		    CALL GOVNT_BUDGET
 		    GBAR_exp = GBAR  
+		    print*, ' '; print*, 'tauC=',tauC,'tauW=',tauW_at,'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' ' 
 		enddo 
 		! Find budget balancing taxes	
 		brentvaluet = brent_p( tauW_at , tauW_at + 0.0025 , tauW_at + 0.005_dp , diff_GBAR , brent_tol, tauK , tau_indicator ) 
@@ -331,7 +333,7 @@ Function diff_GBAR(tau_in,tau_indicator)
     ! Get GBAR difference
     diff_GBAR = (GBAR_exp-gBAR_bench)**2 
 
-    print*, ' '; print*, 'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' '
+    print*, ' '; print*, 'tauC=',tauC,'tau_in=',tau_in,'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' '
 
 
 end Function diff_GBAR
