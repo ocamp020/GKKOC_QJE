@@ -1494,17 +1494,17 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		PRINT*,''
 		Print*,'--------------- OPTIMAL WEALTH TAXES - Consumption Taxes -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_w.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_w_2.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
     	! Start tauW at some level that guarantees enough revenue
     	tauW_at = 0.03_dp
 
-    	! CALL Write_Experimental_Results(.false.)
+    	CALL Write_Experimental_Results(.false.)
 
-    	DO tauC_ind = 1,15,1
+    	DO tauC_ind = 9,15,1
 
-    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_w.txt', STATUS='old', POSITION='append')
+    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_w_2.txt', STATUS='old', POSITION='append')
 
 			tauC = real(tauC_ind,8)/10.0_dp
 			print*, ' '
@@ -1546,7 +1546,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 	    ENDDO
 
 
-	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_c_w.txt', STATUS='replace')
+	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_c_w_2.txt', STATUS='replace')
 
 		tauW_at = OPT_tauW
 		psi 	= OPT_psi
