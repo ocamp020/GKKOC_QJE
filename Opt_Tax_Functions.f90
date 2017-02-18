@@ -166,7 +166,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 	    GBAR_exp = GBAR  
 		! Bracket budget balancing taxes 
 		do while (GBAR_exp>GBAR_bench) 
-			tauW_at = tauW_at - 0.005_dp
+			tauW_at = tauW_at - 0.001_dp
 			CALL FIND_DBN_EQ
 		    CALL GOVNT_BUDGET
 		    GBAR_exp = GBAR  
