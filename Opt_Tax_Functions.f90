@@ -173,7 +173,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 		    print*, ' '; print*, 'tauC=',tauC,'tauW=',tauW_at,'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' ' 
 		enddo 
 		! Find budget balancing taxes	
-		brentvaluet = brent_p( tauW_at , tauW_at + 0.0025 , tauW_at + 0.005_dp , diff_GBAR , brent_tol, tauK , tau_indicator ) 
+		brentvaluet = brent_p( tauW_at , tauW_at + 0.0005 , tauW_at + 0.001_dp , diff_GBAR , brent_tol, tauK , tau_indicator ) 
 	endif 
 
 
