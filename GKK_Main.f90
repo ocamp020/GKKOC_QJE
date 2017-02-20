@@ -1404,6 +1404,11 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		maxbrentvaluet=-10000.0_DP
 	
 	print*,'Optimal Tax Loop'
+
+	print*, ' '
+	print*, sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	print*, sum(DBN_bench(1,:,:,:,:,:))
+	print*, sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))
 	
 		
 
