@@ -4525,6 +4525,8 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Labor_Tax/Total_Tax'		, GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
 			WRITE(UNIT=19, FMT=*) 'Labor_Tax/GDP'			, GBAR_L/YBAR
 			WRITE(UNIT=19, FMT=*) 'Average_Labor_Tax'		, GBAR_L/Tot_Lab_Inc
+			WRITE(UNIT=19, FMT=*) 'Cons_Tax/Total_Tax'		, GBAR_C/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+			WRITE(UNIT=19, FMT=*) 'Cons_Tax/GDP'			, GBAR_C/YBAR
 			WRITE(UNIT=19, FMT=*) ' '
 		CLOSE(Unit=19)
 	if (bench_indx.ne.1) then

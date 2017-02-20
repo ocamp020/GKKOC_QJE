@@ -1404,11 +1404,6 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		maxbrentvaluet=-10000.0_DP
 	
 	print*,'Optimal Tax Loop'
-
-	print*, ' '
-	print*, sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-	print*, sum(DBN_bench(1,:,:,:,:,:))
-	print*, sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))
 	
 		
 
@@ -1423,7 +1418,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
     	! Start tauK at some level that guarantees enough revenue
     	tauK = 0.25_dp
 
-    	DO tauC_ind = 1,15,1
+    	DO tauC_ind = 1,4,1
 
     		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_k.txt', STATUS='old', POSITION='append')
 
@@ -1434,8 +1429,38 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 
             brentvaluet = - EQ_WELFARE_GIVEN_TauC(tauC,Opt_Tax_KW)
 
-            ! Compute moments
+            
+            ! Aggregate variable in experimental economy
+			GBAR_exp  = GBAR
+			QBAR_exp  = QBAR 
+			NBAR_exp  = NBAR  
+			Y_exp 	  = YBAR
+			Ebar_exp  = EBAR
+			P_exp     = P
+			R_exp	  = R
+			wage_exp  = wage
+			tauK_exp  = tauK
+			tauPL_exp = tauPL
+			psi_exp   = psi
+			DBN_exp   = DBN1
+			tauw_bt_exp = tauW_bt
+			tauw_at_exp = tauW_at
+			Y_a_threshold_exp = Y_a_threshold
+
+			ValueFunction_exp = ValueFunction
+			Cons_exp          = Cons           
+			Hours_exp         = Hours
+			Aprime_exp        = Aprime 
+
+			! Compute moments
 			CALL COMPUTE_STATS
+			CALL GOVNT_BUDGET
+			
+			! Compute welfare gain between economies
+			CALL COMPUTE_WELFARE_GAIN
+
+			! Write experimental results in output.txt
+			CALL WRITE_VARIABLES(0)
 
 		    if (brentvaluet .gt. maxbrentvaluet) then
 		        maxbrentvaluet = brentvaluet
@@ -1448,7 +1473,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		    print*,'';print*, 'tauC',tauC,'tauK=', tauK, 'YBAR=', YBAR, & 
 		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
 		      
-		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+		    WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
@@ -1459,7 +1484,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
 		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
 		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-	      	  & tauC 
+		      & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_NB
 
 	    	CLOSE (unit=77) 
 	    	Call Write_Experimental_Results(.true.)
@@ -1477,7 +1502,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 
 		print*, "Optimal tau_K=", tauK, "Optimal psi=", psi, 'Optimal tauC=',tauC
 
-		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+		WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
@@ -1488,7 +1513,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
 		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
 		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-	      	  & tauC
+		      & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_NB
 
 
 		CLOSE (UNIT=77)
@@ -1499,17 +1524,17 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		PRINT*,''
 		Print*,'--------------- OPTIMAL WEALTH TAXES - Consumption Taxes -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_w_2.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_w.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
     	! Start tauW at some level that guarantees enough revenue
     	tauW_at = 0.03_dp
 
-    	CALL Write_Experimental_Results(.false.)
+    	! CALL Write_Experimental_Results(.false.)
 
-    	DO tauC_ind = 9,15,1
+    	DO tauC_ind = 1,8,1
 
-    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_w_2.txt', STATUS='old', POSITION='append')
+    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_w.txt', STATUS='old', POSITION='append')
 
 			tauC = real(tauC_ind,8)/10.0_dp
 			print*, ' '
@@ -1518,8 +1543,37 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 
             brentvaluet = - EQ_WELFARE_GIVEN_TauC(tauC,Opt_Tax_KW)
 
-            ! Compute moments
+            ! Aggregate variable in experimental economy
+			GBAR_exp  = GBAR
+			QBAR_exp  = QBAR 
+			NBAR_exp  = NBAR  
+			Y_exp 	  = YBAR
+			Ebar_exp  = EBAR
+			P_exp     = P
+			R_exp	  = R
+			wage_exp  = wage
+			tauK_exp  = tauK
+			tauPL_exp = tauPL
+			psi_exp   = psi
+			DBN_exp   = DBN1
+			tauw_bt_exp = tauW_bt
+			tauw_at_exp = tauW_at
+			Y_a_threshold_exp = Y_a_threshold
+
+			ValueFunction_exp = ValueFunction
+			Cons_exp          = Cons           
+			Hours_exp         = Hours
+			Aprime_exp        = Aprime 
+
+			! Compute moments
 			CALL COMPUTE_STATS
+			CALL GOVNT_BUDGET
+			
+			! Compute welfare gain between economies
+			CALL COMPUTE_WELFARE_GAIN
+
+			! Write experimental results in output.txt
+			CALL WRITE_VARIABLES(0)
 
 		    if (brentvaluet .gt. maxbrentvaluet) then
 		        maxbrentvaluet = brentvaluet
@@ -1532,7 +1586,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		    print*,''; print*, 'tauC=', tauC,'psi=',psi,'tauW=', tauW_at, 'YBAR=', YBAR, & 
 		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
 		      
-		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
+		    WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
@@ -1543,7 +1597,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
 		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
 		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-		      & tauC
+		      & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_NB
 
 		    CLOSE (unit=77)
 		    Call Write_Experimental_Results(.true.)
@@ -1551,7 +1605,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 	    ENDDO
 
 
-	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_c_w_2.txt', STATUS='replace')
+	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_c_w.txt', STATUS='replace')
 
 		tauW_at = OPT_tauW
 		psi 	= OPT_psi
@@ -1562,7 +1616,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 
 		print*, "Optimal tau_C=",tauC,"Optimal tau_W=", tauW_at, "Optimal psi=", psi
 		
-		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+		WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
@@ -1573,7 +1627,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
 		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
 		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-		      & tauC
+		      & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_NB
 
 
 		CLOSE (UNIT=77)
