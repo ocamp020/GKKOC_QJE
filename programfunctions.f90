@@ -2220,7 +2220,8 @@ SUBROUTINE FIND_DBN_EQ_PF()
 
 
 	    	!!
-	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P
+	    	print*, ' '
+	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P,'Assets',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 	    	!!
 	    simutime  = simutime +1 
 	 
