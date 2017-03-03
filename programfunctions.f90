@@ -2216,7 +2216,7 @@ SUBROUTINE FIND_DBN_EQ_PF()
 	    ENDDO
 	    ENDDO
 	    
-	    DBN2 = 0.9*DBN1 + 0.1*DBN2
+	    ! DBN2 = 0.9*DBN1 + 0.1*DBN2
 	    DBN_dist = maxval(abs(DBN2-DBN1))
 	    ! print*, DBN_dist
 	    DBN1 = DBN2
@@ -2226,7 +2226,6 @@ SUBROUTINE FIND_DBN_EQ_PF()
 
 
 	    	!!
-	    	print*, ' '
 	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P,'Assets',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 	    	!!
 	    simutime  = simutime +1 
