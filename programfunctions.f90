@@ -2043,8 +2043,6 @@ SUBROUTINE FIND_DBN_EQ_PF()
 	! Solve the model at current aggregate values
 		! Find the threshold for wealth taxes (a_bar)
 			!call Find_TauW_Threshold(DBN1,Y_a_threshold)
-		! Adjust grid to include breaking points
-			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		! Compute labor units 
 			CALL ComputeLaborUnits(Ebar, wage) 
 		! Compute Capital demand and Profits by (a,z)
