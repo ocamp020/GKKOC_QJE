@@ -848,7 +848,7 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 
 	endif 
 	
-	CALL Write_Experimental_Results(compute_exp)
+	CALL Write_Experimental_Results(compute_exp_pf)
 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 	K_mat  = K_Matrix(R,P)
 	Pr_mat = Profit_Matrix(R,P)
