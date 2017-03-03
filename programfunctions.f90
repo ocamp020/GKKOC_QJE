@@ -2074,15 +2074,15 @@ SUBROUTINE FIND_DBN_EQ_PF()
 	DO ai=1,na
 	DO lambdai=1,nlambda
 	DO ei=1, ne
-		! ! Get Aprime
-		! if (age.lt.RetAge) then 
-		! Aprime(age, ai, zi, lambdai,ei,xi) = min( amin , max( amax , &
-		! 			& YGRID(ai,zi,xi)  + Y_h(Hours(age, ai, zi, lambdai,ei,xi),age,lambdai,ei,wage)  & 
-		!             & - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) ) )
-  !       else 
-  !       Aprime(age, ai, zi, lambdai,ei,xi) = min( amin , max( amax , &
-		! 			& YGRID(ai,zi,xi)  + RetY_lambda_e(lambdai,ei) - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) ))
-  !       endif 
+		! Get Aprime
+		if (age.lt.RetAge) then 
+		Aprime(age, ai, zi, lambdai,ei,xi) = min( amin , max( amax , &
+					& YGRID(ai,zi,xi)  + Y_h(Hours(age, ai, zi, lambdai,ei,xi),age,lambdai,ei,wage)  & 
+		            & - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) ) )
+        else 
+        Aprime(age, ai, zi, lambdai,ei,xi) = min( amin , max( amax , &
+					& YGRID(ai,zi,xi)  + RetY_lambda_e(lambdai,ei) - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) ))
+        endif 
         ! Discretize Aprime
         if ( Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
             tklo =na-1
