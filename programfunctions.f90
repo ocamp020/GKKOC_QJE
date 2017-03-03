@@ -2043,6 +2043,8 @@ SUBROUTINE FIND_DBN_EQ_PF()
 	! Solve the model at current aggregate values
 		! Find the threshold for wealth taxes (a_bar)
 			!call Find_TauW_Threshold(DBN1,Y_a_threshold)
+		! Adjust grid to include breaking points
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		! Compute labor units 
 			CALL ComputeLaborUnits(Ebar, wage) 
 		! Compute Capital demand and Profits by (a,z)
@@ -2252,6 +2254,13 @@ SUBROUTINE FIND_DBN_EQ_PF()
 	        QBAR = ( QBAR)**(1.0_DP/mu)                
 	        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
 	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+
+    	! Deallocate policy functions on adjusted grid (so that they can be allocated later)
+			deallocate( YGRID_t  )
+			deallocate( MBGRID_t ) 
+			deallocate( Cons_t   )
+			deallocate( Hours_t  )
+			deallocate( Aprime_t )
 
 
 END SUBROUTINE FIND_DBN_EQ_PF
