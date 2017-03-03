@@ -2052,6 +2052,7 @@ SUBROUTINE FIND_DBN_EQ_PF()
 			Pr_mat = Profit_Matrix(R,P)
 		! Form YGRID for the capital income economy given interest rate "P"
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
+			print*,' '; print*, 'YGRID';print*, YGRID(180:200,9,1)
 		
 
 	! Solve for policy and value functions 
@@ -2217,18 +2218,10 @@ SUBROUTINE FIND_DBN_EQ_PF()
 	    ! Instead of adjusting policy functions to be consistent with current DBN at each iteration
 	    ! The code iterates the distribution and only updates policy functions every "update_period"
 
-	    ! Update of policy function with current aggregates
-	    IF (iter_indx .ge. update_period) THEN
 
 	    	!!
 	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P
 	    	!!
-
-		    ! Reset counter for next update of policy functions
-	        iter_indx=0
-	    ENDIF
-	    
-	    iter_indx = iter_indx + 1
 	    simutime  = simutime +1 
 	 
 	ENDDO ! WHILE
