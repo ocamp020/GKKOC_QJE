@@ -2055,10 +2055,10 @@ SUBROUTINE FIND_DBN_EQ_PF()
 			YGRID_old = YGRID 
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 			print*,' '; print*, 'YGRID';
-			print*, YGRID_old(5,9,1) , YGRID(5,9,1)
-			print*, YGRID_old(55,9,1) , YGRID(55,9,1)
-			print*, YGRID_old(105,9,1) , YGRID(105,9,1)
-			print*, YGRID_old(155,9,1) , YGRID(155,9,1)
+			print*, YGRID_old(5,4,1) , YGRID(5,4,1)
+			print*, YGRID_old(55,4,1) , YGRID(55,4,1)
+			print*, YGRID_old(105,4,1) , YGRID(105,4,1)
+			print*, YGRID_old(155,4,1) , YGRID(155,4,1)
 		
 
 	! Solve for policy and value functions 
