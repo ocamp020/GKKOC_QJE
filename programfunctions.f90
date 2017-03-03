@@ -2036,6 +2036,7 @@ SUBROUTINE FIND_DBN_EQ_PF()
 	real(dp)   ::BBAR, MeanWealth, brent_value
 	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, DBN2
 	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi
+	real(dp), dimension(na,nz,nx) :: YGRID_old
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-08_DP
@@ -2051,8 +2052,13 @@ SUBROUTINE FIND_DBN_EQ_PF()
 			K_mat  = K_Matrix(R,P)
 			Pr_mat = Profit_Matrix(R,P)
 		! Form YGRID for the capital income economy given interest rate "P"
+			YGRID_old = YGRID 
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
-			! print*,' '; print*, 'YGRID';print*, YGRID(180:200,9,1)
+			print*,' '; print*, 'YGRID';
+			print*, YGRID_old(5,9,1) , YGRID(5,9,1)
+			print*, YGRID_old(55,9,1) , YGRID(55,9,1)
+			print*, YGRID_old(105,9,1) , YGRID(105,9,1)
+			print*, YGRID_old(155,9,1) , YGRID(155,9,1)
 		
 
 	! Solve for policy and value functions 
