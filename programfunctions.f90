@@ -2054,11 +2054,11 @@ SUBROUTINE FIND_DBN_EQ_PF()
 		! Form YGRID for the capital income economy given interest rate "P"
 			YGRID_old = YGRID 
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
-			print*,' '; print*, 'YGRID';
-			print*, YGRID_old(5,4,1) , YGRID(5,4,1)
-			print*, YGRID_old(55,4,1) , YGRID(55,4,1)
-			print*, YGRID_old(105,4,1) , YGRID(105,4,1)
-			print*, YGRID_old(155,4,1) , YGRID(155,4,1)
+			! print*,' '; print*, 'YGRID';
+			! print*, YGRID_old(5,4,1) , YGRID(5,4,1)
+			! print*, YGRID_old(55,4,1) , YGRID(55,4,1)
+			! print*, YGRID_old(105,4,1) , YGRID(105,4,1)
+			! print*, YGRID_old(155,4,1) , YGRID(155,4,1)
 		
 
 	! Solve for policy and value functions 
@@ -2076,12 +2076,12 @@ SUBROUTINE FIND_DBN_EQ_PF()
 	DO ei=1, ne
 		! Get Aprime
 		if (age.lt.RetAge) then 
-		Aprime(age, ai, zi, lambdai,ei,xi) = min( amin , max( amax , &
-					& YGRID_old(ai,zi,xi)  + Y_h(Hours(age, ai, zi, lambdai,ei,xi),age,lambdai,ei,wage)  & 
+		Aprime(age, ai, zi, lambdai,ei,xi) = max( amin , min( amax , &
+					& YGRID(ai,zi,xi)  + Y_h(Hours(age, ai, zi, lambdai,ei,xi),age,lambdai,ei,wage)  & 
 		            & - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) ) )
         else 
-        Aprime(age, ai, zi, lambdai,ei,xi) = min( amin , max( amax , &
-					& YGRID_old(ai,zi,xi)  + RetY_lambda_e(lambdai,ei) - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) ))
+        Aprime(age, ai, zi, lambdai,ei,xi) = max( amin , min( amax , &
+					& YGRID(ai,zi,xi)  + RetY_lambda_e(lambdai,ei) - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) ))
         endif 
         ! Discretize Aprime
         if ( Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
