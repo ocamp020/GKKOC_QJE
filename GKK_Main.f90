@@ -196,7 +196,7 @@ PROGRAM main
 		if (Tax_Reform) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
 			
-			if (compute_exp_pf)
+			if (compute_exp_pf) then
 				Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions/'
 				call system( 'mkdir -p ' // trim(Result_Folder) )
 				call Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
