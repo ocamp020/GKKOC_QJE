@@ -785,7 +785,7 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 			tauWindx = 0.0_DP
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
 			OPEN(UNIT=19, FILE=trim(Result_Folder)//'Laffer_Curve.txt', STATUS='replace')
-			DO WHILE (GBAR_exp .lt. GBAR_bench)
+			! DO WHILE (GBAR_exp .lt. GBAR_bench)
 			DO aa = 1,20
 				! Set old G and new value of tauW
 				GBAR_exp_old = GBAR_exp
