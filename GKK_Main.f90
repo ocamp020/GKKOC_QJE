@@ -754,6 +754,7 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 	use omp_lib
 	implicit none 
 	logical, intent(in) :: compute_exp_pf, Simul_Switch
+	integer :: aa
 
 	!====================================================================================================
 	PRINT*,''
@@ -783,7 +784,9 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 			tauW_at  = tauWmin_at
 			tauWindx = 0.0_DP
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
+			OPEN(UNIT=19, FILE=trim(Result_Folder)//'Laffer_Curve.txt', STATUS='replace')
 			DO WHILE (GBAR_exp .lt. GBAR_bench)
+			DO aa = 1,20
 				! Set old G and new value of tauW
 				GBAR_exp_old = GBAR_exp
 				tauW_bt = tauWmin_bt + tauWindx * tauWinc_bt
@@ -799,7 +802,11 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 				write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
 				print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
 				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+				WRITE(UNIT=19, FMT=*) 'tau_W',tauW_at,'GBAR',GBAR_exp,'Assets',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 			ENDDO
+			CLOSE(UNIT=19)
+			print*,' Program stoped by Sergio'
+			STOP
 
 			! Set tauW as weighted average of point in  the grid to balance budget more precisely
 				tauW_up_bt  = tauW_bt
