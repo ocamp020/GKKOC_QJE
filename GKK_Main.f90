@@ -754,7 +754,7 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 	use omp_lib
 	implicit none 
 	logical, intent(in) :: compute_exp_pf, Simul_Switch
-	integer :: aa
+	integer :: aa, age1, a1, z1, lambda1, e1, x1
 
 	!====================================================================================================
 	PRINT*,''
