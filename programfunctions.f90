@@ -2232,27 +2232,27 @@ SUBROUTINE FIND_DBN_EQ_PF()
 	 
 	ENDDO ! WHILE
 
-    	! Compute aggregates with current distribution
-	        QBAR =0.0
-	        NBAR =0.0
-	        DO x1=1,nx
-	        DO age1=1,MaxAge
-	        DO z1=1,nz
-	        DO a1=1,na
-	        DO lambda1=1,nlambda
-	        DO e1=1, ne
-	             QBAR= QBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
-	             NBAR= NBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * eff_un(age1, lambda1, e1) * Hours(age1, a1, z1, lambda1,e1,x1)
-	        ENDDO
-	        ENDDO
-	        ENDDO
-	        ENDDO    
-	        ENDDO    
-	        ENDDO    
+    	! ! Compute aggregates with current distribution
+	    !     QBAR =0.0
+	    !     NBAR =0.0
+	    !     DO x1=1,nx
+	    !     DO age1=1,MaxAge
+	    !     DO z1=1,nz
+	    !     DO a1=1,na
+	    !     DO lambda1=1,nlambda
+	    !     DO e1=1, ne
+	    !          QBAR= QBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
+	    !          NBAR= NBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * eff_un(age1, lambda1, e1) * Hours(age1, a1, z1, lambda1,e1,x1)
+	    !     ENDDO
+	    !     ENDDO
+	    !     ENDDO
+	    !     ENDDO    
+	    !     ENDDO    
+	    !     ENDDO    
 	    
-	        QBAR = ( QBAR)**(1.0_DP/mu)                
-	        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
-	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+	    !     QBAR = ( QBAR)**(1.0_DP/mu)                
+	    !     YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
+	    !     Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 
     	! Deallocate policy functions on adjusted grid (so that they can be allocated later)
 			deallocate( YGRID_t  )
