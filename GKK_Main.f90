@@ -766,7 +766,7 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 		solving_bench=0
 	! Set capital taxes to zero
 		tauK = 0.0_DP
-		tauWmin_at= 0.0039_DP
+		tauWmin_at= 0.003_DP
 		tauWinc_at= 0.00001_DP
 	! Set Y_a_threshold
 		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
@@ -785,7 +785,7 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 			tauWindx = 0.0_DP
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
 			OPEN(UNIT=19, FILE=trim(Result_Folder)//'Laffer_Curve.txt', STATUS='replace')
-			DO aa = 1,11
+			DO aa = 1,101
 			! DO WHILE (GBAR_exp .lt. GBAR_bench)
 				! Set old G and new value of tauW
 				GBAR_exp_old = GBAR_exp
