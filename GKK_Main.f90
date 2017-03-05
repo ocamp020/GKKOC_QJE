@@ -766,8 +766,8 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 		solving_bench=0
 	! Set capital taxes to zero
 		tauK = 0.0_DP
-		tauWmin_at= 0.003_DP
-		tauWinc_at= 0.0001_DP
+		tauWmin_at= 0.0039_DP
+		tauWinc_at= 0.00001_DP
 	! Set Y_a_threshold
 		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
 		!Y_a_threshold = 0.0_dp ! big_p   !8.1812138704441200
