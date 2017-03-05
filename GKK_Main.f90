@@ -850,12 +850,35 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
 				ENDDO
 
+	    	! Compute aggregates with current distribution
+	        QBAR =0.0
+	        NBAR =0.0
+	        DO x1=1,nx
+	        DO age1=1,MaxAge
+	        DO z1=1,nz
+	        DO a1=1,na
+	        DO lambda1=1,nlambda
+	        DO e1=1, ne
+	             QBAR= QBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
+	             NBAR= NBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * eff_un(age1, lambda1, e1) * Hours(age1, a1, z1, lambda1,e1,x1)
+	        ENDDO
+	        ENDDO
+	        ENDDO
+	        ENDDO    
+	        ENDDO    
+	        ENDDO    
+	    
+	        QBAR = ( QBAR)**(1.0_DP/mu)                
+	        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
+	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+
 		! Compute value function and store policy functions, value function and distribution in file
 		! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
 		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
 		CALL Firm_Value
 
 	endif 
+
 	
 	CALL Write_Experimental_Results(compute_exp_pf)
 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
