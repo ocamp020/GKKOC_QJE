@@ -766,8 +766,8 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 		solving_bench=0
 	! Set capital taxes to zero
 		tauK = 0.0_DP
-		tauWmin_at= 0.004_DP
-		tauWinc_at= 0.001_DP
+		tauWmin_at= 0.003_DP
+		tauWinc_at= 0.0001_DP
 	! Set Y_a_threshold
 		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
 		!Y_a_threshold = 0.0_dp ! big_p   !8.1812138704441200
@@ -784,9 +784,9 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 			tauW_at  = tauWmin_at
 			tauWindx = 0.0_DP
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-			! OPEN(UNIT=19, FILE=trim(Result_Folder)//'Laffer_Curve.txt', STATUS='replace')
-			! DO aa = 1,20
-			DO WHILE (GBAR_exp .lt. GBAR_bench)
+			OPEN(UNIT=19, FILE=trim(Result_Folder)//'Laffer_Curve.txt', STATUS='replace')
+			DO aa = 1,11
+			! DO WHILE (GBAR_exp .lt. GBAR_bench)
 				! Set old G and new value of tauW
 				GBAR_exp_old = GBAR_exp
 				tauW_bt = tauWmin_bt + tauWindx * tauWinc_bt
@@ -804,9 +804,9 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
 				! WRITE(UNIT=19, FMT=*) 'tau_W',tauW_at,'GBAR',GBAR_exp,'Assets',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 			ENDDO
-			! CLOSE(UNIT=19)
-			! print*,' Program stoped by Sergio'
-			! STOP
+			CLOSE(UNIT=19)
+			print*,' Program stoped by Sergio'
+			STOP
 
 			! Set tauW as weighted average of point in  the grid to balance budget more precisely
 				tauW_up_bt  = tauW_bt
