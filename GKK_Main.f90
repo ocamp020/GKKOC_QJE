@@ -973,6 +973,7 @@ Subroutine Solve_Experiment_Fixed_PF_Interp(compute_exp_pf_interp,Simul_Switch)
 	PRINT*,''
 	Print*,'--------------- Get YGRID from benchmark -----------------'
 	PRINT*,''
+	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 	CALL FORM_Y_MB_GRID(YGRID_bench,MBGRID,YGRID_t,MBGRID_t)
 
 	!====================================================================================================
