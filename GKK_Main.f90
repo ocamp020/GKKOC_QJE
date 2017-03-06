@@ -39,7 +39,7 @@ PROGRAM main
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
-		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, compute_exp_pf
+		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, compute_exp_pf, compute_exp_pf_interp
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -197,11 +197,11 @@ PROGRAM main
 		if (Tax_Reform) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
 			
-			if (compute_exp_pf).and.(compute_exp_pf_interp.eqv..false.) then
+			if ((compute_exp_pf).and.(compute_exp_pf_interp.eqv..false.)) then
 				Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions/'
 				call system( 'mkdir -p ' // trim(Result_Folder) )
 				call Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
-			elseif (compute_exp_pf.eqv..false.).and.(compute_exp_pf_interp) then
+			elseif ((compute_exp_pf.eqv..false.).and.(compute_exp_pf_interp)) then
 				Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp/'
 				call system( 'mkdir -p ' // trim(Result_Folder) )
 				call Solve_Experiment_Fixed_PF_Interp(compute_exp_pf_interp,Simul_Switch)
