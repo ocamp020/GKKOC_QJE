@@ -957,7 +957,7 @@ end Subroutine Solve_Experiment_Fixed_Policy_Functions
 !========================================================================================
 !========================================================================================
 
-Subroutine Solve_Experiment_Fixed_PF_Interp(compute_exp_pf,Simul_Switch)
+Subroutine Solve_Experiment_Fixed_PF_Interp(compute_exp_pf_interp,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
@@ -965,11 +965,14 @@ Subroutine Solve_Experiment_Fixed_PF_Interp(compute_exp_pf,Simul_Switch)
 	use Toolbox
 	use omp_lib
 	implicit none 
-	logical, intent(in) :: compute_exp_pf, Simul_Switch
+	logical, intent(in) :: compute_exp_pf_interp, Simul_Switch
 	integer :: aa, age1, a1, z1, lambda1, e1, x1
 	REAL(DP), DIMENSION(na,nz,nx) :: YGRID_bench
 
 	!====================================================================================================
+	PRINT*,''
+	Print*,'--------------- Get YGRID from benchmark -----------------'
+	PRINT*,''
 	CALL FORM_Y_MB_GRID(YGRID_bench,MBGRID,YGRID_t,MBGRID_t)
 
 	!====================================================================================================
@@ -991,7 +994,7 @@ Subroutine Solve_Experiment_Fixed_PF_Interp(compute_exp_pf,Simul_Switch)
 		Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 		Wealth_factor = Y_a_threshold/W_bench
 
-	if (compute_exp_pf) then 
+	if (compute_exp_pf_interp) then 
 		! Find wealth taxes that balances budget
 		print*, "	Computing Wealth Tax to balance the budget"
 			! Set initial value for G in experimental economy and for wealth taxes
