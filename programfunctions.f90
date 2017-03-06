@@ -2320,10 +2320,10 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
 		! Check
 		if (age.lt.RetAge) then 
 		print*, 'Residual',  YGRID(ai,zi,xi)  + Y_h(Hours(age, ai, zi, lambdai,ei,xi),age,lambdai,ei,wage)  & 
-		            & - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) - Aprime(age, ai, zi, lambdai,ei,xi), 'State', age,ai,zi,lambdai,ei,xi
+		& - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) - Aprime(age, ai, zi, lambdai,ei,xi), 'State', age,ai,zi,lambdai,ei,xi
         else 
         print*, 'Residual',  YGRID(ai,zi,xi)  + RetY_lambda_e(lambdai,ei)  & 
-		            & - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) - Aprime(age, ai, zi, lambdai,ei,xi), 'State', age,ai,zi,lambdai,ei,xi
+		& - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) - Aprime(age, ai, zi, lambdai,ei,xi), 'State', age,ai,zi,lambdai,ei,xi
         endif 
         ! Discretize Aprime
         if ( Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
