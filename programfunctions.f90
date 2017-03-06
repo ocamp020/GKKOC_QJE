@@ -3201,19 +3201,19 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	TFP_star = TFP_star ** (alpha*(1.0_dp-mu)/mu)
 
 	! ! Compute output without distortions
-	! theta_aux = theta
-	! YBAR_aux  = YBAR
-	! QBAR_aux  = QBAR 
-	! NBAR_aux  = NBAR 
-	! K_aux     = K
-	! do i_theta = 9,1000,1
-	! theta     = real(i_theta,8)/3.0_dp; print*, ' '; print*, 'theta= ',theta(1); print*, ' '
-	! CALL FIND_DBN_EQ
-	! enddo 
-	! theta     = big_p ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
-	! CALL FIND_DBN_EQ
-	! theta     = theta_aux 
-	! K         = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+	theta_aux = theta
+	YBAR_aux  = YBAR
+	QBAR_aux  = QBAR 
+	NBAR_aux  = NBAR 
+	K_aux     = K
+	do i_theta = 1,10000,1
+	theta     = 4.0_dp + real(i_theta,8)/10.0_dp; print*, ' '; print*, 'theta= ',theta(1); print*, ' '
+	CALL FIND_DBN_EQ
+	enddo 
+	theta     = big_p ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
+	CALL FIND_DBN_EQ
+	theta     = theta_aux 
+	K         = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 		
 
 

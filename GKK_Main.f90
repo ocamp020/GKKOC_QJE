@@ -62,7 +62,7 @@ PROGRAM main
 		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
-			compute_exp_pf= .true.
+			compute_exp_pf= .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
