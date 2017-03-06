@@ -2317,20 +2317,20 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
 		Aprime(age,ai,zi,lambdai,ei,xi) = Linear_Int(YGRID_bench(:,zi,xi),Aprime_bench(age,:,zi,lambdai,ei,xi),na, YGRID(ai,zi,xi))
 		Cons(age,ai,zi,lambdai,ei,xi)   = Linear_Int(YGRID_bench(:,zi,xi),Cons_bench(age,:,zi,lambdai,ei,xi)  ,na, YGRID(ai,zi,xi))
 		Hours(age,ai,zi,lambdai,ei,xi)  = Linear_Int(YGRID_bench(:,zi,xi),Hours_bench(age,:,zi,lambdai,ei,xi) ,na, YGRID(ai,zi,xi)) 
-		! Check
-		if (age.lt.RetAge) then 
-		print*, 'Residual',  YGRID(ai,zi,xi)  + Y_h(Hours(age, ai, zi, lambdai,ei,xi),age,lambdai,ei,wage)  & 
-		& - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) - Aprime(age, ai, zi, lambdai,ei,xi), &
-		& YGRID_bench(ai,zi,xi)  + Y_h(Hours_bench(age, ai, zi, lambdai,ei,xi),age,lambdai,ei,wage)  & 
-		& - (1.0_dp+tauC)*Cons_bench(age, ai, zi, lambdai,ei,xi) - Aprime_bench(age, ai, zi, lambdai,ei,xi),&
-		&'State', age,ai,zi,lambdai,ei,xi
-        else 
-        print*, 'Residual',  YGRID(ai,zi,xi)  + RetY_lambda_e(lambdai,ei)  & 
-		& - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) - Aprime(age, ai, zi, lambdai,ei,xi),&
-		 YGRID_bench(ai,zi,xi)  + RetY_lambda_e(lambdai,ei)  & 
-		& - (1.0_dp+tauC)*Cons_bench(age, ai, zi, lambdai,ei,xi) - Aprime_bench(age, ai, zi, lambdai,ei,xi),&
-		& 'State', age,ai,zi,lambdai,ei,xi
-        endif 
+		! ! Check
+		! if (age.lt.RetAge) then 
+		! print*, 'Residual',  YGRID(ai,zi,xi)  + Y_h(Hours(age, ai, zi, lambdai,ei,xi),age,lambdai,ei,wage)  & 
+		! & - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) - Aprime(age, ai, zi, lambdai,ei,xi), &
+		! & YGRID_bench(ai,zi,xi)  + Y_h(Hours_bench(age, ai, zi, lambdai,ei,xi),age,lambdai,ei,wage)  & 
+		! & - (1.0_dp+tauC)*Cons_bench(age, ai, zi, lambdai,ei,xi) - Aprime_bench(age, ai, zi, lambdai,ei,xi),&
+		! &'State', age,ai,zi,lambdai,ei,xi
+  !       else 
+  !       print*, 'Residual',  YGRID(ai,zi,xi)  + RetY_lambda_e(lambdai,ei)  & 
+		! & - (1.0_dp+tauC)*Cons(age, ai, zi, lambdai,ei,xi) - Aprime(age, ai, zi, lambdai,ei,xi),&
+		!  YGRID_bench(ai,zi,xi)  + RetY_lambda_e(lambdai,ei)  & 
+		! & - (1.0_dp+tauC)*Cons_bench(age, ai, zi, lambdai,ei,xi) - Aprime_bench(age, ai, zi, lambdai,ei,xi),&
+		! & 'State', age,ai,zi,lambdai,ei,xi
+  !       endif 
         ! Discretize Aprime
         if ( Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
             tklo =na-1
