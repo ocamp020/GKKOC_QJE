@@ -1102,9 +1102,6 @@ Subroutine Solve_Experiment_Fixed_PF_Interp(compute_exp_pf_interp,Simul_Switch)
 
 	
 	CALL Write_Experimental_Results(compute_exp_pf_interp)
-	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-	K_mat  = K_Matrix(R,P)
-	Pr_mat = Profit_Matrix(R,P)
 	CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
 	CALL ComputeLaborUnits(EBAR,wage)
 	CALL GOVNT_BUDGET
