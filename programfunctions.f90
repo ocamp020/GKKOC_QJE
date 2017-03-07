@@ -2283,7 +2283,7 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-07_DP
-	! DBN1 = DBN_bench
+	DBN1 = DBN_bench
 
 		! Form YGRID for the capital income economy given interest rate "P"
 			YGRID_old = YGRID 
