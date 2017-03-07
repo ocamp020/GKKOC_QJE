@@ -975,7 +975,7 @@ Subroutine Solve_Experiment_Fixed_PF_Interp(compute_exp_pf_interp,Simul_Switch)
 	PRINT*,''
 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 	CALL FORM_Y_MB_GRID(YGRID_bench,MBGRID,YGRID_t,MBGRID_t)
-	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+	! deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
 	!====================================================================================================
 	PRINT*,''

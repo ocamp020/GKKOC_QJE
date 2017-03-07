@@ -2494,11 +2494,11 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
 	    !     Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 
     	! Deallocate policy functions on adjusted grid (so that they can be allocated later)
-			deallocate( YGRID_t  )
-			deallocate( MBGRID_t ) 
-			deallocate( Cons_t   )
-			deallocate( Hours_t  )
-			deallocate( Aprime_t )
+			! deallocate( YGRID_t  )
+			! deallocate( MBGRID_t ) 
+			! deallocate( Cons_t   )
+			! deallocate( Hours_t  )
+			! deallocate( Aprime_t )
 
 
 END SUBROUTINE FIND_DBN_EQ_PF_Interp
