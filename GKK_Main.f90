@@ -62,8 +62,8 @@ PROGRAM main
 		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
-			compute_exp_pf= .false.
-			compute_exp_pf_interp = .true.
+			compute_exp_pf= .true.
+			compute_exp_pf_interp = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
@@ -771,8 +771,8 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 		solving_bench=0
 	! Set capital taxes to zero
 		tauK = 0.0_DP
-		tauWmin_at= 0.003_DP
-		tauWinc_at= 0.000001_DP
+		tauWmin_at= 0.005_DP
+		tauWinc_at= 0.005_DP
 	! Set Y_a_threshold
 		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
 		!Y_a_threshold = 0.0_dp ! big_p   !8.1812138704441200

@@ -2040,6 +2040,7 @@ SUBROUTINE FIND_DBN_EQ_PF()
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-07_DP
+	DBN1 = DBN_bench
 
 	! Solve the model at current aggregate values
 		! Find the threshold for wealth taxes (a_bar)
