@@ -2283,18 +2283,8 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-07_DP
-	DBN1 = DBN_bench
+	! DBN1 = DBN_bench
 
-	! Solve the model at current aggregate values
-		! Find the threshold for wealth taxes (a_bar)
-			!call Find_TauW_Threshold(DBN1,Y_a_threshold)
-		! Adjust grid to include breaking points
-			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-		! Compute labor units 
-			CALL ComputeLaborUnits(Ebar, wage) 
-		! Compute Capital demand and Profits by (a,z)
-			K_mat  = K_Matrix(R,P)
-			Pr_mat = Profit_Matrix(R,P)
 		! Form YGRID for the capital income economy given interest rate "P"
 			YGRID_old = YGRID 
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
