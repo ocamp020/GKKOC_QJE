@@ -70,7 +70,7 @@ PROGRAM main
 				Fixed_PF_prices = .false.
 			compute_exp_prices    = .true.
 				Fixed_W = .false. 
-				Fixed_P = .true.
+				Fixed_P = .false.
 				Fixed_R = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
@@ -1388,6 +1388,10 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 		solving_bench=0
 	! Set capital taxes to zero
 		tauK = 0.0_DP
+		if (Fixed_P) then 
+		tauWmin_at= 0.0050_DP
+		tauWinc_at= 0.005_DP
+		endif 
 	! Set Y_a_threshold
 		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
 		!Y_a_threshold = 0.0_dp ! big_p   !8.1812138704441200
