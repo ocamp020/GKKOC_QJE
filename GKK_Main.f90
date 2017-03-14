@@ -39,7 +39,7 @@ PROGRAM main
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
-		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, compute_exp_pf, compute_exp_pf_interp
+		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, compute_exp_pf, compute_exp_pf_interp, compute_exp_prices
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -1278,7 +1278,7 @@ Subroutine Solve_Experiment_Fixed_PF_Prices(compute_exp_prices,Simul_Switch)
 
 	endif 
 	
-	CALL Write_Experimental_Results(compute_exp)
+	CALL Write_Experimental_Results(compute_exp_prices)
 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 	K_mat  = K_Matrix(R,P)
 	Pr_mat = Profit_Matrix(R,P)
