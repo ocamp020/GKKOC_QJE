@@ -2517,6 +2517,7 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	real(dp)   :: BBAR, MeanWealth, brent_value
 	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, DBN2
 	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi
+	real(dp), dimension(na,nz,nx) :: YGRID_bench
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-07_DP
@@ -2531,8 +2532,19 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 		! Compute Capital demand and Profits by (a,z)
 			K_mat  = K_Matrix(R,P)
 			Pr_mat = Profit_Matrix(R,P)
-		! Form YGRID for the capital income economy given interest rate "P"
+		! Compute policy functions and YGRID for benchmark economy
+			tauW_aux = tauW_at
+			tauW_at  = 0.00_dp 
+			tauK     = 0.25_dp 
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
+			CALL EGM_RETIREMENT_WORKING_PERIOD 
+			YGRID_bench = YGRID
+			tauK     = 0.00_dp 
+			tauW_at  = tauW_aux
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
+
+			
 
 	! Solve for policy and value functions 
 			! Instead of EGM I update policy funtions by interpolating from the benchmark policy functions
@@ -2548,9 +2560,9 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	DO lambdai=1,nlambda
 	DO ei=1, ne
 		! Get Policy Functions
-		Aprime(age,ai,zi,lambdai,ei,xi) = Linear_Int(YGRID_bench(:,zi,xi),Aprime_bench(age,:,zi,lambdai,ei,xi),na, YGRID(ai,zi,xi))
-		Cons(age,ai,zi,lambdai,ei,xi)   = Linear_Int(YGRID_bench(:,zi,xi),Cons_bench(age,:,zi,lambdai,ei,xi)  ,na, YGRID(ai,zi,xi))
-		Hours(age,ai,zi,lambdai,ei,xi)  = Linear_Int(YGRID_bench(:,zi,xi),Hours_bench(age,:,zi,lambdai,ei,xi) ,na, YGRID(ai,zi,xi)) 
+		Aprime(age,ai,zi,lambdai,ei,xi) = Linear_Int(YGRID_bench(:,zi,xi),Aprime(age,:,zi,lambdai,ei,xi),na, YGRID(ai,zi,xi))
+		Cons(age,ai,zi,lambdai,ei,xi)   = Linear_Int(YGRID_bench(:,zi,xi),Cons(age,:,zi,lambdai,ei,xi)  ,na, YGRID(ai,zi,xi))
+		Hours(age,ai,zi,lambdai,ei,xi)  = Linear_Int(YGRID_bench(:,zi,xi),Hours(age,:,zi,lambdai,ei,xi) ,na, YGRID(ai,zi,xi)) 
 		! ! Check
 		! if (age.lt.RetAge) then 
 		! print*, 'Residual',  YGRID(ai,zi,xi)  + Y_h(Hours(age, ai, zi, lambdai,ei,xi),age,lambdai,ei,wage)  & 
@@ -2756,20 +2768,18 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 				! Compute Capital demand and Profits by (a,z)
 					K_mat  = K_Matrix(R,P)
 					Pr_mat = Profit_Matrix(R,P)
-				! Form YGRID for the capital income economy given interest rate "P"
-					CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
-
-
-
-					
 				! Solve for policy and value functions 
 					! Policy functions are computed for the capital tax economy 
 					tauW_aux = tauW_at
 					tauW_at  = 0.00_dp 
 					tauK     = 0.25_dp 
+					CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 					CALL EGM_RETIREMENT_WORKING_PERIOD 
+					YGRID_bench = YGRID
 					tauK     = 0.00_dp 
 					tauW_at  = tauW_aux
+					CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+					CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 	        
 				! Solve for policy and value functions 
 						! Instead of EGM I update policy funtions by interpolating from the benchmark policy functions
@@ -2785,9 +2795,9 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 				DO lambdai=1,nlambda
 				DO ei=1, ne
 					! Get Policy Functions
-					Aprime(age,ai,zi,lambdai,ei,xi) = Linear_Int(YGRID_bench(:,zi,xi),Aprime_bench(age,:,zi,lambdai,ei,xi),na, YGRID(ai,zi,xi))
-					Cons(age,ai,zi,lambdai,ei,xi)   = Linear_Int(YGRID_bench(:,zi,xi),Cons_bench(age,:,zi,lambdai,ei,xi)  ,na, YGRID(ai,zi,xi))
-					Hours(age,ai,zi,lambdai,ei,xi)  = Linear_Int(YGRID_bench(:,zi,xi),Hours_bench(age,:,zi,lambdai,ei,xi) ,na, YGRID(ai,zi,xi)) 
+					Aprime(age,ai,zi,lambdai,ei,xi) = Linear_Int(YGRID_bench(:,zi,xi),Aprime(age,:,zi,lambdai,ei,xi),na, YGRID(ai,zi,xi))
+					Cons(age,ai,zi,lambdai,ei,xi)   = Linear_Int(YGRID_bench(:,zi,xi),Cons(age,:,zi,lambdai,ei,xi)  ,na, YGRID(ai,zi,xi))
+					Hours(age,ai,zi,lambdai,ei,xi)  = Linear_Int(YGRID_bench(:,zi,xi),Hours(age,:,zi,lambdai,ei,xi) ,na, YGRID(ai,zi,xi)) 
 			        ! Discretize Aprime
 			        if ( Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
 			            tklo =na-1
