@@ -2847,6 +2847,320 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 
 END SUBROUTINE FIND_DBN_EQ_PF_Prices
 
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
+	use omp_lib
+	IMPLICIT NONE
+	logical, intent(in) :: Fixed_W, Fixed_P, Fixed_R
+	INTEGER:: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
+	REAL   :: DBN_dist, DBN_criteria
+	real(dp)   ::BBAR, MeanWealth, brent_value
+	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, DBN2
+	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi
+
+	!$ call omp_set_num_threads(nz)
+	DBN_criteria = 1.0E-07_DP
+
+	! Solve the model at current aggregate values
+		! Find the threshold for wealth taxes (a_bar)
+			!call Find_TauW_Threshold(DBN1,Y_a_threshold)
+		! Adjust grid to include breaking points
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		! Compute labor units 
+			CALL ComputeLaborUnits(Ebar, wage) 
+		! Compute Capital demand and Profits by (a,z)
+			K_mat  = K_Matrix(R,P)
+			Pr_mat = Profit_Matrix(R,P)
+		! Form YGRID for the capital income economy given interest rate "P"
+			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
+		! Solve for policy and value functions 
+			CALL EGM_RETIREMENT_WORKING_PERIOD 
+
+	! Discretize policy function for assets (a')
+		! For each age and state vector bracket optimal a' between two grid points
+		! When at that age and state the optimal decision is approximated by selecting one the grid points
+		! The grid points are selected with probability proportional to their distance to the optimal a'
+	DO age=1,MaxAge
+	!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
+	DO zi=1,nz
+	DO xi=1,nx
+	DO ai=1,na
+	DO lambdai=1,nlambda
+	DO ei=1, ne
+        if ( Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
+            tklo =na-1
+        elseif (Aprime(age,ai,zi,lambdai, ei,xi) .lt. amin) then
+            tklo = 1
+        else
+            tklo = ((Aprime(age,ai,zi,lambdai, ei,xi) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+        endif
+        tkhi = tklo + 1        
+        Aplo(age,ai,zi,lambdai,ei,xi)  		= tklo
+        Aphi(age,ai,zi,lambdai,ei,xi)  		= tkhi        
+        PrAprimelo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
+        PrAprimehi(age,ai,zi,lambdai,ei,xi) = ( Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+
+	! Probablities are adjusted to lie in [0,1]
+		PrAprimelo = min(PrAprimelo, 1.0_DP)
+		PrAprimelo = max(PrAprimelo, 0.0_DP)
+		PrAprimehi = min(PrAprimehi, 1.0_DP)
+		PrAprimehi = max(PrAprimehi, 0.0_DP)
+
+	! Compute distribution of assets by age and state
+		! Distribution is obtained by iterating over an initial distribution using policy functions
+	DBN_dist=1.0_DP
+	simutime = 1
+	iter_indx = 1
+	!print*, 'Computing Equilibrium Distribution'
+	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. ( simutime .le. 700 ) )
+		! print*, 'DBN_dist=', DBN_dist
+
+	    DBN2=0.0_DP
+
+		! Everyone in MaxAge dies. Those who die, switch to z2, lambda2 and start at ne/2+1 and x=1
+	    age1=MaxAge
+	    DO x1=1,nx
+	    DO z1=1,nz
+	    DO a1=1,na
+	    DO lambda1=1,nlambda
+	    DO e1=1, ne
+	        DO z2=1,nz
+	        DO lambda2=1,nlambda
+	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
+	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
+	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
+	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        ENDDO
+	        ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO    
+	    ENDDO
+	    ENDDO    
+
+		! retirees "e" stays the same for benefit retirement calculation purposes
+	    DO x1=1,nx
+	    DO age1=RetAge-1, MaxAge-1
+	    DO a1=1,na
+	    DO z1=1,nz
+	    DO lambda1=1,nlambda
+	    DO e1=1, ne
+	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
+	        DO z2=1,nz
+	        DO lambda2=1,nlambda
+	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
+	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
+	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
+	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        ENDDO
+	        ENDDO
+	        
+	        ! Those who live stay at z1, lambda1, and also e1 since they are retired
+	        !e2=e1
+	        DO x2=1,nx
+		        DBN2(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) =  &
+		        	& DBN2(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) + DBN1(age1, a1, z1, lambda1, e1,x1) &
+		            & * survP(age1) * PrAprimelo(age1, a1, z1, lambda1, e1,x1) * pr_x(x1,x2,z1,age1)     
+		        DBN2(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) =  &
+		          	& DBN2(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) + DBN1(age1, a1, z1, lambda1, e1,x1) &
+		            & * survP(age1) * PrAprimehi(age1, a1, z1, lambda1, e1,x1) * pr_x(x1,x2,z1,age1)  
+	        ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    
+	    ! Working age agents
+	    DO x1=1,nx
+	    DO age1=1,RetAge-2
+	    DO a1=1,na
+	    DO z1=1,nz
+	    DO lambda1=1,nlambda
+	    DO e1=1, ne
+	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
+	        DO z2=1,nz
+	        DO lambda2=1,nlambda
+	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
+	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
+	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
+	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        ENDDO
+	        ENDDO
+	        
+	        ! Those who live stay at z1, lambda1, but switch to e2 and x2
+	        DO x2=1,nx
+	        DO e2=1,ne
+				DBN2(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) =  &
+	          		& DBN2(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) + DBN1(age1, a1, z1, lambda1, e1,x1) &
+	                & * survP(age1) * pr_e(e1,e2) * pr_x(x1,x2,z1,age1) * PrAprimelo(age1, a1, z1, lambda1, e1,x1)     
+	            DBN2(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) =  &
+	          		& DBN2(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) + DBN1(age1, a1, z1, lambda1, e1,x1) &
+	                & * survP(age1) * pr_e(e1,e2) * pr_x(x1,x2,z1,age1) * PrAprimehi(age1, a1, z1, lambda1, e1,x1) 
+	        ENDDO
+	        ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    
+	    DBN2 = 0.9*DBN1 + 0.1*DBN2
+	    DBN_dist = maxval(abs(DBN2-DBN1))
+	    ! print*, DBN_dist
+	    DBN1 = DBN2
+
+	    ! Instead of adjusting policy functions to be consistent with current DBN at each iteration
+	    ! The code iterates the distribution and only updates policy functions every "update_period"
+
+	    ! Update of policy function with current aggregates
+	    IF (iter_indx .ge. update_period) THEN
+
+	    	! Compute aggregates with current distribution
+	        QBAR =0.0
+	        NBAR =0.0
+	        DO x1=1,nx
+	        DO age1=1,MaxAge
+	        DO z1=1,nz
+	        DO a1=1,na
+	        DO lambda1=1,nlambda
+	        DO e1=1, ne
+	             QBAR= QBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
+	             NBAR= NBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * eff_un(age1, lambda1, e1) * Hours(age1, a1, z1, lambda1,e1,x1)
+	        ENDDO
+	        ENDDO
+	        ENDDO
+	        ENDDO    
+	        ENDDO    
+	        ENDDO    
+	    
+	        QBAR = ( QBAR)**(1.0_DP/mu)                
+	        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
+
+	        if (Fixed_W.eqv..false.) wage = (1.0_DP-alpha)*QBAR **alpha * NBAR  **(-alpha)
+	        if (Fixed_P.eqv..false.) P    = alpha* QBAR **(alpha-mu) * NBAR **(1.0_DP-alpha)
+
+	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+
+	        if (Fixed_R.eqv..false.) then 
+		    	! Solve for new R 
+		    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
+		    	if (sum(theta)/nz .gt. 1.0_DP) then
+		    		P = min(P,1.0_dp)
+		           brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R)
+	            else
+	                R = 0.0_DP
+		        endif
+	        endif 
+
+	    	!!
+	    	print*, 'DBN_diff=',DBN_dist,'R=',R,'P=',P,'W=',W,'Assets',sum(sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid)
+	    	!!
+
+	    	! Solve the model at current aggregate values
+				! Find the threshold for wealth taxes (a_bar)
+					!call Find_TauW_Threshold(DBN1,Y_a_threshold)
+				! Adjust grid to include breaking points
+					CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+				! Compute labor units 
+					CALL ComputeLaborUnits(Ebar, wage) 
+				! Compute Capital demand and Profits by (a,z)
+					K_mat  = K_Matrix(R,P)
+					Pr_mat = Profit_Matrix(R,P)
+				! Form YGRID for the capital income economy given interest rate "P"
+					CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
+				! Solve for policy and value functions 
+					CALL EGM_RETIREMENT_WORKING_PERIOD 
+	        
+				! Discretize policy function for assets (a')
+					! For each age and state vector bracket optimal a' between two grid points
+					! When at that age and state the optimal decision is approximated by selecting one the grid points
+					! The grid points are selected with probability proportional to their distance to the optimal a'
+				DO age=1,MaxAge
+				!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
+				DO zi=1,nz
+				DO xi=1,nx
+				DO ai=1,na
+				DO lambdai=1,nlambda
+				DO ei=1, ne
+			        if ( Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
+			            tklo =na-1
+			        elseif (Aprime(age,ai,zi,lambdai, ei,xi) .lt. amin) then
+			            tklo = 1
+			        else
+			            tklo = ((Aprime(age,ai,zi,lambdai, ei,xi) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+			        endif            
+			        tkhi = tklo + 1        
+			        Aplo(age,ai,zi,lambdai,ei,xi)  		= tklo
+			        Aphi(age,ai,zi,lambdai,ei,xi)  		= tkhi        
+			        PrAprimelo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
+			        PrAprimehi(age,ai,zi,lambdai,ei,xi) = ( Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+				ENDDO
+				ENDDO
+				ENDDO
+				ENDDO
+				ENDDO
+				ENDDO
+	
+	        ! Probablities are adjusted to lie in [0,1]
+		        PrAprimelo = min(PrAprimelo, 1.0_DP)
+		        PrAprimelo = max(PrAprimelo, 0.0_DP)
+		        PrAprimehi = min(PrAprimehi, 1.0_DP)
+		        PrAprimehi = max(PrAprimehi, 0.0_DP)  
+
+		    ! Reset counter for next update of policy functions
+	        iter_indx=0
+	    ENDIF
+	    
+	    iter_indx = iter_indx + 1
+	    simutime  = simutime +1 
+	 
+	ENDDO ! WHILE
+
+	! Write
+		!OPEN(UNIT=3, FILE='agrid', STATUS='replace')
+		!WRITE(unit=3, FMT=*) agrid
+		!CLOSE (unit=3)
+		!
+		!OPEN(UNIT=3, FILE='aprime', STATUS='replace')
+		!WRITE(unit=3, FMT=*) Aprime(1, :, nz/2+1, nlambda/2+1, ne/2+1)
+		!CLOSE (unit=3)
+		!
+		!OPEN(UNIT=3, FILE='aplo', STATUS='replace')
+		!WRITE(unit=3, FMT=*) Aplo(1, :,nz/2+1, nlambda/2+1, ne/2+1)
+		!CLOSE (unit=3)
+		!
+		!OPEN(UNIT=3, FILE='aphi', STATUS='replace')
+		!WRITE(unit=3, FMT=*) Aphi(1, :, nz/2+1, nlambda/2+1, ne/2+1)
+		!CLOSE (unit=3)
+		!
+		!OPEN(UNIT=3, FILE='Pr_aplo', STATUS='replace')
+		!WRITE(unit=3, FMT=*) PrAprimelo(1, :, nz/2+1, nlambda/2+1, ne/2+1)
+		!CLOSE (unit=3)
+		!
+		!OPEN(UNIT=3, FILE='pr_aphi', STATUS='replace')
+		!WRITE(unit=3, FMT=*) PrAprimehi(1, :, nz/2+1, nlambda/2+1, ne/2+1)
+		!CLOSE (unit=3)
+
+END SUBROUTINE FIND_DBN_EQ_Prices
+
 
 !========================================================================================
 !========================================================================================

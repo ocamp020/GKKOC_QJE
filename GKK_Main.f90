@@ -39,7 +39,9 @@ PROGRAM main
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
-		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, compute_exp_pf, compute_exp_pf_interp, compute_exp_prices
+		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX
+		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices,
+		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R 
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -63,8 +65,13 @@ PROGRAM main
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
-			compute_exp_pf_interp = .false.
-			compute_exp_prices= .true.
+				Fixed_PF        = .false.
+				Fixed_PF_interp = .false.
+				Fixed_PF_prices = .false.
+			compute_exp_prices    = .true.
+				Fixed_W = .true. 
+				Fixed_P = .false.
+				Fixed_R = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
@@ -198,18 +205,30 @@ PROGRAM main
 		if (Tax_Reform) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
 			
-			if ((compute_exp_pf).and.(compute_exp_pf_interp.eqv..false.).and.(compute_exp_prices.eqv..false.)) then
-				Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions/'
-				call system( 'mkdir -p ' // trim(Result_Folder) )
-				call Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
-			elseif ((compute_exp_pf.eqv..false.).and.(compute_exp_pf_interp).and.(compute_exp_prices.eqv..false.)) then
-				Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp/'
-				call system( 'mkdir -p ' // trim(Result_Folder) )
-				call Solve_Experiment_Fixed_PF_Interp(compute_exp_pf_interp,Simul_Switch)
-			elseif ((compute_exp_pf.eqv..false.).and.(compute_exp_pf_interp.eqv..false.).and.(compute_exp_prices)) then
-				Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Prices/'
-				call system( 'mkdir -p ' // trim(Result_Folder) )
-				call Solve_Experiment_Fixed_PF_Prices(compute_exp_prices,Simul_Switch)
+			if ((compute_exp_pf).and.(compute_exp_prices.eqv..false.)) then 
+				if     ((Fixed_PF).and.(Fixed_PF_interp.eqv..false.).and.(Fixed_PF_prices.eqv..false.)) then
+					Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions/'
+					call system( 'mkdir -p ' // trim(Result_Folder) )
+					call Solve_Experiment_Fixed_Policy_Functions(Fixed_PF,Simul_Switch)
+				elseif ((Fixed_PF.eqv..false.).and.(Fixed_PF_interp).and.(Fixed_PF_prices.eqv..false.)) then
+					Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp/'
+					call system( 'mkdir -p ' // trim(Result_Folder) )
+					call Solve_Experiment_Fixed_PF_Interp(Fixed_PF_interp,Simul_Switch)
+				elseif ((Fixed_PF.eqv..false.).and.(Fixed_PF_interp.eqv..false.).and.(Fixed_PF_prices)) then
+					Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Prices/'
+					call system( 'mkdir -p ' // trim(Result_Folder) )
+					call Solve_Experiment_Fixed_PF_Prices(Fixed_PF_prices,Simul_Switch)
+				endif 
+			elseif ((compute_exp_pf.eqv..false.).and.(compute_exp_prices)) then 
+					if (Fixed_W) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_W/'
+					if (Fixed_P) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_P/'
+					if (Fixed_R) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_R/'
+					if (Fixed_W.and.Fixed_P) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_WP/'
+					if (Fixed_W.and.Fixed_R) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_WR/'
+					if (Fixed_P.and.Fixed_R) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_PR/'
+					if (Fixed_W.and.Fixed_P.and.Fixed_R) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_WPR/'
+					call system( 'mkdir -p ' // trim(Result_Folder) )
+					call Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W,Fixed_P,Fixed_R)
 			else
 				call Solve_Experiment(compute_exp,Simul_Switch)
 			endif 
@@ -1344,6 +1363,180 @@ Subroutine Solve_Experiment_Fixed_PF_Prices(compute_exp_prices,Simul_Switch)
 
 
 end Subroutine Solve_Experiment_Fixed_PF_Prices
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W,Fixed_P,Fixed_R)
+	use parameters
+	use global 
+	use programfunctions
+	use Simulation_Module
+	use Toolbox
+	use omp_lib
+	implicit none 
+	logical, intent(in) :: compute_exp_prices, Simul_Switch, Fixed_W, Fixed_P, Fixed_R
+
+	!====================================================================================================
+	PRINT*,''
+	Print*,'--------------- SOLVING EXPERIMENT WITH BEST PARAMETERS -----------------'
+	PRINT*,''
+	print*,'Wealth Tax Economy'
+	
+	! Experiment economy
+		solving_bench=0
+	! Set capital taxes to zero
+		tauK = 0.0_DP
+	! Set Y_a_threshold
+		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
+		!Y_a_threshold = 0.0_dp ! big_p   !8.1812138704441200
+		call Find_TauW_Threshold(DBN_bench,W_bench)  
+		Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
+		Wealth_factor = Y_a_threshold/W_bench
+
+	if (compute_exp_prices) then 
+		! Find wealth taxes that balances budget
+		print*, "	Computing Wealth Tax to balance the budget"
+			! Set initial value for G in experimental economy and for wealth taxes
+			GBAR_exp = 0.0_DP
+			tauW_bt  = tauWmin_bt
+			tauW_at  = tauWmin_at
+			tauWindx = 0.0_DP
+			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
+			DO WHILE (GBAR_exp .lt. GBAR_bench)
+				! Set old G and new value of tauW
+				GBAR_exp_old = GBAR_exp
+				tauW_bt = tauWmin_bt + tauWindx * tauWinc_bt
+				tauW_at = tauWmin_at + tauWindx * tauWinc_at
+				! Solve the model
+				CALL FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
+				CALL GOVNT_BUDGET
+
+				! Get new G
+				GBAR_exp = GBAR 
+				! Iteratioins  
+				tauWindx = tauWindx + 1.0_DP   
+				write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
+				print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
+				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+			ENDDO
+
+			! Set tauW as weighted average of point in  the grid to balance budget more precisely
+				tauW_up_bt  = tauW_bt
+				tauW_low_bt = tauW_bt  -  tauWinc_bt
+				tauW_bt     = tauW_low_bt + tauWinc_bt * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				tauW_up_at  = tauW_at
+				tauW_low_at = tauW_at  -  tauWinc_at  
+				tauW_at     = tauW_low_at + tauWinc_at * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				print*,''
+				print*,'GBAR bracketed by taxes:'
+				print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
+				print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
+				print*,''
+
+			! Solve (again) experimental economy
+				CALL FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
+				CALL GOVNT_BUDGET
+
+			! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
+				GBAR_exp = GBAR
+				print*,"Gbar at midpoint of bracket and GBAR at benchmark"
+				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+				print*,''
+				print*,'Bisection for TauW:'
+				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.001 ) ! as long as the difference is greater than 0.1% continue
+				    if (GBAR_exp .gt. GBAR_bench ) then
+				        tauW_up_bt  = tauW_bt 
+				        tauW_up_at  = tauW_at 
+				    else
+				        tauW_low_bt = tauW_bt
+				        tauW_low_at = tauW_at
+				    endif
+				    tauW_bt = (tauW_low_bt + tauW_up_bt)/2.0_DP
+				    tauW_at = (tauW_low_at + tauW_up_at)/2.0_DP
+				    CALL FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
+				    CALL GOVNT_BUDGET
+				    GBAR_exp = GBAR
+				    print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
+					print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
+					print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
+					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+				ENDDO
+
+		! Compute value function and store policy functions, value function and distribution in file
+		! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL Firm_Value
+
+	endif 
+	
+	CALL Write_Experimental_Results(compute_exp_prices)
+	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+	K_mat  = K_Matrix(R,P)
+	Pr_mat = Profit_Matrix(R,P)
+	CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+	CALL ComputeLaborUnits(EBAR,wage)
+	CALL GOVNT_BUDGET
+
+
+	! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+		ValueFunction_exp = ValueFunction
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime
+		V_Pr_exp          = V_Pr 
+		V_Pr_nb_exp  	  = V_Pr_nb
+
+	! Compute moments
+	CALL COMPUTE_STATS
+	
+	! Compute welfare gain between economies
+	CALL COMPUTE_WELFARE_GAIN
+
+	! Write experimental results in output.txt
+	CALL WRITE_VARIABLES(0)
+	if ((Simul_Switch)) then 
+	 	print*,"	Experiment Simulation"
+		CALL SIMULATION(solving_bench)
+	endif
+
+
+	print*,'---------------------------'
+	print*,''
+	print*,'Output Gain Prct=', 100.0_DP*(Y_exp/Y_bench-1.0) 
+	print*,''
+	print*,'---------------------------'
+
+	print*," "
+	print*,"Wealth_factor=",Wealth_factor
+	print*," "
+
+
+	! Deallocate variables
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+	! print*,"	Efficiency Computation"
+	! 	CALL Hsieh_Klenow_Efficiency(solving_bench)
+
+
+end Subroutine Solve_Experiment_Fixed_Prices
 
 
 !========================================================================================
