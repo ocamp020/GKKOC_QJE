@@ -69,9 +69,9 @@ PROGRAM main
 				Fixed_PF_interp = .false.
 				Fixed_PF_prices = .false.
 			compute_exp_prices    = .true.
-				Fixed_W = .true. 
+				Fixed_W = .false. 
 				Fixed_P = .false.
-				Fixed_R = .false.
+				Fixed_R = .true.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
