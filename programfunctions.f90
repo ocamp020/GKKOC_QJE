@@ -3071,7 +3071,7 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 	        endif 
 
 	    	!!
-	    	print*, 'DBN_diff=',DBN_dist,'R=',R,'P=',P,'W=',W,'Assets',sum(sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid)
+	    	print*, 'DBN_diff=',DBN_dist,'R=',R,'P=',P,'W=',wage,'Assets',sum(sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid)
 	    	!!
 
 	    	! Solve the model at current aggregate values
