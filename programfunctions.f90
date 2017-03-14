@@ -2714,6 +2714,7 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	    
 	    DBN2 = 0.8*DBN1 + 0.2*DBN2
 	    DBN_dist = maxval(abs(DBN2-DBN1))
+	    print*, 'Iteration',simutime,'DBN_diff=', DBN_dist, 'R=',R,'P=',P
 	    ! print*, DBN_dist
 	    DBN1 = DBN2
 
@@ -2757,7 +2758,7 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	        endif
 
 	    	!!
-	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P
+	    	print*, 'Iteration',simutime,'DBN_diff=', DBN_dist, 'R=',R,'P=',P
 	    	!!
 
 	    	! Solve the model at current aggregate values
