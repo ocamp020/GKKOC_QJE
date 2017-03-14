@@ -2518,9 +2518,11 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, DBN2
 	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi
 	real(dp), dimension(na,nz,nx) :: YGRID_bench
+	real(dp), dimension(MaxAge, na, nz, nlambda, ne, nx) :: Aprime_aux, Cons_aux, Hours_aux 
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-07_DP
+	! DBN1 = DBN_bench
 
 	! Solve the model at current aggregate values
 		! Find the threshold for wealth taxes (a_bar)
@@ -2539,6 +2541,9 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 			CALL EGM_RETIREMENT_WORKING_PERIOD 
 			YGRID_bench = YGRID
+			Aprime_aux  = Aprime 
+			Cons_aux    = Cons 
+			Hours_aux   = Hours 
 			tauK     = 0.00_dp 
 			tauW_at  = tauW_aux
 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
@@ -2568,9 +2573,9 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	DO lambdai=1,nlambda
 	DO ei=1, ne
 		! Get Policy Functions
-		Aprime(age,ai,zi,lambdai,ei,xi) = Linear_Int(YGRID_bench(:,zi,xi),Aprime(age,:,zi,lambdai,ei,xi),na, YGRID(ai,zi,xi))
-		Cons(age,ai,zi,lambdai,ei,xi)   = Linear_Int(YGRID_bench(:,zi,xi),Cons(age,:,zi,lambdai,ei,xi)  ,na, YGRID(ai,zi,xi))
-		Hours(age,ai,zi,lambdai,ei,xi)  = Linear_Int(YGRID_bench(:,zi,xi),Hours(age,:,zi,lambdai,ei,xi) ,na, YGRID(ai,zi,xi)) 
+		Aprime(age,ai,zi,lambdai,ei,xi) = Linear_Int(YGRID_bench(:,zi,xi),Aprime_aux(age,:,zi,lambdai,ei,xi),na, YGRID(ai,zi,xi))
+		Cons(age,ai,zi,lambdai,ei,xi)   = Linear_Int(YGRID_bench(:,zi,xi),Cons_aux(age,:,zi,lambdai,ei,xi)  ,na, YGRID(ai,zi,xi))
+		Hours(age,ai,zi,lambdai,ei,xi)  = Linear_Int(YGRID_bench(:,zi,xi),Hours_aux(age,:,zi,lambdai,ei,xi) ,na, YGRID(ai,zi,xi)) 
 		! ! Check
 		! if (age.lt.RetAge) then 
 		! print*, 'Residual',  YGRID(ai,zi,xi)  + Y_h(Hours(age, ai, zi, lambdai,ei,xi),age,lambdai,ei,wage)  & 
@@ -2785,6 +2790,9 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 					CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 					CALL EGM_RETIREMENT_WORKING_PERIOD 
 					YGRID_bench = YGRID
+					Aprime_aux  = Aprime 
+					Cons_aux    = Cons 
+					Hours_aux   = Hours 
 					tauK     = 0.00_dp 
 					tauW_at  = tauW_aux
 					CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
@@ -2806,9 +2814,9 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 				DO lambdai=1,nlambda
 				DO ei=1, ne
 					! Get Policy Functions
-					Aprime(age,ai,zi,lambdai,ei,xi) = Linear_Int(YGRID_bench(:,zi,xi),Aprime(age,:,zi,lambdai,ei,xi),na, YGRID(ai,zi,xi))
-					Cons(age,ai,zi,lambdai,ei,xi)   = Linear_Int(YGRID_bench(:,zi,xi),Cons(age,:,zi,lambdai,ei,xi)  ,na, YGRID(ai,zi,xi))
-					Hours(age,ai,zi,lambdai,ei,xi)  = Linear_Int(YGRID_bench(:,zi,xi),Hours(age,:,zi,lambdai,ei,xi) ,na, YGRID(ai,zi,xi)) 
+					Aprime(age,ai,zi,lambdai,ei,xi) = Linear_Int(YGRID_bench(:,zi,xi),Aprime_aux(age,:,zi,lambdai,ei,xi),na, YGRID(ai,zi,xi))
+					Cons(age,ai,zi,lambdai,ei,xi)   = Linear_Int(YGRID_bench(:,zi,xi),Cons_aux(age,:,zi,lambdai,ei,xi)  ,na, YGRID(ai,zi,xi))
+					Hours(age,ai,zi,lambdai,ei,xi)  = Linear_Int(YGRID_bench(:,zi,xi),Hours_aux(age,:,zi,lambdai,ei,xi) ,na, YGRID(ai,zi,xi)) 
 			        ! Discretize Aprime
 			        if ( Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
 			            tklo =na-1
