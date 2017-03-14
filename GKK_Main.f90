@@ -62,8 +62,9 @@ PROGRAM main
 		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
-			compute_exp_pf= .true.
+			compute_exp_pf= .false.
 			compute_exp_pf_interp = .false.
+			compute_exp_prices= .true.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
@@ -197,14 +198,18 @@ PROGRAM main
 		if (Tax_Reform) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
 			
-			if ((compute_exp_pf).and.(compute_exp_pf_interp.eqv..false.)) then
+			if ((compute_exp_pf).and.(compute_exp_pf_interp.eqv..false.).and.(compute_exp_prices.eqv..false.)) then
 				Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions/'
 				call system( 'mkdir -p ' // trim(Result_Folder) )
 				call Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
-			elseif ((compute_exp_pf.eqv..false.).and.(compute_exp_pf_interp)) then
+			elseif ((compute_exp_pf.eqv..false.).and.(compute_exp_pf_interp).and.(compute_exp_prices.eqv..false.)) then
 				Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp/'
 				call system( 'mkdir -p ' // trim(Result_Folder) )
 				call Solve_Experiment_Fixed_PF_Interp(compute_exp_pf_interp,Simul_Switch)
+			elseif ((compute_exp_pf.eqv..false.).and.(compute_exp_pf_interp.eqv..false.).and.(compute_exp_prices)) then
+				Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Prices/'
+				call system( 'mkdir -p ' // trim(Result_Folder) )
+				call Solve_Experiment_Fixed_PF_Prices(compute_exp_prices,Simul_Switch)
 			else
 				call Solve_Experiment(compute_exp,Simul_Switch)
 			endif 
