@@ -2543,7 +2543,8 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 			tauW_at  = tauW_aux
 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
-			deallocate(YGRID_t) ; deallocate(MBGRID_t)
+			deallocate(YGRID_t) ; deallocate(MBGRID_t)  
+			deallocate(Cons_t)  ; deallocate(Hours_t)  ; deallocate( Aprime_t )
 
 			
 
@@ -2782,6 +2783,7 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 					CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 					CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 					deallocate(YGRID_t) ; deallocate(MBGRID_t)
+					deallocate(Cons_t)  ; deallocate(Hours_t)  ; deallocate( Aprime_t )
 	        
 				! Solve for policy and value functions 
 						! Instead of EGM I update policy funtions by interpolating from the benchmark policy functions
