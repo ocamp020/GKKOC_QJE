@@ -2761,7 +2761,7 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	        endif
 
 	    	!!
-	    	print*, 'Iteration',simutime,'DBN_diff=', DBN_dist, 'R=',R,'P=',P
+	    	print*,'Iter',simutime,'DBN_diff=',DBN_dist,'R=',R,'P=',P,'Assets',sum(sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid)
 	    	!!
 
 	    	! Solve the model at current aggregate values
