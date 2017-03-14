@@ -2546,6 +2546,12 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 			deallocate(YGRID_t) ; deallocate(MBGRID_t)  
 			deallocate(Cons_t)  ; deallocate(Hours_t)  ; deallocate( Aprime_t )
 
+			print*, ' '
+			print*, tauW_at
+			print*, YGRID_bench(1:3,7,1)
+			print*, YGRID(1:3,7,1)
+			print*, ' '
+
 			
 
 	! Solve for policy and value functions 
