@@ -40,7 +40,7 @@ PROGRAM main
 	! Compute benchmark or load results
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
 		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX
-		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices,
+		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices
 		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R 
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
