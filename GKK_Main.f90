@@ -1389,8 +1389,8 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 	! Set capital taxes to zero
 		tauK = 0.0_DP
 		if (Fixed_P) then 
-		tauWmin_at= 0.0010_DP
-		tauWinc_at= 0.001_DP
+		tauWmin_at= 0.0050_DP
+		tauWinc_at= 0.005_DP
 		endif 
 	! Set Y_a_threshold
 		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
