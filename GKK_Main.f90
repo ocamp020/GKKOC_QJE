@@ -69,9 +69,9 @@ PROGRAM main
 				Fixed_PF_interp = .false.
 				Fixed_PF_prices = .false.
 			compute_exp_prices    = .true.
-				Fixed_W = .true. 
+				Fixed_W = .false. 
 				Fixed_P = .true.
-				Fixed_R = .true.
+				Fixed_R = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
@@ -1377,6 +1377,7 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 	use omp_lib
 	implicit none 
 	logical, intent(in) :: compute_exp_prices, Simul_Switch, Fixed_W, Fixed_P, Fixed_R
+	real(dp) :: GBAR_low, GBAR_up
 
 	!====================================================================================================
 	PRINT*,''
@@ -1424,6 +1425,9 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 				write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
 				print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
 				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+				! Set GBAR for low and high point in grid
+				GBAR_low     = GBAR_exp_old 
+				GBAR_up      = GBAR_exp 
 			ENDDO
 
 			! Set tauW as weighted average of point in  the grid to balance budget more precisely
@@ -1453,12 +1457,14 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 				    if (GBAR_exp .gt. GBAR_bench ) then
 				        tauW_up_bt  = tauW_bt 
 				        tauW_up_at  = tauW_at 
+				        GBAR_up     = GBAR_exp 
 				    else
 				        tauW_low_bt = tauW_bt
 				        tauW_low_at = tauW_at
+				        GBAR_low    = GBAR_exp 
 				    endif
-				    tauW_bt = (tauW_low_bt + tauW_up_bt)/2.0_DP
-				    tauW_at = (tauW_low_at + tauW_up_at)/2.0_DP
+				    tauW_bt = tauW_low_bt + (tauW_up_bt-tauW_low_bt)*(GBAR_bench-GBAR_low)/(GBAR_up-GBAR_low)
+				    tauW_at = tauW_low_at + (tauW_up_at-tauW_low_at)*(GBAR_bench-GBAR_low)/(GBAR_up-GBAR_low)
 				    CALL FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 				    CALL GOVNT_BUDGET
 				    GBAR_exp = GBAR
