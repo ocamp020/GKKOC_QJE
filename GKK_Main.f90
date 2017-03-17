@@ -220,12 +220,12 @@ PROGRAM main
 					call Solve_Experiment_Fixed_PF_Prices(Fixed_PF_prices,Simul_Switch)
 				endif 
 			elseif ((compute_exp_pf.eqv..false.).and.(compute_exp_prices)) then 
-					if (Fixed_W) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_W/'
-					if (Fixed_P) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_P/'
-					if (Fixed_R) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_R/'
-					if (Fixed_W.and.Fixed_P) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_WP/'
-					if (Fixed_W.and.Fixed_R) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_WR/'
-					if (Fixed_P.and.Fixed_R) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_PR/'
+					if (Fixed_W.and.(Fixed_P.eqv..false.).and.(Fixed_R.eqv..false.)) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_W/'
+					if ((Fixed_W.eqv..false.).and.Fixed_P.and.(Fixed_R.eqv..false.)) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_P/'
+					if ((Fixed_W.eqv..false.).and.(Fixed_P.eqv..false.).and.Fixed_R) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_R/'
+					if (Fixed_W.and.Fixed_P.and.(Fixed_R.eqv..false.)) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_WP/'
+					if (Fixed_W.and.(Fixed_P.eqv..false.).and.Fixed_R) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_WR/'
+					if ((Fixed_W.eqv..false.).and.Fixed_P.and.Fixed_R) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_PR/'
 					if (Fixed_W.and.Fixed_P.and.Fixed_R) Result_Folder = trim(Result_Folder)//'Exp_Fixed_Prices_WPR/'
 					call system( 'mkdir -p ' // trim(Result_Folder) )
 					call Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W,Fixed_P,Fixed_R)
