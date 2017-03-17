@@ -3023,7 +3023,7 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 	    ENDDO
 	    ENDDO
 	    
-	    DBN2 = 0.9*DBN1 + 0.1*DBN2
+	    DBN2 = 0.8*DBN1 + 0.2*DBN2
 	    DBN_dist = maxval(abs(DBN2-DBN1))
 	    ! print*, DBN_dist
 	    DBN1 = DBN2
@@ -3135,30 +3135,7 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 	 
 	ENDDO ! WHILE
 
-	! Write
-		!OPEN(UNIT=3, FILE='agrid', STATUS='replace')
-		!WRITE(unit=3, FMT=*) agrid
-		!CLOSE (unit=3)
-		!
-		!OPEN(UNIT=3, FILE='aprime', STATUS='replace')
-		!WRITE(unit=3, FMT=*) Aprime(1, :, nz/2+1, nlambda/2+1, ne/2+1)
-		!CLOSE (unit=3)
-		!
-		!OPEN(UNIT=3, FILE='aplo', STATUS='replace')
-		!WRITE(unit=3, FMT=*) Aplo(1, :,nz/2+1, nlambda/2+1, ne/2+1)
-		!CLOSE (unit=3)
-		!
-		!OPEN(UNIT=3, FILE='aphi', STATUS='replace')
-		!WRITE(unit=3, FMT=*) Aphi(1, :, nz/2+1, nlambda/2+1, ne/2+1)
-		!CLOSE (unit=3)
-		!
-		!OPEN(UNIT=3, FILE='Pr_aplo', STATUS='replace')
-		!WRITE(unit=3, FMT=*) PrAprimelo(1, :, nz/2+1, nlambda/2+1, ne/2+1)
-		!CLOSE (unit=3)
-		!
-		!OPEN(UNIT=3, FILE='pr_aphi', STATUS='replace')
-		!WRITE(unit=3, FMT=*) PrAprimehi(1, :, nz/2+1, nlambda/2+1, ne/2+1)
-		!CLOSE (unit=3)
+
 
 END SUBROUTINE FIND_DBN_EQ_Prices
 
