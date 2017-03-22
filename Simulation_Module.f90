@@ -1874,12 +1874,12 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	DO age = 1,MaxAge 
 		WRITE  (UNIT=10, FMT='(F12.4)') Mean_a(age,:)
 		WRITE  (UNIT=11, FMT='(F12.4)') Mean_c(age,:)
-		WRITE  (UNIT=10, FMT='(F12.4)') Mean_k(age,:) 
-		WRITE  (UNIT=11, FMT='(F12.4)') Mean_h(age,:)
-		WRITE  (UNIT=10, FMT='(F12.4)') Mean_r(age,:)
-		WRITE  (UNIT=11, FMT='(F12.4)') Mean_r_at(age,:)
-		WRITE  (UNIT=10, FMT='(F12.4)') Mean_r_w(age,:)
-		WRITE  (UNIT=11, FMT='(F12.4)') Mean_r_at_w(age,:) 
+		WRITE  (UNIT=12, FMT='(F12.4)') Mean_k(age,:) 
+		WRITE  (UNIT=13, FMT='(F12.4)') Mean_h(age,:)
+		WRITE  (UNIT=14, FMT='(F12.4)') Mean_r(age,:)
+		WRITE  (UNIT=15, FMT='(F12.4)') Mean_r_at(age,:)
+		WRITE  (UNIT=16, FMT='(F12.4)') Mean_r_w(age,:)
+		WRITE  (UNIT=17, FMT='(F12.4)') Mean_r_at_w(age,:) 
 	ENDDO
 
 	close (unit=10); close (unit=11); close (unit=12); close (unit=13); 
