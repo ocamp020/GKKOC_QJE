@@ -1613,7 +1613,8 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	real(dp) :: tempno, tempnoage
 	REAL(DP) :: start_timet, finish_timet
 	! Result Storage
-	integer  :: sample_size = 100000, i, i_z, tklo, tkhi 
+	integer , parameter :: sample_size = 100000
+	integer  :: i, i_z, tklo, tkhi 
 	real(dp) :: initial_assets
 	integer , dimension(sample_size,nz)        :: Panel_l
 	integer , dimension(sample_size,MaxAge,nz) :: Panel_e, Panel_x, Panel_Death
@@ -1669,7 +1670,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	    Panel_l(i,i_z) = lambdai
 
    ! Capital
-   		Panel_k(i,1,i_z) = min(theta(i_z)*Panel_a(i,1,i_z)&
+   		Panel_k(i,1,i_z) = min(theta(i_z)*Panel_a(i,1,i_z) , &
 	     					&(mu*P*xz_grid(Panel_x(i,1,i_z),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
 	! Return 
@@ -1775,7 +1776,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	      	ENDIF
 
       	    ! Capital
-		   		Panel_k(i,age,i_z) = min(theta(i_z)*Panel_a(i,age,i_z)&
+		   		Panel_k(i,age,i_z) = min(theta(i_z)*Panel_a(i,age,i_z) , &
 			     					&(mu*P*xz_grid(Panel_x(i,age,i_z),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
 			! Return 
