@@ -1652,7 +1652,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		Panel_x(:,1,:) = 1 
 		Panel_e(:,1,:) = ne/2+1 ! ALL NEWBORN START FROM THE MEDIAN E  but if too many people died and started from median E, draw a new E for them
 		! Initial Assets are given
-		Panel_e(:,1,:) = initial_assets
+		Panel_a(:,1,:) = initial_assets
 		! All individuals are alive
 		Panel_Death(:,1,:) = 1 
 
@@ -1712,8 +1712,6 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	! SIMULATE FROM THE SECOND PERIOD SHOCKS AND UPDATE NEW DISTRIBUTIONS
 	!
 	!=============================================================================
-
-	!call cpu_time(start_timet) 
 	
 	print*, 'Starting Simutime loop'
 	DO i_z=1,nz
