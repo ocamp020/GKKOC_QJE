@@ -1718,7 +1718,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	print*, 'Starting Simutime loop'
 	DO i_z=1,nz
 	DO age=2,MaxAge
-		!$omp parallel do private(tempnoage,tempnoe,ei,xi,tklo,tkhi,tempno)
+		!$omp parallel do private(tempnoage,ei,xi,tklo,tkhi,tempno)
 	   	DO i=1,sample_size
 	        
 			!  Compute Assets from previous period savings
