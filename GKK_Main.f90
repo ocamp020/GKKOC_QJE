@@ -68,7 +68,7 @@ PROGRAM main
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .false.
 				Fixed_PF_prices = .true.
-			compute_exp_prices    = .true.
+			compute_exp_prices    = .false.
 				Fixed_W = .false. 
 				Fixed_P = .false.
 				Fixed_R = .true.
@@ -391,7 +391,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
 		endif
-		! Call Simulation_Life_Cycle_Patterns(solving_bench)
+		
 
 	! Aggregate variables in benchmark economy
 		GBAR_bench  = GBAR
@@ -428,7 +428,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 		endif 
 
-
+		Call Simulation_Life_Cycle_Patterns(solving_bench)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
