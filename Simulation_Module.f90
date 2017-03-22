@@ -1613,7 +1613,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	real(dp) :: tempno, tempnoage
 	REAL(DP) :: start_timet, finish_timet
 	! Result Storage
-	integer , parameter :: sample_size = 100000
+	integer , parameter :: sample_size = 1000000
 	integer  :: i, i_z, tklo, tkhi 
 	real(dp) :: initial_assets
 	integer , dimension(sample_size,nz)        :: Panel_l
@@ -1744,7 +1744,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 			! DRAW NEXT PERIOD'S AGE DBN
 	      	tempnoage = omp_ran1() ! ran1(newiseed)  
 	  
-	      	IF (tempnoage .gt. survP(age)) THEN
+	      	IF (tempnoage .gt. survP(age-1)) THEN
 	      		! Agent Dies
 				Panel_Death(i,age,i_z) = 0
 				Panel_x(i,age,i_z)     = 1
