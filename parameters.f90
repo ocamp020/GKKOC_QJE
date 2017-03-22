@@ -60,7 +60,7 @@ MODULE parameters
 
 	! Control for updates on stationary distribution
 		! Every "update_period" iterations policy functions are updated
-	INTEGER(I4B), PARAMETER :: update_period=50 !Normal value is 5
+	INTEGER(I4B), PARAMETER :: update_period=5 !Normal value is 5
 		! The distribution is iterated until convergence or until "MaxSimuTime" iterations
 	INTEGER(I4B), PARAMETER :: MaxSimuTime=5000 
 		! Age categories are established

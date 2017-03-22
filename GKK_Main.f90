@@ -61,14 +61,14 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .false.
 				Fixed_PF_prices = .false.
-			compute_exp_prices    = .true.
+			compute_exp_prices    = .false.
 				Fixed_W = .false. 
 				Fixed_P = .true.
 				Fixed_R = .false.
@@ -390,6 +390,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
 		endif
+		Call Simulation_Life_Cycle_Patterns(solving_bench)
 
 	! Aggregate variables in benchmark economy
 		GBAR_bench  = GBAR
@@ -585,6 +586,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
 	endif
+	Call Simulation_Life_Cycle_Patterns(solving_bench)
 
 
 	print*,'---------------------------'
@@ -1342,7 +1344,7 @@ Subroutine Solve_Experiment_Fixed_PF_Prices(compute_exp_prices,Simul_Switch)
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
 	endif
-
+	Call Simulation_Life_Cycle_Patterns(solving_bench)
 
 	print*,'---------------------------'
 	print*,''
@@ -1526,6 +1528,7 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
 	endif
+	Call Simulation_Life_Cycle_Patterns(solving_bench)
 
 
 	print*,'---------------------------'
