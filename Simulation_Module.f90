@@ -1623,7 +1623,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	integer , dimension(MaxAge,nz)             :: Mean_Death
 
 	! Set initial assets
-	initial_assets = EBAR
+	initial_assets = EBAR_bench
 
 
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )

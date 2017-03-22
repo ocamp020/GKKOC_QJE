@@ -68,7 +68,7 @@ PROGRAM main
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .false.
 				Fixed_PF_prices = .true.
-			compute_exp_prices    = .true.
+			compute_exp_prices    = .false.
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
