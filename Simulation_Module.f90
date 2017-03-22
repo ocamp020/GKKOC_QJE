@@ -1613,12 +1613,15 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	real(dp) :: tempno, tempnoage
 	REAL(DP) :: start_timet, finish_timet
 	! Result Storage
-	integer  :: sample_size = 100000, i, age, i_z, tklo, tkhi 
-	real(dp) :: initial_assets = EBAR
+	integer  :: sample_size = 100000, i, i_z, tklo, tkhi 
+	real(dp) :: initial_assets
 	integer , dimension(sample_size,nz)        :: Panel_l
 	integer , dimension(sample_size,MaxAge,nz) :: Panel_e, Panel_x, Panel_Death
 	real(DP), dimension(sample_size,MaxAge,nz) :: Panel_a, Panel_c, Panel_k, Panel_h, Panel_r, Panel_r_at
 	real(DP), dimension(MaxAge,nz)             :: Mean_a, Mean_c, Mean_k, Mean_h, Mean_r, Mean_r_at, Mean_r_w, Mean_r_at_w
+
+	! Set initial assets
+	initial_assets = EBAR
 
 
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
@@ -1729,9 +1732,9 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 			    endif    
 			    tkhi = tklo + 1        
 
-	            Panel_a(i,age,i_z) = max( amin, min( amax , ((agrid(tkhi) - currenta)* &
+	            Panel_a(i,age,i_z) = max( amin, min( amax , ((agrid(tkhi) - Panel_a(i,age-1,i_z))* &
 	            				& 	Aprime(age-1,tklo,i_z,Panel_l(i,i_z),Panel_e(i,age-1,i_z),Panel_x(i,age-1,i_z))  &
-	                           	&  +  (currenta - agrid(tklo))* &
+	                           	&  +  (Panel_a(i,age-1,i_z) - agrid(tklo))* &
                            		& 	Aprime(age-1,tkhi,i_z,Panel_l(i,i_z),Panel_e(i,age-1,i_z),Panel_x(i,age-1,i_z))) &
 	                            &  / ( agrid(tkhi) - agrid(tklo) )  ) )
 
