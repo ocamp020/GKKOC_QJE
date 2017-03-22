@@ -1813,10 +1813,11 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		ENDDO ! paneli
 		
 
-	 		print*, "Age", age, "Z", i_z
+	 		! print*, "Age", age, "Z", i_z
 
 	 		
 	ENDDO ! age
+		print*, "Z", i_z
 	ENDDO ! z
 
 	!=============================================================================
