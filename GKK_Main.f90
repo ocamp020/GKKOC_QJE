@@ -64,10 +64,10 @@ PROGRAM main
 		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
-			compute_exp_pf= .false.
+			compute_exp_pf= .true.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .false.
-				Fixed_PF_prices = .false.
+				Fixed_PF_prices = .true.
 			compute_exp_prices    = .false.
 				Fixed_W = .false. 
 				Fixed_P = .true.
@@ -203,7 +203,7 @@ PROGRAM main
 
 		! Tax Reform experiment
 		if (Tax_Reform) then 
-		
+
 			call Solve_Benchmark(compute_bench,Simul_Switch)
 			
 			if ((compute_exp_pf).and.(compute_exp_prices.eqv..false.)) then 
@@ -1224,83 +1224,84 @@ Subroutine Solve_Experiment_Fixed_PF_Prices(compute_exp_prices,Simul_Switch)
 		Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 		Wealth_factor = Y_a_threshold/W_bench
 
-	if (compute_exp_prices) then 
-		! Find wealth taxes that balances budget
-		print*, "	Computing Wealth Tax to balance the budget"
-			! Set initial value for G in experimental economy and for wealth taxes
-			GBAR_exp = 0.0_DP
-			tauW_bt  = tauWmin_bt
-			tauW_at  = tauWmin_at
-			tauWindx = 0.0_DP
-			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-			DO WHILE (GBAR_exp .lt. GBAR_bench)
-				! Set old G and new value of tauW
-				GBAR_exp_old = GBAR_exp
-				tauW_bt = tauWmin_bt + tauWindx * tauWinc_bt
-				tauW_at = tauWmin_at + tauWindx * tauWinc_at
-				! Solve the model
-				CALL FIND_DBN_EQ_PF_Prices
-				CALL GOVNT_BUDGET
+	! if (compute_exp_prices) then 
+	! 	! Find wealth taxes that balances budget
+	! 	print*, "	Computing Wealth Tax to balance the budget"
+	! 		! Set initial value for G in experimental economy and for wealth taxes
+	! 		GBAR_exp = 0.0_DP
+	! 		tauW_bt  = tauWmin_bt
+	! 		tauW_at  = tauWmin_at
+	! 		tauWindx = 0.0_DP
+	! 		! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
+	! 		DO WHILE (GBAR_exp .lt. GBAR_bench)
+	! 			! Set old G and new value of tauW
+	! 			GBAR_exp_old = GBAR_exp
+	! 			tauW_bt = tauWmin_bt + tauWindx * tauWinc_bt
+	! 			tauW_at = tauWmin_at + tauWindx * tauWinc_at
+	! 			! Solve the model
+	! 			CALL FIND_DBN_EQ_PF_Prices
+	! 			CALL GOVNT_BUDGET
 
-				! Get new G
-				GBAR_exp = GBAR 
-				! Iteratioins  
-				tauWindx = tauWindx + 1.0_DP   
-				write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
-				print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
-				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
-			ENDDO
+	! 			! Get new G
+	! 			GBAR_exp = GBAR 
+	! 			! Iteratioins  
+	! 			tauWindx = tauWindx + 1.0_DP   
+	! 			write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
+	! 			print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
+	! 			print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+	! 		ENDDO
 
-			! Set tauW as weighted average of point in  the grid to balance budget more precisely
-				tauW_up_bt  = tauW_bt
-				tauW_low_bt = tauW_bt  -  tauWinc_bt
-				tauW_bt     = tauW_low_bt + tauWinc_bt * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
-				tauW_up_at  = tauW_at
-				tauW_low_at = tauW_at  -  tauWinc_at  
-				tauW_at     = tauW_low_at + tauWinc_at * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
-				print*,''
-				print*,'GBAR bracketed by taxes:'
-				print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
-				print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
-				print*,''
+	! 		! Set tauW as weighted average of point in  the grid to balance budget more precisely
+	! 			tauW_up_bt  = tauW_bt
+	! 			tauW_low_bt = tauW_bt  -  tauWinc_bt
+	! 			tauW_bt     = tauW_low_bt + tauWinc_bt * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+	! 			tauW_up_at  = tauW_at
+	! 			tauW_low_at = tauW_at  -  tauWinc_at  
+	! 			tauW_at     = tauW_low_at + tauWinc_at * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+	! 			print*,''
+	! 			print*,'GBAR bracketed by taxes:'
+	! 			print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
+	! 			print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
+	! 			print*,''
 
-			! Solve (again) experimental economy
-				CALL FIND_DBN_EQ_PF_Prices
-				CALL GOVNT_BUDGET
+	! 		! Solve (again) experimental economy
+	! 			CALL FIND_DBN_EQ_PF_Prices
+	! 			CALL GOVNT_BUDGET
 
-			! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
-				GBAR_exp = GBAR
-				print*,"Gbar at midpoint of bracket and GBAR at benchmark"
-				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
-				print*,''
-				print*,'Bisection for TauW:'
-				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
-				    if (GBAR_exp .gt. GBAR_bench ) then
-				        tauW_up_bt  = tauW_bt 
-				        tauW_up_at  = tauW_at 
-				    else
-				        tauW_low_bt = tauW_bt
-				        tauW_low_at = tauW_at
-				    endif
-				    tauW_bt = (tauW_low_bt + tauW_up_bt)/2.0_DP
-				    tauW_at = (tauW_low_at + tauW_up_at)/2.0_DP
-				    CALL FIND_DBN_EQ_PF_Prices
-				    CALL GOVNT_BUDGET
-				    GBAR_exp = GBAR
-				    print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
-					print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
-					print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
-					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
-				ENDDO
+	! 		! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
+	! 			GBAR_exp = GBAR
+	! 			print*,"Gbar at midpoint of bracket and GBAR at benchmark"
+	! 			print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+	! 			print*,''
+	! 			print*,'Bisection for TauW:'
+	! 			DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
+	! 			    if (GBAR_exp .gt. GBAR_bench ) then
+	! 			        tauW_up_bt  = tauW_bt 
+	! 			        tauW_up_at  = tauW_at 
+	! 			    else
+	! 			        tauW_low_bt = tauW_bt
+	! 			        tauW_low_at = tauW_at
+	! 			    endif
+	! 			    tauW_bt = (tauW_low_bt + tauW_up_bt)/2.0_DP
+	! 			    tauW_at = (tauW_low_at + tauW_up_at)/2.0_DP
+	! 			    CALL FIND_DBN_EQ_PF_Prices
+	! 			    CALL GOVNT_BUDGET
+	! 			    GBAR_exp = GBAR
+	! 			    print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
+	! 				print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
+	! 				print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
+	! 				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+	! 			ENDDO
 
-		! Compute value function and store policy functions, value function and distribution in file
-		! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
-		CALL Firm_Value
+	! 	! Compute value function and store policy functions, value function and distribution in file
+	! 	! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+	! 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	! 	CALL Firm_Value
 
-	endif 
+	! endif 
 	
-	CALL Write_Experimental_Results(compute_exp_prices)
+	! CALL Write_Experimental_Results(compute_exp_prices)
+	CALL Write_Experimental_Results(.false.)
 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 	K_mat  = K_Matrix(R,P)
 	Pr_mat = Profit_Matrix(R,P)
@@ -1403,88 +1404,89 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 		Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 		Wealth_factor = Y_a_threshold/W_bench
 
-	if (compute_exp_prices) then 
-		! Find wealth taxes that balances budget
-		print*, "	Computing Wealth Tax to balance the budget"
-			! Set initial value for G in experimental economy and for wealth taxes
-			GBAR_exp = 0.0_DP
-			tauW_bt  = tauWmin_bt
-			tauW_at  = tauWmin_at
-			tauWindx = 0.0_DP
-			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-			DO WHILE (GBAR_exp .lt. GBAR_bench)
-				! Set old G and new value of tauW
-				GBAR_exp_old = GBAR_exp
-				tauW_bt = tauWmin_bt + tauWindx * tauWinc_bt
-				tauW_at = tauWmin_at + tauWindx * tauWinc_at
-				! Solve the model
-				CALL FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
-				CALL GOVNT_BUDGET
+	! if (compute_exp_prices) then 
+	! 	! Find wealth taxes that balances budget
+	! 	print*, "	Computing Wealth Tax to balance the budget"
+	! 		! Set initial value for G in experimental economy and for wealth taxes
+	! 		GBAR_exp = 0.0_DP
+	! 		tauW_bt  = tauWmin_bt
+	! 		tauW_at  = tauWmin_at
+	! 		tauWindx = 0.0_DP
+	! 		! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
+	! 		DO WHILE (GBAR_exp .lt. GBAR_bench)
+	! 			! Set old G and new value of tauW
+	! 			GBAR_exp_old = GBAR_exp
+	! 			tauW_bt = tauWmin_bt + tauWindx * tauWinc_bt
+	! 			tauW_at = tauWmin_at + tauWindx * tauWinc_at
+	! 			! Solve the model
+	! 			CALL FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
+	! 			CALL GOVNT_BUDGET
 
-				! Get new G
-				GBAR_exp = GBAR 
-				! Iteratioins  
-				tauWindx = tauWindx + 1.0_DP   
-				write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
-				print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
-				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
-				! Set GBAR for low and high point in grid
-				GBAR_low     = GBAR_exp_old 
-				GBAR_up      = GBAR_exp 
-			ENDDO
+	! 			! Get new G
+	! 			GBAR_exp = GBAR 
+	! 			! Iteratioins  
+	! 			tauWindx = tauWindx + 1.0_DP   
+	! 			write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
+	! 			print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
+	! 			print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+	! 			! Set GBAR for low and high point in grid
+	! 			GBAR_low     = GBAR_exp_old 
+	! 			GBAR_up      = GBAR_exp 
+	! 		ENDDO
 
-			! Set tauW as weighted average of point in  the grid to balance budget more precisely
-				tauW_up_bt  = tauW_bt
-				tauW_low_bt = tauW_bt  -  tauWinc_bt
-				tauW_bt     = tauW_low_bt + tauWinc_bt * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
-				tauW_up_at  = tauW_at
-				tauW_low_at = tauW_at  -  tauWinc_at  
-				tauW_at     = tauW_low_at + tauWinc_at * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
-				print*,''
-				print*,'GBAR bracketed by taxes:'
-				print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
-				print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
-				print*,''
+	! 		! Set tauW as weighted average of point in  the grid to balance budget more precisely
+	! 			tauW_up_bt  = tauW_bt
+	! 			tauW_low_bt = tauW_bt  -  tauWinc_bt
+	! 			tauW_bt     = tauW_low_bt + tauWinc_bt * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+	! 			tauW_up_at  = tauW_at
+	! 			tauW_low_at = tauW_at  -  tauWinc_at  
+	! 			tauW_at     = tauW_low_at + tauWinc_at * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+	! 			print*,''
+	! 			print*,'GBAR bracketed by taxes:'
+	! 			print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
+	! 			print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
+	! 			print*,''
 
-			! Solve (again) experimental economy
-				CALL FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
-				CALL GOVNT_BUDGET
+	! 		! Solve (again) experimental economy
+	! 			CALL FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
+	! 			CALL GOVNT_BUDGET
 
-			! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
-				GBAR_exp = GBAR
-				print*,"Gbar at midpoint of bracket and GBAR at benchmark"
-				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
-				print*,''
-				print*,'Bisection for TauW:'
-				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.001 ) ! as long as the difference is greater than 0.1% continue
-				    if (GBAR_exp .gt. GBAR_bench ) then
-				        tauW_up_bt  = tauW_bt 
-				        tauW_up_at  = tauW_at 
-				        GBAR_up     = GBAR_exp 
-				    else
-				        tauW_low_bt = tauW_bt
-				        tauW_low_at = tauW_at
-				        GBAR_low    = GBAR_exp 
-				    endif
-				    tauW_bt = tauW_low_bt + (tauW_up_bt-tauW_low_bt)*(GBAR_bench-GBAR_low)/(GBAR_up-GBAR_low)
-				    tauW_at = tauW_low_at + (tauW_up_at-tauW_low_at)*(GBAR_bench-GBAR_low)/(GBAR_up-GBAR_low)
-				    CALL FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
-				    CALL GOVNT_BUDGET
-				    GBAR_exp = GBAR
-				    print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
-					print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
-					print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
-					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
-				ENDDO
+	! 		! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
+	! 			GBAR_exp = GBAR
+	! 			print*,"Gbar at midpoint of bracket and GBAR at benchmark"
+	! 			print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+	! 			print*,''
+	! 			print*,'Bisection for TauW:'
+	! 			DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.001 ) ! as long as the difference is greater than 0.1% continue
+	! 			    if (GBAR_exp .gt. GBAR_bench ) then
+	! 			        tauW_up_bt  = tauW_bt 
+	! 			        tauW_up_at  = tauW_at 
+	! 			        GBAR_up     = GBAR_exp 
+	! 			    else
+	! 			        tauW_low_bt = tauW_bt
+	! 			        tauW_low_at = tauW_at
+	! 			        GBAR_low    = GBAR_exp 
+	! 			    endif
+	! 			    tauW_bt = tauW_low_bt + (tauW_up_bt-tauW_low_bt)*(GBAR_bench-GBAR_low)/(GBAR_up-GBAR_low)
+	! 			    tauW_at = tauW_low_at + (tauW_up_at-tauW_low_at)*(GBAR_bench-GBAR_low)/(GBAR_up-GBAR_low)
+	! 			    CALL FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
+	! 			    CALL GOVNT_BUDGET
+	! 			    GBAR_exp = GBAR
+	! 			    print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
+	! 				print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
+	! 				print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
+	! 				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+	! 			ENDDO
 
-		! Compute value function and store policy functions, value function and distribution in file
-		! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
-		CALL Firm_Value
+	! 	! Compute value function and store policy functions, value function and distribution in file
+	! 	! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+	! 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	! 	CALL Firm_Value
 
-	endif 
+	! endif 
 	
-	CALL Write_Experimental_Results(compute_exp_prices)
+	! CALL Write_Experimental_Results(compute_exp_prices)
+ 	CALL Write_Experimental_Results(.false.)
 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 	K_mat  = K_Matrix(R,P)
 	Pr_mat = Profit_Matrix(R,P)
