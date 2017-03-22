@@ -1620,6 +1620,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	integer , dimension(sample_size,MaxAge,nz) :: Panel_e, Panel_x, Panel_Death
 	real(DP), dimension(sample_size,MaxAge,nz) :: Panel_a, Panel_c, Panel_k, Panel_h, Panel_r, Panel_r_at
 	real(DP), dimension(MaxAge,nz)             :: Mean_a, Mean_c, Mean_k, Mean_h, Mean_r, Mean_r_at, Mean_r_w, Mean_r_at_w
+	integer , dimension(MaxAge,nz)             :: Mean_Death
 
 	! Set initial assets
 	initial_assets = EBAR
@@ -1838,6 +1839,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 								& /sum(Panel_a(:,age,i_z)*Panel_Death(:,age,i_z)) 
 		Mean_r_at_w(age,i_z) = sum(Panel_r_at(:,age,i_z)*Panel_a(:,age,i_z)*Panel_Death(:,age,i_z)) & 
 								& /sum(Panel_a(:,age,i_z)*Panel_Death(:,age,i_z)) 
+		Mean_Death(age,i_z)  = sum(Panel_Death(:,age,i_z)) 
 	ENDDO 
 	ENDDO
 
@@ -1860,6 +1862,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		OPEN(UNIT=15, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_bench.txt'   , STATUS='replace')
 		OPEN(UNIT=16, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_bench.txt'    , STATUS='replace')
 		OPEN(UNIT=17, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_bench.txt' , STATUS='replace')
+		OPEN(UNIT=18, FILE=trim(Result_Folder)//'Simul/Life_Cycle_Sample_Size.txt'  , STATUS='replace')
 	else 
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_exp.txt'		, STATUS='replace')
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Life_Cycle_c_exp.txt'		, STATUS='replace')
@@ -1869,9 +1872,11 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		OPEN(UNIT=15, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_exp.txt'     , STATUS='replace')
 		OPEN(UNIT=16, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_exp.txt' 	    , STATUS='replace')
 		OPEN(UNIT=17, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_exp.txt'	, STATUS='replace')
+		OPEN(UNIT=18, FILE=trim(Result_Folder)//'Simul/Life_Cycle_Sample_Size.txt'  , STATUS='replace')
 	endif 
 
 	DO age = 1,MaxAge 
+		print*,  Mean_a(age,:)
 		WRITE  (UNIT=10, FMT='(F12.4)') Mean_a(age,:)
 		WRITE  (UNIT=11, FMT='(F12.4)') Mean_c(age,:)
 		WRITE  (UNIT=12, FMT='(F12.4)') Mean_k(age,:) 
@@ -1880,10 +1885,11 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		WRITE  (UNIT=15, FMT='(F12.4)') Mean_r_at(age,:)
 		WRITE  (UNIT=16, FMT='(F12.4)') Mean_r_w(age,:)
 		WRITE  (UNIT=17, FMT='(F12.4)') Mean_r_at_w(age,:) 
+		WRITE  (UNIT=18, FMT='(F12.4)') Mean_Death(age,:) 
 	ENDDO
 
 	close (unit=10); close (unit=11); close (unit=12); close (unit=13); 
-	close (unit=14); close (unit=15); close (unit=16); close (unit=17);
+	close (unit=14); close (unit=15); close (unit=16); close (unit=17); close (unit=18);
 
 
 
