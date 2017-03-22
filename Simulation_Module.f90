@@ -1657,13 +1657,13 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		Panel_Death(:,1,:) = 1 
 
 	DO i_z=1,nz 
-	!$omp parallel do private(tempnolambda,lambdai,tklo,tkhi)
+	!$omp parallel do private(tempno,lambdai,tklo,tkhi)
 	DO i=1,sample_size
 	 
 	! LAMBDA  
-	    tempnolambda = omp_ran1() ! ran1(newiseed) 
+	    tempno = omp_ran1() ! ran1(newiseed) 
 	    lambdai=1
-	    DO WHILE (tempnolambda .gt. cdf_Glambda(lambdai))
+	    DO WHILE (tempno .gt. cdf_Glambda(lambdai))
 	       lambdai=lambdai+1
 	    ENDDO
 
