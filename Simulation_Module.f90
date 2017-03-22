@@ -1745,7 +1745,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 			! DRAW NEXT PERIOD'S AGE DBN
 	      	tempnoage = omp_ran1() ! ran1(newiseed)  
 	  
-	      	IF (tempnoage .gt. survP(age-1)) THEN
+	      	IF (tempnoage .gt. survP(age)) THEN
 	      		! Agent Dies
 				Panel_Death(i,age,i_z) = 0
 				Panel_x(i,age,i_z)     = 1
@@ -1754,15 +1754,12 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 				! Agent Survives
 				Panel_Death(i,age,i_z) = 1
 				! !$omp critical
-       			! print*,'Test 1'
        			tempno 	  = omp_ran1() ! ran1(newiseed)   
 	            xi 		  = 1
 	            DO WHILE (tempno .gt. cdf_pr_x(Panel_x(i,age-1,i_z),xi,i_z,age-1))
-	            	! print*, 'tempno',tempno,'xi',xi
 	               xi = xi+1
 	            ENDDO            
 	            Panel_x(i,age,i_z) = xi          
-	            ! print*,'Test 1.1'
 	            IF (age.lt.RetAge) THEN
 		            tempno 	  = omp_ran1() ! ran1(newiseed)   
 		            ei 		  = 1
@@ -1876,7 +1873,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		OPEN(UNIT=18, FILE=trim(Result_Folder)//'Simul/Life_Cycle_Sample_Size.txt'  , STATUS='replace')
 	endif 
 
-	DO age = 1,MaxAge 
+	DO age = 1,MaxAge-1 
 		print*,  Mean_a(age,:)
 		WRITE  (UNIT=10, FMT='(F12.4)') Mean_a(age,:)
 		WRITE  (UNIT=11, FMT='(F12.4)') Mean_c(age,:)
