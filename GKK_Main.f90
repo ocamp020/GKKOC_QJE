@@ -61,7 +61,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
+		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -203,6 +203,7 @@ PROGRAM main
 
 		! Tax Reform experiment
 		if (Tax_Reform) then 
+		
 			call Solve_Benchmark(compute_bench,Simul_Switch)
 			
 			if ((compute_exp_pf).and.(compute_exp_prices.eqv..false.)) then 
