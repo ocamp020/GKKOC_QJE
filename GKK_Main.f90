@@ -64,13 +64,13 @@ PROGRAM main
 		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
-			compute_exp_pf= .true.
+			compute_exp_pf= .false.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .false.
 				Fixed_PF_prices = .true.
-			compute_exp_prices    = .false.
-				Fixed_W = .false. 
-				Fixed_P = .true.
+			compute_exp_prices    = .true.
+				Fixed_W = .true. 
+				Fixed_P = .false.
 				Fixed_R = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
