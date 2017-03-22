@@ -1874,7 +1874,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	endif 
 
 	DO age = 1,MaxAge-1 
-		print*,  Mean_a(age,:)
+		! print*,  Mean_a(age,:)
 		WRITE  (UNIT=10, FMT='(F12.4)') Mean_a(age,:)
 		WRITE  (UNIT=11, FMT='(F12.4)') Mean_c(age,:)
 		WRITE  (UNIT=12, FMT='(F12.4)') Mean_k(age,:) 
@@ -1883,7 +1883,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		WRITE  (UNIT=15, FMT='(F12.4)') Mean_r_at(age,:)
 		WRITE  (UNIT=16, FMT='(F12.4)') Mean_r_w(age,:)
 		WRITE  (UNIT=17, FMT='(F12.4)') Mean_r_at_w(age,:) 
-		WRITE  (UNIT=18, FMT='(F12.4)') Mean_Death(age,:) 
+		WRITE  (UNIT=18, FMT=* 		  ) Mean_Death(age,:) 
 	ENDDO
 
 	close (unit=10); close (unit=11); close (unit=12); close (unit=13); 
