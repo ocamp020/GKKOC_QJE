@@ -1769,6 +1769,8 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		               ei = ei+1
 		            ENDDO            
 		            Panel_e(i,age,i_z) = ei 
+	            ELSE 
+	            	Panel_e(i,age,i_z) = Panel_e(i,age-1,i_z)
 	            ENDIF 
 	            ! !$omp end critical   
 	      	ENDIF
