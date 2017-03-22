@@ -1613,7 +1613,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	real(dp) :: tempno, tempnoage
 	REAL(DP) :: start_timet, finish_timet
 	! Result Storage
-	integer , parameter :: sample_size = 1000000
+	integer , parameter :: sample_size = 100000
 	integer  :: i, i_z, tklo, tkhi 
 	real(dp) :: initial_assets
 	integer , dimension(sample_size,nz)        :: Panel_l
