@@ -1614,13 +1614,14 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	REAL(DP) :: start_timet, finish_timet
 	! Result Storage
 	integer , parameter :: sample_size = 100000
-	integer  :: i, i_z, tklo, tkhi 
+	integer  :: i, i_z, i_x, tklo, tkhi 
 	real(dp) :: initial_assets
 	integer , dimension(sample_size,nz)        :: Panel_l
 	integer , dimension(sample_size,MaxAge,nz) :: Panel_e, Panel_x, Panel_Death
 	real(DP), dimension(sample_size,MaxAge,nz) :: Panel_a, Panel_c, Panel_k, Panel_h, Panel_r, Panel_r_at
 	real(DP), dimension(MaxAge,nz)             :: Mean_a, Mean_c, Mean_k, Mean_h, Mean_r, Mean_r_at, Mean_r_w, Mean_r_at_w
 	integer , dimension(MaxAge,nz)             :: Mean_Death
+	real(DP), dimension(MaxAge,nx) 			   :: Mean_a_x, Mean_c_x, Mean_k_x, Mean_h_x, Mean_r_x, Mean_r_at_x, Mean_r_w_x, Mean_r_at_w_x
 
 	! Set initial assets
 	initial_assets = EBAR_bench
@@ -1841,6 +1842,22 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	ENDDO 
 	ENDDO
 
+	DO i_x = 1,nx
+	DO age = 1,MaxAge 
+		pack(panel_top_ind  , (panelPV_a.ge.A_cut) )
+		Mean_a_x(age,i_x) 	 = sum(pack(Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+		Mean_c_x(age,i_x) 	 = sum(pack(Panel_c(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/sum(pack(Panel_Death(:,age,9)) 
+		Mean_k_x(age,i_x) 	 = sum(pack(Panel_k(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/sum(pack(Panel_Death(:,age,9)) 
+		Mean_h_x(age,i_x) 	 = sum(pack(Panel_h(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/sum(pack(Panel_Death(:,age,9)) 
+		Mean_r_x(age,i_x) 	 = sum(pack(Panel_r(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/sum(pack(Panel_Death(:,age,9)) 
+		Mean_r_at_x(age,i_x) = sum(pack(Panel_r_at(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/sum(pack(Panel_Death(:,age,9)) 
+		Mean_r_w_x(age,i_x)  = sum(pack(Panel_r(:,age,9)*Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) & 
+								& /sum(pack(Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+		Mean_r_at_w_x(age,i_x) = sum(pack(Panel_r_at(:,age,9)*Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) & 
+								& /sum(pack(Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+	ENDDO 
+	ENDDO
+
 	!=============================================================================
 	!
 	! Write Results
@@ -1861,6 +1878,16 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		OPEN(UNIT=16, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_bench.txt'    , STATUS='replace')
 		OPEN(UNIT=17, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_bench.txt' , STATUS='replace')
 		OPEN(UNIT=18, FILE=trim(Result_Folder)//'Simul/Life_Cycle_Sample_Size.txt'  , STATUS='replace')
+
+		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_x_bench.txt'	, STATUS='replace')
+		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/Life_Cycle_c_x_bench.txt'	, STATUS='replace')
+		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Life_Cycle_k_x_bench.txt'	, STATUS='replace')
+		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/Life_Cycle_h_x_bench.txt'   	, STATUS='replace')
+		OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_x_bench.txt'    , STATUS='replace')
+		OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_x_bench.txt' , STATUS='replace')
+		OPEN(UNIT=36, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_x_bench.txt'  , STATUS='replace')
+		OPEN(UNIT=37, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_x_bench.txt' , STATUS='replace')
+		OPEN(UNIT=38, FILE=trim(Result_Folder)//'Simul/Life_Cycle_Sample_Size.txt'  , STATUS='replace')
 	else 
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_exp.txt'		, STATUS='replace')
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Life_Cycle_c_exp.txt'		, STATUS='replace')
@@ -1870,7 +1897,15 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		OPEN(UNIT=15, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_exp.txt'     , STATUS='replace')
 		OPEN(UNIT=16, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_exp.txt' 	    , STATUS='replace')
 		OPEN(UNIT=17, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_exp.txt'	, STATUS='replace')
-		OPEN(UNIT=18, FILE=trim(Result_Folder)//'Simul/Life_Cycle_Sample_Size.txt'  , STATUS='replace')
+
+		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_x_exp.txt'		, STATUS='replace')
+		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/Life_Cycle_c_x_exp.txt'		, STATUS='replace')
+		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Life_Cycle_k_x_exp.txt'		, STATUS='replace')
+		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/Life_Cycle_h_x_exp.txt'   	, STATUS='replace')
+		OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_x_exp.txt'      , STATUS='replace')
+		OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_x_exp.txt'   , STATUS='replace')
+		OPEN(UNIT=36, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_x_exp.txt' 	, STATUS='replace')
+		OPEN(UNIT=37, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_x_exp.txt'	, STATUS='replace')
 	endif 
 
 	DO age = 1,MaxAge-1 
@@ -1884,10 +1919,22 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		WRITE  (UNIT=16, FMT=*) Mean_r_w(age,:)
 		WRITE  (UNIT=17, FMT=*) Mean_r_at_w(age,:) 
 		WRITE  (UNIT=18, FMT=*) Mean_Death(age,:) 
+
+		WRITE  (UNIT=30, FMT=*) Mean_a_x(age,:)
+		WRITE  (UNIT=31, FMT=*) Mean_c_x(age,:)
+		WRITE  (UNIT=32, FMT=*) Mean_k_x(age,:) 
+		WRITE  (UNIT=33, FMT=*) Mean_h_x(age,:)
+		WRITE  (UNIT=24, FMT=*) Mean_r_x(age,:)
+		WRITE  (UNIT=35, FMT=*) Mean_r_at_x(age,:)
+		WRITE  (UNIT=36, FMT=*) Mean_r_w_x(age,:)
+		WRITE  (UNIT=37, FMT=*) Mean_r_at_w_x(age,:) 
 	ENDDO
 
 	close (unit=10); close (unit=11); close (unit=12); close (unit=13); 
 	close (unit=14); close (unit=15); close (unit=16); close (unit=17); close (unit=18);
+
+	close (unit=30); close (unit=31); close (unit=32); close (unit=33); 
+	close (unit=34); close (unit=35); close (unit=36); close (unit=37);
 
 
 
