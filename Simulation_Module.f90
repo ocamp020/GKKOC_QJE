@@ -1845,12 +1845,18 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	DO i_x = 1,nx
 	DO age = 1,MaxAge 
 		pack(panel_top_ind  , (panelPV_a.ge.A_cut) )
-		Mean_a_x(age,i_x) 	 = sum(pack(Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
-		Mean_c_x(age,i_x) 	 = sum(pack(Panel_c(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/sum(pack(Panel_Death(:,age,9)) 
-		Mean_k_x(age,i_x) 	 = sum(pack(Panel_k(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/sum(pack(Panel_Death(:,age,9)) 
-		Mean_h_x(age,i_x) 	 = sum(pack(Panel_h(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/sum(pack(Panel_Death(:,age,9)) 
-		Mean_r_x(age,i_x) 	 = sum(pack(Panel_r(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/sum(pack(Panel_Death(:,age,9)) 
-		Mean_r_at_x(age,i_x) = sum(pack(Panel_r_at(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/sum(pack(Panel_Death(:,age,9)) 
+		Mean_a_x(age,i_x) 	 = sum(pack(Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))&
+								& /sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+		Mean_c_x(age,i_x) 	 = sum(pack(Panel_c(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
+								& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+		Mean_k_x(age,i_x) 	 = sum(pack(Panel_k(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
+								& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+		Mean_h_x(age,i_x) 	 = sum(pack(Panel_h(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
+								& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+		Mean_r_x(age,i_x) 	 = sum(pack(Panel_r(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
+								& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+		Mean_r_at_x(age,i_x) = sum(pack(Panel_r_at(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
+								& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
 		Mean_r_w_x(age,i_x)  = sum(pack(Panel_r(:,age,9)*Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) & 
 								& /sum(pack(Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
 		Mean_r_at_w_x(age,i_x) = sum(pack(Panel_r_at(:,age,9)*Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) & 
