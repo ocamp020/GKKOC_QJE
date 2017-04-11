@@ -1896,11 +1896,12 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		     					&(mu*P*xz_grid(Panel_x_ben(i,age,i_z),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
 			! Return 
-			Panel_r_ben(i,age,i_z) = ( P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - (R+DepRate)*Panel_k_ben(i,age,i_z) +&
- 										&   R*Panel_a_ben(i,age,i_z) )/Panel_a_ben(i,age,i_z)
+			Panel_r_ben(i,age,i_z) = ( P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - &
+								&   (R+DepRate)*Panel_k_ben(i,age,i_z) + R*Panel_a_ben(i,age,i_z) )/Panel_a_ben(i,age,i_z)
 
-			Panel_r_at_ben(i,age,i_z) = ( ( ( (P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - (R+DepRate)*Panel_k_ben(i,age,i_z)) &
-								& + R*Panel_a_ben(i,age,i_z))*(1.0_dp-tauK) + Panel_a_ben(i,age,i_z))*(1.0_dp-tauW_at) )/Panel_a_ben(i,age,i_z) - 1.0_dp 	    
+			Panel_r_at_ben(i,age,i_z) = ( ( ( (P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - &
+								& (R+DepRate)*Panel_k_ben(i,age,i_z)) + R*Panel_a_ben(i,age,i_z))*(1.0_dp-tauK) + &
+								& Panel_a_ben(i,age,i_z))*(1.0_dp-tauW_at) )/Panel_a_ben(i,age,i_z) - 1.0_dp 	    
 
 			ENDDO ! paneli 		
 		ENDDO ! age
