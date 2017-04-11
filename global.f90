@@ -8,7 +8,7 @@ MODULE global
     logical :: Progressive_Tax_Switch
 
     ! Foder to store results
-    character(100) :: Result_Folder
+    character(100) :: Result_Folder, Bench_Simul_Folder
 
     ! "params" determines the economy to be simulated. 
     	! It contains the values of: beta, rho_z, sigma_z_eps, sigma_lambda_eps and phi. In order.

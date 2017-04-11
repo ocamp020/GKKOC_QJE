@@ -68,7 +68,7 @@ PROGRAM main
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .false.
 				Fixed_PF_prices = .true.
-			compute_exp_prices    = .true.
+			compute_exp_prices    = .false.
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
@@ -205,6 +205,7 @@ PROGRAM main
 		if (Tax_Reform) then 
 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
+			Bench_Simul_Folder = trim(Result_Folder)//'Simul/'
 			
 			if ((compute_exp_pf).and.(compute_exp_prices.eqv..false.)) then 
 				if     ((Fixed_PF).and.(Fixed_PF_interp.eqv..false.).and.(Fixed_PF_prices.eqv..false.)) then
@@ -428,7 +429,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 		endif 
 
-		! Call Simulation_Life_Cycle_Patterns(solving_bench)
+		Call Simulation_Life_Cycle_Patterns(solving_bench)
 
 
 		! print*,"	Efficiency Computation"

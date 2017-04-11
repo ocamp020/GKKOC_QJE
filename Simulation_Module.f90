@@ -1617,9 +1617,11 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	integer  :: i, i_z, i_x, tklo, tkhi 
 	real(dp) :: initial_assets
 	integer , dimension(sample_size,nz)        :: Panel_l
-	integer , dimension(sample_size,MaxAge,nz) :: Panel_e, Panel_x, Panel_Death
+	integer , dimension(sample_size,MaxAge,nz) :: Panel_e, Panel_x, Panel_Death, Panel_x_ben, Panel_d_ben
 	real(DP), dimension(sample_size,MaxAge,nz) :: Panel_a, Panel_c, Panel_k, Panel_h, Panel_r, Panel_r_at
+	real(DP), dimension(sample_size,MaxAge,nz) :: Panel_a_ben, Panel_k_ben, Panel_r_ben, Panel_r_at_ben
 	real(DP), dimension(MaxAge,nz)             :: Mean_a, Mean_c, Mean_k, Mean_h, Mean_r, Mean_r_at, Mean_r_w, Mean_r_at_w
+	real(DP), dimension(MaxAge,nz)             :: Mean_k_ben, Mean_r_ben, Mean_r_at_ben, Mean_r_w_ben, Mean_r_at_w_ben
 	integer , dimension(MaxAge,nz)             :: Mean_Death
 	real(DP), dimension(MaxAge,nx) 			   :: Mean_a_x, Mean_c_x, Mean_k_x, Mean_h_x, Mean_r_x, Mean_r_at_x, Mean_r_w_x, Mean_r_at_w_x
 	real(DP), dimension(na,nz)                 :: DBN_AZ
@@ -1870,6 +1872,58 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 
 	!=============================================================================
 	!
+	! Counterfactual returns with benchmark wealth distribution
+	!
+	!=============================================================================
+	if (bench_indx.eq.0) then 
+		! Read panel for assets, x and death from benchmark simulation
+		OPEN (UNIT=1,  FILE=trim(Bench_Simul_Folder)//'Life_Cycle_a_panel_bench.txt'  , STATUS='old', ACTION='read')
+		OPEN (UNIT=2,  FILE=trim(Bench_Simul_Folder)//'Life_Cycle_x_panel_bench.txt'  , STATUS='old', ACTION='read')
+		OPEN (UNIT=3,  FILE=trim(Bench_Simul_Folder)//'Life_Cycle_d_panel_bench.txt'  , STATUS='old', ACTION='read')
+			READ (UNIT=1,  FMT=*), Panel_a_ben
+			READ (UNIT=2,  FMT=*), Panel_x_ben 
+			READ (UNIT=3,  FMT=*), Panel_d_ben 
+		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
+
+		print*, 'Starting Simutime loop for benchmark counterfactual'
+		DO i_z=1,nz
+		DO age=2,MaxAge
+			!$omp parallel do private(tempnoage,ei,xi,tklo,tkhi,tempno)
+		   	DO i=1,sample_size
+		     
+      	    ! Capital
+	   		Panel_k_ben(i,age,i_z) = min(theta(i_z)*Panel_a_ben(i,age,i_z) , &
+		     					&(mu*P*xz_grid(Panel_x_ben(i,age,i_z),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+
+			! Return 
+			Panel_r_ben(i,age,i_z) = ( P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - (R+DepRate)*Panel_k_ben(i,age,i_z) +&
+ 										&   R*Panel_a_ben(i,age,i_z) )/Panel_a_ben(i,age,i_z)
+
+			Panel_r_at_ben(i,age,i_z) = ( ( ( (P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - (R+DepRate)*Panel_k_ben(i,age,i_z)) &
+								& + R*Panel_a_ben(i,age,i_z))*(1.0_dp-tauK) + Panel_a_ben(i,age,i_z))*(1.0_dp-tauW_at) )/Panel_a_ben(i,age,i_z) - 1.0_dp 	    
+
+			ENDDO ! paneli 		
+		ENDDO ! age
+			print*, "Z", i_z
+		ENDDO ! z
+
+		print*, ' '
+		print*, 'Computing Averages'
+		DO i_z = 1,nz 
+		DO age = 1,MaxAge 
+			Mean_k_ben(age,i_z) 	 = sum(Panel_k_ben(:,age,i_z)*Panel_d_ben(:,age,i_z))/sum(Panel_d_ben(:,age,i_z)) 
+			Mean_r_ben(age,i_z) 	 = sum(Panel_r_ben(:,age,i_z)*Panel_d_ben(:,age,i_z))/sum(Panel_d_ben(:,age,i_z)) 
+			Mean_r_at_ben(age,i_z)   = sum(Panel_r_at_ben(:,age,i_z)*Panel_d_ben(:,age,i_z))/sum(Panel_d_ben(:,age,i_z)) 
+			Mean_r_w_ben(age,i_z) 	 = sum(Panel_r_ben(:,age,i_z)*Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z)) & 
+										& /sum(Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z)) 
+			Mean_r_at_w_ben(age,i_z) = sum(Panel_r_at_ben(:,age,i_z)*Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z)) & 
+										& /sum(Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z)) 
+		ENDDO 
+		ENDDO
+
+	endif 
+	!=============================================================================
+	!
 	! Write Results
 	!
 	!=============================================================================
@@ -1901,6 +1955,11 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		OPEN(UNIT=50, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_panel_bench.txt', STATUS='replace')
 		OPEN(UNIT=51, FILE=trim(Result_Folder)//'Simul/Life_Cycle_x_panel_bench.txt', STATUS='replace')
 		OPEN(UNIT=52, FILE=trim(Result_Folder)//'Simul/Life_Cycle_d_panel_bench.txt', STATUS='replace')
+			WRITE  (UNIT=50, FMT=*) Panel_a
+			WRITE  (UNIT=51, FMT=*) Panel_x
+			WRITE  (UNIT=52, FMT=*) Panel_Death
+		close (unit=50); close (unit=51); close (unit=52);
+
 	else 
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_exp.txt'		, STATUS='replace')
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Life_Cycle_c_exp.txt'		, STATUS='replace')
@@ -1920,9 +1979,17 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		OPEN(UNIT=36, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_x_exp.txt' 	, STATUS='replace')
 		OPEN(UNIT=37, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_x_exp.txt'	, STATUS='replace')
 
-		OPEN(UNIT=50, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_panel_exp.txt'  , STATUS='replace')
-		OPEN(UNIT=51, FILE=trim(Result_Folder)//'Simul/Life_Cycle_x_panel_exp.txt'	, STATUS='replace')
-		OPEN(UNIT=52, FILE=trim(Result_Folder)//'Simul/Life_Cycle_d_panel_exp.txt'	, STATUS='replace')
+		OPEN(UNIT=50, FILE=trim(Result_Folder)//'Simul/Life_Cycle_k_exp_a_ben.txt'		, STATUS='replace')
+		OPEN(UNIT=51, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_exp_a_ben.txt'      , STATUS='replace')
+		OPEN(UNIT=52, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_exp_a_ben.txt'   , STATUS='replace')
+		OPEN(UNIT=53, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_exp_a_ben.txt'    , STATUS='replace')
+		OPEN(UNIT=54, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_exp_a_ben.txt'	, STATUS='replace')
+			WRITE  (UNIT=50, FMT=*) Mean_k_ben
+			WRITE  (UNIT=51, FMT=*) Mean_r_ben
+			WRITE  (UNIT=52, FMT=*) Mean_r_at_ben
+			WRITE  (UNIT=53, FMT=*) Mean_r_w_ben
+			WRITE  (UNIT=54, FMT=*) Mean_r_at_w_ben
+		close (unit=50); close (unit=51); close (unit=52); close (unit=53); close (unit=54);
 	endif 
 
 	DO age = 1,MaxAge-1 
@@ -1947,17 +2014,11 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		WRITE  (UNIT=37, FMT=*) Mean_r_at_w_x(age,:) 
 	ENDDO
 
-		WRITE  (UNIT=50, FMT=*) Panel_a
-		WRITE  (UNIT=51, FMT=*) Panel_x
-		WRITE  (UNIT=52, FMT=*) Panel_Death
-
 	close (unit=10); close (unit=11); close (unit=12); close (unit=13); 
 	close (unit=14); close (unit=15); close (unit=16); close (unit=17); close (unit=18);
 
 	close (unit=30); close (unit=31); close (unit=32); close (unit=33); 
 	close (unit=34); close (unit=35); close (unit=36); close (unit=37);
-
-	close (unit=50); close (unit=51); close (unit=52);
 
 END SUBROUTINE Simulation_Life_Cycle_Patterns
 
