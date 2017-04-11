@@ -1887,7 +1887,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 
 		print*, 'Starting Simutime loop for benchmark counterfactual'
 		DO i_z=1,nz
-		DO age=2,MaxAge
+		DO age=1,MaxAge
 			print*, 'Age',age,'Mean Assets',sum(Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z))/sum(Panel_d_ben(:,age,i_z)),&
 					& 'Population', sum(Panel_d_ben(:,age,i_z))
 			!$omp parallel do private(tempnoage,ei,xi,tklo,tkhi,tempno)
