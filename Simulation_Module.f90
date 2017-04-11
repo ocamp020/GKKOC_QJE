@@ -1622,6 +1622,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	real(DP), dimension(MaxAge,nz)             :: Mean_a, Mean_c, Mean_k, Mean_h, Mean_r, Mean_r_at, Mean_r_w, Mean_r_at_w
 	integer , dimension(MaxAge,nz)             :: Mean_Death
 	real(DP), dimension(MaxAge,nx) 			   :: Mean_a_x, Mean_c_x, Mean_k_x, Mean_h_x, Mean_r_x, Mean_r_at_x, Mean_r_w_x, Mean_r_at_w_x
+	real(DP), dimension(na,nz)                 :: DBN_AZ
 
 	! Set initial assets
 	initial_assets = EBAR_bench
@@ -1655,9 +1656,9 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		Panel_e(:,1,:) = ne/2+1 ! ALL NEWBORN START FROM THE MEDIAN E  but if too many people died and started from median E, draw a new E for them
 		! Initial Assets are given
 			! Panel_a(:,1,:) = initial_assets
+			DBN_AZ = sum(sum(sum(sum(DBN_bench,6),5),4),1)
 		do i_z=1,nz 
-			Panel_a(:,1,i_z) = sum( sum(sum(sum(sum(DBN_bench(:,:,i_z,:,:,:),6),5),4),1)*agrid ) & 
-								& / sum( sum(sum(sum(sum(DBN_bench(:,:,i_z,:,:,:),6),5),4),1) )
+			Panel_a(:,1,i_z) = sum( DBN_AZ(:,i_z)*agrid ) / sum( DBN_AZ(:,i_z) )
 		enddo 
 		! All individuals are alive
 		Panel_Death(:,1,:) = 1 
