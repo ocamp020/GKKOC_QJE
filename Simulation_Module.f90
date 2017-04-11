@@ -1985,12 +1985,8 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		OPEN(UNIT=52, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_exp_a_ben.txt'   , STATUS='replace')
 		OPEN(UNIT=53, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_exp_a_ben.txt'    , STATUS='replace')
 		OPEN(UNIT=54, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_exp_a_ben.txt'	, STATUS='replace')
-			WRITE  (UNIT=50, FMT=*) Mean_k_ben
-			WRITE  (UNIT=51, FMT=*) Mean_r_ben
-			WRITE  (UNIT=52, FMT=*) Mean_r_at_ben
-			WRITE  (UNIT=53, FMT=*) Mean_r_w_ben
-			WRITE  (UNIT=54, FMT=*) Mean_r_at_w_ben
-		close (unit=50); close (unit=51); close (unit=52); close (unit=53); close (unit=54);
+			
+		
 	endif 
 
 	DO age = 1,MaxAge-1 
@@ -2013,6 +2009,14 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		WRITE  (UNIT=35, FMT=*) Mean_r_at_x(age,:)
 		WRITE  (UNIT=36, FMT=*) Mean_r_w_x(age,:)
 		WRITE  (UNIT=37, FMT=*) Mean_r_at_w_x(age,:) 
+
+		if (bench_indx.eq.0) then 
+			WRITE  (UNIT=50, FMT=*) Mean_k_ben(age,:)
+			WRITE  (UNIT=51, FMT=*) Mean_r_ben(age,:)
+			WRITE  (UNIT=52, FMT=*) Mean_r_at_ben(age,:)
+			WRITE  (UNIT=53, FMT=*) Mean_r_w_ben(age,:)
+			WRITE  (UNIT=54, FMT=*) Mean_r_at_w_ben(age,:)
+		endif 
 	ENDDO
 
 	close (unit=10); close (unit=11); close (unit=12); close (unit=13); 
@@ -2020,6 +2024,10 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 
 	close (unit=30); close (unit=31); close (unit=32); close (unit=33); 
 	close (unit=34); close (unit=35); close (unit=36); close (unit=37);
+
+	if (bench_indx.eq.0) then 
+		close (unit=50); close (unit=51); close (unit=52); close (unit=53); close (unit=54);
+	endif 
 
 END SUBROUTINE Simulation_Life_Cycle_Patterns
 
