@@ -1654,7 +1654,11 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		Panel_x(:,1,:) = 1 
 		Panel_e(:,1,:) = ne/2+1 ! ALL NEWBORN START FROM THE MEDIAN E  but if too many people died and started from median E, draw a new E for them
 		! Initial Assets are given
-		Panel_a(:,1,:) = initial_assets
+			! Panel_a(:,1,:) = initial_assets
+		do i_z=1,nz 
+			Panel_a(:,1,i_z) = sum( sum(sum(sum(sum(DBN_bench(:,:,i_z,:,:,:),6),5),4),1)*agrid ) & 
+								& / sum( sum(sum(sum(sum(DBN_bench(:,:,i_z,:,:,:),6),5),4),1) )
+		enddo 
 		! All individuals are alive
 		Panel_Death(:,1,:) = 1 
 
@@ -1892,6 +1896,10 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_x_bench.txt' , STATUS='replace')
 		OPEN(UNIT=36, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_x_bench.txt'  , STATUS='replace')
 		OPEN(UNIT=37, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_x_bench.txt' , STATUS='replace')
+
+		OPEN(UNIT=50, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_panel_bench.txt', STATUS='replace')
+		OPEN(UNIT=51, FILE=trim(Result_Folder)//'Simul/Life_Cycle_x_panel_bench.txt', STATUS='replace')
+		OPEN(UNIT=52, FILE=trim(Result_Folder)//'Simul/Life_Cycle_d_panel_bench.txt', STATUS='replace')
 	else 
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_exp.txt'		, STATUS='replace')
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Life_Cycle_c_exp.txt'		, STATUS='replace')
@@ -1910,6 +1918,10 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_x_exp.txt'   , STATUS='replace')
 		OPEN(UNIT=36, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_x_exp.txt' 	, STATUS='replace')
 		OPEN(UNIT=37, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_x_exp.txt'	, STATUS='replace')
+
+		OPEN(UNIT=50, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_panel_exp.txt'  , STATUS='replace')
+		OPEN(UNIT=51, FILE=trim(Result_Folder)//'Simul/Life_Cycle_x_panel_exp.txt'	, STATUS='replace')
+		OPEN(UNIT=52, FILE=trim(Result_Folder)//'Simul/Life_Cycle_d_panel_exp.txt'	, STATUS='replace')
 	endif 
 
 	DO age = 1,MaxAge-1 
@@ -1934,13 +1946,17 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		WRITE  (UNIT=37, FMT=*) Mean_r_at_w_x(age,:) 
 	ENDDO
 
+		WRITE  (UNIT=50, FMT=*) Panel_a
+		WRITE  (UNIT=51, FMT=*) Panel_x
+		WRITE  (UNIT=52, FMT=*) Panel_Death
+
 	close (unit=10); close (unit=11); close (unit=12); close (unit=13); 
 	close (unit=14); close (unit=15); close (unit=16); close (unit=17); close (unit=18);
 
 	close (unit=30); close (unit=31); close (unit=32); close (unit=33); 
 	close (unit=34); close (unit=35); close (unit=36); close (unit=37);
 
-
+	close (unit=50); close (unit=51); close (unit=52);
 
 END SUBROUTINE Simulation_Life_Cycle_Patterns
 
