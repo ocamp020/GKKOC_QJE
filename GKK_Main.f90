@@ -64,11 +64,11 @@ PROGRAM main
 		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
-			compute_exp_pf= .false.
+			compute_exp_pf= .true.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .false.
 				Fixed_PF_prices = .true.
-			compute_exp_prices    = .true.
+			compute_exp_prices    = .false.
 				Fixed_W = .true. 
 				Fixed_P = .false.
 				Fixed_R = .false.
