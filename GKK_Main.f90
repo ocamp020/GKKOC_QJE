@@ -64,7 +64,7 @@ PROGRAM main
 		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
-			compute_exp_pf= .false.
+			compute_exp_pf= .true.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .false.
 				Fixed_PF_prices = .true.
@@ -429,7 +429,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 		endif 
 
-		Call Simulation_Life_Cycle_Patterns(solving_bench)
+		! Call Simulation_Life_Cycle_Patterns(solving_bench)
 
 
 		! print*,"	Efficiency Computation"
