@@ -144,12 +144,16 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 		tauW_at = 0.0_dp 
 		tau_indicator = 1.0_dp 
 		! Solve model at current taxes 
+		print*,'tauC=',tauC,'tauK=',tauK
 		CALL FIND_DBN_EQ
 	    CALL GOVNT_BUDGET
 	    GBAR_exp = GBAR  
+	    print*, ' '; print*, 'tauC=',tauC,'tauK=',tauK,'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' ' 
+	    if (GBAR_exp>GBAR_bench) then 
 		! Bracket budget balancing taxes 
 		do while (GBAR_exp>GBAR_bench) 
 			tauK = tauK - 0.05_dp
+			print*,'tauC=',tauC,'tauK=',tauK
 			CALL FIND_DBN_EQ
 		    CALL GOVNT_BUDGET
 		    GBAR_exp = GBAR 
@@ -157,6 +161,19 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 		enddo 
 		! Find budget balancing taxes	
 		brentvaluet = brent_p( tauK , tauK + 0.025 , tauK + 0.05_dp , diff_GBAR , brent_tol, tauK , tau_indicator ) 
+		else 
+		! Bracket budget balancing taxes 
+		do while (GBAR_exp<GBAR_bench) 
+			tauK = tauK + 0.05_dp
+			print*,'tauC=',tauC,'tauK=',tauK
+			CALL FIND_DBN_EQ
+		    CALL GOVNT_BUDGET
+		    GBAR_exp = GBAR 
+		    print*, ' '; print*, 'tauC=',tauC,'tauK=',tauK,'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' ' 
+		enddo 
+		! Find budget balancing taxes	
+		brentvaluet = brent_p( tauK-0.05_dp , tauK - 0.025 , tauK , diff_GBAR , brent_tol, tauK , tau_indicator ) 
+		endif 
 	else 
 		tauK = 0.0_dp 
 		tau_indicator = 0.0_dp 
@@ -164,6 +181,8 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 		CALL FIND_DBN_EQ
 	    CALL GOVNT_BUDGET
 	    GBAR_exp = GBAR  
+	    print*, ' '; print*, 'tauC=',tauC,'tauK=',tauK,'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' ' 
+	    if (GBAR_exp>GBAR_bench) then 
 		! Bracket budget balancing taxes 
 		do while (GBAR_exp>GBAR_bench) 
 			tauW_at = tauW_at - 0.001_dp
@@ -174,6 +193,18 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 		enddo 
 		! Find budget balancing taxes	
 		brentvaluet = brent_p( tauW_at , tauW_at + 0.0005 , tauW_at + 0.001_dp , diff_GBAR , brent_tol, tauK , tau_indicator ) 
+		else 
+		! Bracket budget balancing taxes 
+		do while (GBAR_exp>GBAR_bench) 
+			tauW_at = tauW_at + 0.001_dp
+			CALL FIND_DBN_EQ
+		    CALL GOVNT_BUDGET
+		    GBAR_exp = GBAR  
+		    print*, ' '; print*, 'tauC=',tauC,'tauW=',tauW_at,'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' ' 
+		enddo 
+		! Find budget balancing taxes	
+		brentvaluet = brent_p( tauW_at - 0.001_dp , tauW_at - 0.0005 , tauW_at , diff_GBAR , brent_tol, tauK , tau_indicator ) 
+		endif 
 	endif 
 
 

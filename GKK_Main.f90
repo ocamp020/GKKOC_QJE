@@ -2297,10 +2297,10 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
     	! CALL Write_Experimental_Results(.false.)
 
     	! Start tauK at some level that guarantees enough revenue
-    	tauK = 0.25_dp
+    	tauK = 0.30_dp
     	psi  = 1.00_dp ! Set labor taxes to zero
 
-    	DO tauC_ind = 2,20,1
+    	DO tauC_ind = 3,20,1
 
     		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_k.txt', STATUS='old', POSITION='append')
 
