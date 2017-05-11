@@ -61,7 +61,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -76,7 +76,7 @@ PROGRAM main
 			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
-		Opt_Tau_CX = .false.
+		Opt_Tau_CX = .true.
 		Simul_Switch  = .false.
 
 
@@ -300,9 +300,9 @@ PROGRAM main
 
 			folder_aux = Result_Folder
 			if (Opt_Tax_KW) then 
-				Result_Folder = trim(folder_aux)//'Opt_Tax_K_Tau_CX/'
+				Result_Folder = trim(folder_aux)//'Opt_Tax_K_Tau_C_No_Labor_Tax/'
 			else 
-				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Tau_CX/'
+				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Tau_C_No_Labor_Tax/'
 			endif
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
@@ -2298,12 +2298,13 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 
     	! Start tauK at some level that guarantees enough revenue
     	tauK = 0.25_dp
+    	psi  = 1.00_dp ! Set labor taxes to zero
 
-    	DO tauC_ind = 1,4,1
+    	DO tauC_ind = 2,20,1
 
     		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_k.txt', STATUS='old', POSITION='append')
 
-			tauC = real(tauC_ind,8)/10.0_dp
+			tauC = real(tauC_ind,8)/20.0_dp
 			print*, ' '
 			print*, ' Consumption Taxes=',tauC
 			print*, ' '
