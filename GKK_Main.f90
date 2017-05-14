@@ -2297,10 +2297,83 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
     	! CALL Write_Experimental_Results(.false.)
 
     	! Start tauK at some level that guarantees enough revenue
-    	tauK = 0.30_dp
-    	psi  = 1.00_dp ! Set labor taxes to zero
+    	tauK = 0.25_dp 
+    	tauC = 0.10_dp ! Initial Value for consumption taxes
+    	
+    	DO tauC_ind = 0,5,1
 
-    	DO tauC_ind = 3,20,1
+    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_k.txt', STATUS='old', POSITION='append')
+
+			psi = 0.75_dp + 0.05_dp*real(tauC_ind,8)
+			print*, ' '
+			print*, ' Consumption Taxes=',tauC
+			print*, ' Labor Taxes=',psi
+			print*, ' '
+
+            brentvaluet = - EQ_WELFARE_GIVEN_TauC(tauC,Opt_Tax_KW)
+
+            
+            ! Aggregate variable in experimental economy
+			GBAR_exp  = GBAR
+			QBAR_exp  = QBAR 
+			NBAR_exp  = NBAR  
+			Y_exp 	  = YBAR
+			Ebar_exp  = EBAR
+			P_exp     = P
+			R_exp	  = R
+			wage_exp  = wage
+			tauK_exp  = tauK
+			tauPL_exp = tauPL
+			psi_exp   = psi
+			DBN_exp   = DBN1
+			tauw_bt_exp = tauW_bt
+			tauw_at_exp = tauW_at
+			Y_a_threshold_exp = Y_a_threshold
+
+			ValueFunction_exp = ValueFunction
+			Cons_exp          = Cons           
+			Hours_exp         = Hours
+			Aprime_exp        = Aprime 
+
+			! Compute moments
+			CALL COMPUTE_STATS
+			CALL GOVNT_BUDGET
+			
+			! Compute welfare gain between economies
+			CALL COMPUTE_WELFARE_GAIN
+
+			! Write experimental results in output.txt
+			CALL WRITE_VARIABLES(0)
+
+		    if (brentvaluet .gt. maxbrentvaluet) then
+		        maxbrentvaluet = brentvaluet
+				OPT_tauK = tauK
+				OPT_psi  = psi
+				OPT_tauC = tauC
+			endif
+
+			! Print Results 
+		    print*,'';print*, 'tauC',tauC,'tauK=', tauK, 'YBAR=', YBAR, & 
+		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+		      
+		    WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+		      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
+		      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
+		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
+		      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
+		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+		      & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_NB
+
+	    	CLOSE (unit=77) 
+	    	Call Write_Experimental_Results(.true.)
+	    ENDDO
+
+    	DO tauC_ind = 2,20,1
 
     		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_k.txt', STATUS='old', POSITION='append')
 
