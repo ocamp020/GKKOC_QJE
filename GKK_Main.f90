@@ -2298,7 +2298,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 
     	! Start tauK at some level that guarantees enough revenue
     	tauK = 0.25_dp 
-    	tauC = 0.10_dp ! Initial Value for consumption taxes
+    	tauC = 0.20_dp ! Initial Value for consumption taxes
     	
     	DO tauC_ind = 0,5,1
 
