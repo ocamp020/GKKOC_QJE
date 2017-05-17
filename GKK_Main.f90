@@ -2298,13 +2298,13 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 
     	! Start tauK at some level that guarantees enough revenue
     	tauK = 0.25_dp 
-    	tauC = 0.15_dp ! Initial Value for consumption taxes
+    	tauC = 0.20_dp ! Initial Value for consumption taxes
     	
-    	DO tauC_ind = 0,5,1
+    	DO tauC_ind = 0,2,1
 
     		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_k.txt', STATUS='old', POSITION='append')
 
-			psi = 0.75_dp + 0.05_dp*real(tauC_ind,8)
+			psi = 0.90_dp + 0.05_dp*real(tauC_ind,8)
 			print*, ' '
 			print*, ' Consumption Taxes=',tauC
 			print*, ' Labor Taxes=',psi
@@ -2373,7 +2373,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 	    	Call Write_Experimental_Results(.true.)
 	    ENDDO
 
-    	DO tauC_ind = 3,20,1
+    	DO tauC_ind = 4,20,1
 
     		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_c_k.txt', STATUS='old', POSITION='append')
 
