@@ -73,7 +73,7 @@ PROGRAM main
 				Fixed_P = .true.
 				Fixed_R = .true.
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
