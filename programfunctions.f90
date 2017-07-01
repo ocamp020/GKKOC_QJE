@@ -4947,7 +4947,7 @@ SUBROUTINE ComputeLaborUnits(Ebart,Waget)
 	yh = Waget * eff_un
 
 	! This part computes Retirement Income
-	RetY_lambda_e = phi_lambda_e  * Ebart 
+	RetY_lambda_e = phi_lambda_e  * Ebart * psi / psi_bench
 	IF ((KeepSSatBench .eq. 1) .AND. (solving_bench .eq. 0)) THEN
     	RetY_lambda_e = phi_lambda_e  * Ebar_bench
 	ENDIF
