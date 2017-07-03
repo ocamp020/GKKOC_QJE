@@ -1891,6 +1891,7 @@ Subroutine Solve_Opt_Tax_K_and_W(Simul_Switch)
 	implicit none 
 	logical, intent(in) :: Simul_Switch
 	INTEGER  :: tauindx_w
+	Logical  :: Opt_Tax_KW
 
 
  	!====================================================================================================
