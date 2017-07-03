@@ -72,9 +72,9 @@ PROGRAM main
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
-		Opt_Tax       = .false.
-			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-		Opt_Tax_K_and_W = .true.
+		Opt_Tax       = .true.
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
+		Opt_Tax_K_and_W = .false.
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
@@ -1612,14 +1612,14 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		PRINT*,''
 		Print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='replace')
     	CLOSE (unit=77) 
     	! CALL Write_Experimental_Results(.false.)
 
-	    DO tauindx=-40,40,2
-	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
+	    DO tauindx=-400,-300,5
+	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='old', POSITION='append')
             
-            tauK        = real(tauindx,8)/100_DP
+            tauK        = real(tauindx,8)/1000_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
              ! Aggregate variable in experimental economy
@@ -1680,38 +1680,39 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	    	Call Write_Experimental_Results(.true.)
 	    ENDDO 
 
-
-
-	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
-
-		tauK = OPT_tauK
+	    tauK = OPT_tauK
 		psi  = OPT_psi
-		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.02_dp,Opt_TauK+0.02_dp) 
 
-		tauK     = OPT_tauK
-		OPT_psi  = psi
+	 	! OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
 
-		! Compute moments
-		CALL COMPUTE_STATS
+		! tauK = OPT_tauK
+		! psi  = OPT_psi
+		! call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.02_dp,Opt_TauK+0.02_dp) 
 
-		print*, "Optimal tau_K=", tauK, "Optimal psi=", psi
+		! tauK     = OPT_tauK
+		! OPT_psi  = psi
 
-		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
-	      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-	      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
-		!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-	      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
-	      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
-	      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
-	      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
-	      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
+		! ! Compute moments
+		! CALL COMPUTE_STATS
+
+		! print*, "Optimal tau_K=", tauK, "Optimal psi=", psi
+
+		! WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+		!     &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+		!     &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+		! !      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+	 	!     &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
+	 	!     &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
+	 	!     &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+	 	!     &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
+	 	!     &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
+	 	!     &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+	 	!     & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+  		!     & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
 
 
-		CLOSE (UNIT=77)
-		Call Write_Experimental_Results(.true.)
+		! CLOSE (UNIT=77)
+		! Call Write_Experimental_Results(.true.)
 
 	else
 		PRINT*,''
