@@ -1918,6 +1918,8 @@ Subroutine Solve_Opt_Tax_K_and_W(Simul_Switch)
 			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 			Wealth_factor = Y_a_threshold/W_bench
 
+		Opt_Tax_KW = .true.
+
 		DO tauindx_w=-00,20,5
 			tauw_at     = real(tauindx_w,8)/1000_DP
 
