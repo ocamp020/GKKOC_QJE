@@ -1616,7 +1616,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	CLOSE (unit=77) 
     	! CALL Write_Experimental_Results(.false.)
 
-	    DO tauindx=-400,-300,5
+	    DO tauindx=-400,-300,1
 	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='old', POSITION='append')
             
             tauK        = real(tauindx,8)/1000_DP
