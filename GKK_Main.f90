@@ -652,39 +652,39 @@ Subroutine Find_Capital_and_Wealth_Tax(compute_exp,Simul_Switch)
 	logical, intent(in) :: compute_exp, Simul_Switch
 	real(dp) :: brentvaluet, Opt_TauK, CE2_NB
 
-	! Solve Benchmark
-	call Solve_Benchmark(.false.,.false.)
+	! ! Solve Benchmark
+	! call Solve_Benchmark(.false.,.false.)
 
-	! Set Folder
-	folder_aux = Result_Folder
-	Result_Folder = trim(folder_aux)//'Tax_Reform_KW/'
-	call system( 'mkdir -p ' // trim(Result_Folder) )
+	! ! Set Folder
+	! folder_aux = Result_Folder
+	! Result_Folder = trim(folder_aux)//'Tax_Reform_KW/'
+	! call system( 'mkdir -p ' // trim(Result_Folder) )
 
-	! Set initial wealth tax 
-	tauW_bt = 0.0_dp 
-	tauW_at = 0.0_dp 
+	! ! Set initial wealth tax 
+	! tauW_bt = 0.0_dp 
+	! tauW_at = 0.0_dp 
 
-	! Find optimal capital income tax (subsidy)
-	brentvaluet = brent( -0.60_dp, -0.40_dp , 0.00_dp , Tax_Reform_Welfare , brent_tol, Opt_TauK) 
+	! ! Find optimal capital income tax (subsidy)
+	! brentvaluet = brent( -0.60_dp, -0.40_dp , 0.00_dp , Tax_Reform_Welfare , brent_tol, Opt_TauK) 
 
-	! Set Optimal Taxes
-	tauK = Opt_TauK
-	CE2_NB = Tax_Reform_Welfare(Opt_TauK)
+	! ! Set Optimal Taxes
+	! tauK = Opt_TauK
+	! CE2_NB = Tax_Reform_Welfare(Opt_TauK)
 
-	! Save Results and Simulation
-	CALL Write_Experimental_Results(.true.)
-	if ((Simul_Switch)) then 
-	 	print*,"	Experiment Simulation"
-		CALL SIMULATION(solving_bench)
-	endif
-	Call Simulation_Life_Cycle_Patterns(solving_bench)
+	! ! Save Results and Simulation
+	! CALL Write_Experimental_Results(.true.)
+	! if ((Simul_Switch)) then 
+	!  	print*,"	Experiment Simulation"
+	! 	CALL SIMULATION(solving_bench)
+	! endif
+	! Call Simulation_Life_Cycle_Patterns(solving_bench)
 
 
-	! Deallocate variables
-		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+	! ! Deallocate variables
+	! 	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
-	! print*,"	Efficiency Computation"
-	! 	CALL Hsieh_Klenow_Efficiency(solving_bench)
+	! ! print*,"	Efficiency Computation"
+	! ! 	CALL Hsieh_Klenow_Efficiency(solving_bench)
 
 end Subroutine Find_Capital_and_Wealth_Tax
 
