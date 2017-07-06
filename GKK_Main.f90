@@ -39,7 +39,7 @@ PROGRAM main
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
-		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, Opt_Tax_K_and_W
+		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, Opt_Tax_K_and_W, Tax_Reform_KW
 		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices
 		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R 
 	! Auxiliary variable for writing file
@@ -73,8 +73,9 @@ PROGRAM main
 				Fixed_P = .true.
 				Fixed_R = .true.
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Tax_K_and_W = .false.
+		Tax_Reform_KW   = .false.
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
@@ -331,6 +332,10 @@ PROGRAM main
 			! CALL SIMULATION(0)
 
 		endif
+
+		if (Tax_Reform_KW) then 
+			call Find_Capital_and_Wealth_Tax(compute_exp,Simul_Switch)
+		endif 
 
 
 	call cpu_time(finish_time)
@@ -636,7 +641,55 @@ end Subroutine Solve_Experiment
 !========================================================================================
 !========================================================================================
 
-function CE_Tax_Reform = Tax_Reform_Welfare(tk)
+Subroutine Find_Capital_and_Wealth_Tax(compute_exp,Simul_Switch)
+	use parameters
+	use global 
+	use programfunctions
+	use Simulation_Module
+	use Toolbox
+	use omp_lib
+	implicit none 
+	logical, intent(in) :: compute_exp, Simul_Switch
+	real(dp) :: brentvaluet, Opt_TauK, CE2_NB
+
+	! Solve Benchmark
+	call Solve_Benchmark(.false.,.false.)
+
+	! Set Folder
+	folder_aux = Result_Folder
+	Result_Folder = trim(folder_aux)//'Tax_Reform_KW/'
+	call system( 'mkdir -p ' // trim(Result_Folder) )
+
+	! Set initial wealth tax 
+	tauW_bt = 0.0_dp 
+	tauW_at = 0.0_dp 
+
+	! Find optimal capital income tax (subsidy)
+	brentvaluet = brent( -0.60_dp, -0.40_dp , 0.00_dp , Tax_Reform_Welfare , brent_tol, Opt_TauK) 
+
+	! Set Optimal Taxes
+	tauK = Opt_TauK
+	CE2_NB = Tax_Reform_Welfare(Opt_TauK)
+
+	! Save Results and Simulation
+	CALL Write_Experimental_Results(.true.)
+	if ((Simul_Switch)) then 
+	 	print*,"	Experiment Simulation"
+		CALL SIMULATION(solving_bench)
+	endif
+	Call Simulation_Life_Cycle_Patterns(solving_bench)
+
+
+	! Deallocate variables
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+	! print*,"	Efficiency Computation"
+	! 	CALL Hsieh_Klenow_Efficiency(solving_bench)
+
+end Subroutine Find_Capital_and_Wealth_Tax
+
+
+function Tax_Reform_Welfare(tk)
 	use parameters
 	use global 
 	use programfunctions
@@ -645,7 +698,7 @@ function CE_Tax_Reform = Tax_Reform_Welfare(tk)
 	use omp_lib
 	implicit none 
 	real(dp), intent(in)  :: tk 
-	real(dp), intent(out) :: CE_Tax_Reform
+	real(dp), intent(out) :: Tax_Reform_Welfare
 
 	!====================================================================================================
 	PRINT*,''
@@ -657,6 +710,9 @@ function CE_Tax_Reform = Tax_Reform_Welfare(tk)
 		solving_bench=0
 	! Set capital taxes to tk
 		tauK = tk
+	! Set initial wealth taxes
+		tauWmin_bt = tauW_bt
+		tauWmin_at = tauW_at
 	! Set Y_a_threshold
 		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
 		!Y_a_threshold = 0.0_dp ! big_p   !8.1812138704441200
@@ -738,7 +794,7 @@ function CE_Tax_Reform = Tax_Reform_Welfare(tk)
 		CALL Firm_Value
 
 	
-	CALL Write_Experimental_Results(compute_exp)
+	! CALL Write_Experimental_Results(.true.)
 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 	K_mat  = K_Matrix(R,P)
 	Pr_mat = Profit_Matrix(R,P)
@@ -779,29 +835,13 @@ function CE_Tax_Reform = Tax_Reform_Welfare(tk)
 
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
-	if ((Simul_Switch)) then 
-	 	print*,"	Experiment Simulation"
-		CALL SIMULATION(solving_bench)
-	endif
-	Call Simulation_Life_Cycle_Patterns(solving_bench)
-
-
-	print*,'---------------------------'
-	print*,''
-	print*,'Output Gain Prct=', 100.0_DP*(Y_exp/Y_bench-1.0) 
-	print*,''
-	print*,'---------------------------'
-
-	print*," "
-	print*,"Wealth_factor=",Wealth_factor
-	print*," "
 
 
 	! Deallocate variables
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
-	print*,"	Efficiency Computation"
-		CALL Hsieh_Klenow_Efficiency(solving_bench)
+	! Output variable
+	Tax_Reform_Welfare = Av_Util_NB 
 
 
 end Subroutine Tax_Reform_Welfare
