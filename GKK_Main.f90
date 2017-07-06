@@ -651,6 +651,7 @@ Subroutine Find_Capital_and_Wealth_Tax(compute_exp,Simul_Switch)
 	implicit none 
 	logical, intent(in) :: compute_exp, Simul_Switch
 	real(dp) :: brentvaluet, Opt_TauK, CE2_NB
+	character(100) :: folder_aux
 
 	! Solve Benchmark
 	call Solve_Benchmark(.false.,.false.)
@@ -698,7 +699,7 @@ function Tax_Reform_Welfare(tk)
 	use omp_lib
 	implicit none 
 	real(dp), intent(in)  :: tk 
-	real(dp), intent(out) :: Tax_Reform_Welfare
+	real(dp) :: Tax_Reform_Welfare
 
 	!====================================================================================================
 	PRINT*,''
