@@ -5547,12 +5547,6 @@ END SUBROUTINE Firm_Value
 ! !========================================================================================
 
 Function Tax_Reform_Welfare(tk)
-	use parameters
-	use global 
-	use programfunctions
-	use Simulation_Module
-	use Toolbox
-	use omp_lib
 	implicit none 
 	real(dp), intent(in)  :: tk 
 	real(dp) :: Tax_Reform_Welfare
