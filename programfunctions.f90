@@ -5555,7 +5555,7 @@ Function Tax_Reform_Welfare(tk)
 	PRINT*,''
 	Print*,'--------------- SOLVING EXPERIMENT WITH BEST PARAMETERS -----------------'
 	PRINT*,''
-	print*,'Wealth Tax Economy'
+	print*,'Wealth Tax Economy','tauK',tk
 	
 	! Experiment economy
 		solving_bench=0
@@ -5693,6 +5693,8 @@ Function Tax_Reform_Welfare(tk)
 
 	! Output variable
 	Tax_Reform_Welfare = Av_Util_NB 
+
+	print*, 'Tax Reform: tauK=',tauK,'tauW=',tauW_at,'Gain',Tax_Reform_Welfare
 
 
 end Function Tax_Reform_Welfare
