@@ -1672,12 +1672,11 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		PRINT*,''
 		Print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_no_tax_2.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_no_tax_3.txt', STATUS='replace')
     	CLOSE (unit=77) 
-    	CALL Write_Experimental_Results(.false.)
 
-	    DO tauindx=0,40,2
-	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_no_tax_2.txt', STATUS='old', POSITION='append')
+	    DO tauindx=0,25,1
+	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_no_tax_3.txt', STATUS='old', POSITION='append')
             
             tauK        = real(tauindx,8)/100_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
@@ -1735,7 +1734,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
 			      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
 			      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
+		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet
 	      	CLOSE (unit=77) 
 	    	Call Write_Experimental_Results(.true.)
 	    ENDDO 
@@ -1782,13 +1781,13 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			call Find_TauW_Threshold(DBN_bench,W_bench)  
 			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 			Wealth_factor = Y_a_threshold/W_bench
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_no_tax.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_no_tax_2.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
     	! CALL Write_Experimental_Results(.false.)
 
-	    DO tauindx=0,40,2
-	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_no_tax.txt', STATUS='old', POSITION='append')
+	    DO tauindx=40,60,2
+	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_no_tax_2.txt', STATUS='old', POSITION='append')
 
             tauw_at     = real(tauindx,8)/1000_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
@@ -1846,7 +1845,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
 			      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
 			      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
+		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet
 
       	  	CLOSE (unit=77)
 		    Call Write_Experimental_Results(.true.)
