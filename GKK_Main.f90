@@ -650,7 +650,8 @@ Subroutine Find_Capital_and_Wealth_Tax(compute_exp,Simul_Switch)
 	use omp_lib
 	implicit none 
 	logical, intent(in) :: compute_exp, Simul_Switch
-	real(dp) :: brentvaluet, Opt_TauK, CE2_NB
+	real(dp) :: brentvaluet, Opt_TauK, Opt_tauW, CE2_NB, max_CE2_NB
+	integer  :: tauindx 
 	character(100) :: folder_aux
 
 	! Solve Benchmark
@@ -665,8 +666,30 @@ Subroutine Find_Capital_and_Wealth_Tax(compute_exp,Simul_Switch)
 	tauW_bt = 0.0_dp 
 	tauW_at = 0.0_dp 
 
+	! Grid for tauK 
+	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
+	CLOSE (unit=77) 
+	max_CE2_NB = -10000.0_dp 
+	do tauindx=0,-40,-5
+    	tauK = real(tauindx,8)/100_DP
+    	CE2_NB = Tax_Reform_Welfare(tauK)
+	    if (CE2_NB .gt. max_CE2_NB) then
+	        max_CE2_NB = CE2_NB
+			Opt_tauK = tauK
+			Opt_tauW = tauW_at 
+		endif
+
+		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
+		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+			      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
+			      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
+      	CLOSE (unit=77) 
+	enddo 
+
 	! Find optimal capital income tax (subsidy)
-	brentvaluet = brent( -0.60_dp, -0.40_dp , 0.00_dp , Tax_Reform_Welfare , brent_tol, Opt_TauK) 
+	brentvaluet = brent(Opt_TauK-0.05_dp,Opt_TauK,Opt_TauK+0.05_dp,Tax_Reform_Welfare , brent_tol, Opt_TauK) 
 
 	! Set Optimal Taxes
 	tauK = Opt_TauK
