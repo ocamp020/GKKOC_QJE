@@ -673,20 +673,20 @@ Subroutine Find_Capital_and_Wealth_Tax(compute_exp,Simul_Switch)
 	do tauindx=0,-40,-5
     	tauK = real(tauindx,8)/100_DP
     	print*, 'Capital Tax Grid: tauK=',tauK
-  !   	CE2_NB = Tax_Reform_Welfare(tauK)
-	 !    if (CE2_NB .gt. max_CE2_NB) then
-	 !        max_CE2_NB = CE2_NB
-		! 	Opt_tauK = tauK
-		! 	Opt_tauW = tauW_at 
-		! endif
+    	CE2_NB = Tax_Reform_Welfare(tauK)
+	    if (CE2_NB .gt. max_CE2_NB) then
+	        max_CE2_NB = CE2_NB
+			Opt_tauK = tauK
+			Opt_tauW = tauW_at 
+		endif
 
-		! OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
-		! WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
-		! 	      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-		! 	      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
-		! 	      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-		!       	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
-  !     	CLOSE (unit=77) 
+		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
+		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+			      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
+			      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
+      	CLOSE (unit=77) 
 	enddo 
 
 	! Find optimal capital income tax (subsidy)
