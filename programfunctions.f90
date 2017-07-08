@@ -5564,8 +5564,8 @@ Function Tax_Reform_Welfare(tk)
 	! Set initial wealth taxes
 		tauWmin_bt  = tauW_bt
 		tauWmin_at  = tauW_at
-		tauW_inc_bt = 0.001_dp
-		tauW_inc_at = 0.001_dp
+		tauWinc_bt  = 0.001_dp
+		tauWinc_at  = 0.001_dp
 	! Set Y_a_threshold
 		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
 		!Y_a_threshold = 0.0_dp ! big_p   !8.1812138704441200
