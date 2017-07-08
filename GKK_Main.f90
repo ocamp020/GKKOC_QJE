@@ -663,8 +663,8 @@ Subroutine Find_Capital_and_Wealth_Tax(compute_exp,Simul_Switch)
 	call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	! Set initial wealth tax 
-	tauW_bt = 0.0_dp 
-	tauW_at = 0.0_dp 
+	tauW_bt = 0.01_dp 
+	tauW_at = 0.01_dp 
 
 	! Grid for tauK 
 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
