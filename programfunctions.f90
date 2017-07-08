@@ -5562,8 +5562,10 @@ Function Tax_Reform_Welfare(tk)
 	! Set capital taxes to tk
 		tauK = tk
 	! Set initial wealth taxes
-		tauWmin_bt = tauW_bt
-		tauWmin_at = tauW_at
+		tauWmin_bt  = tauW_bt
+		tauWmin_at  = tauW_at
+		tauW_inc_bt = 0.001_dp
+		tauW_inc_at = 0.001_dp
 	! Set Y_a_threshold
 		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
 		!Y_a_threshold = 0.0_dp ! big_p   !8.1812138704441200
@@ -5577,33 +5579,67 @@ Function Tax_Reform_Welfare(tk)
 			GBAR_exp = 0.0_DP
 			tauW_bt  = tauWmin_bt
 			tauW_at  = tauWmin_at
-			tauWindx = 0.0_DP
-			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-			DO WHILE (GBAR_exp .lt. GBAR_bench)
-				! Set old G and new value of tauW
-				GBAR_exp_old = GBAR_exp
-				tauW_bt = tauWmin_bt + tauWindx * tauWinc_bt
-				tauW_at = tauWmin_at + tauWindx * tauWinc_at
-				! Solve the model
+			! Solve the model
 				CALL FIND_DBN_EQ
 				CALL GOVNT_BUDGET
-
-				! Get new G
+			! Get new G
 				GBAR_exp = GBAR 
-				! Iteratioins  
-				tauWindx = tauWindx + 1.0_DP   
-				write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
-				print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
-				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
-			ENDDO
+			tauWindx = 0.0_DP
 
-			! Set tauW as weighted average of point in  the grid to balance budget more precisely
+			if (GBAR_exp.lt.GBAR_bench) then 
+				! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
+				DO WHILE (GBAR_exp .lt. GBAR_bench)
+					! Set old G and new value of tauW
+					GBAR_exp_old = GBAR_exp
+					tauW_bt = tauWmin_bt + tauWindx * tauWinc_bt
+					tauW_at = tauWmin_at + tauWindx * tauWinc_at
+					! Solve the model
+					CALL FIND_DBN_EQ
+					CALL GOVNT_BUDGET
+
+					! Get new G
+					GBAR_exp = GBAR 
+					! Iteratioins  
+					tauWindx = tauWindx + 1.0_DP   
+					write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
+					print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
+					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+				ENDDO
+				! Set tauW as weighted average of point in  the grid to balance budget more precisely
 				tauW_up_bt  = tauW_bt
 				tauW_low_bt = tauW_bt  -  tauWinc_bt
 				tauW_bt     = tauW_low_bt + tauWinc_bt * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
 				tauW_up_at  = tauW_at
 				tauW_low_at = tauW_at  -  tauWinc_at  
 				tauW_at     = tauW_low_at + tauWinc_at * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+			elseif (GBAR_exp.gt.GBAR_bench) then 
+				! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
+				DO WHILE (GBAR_exp .gt. GBAR_bench)
+					! Set old G and new value of tauW
+					GBAR_exp_old = GBAR_exp
+					tauW_bt = tauWmin_bt - tauWindx * tauWinc_bt
+					tauW_at = tauWmin_at - tauWindx * tauWinc_at
+					! Solve the model
+					CALL FIND_DBN_EQ
+					CALL GOVNT_BUDGET
+
+					! Get new G
+					GBAR_exp = GBAR 
+					! Iteratioins  
+					tauWindx = tauWindx + 1.0_DP   
+					write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
+					print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
+					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
+				ENDDO
+				! Set tauW as weighted average of point in  the grid to balance budget more precisely
+				tauW_up_bt  = tauW_bt  +  tauWinc_bt
+				tauW_low_bt = tauW_bt  
+				tauW_bt     = tauW_up_bt - tauWinc_bt * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				tauW_up_at  = tauW_at  +  tauWinc_at  
+				tauW_low_at = tauW_at
+				tauW_at     = tauW_up_at - tauWinc_at * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+			endif 
+
 				print*,''
 				print*,'GBAR bracketed by taxes:'
 				print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
