@@ -663,14 +663,14 @@ Subroutine Find_Capital_and_Wealth_Tax(compute_exp,Simul_Switch)
 	call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	! Set initial wealth tax 
-	tauW_bt = 0.02615_dp!0.01_dp 
-	tauW_at = 0.02615_dp!0.01_dp 
+	tauW_bt = 0.027_dp!0.01_dp 
+	tauW_at = 0.027_dp!0.01_dp 
 
 	! Grid for tauK 
-	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='replace')
+	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_3.txt', STATUS='replace')
 	CLOSE (unit=77) 
 	max_CE2_NB = -10000.0_dp 
-	do tauindx=-40,-60,-2
+	do tauindx=-46,-60,-2
     	tauK = real(tauindx,8)/100_DP
     	print*, 'Capital Tax Grid: tauK=',tauK
     	CE2_NB = Tax_Reform_Welfare(tauK)
@@ -680,7 +680,7 @@ Subroutine Find_Capital_and_Wealth_Tax(compute_exp,Simul_Switch)
 			Opt_tauW = tauW_at 
 		endif
 
-		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='old', POSITION='append')
+		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_3.txt', STATUS='old', POSITION='append')
 		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 			      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
