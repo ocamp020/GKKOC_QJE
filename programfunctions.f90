@@ -5550,13 +5550,14 @@ Function Tax_Reform_Welfare(tk)
 	implicit none 
 	real(dp), intent(in)  :: tk 
 	real(dp) :: Tax_Reform_Welfare
+	real(dp) :: tau_diff, tau_tol
 
 	!====================================================================================================
 	PRINT*,''
 	Print*,'--------------- SOLVING EXPERIMENT WITH BEST PARAMETERS -----------------'
 	PRINT*,''
 	print*,'Wealth Tax Economy','tauK',tk
-	
+	tau_tol = 0.0000001_dp 
 	! Experiment economy
 		solving_bench=0
 	! Set capital taxes to tk
@@ -5652,11 +5653,12 @@ Function Tax_Reform_Welfare(tk)
 
 			! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
 				GBAR_exp = GBAR
+				tau_diff = tauW_up_at - tauW_low_at
 				print*,"Gbar at midpoint of bracket and GBAR at benchmark"
 				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
 				print*,''
 				print*,'Bisection for TauW:'
-				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.001 ) ! as long as the difference is greater than 0.1% continue
+				DO WHILE ((  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.001 ).and.(tau_diff.gt.tau_tol))! as long as the difference is greater than 0.1% continue
 				    if (GBAR_exp .gt. GBAR_bench ) then
 				        tauW_up_bt  = tauW_bt 
 				        tauW_up_at  = tauW_at 
@@ -5664,6 +5666,7 @@ Function Tax_Reform_Welfare(tk)
 				        tauW_low_bt = tauW_bt
 				        tauW_low_at = tauW_at
 				    endif
+				    tau_diff = tauW_up_at - tauW_low_at
 				    tauW_bt = (tauW_low_bt + tauW_up_bt)/2.0_DP
 				    tauW_at = (tauW_low_at + tauW_up_at)/2.0_DP
 				    CALL FIND_DBN_EQ
