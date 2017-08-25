@@ -673,7 +673,7 @@ Subroutine Find_Capital_and_Wealth_Tax(compute_exp,Simul_Switch)
 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_9.txt', STATUS='replace')
 	CLOSE (unit=77) 
 	max_CE2_NB = -10000.0_dp 
-	do tauindx=-162,-200,-2
+	do tauindx=-202,-240,-2
     	tauK = real(tauindx,8)/100_DP
     	print*, 'Capital Tax Grid: tauK=',tauK
     	CE2_NB = Tax_Reform_Welfare(tauK)
