@@ -1415,12 +1415,12 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
     av_wealth_draft_group   = wealth_draft_group/size_draft_group
     frac_wealth_draft_group = wealth_draft_group/MeanWealth 
 
-    OPEN (UNIT=80, FILE=trim(Result_Folder)//'CE_draft_group.txt', STATUS='replace') 
-    OPEN (UNIT=81, FILE=trim(Result_Folder)//'size_draft_group.txt', STATUS='replace') 
-    OPEN (UNIT=82, FILE=trim(Result_Folder)//'frac_pos_welfare_draft_group.txt', STATUS='replace') 
-    OPEN (UNIT=83, FILE=trim(Result_Folder)//'wealth_draft_group.txt', STATUS='replace') 
-    OPEN (UNIT=84, FILE=trim(Result_Folder)//'av_wealth_draft_group.txt', STATUS='replace') 
-    OPEN (UNIT=85, FILE=trim(Result_Folder)//'frac_draft_group.txt', STATUS='replace') 
+    OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE.txt', STATUS='replace') 
+    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size.txt', STATUS='replace') 
+    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_fpos_welfare.txt', STATUS='replace') 
+    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_wealth.txt', STATUS='replace') 
+    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_av_wealth.txt', STATUS='replace') 
+    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_frac_wealth.txt', STATUS='replace') 
 	do age = 1,draft_age_category
 	    WRITE  (UNIT=80, FMT=*)  CE_draft_group(age,:)
 	    WRITE  (UNIT=81, FMT=*)  size_draft_group(age,:)
