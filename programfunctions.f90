@@ -806,10 +806,18 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	REAL(DP), dimension(max_age_category,nz) :: tot_aprime_by_agegroup_by_z_exp, tot_return_by_agegroup_by_z_exp
 	REAL(DP), dimension(max_age_category,nz) :: tot_at_return_by_agegroup_by_z_exp, tot_cap_tax_by_agegroup_by_z_exp
 	REAL(DP), dimension(max_age_category,nz) :: tot_lab_tax_by_agegroup_by_z_exp, tot_cons_tax_by_agegroup_by_z_exp
+	REAL(DP), dimension(draft_age_category,draft_z_category) :: CE_draft_group,  size_draft_group, frac_pos_welfare_draft_group
+	REAL(DP), dimension(draft_age_category,draft_z_category) :: wealth_draft_group,  av_wealth_draft_group, frac_wealth_draft_group
+	INTEGER , dimension(draft_age_category+1) :: draft_age_limit
+	INTEGER , dimension(draft_z_category+1)   :: draft_z_limit
+	INTEGER :: age2, z2
+
 
 
 	! Age Brackets
-		age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
+		age_limit       = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
+		draft_age_limit = [0, 1, 15, 30, 45, MaxAge ] 
+		draft_z_limit   = [0, 3,  4,  5,  7,   nz   ] 
 
 	! Discount factor
 		CumDiscountF(MaxAge)=1.0_DP
@@ -1365,6 +1373,68 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	Av_Util_Pop =  100.0_dp * (( sum(ValueFunction_exp(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:)) / &
 				& 	            sum(ValueFunction_Bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:)) ) &
 				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! Draft Tables
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	frac_pos_welfare_draft_group = 0.0_dp 
+	wealth_draft_group           = 0.0_dp 
+
+	do zi  = 1,draft_z_category
+	do age = 1,draft_age_category
+		size_draft_group(age,zi) = &
+			& sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,draft_z_limit(zi)+1:draft_z_limit(zi+1),:,:,:))
+
+		CE_draft_group(age,zi) =  100* &
+			& sum(Cons_Eq_Welfare(draft_age_limit(age)+1:draft_age_limit(age+1),:,draft_z_limit(zi)+1:draft_z_limit(zi+1),:,:,:)* &
+            &     DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,draft_z_limit(zi)+1:draft_z_limit(zi+1),:,:,:))/&
+            & sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,draft_z_limit(zi)+1:draft_z_limit(zi+1),:,:,:))
+
+        do xi=1,nx
+	    do ei=1,ne
+	    do lambdai=1,nlambda
+	    do z2=draft_z_limit(zi)+1,draft_z_limit(zi+1)
+	    do ai=1,na
+	    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
+	    	If ( Cons_Eq_Welfare(age2,ai,z2,lambdai,ei,xi) .ge. 0.0_DP) then
+        	frac_pos_welfare_draft_group(age,zi) = frac_pos_welfare_draft_group(age,zi) + DBN_bench(age2,ai,z2,lambdai,ei,xi)
+        	endif 
+        	wealth_draft_group(age,zi) = wealth_draft_group(age,zi) + agrid(ai)*DBN_bench(age2,ai,z2,lambdai,ei,xi)
+    	enddo 
+    	enddo 
+    	enddo 
+    	enddo 
+    	enddo 
+    	enddo 
+	enddo
+	enddo 
+
+	frac_pos_welfare_draft_group = frac_pos_welfare_draft_group/size_draft_group
+    av_wealth_draft_group   = wealth_draft_group/size_draft_group
+    frac_wealth_draft_group = wealth_draft_group/MeanWealth 
+
+    OPEN (UNIT=80, FILE=trim(Result_Folder)//'CE_draft_group.txt', STATUS='replace') 
+    OPEN (UNIT=81, FILE=trim(Result_Folder)//'size_draft_group.txt', STATUS='replace') 
+    OPEN (UNIT=82, FILE=trim(Result_Folder)//'frac_pos_welfare_draft_group.txt', STATUS='replace') 
+    OPEN (UNIT=83, FILE=trim(Result_Folder)//'wealth_draft_group.txt', STATUS='replace') 
+    OPEN (UNIT=84, FILE=trim(Result_Folder)//'av_wealth_draft_group.txt', STATUS='replace') 
+    OPEN (UNIT=85, FILE=trim(Result_Folder)//'frac_draft_group.txt', STATUS='replace') 
+	do age = 1,draft_age_category
+	    WRITE  (UNIT=80, FMT=*)  CE_draft_group(age,:)
+	    WRITE  (UNIT=81, FMT=*)  size_draft_group(age,:)
+	    WRITE  (UNIT=82, FMT=*)  frac_pos_welfare_draft_group(age,:)
+	    WRITE  (UNIT=83, FMT=*)  wealth_draft_group(age,:)
+	    WRITE  (UNIT=84, FMT=*)  av_wealth_draft_group(age,:)
+	    WRITE  (UNIT=85, FMT=*)  frac_wealth_draft_group(age,:)
+	ENDDO
+	close(unit=80)
+	close(unit=81)
+	close(unit=82)
+	close(unit=83)
+	close(unit=84)
+	close(unit=85)
 
 
 
