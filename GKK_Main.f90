@@ -61,7 +61,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -72,8 +72,8 @@ PROGRAM main
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
-		Opt_Tax       = .false.
-			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+		Opt_Tax       = .true.
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
 		Opt_Threshold = .false.
@@ -163,11 +163,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		if (KeepSSatBench.eq.1) then 
 		Result_Folder = trim(Result_Folder)//'Model_1.2_bv/' 
-		else 
-		Result_Folder = trim(Result_Folder)//'Model_1.2_bv/SS_reform/' 
-		endif 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
@@ -254,18 +250,53 @@ PROGRAM main
 
 			folder_aux = Result_Folder
 			if (Opt_Tax_KW) then 
-				Result_Folder = trim(folder_aux)//'Opt_Tax_K_SS/'
+				Result_Folder = trim(folder_aux)//'Opt_Tax_K/'
 			else 
-				Result_Folder = trim(folder_aux)//'Opt_Tax_W_SS/'
+				Result_Folder = trim(folder_aux)//'Opt_Tax_W/'
 			endif
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
 			
-			call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
+			! call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			
-			! print*, Result_Folder
-			! CALL Write_Experimental_Results(.false.)
-			! CALL SIMULATION(0)
+			CALL Write_Experimental_Results(.false)
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			K_mat  = K_Matrix(R,P)
+			Pr_mat = Profit_Matrix(R,P)
+			CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+			CALL ComputeLaborUnits(EBAR,wage)
+			CALL GOVNT_BUDGET
+
+			! Aggregate variable in experimental economy
+				GBAR_exp  = GBAR
+				QBAR_exp  = QBAR 
+				NBAR_exp  = NBAR  
+				Y_exp 	  = YBAR
+				Ebar_exp  = EBAR
+				P_exp     = P
+				R_exp	  = R
+				wage_exp  = wage
+				tauK_exp  = tauK
+				tauPL_exp = tauPL
+				psi_exp   = psi
+				DBN_exp   = DBN1
+				tauw_bt_exp = tauW_bt
+				tauw_at_exp = tauW_at
+				Y_a_threshold_exp = Y_a_threshold
+
+				ValueFunction_exp = ValueFunction
+				Cons_exp          = Cons           
+				Hours_exp         = Hours
+				Aprime_exp        = Aprime
+				V_Pr_exp          = V_Pr 
+				V_Pr_nb_exp  	  = V_Pr_nb
+
+			! Compute moments
+			CALL COMPUTE_STATS
+			
+			! Compute welfare gain between economies
+			CALL COMPUTE_WELFARE_GAIN
+
 
 		endif 
 
@@ -334,6 +365,7 @@ PROGRAM main
 			! print*, Result_Folder
 			! CALL Write_Experimental_Results(.false.)
 			! CALL SIMULATION(0)
+
 
 		endif
 
