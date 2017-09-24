@@ -259,7 +259,7 @@ PROGRAM main
 			
 			! call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			
-			CALL Write_Experimental_Results(.false)
+			CALL Write_Experimental_Results(.false.)
 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 			K_mat  = K_Matrix(R,P)
 			Pr_mat = Profit_Matrix(R,P)
