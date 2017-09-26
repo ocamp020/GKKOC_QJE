@@ -1419,7 +1419,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	print*,'CDF_Z=',CDF_Z 
 	print*,' '
 
-	! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 90%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
 	size_draft_group(:,1) = ( DBN_Z(1)*size_draft_group_z(:,1) + DBN_Z(2)*size_draft_group_z(:,2) + & 
 							& DBN_Z(3)*size_draft_group_z(:,3) + (0.40_dp-CDF_Z(3))*size_draft_group_z(:,4) )/0.40_dp
 	size_draft_group(:,2) = ( (CDF_Z(4)-0.40_dp)*size_draft_group_z(:,4) + (0.80_dp-CDF_Z(4))*size_draft_group_z(:,5) )/0.40_dp
@@ -1431,7 +1431,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	size_draft_group(:,7) = ( (CDF_Z(7)-0.999_dp)*size_draft_group_z(:,7) + (0.9999_dp-CDF_Z(8))*size_draft_group_z(:,8) )/0.0009_dp
 	size_draft_group(:,8) = ( (CDF_Z(8)-0.9999_dp)*size_draft_group_z(:,8) + DBN_Z(9)*size_draft_group_z(:,9) )/0.0001_dp
 
-	! CE of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 90%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! CE of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
 	CE_draft_group(:,1)   = ( DBN_Z(1)*CE_draft_group_z(:,1) + DBN_Z(2)*CE_draft_group_z(:,2) + & 
 							& DBN_Z(3)*CE_draft_group_z(:,3) + (0.40_dp-CDF_Z(3))*CE_draft_group_z(:,4) )/0.40_dp
 	CE_draft_group(:,2)   = ( (CDF_Z(4)-0.40_dp)*CE_draft_group_z(:,4) + (0.80_dp-CDF_Z(4))*CE_draft_group_z(:,5) )/0.40_dp
@@ -1443,7 +1443,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	CE_draft_group(:,7)   = ( (CDF_Z(7)-0.999_dp)*CE_draft_group_z(:,7) + (0.9999_dp-CDF_Z(8))*CE_draft_group_z(:,8) )/0.0009_dp
 	CE_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*CE_draft_group_z(:,8) + DBN_Z(9)*CE_draft_group_z(:,9) )/0.0001_dp
 
-	! Frac. pos. welfare by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 90%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! Frac. pos. welfare by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
 	frac_pos_welfare_draft_group(:,1) = ( DBN_Z(1)*frac_pos_welfare_draft_group_z(:,1)+DBN_Z(2)*frac_pos_welfare_draft_group_z(:,2)+& 
 							& DBN_Z(3)*frac_pos_welfare_draft_group_z(:,3) + (0.40_dp-CDF_Z(3))*frac_pos_welfare_draft_group_z(:,4) )/0.40_dp
 	frac_pos_welfare_draft_group(:,2) = ( (CDF_Z(4)-0.40_dp)*frac_pos_welfare_draft_group_z(:,4) + &
@@ -1460,7 +1460,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	frac_pos_welfare_draft_group(:,8) = ( (CDF_Z(8)-0.9999_dp)*frac_pos_welfare_draft_group_z(:,8) + &
 							&  DBN_Z(9)*frac_pos_welfare_draft_group_z(:,9) )/0.0001_dp
 
-	! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 90%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
 	wealth_draft_group(:,1) = ( DBN_Z(1)*wealth_draft_group_z(:,1) + DBN_Z(2)*wealth_draft_group_z(:,2) + & 
 							& DBN_Z(3)*wealth_draft_group_z(:,3) + (0.40_dp-CDF_Z(3))*wealth_draft_group_z(:,4) )/0.40_dp
 	wealth_draft_group(:,2) = ( (CDF_Z(4)-0.40_dp)*wealth_draft_group_z(:,4) + (0.80_dp-CDF_Z(4))*wealth_draft_group_z(:,5) )/0.40_dp
