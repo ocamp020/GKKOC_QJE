@@ -1498,16 +1498,16 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	close(unit=84)
 	close(unit=85)
 
-	! print*,' '
-	! print*,'CE_groups_z'
-	! do age = 1,draft_age_category
-	! 	print*, CE_draft_group_z(age,:)
-	! enddo 
-	! print*,' '
-	! print*,'CE_groups'
-	! do age = 1,draft_age_category
-	! 	print*, CE_draft_group(age,:)
-	! enddo 
+	print*,' '
+	print*,'CE_groups_z'
+	do age = 1,draft_age_category
+		print*, frac_pos_welfare_draft_group_z(age,:)
+	enddo 
+	print*,' '
+	print*,'CE_groups'
+	do age = 1,draft_age_category
+		print*, frac_pos_welfare_draft_group(age,:)
+	enddo 
 	! print*,' '
 	! print*,'Weights'
 	! print*,(/ DBN_Z(1) , DBN_Z(2), DBN_Z(3), (0.40_dp-CDF_Z(3)) , DBN_Z(1)+DBN_Z(2)+DBN_Z(3)+(0.40_dp-CDF_Z(3)) /)/0.40_dp
