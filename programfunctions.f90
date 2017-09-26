@@ -1406,15 +1406,18 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
     	enddo 
     	enddo 
     	enddo 
-    	enddo 
-    	enddo 
+    	enddo  
 	enddo
 	enddo 
 
-	DBN_Z = sum(sum(sum(sum(sum(DBN_bench,6),5),4),3),1) 
+	DBN_Z = sum(sum(sum(sum(sum(DBN_bench,6),5),4),2),1) 
 	do zi=1,nz 
 		CDF_Z(zi) = sum(DBN_Z(1:zi))
-	enddo  
+	enddo 
+	print*,' '
+	print*,'DBN_Z=',DBN_Z
+	print*,'CDF_Z=',CDF_Z 
+	print*,' '
 
 	! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 90%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
 	size_draft_group(:,1) = ( DBN_Z(1)*size_draft_group_z(:,1) + DBN_Z(2)*size_draft_group_z(:,2) + & 
