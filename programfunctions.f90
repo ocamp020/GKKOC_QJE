@@ -1414,10 +1414,10 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	do zi=1,nz 
 		CDF_Z(zi) = sum(DBN_Z(1:zi))
 	enddo 
-	print*,' '
-	print*,'DBN_Z=',DBN_Z
-	print*,'CDF_Z=',CDF_Z 
-	print*,' '
+	! print*,' '
+	! print*,'DBN_Z=',DBN_Z
+	! print*,'CDF_Z=',CDF_Z 
+	! print*,' '
 
 	! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
 	size_draft_group(:,1) = ( DBN_Z(1)*size_draft_group_z(:,1) + DBN_Z(2)*size_draft_group_z(:,2) + & 
@@ -1428,7 +1428,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	size_draft_group(:,5) = ( (CDF_Z(6)-0.99_dp)*size_draft_group_z(:,6) + (0.999_dp-CDF_Z(6))*size_draft_group_z(:,7) )/0.009_dp
 	size_draft_group(:,6) = ( (CDF_Z(7)-0.999_dp)*size_draft_group_z(:,7) + &
 							&  DBN_Z(8)*size_draft_group_z(:,8) + DBN_Z(9)*size_draft_group_z(:,9) )/0.001_dp
-	size_draft_group(:,7) = ( (CDF_Z(7)-0.999_dp)*size_draft_group_z(:,7) + (0.9999_dp-CDF_Z(8))*size_draft_group_z(:,8) )/0.0009_dp
+	size_draft_group(:,7) = ( (CDF_Z(7)-0.999_dp)*size_draft_group_z(:,7) + (0.9999_dp-CDF_Z(7))*size_draft_group_z(:,8) )/0.0009_dp
 	size_draft_group(:,8) = ( (CDF_Z(8)-0.9999_dp)*size_draft_group_z(:,8) + DBN_Z(9)*size_draft_group_z(:,9) )/0.0001_dp
 
 	! CE of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
@@ -1440,7 +1440,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	CE_draft_group(:,5)   = ( (CDF_Z(6)-0.99_dp)*CE_draft_group_z(:,6) + (0.999_dp-CDF_Z(6))*CE_draft_group_z(:,7) )/0.009_dp
 	CE_draft_group(:,6)   = ( (CDF_Z(7)-0.999_dp)*CE_draft_group_z(:,7) + &
 							&  DBN_Z(8)*CE_draft_group_z(:,8) + DBN_Z(9)*CE_draft_group_z(:,9) )/0.001_dp
-	CE_draft_group(:,7)   = ( (CDF_Z(7)-0.999_dp)*CE_draft_group_z(:,7) + (0.9999_dp-CDF_Z(8))*CE_draft_group_z(:,8) )/0.0009_dp
+	CE_draft_group(:,7)   = ( (CDF_Z(7)-0.999_dp)*CE_draft_group_z(:,7) + (0.9999_dp-CDF_Z(7))*CE_draft_group_z(:,8) )/0.0009_dp
 	CE_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*CE_draft_group_z(:,8) + DBN_Z(9)*CE_draft_group_z(:,9) )/0.0001_dp
 
 	! Frac. pos. welfare by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
@@ -1456,7 +1456,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	frac_pos_welfare_draft_group(:,6) = ( (CDF_Z(7)-0.999_dp)*frac_pos_welfare_draft_group_z(:,7) + &
 							&  DBN_Z(8)*frac_pos_welfare_draft_group_z(:,8) + DBN_Z(9)*frac_pos_welfare_draft_group_z(:,9) )/0.001_dp
 	frac_pos_welfare_draft_group(:,7) = ( (CDF_Z(7)-0.999_dp)*frac_pos_welfare_draft_group_z(:,7) + &
-							& (0.9999_dp-CDF_Z(8))*frac_pos_welfare_draft_group_z(:,8) )/0.0009_dp
+							& (0.9999_dp-CDF_Z(7))*frac_pos_welfare_draft_group_z(:,8) )/0.0009_dp
 	frac_pos_welfare_draft_group(:,8) = ( (CDF_Z(8)-0.9999_dp)*frac_pos_welfare_draft_group_z(:,8) + &
 							&  DBN_Z(9)*frac_pos_welfare_draft_group_z(:,9) )/0.0001_dp
 
@@ -1469,7 +1469,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	wealth_draft_group(:,5) = ( (CDF_Z(6)-0.99_dp)*wealth_draft_group_z(:,6) + (0.999_dp-CDF_Z(6))*wealth_draft_group_z(:,7) )/0.009_dp
 	wealth_draft_group(:,6) = ( (CDF_Z(7)-0.999_dp)*wealth_draft_group_z(:,7) + &
 							&  DBN_Z(8)*wealth_draft_group_z(:,8) + DBN_Z(9)*wealth_draft_group_z(:,9) )/0.001_dp
-	wealth_draft_group(:,7) = ( (CDF_Z(7)-0.999_dp)*wealth_draft_group_z(:,7) + (0.9999_dp-CDF_Z(8))*wealth_draft_group_z(:,8) )/0.0009_dp
+	wealth_draft_group(:,7) = ( (CDF_Z(7)-0.999_dp)*wealth_draft_group_z(:,7) + (0.9999_dp-CDF_Z(7))*wealth_draft_group_z(:,8) )/0.0009_dp
 	wealth_draft_group(:,8) = ( (CDF_Z(8)-0.9999_dp)*wealth_draft_group_z(:,8) + DBN_Z(9)*wealth_draft_group_z(:,9) )/0.0001_dp
 
 	! Fix fractions
@@ -1497,6 +1497,27 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	close(unit=83)
 	close(unit=84)
 	close(unit=85)
+
+	! print*,' '
+	! print*,'CE_groups_z'
+	! do age = 1,draft_age_category
+	! 	print*, CE_draft_group_z(age,:)
+	! enddo 
+	! print*,' '
+	! print*,'CE_groups'
+	! do age = 1,draft_age_category
+	! 	print*, CE_draft_group(age,:)
+	! enddo 
+	! print*,' '
+	! print*,'Weights'
+	! print*,(/ DBN_Z(1) , DBN_Z(2), DBN_Z(3), (0.40_dp-CDF_Z(3)) , DBN_Z(1)+DBN_Z(2)+DBN_Z(3)+(0.40_dp-CDF_Z(3)) /)/0.40_dp
+	! print*,(/ (CDF_Z(4)-0.40_dp) , (0.80_dp-CDF_Z(4)) , (CDF_Z(4)-0.40_dp)+(0.80_dp-CDF_Z(4)) /)/0.40_dp
+	! print*, 1.0_dp
+	! print*,(/ (CDF_Z(5)-0.90_dp) , (0.99_dp-CDF_Z(5)) , (CDF_Z(5)-0.90_dp)+(0.99_dp-CDF_Z(5)) /)/0.09_dp
+	! print*,(/ (CDF_Z(6)-0.99_dp) , (0.999_dp-CDF_Z(6)) , (CDF_Z(6)-0.99_dp)+(0.999_dp-CDF_Z(6)) /)/0.009_dp
+	! print*,(/ (CDF_Z(7)-0.999_dp) ,  DBN_Z(8) , DBN_Z(9) , (CDF_Z(7)-0.999_dp)+DBN_Z(8)+DBN_Z(9) /)/0.001_dp
+	! print*,(/ (CDF_Z(7)-0.999_dp) , (0.9999_dp-CDF_Z(7)) , (CDF_Z(7)-0.999_dp)+(0.9999_dp-CDF_Z(7)) /)/0.0009_dp
+	! print*,(/ (CDF_Z(8)-0.9999_dp) , DBN_Z(9) , (CDF_Z(8)-0.9999_dp)+DBN_Z(9) /)/0.0001_dp
 
 
 
