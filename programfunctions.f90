@@ -1444,7 +1444,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	CE_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*CE_draft_group_z(:,8) + DBN_Z(9)*CE_draft_group_z(:,9) )/0.0001_dp
 
 	! Frac. pos. welfare by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 90%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-	frac_pos_welfare_draft_group(:,1) = ( DBN_Z(1)*frac_pos_welfare_draft_group_z(:,1) + DBN_Z(2)*frac_pos_welfare_draft_group_z(:,2) + & 
+	frac_pos_welfare_draft_group(:,1) = ( DBN_Z(1)*frac_pos_welfare_draft_group_z(:,1)+DBN_Z(2)*frac_pos_welfare_draft_group_z(:,2)+& 
 							& DBN_Z(3)*frac_pos_welfare_draft_group_z(:,3) + (0.40_dp-CDF_Z(3))*frac_pos_welfare_draft_group_z(:,4) )/0.40_dp
 	frac_pos_welfare_draft_group(:,2) = ( (CDF_Z(4)-0.40_dp)*frac_pos_welfare_draft_group_z(:,4) + &
 							& (0.80_dp-CDF_Z(4))*frac_pos_welfare_draft_group_z(:,5) )/0.40_dp
@@ -1475,7 +1475,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	! Fix fractions
 	frac_pos_welfare_draft_group = 100*frac_pos_welfare_draft_group/size_draft_group
     av_wealth_draft_group        = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*wealth_draft_group/size_draft_group
-    frac_wealth_draft_group      = 100*wealth_draft_group/sum(sum(wealth_draft_group))
+    frac_wealth_draft_group      = 100*wealth_draft_group/sum(wealth_draft_group)
 
     OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE.txt', STATUS='replace') 
     OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size.txt', STATUS='replace') 
