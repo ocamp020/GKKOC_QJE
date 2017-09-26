@@ -1399,9 +1399,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	    do ai=1,na
 	    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
 	    	If ( Cons_Eq_Welfare(age2,ai,zi,lambdai,ei,xi) .ge. 0.0_DP) then
-        	frac_pos_welfare_draft_group_z(age,zi) = frac_pos_welfare_draft_group(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
+        	frac_pos_welfare_draft_group_z(age,zi) = frac_pos_welfare_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
         	endif 
-        	wealth_draft_group_z(age,zi) = wealth_draft_group(age,zi) + agrid(ai)*DBN_bench(age2,ai,zi,lambdai,ei,xi)
+        	wealth_draft_group_z(age,zi) = wealth_draft_group_z(age,zi) + agrid(ai)*DBN_bench(age2,ai,zi,lambdai,ei,xi)
     	enddo 
     	enddo 
     	enddo 
