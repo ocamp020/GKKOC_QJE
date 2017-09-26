@@ -64,7 +64,7 @@ MODULE parameters
 		! The distribution is iterated until convergence or until "MaxSimuTime" iterations
 	INTEGER(I4B), PARAMETER :: MaxSimuTime=5000 
 		! Age categories are established
-	INTEGER(I4B), PARAMETER :: max_age_category=7, draft_age_category = 5, draft_z_category = 5
+	INTEGER(I4B), PARAMETER :: max_age_category=7, draft_age_category = 5, draft_z_category = 8
 
 	! Parameters for external functions and procedures
 		! Number of std std away from mean in tauchen
