@@ -2104,7 +2104,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	!=====================================================================
 
 	! Get Steady State Distributions for drawing
-		DBN_A_nb 	= sum(sum(sum(sum(DBN1(1,:,:,:,:,:),6),5),4),3)/sum(DBN1(1,:,:,:,:,:))
+		DBN_A_nb 	= sum(sum(sum(sum(DBN1(1,:,:,:,:,:),5),4),3),2)/sum(DBN1(1,:,:,:,:,:))
 			do i=1,na
 				CDF_A_nb(i) = sum(DBN_A_nb(1:i))
 			enddo 
