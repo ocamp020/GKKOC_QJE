@@ -2036,6 +2036,537 @@ END SUBROUTINE Simulation_Life_Cycle_Patterns
 
 
 
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+SUBROUTINE  SSimulation_Life_Cycle_Asset_Return_Panel(bench_indx)
+	use parameters
+	use global
+	use omp_lib
+	IMPLICIT NONE	
+	integer, intent(in) :: bench_indx
+	! Simulation variables
+	integer  :: thread_num
+	real(dp) :: tempno, tempnoage
+	REAL(DP) :: start_timet, finish_timet
+	! Result Storage
+	integer , parameter :: sample_size = 1000000
+	integer  :: i, i_z, i_x, tklo, tkhi, i_pct
+	integer , dimension(sample_size)        :: Panel_l, Panel_z
+	integer , dimension(sample_size,RetAge) :: Panel_e, Panel_x, Panel_Death, Panel_x_ben, Panel_d_ben
+	real(DP), dimension(sample_size,RetAge) :: Panel_a, Panel_c, Panel_k, Panel_h, Panel_r, Panel_r_at
+	real(DP), dimension(RetAge)             :: Mean_a, Mean_c, Mean_k, Mean_h, Mean_r, Mean_r_at, Mean_r_w, Mean_r_at_w
+	real(DP), dimension(RetAge)             :: Mean_k_ben, Mean_r_ben, Mean_r_at_ben, Mean_r_w_ben, Mean_r_at_w_ben
+	integer , dimension(RetAge)             :: Mean_Death
+	real(DP)				                :: DBN_A_nb(na), DBN_Z(nz), CDF_A_nb(na), CDF_Z(nz)
+	real(DP), dimension(sample_size) 		:: Av_Return,	Av_Return_at, Av_Return_W, Av_Return_at_W , R_Av_Return, R_Av_Return_at
+	real(DP), dimension(sample_size) 		:: Av_Return_2024,	Av_Return_at_2024, Av_Return_W_2024, Av_Return_at_W_2024
+	real(DP), dimension(sample_size) 		:: R_Av_Return_2024,	R_Av_Return_at_2024 
+	real(DP), dimension(sample_size) 		:: Av_Return_2565,	Av_Return_at_2565, Av_Return_W_2565, Av_Return_at_W_2565
+	real(DP), dimension(sample_size) 		:: R_Av_Return_2565,	R_Av_Return_at_2565 
+	real(DP), dimension(sample_size) 		:: Av_Return_2029,	Av_Return_at_2029, Av_Return_W_2029, Av_Return_at_W_2029
+	real(DP), dimension(sample_size) 		:: R_Av_Return_2029,	R_Av_Return_at_2029 
+	real(DP), dimension(sample_size) 		:: Av_Return_3065,	Av_Return_at_3065, Av_Return_W_3065, Av_Return_at_W_3065
+	real(DP), dimension(sample_size) 		:: R_Av_Return_3065,	R_Av_Return_at_3065
+	real(dp), dimension(10) :: prctile_ret
+	real(dp), dimension(11) :: prc_Av_Return, prc_Av_Return_at, prc_Av_Return_W, prc_Av_Return_at_W
+	real(dp), dimension(11) :: prc_Av_Return_2024, prc_Av_Return_at_2024, prc_Av_Return_W_2024, prc_Av_Return_at_W_2024 
+	real(dp), dimension(11) :: prc_Av_Return_2565, prc_Av_Return_at_2565, prc_Av_Return_W_2565, prc_Av_Return_at_W_2565
+	real(dp), dimension(11) :: prc_Av_Return_2029, prc_Av_Return_at_2029, prc_Av_Return_W_2029, prc_Av_Return_at_W_2029
+	real(dp), dimension(11) :: prc_Av_Return_3065, prc_Av_Return_at_3065, prc_Av_Return_W_3065, prc_Av_Return_at_W_3065
+	real(dp), dimension(11) :: prc_R_Av_Return, prc_R_Av_Return_at
+	real(dp), dimension(11) :: prc_R_Av_Return_2024, prc_R_Av_Return_at_2024
+	real(dp), dimension(11) :: prc_R_Av_Return_2565, prc_R_Av_Return_at_2565
+	real(dp), dimension(11) :: prc_R_Av_Return_2029, prc_R_Av_Return_at_2029
+	real(dp), dimension(11) :: prc_R_Av_Return_3065, prc_R_Av_Return_at_3065
+
+
+	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/Asset_Return_Panel/' )
+
+	!$ call omp_set_num_threads(20)
+
+		! Set Seeds for each thread
+	!$OMP parallel
+    !$OMP critical
+		thread_num = omp_get_thread_num()
+		newiseed   = -5 - thread_num
+		tempno     = omp_ran1(newiseed)
+       	! write(*,'("inside critical myt=",i4,f12.8)') thread_num,tempno,newiseed
+    !$OMP end critical
+    !$OMP end parallel
+
+	print*,'SIMULATION STARTED'
+
+
+	!=====================================================================
+	!                     GENERATE   INITIAL   PANEL
+	!=====================================================================
+
+	! Get Steady State Distributions for drawing
+		DBN_A_nb 	= sum(sum(sum(sum(DBN1(1,:,:,:,:,:),6),5),4),3)/sum(DBN1(1,:,:,:,:,:))
+			do i=1,na
+				CDF_A_nb(i) = sum(DBN_A_nb(1:i))
+			enddo 
+		DBN_Z      	= sum(sum(sum(sum(sum(DBN1,6),5),4),2),1)
+			do i=1,nz
+				CDF_Z(i) = sum(DBN_Z(1:i))
+			enddo 
+
+	newiseed=-1
+		! Initial x and e are predetermined
+		Panel_x(:,1) = 1 
+		Panel_e(:,1) = ne/2+1 ! ALL NEWBORN START FROM THE MEDIAN E  but if too many people died and started from median E, draw a new E for them
+		! Initial Assets are drawn from the steady state distribution of assets for new-borns
+
+		do i_z=1,nz 
+			Panel_a(:,1,i_z) = sum( DBN_AZ(:,i_z)*agrid ) / sum( DBN_AZ(:,i_z) )
+		enddo 
+		! All individuals are alive
+		Panel_Death(:,1) = 1 
+
+	!$omp parallel do private(tempno,lambdai,tklo,tkhi,ai,i_z)
+	DO i=1,sample_size
+
+	! Assets
+		tempno = omp_ran1() ! ran1(newiseed) 
+	    ai=1
+	    DO WHILE (tempno .gt. CDF_A_nb(ai))
+	       ai=ai+1
+	    ENDDO
+
+	    Panel_a(i,1) = agrid(ai)
+
+	! Z
+		tempno = omp_ran1() ! ran1(newiseed) 
+	    i_z=1
+	    DO WHILE (tempno .gt. CDF_Z(i_z))
+	       i_z=i_z+1
+	    ENDDO
+
+	    Panel_z(i) = i_z
+	 
+	! LAMBDA  
+	    tempno = omp_ran1() ! ran1(newiseed) 
+	    lambdai=1
+	    DO WHILE (tempno .gt. cdf_Glambda(lambdai))
+	       lambdai=lambdai+1
+	    ENDDO
+
+	    Panel_l(i) = lambdai
+
+   ! Capital
+   		Panel_k(i,1)    = min(theta(i_z)*Panel_a(i,1) , &
+	     					&(mu*P*xz_grid(Panel_x(i,1),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+
+	! Return 
+		Panel_r(i,1)    = ( P*(xz_grid(Panel_x(i,1),i_z)*Panel_k(i,1))**mu - (R+DepRate)*Panel_k(i,1) +&
+	     								&   R*Panel_a(i,1) )/Panel_a(i,1)
+
+		Panel_r_at(i,1) = ( ( ( (P*(xz_grid(Panel_x(i,1),i_z)*Panel_k(i,1))**mu - (R+DepRate)*Panel_k(i,1)) &
+							& + R*Panel_a(i,1))*(1.0_dp-tauK) + Panel_a(i,1))*(1.0_dp-tauW_at) )/Panel_a(i,1) - 1.0_dp 
+
+	! Consumption and Labor
+ 		if (Panel_a(i,1) .ge. amax) then
+	        tklo = na-1
+	    elseif (Panel_a(i,1) .lt. amin) then
+            tklo = 1
+        else
+            tklo = ((Panel_a(i,1)- amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+	    endif    
+	    tkhi = tklo + 1        
+
+	    Panel_c(i,1) = (    (agrid(tkhi) - Panel_a(i,1)) * & 
+	    					&		Cons(1,tklo,i_z,Panel_l(i),Panel_e(i,1),Panel_x(i,1))    &
+	                       	& + (Panel_a(i,1) - agrid(tklo)) * &
+	                       	&		Cons(1,tkhi,i_z,Panel_l(i),Panel_e(i,1),Panel_x(i,1)) )  &
+	                       	&  / ( agrid(tkhi) - agrid(tklo) )  
+
+       	Panel_h(i,1) = (    (agrid(tkhi) - Panel_a(i,1)) * & 
+	    					&		Hours(1,tklo,i_z,Panel_l(i),Panel_e(i,1),Panel_x(i,1))    &
+	                       	& + (Panel_a(i,1) - agrid(tklo)) * &
+	                       	&		Hours(1,tkhi,i_z,Panel_l(i),Panel_e(i,1),Panel_x(i,1)) )  &
+	                       	&  / ( agrid(tkhi) - agrid(tklo) )  
+
+	   
+	ENDDO
+
+
+	!=============================================================================
+	!
+	! SIMULATE FROM THE SECOND PERIOD SHOCKS AND UPDATE NEW DISTRIBUTIONS
+	!
+	!=============================================================================
+	
+	print*, 'Starting Simutime loop'
+	DO age=2,RetAge
+		!$omp parallel do private(tempnoage,ei,xi,tklo,tkhi,tempno,i_z)
+	   	DO i=1,sample_size
+	        i_z = Panel_z(i)
+			!  Compute Assets from previous period savings
+	       	! if (age .lt. MaxAge) then
+	            ! do linear interpolation here to find aprime. calling the function takes much more time
+	            if (Panel_a(i,age-1) .ge. amax) then
+			        tklo = na-1
+			    elseif (Panel_a(i,age-1) .lt. amin) then
+		            tklo = 1
+		        else
+		            tklo = ((Panel_a(i,age-1)- amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+			    endif    
+			    tkhi = tklo + 1        
+
+	            Panel_a(i,age) = max( amin, min( amax , ((agrid(tkhi) - Panel_a(i,age-1))* &
+	            				& 	Aprime(age-1,tklo,i_z,Panel_l(i),Panel_e(i,age-1),Panel_x(i,age-1))  &
+	                           	&  +  (Panel_a(i,age-1) - agrid(tklo))* &
+                           		& 	Aprime(age-1,tkhi,i_z,Panel_l(i),Panel_e(i,age-1),Panel_x(i,age-1))) &
+	                            &  / ( agrid(tkhi) - agrid(tklo) )  ) )
+
+	       	! endif !age .lt. MaxAge
+			!  NEXT PERIOD'S ASSET IS COMPUTED
+
+	             
+			! DRAW NEXT PERIOD'S AGE DBN
+	      	! tempnoage = omp_ran1() ! ran1(newiseed)  
+	  		! Make everyone survive
+	  		tempnoage = 2.0_dp
+	      	IF (tempnoage .gt. survP(age)) THEN
+	      		! Agent Dies
+				Panel_Death(i,age) = 0
+				Panel_x(i,age)     = 1
+				Panel_e(i,age)	   = ne/2+1
+			ELSE
+				! Agent Survives
+				Panel_Death(i,age) = 1
+				! !$omp critical
+       			tempno 	  = omp_ran1() ! ran1(newiseed)   
+	            xi 		  = 1
+	            DO WHILE (tempno .gt. cdf_pr_x(Panel_x(i,age-1),xi,i_z,age-1))
+	               xi = xi+1
+	            ENDDO            
+	            Panel_x(i,age) = xi          
+	            IF (age.lt.RetAge) THEN
+		            tempno 	  = omp_ran1() ! ran1(newiseed)   
+		            ei 		  = 1
+		            DO WHILE (tempno .gt. cdf_pr_e(Panel_e(i,age-1) ,ei))
+		               ei = ei+1
+		            ENDDO            
+		            Panel_e(i,age) = ei 
+	            ELSE 
+	            	Panel_e(i,age) = Panel_e(i,age-1)
+	            ENDIF 
+	            ! !$omp end critical   
+	      	ENDIF
+
+      	    ! Capital
+		   		Panel_k(i,age) = min(theta(i_z)*Panel_a(i,age) , &
+			     					&(mu*P*xz_grid(Panel_x(i,age),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+
+			! Return 
+				Panel_r(i,age) = ( P*(xz_grid(Panel_x(i,age),i_z)*Panel_k(i,age))**mu - (R+DepRate)*Panel_k(i,age) +&
+			     								&   R*Panel_a(i,age) )/Panel_a(i,age)
+
+				Panel_r_at(i,age) = ( ( ( (P*(xz_grid(Panel_x(i,age),i_z)*Panel_k(i,age))**mu - (R+DepRate)*Panel_k(i,age)) &
+									& + R*Panel_a(i,age))*(1.0_dp-tauK) + Panel_a(i,age))*(1.0_dp-tauW_at) )/Panel_a(i,age) - 1.0_dp 
+
+			! Consumption and Labor
+		 		if (Panel_a(i,age) .ge. amax) then
+			        tklo = na-1
+			    elseif (Panel_a(i,age) .lt. amin) then
+		            tklo = 1
+		        else
+		            tklo = ((Panel_a(i,age)- amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+			    endif    
+			    tkhi = tklo + 1        
+
+			    Panel_c(i,age) = (    (agrid(tkhi) - Panel_a(i,age)) * & 
+			    					&		Cons(age,tklo,i_z,Panel_l(i),Panel_e(i,age),Panel_x(i,age))    &
+			                       	& + (Panel_a(i,age) - agrid(tklo)) * &
+			                       	&		Cons(age,tkhi,i_z,Panel_l(i),Panel_e(i,age),Panel_x(i,age)) )  &
+			                       	&  / ( agrid(tkhi) - agrid(tklo) )  
+
+		       	Panel_h(i,age) = (    (agrid(tkhi) - Panel_a(i,age)) * & 
+			    					&		Hours(age,tklo,i_z,Panel_l(i),Panel_e(i,age),Panel_x(i,age))    &
+			                       	& + (Panel_a(i,age) - agrid(tklo)) * &
+			                       	&		Hours(age,tkhi,i_z,Panel_l(i),Panel_e(i,age),Panel_x(i,age)) )  &
+			                       	&  / ( agrid(tkhi) - agrid(tklo) )  
+			    
+
+		ENDDO ! paneli
+		
+
+	 		print*, "Panel Simultaion: Age", age, "Complete"
+
+	 		
+	ENDDO ! age
+
+	!=============================================================================
+	!
+	! Get Averages
+	!
+	!=============================================================================
+
+	print*, ' '
+	print*, 'Computing Averages'
+	DO age = 1,MaxAge 
+		Mean_a(age) 	 = sum(Panel_a(:,age)*Panel_Death(:,age))/sum(Panel_Death(:,age)) 
+		Mean_c(age) 	 = sum(Panel_c(:,age)*Panel_Death(:,age))/sum(Panel_Death(:,age)) 
+		Mean_k(age) 	 = sum(Panel_k(:,age)*Panel_Death(:,age))/sum(Panel_Death(:,age)) 
+		Mean_h(age) 	 = sum(Panel_h(:,age)*Panel_Death(:,age))/sum(Panel_Death(:,age)) 
+		Mean_r(age) 	 = sum(Panel_r(:,age)*Panel_Death(:,age))/sum(Panel_Death(:,age)) 
+		Mean_r_at(age)   = sum(Panel_r_at(:,age)*Panel_Death(:,age))/sum(Panel_Death(:,age)) 
+		Mean_r_w(age) 	 = sum(Panel_r(:,age)*Panel_a(:,age)*Panel_Death(:,age)) & 
+								& /sum(Panel_a(:,age)*Panel_Death(:,age)) 
+		Mean_r_at_w(age) = sum(Panel_r_at(:,age)*Panel_a(:,age)*Panel_Death(:,age)) & 
+								& /sum(Panel_a(:,age)*Panel_Death(:,age)) 
+		Mean_Death(age)  = sum(Panel_Death(:,age)) 
+	ENDDO
+
+	!$omp parallel do 
+	DO i = 1, sample_size
+		Av_Return(i) 			= sum(panel_r(i,:)   *Panel_Death(i,:))/sum(Panel_Death(i,:))
+		Av_Return_at(i) 		= sum(panel_r_at(i,:)*Panel_Death(i,:))/sum(Panel_Death(i,:))
+		Av_Return_W(i) 	  		= sum(panel_r(i,:)   *Panel_a(i,:)*Panel_Death(i,:))/sum(Panel_a(i,:)*Panel_Death(i,:))
+		Av_Return_at_W(i) 		= sum(panel_r_at(i,:)*Panel_a(i,:)*Panel_Death(i,:))/sum(Panel_a(i,:)*Panel_Death(i,:))
+
+		Av_Return_2024(i) 		= sum(panel_r(i,1:5)   *Panel_Death(i,1:5))/sum(Panel_Death(i,1:5))
+		Av_Return_at_2024(i) 	= sum(panel_r_at(i,1:5)*Panel_Death(i,1:5))/sum(Panel_Death(i,1:5))
+		Av_Return_W_2024(i) 	= sum(panel_r(i,1:5)   *Panel_a(i,1:5)*Panel_Death(i,1:5))/sum(Panel_a(i,1:5)*Panel_Death(i,1:5))
+		Av_Return_at_W_2024(i) 	= sum(panel_r_at(i,1:5)*Panel_a(i,1:5)*Panel_Death(i,1:5))/sum(Panel_a(i,1:5)*Panel_Death(i,1:5))
+
+		Av_Return_2565(i) 		= sum(panel_r(i,6:)   *Panel_Death(i,6:))/sum(Panel_Death(i,6:))
+		Av_Return_at_2565(i) 	= sum(panel_r_at(i,6:)*Panel_Death(i,6:))/sum(Panel_Death(i,6:))
+		Av_Return_W_2565(i) 	= sum(panel_r(i,6:)   *Panel_a(i,6:)*Panel_Death(i,6:))/sum(Panel_a(i,6:)*Panel_Death(i,6:))
+		Av_Return_at_W_2565(i) 	= sum(panel_r_at(i,6:)*Panel_a(i,6:)*Panel_Death(i,6:))/sum(Panel_a(i,6:)*Panel_Death(i,6:))
+
+		Av_Return_2029(i) 		= sum(panel_r(i,1:10)   *Panel_Death(i,1:10))/sum(Panel_Death(i,1:10))
+		Av_Return_at_2029(i) 	= sum(panel_r_at(i,1:10)*Panel_Death(i,1:10))/sum(Panel_Death(i,1:10))
+		Av_Return_W_2029(i) 	= sum(panel_r(i,1:10)   *Panel_a(i,1:10)*Panel_Death(i,1:10))/sum(Panel_a(i,1:10)*Panel_Death(i,1:10))
+		Av_Return_at_W_2029(i) 	= sum(panel_r_at(i,1:10)*Panel_a(i,1:10)*Panel_Death(i,1:10))/sum(Panel_a(i,1:10)*Panel_Death(i,1:10))
+
+		Av_Return_3065(i) 		= sum(panel_r(i,11:)   *Panel_Death(i,11:))/sum(Panel_Death(i,11:))
+		Av_Return_at_3065(i) 	= sum(panel_r_at(i,11:)*Panel_Death(i,11:))/sum(Panel_Death(i,11:))
+		Av_Return_W_3065(i) 	= sum(panel_r(i,11:)   *Panel_a(i,11:)*Panel_Death(i,11:))/sum(Panel_a(i,11:)*Panel_Death(i,11:))
+		Av_Return_at_W_3065(i) 	= sum(panel_r_at(i,11:)*Panel_a(i,11:)*Panel_Death(i,11:))/sum(Panel_a(i,11:)*Panel_Death(i,11:))
+
+		! Robust means - excluding highest return
+		R_Av_Return(i) 			= (sum(panel_r(i,:)   *Panel_Death(i,:))-maxval(panel_r(i,:)   *Panel_Death(i,:)))/&
+									& (sum(Panel_Death(i,:))-1.0_dp)
+		R_Av_Return_at(i) 		= (sum(panel_r_at(i,:)*Panel_Death(i,:))-maxval(panel_r_at(i,:)*Panel_Death(i,:)))/&
+									& (sum(Panel_Death(i,:))-1.0_dp)
+
+		R_Av_Return_2024(i) 	= (sum(panel_r(i,1:5)   *Panel_Death(i,1:5))-maxval(panel_r(i,1:5)*Panel_Death(i,1:5)))/&
+									& (sum(Panel_Death(i,1:5))-1.0_dp)
+		R_Av_Return_at_2024(i)  = (sum(panel_r_at(i,1:5)*Panel_Death(i,1:5))-maxval(panel_r(i,1:5)*Panel_Death(i,1:5)))/&
+									& (sum(Panel_Death(i,1:5))-1.0_dp)
+
+		R_Av_Return_2565(i) 	= (sum(panel_r(i,6:)   *Panel_Death(i,6:))-maxval(panel_r(i,6:)*Panel_Death(i,6:)))/&
+									& (sum(Panel_Death(i,6:))-1.0_dp)
+		R_Av_Return_at_2565(i) 	= (sum(panel_r_at(i,6:)*Panel_Death(i,6:))-maxval(panel_r(i,6:)*Panel_Death(i,6:)))/& 
+									& (sum(Panel_Death(i,6:))-1.0_dp)
+
+		R_Av_Return_2029(i) 	= (sum(panel_r(i,1:10)   *Panel_Death(i,1:10))-maxval(panel_r(i,1:10)*Panel_Death(i,1:10)))/&
+									& (sum(Panel_Death(i,1:10))-1.0_dp)
+		R_Av_Return_at_2029(i) 	= (sum(panel_r_at(i,1:10)*Panel_Death(i,1:10))-maxval(panel_r(i,1:10)*Panel_Death(i,1:10)))/&
+									& (sum(Panel_Death(i,1:10))-1.0_dp)
+
+		R_Av_Return_3065(i) 	= (sum(panel_r(i,11:)   *Panel_Death(i,11:))-maxval(panel_r(i,11:)*Panel_Death(i,11:)))/&
+									& (sum(Panel_Death(i,11:))-1.0_dp)
+		R_Av_Return_at_3065(i) 	= (sum(panel_r_at(i,11:)*Panel_Death(i,11:))-maxval(panel_r(i,11:)*Panel_Death(i,11:)))/&
+									& (sum(Panel_Death(i,11:))-1.0_dp)
+	ENDDO
+
+	!=============================================================================
+	!
+	! Get Percentiles
+	!=============================================================================
+
+	print*, ' '
+	print*, 'Computing Averages'
+	prctile_ret = (/0.999_dp, 0.99_dp, 0.95_dp, 0.90_dp, 0.80_dp, 0.75_dp, 0.50_dp, 0.25_dp, 0.20_dp, 0.10_dp/)
+
+	do i_pct=1,10
+		print*, 'Ret prc=', prctile_ret(i_pct)
+		prc_Av_Return(i_pct)      = Percetile(prctile_ret(i_pct),sample_size,Av_Return)
+		prc_Av_Return_at(i_pct)   = Percetile(prctile_ret(i_pct),sample_size,Av_Return_at)
+		prc_Av_Return_W(i_pct)    = Percetile(prctile_ret(i_pct),sample_size,Av_Return_W)
+		prc_Av_Return_at_W(i_pct) = Percetile(prctile_ret(i_pct),sample_size,Av_Return_at_W)
+
+		prc_Av_Return_2024(i_pct)      = Percetile(prctile_ret(i_pct),sample_size,Av_Return_2024)
+		prc_Av_Return_at_2024(i_pct)   = Percetile(prctile_ret(i_pct),sample_size,Av_Return_at_2024)
+		prc_Av_Return_W_2024(i_pct)    = Percetile(prctile_ret(i_pct),sample_size,Av_Return_W_2024)
+		prc_Av_Return_at_W_2024(i_pct) = Percetile(prctile_ret(i_pct),sample_size,Av_Return_at_W_2024)
+
+		prc_Av_Return_2565(i_pct)      = Percetile(prctile_ret(i_pct),sample_size,Av_Return_2565)
+		prc_Av_Return_at_2565(i_pct)   = Percetile(prctile_ret(i_pct),sample_size,Av_Return_at_2565)
+		prc_Av_Return_W_2565(i_pct)    = Percetile(prctile_ret(i_pct),sample_size,Av_Return_W_2565)
+		prc_Av_Return_at_W_2565(i_pct) = Percetile(prctile_ret(i_pct),sample_size,Av_Return_at_W_2565)
+
+		prc_Av_Return_2029(i_pct)      = Percetile(prctile_ret(i_pct),sample_size,Av_Return_2029)
+		prc_Av_Return_at_2029(i_pct)   = Percetile(prctile_ret(i_pct),sample_size,Av_Return_at_2029)
+		prc_Av_Return_W_2029(i_pct)    = Percetile(prctile_ret(i_pct),sample_size,Av_Return_W_2029)
+		prc_Av_Return_at_W_2029(i_pct) = Percetile(prctile_ret(i_pct),sample_size,Av_Return_at_W_2029)
+
+		prc_Av_Return_3065(i_pct)      = Percetile(prctile_ret(i_pct),sample_size,Av_Return_3065)
+		prc_Av_Return_at_3065(i_pct)   = Percetile(prctile_ret(i_pct),sample_size,Av_Return_at_3065)
+		prc_Av_Return_W_3065(i_pct)    = Percetile(prctile_ret(i_pct),sample_size,Av_Return_W_3065)
+		prc_Av_Return_at_W_3065(i_pct) = Percetile(prctile_ret(i_pct),sample_size,Av_Return_at_W_3065)
+
+		prc_R_Av_Return(i_pct)      	= Percetile(prctile_ret(i_pct),sample_size,R_Av_Return)
+		prc_R_Av_Return_at(i_pct)   	= Percetile(prctile_ret(i_pct),sample_size,R_Av_Return_at)
+		prc_R_Av_Return_2024(i_pct)     = Percetile(prctile_ret(i_pct),sample_size,R_Av_Return_2024)
+		prc_R_Av_Return_at_2024(i_pct)  = Percetile(prctile_ret(i_pct),sample_size,R_Av_Return_at_2024)
+		prc_R_Av_Return_2565(i_pct)     = Percetile(prctile_ret(i_pct),sample_size,R_Av_Return_2565)
+		prc_R_Av_Return_at_2565(i_pct)  = Percetile(prctile_ret(i_pct),sample_size,R_Av_Return_at_2565)
+		prc_R_Av_Return_2029(i_pct)     = Percetile(prctile_ret(i_pct),sample_size,R_Av_Return_2029)
+		prc_R_Av_Return_at_2029(i_pct)  = Percetile(prctile_ret(i_pct),sample_size,R_Av_Return_at_2029)
+		prc_R_Av_Return_3065(i_pct)     = Percetile(prctile_ret(i_pct),sample_size,R_Av_Return_3065)
+		prc_R_Av_Return_at_3065(i_pct)  = Percetile(prctile_ret(i_pct),sample_size,R_Av_Return_at_3065)
+	enddo 
+		prc_Av_Return(11)       	= sum(Av_Return)/sample_size
+		prc_Av_Return_at(11)   		= sum(Av_Return_at)/sample_size
+		prc_Av_Return_W(11)    		= sum(Av_Return_W)/sample_size
+		prc_Av_Return_at_W(11) 		= sum(Av_Return_at_W)/sample_size
+
+		prc_Av_Return_2024(11)      = sum(Av_Return_2024)/sample_size
+		prc_Av_Return_at_2024(11)   = sum(Av_Return_at_2024)/sample_size
+		prc_Av_Return_W_2024(11)    = sum(Av_Return_W_2024)/sample_size
+		prc_Av_Return_at_W_2024(11) = sum(Av_Return_at_W_2024)/sample_size
+
+		prc_Av_Return_2565(11)      = sum(Av_Return_2565)/sample_size
+		prc_Av_Return_at_2565(11)   = sum(Av_Return_at_2565)/sample_size
+		prc_Av_Return_W_2565(11)    = sum(Av_Return_W_2565)/sample_size
+		prc_Av_Return_at_W_2565(11) = sum(Av_Return_at_W_2565)/sample_size
+
+		prc_Av_Return_2029(11)      = sum(Av_Return_2029)/sample_size
+		prc_Av_Return_at_2029(11)   = sum(Av_Return_at_2029)/sample_size
+		prc_Av_Return_W_2029(11)    = sum(Av_Return_W_2029)/sample_size
+		prc_Av_Return_at_W_2029(11) = sum(Av_Return_at_W_2029)/sample_size
+
+		prc_Av_Return_3065(11)      = sum(Av_Return_3065)/sample_size
+		prc_Av_Return_at_3065(11)   = sum(Av_Return_at_3065)/sample_size
+		prc_Av_Return_W_3065(11)    = sum(Av_Return_W_3065)/sample_size
+		prc_Av_Return_at_W_3065(11) = sum(Av_Return_at_W_3065)/sample_size
+
+		prc_R_Av_Return(11)      	= sum(R_Av_Return)/sample_size
+		prc_R_Av_Return_at(11)   	= sum(R_Av_Return_at)/sample_size
+		prc_R_Av_Return_2024(11)    = sum(R_Av_Return_2024)/sample_size
+		prc_R_Av_Return_at_2024(11) = sum(R_Av_Return_at_2024)/sample_size
+		prc_R_Av_Return_2565(11)    = sum(R_Av_Return_2565)/sample_size
+		prc_R_Av_Return_at_2565(11) = sum(R_Av_Return_at_2565)/sample_size
+		prc_R_Av_Return_2029(11)    = sum(R_Av_Return_2029)/sample_size
+		prc_R_Av_Return_at_2029(11) = sum(R_Av_Return_at_2029)/sample_size
+		prc_R_Av_Return_3065(11)    = sum(R_Av_Return_3065)/sample_size
+		prc_R_Av_Return_at_3065(11) = sum(R_Av_Return_at_3065)/sample_size
+	print*, 'End of prc of return'
+
+	!=============================================================================
+	!
+	! Write Results
+	!
+	!=============================================================================
+
+	print*, ' '
+	print*, 'Writing tables with percentiles and means'
+	if (bench_indx.eq.1) then
+		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Return_Stats_ben.txt', STATUS='replace')
+	else 
+		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Return_Stats_exp.txt', STATUS='replace')
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Return_at_Stats_exp.txt', STATUS='replace')
+	endif 
+
+	WRITE(UNIT=10, FMT=*) " "
+	WRITE(UNIT=10, FMT=*) "Stats for Returns"
+	WRITE(UNIT=10, FMT=*) "Stat","p99.9","p99","p95","p90","p80","p75","p50","p25","p20","p10","Mean"
+	WRITE(UNIT=10, FMT=*) "Returns",      prc_Av_Return
+	WRITE(UNIT=10, FMT=*) "Returns_2024", prc_Av_Return_2024
+	WRITE(UNIT=10, FMT=*) "Returns_2565", prc_Av_Return_2565
+	WRITE(UNIT=10, FMT=*) "Returns_2029", prc_Av_Return_2029
+	WRITE(UNIT=10, FMT=*) "Returns_3065", prc_Av_Return_3065
+	WRITE(UNIT=10, FMT=*) " "
+	WRITE(UNIT=10, FMT=*) "Stats for Robust Returns (Removing Max Return)"
+	WRITE(UNIT=10, FMT=*) "Stat","p99.9","p99","p95","p90","p80","p75","p50","p25","p20","p10","Mean"
+	WRITE(UNIT=10, FMT=*) "R_Returns",      prc_R_Av_Return
+	WRITE(UNIT=10, FMT=*) "R_Returns_2024", prc_R_Av_Return_2024
+	WRITE(UNIT=10, FMT=*) "R_Returns_2565", prc_R_Av_Return_2565
+	WRITE(UNIT=10, FMT=*) "R_Returns_2029", prc_R_Av_Return_2029
+	WRITE(UNIT=10, FMT=*) "R_Returns_3065", prc_R_Av_Return_3065
+	WRITE(UNIT=10, FMT=*) " "
+	WRITE(UNIT=10, FMT=*) "Stats for Weighted Returns (Weighted by assets across age - unweighted across individuals)"
+	WRITE(UNIT=10, FMT=*) "Stat","p99.9","p99","p95","p90","p80","p75","p50","p25","p20","p10","Mean"
+	WRITE(UNIT=10, FMT=*) "W_Returns",      prc_Av_Return_W
+	WRITE(UNIT=10, FMT=*) "W_Returns_2024", prc_Av_Return_W_2024
+	WRITE(UNIT=10, FMT=*) "W_Returns_2565", prc_Av_Return_W_2565
+	WRITE(UNIT=10, FMT=*) "W_Returns_2029", prc_Av_Return_W_2029
+	WRITE(UNIT=10, FMT=*) "W_Returns_3065", prc_Av_Return_W_3065
+	WRITE(UNIT=10, FMT=*) " "
+	WRITE(UNIT=10, FMT=*) " "
+	WRITE(UNIT=10, FMT=*) " "
+	WRITE(UNIT=10, FMT=*) "Stats for After Tax Returns"
+	WRITE(UNIT=10, FMT=*) "Stat","p99.9","p99","p95","p90","p80","p75","p50","p25","p20","p10","Mean"
+	WRITE(UNIT=10, FMT=*) "AT_Returns",      prc_Av_Return_at
+	WRITE(UNIT=10, FMT=*) "AT_Returns_2024", prc_Av_Return_at_2024
+	WRITE(UNIT=10, FMT=*) "AT_Returns_2565", prc_Av_Return_at_2565
+	WRITE(UNIT=10, FMT=*) "AT_Returns_2029", prc_Av_Return_at_2029
+	WRITE(UNIT=10, FMT=*) "AT_Returns_3065", prc_Av_Return_at_3065
+	WRITE(UNIT=10, FMT=*) " "
+	WRITE(UNIT=10, FMT=*) "Stats for Robust After Tax Returns (Removing Max Return)"
+	WRITE(UNIT=10, FMT=*) "Stat","p99.9","p99","p95","p90","p80","p75","p50","p25","p20","p10","Mean"
+	WRITE(UNIT=10, FMT=*) "R_AT_Returns",      prc_R_Av_Return_at
+	WRITE(UNIT=10, FMT=*) "R_AT_Returns_2024", prc_R_Av_Return_at_2024
+	WRITE(UNIT=10, FMT=*) "R_AT_Returns_2565", prc_R_Av_Return_at_2565
+	WRITE(UNIT=10, FMT=*) "R_AT_Returns_2029", prc_R_Av_Return_at_2029
+	WRITE(UNIT=10, FMT=*) "R_AT_Returns_3065", prc_R_Av_Return_at_3065
+	WRITE(UNIT=10, FMT=*) " "
+	WRITE(UNIT=10, FMT=*) "Stats for Weighted After Tax Returns (Weighted by assets across age - unweighted across individuals)"
+	WRITE(UNIT=10, FMT=*) "Stat","p99.9","p99","p95","p90","p80","p75","p50","p25","p20","p10","Mean"
+	WRITE(UNIT=10, FMT=*) "W_AT_Returns",      prc_Av_Return_at_W
+	WRITE(UNIT=10, FMT=*) "W_AT_Returns_2024", prc_Av_Return_at_W_2024
+	WRITE(UNIT=10, FMT=*) "W_AT_Returns_2565", prc_Av_Return_at_W_2565
+	WRITE(UNIT=10, FMT=*) "W_AT_Returns_2029", prc_Av_Return_at_W_2029
+	WRITE(UNIT=10, FMT=*) "W_AT_Returns_3065", prc_Av_Return_at_W_3065
+
+	close (unit=10);
+
+
+	print*, ' '
+	print*, 'Saving panel from simulation results'
+
+	if (bench_indx.eq.1) then
+		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_a_ben.txt', STATUS='replace')
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_r_ben.txt', STATUS='replace')
+		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_r_at_ben.txt', STATUS='replace')
+		OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_k_ben.txt', STATUS='replace')
+		OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_c_ben.txt', STATUS='replace')
+		OPEN(UNIT=15, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_h_ben.txt', STATUS='replace')
+
+		WRITE  (UNIT=10, FMT='(F12.4)') Panel_a
+		WRITE  (UNIT=11, FMT='(F12.4)') Panel_r
+		WRITE  (UNIT=12, FMT='(F12.4)') Panel_r_at 
+		WRITE  (UNIT=13, FMT='(F12.4)') Panel_k
+		WRITE  (UNIT=14, FMT='(F12.4)') Panel_c 
+		WRITE  (UNIT=15, FMT='(F12.4)') Panel_h
+		close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14); close (unit=15);
+
+	else 
+		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_a_exp.txt', STATUS='replace')
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_r_exp.txt', STATUS='replace')
+		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_r_at_exp.txt', STATUS='replace')
+		OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_k_exp.txt', STATUS='replace')
+		OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_c_exp.txt', STATUS='replace')
+		OPEN(UNIT=15, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_h_exp.txt', STATUS='replace')
+
+		WRITE  (UNIT=10, FMT='(F12.4)') Panel_a
+		WRITE  (UNIT=11, FMT='(F12.4)') Panel_r
+		WRITE  (UNIT=12, FMT='(F12.4)') Panel_r_at 
+		WRITE  (UNIT=13, FMT='(F12.4)') Panel_k
+		WRITE  (UNIT=14, FMT='(F12.4)') Panel_c 
+		WRITE  (UNIT=15, FMT='(F12.4)') Panel_h
+		close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14); close (unit=15);		
+	endif 
+
+
+END SUBROUTINE Simulation_Life_Cycle_Asset_Return_Panel
+
 
 !========================================================================================
 !========================================================================================
