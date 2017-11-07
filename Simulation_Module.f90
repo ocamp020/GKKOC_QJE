@@ -2040,7 +2040,7 @@ END SUBROUTINE Simulation_Life_Cycle_Patterns
 !========================================================================================
 !========================================================================================
 
-SUBROUTINE  SSimulation_Life_Cycle_Asset_Return_Panel(bench_indx)
+SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	use parameters
 	use global
 	use omp_lib
@@ -2117,11 +2117,6 @@ SUBROUTINE  SSimulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		! Initial x and e are predetermined
 		Panel_x(:,1) = 1 
 		Panel_e(:,1) = ne/2+1 ! ALL NEWBORN START FROM THE MEDIAN E  but if too many people died and started from median E, draw a new E for them
-		! Initial Assets are drawn from the steady state distribution of assets for new-borns
-
-		do i_z=1,nz 
-			Panel_a(:,1,i_z) = sum( DBN_AZ(:,i_z)*agrid ) / sum( DBN_AZ(:,i_z) )
-		enddo 
 		! All individuals are alive
 		Panel_Death(:,1) = 1 
 
