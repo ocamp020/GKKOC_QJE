@@ -2471,7 +2471,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for Returns"
-	WRITE(UNIT=10, FMT=*) "Stat","p99.9","p99","p95","p90","p80","p75","p50","p25","p20","p10","Mean"
+	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
 	WRITE(UNIT=10, FMT=*) "Returns",      prc_Av_Return
 	WRITE(UNIT=10, FMT=*) "Returns_2024", prc_Av_Return_2024
 	WRITE(UNIT=10, FMT=*) "Returns_2565", prc_Av_Return_2565
@@ -2479,7 +2479,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	WRITE(UNIT=10, FMT=*) "Returns_3065", prc_Av_Return_3065
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for Robust Returns (Removing Max Return)"
-	WRITE(UNIT=10, FMT=*) "Stat","p99.9","p99","p95","p90","p80","p75","p50","p25","p20","p10","Mean"
+	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
 	WRITE(UNIT=10, FMT=*) "R_Returns",      prc_R_Av_Return
 	WRITE(UNIT=10, FMT=*) "R_Returns_2024", prc_R_Av_Return_2024
 	WRITE(UNIT=10, FMT=*) "R_Returns_2565", prc_R_Av_Return_2565
@@ -2487,7 +2487,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	WRITE(UNIT=10, FMT=*) "R_Returns_3065", prc_R_Av_Return_3065
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for Weighted Returns (Weighted by assets across age - unweighted across individuals)"
-	WRITE(UNIT=10, FMT=*) "Stat","p99.9","p99","p95","p90","p80","p75","p50","p25","p20","p10","Mean"
+	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
 	WRITE(UNIT=10, FMT=*) "W_Returns",      prc_Av_Return_W
 	WRITE(UNIT=10, FMT=*) "W_Returns_2024", prc_Av_Return_W_2024
 	WRITE(UNIT=10, FMT=*) "W_Returns_2565", prc_Av_Return_W_2565
@@ -2497,7 +2497,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for After Tax Returns"
-	WRITE(UNIT=10, FMT=*) "Stat","p99.9","p99","p95","p90","p80","p75","p50","p25","p20","p10","Mean"
+	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
 	WRITE(UNIT=10, FMT=*) "AT_Returns",      prc_Av_Return_at
 	WRITE(UNIT=10, FMT=*) "AT_Returns_2024", prc_Av_Return_at_2024
 	WRITE(UNIT=10, FMT=*) "AT_Returns_2565", prc_Av_Return_at_2565
@@ -2505,7 +2505,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	WRITE(UNIT=10, FMT=*) "AT_Returns_3065", prc_Av_Return_at_3065
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for Robust After Tax Returns (Removing Max Return)"
-	WRITE(UNIT=10, FMT=*) "Stat","p99.9","p99","p95","p90","p80","p75","p50","p25","p20","p10","Mean"
+	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
 	WRITE(UNIT=10, FMT=*) "R_AT_Returns",      prc_R_Av_Return_at
 	WRITE(UNIT=10, FMT=*) "R_AT_Returns_2024", prc_R_Av_Return_at_2024
 	WRITE(UNIT=10, FMT=*) "R_AT_Returns_2565", prc_R_Av_Return_at_2565
@@ -2513,7 +2513,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	WRITE(UNIT=10, FMT=*) "R_AT_Returns_3065", prc_R_Av_Return_at_3065
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for Weighted After Tax Returns (Weighted by assets across age - unweighted across individuals)"
-	WRITE(UNIT=10, FMT=*) "Stat","p99.9","p99","p95","p90","p80","p75","p50","p25","p20","p10","Mean"
+	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
 	WRITE(UNIT=10, FMT=*) "W_AT_Returns",      prc_Av_Return_at_W
 	WRITE(UNIT=10, FMT=*) "W_AT_Returns_2024", prc_Av_Return_at_W_2024
 	WRITE(UNIT=10, FMT=*) "W_AT_Returns_2565", prc_Av_Return_at_W_2565
