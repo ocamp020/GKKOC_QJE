@@ -1114,6 +1114,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    print*,' '
 		    print*, 'Av Utility NB (bench) =',sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  
 		    print*, 'Av Utility NB (exp  ) =',sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))    
+		    print*, sum(ValueFunction_exp(1,:,:,:,:,:)), sum(DBN1(1,:,:,:,:,:))    
 		close (unit=50)		
 
 

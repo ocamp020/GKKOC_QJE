@@ -488,7 +488,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		endif 
 
 		! Call Simulation_Life_Cycle_Patterns(solving_bench)
-		Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
+		! Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
 
 
 		! print*,"	Efficiency Computation"
@@ -2221,8 +2221,9 @@ Subroutine Solve_Opt_Threshold
 
 	Threshold_Factor = 0.250_dp
 	CALL Write_Experimental_Results(.false.)
+	CALL COMPUTE_STATS
 	CALL COMPUTE_WELFARE_GAIN
-	
+
 
 
 ! 	!====================================================================================================
