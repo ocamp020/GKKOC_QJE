@@ -2284,10 +2284,10 @@ Subroutine Solve_Opt_Threshold
 			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 			Wealth_factor = Y_a_threshold/W_bench
     	
-	    DO tauindx=25,40
+	    DO tauindx=250,400,5
 	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold.txt', STATUS='old', POSITION='append')
 
-            tauw_at     = real(tauindx,8)/1000_DP
+            tauw_at     = real(tauindx,8)/10000_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
             ! Aggregate variable in experimental economy
