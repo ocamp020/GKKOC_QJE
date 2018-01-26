@@ -2262,6 +2262,8 @@ Subroutine Solve_Opt_Threshold
 		Opt_TauK = 0.0_DP
 		Opt_TauW = 0.0_DP
 		maxbrentvaluet=-10000.0_DP
+
+		Psi = 0.837668065030712_dp
 	
 	print*,'Optimal Tax Loop'
 	OPEN(UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold.txt', STATUS='replace')
