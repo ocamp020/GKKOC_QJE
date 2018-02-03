@@ -2263,7 +2263,8 @@ Subroutine Solve_Opt_Threshold
 		Opt_TauW = 0.0_DP
 		maxbrentvaluet=-10000.0_DP
 
-		CALL Write_Experimental_Results(.false.)
+		! CALL Write_Experimental_Results(.false.)
+		psi = 0.82482491997626_dp
 	
 	print*,'Optimal Tax Loop'
 	OPEN(UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_2.txt', STATUS='replace')
@@ -2348,11 +2349,13 @@ Subroutine Solve_Opt_Threshold
 		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
 		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
 	      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet
+      	  	CLOSE (unit=77)
+      	  	CALL Write_Experimental_Results(.true.)
 	    ENDDO 
 
 	    ENDDO
 
-    CLOSE (unit=77)
+    
 
 
 	! Evaluate optimal point in grid
