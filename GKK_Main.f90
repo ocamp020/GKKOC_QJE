@@ -2263,17 +2263,17 @@ Subroutine Solve_Opt_Threshold
 		Opt_TauW = 0.0_DP
 		maxbrentvaluet=-10000.0_DP
 
-		Psi = 0.837668065030712_dp
+		CALL Write_Experimental_Results(.false.)
 	
 	print*,'Optimal Tax Loop'
-	OPEN(UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold.txt', STATUS='replace')
+	OPEN(UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_2.txt', STATUS='replace')
 	WRITE(UNIT=77, FMT=*) 'Threshold_Factor ', 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
 		      & 'MeanWealth ','QBAR ','NBAR ','YBAR ','Y_Growth ', 'wage ', &
 		      & 'Av_Util_NB ', 'CE2_NB ', 'CE2_Pop ', &
 		      & 'Wealth_Output ', 'prct1_wealth ' , 'prct10_wealth ', 'Std_Log_Earnings ', 'mean_hours ', &
 	      	  & 'GBAR ', 'GBAR_K ', 'GBAR_W ', 'GBAR_L ', 'GBAR_C ', 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet '
 	CLOSE(unit=77) 
-		DO Threshold_ind = 0,100,5
+		DO Threshold_ind = 25,100,5
 
 		Threshold_Factor = real(Threshold_ind,8)/100.0_dp
 		print*, ' Threshold_Factor=',Threshold_Factor
@@ -2287,7 +2287,7 @@ Subroutine Solve_Opt_Threshold
 			Wealth_factor = Y_a_threshold/W_bench
     	
 	    DO tauindx=250,400,5
-	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_2.txt', STATUS='old', POSITION='append')
 
             tauw_at     = real(tauindx,8)/10000_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
