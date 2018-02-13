@@ -2354,7 +2354,7 @@ Subroutine Solve_Opt_Threshold
 	  !   ENDDO 
 
 
-	  	call Find_Opt_Tax(Opt_Tax_KW,tauW_at,0.028_dp,0.034_dp)
+	  	call Find_Opt_Tax(.false.,tauW_at,0.028_dp,0.034_dp)
             ! Aggregate variable in experimental economy
 				GBAR_exp  = GBAR
 				QBAR_exp  = QBAR 
@@ -2399,7 +2399,7 @@ Subroutine Solve_Opt_Threshold
 			print*, ' '
 			print*, ' '
 			print*, ' '
-		    print*, 'Threshold',  Threshold_Factor,'tauW=', tauW_at, 'psi',psi 'YBAR=', YBAR, & 
+		    print*, 'Threshold',  Threshold_Factor,'tauW=', tauW_at, 'psi',psi, 'YBAR=', YBAR, & 
 		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
 		    print*, ' '
 		    print*, ' '
@@ -2419,7 +2419,7 @@ Subroutine Solve_Opt_Threshold
 		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
 	      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet
       	  	CLOSE (unit=77)
-      	  	
+
       	  	CALL Write_Experimental_Results(.true.)
 
 
