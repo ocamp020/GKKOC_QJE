@@ -2274,7 +2274,7 @@ Subroutine Solve_Opt_Threshold
 		      & 'Wealth_Output ', 'prct1_wealth ' , 'prct10_wealth ', 'Std_Log_Earnings ', 'mean_hours ', &
 	      	  & 'GBAR ', 'GBAR_K ', 'GBAR_W ', 'GBAR_L ', 'GBAR_C ', 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet '
 	CLOSE(unit=77) 
-		DO Threshold_ind = 30,100,5
+		DO Threshold_ind = 60,100,5
 
 		Threshold_Factor = real(Threshold_ind,8)/100.0_dp
 		print*, ' Threshold_Factor=',Threshold_Factor
@@ -2287,12 +2287,74 @@ Subroutine Solve_Opt_Threshold
 			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 			Wealth_factor = Y_a_threshold/W_bench
     	
-	    DO tauindx=250,400,5
-	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_3.txt', STATUS='old', POSITION='append')
+	  !   DO tauindx=250,400,5
+	  !   	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_3.txt', STATUS='old', POSITION='append')
 
-            tauw_at     = real(tauindx,8)/10000_DP
-            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+   !          tauw_at     = real(tauindx,8)/10000_DP
+   !          brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
+   !          ! Aggregate variable in experimental economy
+			! 	GBAR_exp  = GBAR
+			! 	QBAR_exp  = QBAR 
+			! 	NBAR_exp  = NBAR  
+			! 	Y_exp 	  = YBAR
+			! 	Ebar_exp  = EBAR
+			! 	P_exp     = P
+			! 	R_exp	  = R
+			! 	wage_exp  = wage
+			! 	tauK_exp  = tauK
+			! 	tauPL_exp = tauPL
+			! 	psi_exp   = psi
+			! 	DBN_exp   = DBN1
+			! 	tauw_bt_exp = tauW_bt
+			! 	tauw_at_exp = tauW_at
+			! 	Y_a_threshold_exp = Y_a_threshold
+
+			! 	ValueFunction_exp = ValueFunction
+			! 	Cons_exp          = Cons           
+			! 	Hours_exp         = Hours
+			! 	Aprime_exp        = Aprime 
+
+			! ! Compute moments
+			! 	CALL COMPUTE_STATS
+			! 	CALL GOVNT_BUDGET
+				
+			! ! Compute welfare gain between economies
+			! 	CALL COMPUTE_WELFARE_GAIN
+
+			! ! Write experimental results in output.txt
+			! 	CALL WRITE_VARIABLES(0)
+
+
+		 !    if (brentvaluet .gt. maxbrentvaluet) then
+		 !        maxbrentvaluet = brentvaluet
+			! 	OPT_tauW = tauW_at
+			! 	OPT_psi  = psi
+			! 	OPT_Threshold = Threshold_Factor
+			! endif
+
+			! ! Print Results 
+		 !    print*, 'Threshold',  Threshold_Factor,'tauW=', tauW_at, 'YBAR=', YBAR, & 
+		 !    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+		      
+		 !    WRITE  (UNIT=77, FMT=*) Threshold_Factor, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
+		 !      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+		 !      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+			! !      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
+		 !      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
+		 !      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
+		 !      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		 !      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
+		 !      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
+		 !      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		 !      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+	  !     	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet
+   !    	  	CLOSE (unit=77)
+   !    	  	CALL Write_Experimental_Results(.true.)
+	  !   ENDDO 
+
+
+	  	call Find_Opt_Tax(Opt_Tax_KW,tauW_at,0.028_dp,0.034_dp)
             ! Aggregate variable in experimental economy
 				GBAR_exp  = GBAR
 				QBAR_exp  = QBAR 
@@ -2325,7 +2387,7 @@ Subroutine Solve_Opt_Threshold
 			! Write experimental results in output.txt
 				CALL WRITE_VARIABLES(0)
 
-
+			brentvaluet = sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:));
 		    if (brentvaluet .gt. maxbrentvaluet) then
 		        maxbrentvaluet = brentvaluet
 				OPT_tauW = tauW_at
@@ -2351,7 +2413,7 @@ Subroutine Solve_Opt_Threshold
 	      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet
       	  	CLOSE (unit=77)
       	  	CALL Write_Experimental_Results(.true.)
-	    ENDDO 
+
 
 	    ENDDO
 
