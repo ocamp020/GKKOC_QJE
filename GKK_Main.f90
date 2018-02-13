@@ -2267,7 +2267,7 @@ Subroutine Solve_Opt_Threshold
 		! psi = 0.82482491997626_dp
 	
 	print*,'Optimal Tax Loop'
-	OPEN(UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_3.txt', STATUS='replace')
+	OPEN(UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_4.txt', STATUS='replace')
 	WRITE(UNIT=77, FMT=*) 'Threshold_Factor ', 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
 		      & 'MeanWealth ','QBAR ','NBAR ','YBAR ','Y_Growth ', 'wage ', &
 		      & 'Av_Util_NB ', 'CE2_NB ', 'CE2_Pop ', &
@@ -2396,9 +2396,16 @@ Subroutine Solve_Opt_Threshold
 			endif
 
 			! Print Results 
-		    print*, 'Threshold',  Threshold_Factor,'tauW=', tauW_at, 'YBAR=', YBAR, & 
+			print*, ' '
+			print*, ' '
+			print*, ' '
+		    print*, 'Threshold',  Threshold_Factor,'tauW=', tauW_at, 'psi',psi 'YBAR=', YBAR, & 
 		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
-		      
+		    print*, ' '
+		    print*, ' '
+		    print*, ' '
+
+		    OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_4.txt', STATUS='old', POSITION='append') 
 		    WRITE  (UNIT=77, FMT=*) Threshold_Factor, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
@@ -2412,6 +2419,7 @@ Subroutine Solve_Opt_Threshold
 		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
 	      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet
       	  	CLOSE (unit=77)
+      	  	
       	  	CALL Write_Experimental_Results(.true.)
 
 
