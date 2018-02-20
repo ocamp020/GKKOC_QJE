@@ -2264,7 +2264,7 @@ Subroutine Solve_Opt_Threshold
 		maxbrentvaluet=-10000.0_DP
 
 		! CALL Write_Experimental_Results(.false.)
-		psi = 0.855_dp
+		psi = 0.85618318_dp
 	
 	print*,'Optimal Tax Loop'
 	OPEN(UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_5.txt', STATUS='replace')
@@ -2354,7 +2354,7 @@ Subroutine Solve_Opt_Threshold
 	  !   ENDDO 
 
 
-	  	call Find_Opt_Tax(.false.,tauW_at,0.028_dp,0.034_dp)
+	  	call Find_Opt_Tax(.false.,tauW_at,0.029_dp,0.032_dp)
             ! Aggregate variable in experimental economy
 				GBAR_exp  = GBAR
 				QBAR_exp  = QBAR 
@@ -2405,7 +2405,7 @@ Subroutine Solve_Opt_Threshold
 		    print*, ' '
 		    print*, ' '
 
-		    OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_45.txt', STATUS='old', POSITION='append') 
+		    OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_5.txt', STATUS='old', POSITION='append') 
 		    WRITE  (UNIT=77, FMT=*) Threshold_Factor, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
