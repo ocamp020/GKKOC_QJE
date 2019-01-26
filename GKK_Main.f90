@@ -442,10 +442,10 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 			! STOP
 		CALL GOVNT_BUDGET
 	end if 
-		!print*,"	Computing satitics"
+		print*,"	Computing satitics"
 		!CALL COMPUTE_STATS
 		print*,"	Writing variables"
-		CALL WRITE_VARIABLES(1)
+		!CALL WRITE_VARIABLES(1)
 		if (Simul_Switch) then 
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
