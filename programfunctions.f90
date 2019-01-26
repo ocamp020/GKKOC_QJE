@@ -1658,7 +1658,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		Tot_Income_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Tot_Income_draft_group_z(:,8) + Tot_Income_draft_group_z(:,9)
 
 		
-		
+
 		print*,' K_Tax_Total - Z Groups'
 		print*,K_Tax_draft_group_z(1,:)
 		print*,' Tot_Income_Total - Z Groups'
@@ -1675,8 +1675,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		print*, CDF_Z
 		print*,' '
 		print*,K_Tax_draft_group_z(1,1) + K_Tax_draft_group_z(1,2) + K_Tax_draft_group_z(1,3) & 
-								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*K_Tax_draft_group_z(1,4) , &
-								&  
+								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*K_Tax_draft_group_z(1,4) 
 
 		! Get ratios to total income in group
 		K_Tax_draft_group = K_Tax_draft_group/Tot_Income_draft_group
