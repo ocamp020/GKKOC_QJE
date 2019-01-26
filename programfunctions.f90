@@ -808,8 +808,12 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	REAL(DP), dimension(max_age_category,nz) :: tot_lab_tax_by_agegroup_by_z_exp, tot_cons_tax_by_agegroup_by_z_exp
 	REAL(DP), dimension(draft_age_category,nz) :: CE_draft_group_z,  size_draft_group_z, frac_pos_welfare_draft_group_z
 	REAL(DP), dimension(draft_age_category,nz) :: wealth_draft_group_z
+	REAL(DP), dimension(draft_age_category,nz) :: K_Tax_draft_group_z, L_Tax_draft_group_z, C_Tax_draft_group_z, Tot_Income_draft_group_z
+	REAL(DP), dimension(draft_age_category,nz) :: K_Tax_Inc_draft_group_z, L_Tax_Inc_draft_group_z, C_Tax_Inc_draft_group_z
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: CE_draft_group,  size_draft_group, frac_pos_welfare_draft_group
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: wealth_draft_group,  av_wealth_draft_group, frac_wealth_draft_group
+	REAL(DP), dimension(draft_age_category,draft_z_category) :: K_Tax_draft_group, L_Tax_draft_group, C_Tax_draft_group, Tot_Income_draft_group
+	REAL(DP), dimension(draft_age_category,draft_z_category) :: K_Tax_Inc_draft_group, L_Tax_Inc_draft_group, C_Tax_Inc_draft_group
 	REAL(DP), dimension(nz) :: DBN_Z, CDF_Z 
 	INTEGER , dimension(draft_age_category+1) :: draft_age_limit
 	INTEGER :: age2, z2
@@ -1525,6 +1529,447 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	! print*,(/ (CDF_Z(7)-0.999_dp) ,  DBN_Z(8) , DBN_Z(9) , (CDF_Z(7)-0.999_dp)+DBN_Z(8)+DBN_Z(9) /)/0.001_dp
 	! print*,(/ (CDF_Z(7)-0.999_dp) , (0.9999_dp-CDF_Z(7)) , (CDF_Z(7)-0.999_dp)+(0.9999_dp-CDF_Z(7)) /)/0.0009_dp
 	! print*,(/ (CDF_Z(8)-0.9999_dp) , DBN_Z(9) , (CDF_Z(8)-0.9999_dp)+DBN_Z(9) /)/0.0001_dp
+
+
+	!! Tables for Tax Burden
+
+
+		!! Benchmark 
+		Pr_mat = Profit_Matrix(R_bench,P_bench)
+		CALL ComputeLaborUnits(EBAR_bench,wage_bench)
+
+		K_Tax_draft_group_z			= 0.0_dp
+		L_Tax_draft_group_z			= 0.0_dp
+		C_Tax_draft_group_z			= 0.0_dp
+		Tot_Income_draft_group_z	= 0.0_dp
+		K_Tax_Inc_draft_group_z		= 0.0_dp
+		L_Tax_Inc_draft_group_z		= 0.0_dp
+		C_Tax_Inc_draft_group_z		= 0.0_dp
+
+		do zi  = 1,nz
+		do age = 1,draft_age_category
+	        do xi=1,nx
+		    do ei=1,ne
+		    do lambdai=1,nlambda
+		    do ai=1,na
+		    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
+
+	        	K_Tax_draft_group_z(age,zi) = K_Tax_draft_group_z(age,zi) + & 
+	        		& ( tauK_bench*( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) ) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)
+
+        		L_Tax_draft_group_z(age,zi) = L_Tax_draft_group_z(age,zi) + & 
+	        		& ( yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi) &
+ 	                & - psi_bench*(yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi))**(1.0_DP-tauPL_bench) )*& 
+ 	                & DBN_bench(age2,ai,zi,lambdai,ei,xi)
+
+                C_Tax_draft_group_z(age,zi) = C_Tax_draft_group_z(age,zi) + & 
+	        		& ( tauC*Cons_bench(age2,ai,zi,lambdai,ei,xi) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)
+
+	        	Tot_Income_draft_group_z(age,zi) = Tot_Income_draft_group_z(age,zi) + & 
+	        		& ( (1.0_dp+R_bench)*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )* & 
+	        		& DBN_bench(age2,ai,zi,lambdai,ei,xi)
+
+        		K_Tax_Inc_draft_group_z(age,zi) = K_Tax_Inc_draft_group_z(age,zi) + & 
+	        		& ( tauK_bench*( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) ) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)/&
+	        		& ( (1.0_dp+R_bench)*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )
+
+        		L_Tax_Inc_draft_group_z(age,zi) = L_Tax_Inc_draft_group_z(age,zi) + & 
+	        		& ( yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi) &
+ 	                & - psi_bench*(yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi))**(1.0_DP-tauPL_bench) )*& 
+ 	                & DBN_bench(age2,ai,zi,lambdai,ei,xi)/&
+	        		& ( (1.0_dp+R_bench)*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )
+
+                C_Tax_Inc_draft_group_z(age,zi) = C_Tax_Inc_draft_group_z(age,zi) + & 
+	        		& ( tauC*Cons_bench(age2,ai,zi,lambdai,ei,xi) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)/&
+	        		& ( (1.0_dp+R_bench)*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )
+	    	enddo 
+	    	enddo 
+	    	enddo 
+	    	enddo 
+	    	enddo  
+		enddo
+		enddo
+
+		! Total Capital Tax adjusted by productivity group
+		K_Tax_draft_group(:,1) = K_Tax_draft_group_z(:,1) + K_Tax_draft_group_z(:,2) + K_Tax_draft_group_z(:,3) & 
+								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*K_Tax_draft_group_z(:,4)
+		K_Tax_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*K_Tax_draft_group_z(:,4) +& 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*K_Tax_draft_group_z(:,5)
+		K_Tax_draft_group(:,3) = (0.10_dp/DBN_Z(5))*K_Tax_draft_group_z(:,5)
+		K_Tax_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*K_Tax_draft_group_z(:,5) + & 
+								&  ((0.99_dp-CDF_Z(5))/DBN_Z(6))*K_Tax_draft_group_z(:,6)
+		K_Tax_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*K_Tax_draft_group_z(:,6) + & 
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*K_Tax_draft_group_z(:,7) 
+		K_Tax_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*K_Tax_draft_group_z(:,7) +&
+								&  K_Tax_draft_group_z(:,8) + K_Tax_draft_group_z(:,9) 
+		K_Tax_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*K_Tax_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*K_Tax_draft_group_z(:,8)
+		K_Tax_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*K_Tax_draft_group_z(:,8) + K_Tax_draft_group_z(:,9)
+
+		! Total Labor Tax adjusted by productivity group
+		L_Tax_draft_group(:,1) = L_Tax_draft_group_z(:,1) + L_Tax_draft_group_z(:,2) + L_Tax_draft_group_z(:,3) & 
+								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*L_Tax_draft_group_z(:,4)
+		L_Tax_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*L_Tax_draft_group_z(:,4) +& 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*L_Tax_draft_group_z(:,5)
+		L_Tax_draft_group(:,3) = (0.10_dp/DBN_Z(5))*L_Tax_draft_group_z(:,5)
+		L_Tax_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*L_Tax_draft_group_z(:,5) + & 
+								&  ((0.99_dp-CDF_Z(5))/DBN_Z(6))*L_Tax_draft_group_z(:,6)
+		L_Tax_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*L_Tax_draft_group_z(:,6) + & 
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*L_Tax_draft_group_z(:,7) 
+		L_Tax_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*L_Tax_draft_group_z(:,7) +&
+								&  L_Tax_draft_group_z(:,8) + L_Tax_draft_group_z(:,9) 
+		L_Tax_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*L_Tax_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*L_Tax_draft_group_z(:,8)
+		L_Tax_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*L_Tax_draft_group_z(:,8) + L_Tax_draft_group_z(:,9)
+
+
+		! Total Capital Tax adjusted by productivity group
+		C_Tax_draft_group(:,1) = C_Tax_draft_group_z(:,1) + C_Tax_draft_group_z(:,2) + C_Tax_draft_group_z(:,3) & 
+								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*C_Tax_draft_group_z(:,4)
+		C_Tax_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*C_Tax_draft_group_z(:,4) +& 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*C_Tax_draft_group_z(:,5)
+		C_Tax_draft_group(:,3) = (0.10_dp/DBN_Z(5))*C_Tax_draft_group_z(:,5)
+		C_Tax_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*C_Tax_draft_group_z(:,5) + & 
+								&  ((0.99_dp-CDF_Z(5))/DBN_Z(6))*C_Tax_draft_group_z(:,6)
+		C_Tax_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*C_Tax_draft_group_z(:,6) + & 
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*C_Tax_draft_group_z(:,7) 
+		C_Tax_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*C_Tax_draft_group_z(:,7) +&
+								&  C_Tax_draft_group_z(:,8) + C_Tax_draft_group_z(:,9) 
+		C_Tax_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*C_Tax_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*C_Tax_draft_group_z(:,8)
+		C_Tax_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*C_Tax_draft_group_z(:,8) + C_Tax_draft_group_z(:,9)
+
+		! Total Pre-Tax Income adjusted by productivity group
+		Tot_Income_draft_group(:,1) = Tot_Income_draft_group_z(:,1) + Tot_Income_draft_group_z(:,2) + Tot_Income_draft_group_z(:,3) & 
+								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*Tot_Income_draft_group_z(:,4)
+		Tot_Income_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*Tot_Income_draft_group_z(:,4) +& 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*Tot_Income_draft_group_z(:,5)
+		Tot_Income_draft_group(:,3) = (0.10_dp/DBN_Z(5))*Tot_Income_draft_group_z(:,5)
+		Tot_Income_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*Tot_Income_draft_group_z(:,5) + & 
+								&  ((0.99_dp-CDF_Z(5))/DBN_Z(6))*Tot_Income_draft_group_z(:,6)
+		Tot_Income_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*Tot_Income_draft_group_z(:,6) + & 
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*Tot_Income_draft_group_z(:,7) 
+		Tot_Income_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tot_Income_draft_group_z(:,7) +&
+								&  Tot_Income_draft_group_z(:,8) + Tot_Income_draft_group_z(:,9) 
+		Tot_Income_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tot_Income_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*Tot_Income_draft_group_z(:,8)
+		Tot_Income_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Tot_Income_draft_group_z(:,8) + Tot_Income_draft_group_z(:,9)
+
+		! Get ratios to total income in group
+		K_Tax_draft_group = K_Tax_draft_group/Tot_Income_draft_group
+		L_Tax_draft_group = L_Tax_draft_group/Tot_Income_draft_group
+		C_Tax_draft_group = C_Tax_draft_group/Tot_Income_draft_group
+
+
+		! Divide by mass in group
+		K_Tax_Inc_draft_group_z = K_Tax_Inc_draft_group_z/size_draft_group_z
+		L_Tax_Inc_draft_group_z = L_Tax_Inc_draft_group_z/size_draft_group_z
+		C_Tax_Inc_draft_group_z = C_Tax_Inc_draft_group_z/size_draft_group_z 
+
+		! Total Capital Tax to income ratio adjusted by productivity group
+		K_Tax_Inc_draft_group(:,1)   = ( DBN_Z(1)*K_Tax_Inc_draft_group_z(:,1) + DBN_Z(2)*K_Tax_Inc_draft_group_z(:,2) + & 
+								& DBN_Z(3)*K_Tax_Inc_draft_group_z(:,3) + (0.40_dp-CDF_Z(3))*K_Tax_Inc_draft_group_z(:,4) )/0.40_dp
+		K_Tax_Inc_draft_group(:,2)   = ( (CDF_Z(4)-0.40_dp)*K_Tax_Inc_draft_group_z(:,4) + &
+								& (0.80_dp-CDF_Z(4))*K_Tax_Inc_draft_group_z(:,5) )/0.40_dp
+		K_Tax_Inc_draft_group(:,3)   = K_Tax_Inc_draft_group_z(:,5)
+		K_Tax_Inc_draft_group(:,4)   = ( (CDF_Z(5)-0.90_dp)*K_Tax_Inc_draft_group_z(:,5) + &
+								& (0.99_dp-CDF_Z(5))*K_Tax_Inc_draft_group_z(:,6) )/0.09_dp
+		K_Tax_Inc_draft_group(:,5)   = ( (CDF_Z(6)-0.99_dp)*K_Tax_Inc_draft_group_z(:,6) + &
+								& (0.999_dp-CDF_Z(6))*K_Tax_Inc_draft_group_z(:,7) )/0.009_dp
+		K_Tax_Inc_draft_group(:,6)   = ( (CDF_Z(7)-0.999_dp)*K_Tax_Inc_draft_group_z(:,7) + &
+								&  DBN_Z(8)*K_Tax_Inc_draft_group_z(:,8) + DBN_Z(9)*K_Tax_Inc_draft_group_z(:,9) )/0.001_dp
+		K_Tax_Inc_draft_group(:,7)   = ( (CDF_Z(7)-0.999_dp)*K_Tax_Inc_draft_group_z(:,7) + &
+								& (0.9999_dp-CDF_Z(7))*K_Tax_Inc_draft_group_z(:,8) )/0.0009_dp
+		K_Tax_Inc_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*K_Tax_Inc_draft_group_z(:,8) + &
+								& DBN_Z(9)*K_Tax_Inc_draft_group_z(:,9) )/0.0001_dp
+
+		! Total Labor Tax to income ratio adjusted by productivity group
+		L_Tax_Inc_draft_group(:,1)   = ( DBN_Z(1)*L_Tax_Inc_draft_group_z(:,1) + DBN_Z(2)*L_Tax_Inc_draft_group_z(:,2) + & 
+								& DBN_Z(3)*L_Tax_Inc_draft_group_z(:,3) + (0.40_dp-CDF_Z(3))*L_Tax_Inc_draft_group_z(:,4) )/0.40_dp
+		L_Tax_Inc_draft_group(:,2)   = ( (CDF_Z(4)-0.40_dp)*L_Tax_Inc_draft_group_z(:,4) + &
+								& (0.80_dp-CDF_Z(4))*L_Tax_Inc_draft_group_z(:,5) )/0.40_dp
+		L_Tax_Inc_draft_group(:,3)   = L_Tax_Inc_draft_group_z(:,5)
+		L_Tax_Inc_draft_group(:,4)   = ( (CDF_Z(5)-0.90_dp)*L_Tax_Inc_draft_group_z(:,5) + &
+								& (0.99_dp-CDF_Z(5))*L_Tax_Inc_draft_group_z(:,6) )/0.09_dp
+		L_Tax_Inc_draft_group(:,5)   = ( (CDF_Z(6)-0.99_dp)*L_Tax_Inc_draft_group_z(:,6) + &
+								& (0.999_dp-CDF_Z(6))*L_Tax_Inc_draft_group_z(:,7) )/0.009_dp
+		L_Tax_Inc_draft_group(:,6)   = ( (CDF_Z(7)-0.999_dp)*L_Tax_Inc_draft_group_z(:,7) + &
+								&  DBN_Z(8)*L_Tax_Inc_draft_group_z(:,8) + DBN_Z(9)*L_Tax_Inc_draft_group_z(:,9) )/0.001_dp
+		L_Tax_Inc_draft_group(:,7)   = ( (CDF_Z(7)-0.999_dp)*L_Tax_Inc_draft_group_z(:,7) + &
+								& (0.9999_dp-CDF_Z(7))*L_Tax_Inc_draft_group_z(:,8) )/0.0009_dp
+		L_Tax_Inc_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*L_Tax_Inc_draft_group_z(:,8) + &
+								& DBN_Z(9)*L_Tax_Inc_draft_group_z(:,9) )/0.0001_dp
+
+
+		! Total Capital Tax adjusted by productivity group
+		C_Tax_Inc_draft_group(:,1)   = ( DBN_Z(1)*C_Tax_Inc_draft_group_z(:,1) + DBN_Z(2)*C_Tax_Inc_draft_group_z(:,2) + & 
+								& DBN_Z(3)*C_Tax_Inc_draft_group_z(:,3) + (0.40_dp-CDF_Z(3))*C_Tax_Inc_draft_group_z(:,4) )/0.40_dp
+		C_Tax_Inc_draft_group(:,2)   = ( (CDF_Z(4)-0.40_dp)*C_Tax_Inc_draft_group_z(:,4) + &
+								& (0.80_dp-CDF_Z(4))*C_Tax_Inc_draft_group_z(:,5) )/0.40_dp
+		C_Tax_Inc_draft_group(:,3)   = C_Tax_Inc_draft_group_z(:,5)
+		C_Tax_Inc_draft_group(:,4)   = ( (CDF_Z(5)-0.90_dp)*C_Tax_Inc_draft_group_z(:,5) + &
+								& (0.99_dp-CDF_Z(5))*C_Tax_Inc_draft_group_z(:,6) )/0.09_dp
+		C_Tax_Inc_draft_group(:,5)   = ( (CDF_Z(6)-0.99_dp)*C_Tax_Inc_draft_group_z(:,6) + &
+								& (0.999_dp-CDF_Z(6))*C_Tax_Inc_draft_group_z(:,7) )/0.009_dp
+		C_Tax_Inc_draft_group(:,6)   = ( (CDF_Z(7)-0.999_dp)*C_Tax_Inc_draft_group_z(:,7) + &
+								&  DBN_Z(8)*C_Tax_Inc_draft_group_z(:,8) + DBN_Z(9)*C_Tax_Inc_draft_group_z(:,9) )/0.001_dp
+		C_Tax_Inc_draft_group(:,7)   = ( (CDF_Z(7)-0.999_dp)*C_Tax_Inc_draft_group_z(:,7) + &
+								& (0.9999_dp-CDF_Z(7))*C_Tax_Inc_draft_group_z(:,8) )/0.0009_dp
+		C_Tax_Inc_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*C_Tax_Inc_draft_group_z(:,8) + &
+								& DBN_Z(9)*C_Tax_Inc_draft_group_z(:,9) )/0.0001_dp
+
+		K_Tax_draft_group = K_Tax_draft_group/Tot_Income_draft_group
+		L_Tax_draft_group = L_Tax_draft_group/Tot_Income_draft_group
+		C_Tax_draft_group = C_Tax_draft_group/Tot_Income_draft_group
+
+
+		! Divide by mass in group
+		K_Tax_Inc_draft_group_z = K_Tax_Inc_draft_group_z/size_draft_group_z
+		L_Tax_Inc_draft_group_z = L_Tax_Inc_draft_group_z/size_draft_group_z
+		C_Tax_Inc_draft_group_z = C_Tax_Inc_draft_group_z/size_draft_group_z 
+
+		OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_Tax_K_bench.txt', STATUS='replace') 
+	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_Tax_L_bench.txt', STATUS='replace') 
+	    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_Tax_C_bench.txt', STATUS='replace') 
+	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_Inc_bench.txt', STATUS='replace') 
+	    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_Tax_K_Inc_bench.txt', STATUS='replace') 
+	    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_Tax_L_Inc_bench.txt', STATUS='replace') 
+	    OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_Tax_C_Inc_bench.txt', STATUS='replace') 
+		do age = 1,draft_age_category
+		    WRITE  (UNIT=80, FMT=*)  K_Tax_draft_group(age,:)
+		    WRITE  (UNIT=81, FMT=*)  L_Tax_draft_group(age,:)
+		    WRITE  (UNIT=82, FMT=*)  C_Tax_draft_group(age,:)
+		    WRITE  (UNIT=83, FMT=*)  Tot_Income_draft_group(age,:)
+		    WRITE  (UNIT=84, FMT=*)  K_Tax_Inc_draft_group(age,:)
+		    WRITE  (UNIT=85, FMT=*)  L_Tax_Inc_draft_group(age,:)
+		    WRITE  (UNIT=86, FMT=*)  C_Tax_Inc_draft_group(age,:)
+		ENDDO
+		close(unit=80)
+		close(unit=81)
+		close(unit=82)
+		close(unit=83)
+		close(unit=84)
+		close(unit=85)
+		close(unit=86)
+
+		
+		!! Experiment 
+		Pr_mat = Profit_Matrix(R_exp,P_exp)
+		CALL ComputeLaborUnits(EBAR_exp,wage_exp)
+
+		K_Tax_draft_group_z			= 0.0_dp
+		L_Tax_draft_group_z			= 0.0_dp
+		C_Tax_draft_group_z			= 0.0_dp
+		Tot_Income_draft_group_z	= 0.0_dp
+		K_Tax_Inc_draft_group_z		= 0.0_dp
+		L_Tax_Inc_draft_group_z		= 0.0_dp
+		C_Tax_Inc_draft_group_z		= 0.0_dp
+
+		do zi  = 1,nz
+		do age = 1,draft_age_category
+	        do xi=1,nx
+		    do ei=1,ne
+		    do lambdai=1,nlambda
+		    do ai=1,na
+		    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
+
+	        	K_Tax_draft_group_z(age,zi) = K_Tax_draft_group_z(age,zi) + & 
+	        		& ( tauK_exp*( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) ) )*DBN_exp(age2,ai,zi,lambdai,ei,xi)
+
+        		L_Tax_draft_group_z(age,zi) = L_Tax_draft_group_z(age,zi) + & 
+	        		& ( yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi) &
+ 	                & - psi_exp*(yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi))**(1.0_DP-tauPL_exp) )*& 
+ 	                & DBN_exp(age2,ai,zi,lambdai,ei,xi)
+
+                C_Tax_draft_group_z(age,zi) = C_Tax_draft_group_z(age,zi) + & 
+	        		& ( tauC*Cons_exp(age2,ai,zi,lambdai,ei,xi) )*DBN_exp(age2,ai,zi,lambdai,ei,xi)
+
+	        	Tot_Income_draft_group_z(age,zi) = Tot_Income_draft_group_z(age,zi) + & 
+	        		& ( (1.0_dp+R_exp)*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_exp(age,ai,zi,lambdai,ei,xi) )* & 
+	        		& DBN_exp(age2,ai,zi,lambdai,ei,xi)
+
+        		K_Tax_Inc_draft_group_z(age,zi) = K_Tax_Inc_draft_group_z(age,zi) + & 
+	        		& ( tauK_exp*( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) ) )*DBN_exp(age2,ai,zi,lambdai,ei,xi)/&
+	        		& ( (1.0_dp+R_exp)*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_exp(age,ai,zi,lambdai,ei,xi) )
+
+        		L_Tax_Inc_draft_group_z(age,zi) = L_Tax_Inc_draft_group_z(age,zi) + & 
+	        		& ( yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi) &
+ 	                & - psi_exp*(yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi))**(1.0_DP-tauPL_exp) )*& 
+ 	                & DBN_exp(age2,ai,zi,lambdai,ei,xi)/&
+	        		& ( (1.0_dp+R_exp)*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_exp(age,ai,zi,lambdai,ei,xi) )
+
+                C_Tax_Inc_draft_group_z(age,zi) = C_Tax_Inc_draft_group_z(age,zi) + & 
+	        		& ( tauC*Cons_exp(age2,ai,zi,lambdai,ei,xi) )*DBN_exp(age2,ai,zi,lambdai,ei,xi)/&
+	        		& ( (1.0_dp+R_exp)*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_exp(age,ai,zi,lambdai,ei,xi) )
+	    	enddo 
+	    	enddo 
+	    	enddo 
+	    	enddo 
+	    	enddo  
+		enddo
+		enddo
+
+		! Total Capital Tax adjusted by productivity group
+		K_Tax_draft_group(:,1) = K_Tax_draft_group_z(:,1) + K_Tax_draft_group_z(:,2) + K_Tax_draft_group_z(:,3) & 
+								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*K_Tax_draft_group_z(:,4)
+		K_Tax_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*K_Tax_draft_group_z(:,4) +& 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*K_Tax_draft_group_z(:,5)
+		K_Tax_draft_group(:,3) = (0.10_dp/DBN_Z(5))*K_Tax_draft_group_z(:,5)
+		K_Tax_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*K_Tax_draft_group_z(:,5) + & 
+								&  ((0.99_dp-CDF_Z(5))/DBN_Z(6))*K_Tax_draft_group_z(:,6)
+		K_Tax_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*K_Tax_draft_group_z(:,6) + & 
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*K_Tax_draft_group_z(:,7) 
+		K_Tax_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*K_Tax_draft_group_z(:,7) +&
+								&  K_Tax_draft_group_z(:,8) + K_Tax_draft_group_z(:,9) 
+		K_Tax_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*K_Tax_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*K_Tax_draft_group_z(:,8)
+		K_Tax_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*K_Tax_draft_group_z(:,8) + K_Tax_draft_group_z(:,9)
+
+		! Total Labor Tax adjusted by productivity group
+		L_Tax_draft_group(:,1) = L_Tax_draft_group_z(:,1) + L_Tax_draft_group_z(:,2) + L_Tax_draft_group_z(:,3) & 
+								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*L_Tax_draft_group_z(:,4)
+		L_Tax_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*L_Tax_draft_group_z(:,4) +& 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*L_Tax_draft_group_z(:,5)
+		L_Tax_draft_group(:,3) = (0.10_dp/DBN_Z(5))*L_Tax_draft_group_z(:,5)
+		L_Tax_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*L_Tax_draft_group_z(:,5) + & 
+								&  ((0.99_dp-CDF_Z(5))/DBN_Z(6))*L_Tax_draft_group_z(:,6)
+		L_Tax_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*L_Tax_draft_group_z(:,6) + & 
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*L_Tax_draft_group_z(:,7) 
+		L_Tax_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*L_Tax_draft_group_z(:,7) +&
+								&  L_Tax_draft_group_z(:,8) + L_Tax_draft_group_z(:,9) 
+		L_Tax_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*L_Tax_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*L_Tax_draft_group_z(:,8)
+		L_Tax_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*L_Tax_draft_group_z(:,8) + L_Tax_draft_group_z(:,9)
+
+
+		! Total Capital Tax adjusted by productivity group
+		C_Tax_draft_group(:,1) = C_Tax_draft_group_z(:,1) + C_Tax_draft_group_z(:,2) + C_Tax_draft_group_z(:,3) & 
+								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*C_Tax_draft_group_z(:,4)
+		C_Tax_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*C_Tax_draft_group_z(:,4) +& 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*C_Tax_draft_group_z(:,5)
+		C_Tax_draft_group(:,3) = (0.10_dp/DBN_Z(5))*C_Tax_draft_group_z(:,5)
+		C_Tax_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*C_Tax_draft_group_z(:,5) + & 
+								&  ((0.99_dp-CDF_Z(5))/DBN_Z(6))*C_Tax_draft_group_z(:,6)
+		C_Tax_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*C_Tax_draft_group_z(:,6) + & 
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*C_Tax_draft_group_z(:,7) 
+		C_Tax_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*C_Tax_draft_group_z(:,7) +&
+								&  C_Tax_draft_group_z(:,8) + C_Tax_draft_group_z(:,9) 
+		C_Tax_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*C_Tax_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*C_Tax_draft_group_z(:,8)
+		C_Tax_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*C_Tax_draft_group_z(:,8) + C_Tax_draft_group_z(:,9)
+
+		! Total Pre-Tax Income adjusted by productivity group
+		Tot_Income_draft_group(:,1) = Tot_Income_draft_group_z(:,1) + Tot_Income_draft_group_z(:,2) + Tot_Income_draft_group_z(:,3) & 
+								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*Tot_Income_draft_group_z(:,4)
+		Tot_Income_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*Tot_Income_draft_group_z(:,4) +& 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*Tot_Income_draft_group_z(:,5)
+		Tot_Income_draft_group(:,3) = (0.10_dp/DBN_Z(5))*Tot_Income_draft_group_z(:,5)
+		Tot_Income_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*Tot_Income_draft_group_z(:,5) + & 
+								&  ((0.99_dp-CDF_Z(5))/DBN_Z(6))*Tot_Income_draft_group_z(:,6)
+		Tot_Income_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*Tot_Income_draft_group_z(:,6) + & 
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*Tot_Income_draft_group_z(:,7) 
+		Tot_Income_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tot_Income_draft_group_z(:,7) +&
+								&  Tot_Income_draft_group_z(:,8) + Tot_Income_draft_group_z(:,9) 
+		Tot_Income_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tot_Income_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*Tot_Income_draft_group_z(:,8)
+		Tot_Income_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Tot_Income_draft_group_z(:,8) + Tot_Income_draft_group_z(:,9)
+
+		! Get ratios to total income in group
+		K_Tax_draft_group = K_Tax_draft_group/Tot_Income_draft_group
+		L_Tax_draft_group = L_Tax_draft_group/Tot_Income_draft_group
+		C_Tax_draft_group = C_Tax_draft_group/Tot_Income_draft_group
+
+
+		! Divide by mass in group
+		K_Tax_Inc_draft_group_z = K_Tax_Inc_draft_group_z/size_draft_group_z
+		L_Tax_Inc_draft_group_z = L_Tax_Inc_draft_group_z/size_draft_group_z
+		C_Tax_Inc_draft_group_z = C_Tax_Inc_draft_group_z/size_draft_group_z 
+
+		! Total Capital Tax to income ratio adjusted by productivity group
+		K_Tax_Inc_draft_group(:,1)   = ( DBN_Z(1)*K_Tax_Inc_draft_group_z(:,1) + DBN_Z(2)*K_Tax_Inc_draft_group_z(:,2) + & 
+								& DBN_Z(3)*K_Tax_Inc_draft_group_z(:,3) + (0.40_dp-CDF_Z(3))*K_Tax_Inc_draft_group_z(:,4) )/0.40_dp
+		K_Tax_Inc_draft_group(:,2)   = ( (CDF_Z(4)-0.40_dp)*K_Tax_Inc_draft_group_z(:,4) + &
+								& (0.80_dp-CDF_Z(4))*K_Tax_Inc_draft_group_z(:,5) )/0.40_dp
+		K_Tax_Inc_draft_group(:,3)   = K_Tax_Inc_draft_group_z(:,5)
+		K_Tax_Inc_draft_group(:,4)   = ( (CDF_Z(5)-0.90_dp)*K_Tax_Inc_draft_group_z(:,5) + &
+								& (0.99_dp-CDF_Z(5))*K_Tax_Inc_draft_group_z(:,6) )/0.09_dp
+		K_Tax_Inc_draft_group(:,5)   = ( (CDF_Z(6)-0.99_dp)*K_Tax_Inc_draft_group_z(:,6) + &
+								& (0.999_dp-CDF_Z(6))*K_Tax_Inc_draft_group_z(:,7) )/0.009_dp
+		K_Tax_Inc_draft_group(:,6)   = ( (CDF_Z(7)-0.999_dp)*K_Tax_Inc_draft_group_z(:,7) + &
+								&  DBN_Z(8)*K_Tax_Inc_draft_group_z(:,8) + DBN_Z(9)*K_Tax_Inc_draft_group_z(:,9) )/0.001_dp
+		K_Tax_Inc_draft_group(:,7)   = ( (CDF_Z(7)-0.999_dp)*K_Tax_Inc_draft_group_z(:,7) + &
+								& (0.9999_dp-CDF_Z(7))*K_Tax_Inc_draft_group_z(:,8) )/0.0009_dp
+		K_Tax_Inc_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*K_Tax_Inc_draft_group_z(:,8) + &
+								& DBN_Z(9)*K_Tax_Inc_draft_group_z(:,9) )/0.0001_dp
+
+		! Total Labor Tax to income ratio adjusted by productivity group
+		L_Tax_Inc_draft_group(:,1)   = ( DBN_Z(1)*L_Tax_Inc_draft_group_z(:,1) + DBN_Z(2)*L_Tax_Inc_draft_group_z(:,2) + & 
+								& DBN_Z(3)*L_Tax_Inc_draft_group_z(:,3) + (0.40_dp-CDF_Z(3))*L_Tax_Inc_draft_group_z(:,4) )/0.40_dp
+		L_Tax_Inc_draft_group(:,2)   = ( (CDF_Z(4)-0.40_dp)*L_Tax_Inc_draft_group_z(:,4) + &
+								& (0.80_dp-CDF_Z(4))*L_Tax_Inc_draft_group_z(:,5) )/0.40_dp
+		L_Tax_Inc_draft_group(:,3)   = L_Tax_Inc_draft_group_z(:,5)
+		L_Tax_Inc_draft_group(:,4)   = ( (CDF_Z(5)-0.90_dp)*L_Tax_Inc_draft_group_z(:,5) + &
+								& (0.99_dp-CDF_Z(5))*L_Tax_Inc_draft_group_z(:,6) )/0.09_dp
+		L_Tax_Inc_draft_group(:,5)   = ( (CDF_Z(6)-0.99_dp)*L_Tax_Inc_draft_group_z(:,6) + &
+								& (0.999_dp-CDF_Z(6))*L_Tax_Inc_draft_group_z(:,7) )/0.009_dp
+		L_Tax_Inc_draft_group(:,6)   = ( (CDF_Z(7)-0.999_dp)*L_Tax_Inc_draft_group_z(:,7) + &
+								&  DBN_Z(8)*L_Tax_Inc_draft_group_z(:,8) + DBN_Z(9)*L_Tax_Inc_draft_group_z(:,9) )/0.001_dp
+		L_Tax_Inc_draft_group(:,7)   = ( (CDF_Z(7)-0.999_dp)*L_Tax_Inc_draft_group_z(:,7) + &
+								& (0.9999_dp-CDF_Z(7))*L_Tax_Inc_draft_group_z(:,8) )/0.0009_dp
+		L_Tax_Inc_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*L_Tax_Inc_draft_group_z(:,8) + &
+								& DBN_Z(9)*L_Tax_Inc_draft_group_z(:,9) )/0.0001_dp
+
+
+		! Total Capital Tax adjusted by productivity group
+		C_Tax_Inc_draft_group(:,1)   = ( DBN_Z(1)*C_Tax_Inc_draft_group_z(:,1) + DBN_Z(2)*C_Tax_Inc_draft_group_z(:,2) + & 
+								& DBN_Z(3)*C_Tax_Inc_draft_group_z(:,3) + (0.40_dp-CDF_Z(3))*C_Tax_Inc_draft_group_z(:,4) )/0.40_dp
+		C_Tax_Inc_draft_group(:,2)   = ( (CDF_Z(4)-0.40_dp)*C_Tax_Inc_draft_group_z(:,4) + &
+								& (0.80_dp-CDF_Z(4))*C_Tax_Inc_draft_group_z(:,5) )/0.40_dp
+		C_Tax_Inc_draft_group(:,3)   = C_Tax_Inc_draft_group_z(:,5)
+		C_Tax_Inc_draft_group(:,4)   = ( (CDF_Z(5)-0.90_dp)*C_Tax_Inc_draft_group_z(:,5) + &
+								& (0.99_dp-CDF_Z(5))*C_Tax_Inc_draft_group_z(:,6) )/0.09_dp
+		C_Tax_Inc_draft_group(:,5)   = ( (CDF_Z(6)-0.99_dp)*C_Tax_Inc_draft_group_z(:,6) + &
+								& (0.999_dp-CDF_Z(6))*C_Tax_Inc_draft_group_z(:,7) )/0.009_dp
+		C_Tax_Inc_draft_group(:,6)   = ( (CDF_Z(7)-0.999_dp)*C_Tax_Inc_draft_group_z(:,7) + &
+								&  DBN_Z(8)*C_Tax_Inc_draft_group_z(:,8) + DBN_Z(9)*C_Tax_Inc_draft_group_z(:,9) )/0.001_dp
+		C_Tax_Inc_draft_group(:,7)   = ( (CDF_Z(7)-0.999_dp)*C_Tax_Inc_draft_group_z(:,7) + &
+								& (0.9999_dp-CDF_Z(7))*C_Tax_Inc_draft_group_z(:,8) )/0.0009_dp
+		C_Tax_Inc_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*C_Tax_Inc_draft_group_z(:,8) + &
+								& DBN_Z(9)*C_Tax_Inc_draft_group_z(:,9) )/0.0001_dp
+
+		K_Tax_draft_group = K_Tax_draft_group/Tot_Income_draft_group
+		L_Tax_draft_group = L_Tax_draft_group/Tot_Income_draft_group
+		C_Tax_draft_group = C_Tax_draft_group/Tot_Income_draft_group
+
+
+		! Divide by mass in group
+		K_Tax_Inc_draft_group_z = K_Tax_Inc_draft_group_z/size_draft_group_z
+		L_Tax_Inc_draft_group_z = L_Tax_Inc_draft_group_z/size_draft_group_z
+		C_Tax_Inc_draft_group_z = C_Tax_Inc_draft_group_z/size_draft_group_z 
+
+		OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_Tax_K_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_Tax_L_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_Tax_C_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_Inc_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_Tax_K_Inc_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_Tax_L_Inc_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_Tax_C_Inc_exp.txt', STATUS='replace') 
+		do age = 1,draft_age_category
+		    WRITE  (UNIT=80, FMT=*)  K_Tax_draft_group(age,:)
+		    WRITE  (UNIT=81, FMT=*)  L_Tax_draft_group(age,:)
+		    WRITE  (UNIT=82, FMT=*)  C_Tax_draft_group(age,:)
+		    WRITE  (UNIT=83, FMT=*)  Tot_Income_draft_group(age,:)
+		    WRITE  (UNIT=84, FMT=*)  K_Tax_Inc_draft_group(age,:)
+		    WRITE  (UNIT=85, FMT=*)  L_Tax_Inc_draft_group(age,:)
+		    WRITE  (UNIT=86, FMT=*)  C_Tax_Inc_draft_group(age,:)
+		ENDDO
+		close(unit=80)
+		close(unit=81)
+		close(unit=82)
+		close(unit=83)
+		close(unit=84)
+		close(unit=85)
+		close(unit=86)
 
 
 END SUBROUTINE  COMPUTE_WELFARE_GAIN
