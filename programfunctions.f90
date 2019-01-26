@@ -1720,6 +1720,16 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		C_Tax_Inc_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*C_Tax_Inc_draft_group_z(:,8) + &
 								& DBN_Z(9)*C_Tax_Inc_draft_group_z(:,9) )/0.0001_dp
 
+		print*,' K_Tax_Total - Z Groups'
+		print*,K_Tax_draft_group_z(1,:)
+		print*,' Tot_Income_Total - Z Groups'
+		print*,Tot_Income_draft_group_z(1,:)
+		print*,' '
+		print*,' K_Tax_Total - Draft Groups'
+		print*,K_Tax_draft_group(1,:)
+		print*,' Tot_Income_Total - Draft Groups'
+		print*,Tot_Income_draft_group(1,:)
+
 		K_Tax_draft_group = K_Tax_draft_group/Tot_Income_draft_group
 		L_Tax_draft_group = L_Tax_draft_group/Tot_Income_draft_group
 		C_Tax_draft_group = C_Tax_draft_group/Tot_Income_draft_group
@@ -1758,6 +1768,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		!! Experiment 
 		Pr_mat = Profit_Matrix(R_exp,P_exp)
 		CALL ComputeLaborUnits(EBAR_exp,wage_exp)
+		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
 
 		K_Tax_draft_group_z			= 0.0_dp
 		L_Tax_draft_group_z			= 0.0_dp
@@ -1776,7 +1787,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
 
 	        	K_Tax_draft_group_z(age,zi) = K_Tax_draft_group_z(age,zi) + & 
-	        		& ( tauK_exp*( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) ) )*DBN_exp(age2,ai,zi,lambdai,ei,xi)
+	        		& (( agrid(ai) + ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) ) ) - YGRID(ai,zi,xi) )*DBN_exp(age2,ai,zi,lambdai,ei,xi)
 
         		L_Tax_draft_group_z(age,zi) = L_Tax_draft_group_z(age,zi) + & 
 	        		& ( yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi) &
@@ -1791,7 +1802,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	        		& DBN_exp(age2,ai,zi,lambdai,ei,xi)
 
         		K_Tax_Inc_draft_group_z(age,zi) = K_Tax_Inc_draft_group_z(age,zi) + & 
-	        		& ( tauK_exp*( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) ) )*DBN_exp(age2,ai,zi,lambdai,ei,xi)/&
+	        		& (( agrid(ai) + ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) ) ) - YGRID(ai,zi,xi) )*&
+	        		& DBN_exp(age2,ai,zi,lambdai,ei,xi)/&
 	        		& ( (1.0_dp+R_exp)*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_exp(age,ai,zi,lambdai,ei,xi) )
 
         		L_Tax_Inc_draft_group_z(age,zi) = L_Tax_Inc_draft_group_z(age,zi) + & 
