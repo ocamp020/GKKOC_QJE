@@ -3781,7 +3781,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: Frisch_Aux, Frisch_Aux_2
 
 	!$ call omp_set_num_threads(20)
-
+	!$ print *, "OMP Test Message"
 	
 	! Age Brackets
 		age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
