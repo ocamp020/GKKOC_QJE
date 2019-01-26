@@ -1657,16 +1657,32 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*Tot_Income_draft_group_z(:,8)
 		Tot_Income_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Tot_Income_draft_group_z(:,8) + Tot_Income_draft_group_z(:,9)
 
+		
+		
+		print*,' K_Tax_Total - Z Groups'
+		print*,K_Tax_draft_group_z(1,:)
+		print*,' Tot_Income_Total - Z Groups'
+		print*,Tot_Income_draft_group_z(1,:)
+		print*,' '
+		print*,' K_Tax_Total - Draft Groups'
+		print*,K_Tax_draft_group(1,:)
+		print*,' Tot_Income_Total - Draft Groups'
+		print*,Tot_Income_draft_group(1,:)
+		print*,' '
+		print*,'DBN_Z'
+		print*, DBN_Z
+		print*,'CDF_Z'
+		print*, CDF_Z
+		print*,' '
+		print*,K_Tax_draft_group_z(1,1) + K_Tax_draft_group_z(1,2) + K_Tax_draft_group_z(1,3) & 
+								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*K_Tax_draft_group_z(1,4) , &
+								&  
+
 		! Get ratios to total income in group
 		K_Tax_draft_group = K_Tax_draft_group/Tot_Income_draft_group
 		L_Tax_draft_group = L_Tax_draft_group/Tot_Income_draft_group
 		C_Tax_draft_group = C_Tax_draft_group/Tot_Income_draft_group
 
-
-		! Divide by mass in group
-		K_Tax_Inc_draft_group_z = K_Tax_Inc_draft_group_z/size_draft_group_z
-		L_Tax_Inc_draft_group_z = L_Tax_Inc_draft_group_z/size_draft_group_z
-		C_Tax_Inc_draft_group_z = C_Tax_Inc_draft_group_z/size_draft_group_z 
 
 		! Total Capital Tax to income ratio adjusted by productivity group
 		K_Tax_Inc_draft_group(:,1)   = ( DBN_Z(1)*K_Tax_Inc_draft_group_z(:,1) + DBN_Z(2)*K_Tax_Inc_draft_group_z(:,2) + & 
@@ -1719,29 +1735,6 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 								& (0.9999_dp-CDF_Z(7))*C_Tax_Inc_draft_group_z(:,8) )/0.0009_dp
 		C_Tax_Inc_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*C_Tax_Inc_draft_group_z(:,8) + &
 								& DBN_Z(9)*C_Tax_Inc_draft_group_z(:,9) )/0.0001_dp
-
-		print*,' K_Tax_Total - Z Groups'
-		print*,K_Tax_draft_group_z(1,:)
-		print*,' Tot_Income_Total - Z Groups'
-		print*,Tot_Income_draft_group_z(1,:)
-		print*,' '
-		print*,' K_Tax_Total - Draft Groups'
-		print*,K_Tax_draft_group(1,:)
-		print*,' Tot_Income_Total - Draft Groups'
-		print*,Tot_Income_draft_group(1,:)
-		print*,' '
-		print*,'DBN_Z'
-		print*, DBN_Z
-		print*,'CDF_Z'
-		print*, CDF_Z
-		print*,' '
-		print*,K_Tax_draft_group_z(:,1) + K_Tax_draft_group_z(:,2) + K_Tax_draft_group_z(:,3) & 
-								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*K_Tax_draft_group_z(:,4) 
-
-		K_Tax_draft_group = K_Tax_draft_group/Tot_Income_draft_group
-		L_Tax_draft_group = L_Tax_draft_group/Tot_Income_draft_group
-		C_Tax_draft_group = C_Tax_draft_group/Tot_Income_draft_group
-
 
 		! Divide by mass in group
 		K_Tax_Inc_draft_group_z = K_Tax_Inc_draft_group_z/size_draft_group_z
