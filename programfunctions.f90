@@ -1734,6 +1734,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		print*, DBN_Z
 		print*,'CDF_Z'
 		print*, CDF_Z
+		print*,' '
+		print*,K_Tax_draft_group_z(:,1) + K_Tax_draft_group_z(:,2) + K_Tax_draft_group_z(:,3) & 
+								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*K_Tax_draft_group_z(:,4) 
 
 		K_Tax_draft_group = K_Tax_draft_group/Tot_Income_draft_group
 		L_Tax_draft_group = L_Tax_draft_group/Tot_Income_draft_group
