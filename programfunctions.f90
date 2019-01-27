@@ -1622,6 +1622,30 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		print*, K_Tax_draft_group_z(4,:)/Tot_Income_draft_group_z(4,:)
 		print*, K_Tax_draft_group_z(5,:)/Tot_Income_draft_group_z(5,:)
 
+		print*,' '
+		print*,'K_Tax/K_Inc '
+		print*, K_Tax_draft_group_z(1,:)/K_Inc_draft_group_z(1,:)
+		print*, K_Tax_draft_group_z(2,:)/K_Inc_draft_group_z(2,:)
+		print*, K_Tax_draft_group_z(3,:)/K_Inc_draft_group_z(3,:)
+		print*, K_Tax_draft_group_z(4,:)/K_Inc_draft_group_z(4,:)
+		print*, K_Tax_draft_group_z(5,:)/K_Inc_draft_group_z(5,:)
+
+		print*,' '
+		print*,'L_Tax/Tot_Income '
+		print*, L_Tax_draft_group_z(1,:)/Tot_Income_draft_group_z(1,:)
+		print*, L_Tax_draft_group_z(2,:)/Tot_Income_draft_group_z(2,:)
+		print*, L_Tax_draft_group_z(3,:)/Tot_Income_draft_group_z(3,:)
+		print*, L_Tax_draft_group_z(4,:)/Tot_Income_draft_group_z(4,:)
+		print*, L_Tax_draft_group_z(5,:)/Tot_Income_draft_group_z(5,:)
+
+		print*,' '
+		print*,'L_Tax/L_Inc '
+		print*, L_Tax_draft_group_z(1,:)/L_Inc_draft_group_z(1,:)
+		print*, L_Tax_draft_group_z(2,:)/L_Inc_draft_group_z(2,:)
+		print*, L_Tax_draft_group_z(3,:)/L_Inc_draft_group_z(3,:)
+		print*, L_Tax_draft_group_z(4,:)/L_Inc_draft_group_z(4,:)
+		print*, L_Tax_draft_group_z(5,:)/L_Inc_draft_group_z(5,:)
+
 		! Total Capital Tax adjusted by productivity group
 		K_Tax_draft_group(:,1) = K_Tax_draft_group_z(:,1) + K_Tax_draft_group_z(:,2) + K_Tax_draft_group_z(:,3) & 
 								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*K_Tax_draft_group_z(:,4)
