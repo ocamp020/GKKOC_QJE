@@ -1563,7 +1563,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    do ai=1,na
 		    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
 
-		    	if (age.eq.draft_age_category) then
+		    	if (age.lt.draft_age_category) then
 		    	L_Inc_aux   = yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi)
 		    	else
 		    	L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
@@ -1574,7 +1574,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	        	K_Tax_draft_group_z(age,zi) = K_Tax_draft_group_z(age,zi) + & 
 	        		& ( tauK_bench*( K_Inc_aux ) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)
 
-	        	if (age.eq.draft_age_category) then
+	        	if (age.lt.draft_age_category) then
         		L_Tax_draft_group_z(age,zi) = L_Tax_draft_group_z(age,zi) + & 
 	        		& ( L_Inc_aux - psi_bench*(L_Inc_aux)**(1.0_DP-tauPL_bench) )* DBN_bench(age2,ai,zi,lambdai,ei,xi)
 	        	endif 
@@ -1598,7 +1598,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
         		K_Tax_Inc_draft_group_z(age,zi) = K_Tax_Inc_draft_group_z(age,zi) + & 
 	        		& ( tauK_bench*( K_Inc_aux ) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)/( K_Inc_aux + L_Inc_aux )
 
-	        	if (age.eq.draft_age_category) then
+	        	if (age.lt.draft_age_category) then
         		L_Tax_Inc_draft_group_z(age,zi) = L_Tax_Inc_draft_group_z(age,zi) + & 
 	        		& ( L_Inc_aux - psi_bench*(L_Inc_aux)**(1.0_DP-tauPL_bench) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)/&
 	        		& ( K_Inc_aux + L_Inc_aux )
@@ -1866,7 +1866,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    do ai=1,na
 		    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
 
-		    	if (age.eq.draft_age_category) then
+		    	if (age.lt.draft_age_category) then
 		    	L_Inc_aux   = yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi)
 		    	else
 		    	L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
@@ -1877,7 +1877,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	        	K_Tax_draft_group_z(age,zi) = K_Tax_draft_group_z(age,zi) + & 
 	        		& (((1.0_dp+R_exp)*agrid(ai) + Pr_mat(ai,zi,xi))-YGRID(ai,zi,xi) )*DBN_exp(age2,ai,zi,lambdai,ei,xi)
 
-	        	if (age.eq.draft_age_category) then
+	        	if (age.lt.draft_age_category) then
         		L_Tax_draft_group_z(age,zi) = L_Tax_draft_group_z(age,zi) + & 
 	        		& ( L_Inc_aux - psi_exp*(L_Inc_aux)**(1.0_DP-tauPL_exp) )* DBN_exp(age2,ai,zi,lambdai,ei,xi)
 	        	endif 
@@ -1902,7 +1902,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	        		& (((1.0_dp+R_exp)*agrid(ai) + Pr_mat(ai,zi,xi))-YGRID(ai,zi,xi))*DBN_exp(age2,ai,zi,lambdai,ei,xi)/&
 	        		& ( K_Inc_aux + L_Inc_aux )
 	        		
-	        	if (age.eq.draft_age_category) then
+	        	if (age.lt.draft_age_category) then
         		L_Tax_Inc_draft_group_z(age,zi) = L_Tax_Inc_draft_group_z(age,zi) + & 
 	        		& ( L_Inc_aux - psi_exp*(L_Inc_aux)**(1.0_DP-tauPL_exp) )*DBN_exp(age2,ai,zi,lambdai,ei,xi)/&
 	        		& ( K_Inc_aux + L_Inc_aux )
