@@ -1677,7 +1677,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 								&  Tot_Income_draft_group_z(:,8) + Tot_Income_draft_group_z(:,9) 
 		Tot_Income_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tot_Income_draft_group_z(:,7) + &
 								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*Tot_Income_draft_group_z(:,8)
-		Tot_Income_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Tot_Income_draft_group_z(:,8) + Tot_Income_draft_group_z(:,9)ç
+		Tot_Income_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Tot_Income_draft_group_z(:,8) + Tot_Income_draft_group_z(:,9)
 
 		! Total Pre-Tax Capital Income adjusted by productivity group
 		K_Inc_draft_group(:,1) = K_Inc_draft_group_z(:,1) + K_Inc_draft_group_z(:,2) + K_Inc_draft_group_z(:,3) & 
