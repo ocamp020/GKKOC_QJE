@@ -1581,9 +1581,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	        		& ( (1.0_dp+R_bench)*agrid(ai) + Pr_mat(ai,zi,xi) )* DBN_bench(age2,ai,zi,lambdai,ei,xi)
 
         		L_Inc_draft_group_z(age,zi) = L_Inc_draft_group_z(age,zi) + & 
-	        		& ( yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )/&
-	        		& ( (1.0_dp+R_bench)*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )* &
-	        		&  DBN_bench(age2,ai,zi,lambdai,ei,xi)
+	        		& ( yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)
 
         		K_Inc_frac_draft_group_z(age,zi) = K_Inc_frac_draft_group_z(age,zi) + & 
 	        		& ( (1.0_dp+R_bench)*agrid(ai) + Pr_mat(ai,zi,xi) )/&
@@ -1591,7 +1589,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	        		&  DBN_bench(age2,ai,zi,lambdai,ei,xi)
 
         		L_Inc_frac_draft_group_z(age,zi) = L_Inc_frac_draft_group_z(age,zi) + & 
-	        		& ( yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )* DBN_bench(age2,ai,zi,lambdai,ei,xi)
+	        		& (                                                 yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )/&
+	        		& ( (1.0_dp+R_bench)*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )* &
+	        		&  DBN_bench(age2,ai,zi,lambdai,ei,xi)
 
         		K_Tax_Inc_draft_group_z(age,zi) = K_Tax_Inc_draft_group_z(age,zi) + & 
 	        		& ( tauK_bench*( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) ) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)/&
@@ -2102,17 +2102,17 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 								& DBN_Z(9)*L_Inc_frac_draft_group_z(:,9) )/0.0001_dp
 
 
-		OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_Tax_K_bench.txt', STATUS='replace') 
-	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_Tax_L_bench.txt', STATUS='replace') 
-	    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_Tax_C_bench.txt', STATUS='replace') 
-	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_Inc_bench.txt', STATUS='replace') 
-	    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_Tax_K_Inc_bench.txt', STATUS='replace') 
-	    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_Tax_L_Inc_bench.txt', STATUS='replace') 
-	    OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_Tax_C_Inc_bench.txt', STATUS='replace') 
-	    OPEN (UNIT=87, FILE=trim(Result_Folder)//'draft_group_K_Inc_bench.txt', STATUS='replace') 
-	    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_L_Inc_bench.txt', STATUS='replace') 
-	    OPEN (UNIT=89, FILE=trim(Result_Folder)//'draft_group_K_Inc_frac_bench.txt', STATUS='replace') 
-	    OPEN (UNIT=90, FILE=trim(Result_Folder)//'draft_group_L_Inc_frac_bench.txt', STATUS='replace') 
+		OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_Tax_K_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_Tax_L_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_Tax_C_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_Inc_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_Tax_K_Inc_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_Tax_L_Inc_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_Tax_C_Inc_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=87, FILE=trim(Result_Folder)//'draft_group_K_Inc_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_L_Inc_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=89, FILE=trim(Result_Folder)//'draft_group_K_Inc_frac_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=90, FILE=trim(Result_Folder)//'draft_group_L_Inc_frac_exp.txt', STATUS='replace') 
 		do age = 1,draft_age_category
 		    WRITE  (UNIT=80, FMT=*)  K_Tax_draft_group(age,:)
 		    WRITE  (UNIT=81, FMT=*)  L_Tax_draft_group(age,:)
