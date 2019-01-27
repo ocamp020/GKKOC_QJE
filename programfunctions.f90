@@ -821,6 +821,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	REAL(DP), dimension(nz) :: DBN_Z, CDF_Z 
 	INTEGER , dimension(draft_age_category+1) :: draft_age_limit
 	INTEGER :: age2, z2
+	REAL(DP):: K_Inc_aux, L_Inc_aux
 
 
 
