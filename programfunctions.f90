@@ -1574,38 +1574,38 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	        		& ( tauC*Cons_bench(age2,ai,zi,lambdai,ei,xi) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)
 
 	        	Tot_Income_draft_group_z(age,zi) = Tot_Income_draft_group_z(age,zi) + & 
-	        		& ( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )* & 
+	        		& ( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi) )* & 
 	        		& DBN_bench(age2,ai,zi,lambdai,ei,xi)
 
         		K_Inc_draft_group_z(age,zi) = K_Inc_draft_group_z(age,zi) + & 
 	        		& ( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) )* DBN_bench(age2,ai,zi,lambdai,ei,xi)
 
         		L_Inc_draft_group_z(age,zi) = L_Inc_draft_group_z(age,zi) + & 
-	        		& ( yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)
+	        		& ( yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)
 
         		K_Inc_frac_draft_group_z(age,zi) = K_Inc_frac_draft_group_z(age,zi) + & 
 	        		& ( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) )/&
-	        		& ( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )* &
+	        		& ( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi) )* &
 	        		&  DBN_bench(age2,ai,zi,lambdai,ei,xi)
 
         		L_Inc_frac_draft_group_z(age,zi) = L_Inc_frac_draft_group_z(age,zi) + & 
-	        		& (                                                 yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )/&
-	        		& ( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )* &
+	        		& (     yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi) )/&
+	        		& ( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi) )* &
 	        		&  DBN_bench(age2,ai,zi,lambdai,ei,xi)
 
         		K_Tax_Inc_draft_group_z(age,zi) = K_Tax_Inc_draft_group_z(age,zi) + & 
 	        		& ( tauK_bench*( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) ) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)/&
-	        		& ( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )
+	        		& ( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi) )
 
         		L_Tax_Inc_draft_group_z(age,zi) = L_Tax_Inc_draft_group_z(age,zi) + & 
 	        		& ( yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi) &
  	                & - psi_bench*(yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi))**(1.0_DP-tauPL_bench) )*& 
  	                & DBN_bench(age2,ai,zi,lambdai,ei,xi)/&
-	        		& ( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )
+	        		& ( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi) )
 
                 C_Tax_Inc_draft_group_z(age,zi) = C_Tax_Inc_draft_group_z(age,zi) + & 
 	        		& ( tauC*Cons_bench(age2,ai,zi,lambdai,ei,xi) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)/&
-	        		& ( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_bench(age,ai,zi,lambdai,ei,xi) )
+	        		& ( R_bench*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi) )
 	    	enddo 
 	    	enddo 
 	    	enddo 
@@ -1910,39 +1910,39 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	        		& ( tauC*Cons_exp(age2,ai,zi,lambdai,ei,xi) )*DBN_exp(age2,ai,zi,lambdai,ei,xi)
 
 	        	Tot_Income_draft_group_z(age,zi) = Tot_Income_draft_group_z(age,zi) + & 
-	        		& ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_exp(age,ai,zi,lambdai,ei,xi) )* & 
+	        		& ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi) )* & 
 	        		& DBN_exp(age2,ai,zi,lambdai,ei,xi)
 
         		K_Inc_draft_group_z(age,zi) = K_Inc_draft_group_z(age,zi) + & 
 	        		& ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) )* DBN_exp(age2,ai,zi,lambdai,ei,xi)
 
         		L_Inc_draft_group_z(age,zi) = L_Inc_draft_group_z(age,zi) + & 
-	        		& ( yh(age,lambdai,ei)*Hours_exp(age,ai,zi,lambdai,ei,xi) )* DBN_exp(age2,ai,zi,lambdai,ei,xi)
+	        		& ( yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi) )* DBN_exp(age2,ai,zi,lambdai,ei,xi)
 
         		K_Inc_frac_draft_group_z(age,zi) = K_Inc_frac_draft_group_z(age,zi) + & 
 	        		& ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) )/&
-	        		& ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_exp(age,ai,zi,lambdai,ei,xi) )* & 
+	        		& ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi) )* & 
 	        		& DBN_exp(age2,ai,zi,lambdai,ei,xi)
 
         		L_Inc_frac_draft_group_z(age,zi) = L_Inc_frac_draft_group_z(age,zi) + & 
-	        		& ( yh(age,lambdai,ei)*Hours_exp(age,ai,zi,lambdai,ei,xi) )/&
-	        		& ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_exp(age,ai,zi,lambdai,ei,xi) )* & 
+	        		& ( yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi) )/&
+	        		& ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi) )* & 
 	        		& DBN_exp(age2,ai,zi,lambdai,ei,xi)
 
         		K_Tax_Inc_draft_group_z(age,zi) = K_Tax_Inc_draft_group_z(age,zi) + & 
 	        		& (( agrid(ai) + ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) ) ) - YGRID(ai,zi,xi) )*&
 	        		& DBN_exp(age2,ai,zi,lambdai,ei,xi)/&
-	        		& ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_exp(age,ai,zi,lambdai,ei,xi) )
+	        		& ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi) )
 
         		L_Tax_Inc_draft_group_z(age,zi) = L_Tax_Inc_draft_group_z(age,zi) + & 
 	        		& ( yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi) &
  	                & - psi_exp*(yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi))**(1.0_DP-tauPL_exp) )*& 
  	                & DBN_exp(age2,ai,zi,lambdai,ei,xi)/&
-	        		& ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_exp(age,ai,zi,lambdai,ei,xi) )
+	        		& ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi) )
 
                 C_Tax_Inc_draft_group_z(age,zi) = C_Tax_Inc_draft_group_z(age,zi) + & 
 	        		& ( tauC*Cons_exp(age2,ai,zi,lambdai,ei,xi) )*DBN_exp(age2,ai,zi,lambdai,ei,xi)/&
-	        		& ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours_exp(age,ai,zi,lambdai,ei,xi) )
+	        		& ( R_exp*agrid(ai) + Pr_mat(ai,zi,xi) + yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi) )
 	    	enddo 
 	    	enddo 
 	    	enddo 
