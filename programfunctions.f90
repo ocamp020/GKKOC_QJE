@@ -1614,6 +1614,14 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		enddo
 		enddo
 
+		print*,' '
+		print*,'K_Tax/Tot_Income '
+		print*, K_Tax_draft_group_z(1,:)/Tot_Income_draft_group_z(1,:)
+		print*, K_Tax_draft_group_z(2,:)/Tot_Income_draft_group_z(2,:)
+		print*, K_Tax_draft_group_z(3,:)/Tot_Income_draft_group_z(3,:)
+		print*, K_Tax_draft_group_z(4,:)/Tot_Income_draft_group_z(4,:)
+		print*, K_Tax_draft_group_z(5,:)/Tot_Income_draft_group_z(5,:)
+
 		! Total Capital Tax adjusted by productivity group
 		K_Tax_draft_group(:,1) = K_Tax_draft_group_z(:,1) + K_Tax_draft_group_z(:,2) + K_Tax_draft_group_z(:,3) & 
 								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*K_Tax_draft_group_z(:,4)
