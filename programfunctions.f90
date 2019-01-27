@@ -1760,6 +1760,23 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		L_Tax_Inc_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*L_Tax_Inc_draft_group_z(:,8) + &
 								& DBN_Z(9)*L_Tax_Inc_draft_group_z(:,9) )/0.0001_dp
 
+		! Total Consumption Tax to income ratio adjusted by productivity group
+		C_Tax_Inc_draft_group(:,1)   = ( DBN_Z(1)*C_Tax_Inc_draft_group_z(:,1) + DBN_Z(2)*C_Tax_Inc_draft_group_z(:,2) + & 
+								& DBN_Z(3)*C_Tax_Inc_draft_group_z(:,3) + (0.40_dp-CDF_Z(3))*C_Tax_Inc_draft_group_z(:,4) )/0.40_dp
+		C_Tax_Inc_draft_group(:,2)   = ( (CDF_Z(4)-0.40_dp)*C_Tax_Inc_draft_group_z(:,4) + &
+								& (0.80_dp-CDF_Z(4))*C_Tax_Inc_draft_group_z(:,5) )/0.40_dp
+		C_Tax_Inc_draft_group(:,3)   = C_Tax_Inc_draft_group_z(:,5)
+		C_Tax_Inc_draft_group(:,4)   = ( (CDF_Z(5)-0.90_dp)*C_Tax_Inc_draft_group_z(:,5) + &
+								& (0.99_dp-CDF_Z(5))*C_Tax_Inc_draft_group_z(:,6) )/0.09_dp
+		C_Tax_Inc_draft_group(:,5)   = ( (CDF_Z(6)-0.99_dp)*C_Tax_Inc_draft_group_z(:,6) + &
+								& (0.999_dp-CDF_Z(6))*C_Tax_Inc_draft_group_z(:,7) )/0.009_dp
+		C_Tax_Inc_draft_group(:,6)   = ( (CDF_Z(7)-0.999_dp)*C_Tax_Inc_draft_group_z(:,7) + &
+								&  DBN_Z(8)*C_Tax_Inc_draft_group_z(:,8) + DBN_Z(9)*C_Tax_Inc_draft_group_z(:,9) )/0.001_dp
+		C_Tax_Inc_draft_group(:,7)   = ( (CDF_Z(7)-0.999_dp)*C_Tax_Inc_draft_group_z(:,7) + &
+								& (0.9999_dp-CDF_Z(7))*C_Tax_Inc_draft_group_z(:,8) )/0.0009_dp
+		C_Tax_Inc_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*C_Tax_Inc_draft_group_z(:,8) + &
+								& DBN_Z(9)*C_Tax_Inc_draft_group_z(:,9) )/0.0001_dp
+
 
 		! Capital Income Share Tax adjusted by productivity group
 		K_Inc_frac_draft_group(:,1)   = ( DBN_Z(1)*K_Inc_frac_draft_group_z(:,1) + DBN_Z(2)*K_Inc_frac_draft_group_z(:,2) + & 
