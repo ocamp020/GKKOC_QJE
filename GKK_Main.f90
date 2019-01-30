@@ -444,9 +444,9 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	end if 
 
 		print*,"	Computing satitics"
-		!CALL COMPUTE_STATS
+		CALL COMPUTE_STATS
 		print*,"	Writing variables"
-		!CALL WRITE_VARIABLES(1)
+		CALL WRITE_VARIABLES(1)
 		if (Simul_Switch) then 
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
@@ -639,7 +639,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		V_Pr_nb_exp  	  = V_Pr_nb
 
 	! Compute moments
-	! CALL COMPUTE_STATS
+	CALL COMPUTE_STATS
 	
 	! Compute welfare gain between economies
 	CALL COMPUTE_WELFARE_GAIN
