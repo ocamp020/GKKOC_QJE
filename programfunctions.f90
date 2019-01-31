@@ -1554,6 +1554,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		K_Tax_Inc_draft_group_z		= 0.0_dp
 		L_Tax_Inc_draft_group_z		= 0.0_dp
 		C_Tax_Inc_draft_group_z		= 0.0_dp
+		wealth_draft_group_z   		= 0.0_dp 
 
 		do zi  = 1,nz
 		do age = 1,draft_age_category
@@ -1606,6 +1607,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 
                 C_Tax_Inc_draft_group_z(age,zi) = C_Tax_Inc_draft_group_z(age,zi) + & 
 	        		& ( tauC*Cons_bench(age2,ai,zi,lambdai,ei,xi) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)/( K_Inc_aux + L_Inc_aux )
+
+        		wealth_draft_group_z(age,zi) = wealth_draft_group_z(age,zi) + agrid(ai)*DBN_bench(age2,ai,zi,lambdai,ei,xi)
 	    	enddo 
 	    	enddo 
 	    	enddo 
@@ -1812,6 +1815,22 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		L_Inc_frac_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*L_Inc_frac_draft_group_z(:,8) + &
 								& DBN_Z(9)*L_Inc_frac_draft_group_z(:,9) )/0.0001_dp
 
+		! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		wealth_draft_group(:,1) = wealth_draft_group_z(:,1) + wealth_draft_group_z(:,2) + wealth_draft_group_z(:,3) & 
+								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*wealth_draft_group_z(:,4)
+		wealth_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*wealth_draft_group_z(:,4) +& 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*wealth_draft_group_z(:,5)
+		wealth_draft_group(:,3) = (0.10_dp/DBN_Z(5))*wealth_draft_group_z(:,5)
+		wealth_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*wealth_draft_group_z(:,5) + & 
+								&  ((0.99_dp-CDF_Z(5))/DBN_Z(6))*wealth_draft_group_z(:,6)
+		wealth_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*wealth_draft_group_z(:,6) + & 
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*wealth_draft_group_z(:,7) 
+		wealth_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*wealth_draft_group_z(:,7) +&
+								&  wealth_draft_group_z(:,8) + wealth_draft_group_z(:,9) 
+		wealth_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*wealth_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*wealth_draft_group_z(:,8)
+		wealth_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*wealth_draft_group_z(:,8) + wealth_draft_group_z(:,9)
+
 
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_Tax_K_bench.txt', STATUS='replace') 
 	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_Tax_L_bench.txt', STATUS='replace') 
@@ -1824,6 +1843,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_L_Inc_bench.txt', STATUS='replace') 
 	    OPEN (UNIT=89, FILE=trim(Result_Folder)//'draft_group_K_Inc_frac_bench.txt', STATUS='replace') 
 	    OPEN (UNIT=90, FILE=trim(Result_Folder)//'draft_group_L_Inc_frac_bench.txt', STATUS='replace') 
+	    OPEN (UNIT=91, FILE=trim(Result_Folder)//'draft_group_Wealth_bench.txt', STATUS='replace') 
 		do age = 1,draft_age_category
 		    WRITE  (UNIT=80, FMT=*)  K_Tax_draft_group(age,:)
 		    WRITE  (UNIT=81, FMT=*)  L_Tax_draft_group(age,:)
@@ -1836,9 +1856,10 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    WRITE  (UNIT=88, FMT=*)  L_Inc_draft_group(age,:)
 		    WRITE  (UNIT=89, FMT=*)  K_Inc_frac_draft_group(age,:)
 		    WRITE  (UNIT=90, FMT=*)  L_Inc_frac_draft_group(age,:)
+		    WRITE  (UNIT=91, FMT=*)  wealth_draft_group(age,:)
 		ENDDO
 		close(unit=80); close(unit=81); close(unit=82); close(unit=83); close(unit=84); close(unit=85)
-		close(unit=86); close(unit=87); close(unit=88); close(unit=89); close(unit=90); 
+		close(unit=86); close(unit=87); close(unit=88); close(unit=89); close(unit=90); close(unit=91); 
 
 		
 		!! Experiment 
@@ -1857,6 +1878,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		K_Tax_Inc_draft_group_z		= 0.0_dp
 		L_Tax_Inc_draft_group_z		= 0.0_dp
 		C_Tax_Inc_draft_group_z		= 0.0_dp
+		wealth_draft_group_z 	    = 0.0_dp
 
 		do zi  = 1,nz
 		do age = 1,draft_age_category
@@ -1910,6 +1932,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 
                 C_Tax_Inc_draft_group_z(age,zi) = C_Tax_Inc_draft_group_z(age,zi) + & 
 	        		& ( tauC*Cons_exp(age2,ai,zi,lambdai,ei,xi) )*DBN_exp(age2,ai,zi,lambdai,ei,xi)/( K_Inc_aux + L_Inc_aux )
+
+        		wealth_draft_group_z(age,zi) = wealth_draft_group_z(age,zi) + agrid(ai)*DBN_exp(age2,ai,zi,lambdai,ei,xi)
 
 	    	enddo 
 	    	enddo 
@@ -2117,6 +2141,29 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 								& (0.9999_dp-CDF_Z(7))*L_Inc_frac_draft_group_z(:,8) )/0.0009_dp
 		L_Inc_frac_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*L_Inc_frac_draft_group_z(:,8) + &
 								& DBN_Z(9)*L_Inc_frac_draft_group_z(:,9) )/0.0001_dp
+		L_Inc_frac_draft_group(:,6)   = ( (CDF_Z(7)-0.999_dp)*L_Inc_frac_draft_group_z(:,7) + &
+								&  DBN_Z(8)*L_Inc_frac_draft_group_z(:,8) + DBN_Z(9)*L_Inc_frac_draft_group_z(:,9) )/0.001_dp
+		L_Inc_frac_draft_group(:,7)   = ( (CDF_Z(7)-0.999_dp)*L_Inc_frac_draft_group_z(:,7) + &
+								& (0.9999_dp-CDF_Z(7))*L_Inc_frac_draft_group_z(:,8) )/0.0009_dp
+		L_Inc_frac_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*L_Inc_frac_draft_group_z(:,8) + &
+								& DBN_Z(9)*L_Inc_frac_draft_group_z(:,9) )/0.0001_dp
+
+		! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		wealth_draft_group(:,1) = wealth_draft_group_z(:,1) + wealth_draft_group_z(:,2) + wealth_draft_group_z(:,3) & 
+								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*wealth_draft_group_z(:,4)
+		wealth_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*wealth_draft_group_z(:,4) +& 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*wealth_draft_group_z(:,5)
+		wealth_draft_group(:,3) = (0.10_dp/DBN_Z(5))*wealth_draft_group_z(:,5)
+		wealth_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*wealth_draft_group_z(:,5) + & 
+								&  ((0.99_dp-CDF_Z(5))/DBN_Z(6))*wealth_draft_group_z(:,6)
+		wealth_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*wealth_draft_group_z(:,6) + & 
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*wealth_draft_group_z(:,7) 
+		wealth_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*wealth_draft_group_z(:,7) +&
+								&  wealth_draft_group_z(:,8) + wealth_draft_group_z(:,9) 
+		wealth_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*wealth_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*wealth_draft_group_z(:,8)
+		wealth_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*wealth_draft_group_z(:,8) + wealth_draft_group_z(:,9)
+
 
 
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_Tax_K_exp.txt', STATUS='replace') 
@@ -2129,7 +2176,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	    OPEN (UNIT=87, FILE=trim(Result_Folder)//'draft_group_K_Inc_exp.txt', STATUS='replace') 
 	    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_L_Inc_exp.txt', STATUS='replace') 
 	    OPEN (UNIT=89, FILE=trim(Result_Folder)//'draft_group_K_Inc_frac_exp.txt', STATUS='replace') 
-	    OPEN (UNIT=90, FILE=trim(Result_Folder)//'draft_group_L_Inc_frac_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=90, FILE=trim(Result_Folder)//'draft_group_L_Inc_frac_exp.txt', STATUS='replace')
+	    OPEN (UNIT=91, FILE=trim(Result_Folder)//'draft_group_Wealth_exp.txt', STATUS='replace') 
 		do age = 1,draft_age_category
 		    WRITE  (UNIT=80, FMT=*)  K_Tax_draft_group(age,:)
 		    WRITE  (UNIT=81, FMT=*)  L_Tax_draft_group(age,:)
@@ -2142,9 +2190,10 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    WRITE  (UNIT=88, FMT=*)  L_Inc_draft_group(age,:)
 		    WRITE  (UNIT=89, FMT=*)  K_Inc_frac_draft_group(age,:)
 		    WRITE  (UNIT=90, FMT=*)  L_Inc_frac_draft_group(age,:)
+		    WRITE  (UNIT=91, FMT=*)  wealth_draft_group(age,:)
 		ENDDO
 		close(unit=80); close(unit=81); close(unit=82); close(unit=83); close(unit=84); close(unit=85)
-		close(unit=86); close(unit=87); close(unit=88); close(unit=89); close(unit=90); 
+		close(unit=86); close(unit=87); close(unit=88); close(unit=89); close(unit=90); close(unit=91); 
 
 
 END SUBROUTINE  COMPUTE_WELFARE_GAIN
