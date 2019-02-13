@@ -77,9 +77,6 @@ Program Consumption_Equivalent
 		x_0     = 0.00_dp
 		a_x 	= 0.10_dp
 		b_x 	= 0.00_dp
-print*, ' '
-print*, ' Test 1'
-print*, ' '
 
 	! Taxes
 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
@@ -93,21 +90,26 @@ print*, ' '
  		tauPL=0.0_DP
  		psi=0.776_DP  	
 
-! 	! Resutls Folder
-! 		write(Result_Folder,'(f4.2)') Threshold_Factor
-! 		write(string_theta,'(f4.2)')  theta_folder
+	! Resutls Folder
+		write(Result_Folder,'(f4.2)') Threshold_Factor
+		write(string_theta,'(f4.2)')  theta_folder
 		
-! 		Result_Folder = './NSU_ZS_LT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
-! 		Result_Folder = trim(Result_Folder)//'Model_1.2_bv/' 
-! 		Result_Folder_aux = Result_Folder
+		Result_Folder = './NSU_ZS_LT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
+		Result_Folder = trim(Result_Folder)//'Model_1.2_bv/' 
+		Result_Folder_aux = Result_Folder
 
-! 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
-! 		call system( 'mkdir -p ' // trim(Result_Folder) )
-! 		call system( 'mkdir -p ' // trim(Result_Folder)//'CE_Files/' )
-! 		print*, "Results are stored in directory: ", Result_Folder
+		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
+		call system( 'mkdir -p ' // trim(Result_Folder) )
+		call system( 'mkdir -p ' // trim(Result_Folder)//'CE_Files/' )
+		print*, "Results are stored in directory: ", Result_Folder
 
-! 	! Bench_Folder
-! 		Bench_Folder = trim(Result_Folder)//'Bench_Files/'
+	! Bench_Folder
+		Bench_Folder = trim(Result_Folder)//'Bench_Files/'
+
+
+print*, ' '
+print*, ' Test 1'
+print*, ' '
 
 ! 	! Initialize program and load functions
 ! 		print*,"	Initializing program"
