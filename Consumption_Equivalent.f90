@@ -22,33 +22,36 @@ Program Consumption_Equivalent
 	real(dp) :: CE_total_NB_exp, CE_c_NB_exp, CE_cl_NB_exp, CE_cd_NB_exp, CE_h_NB_exp, CE_hl_NB_exp, CE_hd_NB_exp
 
 	print*, 'CE Program starting'
-! 	! Switch for solving benchmark or just reading resutls
-! 		Calibration_Switch = .false.
-! 		! If compute_bench==.true. then just read resutls
-! 		! If compute_bench==.false. then solve for benchmark and store results
-! 		Tax_Reform    = .false.
-! 			compute_bench = .false.
-! 			compute_exp   = .false.
-! 		Opt_Tax       = .false.
-! 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
-! 		Simul_Switch  = .false.
+	! Switch for solving benchmark or just reading resutls
+		Calibration_Switch = .false.
+		! If compute_bench==.true. then just read resutls
+		! If compute_bench==.false. then solve for benchmark and store results
+		Tax_Reform    = .false.
+			compute_bench = .false.
+			compute_exp   = .false.
+		Opt_Tax       = .false.
+			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+		Simul_Switch  = .false.
 
 
-! 	! Switch for separable and non-separable utility
-! 		! If NSU_Switch==.true. then do non-separable utility
-! 		! If NSU_Switch==.false. then do separable utility
-! 		NSU_Switch = .true.
+	! Switch for separable and non-separable utility
+		! If NSU_Switch==.true. then do non-separable utility
+		! If NSU_Switch==.false. then do separable utility
+		NSU_Switch = .true.
 
-! 	! Switch for log utility 
-! 		! If Log_Switch==.true. then utility is log
-! 		! If Log_Switch==.false. then utility is not log
-! 		Log_Switch = .false.
+	! Switch for log utility 
+		! If Log_Switch==.true. then utility is log
+		! If Log_Switch==.false. then utility is not log
+		Log_Switch = .false.
 
-! 	! Switch for labor taxes
-! 		! If Progressive_Tax_Switch==.true. then use progressive taxes
-! 		! If Progressive_Tax_Switch==.false. then use linear taxes
-! 		Progressive_Tax_Switch = .false.
+	! Switch for labor taxes
+		! If Progressive_Tax_Switch==.true. then use progressive taxes
+		! If Progressive_Tax_Switch==.false. then use linear taxes
+		Progressive_Tax_Switch = .false.
 
+print*, ' '
+print*, ' Test 1'
+print*, ' '
 
 ! 	! Capital Market
 ! 		theta_folder = 1.50_dp
