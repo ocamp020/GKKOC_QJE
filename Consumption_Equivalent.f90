@@ -21,6 +21,9 @@ Program Consumption_Equivalent
 	real(dp) :: CE_total_exp, CE_c_exp, CE_cl_exp, CE_cd_exp, CE_h_exp, CE_hl_exp, CE_hd_exp
 	real(dp) :: CE_total_NB_exp, CE_c_NB_exp, CE_cl_NB_exp, CE_cd_NB_exp, CE_h_NB_exp, CE_hl_NB_exp, CE_hd_NB_exp
 
+	! Allocate Variables
+	call Allocate_Variables
+
 	print*, 'CE Program starting'
 	! Switch for solving benchmark or just reading resutls
 		Calibration_Switch = .false.
