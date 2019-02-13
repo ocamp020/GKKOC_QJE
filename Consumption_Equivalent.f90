@@ -265,7 +265,7 @@ do i=1,3
 		& 					**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_NB_bench/C_NB_exp - 1.0_dp ) ;
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	CE2_pop_c  = 100.0_dp*((sum(Value_aux*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
+	CE2_pop_c  = 100.0_dp*((sum(Value_aux*DBN_bench)/sum(ValueFunction_bench*DBN_bench))&
 		& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
 	CE2_pop_cl = 100_dp*(C_exp/C_bench - 1.0_dp)
