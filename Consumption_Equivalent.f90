@@ -211,20 +211,20 @@ do i=1,3
 		print*, ' Test 3'
 		print*, ' '
 
-! !====================================================================================================
-! 	PRINT*,''
-! 	Print*,'Total Consumption and Hours '
-! 	PRINT*,''
+!====================================================================================================
+	PRINT*,''
+	Print*,'Total Consumption and Hours '
+	PRINT*,''
 
-! 	C_bench = sum(Cons_bench*DBN_bench)
-! 	C_exp   = sum(Cons_exp*DBN_exp)
-! 	C_NB_bench = sum(Cons_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-! 	C_NB_exp   = sum(Cons_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	C_bench = sum(Cons_bench*DBN_bench)
+	C_exp   = sum(Cons_exp*DBN_exp)
+	C_NB_bench = sum(Cons_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	C_NB_exp   = sum(Cons_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
 
-! 	H_bench = sum(Hours_bench*DBN_bench)
-! 	H_exp   = sum(Hours_exp*DBN_exp)
-! 	H_NB_bench = sum(Hours_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-! 	H_NB_exp   = sum(Hours_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	H_bench = sum(Hours_bench*DBN_bench)
+	H_exp   = sum(Hours_exp*DBN_exp)
+	H_NB_bench = sum(Hours_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	H_NB_exp   = sum(Hours_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
 
 ! !====================================================================================================
 ! 	PRINT*,''
