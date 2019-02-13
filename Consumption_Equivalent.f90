@@ -225,7 +225,9 @@ do i=1,3
 	H_exp   = sum(Hours_exp*DBN_exp)
 	H_NB_bench = sum(Hours_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
 	H_NB_exp   = sum(Hours_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
-
+	print*, ' '
+		print*, ' Test 4'
+		print*, ' '
 ! !====================================================================================================
 ! 	PRINT*,''
 ! 	Print*,'Consumption Equivalent - Total'
