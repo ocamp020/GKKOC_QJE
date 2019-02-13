@@ -812,16 +812,30 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	REAL(DP), dimension(draft_age_category,nz) :: Tot_Income_draft_group_z, K_Inc_draft_group_z, L_Inc_draft_group_z
 	REAL(DP), dimension(draft_age_category,nz) :: K_Inc_frac_draft_group_z, L_Inc_frac_draft_group_z
 	REAL(DP), dimension(draft_age_category,nz) :: K_Tax_Inc_draft_group_z, L_Tax_Inc_draft_group_z, C_Tax_Inc_draft_group_z
+	REAL(DP), dimension(draft_age_category,nz) :: Tax_Increase_tk_draft_group_z, Tax_Increase_tl_draft_group_z
+	REAL(DP), dimension(draft_age_category,nz) :: Tax_Increase_draft_group_z, Tax_Rate_Increase_draft_group_z
+	REAL(DP), dimension(draft_age_category,nz) :: Tax_Rate_Increase_tk_draft_group_z, Tax_Rate_Increase_tl_draft_group_z
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: CE_draft_group,  size_draft_group, frac_pos_welfare_draft_group
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: wealth_draft_group,  av_wealth_draft_group, frac_wealth_draft_group
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: K_Tax_draft_group, L_Tax_draft_group, C_Tax_draft_group
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: Tot_Income_draft_group, K_Inc_draft_group, L_Inc_draft_group
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: K_Inc_frac_draft_group, L_Inc_frac_draft_group
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: K_Tax_Inc_draft_group, L_Tax_Inc_draft_group, C_Tax_Inc_draft_group
+	REAL(DP), dimension(draft_age_category,draft_z_category) :: Tax_Increase_tk_draft_group, Tax_Increase_tl_draft_group
+	REAL(DP), dimension(draft_age_category,draft_z_category) :: Tax_Increase_draft_group, Tax_Rate_Increase_draft_group
+	REAL(DP), dimension(draft_age_category,draft_z_category) :: Tax_Rate_Increase_tk_draft_group, Tax_Rate_Increase_tl_draft_group
 	REAL(DP), dimension(nz) :: DBN_Z, CDF_Z 
 	INTEGER , dimension(draft_age_category+1) :: draft_age_limit
 	INTEGER :: age2, z2
 	REAL(DP):: K_Inc_aux, L_Inc_aux
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Income_bench, K_Tax_bench, L_Tax_bench
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Income_exp,   K_Tax_exp,   L_Tax_exp
+	allocate( Income_bench( MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( K_Tax_bench(  MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( L_Tax_bench(  MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Income_exp(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( K_Tax_exp(    MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( L_Tax_exp(    MaxAge,na,nz,nlambda,ne,nx) )
 
 
 
@@ -1571,6 +1585,11 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    	endif 
 		    	K_Inc_aux   = R_bench*agrid(ai) + Pr_mat(ai,zi,xi)
 
+		    	Income_bench(age2,ai,zi,lambdai,ei,xi) = L_Inc_aux + K_Inc_aux
+		    	K_Tax_bench(age2,ai,zi,lambdai,ei,xi)  = tauK_bench*( K_Inc_aux )
+		    	if (age.lt.draft_age_category) then
+		    	L_Tax_bench(age2,ai,zi,lambdai,ei,xi)  = L_Inc_aux - psi_bench*(L_Inc_aux)**(1.0_DP-tauPL_bench)
+		    	endif 
 
 	        	K_Tax_draft_group_z(age,zi) = K_Tax_draft_group_z(age,zi) + & 
 	        		& ( tauK_bench*( K_Inc_aux ) )*DBN_bench(age2,ai,zi,lambdai,ei,xi)
@@ -1895,6 +1914,12 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    	endif 
 		    	K_Inc_aux   = R_exp*agrid(ai) + Pr_mat(ai,zi,xi)
 
+		    	Income_exp(age2,ai,zi,lambdai,ei,xi) = L_Inc_aux + K_Inc_aux
+		    	K_Tax_exp(age2,ai,zi,lambdai,ei,xi)  = ((1.0_dp+R_exp)*agrid(ai) + Pr_mat(ai,zi,xi))-YGRID(ai,zi,xi) 
+		    	if (age.lt.draft_age_category) then
+		    	L_Tax_exp(age2,ai,zi,lambdai,ei,xi)  =  L_Inc_aux - psi_exp*(L_Inc_aux)**(1.0_DP-tauPL_exp) 
+		    	endif 
+
 
 	        	K_Tax_draft_group_z(age,zi) = K_Tax_draft_group_z(age,zi) + & 
 	        		& (((1.0_dp+R_exp)*agrid(ai) + Pr_mat(ai,zi,xi))-YGRID(ai,zi,xi) )*DBN_exp(age2,ai,zi,lambdai,ei,xi)
@@ -2194,6 +2219,201 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		ENDDO
 		close(unit=80); close(unit=81); close(unit=82); close(unit=83); close(unit=84); close(unit=85)
 		close(unit=86); close(unit=87); close(unit=88); close(unit=89); close(unit=90); close(unit=91); 
+
+
+		!! Fraction of tax increses
+		Tax_Increase_tk_draft_group_z = 0.0_dp ; Tax_Increase_tl_draft_group_z = 0.0_dp ;
+		Tax_Increase_draft_group_z = 0.0_dp ; Tax_Rate_Increase_draft_group_z = 0.0_dp ;
+		Tax_Rate_Increase_tk_draft_group_z = 0.0_dp ; Tax_Rate_Increase_tl_draft_group_z = 0.0_dp ;
+
+		do zi  = 1,nz
+		do age = 1,draft_age_category
+	        do xi=1,nx
+		    do ei=1,ne
+		    do lambdai=1,nlambda
+		    do ai=1,na
+		    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
+
+		    	! Capital taxes
+		    	If ( K_Tax_exp(age2,ai,zi,lambdai,ei,xi) .gt. K_Tax_bench(age2,ai,zi,lambdai,ei,xi)) then
+		    	Tax_Increase_tk_draft_group_z(age,zi) = Tax_Increase_tk_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
+
+		    	! Labor taxes
+		    	If ( L_Tax_exp(age2,ai,zi,lambdai,ei,xi) .gt. L_Tax_bench(age2,ai,zi,lambdai,ei,xi)) then
+		    	Tax_Increase_tl_draft_group_z(age,zi) = Tax_Increase_tl_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
+
+		    	! Total taxes
+		    	If ( (K_Tax_exp(age2,ai,zi,lambdai,ei,xi)+L_Tax_exp(age2,ai,zi,lambdai,ei,xi)) .gt. &
+		    	  &  (K_Tax_bench(age2,ai,zi,lambdai,ei,xi)+L_Tax_bench(age2,ai,zi,lambdai,ei,xi)) ) then
+		    	Tax_Increase_draft_group_z(age,zi) = Tax_Increase_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
+
+				! Capital tax rate
+		    	If ( K_Tax_exp(age2,ai,zi,lambdai,ei,xi)/Income_exp(age2,ai,zi,lambdai,ei,xi) .gt. & 
+		    	  &  K_Tax_bench(age2,ai,zi,lambdai,ei,xi)/Income_bench(age2,ai,zi,lambdai,ei,xi)) then
+		    	Tax_Rate_Increase_tk_draft_group_z(age,zi) = Tax_Rate_Increase_tk_draft_group_z(age,zi) + & 
+		    		&  DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
+
+		    	! Labor tax rate
+		    	If ( L_Tax_exp(age2,ai,zi,lambdai,ei,xi)/Income_exp(age2,ai,zi,lambdai,ei,xi) .gt. & 
+		    	  &  L_Tax_bench(age2,ai,zi,lambdai,ei,xi)/Income_bench(age2,ai,zi,lambdai,ei,xi)) then
+		    	Tax_Rate_Increase_tl_draft_group_z(age,zi) = Tax_Rate_Increase_tl_draft_group_z(age,zi) + & 
+		    		& DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
+
+		    	! Total tax rate
+		    	If ( (K_Tax_exp(age2,ai,zi,lambdai,ei,xi)+L_Tax_exp(age2,ai,zi,lambdai,ei,xi))/Income_exp(age2,ai,zi,lambdai,ei,xi) &
+		    		& .gt. (K_Tax_bench(age2,ai,zi,lambdai,ei,xi)+L_Tax_bench(age2,ai,zi,lambdai,ei,xi))/&
+		    		& Income_bench(age2,ai,zi,lambdai,ei,xi) ) then
+		    	Tax_Rate_Increase_draft_group_z(age,zi) = Tax_Rate_Increase_draft_group_z(age,zi)+DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
+	    	enddo 
+	    	enddo 
+	    	enddo 
+	    	enddo 
+	    	enddo  
+		enddo
+		enddo
+
+		! Frac. capital tax increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Tax_Increase_tk_draft_group(:,1) = Tax_Increase_tk_draft_group_z(:,1) + Tax_Increase_tk_draft_group_z(:,2) + &
+						&  Tax_Increase_tk_draft_group_z(:,3) + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*Tax_Increase_tk_draft_group_z(:,4)
+		Tax_Increase_tk_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*Tax_Increase_tk_draft_group_z(:,4) + & 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*Tax_Increase_tk_draft_group_z(:,5)
+		Tax_Increase_tk_draft_group(:,3) = (0.10_dp/DBN_Z(5))*Tax_Increase_tk_draft_group_z(:,5)
+		Tax_Increase_tk_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*Tax_Increase_tk_draft_group_z(:,5) + & 
+								& ((0.99_dp-CDF_Z(5))/DBN_Z(6))*Tax_Increase_tk_draft_group_z(:,6) 
+		Tax_Increase_tk_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*Tax_Increase_tk_draft_group_z(:,6) + &
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*Tax_Increase_tk_draft_group_z(:,7) 
+		Tax_Increase_tk_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tax_Increase_tk_draft_group_z(:,7) + &
+								& Tax_Increase_tk_draft_group_z(:,8) + Tax_Increase_tk_draft_group_z(:,9) 
+		Tax_Increase_tk_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tax_Increase_tk_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*Tax_Increase_tk_draft_group_z(:,8)
+		Tax_Increase_tk_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Tax_Increase_tk_draft_group_z(:,8) + &
+								&  Tax_Increase_tk_draft_group_z(:,9)
+
+			! Fix fractions
+			Tax_Increase_tk_draft_group = 100*Tax_Increase_tk_draft_group/size_draft_group
+
+		! Frac. labor tax increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Tax_Increase_tl_draft_group(:,1) = Tax_Increase_tl_draft_group_z(:,1) + Tax_Increase_tl_draft_group_z(:,2) + &
+						&  Tax_Increase_tl_draft_group_z(:,3) + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*Tax_Increase_tl_draft_group_z(:,4)
+		Tax_Increase_tl_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*Tax_Increase_tl_draft_group_z(:,4) + & 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*Tax_Increase_tl_draft_group_z(:,5)
+		Tax_Increase_tl_draft_group(:,3) = (0.10_dp/DBN_Z(5))*Tax_Increase_tl_draft_group_z(:,5)
+		Tax_Increase_tl_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*Tax_Increase_tl_draft_group_z(:,5) + & 
+								& ((0.99_dp-CDF_Z(5))/DBN_Z(6))*Tax_Increase_tl_draft_group_z(:,6) 
+		Tax_Increase_tl_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*Tax_Increase_tl_draft_group_z(:,6) + &
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*Tax_Increase_tl_draft_group_z(:,7) 
+		Tax_Increase_tl_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tax_Increase_tl_draft_group_z(:,7) + &
+								& Tax_Increase_tl_draft_group_z(:,8) + Tax_Increase_tl_draft_group_z(:,9) 
+		Tax_Increase_tl_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tax_Increase_tl_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*Tax_Increase_tl_draft_group_z(:,8)
+		Tax_Increase_tl_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Tax_Increase_tl_draft_group_z(:,8) + &
+								&  Tax_Increase_tl_draft_group_z(:,9)
+
+			! Fix fractions
+			Tax_Increase_tl_draft_group = 100*Tax_Increase_tl_draft_group/size_draft_group
+
+		! Frac. total tax increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Tax_Increase_draft_group(:,1) = Tax_Increase_draft_group_z(:,1) + Tax_Increase_draft_group_z(:,2) + &
+						&  Tax_Increase_draft_group_z(:,3) + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*Tax_Increase_draft_group_z(:,4)
+		Tax_Increase_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*Tax_Increase_draft_group_z(:,4) + & 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*Tax_Increase_draft_group_z(:,5)
+		Tax_Increase_draft_group(:,3) = (0.10_dp/DBN_Z(5))*Tax_Increase_draft_group_z(:,5)
+		Tax_Increase_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*Tax_Increase_draft_group_z(:,5) + & 
+								& ((0.99_dp-CDF_Z(5))/DBN_Z(6))*Tax_Increase_draft_group_z(:,6) 
+		Tax_Increase_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*Tax_Increase_draft_group_z(:,6) + &
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*Tax_Increase_draft_group_z(:,7) 
+		Tax_Increase_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tax_Increase_draft_group_z(:,7) + &
+								& Tax_Increase_draft_group_z(:,8) + Tax_Increase_draft_group_z(:,9) 
+		Tax_Increase_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tax_Increase_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*Tax_Increase_draft_group_z(:,8)
+		Tax_Increase_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Tax_Increase_draft_group_z(:,8) + &
+								&  Tax_Increase_draft_group_z(:,9)
+
+			! Fix fractions
+			Tax_Increase_draft_group = 100*Tax_Increase_draft_group/size_draft_group
+
+		! Frac. capital tax rate increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Tax_Rate_Increase_tk_draft_group(:,1) = Tax_Rate_Increase_tk_draft_group_z(:,1) + Tax_Rate_Increase_tk_draft_group_z(:,2) + &
+						&  Tax_Rate_Increase_tk_draft_group_z(:,3) + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*Tax_Rate_Increase_tk_draft_group_z(:,4)
+		Tax_Rate_Increase_tk_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*Tax_Rate_Increase_tk_draft_group_z(:,4) + & 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*Tax_Rate_Increase_tk_draft_group_z(:,5)
+		Tax_Rate_Increase_tk_draft_group(:,3) = (0.10_dp/DBN_Z(5))*Tax_Rate_Increase_tk_draft_group_z(:,5)
+		Tax_Rate_Increase_tk_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*Tax_Rate_Increase_tk_draft_group_z(:,5) + & 
+								& ((0.99_dp-CDF_Z(5))/DBN_Z(6))*Tax_Rate_Increase_tk_draft_group_z(:,6) 
+		Tax_Rate_Increase_tk_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*Tax_Rate_Increase_tk_draft_group_z(:,6) + &
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*Tax_Rate_Increase_tk_draft_group_z(:,7) 
+		Tax_Rate_Increase_tk_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tax_Rate_Increase_tk_draft_group_z(:,7) + &
+								& Tax_Rate_Increase_tk_draft_group_z(:,8) + Tax_Rate_Increase_tk_draft_group_z(:,9) 
+		Tax_Rate_Increase_tk_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tax_Rate_Increase_tk_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*Tax_Rate_Increase_tk_draft_group_z(:,8)
+		Tax_Rate_Increase_tk_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Tax_Rate_Increase_tk_draft_group_z(:,8) + &
+								&  Tax_Rate_Increase_tk_draft_group_z(:,9)
+
+			! Fix fractions
+			Tax_Rate_Increase_tk_draft_group = 100*Tax_Rate_Increase_tk_draft_group/size_draft_group
+
+		! Frac. labor tax rate increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Tax_Rate_Increase_tl_draft_group(:,1) = Tax_Rate_Increase_tl_draft_group_z(:,1) + Tax_Rate_Increase_tl_draft_group_z(:,2) + &
+						&  Tax_Rate_Increase_tl_draft_group_z(:,3) + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*Tax_Rate_Increase_tl_draft_group_z(:,4)
+		Tax_Rate_Increase_tl_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*Tax_Rate_Increase_tl_draft_group_z(:,4) + & 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*Tax_Rate_Increase_tl_draft_group_z(:,5)
+		Tax_Rate_Increase_tl_draft_group(:,3) = (0.10_dp/DBN_Z(5))*Tax_Rate_Increase_tl_draft_group_z(:,5)
+		Tax_Rate_Increase_tl_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*Tax_Rate_Increase_tl_draft_group_z(:,5) + & 
+								& ((0.99_dp-CDF_Z(5))/DBN_Z(6))*Tax_Rate_Increase_tl_draft_group_z(:,6) 
+		Tax_Rate_Increase_tl_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*Tax_Rate_Increase_tl_draft_group_z(:,6) + &
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*Tax_Rate_Increase_tl_draft_group_z(:,7) 
+		Tax_Rate_Increase_tl_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tax_Rate_Increase_tl_draft_group_z(:,7) + &
+								& Tax_Rate_Increase_tl_draft_group_z(:,8) + Tax_Rate_Increase_tl_draft_group_z(:,9) 
+		Tax_Rate_Increase_tl_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tax_Rate_Increase_tl_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*Tax_Rate_Increase_tl_draft_group_z(:,8)
+		Tax_Rate_Increase_tl_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Tax_Rate_Increase_tl_draft_group_z(:,8) + &
+								&  Tax_Rate_Increase_tl_draft_group_z(:,9)
+
+			! Fix fractions
+			Tax_Rate_Increase_tl_draft_group = 100*Tax_Rate_Increase_tl_draft_group/size_draft_group
+
+		! Frac. total tax rate increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Tax_Rate_Increase_draft_group(:,1) = Tax_Rate_Increase_draft_group_z(:,1) + Tax_Rate_Increase_draft_group_z(:,2) + &
+						&  Tax_Rate_Increase_draft_group_z(:,3) + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*Tax_Rate_Increase_draft_group_z(:,4)
+		Tax_Rate_Increase_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*Tax_Rate_Increase_draft_group_z(:,4) + & 
+								&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*Tax_Rate_Increase_draft_group_z(:,5)
+		Tax_Rate_Increase_draft_group(:,3) = (0.10_dp/DBN_Z(5))*Tax_Rate_Increase_draft_group_z(:,5)
+		Tax_Rate_Increase_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*Tax_Rate_Increase_draft_group_z(:,5) + & 
+								& ((0.99_dp-CDF_Z(5))/DBN_Z(6))*Tax_Rate_Increase_draft_group_z(:,6) 
+		Tax_Rate_Increase_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*Tax_Rate_Increase_draft_group_z(:,6) + &
+								& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*Tax_Rate_Increase_draft_group_z(:,7) 
+		Tax_Rate_Increase_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tax_Rate_Increase_draft_group_z(:,7) + &
+								& Tax_Rate_Increase_draft_group_z(:,8) + Tax_Rate_Increase_draft_group_z(:,9) 
+		Tax_Rate_Increase_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Tax_Rate_Increase_draft_group_z(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*Tax_Rate_Increase_draft_group_z(:,8)
+		Tax_Rate_Increase_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Tax_Rate_Increase_draft_group_z(:,8) + &
+								&  Tax_Rate_Increase_draft_group_z(:,9)
+
+			! Fix fractions
+			Tax_Rate_Increase_draft_group = 100*Tax_Rate_Increase_draft_group/size_draft_group
+
+		OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_frac_Tax_K.txt', STATUS='replace') 
+	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_frac_Tax_L.txt', STATUS='replace') 
+	    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_frac_Tax.txt', STATUS='replace') 
+	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate_K.txt', STATUS='replace') 
+	    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate_L.txt', STATUS='replace') 
+	    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate.txt', STATUS='replace') 
+		do age = 1,draft_age_category
+		    WRITE  (UNIT=80, FMT=*)  Tax_Increase_tk_draft_group(age,:)
+		    WRITE  (UNIT=81, FMT=*)  Tax_Increase_tl_draft_group(age,:)
+		    WRITE  (UNIT=82, FMT=*)  Tax_Increase_draft_group(age,:)
+		    WRITE  (UNIT=83, FMT=*)  Tax_Rate_Increase_tk_draft_group(age,:)
+		    WRITE  (UNIT=84, FMT=*)  Tax_Rate_Increase_tl_draft_group(age,:)
+		    WRITE  (UNIT=85, FMT=*)  Tax_Rate_Increase_draft_group(age,:)
+		ENDDO
+		close(unit=80); close(unit=81); close(unit=82); close(unit=83); close(unit=84); close(unit=85)
+
 
 
 END SUBROUTINE  COMPUTE_WELFARE_GAIN
