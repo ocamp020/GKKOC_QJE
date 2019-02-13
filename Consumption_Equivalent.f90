@@ -236,7 +236,7 @@ do i=1,3
 	!CE_total = 100.0_dp*((ValueFunction_exp/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 	!print*, shape(ValueFunction_exp)
 	!print*, shape(ValueFunction_bench)
-	print*, sum(CE_total)
+	CE_total = 0.0_dp
 		print*, ' Test 4.1'
 		
 	! CE2_nb_total = 100.0_dp*&
