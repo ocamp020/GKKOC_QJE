@@ -235,16 +235,19 @@ do i=1,3
 
 	CE_total = 100.0_dp*((ValueFunction_exp/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
-	CE2_nb_total = 100.0_dp*&
-				& ((sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))&
-				&	/sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
-				& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+		print*, ' Test 4.1'
+		
+	! CE2_nb_total = 100.0_dp*&
+	! 			& ((sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))&
+	! 			&	/sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
+	! 			& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+	! 	print*, ' Test 4.2'
 
-	CE2_pop_total = 100.0_dp*((sum(ValueFunction_exp*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
-				& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
-	print*, ' '
-		print*, ' Test 5'
-		print*, ' '
+	! CE2_pop_total = 100.0_dp*((sum(ValueFunction_exp*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
+	! 			& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+	! print*, ' '
+	! 	print*, ' Test 5'
+	! 	print*, ' '
 ! !====================================================================================================
 ! 	PRINT*,''
 ! 	Print*,'Consumption Equivalent - Consumption'
