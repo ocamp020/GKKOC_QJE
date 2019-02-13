@@ -10,9 +10,9 @@ Program Consumption_Equivalent
 	integer        :: i
 	! Compute benchmark or load results
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
-	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: CE_total, CE_c, CE_cl, CE_cd, CE_h, CE_hl, CE_hd
-	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: CE_nb_cl, CE_nb_cd, CE_nb_hl, CE_nb_hd
-	real(dp), dimension(MaxAge,na,nz,nlambda,ne,nx) :: Value_aux
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: CE_total, CE_c, CE_cl, CE_cd, CE_h, CE_hl, CE_hd
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: CE_nb_cl, CE_nb_cd, CE_nb_hl, CE_nb_hd
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Value_aux
 	real(dp) :: CE2_nb_total, CE2_nb_c, CE2_nb_cl, CE2_nb_cd, CE2_nb_h, CE2_nb_hl, CE2_nb_hd
 	real(dp) :: CE2_pop_total, CE2_pop_c, CE2_pop_cl, CE2_pop_cd, CE2_pop_h, CE2_pop_hl, CE2_pop_hd
 	real(dp) :: C_bench, C_exp, H_bench, H_exp, C_NB_bench, C_NB_exp, H_NB_bench, H_NB_exp
@@ -23,6 +23,19 @@ Program Consumption_Equivalent
 
 	! Allocate Variables
 	call Allocate_Variables
+	allocate( Cons(            MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_total(        MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_c(            MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_cl(           MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_cd(           MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_h(            MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_hl(           MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_hd(           MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_nb_cl(        MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_nb_cd(        MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_nb_hlCE_nb_hd(MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Value_aux(       MaxAge,na,nz,nlambda,ne,nx) )
+    
 
 	print*, 'CE Program starting'
 	! Switch for solving benchmark or just reading resutls
