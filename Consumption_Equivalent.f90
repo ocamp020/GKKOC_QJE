@@ -140,6 +140,10 @@ Program Consumption_Equivalent
 		tauw_at_bench = tauW_at
 		Y_a_threshold_bench = Y_a_threshold
 
+print*, ' '
+print*, ' Test 1'
+print*, ' '
+
 		DBN_bench           = DBN1
 		ValueFunction_bench = ValueFunction
 		Cons_bench          = Cons           
@@ -148,8 +152,13 @@ Program Consumption_Equivalent
 		V_Pr_bench          = V_Pr
 		V_Pr_nb_bench       = V_Pr_nb 
 
-
+print*, ' '
+print*, ' Test 2'
+print*, ' '
 		CALL ComputeLaborUnits(EBAR, wage) 
+print*, ' '
+print*, ' Test 3'
+print*, ' '
 
 
 ! !====================================================================================================
