@@ -145,16 +145,21 @@ print*, ' Test 1'
 print*, ' '
 
 		DBN_bench           = DBN1
+		print*, ' Test 2.1'
 		ValueFunction_bench = ValueFunction
+print*, ' Test 2.2'
 		Cons_bench          = Cons           
+		print*, ' Test 2.3'
 		Hours_bench         = Hours
+		print*, ' Test 2.4'
 		Aprime_bench        = Aprime 
+		print*, ' Test 2.5'
 		V_Pr_bench          = V_Pr
+		print*, ' Test 2.6'
 		V_Pr_nb_bench       = V_Pr_nb 
+		print*, ' Test 2.7'
 
-print*, ' '
-print*, ' Test 2'
-print*, ' '
+
 		CALL ComputeLaborUnits(EBAR, wage) 
 print*, ' '
 print*, ' Test 3'
