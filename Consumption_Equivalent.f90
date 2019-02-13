@@ -23,18 +23,19 @@ Program Consumption_Equivalent
 
 	! Allocate Variables
 	call Allocate_Variables
-	allocate( Cons(            MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( CE_total(        MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( CE_c(            MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( CE_cl(           MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( CE_cd(           MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( CE_h(            MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( CE_hl(           MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( CE_hd(           MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( CE_nb_cl(        MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( CE_nb_cd(        MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( CE_nb_hlCE_nb_hd(MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( Value_aux(       MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Cons(       MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_total(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_c(       MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_cl(      MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_cd(      MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_h(       MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_hl(      MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_hd(      MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_nb_cl(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_nb_cd(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_nb_hl(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE_nb_hd(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Value_aux(  MaxAge,na,nz,nlambda,ne,nx) )
     
 
 	print*, 'CE Program starting'
