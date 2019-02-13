@@ -147,6 +147,7 @@ print*, ' '
 		DBN_bench           = DBN1
 		print*, ' Test 2.1'
 		print*, size(ValueFunction), size(ValueFunction_bench)
+		print*, shape(ValueFunction),' ', shape(ValueFunction_bench)
 		ValueFunction_bench = ValueFunction
 	print*, ' Test 2.2'
 		Cons_bench          = Cons           
