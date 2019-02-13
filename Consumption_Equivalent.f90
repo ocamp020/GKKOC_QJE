@@ -233,8 +233,9 @@ do i=1,3
 	Print*,'Consumption Equivalent - Total'
 	PRINT*,''
 
-	CE_total = 100.0_dp*((ValueFunction_exp/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
-
+	!CE_total = 100.0_dp*((ValueFunction_exp/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+	print*, shape(ValueFunction_exp/ValueFunction_bench)
+	print*, shape(CE_total)
 		print*, ' Test 4.1'
 		
 	! CE2_nb_total = 100.0_dp*&
