@@ -106,55 +106,50 @@ Program Consumption_Equivalent
 	! Bench_Folder
 		Bench_Folder = trim(Result_Folder)//'Bench_Files/'
 
-
-print*, ' '
-print*, ' Test 1'
-print*, ' '
-
 	! Initialize program and load functions
 		print*,"	Initializing program"
 		CALL INITIALIZE
 
-! !====================================================================================================
-! 	PRINT*,''
-! 	Print*,'Loading benchmark'
-! 	PRINT*,''
+!====================================================================================================
+	PRINT*,''
+	Print*,'Loading benchmark'
+	PRINT*,''
 
-! 	! Set taxes for benchmark economy
-! 		tauK = 0.25_DP
-! 		tauW_at = 0.00_DP
-! 		Y_a_threshold = 0.00_DP 
+	! Set taxes for benchmark economy
+		tauK = 0.25_DP
+		tauW_at = 0.00_DP
+		Y_a_threshold = 0.00_DP 
 
-! 	print*,"	Reading benchmark results from files"
-! 		CALL Write_Benchmark_Results(.false.)
+	print*,"	Reading benchmark results from files"
+		CALL Write_Benchmark_Results(.false.)
 
-! 	! Aggregate variables in benchmark economy
-! 		GBAR_bench  = GBAR
-! 		QBAR_bench  = QBAR 
-! 		NBAR_bench  = NBAR 
-! 		Ebar_bench  = EBAR
-! 		P_bench     = P
-! 		R_bench     = R
-! 		wage_bench  = wage
-! 		Y_bench     = YBAR
-! 		tauK_bench  = tauK
-! 		tauPL_bench = tauPL
-! 		psi_bench   = psi
-! 		DBN_bench   = DBN1
-! 		tauw_bt_bench = tauW_bt
-! 		tauw_at_bench = tauW_at
-! 		Y_a_threshold_bench = Y_a_threshold
+	! Aggregate variables in benchmark economy
+		GBAR_bench  = GBAR
+		QBAR_bench  = QBAR 
+		NBAR_bench  = NBAR 
+		Ebar_bench  = EBAR
+		P_bench     = P
+		R_bench     = R
+		wage_bench  = wage
+		Y_bench     = YBAR
+		tauK_bench  = tauK
+		tauPL_bench = tauPL
+		psi_bench   = psi
+		DBN_bench   = DBN1
+		tauw_bt_bench = tauW_bt
+		tauw_at_bench = tauW_at
+		Y_a_threshold_bench = Y_a_threshold
 
-! 		DBN_bench           = DBN1
-! 		ValueFunction_bench = ValueFunction
-! 		Cons_bench          = Cons           
-! 		Hours_bench         = Hours
-! 		Aprime_bench        = Aprime 
-! 		V_Pr_bench          = V_Pr
-! 		V_Pr_nb_bench       = V_Pr_nb 
+		DBN_bench           = DBN1
+		ValueFunction_bench = ValueFunction
+		Cons_bench          = Cons           
+		Hours_bench         = Hours
+		Aprime_bench        = Aprime 
+		V_Pr_bench          = V_Pr
+		V_Pr_nb_bench       = V_Pr_nb 
 
 
-! 		CALL ComputeLaborUnits(EBAR, wage) 
+		CALL ComputeLaborUnits(EBAR, wage) 
 
 
 ! !====================================================================================================
