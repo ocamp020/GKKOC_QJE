@@ -49,51 +49,49 @@ Program Consumption_Equivalent
 		! If Progressive_Tax_Switch==.false. then use linear taxes
 		Progressive_Tax_Switch = .false.
 
+	! Capital Market
+		theta_folder = 1.50_dp
+		do zi=1,nz
+		theta(zi)        = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+		enddo
+	! Threshold 
+		Threshold_Factor = 0.00_dp 
+
+	! Set Parameters 
+		! Present value calibration
+		Params =[ 0.9485_dp, 0.00_dp, 0.1_dp, 0.0665_dp, 0.29_dp , 0.470_dp] ! tauL=0.224, tauC=0.075 calibration
+		! Book value calibration
+		Params =[ 0.9475_dp, 0.00_dp, 0.1_dp, 0.072_dp , 0.305_dp, 0.46_dp ] ! tauL=0.224, tauC=0.075 calibration
+		
+
+		beta   = params(1)
+		mu_z   = params(2) ! this is just shifting the z grids. it is zero now.
+		rho_z  = params(3) 
+		sigma_z_eps      = params(4)
+		sigma_lambda_eps = params(5)
+		gamma  = params(6)
+		sigma  = 4.0_dp
+
+		x_hi	= 5.00_dp
+		x_lo	= 1.00_dp
+		x_0     = 0.00_dp
+		a_x 	= 0.10_dp
+		b_x 	= 0.00_dp
 print*, ' '
 print*, ' Test 1'
 print*, ' '
 
-! 	! Capital Market
-! 		theta_folder = 1.50_dp
-! 		do zi=1,nz
-! 		theta(zi)        = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
-! 		enddo
-! 	! Threshold 
-! 		Threshold_Factor = 0.00_dp 
-
-! 	! Set Parameters 
-! 		! Present value calibration
-! 		Params =[ 0.9485_dp, 0.00_dp, 0.1_dp, 0.0665_dp, 0.29_dp , 0.470_dp] ! tauL=0.224, tauC=0.075 calibration
-! 		! Book value calibration
-! 		Params =[ 0.9475_dp, 0.00_dp, 0.1_dp, 0.072_dp , 0.305_dp, 0.46_dp ] ! tauL=0.224, tauC=0.075 calibration
-		
-
-! 		beta   = params(1)
-! 		mu_z   = params(2) ! this is just shifting the z grids. it is zero now.
-! 		rho_z  = params(3) 
-! 		sigma_z_eps      = params(4)
-! 		sigma_lambda_eps = params(5)
-! 		gamma  = params(6)
-! 		sigma  = 4.0_dp
-
-! 		x_hi	= 5.00_dp
-! 		x_lo	= 1.00_dp
-! 		x_0     = 0.00_dp
-! 		a_x 	= 0.10_dp
-! 		b_x 	= 0.00_dp
-
-
-! 	! Taxes
-! 	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
-! 		TauW_bt          = 0.00_dp
-! 		Threshold_Factor = 0.00_dp 
-! 	! Consumption tax
-! 		tauC=0.075_DP
-! 	! Set Labor Tax Regime
-! 		!tauPL=0.185_DP
-! 		!psi=0.77_DP  
-!  		tauPL=0.0_DP
-!  		psi=0.776_DP  	
+	! Taxes
+	! Wealth tax: minimum wealth tax to consider and increments for balancing budget
+		TauW_bt          = 0.00_dp
+		Threshold_Factor = 0.00_dp 
+	! Consumption tax
+		tauC=0.075_DP
+	! Set Labor Tax Regime
+		!tauPL=0.185_DP
+		!psi=0.77_DP  
+ 		tauPL=0.0_DP
+ 		psi=0.776_DP  	
 
 ! 	! Resutls Folder
 ! 		write(Result_Folder,'(f4.2)') Threshold_Factor
