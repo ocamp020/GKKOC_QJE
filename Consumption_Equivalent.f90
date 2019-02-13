@@ -23,7 +23,6 @@ Program Consumption_Equivalent
 
 	! Allocate Variables
 	call Allocate_Variables
-	allocate( Cons(       MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( CE_total(   MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( CE_c(       MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( CE_cl(      MaxAge,na,nz,nlambda,ne,nx) )
