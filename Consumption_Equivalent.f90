@@ -166,9 +166,6 @@ Program Consumption_Equivalent
 	
 
 		CALL ComputeLaborUnits(EBAR, wage) 
-print*, ' '
-print*, ' Test 1'
-print*, ' '
 
 
 !====================================================================================================
@@ -185,9 +182,6 @@ do i=1,3
 		Result_Folder = trim(Result_Folder_aux)//'Opt_Tax_W/' 
 	endif 
 
-	print*, ' '
-	print*, ' Test 2'
-	print*, ' '
 
 !====================================================================================================
 	PRINT*,''
@@ -220,9 +214,6 @@ do i=1,3
 		V_Pr_exp          = V_Pr 
 		V_Pr_nb_exp  	  = V_Pr_nb
 
-		print*, ' '
-		print*, ' Test 3'
-		print*, ' '
 
 !====================================================================================================
 	PRINT*,''
@@ -238,28 +229,22 @@ do i=1,3
 	H_exp   = sum(Hours_exp*DBN_exp)
 	H_NB_bench = sum(Hours_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
 	H_NB_exp   = sum(Hours_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
-	print*, ' '
-		print*, ' Test 4'
-		print*, ' '
+	
 !====================================================================================================
 	PRINT*,''
 	Print*,'Consumption Equivalent - Total'
 	PRINT*,''
 
 	CE_total = 100.0_dp*((ValueFunction_exp/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
-		print*, ' Test 4.1'
 		
 	CE2_nb_total = 100.0_dp*&
 				& ((sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))&
 				&	/sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
 				& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
-		print*, ' Test 4.2'
 
 	CE2_pop_total = 100.0_dp*((sum(ValueFunction_exp*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
 				& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
-	print*, ' '
-		print*, ' Test 5'
-		print*, ' '
+	
 !====================================================================================================
 	PRINT*,''
 	Print*,'Consumption Equivalent - Consumption'
