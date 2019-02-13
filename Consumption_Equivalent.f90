@@ -111,9 +111,9 @@ print*, ' '
 print*, ' Test 1'
 print*, ' '
 
-! 	! Initialize program and load functions
-! 		print*,"	Initializing program"
-! 		CALL INITIALIZE
+	! Initialize program and load functions
+		print*,"	Initializing program"
+		CALL INITIALIZE
 
 ! !====================================================================================================
 ! 	PRINT*,''
