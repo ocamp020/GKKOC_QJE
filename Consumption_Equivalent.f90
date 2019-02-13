@@ -246,279 +246,276 @@ do i=1,3
 	Print*,'Consumption Equivalent - Total'
 	PRINT*,''
 
-	!CE_total = 100.0_dp*((ValueFunction_exp/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
-	!print*, shape(ValueFunction_exp)
-	!print*, shape(ValueFunction_bench)
-	CE_total = 0.0_dp
+	CE_total = 100.0_dp*((ValueFunction_exp/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 		print*, ' Test 4.1'
 		
-	! CE2_nb_total = 100.0_dp*&
-	! 			& ((sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))&
-	! 			&	/sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
-	! 			& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
-	! 	print*, ' Test 4.2'
+	CE2_nb_total = 100.0_dp*&
+				& ((sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))&
+				&	/sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
+				& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+		print*, ' Test 4.2'
 
-	! CE2_pop_total = 100.0_dp*((sum(ValueFunction_exp*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
-	! 			& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
-	! print*, ' '
-	! 	print*, ' Test 5'
-	! 	print*, ' '
-! !====================================================================================================
-! 	PRINT*,''
-! 	Print*,'Consumption Equivalent - Consumption'
-! 	PRINT*,''
+	CE2_pop_total = 100.0_dp*((sum(ValueFunction_exp*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
+				& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+	print*, ' '
+		print*, ' Test 5'
+		print*, ' '
+!====================================================================================================
+	PRINT*,''
+	Print*,'Consumption Equivalent - Consumption'
+	PRINT*,''
 
-! 	Cons    = Cons_exp 
-! 	Aprime  = Aprime_exp
-! 	Hours   = Hours_bench 
+	Cons    = Cons_exp 
+	Aprime  = Aprime_exp
+	Hours   = Hours_bench 
 
-! 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,Value_aux)
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,Value_aux)
 
-! 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 	CE_c  = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CE_c  = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
-! 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 	CE_cl = 100_dp*(C_exp/C_bench - 1.0_dp)
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CE_cl = 100_dp*(C_exp/C_bench - 1.0_dp)
 
-! 	CE_cd = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_bench/C_exp - 1.0_dp ) ;
+	CE_cd = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_bench/C_exp - 1.0_dp ) ;
 
-! 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 	CE_nb_cl = 100_dp*(C_NB_exp/C_NB_bench - 1.0_dp)
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CE_nb_cl = 100_dp*(C_NB_exp/C_NB_bench - 1.0_dp)
 
-! 	CE_nb_cd = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_NB_bench/C_NB_exp - 1.0_dp ) ;
+	CE_nb_cd = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_NB_bench/C_NB_exp - 1.0_dp ) ;
 
-! 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 	CE2_nb_c = 100.0_dp*((sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/&
-! 		&                  sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
-! 		&                  **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CE2_nb_c = 100.0_dp*((sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/&
+		&                  sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
+		&                  **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
-! 	CE2_nb_cl = 100_dp*(C_NB_exp/C_NB_bench - 1.0_dp)
+	CE2_nb_cl = 100_dp*(C_NB_exp/C_NB_bench - 1.0_dp)
 
-! 	CE2_nb_cd = 100.0_dp*((sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/&
-! 		&				   sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
-! 		& 					**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_NB_bench/C_NB_exp - 1.0_dp ) ;
+	CE2_nb_cd = 100.0_dp*((sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/&
+		&				   sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
+		& 					**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_NB_bench/C_NB_exp - 1.0_dp ) ;
 
-! 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 	CE2_pop_c  = 100.0_dp*((sum(Value_aux*DBN_bench)/sum(ValueFunction_bench*DBN_bench))&
-! 		& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CE2_pop_c  = 100.0_dp*((sum(Value_aux*DBN_bench)/sum(ValueFunction_bench*DBN_bench))&
+		& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
-! 	CE2_pop_cl = 100_dp*(C_exp/C_bench - 1.0_dp)
+	CE2_pop_cl = 100_dp*(C_exp/C_bench - 1.0_dp)
 
-! 	CE2_pop_cd = 100.0_dp*((sum(Value_aux*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
-! 		& **(1.0_dp/((1.0_dp-sigma)*gamma)) * C_bench/C_exp - 1.0_dp ) ;
+	CE2_pop_cd = 100.0_dp*((sum(Value_aux*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
+		& **(1.0_dp/((1.0_dp-sigma)*gamma)) * C_bench/C_exp - 1.0_dp ) ;
 
-! !====================================================================================================
-! 	PRINT*,''
-! 	Print*,'Consumption Equivalent - Hours'
-! 	PRINT*,''
+!====================================================================================================
+	PRINT*,''
+	Print*,'Consumption Equivalent - Hours'
+	PRINT*,''
 
 
-! 	Cons    = Cons_exp
-! 	Aprime  = Aprime_exp
-! 	Hours   = Hours_bench 
+	Cons    = Cons_exp
+	Aprime  = Aprime_exp
+	Hours   = Hours_bench 
 	
-! 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,Value_aux)
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,Value_aux)
 
-! 	Cons    = Cons_bench 
-! 	Aprime  = Aprime_bench
-! 	Hours   = Hours_exp
-! 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	Cons    = Cons_bench 
+	Aprime  = Aprime_bench
+	Hours   = Hours_exp
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
 
-! 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 	CE_h  = 100.0_dp*((ValueFunction_exp/Value_aux)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CE_h  = 100.0_dp*((ValueFunction_exp/Value_aux)**(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
-! 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 	CE_hl = 100_dp*(((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CE_hl = 100_dp*(((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
 
-! 	CE_hd = 100.0_dp*((ValueFunction/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) &
-! 	        &  * ((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
+	CE_hd = 100.0_dp*((ValueFunction/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) &
+	        &  * ((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
 
-! 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 	CE_nb_hl = 100_dp*(((1.0_dp-H_NB_exp)/(1.0_dp-H_NB_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CE_nb_hl = 100_dp*(((1.0_dp-H_NB_exp)/(1.0_dp-H_NB_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
 
-! 	CE_nb_hd = 100.0_dp*((ValueFunction/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) &
-! 	        &  * ((1.0_dp-H_NB_bench)/(1.0_dp-H_NB_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
+	CE_nb_hd = 100.0_dp*((ValueFunction/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) &
+	        &  * ((1.0_dp-H_NB_bench)/(1.0_dp-H_NB_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
 
-! 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 	CE2_nb_h  = 100.0_dp*((sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/&
-! 			&				sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
-! 			& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CE2_nb_h  = 100.0_dp*((sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/&
+			&				sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
+			& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
-! 	CE2_nb_hl = 100_dp*(((1.0_dp-H_NB_exp)/(1.0_dp-H_NB_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
+	CE2_nb_hl = 100_dp*(((1.0_dp-H_NB_exp)/(1.0_dp-H_NB_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
 
-! 	CE2_nb_hd = 100.0_dp*((sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/&
-! 			& sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
-! 			& **(1.0_dp/((1.0_dp-sigma)*gamma)) &
-! 	        &  * ((1.0_dp-H_NB_bench)/(1.0_dp-H_NB_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
+	CE2_nb_hd = 100.0_dp*((sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/&
+			& sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
+			& **(1.0_dp/((1.0_dp-sigma)*gamma)) &
+	        &  * ((1.0_dp-H_NB_bench)/(1.0_dp-H_NB_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
 
-! 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 	CE2_pop_h  = 100.0_dp*((sum(ValueFunction_exp*DBN_exp)/sum(Value_aux*DBN_bench))&
-! 			& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CE2_pop_h  = 100.0_dp*((sum(ValueFunction_exp*DBN_exp)/sum(Value_aux*DBN_bench))&
+			& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
-! 	CE2_pop_hl = 100_dp*(((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
+	CE2_pop_hl = 100_dp*(((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
 
-! 	CE2_pop_hd = 100.0_dp*((sum(ValueFunction*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
-! 			& **(1.0_dp/((1.0_dp-sigma)*gamma)) &
-! 	        &  * ((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
+	CE2_pop_hd = 100.0_dp*((sum(ValueFunction*DBN_exp)/sum(ValueFunction_bench*DBN_bench))&
+			& **(1.0_dp/((1.0_dp-sigma)*gamma)) &
+	        &  * ((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
 
-! !====================================================================================================
-! 	PRINT*,''
-! 	Print*,'Report Output'
-! 	PRINT*,''
+!====================================================================================================
+	PRINT*,''
+	Print*,'Report Output'
+	PRINT*,''
 
-! 	CE_total_bench 	= sum(CE_total*DBN_bench )
-! 	CE_c_bench     	= sum(CE_c*DBN_bench )
-! 	CE_cl_bench    	= sum(CE_cl*DBN_bench )
-! 	CE_cd_bench 	= sum(CE_cd*DBN_bench )
-! 	CE_h_bench 		= sum(CE_h*DBN_bench )
-! 	CE_hl_bench 	= sum(CE_hl*DBN_bench )
-! 	CE_hd_bench 	= sum(CE_hd*DBN_bench )
+	CE_total_bench 	= sum(CE_total*DBN_bench )
+	CE_c_bench     	= sum(CE_c*DBN_bench )
+	CE_cl_bench    	= sum(CE_cl*DBN_bench )
+	CE_cd_bench 	= sum(CE_cd*DBN_bench )
+	CE_h_bench 		= sum(CE_h*DBN_bench )
+	CE_hl_bench 	= sum(CE_hl*DBN_bench )
+	CE_hd_bench 	= sum(CE_hd*DBN_bench )
 
-! 	CE_total_NB_bench 	= sum(CE_total(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-! 	CE_c_NB_bench 		= sum(CE_c(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-! 	CE_cl_NB_bench 		= sum(CE_nb_cl(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-! 	CE_cd_NB_bench 		= sum(CE_nb_cd(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-! 	CE_h_NB_bench 		= sum(CE_h(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-! 	CE_hl_NB_bench 		= sum(CE_nb_hl(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-! 	CE_hd_NB_bench 		= sum(CE_nb_hd(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_total_NB_bench 	= sum(CE_total(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_c_NB_bench 		= sum(CE_c(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_cl_NB_bench 		= sum(CE_nb_cl(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_cd_NB_bench 		= sum(CE_nb_cd(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_h_NB_bench 		= sum(CE_h(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_hl_NB_bench 		= sum(CE_nb_hl(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	CE_hd_NB_bench 		= sum(CE_nb_hd(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
 
-! 	CE_total_exp 	= sum(CE_total*DBN_exp )
-! 	CE_c_exp 		= sum(CE_c*DBN_exp )
-! 	CE_cl_exp 		= sum(CE_cl*DBN_exp )
-! 	CE_cd_exp 		= sum(CE_cd*DBN_exp )
-! 	CE_h_exp 		= sum(CE_h*DBN_exp )
-! 	CE_hl_exp 		= sum(CE_hl*DBN_exp )
-! 	CE_hd_exp 		= sum(CE_hd*DBN_exp )
+	CE_total_exp 	= sum(CE_total*DBN_exp )
+	CE_c_exp 		= sum(CE_c*DBN_exp )
+	CE_cl_exp 		= sum(CE_cl*DBN_exp )
+	CE_cd_exp 		= sum(CE_cd*DBN_exp )
+	CE_h_exp 		= sum(CE_h*DBN_exp )
+	CE_hl_exp 		= sum(CE_hl*DBN_exp )
+	CE_hd_exp 		= sum(CE_hd*DBN_exp )
 
-! 	CE_total_NB_exp 	= sum(CE_total(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
-! 	CE_c_NB_exp 		= sum(CE_c(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
-! 	CE_cl_NB_exp 		= sum(CE_nb_cl(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
-! 	CE_cd_NB_exp 		= sum(CE_nb_cd(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
-! 	CE_h_NB_exp 		= sum(CE_h(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
-! 	CE_hl_NB_exp 		= sum(CE_nb_hl(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
-! 	CE_hd_NB_exp 		= sum(CE_nb_hd(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_total_NB_exp 	= sum(CE_total(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_c_NB_exp 		= sum(CE_c(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_cl_NB_exp 		= sum(CE_nb_cl(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_cd_NB_exp 		= sum(CE_nb_cd(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_h_NB_exp 		= sum(CE_h(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_hl_NB_exp 		= sum(CE_nb_hl(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+	CE_hd_NB_exp 		= sum(CE_nb_hd(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
 
 
-	! if (i.eq.1) then 
-	! 	! Tax Reform
-	! 	OPEN  (UNIT=1,  FILE=trim(Result_Folder_aux)//'CE_output.txt'  , STATUS='replace')
-	! 	WRITE (UNIT=1,  FMT=*) ' '
-	! 	WRITE (UNIT=1,  FMT=*) 'Consumption Equivalent Welfare - Tax Reform'
-	! 	WRITE (UNIT=1,  FMT=*) ' '
-	! elseif (i.eq.2) then 
-	! 	! Optimal tax: Capital
-	! 	OPEN  (UNIT=1,  FILE=trim(Result_Folder_aux)//'CE_output_otk.txt'  , STATUS='replace')
-	! 	WRITE (UNIT=1,  FMT=*) ' '
-	! 	WRITE (UNIT=1,  FMT=*) 'Consumption Equivalent Welfare - Optimal Capital Taxes'
-	! 	WRITE (UNIT=1,  FMT=*) ' '
-	! elseif (i.eq.3) then 
-	! 	! Optimal tax: Wealth
-	! 	OPEN  (UNIT=1,  FILE=trim(Result_Folder_aux)//'CE_output_otw.txt'  , STATUS='replace')
-	! 	WRITE (UNIT=1,  FMT=*) ' '
-	! 	WRITE (UNIT=1,  FMT=*) 'Consumption Equivalent Welfare - Optimal Wealth Taxes'
-	! 	WRITE (UNIT=1,  FMT=*) ' '
-	! endif 
+	if (i.eq.1) then 
+		! Tax Reform
+		OPEN  (UNIT=1,  FILE=trim(Result_Folder_aux)//'CE_output.txt'  , STATUS='replace')
+		WRITE (UNIT=1,  FMT=*) ' '
+		WRITE (UNIT=1,  FMT=*) 'Consumption Equivalent Welfare - Tax Reform'
+		WRITE (UNIT=1,  FMT=*) ' '
+	elseif (i.eq.2) then 
+		! Optimal tax: Capital
+		OPEN  (UNIT=1,  FILE=trim(Result_Folder_aux)//'CE_output_otk.txt'  , STATUS='replace')
+		WRITE (UNIT=1,  FMT=*) ' '
+		WRITE (UNIT=1,  FMT=*) 'Consumption Equivalent Welfare - Optimal Capital Taxes'
+		WRITE (UNIT=1,  FMT=*) ' '
+	elseif (i.eq.3) then 
+		! Optimal tax: Wealth
+		OPEN  (UNIT=1,  FILE=trim(Result_Folder_aux)//'CE_output_otw.txt'  , STATUS='replace')
+		WRITE (UNIT=1,  FMT=*) ' '
+		WRITE (UNIT=1,  FMT=*) 'Consumption Equivalent Welfare - Optimal Wealth Taxes'
+		WRITE (UNIT=1,  FMT=*) ' '
+	endif 
 
-	! WRITE (UNIT=1,  FMT=*) 'Benchmark - Aggregate'
-	! WRITE (UNIT=1,  FMT=*) 'CE',CE_total_bench, 'CE_c',CE_c_bench,'CE_h',CE_h_bench
-	! WRITE (UNIT=1,  FMT=*) 'CE_c',CE_c_bench,'CE_cl',CE_cl_bench,'CE_cd',CE_cd_bench
-	! WRITE (UNIT=1,  FMT=*) 'CE_h',CE_h_bench,'CE_hl',CE_hl_bench,'CE_hd',CE_hd_bench
-	! WRITE (UNIT=1,  FMT=*)' '
+	WRITE (UNIT=1,  FMT=*) 'Benchmark - Aggregate'
+	WRITE (UNIT=1,  FMT=*) 'CE',CE_total_bench, 'CE_c',CE_c_bench,'CE_h',CE_h_bench
+	WRITE (UNIT=1,  FMT=*) 'CE_c',CE_c_bench,'CE_cl',CE_cl_bench,'CE_cd',CE_cd_bench
+	WRITE (UNIT=1,  FMT=*) 'CE_h',CE_h_bench,'CE_hl',CE_hl_bench,'CE_hd',CE_hd_bench
+	WRITE (UNIT=1,  FMT=*)' '
 
-	! WRITE (UNIT=1,  FMT=*)'Benchmark - NewBorn'
-	! WRITE (UNIT=1,  FMT=*) 'CE',CE_total_NB_bench, 'CE_c',CE_c_NB_bench,'CE_h',CE_h_NB_bench
-	! WRITE (UNIT=1,  FMT=*) 'CE_c',CE_c_NB_bench,'CE_cl',CE_cl_NB_bench,'CE_cd',CE_cd_NB_bench
-	! WRITE (UNIT=1,  FMT=*) 'CE_h',CE_h_NB_bench,'CE_hl',CE_hl_NB_bench,'CE_hd',CE_hd_NB_bench
-	! WRITE (UNIT=1,  FMT=*)' '
+	WRITE (UNIT=1,  FMT=*)'Benchmark - NewBorn'
+	WRITE (UNIT=1,  FMT=*) 'CE',CE_total_NB_bench, 'CE_c',CE_c_NB_bench,'CE_h',CE_h_NB_bench
+	WRITE (UNIT=1,  FMT=*) 'CE_c',CE_c_NB_bench,'CE_cl',CE_cl_NB_bench,'CE_cd',CE_cd_NB_bench
+	WRITE (UNIT=1,  FMT=*) 'CE_h',CE_h_NB_bench,'CE_hl',CE_hl_NB_bench,'CE_hd',CE_hd_NB_bench
+	WRITE (UNIT=1,  FMT=*)' '
 
-	! WRITE (UNIT=1,  FMT=*)'Experimental - Aggregate'
-	! WRITE (UNIT=1,  FMT=*) 'CE',CE_total_exp, 'CE_c',CE_c_exp,'CE_h',CE_h_exp
-	! WRITE (UNIT=1,  FMT=*) 'CE_c',CE_c_exp,'CE_cl',CE_cl_exp,'CE_cd',CE_cd_exp
-	! WRITE (UNIT=1,  FMT=*) 'CE_h',CE_h_exp,'CE_hl',CE_hl_exp,'CE_hd',CE_hd_exp
-	! WRITE (UNIT=1,  FMT=*)' '
+	WRITE (UNIT=1,  FMT=*)'Experimental - Aggregate'
+	WRITE (UNIT=1,  FMT=*) 'CE',CE_total_exp, 'CE_c',CE_c_exp,'CE_h',CE_h_exp
+	WRITE (UNIT=1,  FMT=*) 'CE_c',CE_c_exp,'CE_cl',CE_cl_exp,'CE_cd',CE_cd_exp
+	WRITE (UNIT=1,  FMT=*) 'CE_h',CE_h_exp,'CE_hl',CE_hl_exp,'CE_hd',CE_hd_exp
+	WRITE (UNIT=1,  FMT=*)' '
 
-	! WRITE (UNIT=1,  FMT=*)'Experimental - NewBorn'
-	! WRITE (UNIT=1,  FMT=*) 'CE',CE_total_NB_exp, 'CE_c',CE_c_NB_exp,'CE_h',CE_h_NB_exp
-	! WRITE (UNIT=1,  FMT=*) 'CE_c',CE_c_NB_exp,'CE_cl',CE_cl_NB_exp,'CE_cd',CE_cd_NB_exp
-	! WRITE (UNIT=1,  FMT=*) 'CE_h',CE_h_NB_exp,'CE_hl',CE_hl_NB_exp,'CE_hd',CE_hd_NB_exp
-	! WRITE (UNIT=1,  FMT=*)' '
+	WRITE (UNIT=1,  FMT=*)'Experimental - NewBorn'
+	WRITE (UNIT=1,  FMT=*) 'CE',CE_total_NB_exp, 'CE_c',CE_c_NB_exp,'CE_h',CE_h_NB_exp
+	WRITE (UNIT=1,  FMT=*) 'CE_c',CE_c_NB_exp,'CE_cl',CE_cl_NB_exp,'CE_cd',CE_cd_NB_exp
+	WRITE (UNIT=1,  FMT=*) 'CE_h',CE_h_NB_exp,'CE_hl',CE_hl_NB_exp,'CE_hd',CE_hd_NB_exp
+	WRITE (UNIT=1,  FMT=*)' '
 
-	! WRITE (UNIT=1,  FMT=*) 'CE1 '	, 'NB '				, 'Pop '			, 'Test' 	
-	! WRITE (UNIT=1,  FMT=*) 'CE1'	, CE_total_NB_bench , CE_total_bench 	, 100*((1+CE_c_NB_bench/100)*(1+CE_h_NB_bench/100)-1)
-	! WRITE (UNIT=1,  FMT=*) 'CE1_c'	, CE_c_NB_bench 	, CE_c_bench 		, 100*((1+CE_cl_NB_bench/100)*(1+CE_cd_NB_bench/100)-1)		
-	! WRITE (UNIT=1,  FMT=*) 'CE1_cl'	, CE_cl_NB_bench	, CE_cl_bench
-	! WRITE (UNIT=1,  FMT=*) 'CE_cd'	, CE_cd_NB_bench 	, CE_cd_bench
-	! WRITE (UNIT=1,  FMT=*) 'CE1_h'	, CE_h_NB_bench 	, CE_h_bench 		, 100*((1+CE_hl_NB_bench/100)*(1+CE_hd_NB_bench/100)-1)		
-	! WRITE (UNIT=1,  FMT=*) 'CE1_hl'	, CE_hl_NB_bench 	, CE_hl_bench
-	! WRITE (UNIT=1,  FMT=*) 'CE1_hd'	, CE_hd_NB_bench 	, CE_hd_bench 
-	! WRITE (UNIT=1,  FMT=*)' '
+	WRITE (UNIT=1,  FMT=*) 'CE1 '	, 'NB '				, 'Pop '			, 'Test' 	
+	WRITE (UNIT=1,  FMT=*) 'CE1'	, CE_total_NB_bench , CE_total_bench 	, 100*((1+CE_c_NB_bench/100)*(1+CE_h_NB_bench/100)-1)
+	WRITE (UNIT=1,  FMT=*) 'CE1_c'	, CE_c_NB_bench 	, CE_c_bench 		, 100*((1+CE_cl_NB_bench/100)*(1+CE_cd_NB_bench/100)-1)		
+	WRITE (UNIT=1,  FMT=*) 'CE1_cl'	, CE_cl_NB_bench	, CE_cl_bench
+	WRITE (UNIT=1,  FMT=*) 'CE_cd'	, CE_cd_NB_bench 	, CE_cd_bench
+	WRITE (UNIT=1,  FMT=*) 'CE1_h'	, CE_h_NB_bench 	, CE_h_bench 		, 100*((1+CE_hl_NB_bench/100)*(1+CE_hd_NB_bench/100)-1)		
+	WRITE (UNIT=1,  FMT=*) 'CE1_hl'	, CE_hl_NB_bench 	, CE_hl_bench
+	WRITE (UNIT=1,  FMT=*) 'CE1_hd'	, CE_hd_NB_bench 	, CE_hd_bench 
+	WRITE (UNIT=1,  FMT=*)' '
 
-	! WRITE (UNIT=1,  FMT=*) 'CE2 '	, 'NB '			, 'Pop '		, 'Test' 	
-	! WRITE (UNIT=1,  FMT=*) 'CE2'	, CE2_nb_total 	, CE2_pop_total , 100*((1+CE2_nb_c/100)*(1+CE2_nb_h/100)-1)
-	! WRITE (UNIT=1,  FMT=*) 'CE2_c'	, CE2_nb_c 		, CE2_pop_c 	, 100*((1+CE2_nb_cl/100)*(1+CE2_nb_cd/100)-1)		
-	! WRITE (UNIT=1,  FMT=*) 'CE2_cl'	, CE2_nb_cl		, CE2_pop_cl
-	! WRITE (UNIT=1,  FMT=*) 'CE2_cd'	, CE2_nb_cd 	, CE2_pop_cd
-	! WRITE (UNIT=1,  FMT=*) 'CE2_h'	, CE2_nb_h 		, CE2_pop_h 	, 100*((1+CE2_nb_hl/100)*(1+CE2_nb_hd/100)-1)
-	! WRITE (UNIT=1,  FMT=*) 'CE2_hl'	, CE2_nb_hl 	, CE2_pop_hl
-	! WRITE (UNIT=1,  FMT=*) 'CE2_hd'	, CE2_nb_hd 	, CE2_pop_hd 
-	! WRITE (UNIT=1,  FMT=*)' '
+	WRITE (UNIT=1,  FMT=*) 'CE2 '	, 'NB '			, 'Pop '		, 'Test' 	
+	WRITE (UNIT=1,  FMT=*) 'CE2'	, CE2_nb_total 	, CE2_pop_total , 100*((1+CE2_nb_c/100)*(1+CE2_nb_h/100)-1)
+	WRITE (UNIT=1,  FMT=*) 'CE2_c'	, CE2_nb_c 		, CE2_pop_c 	, 100*((1+CE2_nb_cl/100)*(1+CE2_nb_cd/100)-1)		
+	WRITE (UNIT=1,  FMT=*) 'CE2_cl'	, CE2_nb_cl		, CE2_pop_cl
+	WRITE (UNIT=1,  FMT=*) 'CE2_cd'	, CE2_nb_cd 	, CE2_pop_cd
+	WRITE (UNIT=1,  FMT=*) 'CE2_h'	, CE2_nb_h 		, CE2_pop_h 	, 100*((1+CE2_nb_hl/100)*(1+CE2_nb_hd/100)-1)
+	WRITE (UNIT=1,  FMT=*) 'CE2_hl'	, CE2_nb_hl 	, CE2_pop_hl
+	WRITE (UNIT=1,  FMT=*) 'CE2_hd'	, CE2_nb_hd 	, CE2_pop_hd 
+	WRITE (UNIT=1,  FMT=*)' '
 
+	CLOSE (unit=1)
+
+	! OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'CE_Files/CE_total'  , STATUS='replace')
+	! OPEN  (UNIT=2,  FILE=trim(Result_Folder)//'CE_Files/CE_c'  , STATUS='replace')
+	! OPEN  (UNIT=3,  FILE=trim(Result_Folder)//'CE_Files/CE_cl'  , STATUS='replace')
+	! OPEN  (UNIT=4,  FILE=trim(Result_Folder)//'CE_Files/CE_cd'  , STATUS='replace')
+	! OPEN  (UNIT=5,  FILE=trim(Result_Folder)//'CE_Files/CE_h'  , STATUS='replace')
+	! OPEN  (UNIT=6,  FILE=trim(Result_Folder)//'CE_Files/CE_hl'  , STATUS='replace')
+	! OPEN  (UNIT=7,  FILE=trim(Result_Folder)//'CE_Files/CE_hd'  , STATUS='replace')
+	
+	! WRITE (UNIT=1,  FMT=*) CE_total
+	! WRITE (UNIT=2,  FMT=*) CE_c
+	! WRITE (UNIT=3,  FMT=*) CE_cl
+	! WRITE (UNIT=4,  FMT=*) CE_cd
+	! WRITE (UNIT=5,  FMT=*) CE_h
+	! WRITE (UNIT=6,  FMT=*) CE_hl
+	! WRITE (UNIT=7,  FMT=*) CE_hd
+	
 	! CLOSE (unit=1)
+	! CLOSE (unit=2)
+	! CLOSE (unit=3)
+	! CLOSE (unit=4)
+	! CLOSE (unit=5)
+	! CLOSE (unit=6)
+	! CLOSE (unit=7)
 
-	! ! OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'CE_Files/CE_total'  , STATUS='replace')
-	! ! OPEN  (UNIT=2,  FILE=trim(Result_Folder)//'CE_Files/CE_c'  , STATUS='replace')
-	! ! OPEN  (UNIT=3,  FILE=trim(Result_Folder)//'CE_Files/CE_cl'  , STATUS='replace')
-	! ! OPEN  (UNIT=4,  FILE=trim(Result_Folder)//'CE_Files/CE_cd'  , STATUS='replace')
-	! ! OPEN  (UNIT=5,  FILE=trim(Result_Folder)//'CE_Files/CE_h'  , STATUS='replace')
-	! ! OPEN  (UNIT=6,  FILE=trim(Result_Folder)//'CE_Files/CE_hl'  , STATUS='replace')
-	! ! OPEN  (UNIT=7,  FILE=trim(Result_Folder)//'CE_Files/CE_hd'  , STATUS='replace')
-	
-	! ! WRITE (UNIT=1,  FMT=*) CE_total
-	! ! WRITE (UNIT=2,  FMT=*) CE_c
-	! ! WRITE (UNIT=3,  FMT=*) CE_cl
-	! ! WRITE (UNIT=4,  FMT=*) CE_cd
-	! ! WRITE (UNIT=5,  FMT=*) CE_h
-	! ! WRITE (UNIT=6,  FMT=*) CE_hl
-	! ! WRITE (UNIT=7,  FMT=*) CE_hd
-	
-	! ! CLOSE (unit=1)
-	! ! CLOSE (unit=2)
-	! ! CLOSE (unit=3)
-	! ! CLOSE (unit=4)
-	! ! CLOSE (unit=5)
-	! ! CLOSE (unit=6)
-	! ! CLOSE (unit=7)
+	if (i.eq.1) then 
+		! Tax Reform
+		print*, 'Consumption Equivalent Welfare - Tax Reform'
+	elseif (i.eq.2) then 
+		! Optimal tax: Capital
+		print*, 'Consumption Equivalent Welfare - Optimal Capital Taxes'
+	elseif (i.eq.3) then 
+		! Optimal tax: Wealth
+		print*, 'Consumption Equivalent Welfare - Optimal Wealth Taxes'
+	endif 
 
-	! if (i.eq.1) then 
-	! 	! Tax Reform
-	! 	print*, 'Consumption Equivalent Welfare - Tax Reform'
-	! elseif (i.eq.2) then 
-	! 	! Optimal tax: Capital
-	! 	print*, 'Consumption Equivalent Welfare - Optimal Capital Taxes'
-	! elseif (i.eq.3) then 
-	! 	! Optimal tax: Wealth
-	! 	print*, 'Consumption Equivalent Welfare - Optimal Wealth Taxes'
-	! endif 
-
-	! print*,' '
-	! print*, 'CE1 '	, 'NB '				, 'Pop '			, 'Test' 	
-	! print*, 'CE1'	, CE_total_NB_bench , CE_total_bench 	, 100*((1+CE_c_NB_bench/100)*(1+CE_h_NB_bench/100)-1)
-	! print*, 'CE1_c'	, CE_c_NB_bench 	, CE_c_bench 		, 100*((1+CE_cl_NB_bench/100)*(1+CE_cd_NB_bench/100)-1)		
-	! print*, 'CE1_cl', CE_cl_NB_bench	, CE_cl_bench
-	! print*, 'CE_cd'	, CE_cd_NB_bench 	, CE_cd_bench
-	! print*, 'CE1_h'	, CE_h_NB_bench 	, CE_h_bench 		, 100*((1+CE_hl_NB_bench/100)*(1+CE_hd_NB_bench/100)-1)		
-	! print*, 'CE1_hl', CE_hl_NB_bench 	, CE_hl_bench
-	! print*, 'CE1_hd', CE_hd_NB_bench 	, CE_hd_bench 
-	! print*,' '
-	! print*,  'CE2 '		, 'NB '			, 'Pop '		, 'Test '
-	! print*,  'CE2'		, CE2_nb_total 	, CE2_pop_total , 100*((1+CE2_nb_c/100)*(1+CE2_nb_h/100)-1)
-	! print*,  'CE2_c'	, CE2_nb_c 		, CE2_pop_c 	, 100*((1+CE2_nb_cl/100)*(1+CE2_nb_cd/100)-1)
-	! print*,  'CE2_cl'	, CE2_nb_cl		, CE2_pop_cl
-	! print*,  'CE2_cd'	, CE2_nb_cd 	, CE2_pop_cd
-	! print*,  'CE2_h'	, CE2_nb_h 		, CE2_pop_h 	, 100*((1+CE2_nb_hl/100)*(1+CE2_nb_hd/100)-1)
-	! print*,  'CE2_hl'	, CE2_nb_hl 	, CE2_pop_hl
-	! print*,  'CE2_hd'	, CE2_nb_hd 	, CE2_pop_hd 
-	! print*, ' '
+	print*,' '
+	print*, 'CE1 '	, 'NB '				, 'Pop '			, 'Test' 	
+	print*, 'CE1'	, CE_total_NB_bench , CE_total_bench 	, 100*((1+CE_c_NB_bench/100)*(1+CE_h_NB_bench/100)-1)
+	print*, 'CE1_c'	, CE_c_NB_bench 	, CE_c_bench 		, 100*((1+CE_cl_NB_bench/100)*(1+CE_cd_NB_bench/100)-1)		
+	print*, 'CE1_cl', CE_cl_NB_bench	, CE_cl_bench
+	print*, 'CE_cd'	, CE_cd_NB_bench 	, CE_cd_bench
+	print*, 'CE1_h'	, CE_h_NB_bench 	, CE_h_bench 		, 100*((1+CE_hl_NB_bench/100)*(1+CE_hd_NB_bench/100)-1)		
+	print*, 'CE1_hl', CE_hl_NB_bench 	, CE_hl_bench
+	print*, 'CE1_hd', CE_hd_NB_bench 	, CE_hd_bench 
+	print*,' '
+	print*,  'CE2 '		, 'NB '			, 'Pop '		, 'Test '
+	print*,  'CE2'		, CE2_nb_total 	, CE2_pop_total , 100*((1+CE2_nb_c/100)*(1+CE2_nb_h/100)-1)
+	print*,  'CE2_c'	, CE2_nb_c 		, CE2_pop_c 	, 100*((1+CE2_nb_cl/100)*(1+CE2_nb_cd/100)-1)
+	print*,  'CE2_cl'	, CE2_nb_cl		, CE2_pop_cl
+	print*,  'CE2_cd'	, CE2_nb_cd 	, CE2_pop_cd
+	print*,  'CE2_h'	, CE2_nb_h 		, CE2_pop_h 	, 100*((1+CE2_nb_hl/100)*(1+CE2_nb_hd/100)-1)
+	print*,  'CE2_hl'	, CE2_nb_hl 	, CE2_pop_hl
+	print*,  'CE2_hd'	, CE2_nb_hd 	, CE2_pop_hd 
+	print*, ' '
 	
 enddo 
 
