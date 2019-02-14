@@ -265,20 +265,24 @@ do i=1,3
 	CE_cd = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_bench/C_exp - 1.0_dp ) ;
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	CE_nb_cl = 100_dp*(C_NB_exp/C_NB_bench - 1.0_dp)
+	CE_nb_cl = 100_dp*(C_exp/C_bench - 1.0_dp) ! 100_dp*(C_NB_exp/C_NB_bench - 1.0_dp)
 
-	CE_nb_cd = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_NB_bench/C_NB_exp - 1.0_dp ) ;
+	!CE_nb_cd = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_NB_bench/C_NB_exp - 1.0_dp ) ;
+	CE_nb_cd = 100.0_dp*((Value_aux/ValueFunction_bench)**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_bench/C_exp - 1.0_dp ) ;
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	CE2_nb_c = 100.0_dp*((sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/&
 		&                  sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
 		&                  **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
-	CE2_nb_cl = 100_dp*(C_NB_exp/C_NB_bench - 1.0_dp)
+	CE2_nb_cl = 100_dp*(C_exp/C_bench - 1.0_dp) ! 100_dp*(C_NB_exp/C_NB_bench - 1.0_dp)
 
+	! CE2_nb_cd = 100.0_dp*((sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/&
+	! 	&				   sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
+	! 	& 					**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_NB_bench/C_NB_exp - 1.0_dp ) ;
 	CE2_nb_cd = 100.0_dp*((sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/&
 		&				   sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
-		& 					**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_NB_bench/C_NB_exp - 1.0_dp ) ;
+		& 					**(1.0_dp/((1.0_dp-sigma)*gamma)) * C_bench/C_exp - 1.0_dp ) ;
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	CE2_pop_c  = 100.0_dp*((sum(Value_aux*DBN_bench)/sum(ValueFunction_bench*DBN_bench))&
@@ -316,24 +320,28 @@ do i=1,3
 	        &  * ((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	CE_nb_hl = 100_dp*(((1.0_dp-H_NB_exp)/(1.0_dp-H_NB_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
+	CE_nb_hl = 100_dp*(((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)! 100_dp*(((1.0_dp-H_NB_exp)/(1.0_dp-H_NB_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
 
+	! CE_nb_hd = 100.0_dp*((ValueFunction_exp/Value_aux)**(1.0_dp/((1.0_dp-sigma)*gamma)) &
+	!         &  * ((1.0_dp-H_NB_bench)/(1.0_dp-H_NB_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
 	CE_nb_hd = 100.0_dp*((ValueFunction_exp/Value_aux)**(1.0_dp/((1.0_dp-sigma)*gamma)) &
-	        &  * ((1.0_dp-H_NB_bench)/(1.0_dp-H_NB_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
+	        &  * ((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	CE2_nb_h  = 100.0_dp*((sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/&
 			&				sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
 			& **(1.0_dp/((1.0_dp-sigma)*gamma)) - 1.0_dp ) ;
 
-	CE2_nb_hl = 100_dp*(((1.0_dp-H_NB_exp)/(1.0_dp-H_NB_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
+	! CE2_nb_hl = 100_dp*(((1.0_dp-H_NB_exp)/(1.0_dp-H_NB_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
+	CE2_nb_hl = 100_dp*(((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) - 1.0_dp)
 
 	! CE2_nb_hd = 100.0_dp*((sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/&
 	! 		& sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))&
 	! 		& **(1.0_dp/((1.0_dp-sigma)*gamma)) &
 	!         &  * ((1.0_dp-H_NB_bench)/(1.0_dp-H_NB_exp))**((1.0_dp-gamma)/gamma) - 1.0_dp ) ;
 
-	CE2_nb_hd = 100.0_dp*( (CE2_nb_h/100_dp+1)*((1.0_dp-H_NB_bench)/(1.0_dp-H_NB_exp))**((1.0_dp-gamma)/gamma)-1.0_dp)
+	!CE2_nb_hd = 100.0_dp*( (CE2_nb_h/100_dp+1)*((1.0_dp-H_NB_bench)/(1.0_dp-H_NB_exp))**((1.0_dp-gamma)/gamma)-1.0_dp)
+	CE2_nb_hd = 100.0_dp*( (CE2_nb_h/100_dp+1)*((1.0_dp-H_bench)/(1.0_dp-H_exp))**((1.0_dp-gamma)/gamma)-1.0_dp)
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	CE2_pop_h  = 100.0_dp*((sum(ValueFunction_exp*DBN_exp)/sum(Value_aux*DBN_bench))&
