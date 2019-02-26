@@ -546,8 +546,10 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 				GBAR_exp_old = GBAR_exp
 				tauW_bt = tauWmin_bt + tauWindx * tauWinc_bt
 				tauW_at = tauWmin_at + tauWindx * tauWinc_at
+				print*, 'Test 1'
 				! Solve the model
 				CALL FIND_DBN_EQ
+				print*, 'Test 2'
 				CALL GOVNT_BUDGET
 
 				! Get new G
