@@ -2732,7 +2732,7 @@ SUBROUTINE FIND_DBN_EQ()
 	use omp_lib
 	IMPLICIT NONE
 	INTEGER:: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
-	REAL(DP)   :: DBN_dist, DBN_criteria
+	REAL   :: DBN_dist, DBN_criteria
 	REAL(DP)   ::BBAR, MeanWealth, brent_value
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable ::  PrAprimelo, PrAprimehi, DBN2
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable ::  Aplo, Aphi
