@@ -5218,7 +5218,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    EndoYgrid = big_p 
 	    sw 		  = 0
     DO ai=1,na_t 
-		if (abs(a_grid_t(ai)-Y_a_threshold).lt.1e-8) then 
+		if (abs(agrid_t(ai)-Y_a_threshold).lt.1e-8) then 
 			sw 			  = sw+1	
     		
     		! Consumption on endogenous grid and implied asset income under tauW_bt
@@ -5388,7 +5388,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    sw 		  = 0                    
         DO ai=1,na_t
         state_FOC  = (/age,ai,zi,lambdai,ei,xi/)
-		if (abs(a_grid_t(ai)-Y_a_threshold).lt.1e-8) then 
+		if (abs(agrid_t(ai)-Y_a_threshold).lt.1e-8) then 
 			sw 			  = sw+1	
 
 	    	! Below threshold
