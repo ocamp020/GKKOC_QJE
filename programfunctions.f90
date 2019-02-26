@@ -43,7 +43,7 @@ Subroutine Asset_Grid_Threshold(Y_a_threshold_in,agrid_t,na_t)
  		na_t = na + 1
  		allocate( agrid_t(1:na_t) )
  		allocate( agrid_t_ind(1:na_t) )
- 		agrid_t = [agrid,Y_threshold]
+ 		agrid_t = [agrid,Y_a_threshold]
  		call Sort(na_t,agrid_t,agrid_t,agrid_t_ind)
  	else 
  		na_t    = na
@@ -4216,8 +4216,6 @@ SUBROUTINE COMPUTE_STATS()
 				Threshold_Share = Threshold_Share + pr_a_dbn(ai)
 			end if 
 		end do 
-		end do 
-		end do 
 
 		
 		! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
@@ -5220,7 +5218,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    EndoYgrid = big_p 
 	    sw 		  = 0
     DO ai=1,na_t 
-		if (abs(a_grid_t(ai)-Y_a_threshold)).lt.1e-8)) then 
+		if (abs(a_grid_t(ai)-Y_a_threshold).lt.1e-8) then 
 			sw 			  = sw+1	
     		
     		! Consumption on endogenous grid and implied asset income under tauW_bt
@@ -5390,7 +5388,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    sw 		  = 0                    
         DO ai=1,na_t
         state_FOC  = (/age,ai,zi,lambdai,ei,xi/)
-		if (abs(a_grid_t(ai)-Y_a_threshold)).lt.1e-8)) then 
+		if (abs(a_grid_t(ai)-Y_a_threshold).lt.1e-8) then 
 			sw 			  = sw+1	
 
 	    	! Below threshold
