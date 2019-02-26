@@ -2729,7 +2729,9 @@ END  SUBROUTINE GOVNT_BUDGET
 
 
 SUBROUTINE FIND_DBN_EQ()
+	print*, 'Test 1.0'
 	use omp_lib
+	print*, 'Test 1.01'
 	IMPLICIT NONE
 	INTEGER:: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL   :: DBN_dist, DBN_criteria
