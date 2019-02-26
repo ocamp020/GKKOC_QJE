@@ -234,6 +234,9 @@ PROGRAM main
 					call system( 'mkdir -p ' // trim(Result_Folder) )
 					call Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W,Fixed_P,Fixed_R)
 			else
+
+				Result_Folder = trim(Result_Folder)//'Tax_Reform_Timing/'
+				call system( 'mkdir -p ' // trim(Result_Folder) )
 				call Solve_Experiment(compute_exp,Simul_Switch)
 			endif 
 
@@ -252,7 +255,7 @@ PROGRAM main
 			if (Opt_Tax_KW) then 
 				Result_Folder = trim(folder_aux)//'Opt_Tax_K/'
 			else 
-				Result_Folder = trim(folder_aux)//'Opt_Tax_W/'
+				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Timing/'
 			endif
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
