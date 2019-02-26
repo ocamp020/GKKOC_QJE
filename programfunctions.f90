@@ -2736,7 +2736,7 @@ SUBROUTINE FIND_DBN_EQ()
 	real(dp)   ::BBAR, MeanWealth, brent_value
 	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, DBN2
 	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi
-
+	print*, 'Test 1.1'
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-07_DP
 
@@ -2745,15 +2745,20 @@ SUBROUTINE FIND_DBN_EQ()
 			!call Find_TauW_Threshold(DBN1,Y_a_threshold)
 		! Adjust grid to include breaking points
 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			print*, 'Test 1.2'
 		! Compute labor units 
 			CALL ComputeLaborUnits(Ebar, wage) 
+			print*, 'Test 1.3'
 		! Compute Capital demand and Profits by (a,z)
 			K_mat  = K_Matrix(R,P)
 			Pr_mat = Profit_Matrix(R,P)
+			print*, 'Test 1.4'
 		! Form YGRID for the capital income economy given interest rate "P"
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
+			print*, 'Test 1.5'
 		! Solve for policy and value functions 
 			CALL EGM_RETIREMENT_WORKING_PERIOD 
+			print*, 'Test 1.6'
 
 	! Discretize policy function for assets (a')
 		! For each age and state vector bracket optimal a' between two grid points
