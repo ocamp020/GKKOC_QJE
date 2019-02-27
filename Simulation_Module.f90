@@ -1071,7 +1071,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		endif 
 
 
-		WRITE  (UNIT=10, FMT='(F12.4)') panela
+		WRITE  (UNIT=10, FMT=*) panela ! WRITE  (UNIT=10, FMT='(F12.4)') panela
 		WRITE  (UNIT=11, FMT=*) panelage 
 		WRITE  (UNIT=12, FMT=*) panelz 
 		WRITE  (UNIT=13, FMT=*) panellambda 

@@ -153,20 +153,20 @@ elseif X_Switch==1.1
         Tables_file     = 'Tables_Presentation_Model_11.xls' ;
     
 elseif X_Switch==1.2
-%    mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/')
-%     cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/'
-%         Result_Folder = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/') ;
-%         Simul_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/') ;
-%         Bench_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Bench_Files/') ;
-%         Exp_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Exp_Files/') ;
-%         Otk_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Opt_Tax_K/Exp_Files/') ;
-%         Otk_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Opt_Tax_K/Simul/') ;
-%         Otw_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Opt_Tax_W/Exp_Files/') ;
-%         Otw_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Opt_Tax_W/Simul/');
-%         Etc_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Tau_C_Experiment/Exp_Files/') ;
-%         Etc_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Tau_C_Experiment/Simul/') ;
-%         Top_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/Top_A/') ;
-%         Tables_file   = 'Tables_Presentation_Model_12_bv.xls' ;
+   mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/')
+    cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/'
+        Result_Folder = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/') ;
+        Simul_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/') ;
+        Bench_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Bench_Files/') ;
+        Exp_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Exp_Files/') ;
+        Otk_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Opt_Tax_K/Exp_Files/') ;
+        Otk_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Opt_Tax_K/Simul/') ;
+        Otw_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Opt_Tax_W/Exp_Files/') ;
+        Otw_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Opt_Tax_W/Simul/');
+        Etc_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Tau_C_Experiment/Exp_Files/') ;
+        Etc_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Tau_C_Experiment/Simul/') ;
+        Top_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/Top_A/') ;
+        Tables_file   = 'Tables_Presentation_Model_12_bv.xls' ;
         
 %    mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/')
 %     cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/'
@@ -180,23 +180,23 @@ elseif X_Switch==1.2
 %         tauW = 0 ;
 
 
-   mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_ns/')
-    cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_ns/'
-        Result_Folder = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/') ;
-        Simul_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Simul/') ;
-        Bench_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Bench_Files/') ;
-        Exp_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Exp_Files/') ;
-        Otk_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Opt_Tax_K/Exp_Files/') ;
-        Otk_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Opt_Tax_K/Simul/') ;
-        Otw_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Opt_Tax_W/Exp_Files/') ;
-        Otw_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Opt_Tax_W/Simul/');
-        Etc_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Tau_C_Experiment/Exp_Files/') ;
-        Etc_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Tau_C_Experiment/Simul/') ;
-        Top_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Simul/Top_A/') ;
-        Tables_file   = 'Tables_Presentation_Model_12_ns.xls' ;
-        n_x = 1 ; 
-        x_grid = 1 ; 
-        X_Switch = 0 ;
+%    mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_ns/')
+%     cd '/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_ns/'
+%         Result_Folder = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/') ;
+%         Simul_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Simul/') ;
+%         Bench_Folder  = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Bench_Files/') ;
+%         Exp_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Exp_Files/') ;
+%         Otk_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Opt_Tax_K/Exp_Files/') ;
+%         Otk_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Opt_Tax_K/Simul/') ;
+%         Otw_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Opt_Tax_W/Exp_Files/') ;
+%         Otw_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Opt_Tax_W/Simul/');
+%         Etc_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Tau_C_Experiment/Exp_Files/') ;
+%         Etc_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Tau_C_Experiment/Simul/') ;
+%         Top_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_ns/Simul/Top_A/') ;
+%         Tables_file   = 'Tables_Presentation_Model_12_ns.xls' ;
+%         n_x = 1 ; 
+%         x_grid = 1 ; 
+%         X_Switch = 0 ;
         
     
 elseif X_Switch==2.1
@@ -1025,7 +1025,7 @@ status = xlwrite(Tables_file,share,'Wealth_Shares') ;
             % Maximum Likelihood
             a_ml(ii)  = sum(weights_V(panel_V>w_min(ii))) / sum(weights_V(panel_V>w_min(ii)).*log(panel_V(panel_V>w_min(ii))/w_min(ii))) ;
             % Regression
-            mdl_b     = fitlm(x_bench',y_bench')         ;
+            mdl_b     = fitlm(-x_bench',y_bench')         ;
             C_b       = mdl_b.Coefficients.Estimate(1)   ;
             a_b(ii)   = mdl_b.Coefficients.Estimate(2)   ; 
             mdl_V_s   = fitlm(x_V_s',y_V_s')             ;      

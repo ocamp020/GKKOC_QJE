@@ -14,7 +14,7 @@
         javaaddpath('poi_library/dom4j-1.6.1.jar');
         javaaddpath('poi_library/stax-api-1.0.1.jar');
         
-        cd '/Users/s-ocampo/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Pareto_Tail/'
+        cd '/Users/ocamp020/Dropbox/RA_Guvenen/Wealth_Tax/GKKOC_CODES/Sergio/Graphs/Pareto_Tail/'
 
         
 %% Parameters 
