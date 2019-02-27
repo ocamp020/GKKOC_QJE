@@ -4213,28 +4213,28 @@ SUBROUTINE COMPUTE_STATS()
 
 
 
-	! ! Distribution of Assets
-	! 	DO ai=1,na
-	! 	     pr_a_dbn(ai)          = sum(DBN1(:,ai,:,:,:,:)) 
-	! 	     cdf_a_dbn(ai)         = sum( pr_a_dbn(1:ai) )      
-	! 	     tot_a_by_grid(ai)     = sum(DBN1(:,ai,:,:,:,:) * agrid(ai) )
-	! 	     cdf_tot_a_by_grid(ai) = sum(tot_a_by_grid(1:ai))   
-	! 	!     print*, pr_a_dbn(ai), cdf_a_dbn(ai)
-	! 	ENDDO
-	! 	cdf_a_dbn = cdf_a_dbn + 1.0_DP - cdf_a_dbn(na)
+	! Distribution of Assets
+		DO ai=1,na
+		     pr_a_dbn(ai)          = sum(DBN1(:,ai,:,:,:,:)) 
+		     cdf_a_dbn(ai)         = sum( pr_a_dbn(1:ai) )      
+		     tot_a_by_grid(ai)     = sum(DBN1(:,ai,:,:,:,:) * agrid(ai) )
+		     cdf_tot_a_by_grid(ai) = sum(tot_a_by_grid(1:ai))   
+		!     print*, pr_a_dbn(ai), cdf_a_dbn(ai)
+		ENDDO
+		cdf_a_dbn = cdf_a_dbn + 1.0_DP - cdf_a_dbn(na)
 
-	! 	! Percentage of the population above wealth tax threshold
-	! 	! Compute distribution of agents by (a,z,x)
-	! 	DBN_azx = sum(sum(sum(DBN1,5),4),1)
-	! 	! Compute mean before tax wealth
-	! 	Wealth_mat = Wealth_Matrix(R,P)
-	! 	! Compute share of agents above threshold
-	! 	Threshold_Share = 0.0_dp
-	! 	do ai=1,na 
-	! 		if (agrid(ai).gt.Y_a_threshold) then 
-	! 			Threshold_Share = Threshold_Share + pr_a_dbn(ai)
-	! 		end if 
-	! 	end do 
+		! Percentage of the population above wealth tax threshold
+		! Compute distribution of agents by (a,z,x)
+		DBN_azx = sum(sum(sum(DBN1,5),4),1)
+		! Compute mean before tax wealth
+		Wealth_mat = Wealth_Matrix(R,P)
+		! Compute share of agents above threshold
+		Threshold_Share = 0.0_dp
+		do ai=1,na 
+			if (agrid(ai).gt.Y_a_threshold) then 
+				Threshold_Share = Threshold_Share + pr_a_dbn(ai)
+			end if 
+		end do 
 
 		
 	! 	! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
