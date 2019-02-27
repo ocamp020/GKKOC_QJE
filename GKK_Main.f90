@@ -498,7 +498,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		stop
+		
 
 end Subroutine Solve_Benchmark
 
