@@ -26,15 +26,15 @@ SUBROUTINE  SIMULATION(bench_indx)
 		REAL(SP), DIMENSION(:), allocatable :: panela, panelPV_a, panelK, panel_Y_L, panelRet, panelRet_K
 
 		! Intergenerational statistics
-		INTEGER , DIMENSION(totpop) 			  :: eligible, death_count
-		REAL(SP), DIMENSION(totpop) 			  :: panela_parents, panela_sons
+		INTEGER , DIMENSION(:)      , allocatable :: eligible, death_count
+		REAL(SP), DIMENSION(:)      , allocatable :: panela_parents, panela_sons
 		REAL(SP), DIMENSION(:)      , allocatable :: eligible_panela_parents, eligible_panela_sons
-		INTEGER , DIMENSION(totpop) 			  :: panelage_parents, panelage_sons
+		INTEGER , DIMENSION(:)      , allocatable :: panelage_parents, panelage_sons
 		INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_parents, eligible_panelage_sons
 		INTEGER                     			  :: n_eligible
 		! Intergenerational statistics 30-50
-		REAL(SP), DIMENSION(totpop) 	     :: assets_dad, assets_son, return_dad, return_son, PV_dad, PV_son
-		INTEGER , DIMENSION(totpop) 	     :: age_dad, age_son, z_dad, z_son
+		REAL(SP), DIMENSION(:)      , allocatable :: assets_dad, assets_son, return_dad, return_son, PV_dad, PV_son
+		INTEGER , DIMENSION(:)      , allocatable :: age_dad, age_son, z_dad, z_son
 		REAL(SP), DIMENSION(2,4000000)       :: IGM_a_matrix, IGM_r_matrix, IGM_pv_matrix
 		INTEGER , DIMENSION(2,4000000) 		 :: IGM_z_matrix
 		REAL(SP), DIMENSION(:) , allocatable :: panela_dad, panela_son, panelz_dad, panelz_son
@@ -73,7 +73,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		REAL :: k_igm
 
 		! Top Agents 
-		INTEGER       :: top_ind(80), panel_top_ind(totpop), top_ind_aux(80), n_top
+		INTEGER       :: top_ind(80), top_ind_aux(80), n_top
+		INTEGER, DIMENSION(:), allocatable :: panel_top_ind
 		REAL(DP)      :: top_A(80), A_cut, A_hi, A_low
 		character(10) :: top_folder
 
@@ -91,6 +92,23 @@ SUBROUTINE  SIMULATION(bench_indx)
 		allocate( panel_Y_L(		totpop) )
 		allocate( panelRet(			totpop) )
 		allocate( panelRet_K(		totpop) )
+		allocate( eligible(			totpop) )
+		allocate( death_count(		totpop) )
+		allocate( panela_parents(	totpop) )
+		allocate( panela_sons(		totpop) )
+		allocate( panelage_parents(	totpop) )
+		allocate( panelage_sons(	totpop) )
+		allocate( assets_dad(		totpop) )
+		allocate( assets_son(		totpop) )
+		allocate( return_dad(		totpop) )
+		allocate( return_son(		totpop) )
+		allocate( PV_dad(			totpop) )
+		allocate( PV_son(			totpop) )
+		allocate( age_dad(			totpop) )
+		allocate( age_son(			totpop) )
+		allocate( z_dad(			totpop) )
+		allocate( z_son(			totpop) )
+		allocate( panel_top_ind(	totpop) )
 			panelRet_K = 0.0_sp
 
 		print*, 'Starting Simulation Module'
