@@ -4237,57 +4237,57 @@ SUBROUTINE COMPUTE_STATS()
 		end do 
 
 		
-	! 	! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
-	! 	DO prctile=1,100
-	! 	    ai=1
-	! 	    DO while (cdf_a_dbn(ai) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
-	! 	        ai=ai+1
-	! 	    ENDDO
-	! 	    prctile_ai_ind(prctile) = ai
-	! 	    prctile_ai(prctile)     = agrid(ai)
-	! 	    ! print*,prctile, REAL(prctile,8)/100.0_DP,  ai
-	! 	    IF (ai .gt. 1) THEN
-	! 	        cdf_tot_a_by_prctile(prctile)  = cdf_tot_a_by_grid(ai-1) + (REAL(prctile,8)/100.0_DP - cdf_a_dbn(ai-1))*agrid(ai) 
-	! 	    else
-	! 	        cdf_tot_a_by_prctile(prctile)  = (REAL(prctile,8)/100.0_DP )*agrid(ai)     
-	! 	    ENDIF
-	! 	ENDDO
-	! 	print*,''
-	! 	prct1_wealth  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
-	! 	prct10_wealth = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
-	! 	prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
-	! 	prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
+		! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
+		DO prctile=1,100
+		    ai=1
+		    DO while (cdf_a_dbn(ai) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
+		        ai=ai+1
+		    ENDDO
+		    prctile_ai_ind(prctile) = ai
+		    prctile_ai(prctile)     = agrid(ai)
+		    ! print*,prctile, REAL(prctile,8)/100.0_DP,  ai
+		    IF (ai .gt. 1) THEN
+		        cdf_tot_a_by_prctile(prctile)  = cdf_tot_a_by_grid(ai-1) + (REAL(prctile,8)/100.0_DP - cdf_a_dbn(ai-1))*agrid(ai) 
+		    else
+		        cdf_tot_a_by_prctile(prctile)  = (REAL(prctile,8)/100.0_DP )*agrid(ai)     
+		    ENDIF
+		ENDDO
+		print*,''
+		prct1_wealth  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
+		prct10_wealth = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
+		prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
+		prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
 	
 
-	! ! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
-	! ! COMPUTE VARIANCE OF LOG EARNINGS FOR 25-60 FOR THOSE WHO WORK MORE THAN 260 HOURS
-	! ! WHICH CORRESPOND TO 0.055 IN THE MODEL
-	! pop_25_60        	   = 0.0_DP
-	! tothours_25_60         = 0.0_DP
-	! pop_pos_earn_25_60     = 0.0_DP
-	! tot_log_earnings_25_60 = 0.0_DP 
-	! Var_Log_Earnings_25_60 = 0.0_DP
-	! do xi=1,nx
-	! DO age=5,40
-	! DO ai=1,na
-	! DO zi=1,nz
-	! DO lambdai=1,nlambda
-	! DO ei=1,ne
-	! 	tothours_25_60 = tothours_25_60 + DBN1(age, ai, zi, lambdai, ei, xi)  * Hours(age, ai, zi, lambdai,ei,xi)
-	! 	pop_25_60      = pop_25_60 +  DBN1(age, ai, zi, lambdai, ei,xi)
-	! 	IF (Hours(age, ai, zi, lambdai, ei,xi) .ge. 0.055) THEN
-	! 	tot_log_earnings_25_60 = tot_log_earnings_25_60 + DBN1(age, ai, zi, lambdai, ei,xi)  &
-	! 	                 		& *  log( Y_h(Hours(age, ai, zi, lambdai, ei,xi),age,lambdai,ei,wage) )
-	! 	pop_pos_earn_25_60     = pop_pos_earn_25_60 +  DBN1(age, ai, zi, lambdai, ei,xi)
-	! 	ENDIF
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! meanhours_25_60         = tothours_25_60 / pop_25_60
-	! mean_log_earnings_25_60 = tot_log_earnings_25_60 / pop_pos_earn_25_60
+	! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
+	! COMPUTE VARIANCE OF LOG EARNINGS FOR 25-60 FOR THOSE WHO WORK MORE THAN 260 HOURS
+	! WHICH CORRESPOND TO 0.055 IN THE MODEL
+	pop_25_60        	   = 0.0_DP
+	tothours_25_60         = 0.0_DP
+	pop_pos_earn_25_60     = 0.0_DP
+	tot_log_earnings_25_60 = 0.0_DP 
+	Var_Log_Earnings_25_60 = 0.0_DP
+	do xi=1,nx
+	DO age=5,40
+	DO ai=1,na
+	DO zi=1,nz
+	DO lambdai=1,nlambda
+	DO ei=1,ne
+		tothours_25_60 = tothours_25_60 + DBN1(age, ai, zi, lambdai, ei, xi)  * Hours(age, ai, zi, lambdai,ei,xi)
+		pop_25_60      = pop_25_60 +  DBN1(age, ai, zi, lambdai, ei,xi)
+		IF (Hours(age, ai, zi, lambdai, ei,xi) .ge. 0.055) THEN
+		tot_log_earnings_25_60 = tot_log_earnings_25_60 + DBN1(age, ai, zi, lambdai, ei,xi)  &
+		                 		& *  log( Y_h(Hours(age, ai, zi, lambdai, ei,xi),age,lambdai,ei,wage) )
+		pop_pos_earn_25_60     = pop_pos_earn_25_60 +  DBN1(age, ai, zi, lambdai, ei,xi)
+		ENDIF
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	meanhours_25_60         = tothours_25_60 / pop_25_60
+	mean_log_earnings_25_60 = tot_log_earnings_25_60 / pop_pos_earn_25_60
 
 	! DO xi=1,nx
 	! DO age=5,40
