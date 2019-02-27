@@ -33,13 +33,13 @@ SUBROUTINE  SIMULATION(bench_indx)
 		INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_parents, eligible_panelage_sons
 		INTEGER                     			  :: n_eligible
 		! Intergenerational statistics 30-50
-		REAL(SP), DIMENSION(:)      , allocatable :: assets_dad, assets_son, return_dad, return_son, PV_dad, PV_son
-		INTEGER , DIMENSION(:)      , allocatable :: age_dad, age_son, z_dad, z_son
-		REAL(SP), DIMENSION(2,4000000)       :: IGM_a_matrix, IGM_r_matrix, IGM_pv_matrix
-		INTEGER , DIMENSION(2,4000000) 		 :: IGM_z_matrix
-		REAL(SP), DIMENSION(:) , allocatable :: panela_dad, panela_son, panelz_dad, panelz_son
-		REAL(SP), DIMENSION(:) , allocatable :: panelr_dad, panelr_son, panelPV_dad, panelPV_son
-		INTEGER 						     :: IGM_index
+		REAL(SP), DIMENSION(:)  , allocatable :: assets_dad, assets_son, return_dad, return_son, PV_dad, PV_son
+		INTEGER , DIMENSION(:)  , allocatable :: age_dad, age_son, z_dad, z_son
+		REAL(SP), DIMENSION(:,:), allocatable :: IGM_a_matrix, IGM_r_matrix, IGM_pv_matrix
+		INTEGER , DIMENSION(:,:), allocatable :: IGM_z_matrix
+		REAL(SP), DIMENSION(:)  , allocatable :: panela_dad, panela_son, panelz_dad, panelz_son
+		REAL(SP), DIMENSION(:)  , allocatable :: panelr_dad, panelr_son, panelPV_dad, panelPV_son
+		INTEGER 						      :: IGM_index
 		! ! Intergenerational statistics 40-60
 		! REAL(SP), DIMENSION(totpop) 	     :: assets_dad_2, assets_son_2, return_dad_2, return_son_2, PV_dad_2, PV_son_2
 		! INTEGER , DIMENSION(totpop) 	     :: age_dad_2, age_son_2, z_dad_2, z_son_2
@@ -109,6 +109,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 		allocate( z_dad(			totpop) )
 		allocate( z_son(			totpop) )
 		allocate( panel_top_ind(	totpop) )
+		allocate( IGM_a_matrix(  2,4000000) )
+		allocate( IGM_r_matrix(  2,4000000) )
+		allocate( IGM_pv_matrix( 2,4000000) )
+		allocate( IGM_z_matrix(  2,4000000) )
 			panelRet_K = 0.0_sp
 
 		print*, 'Starting Simulation Module'
