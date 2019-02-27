@@ -4857,17 +4857,17 @@ SUBROUTINE COMPUTE_STATS()
 
 	CLOSE(Unit=19)
 
-	! ! Leverage and constrained firms 
-	! 	WRITE(UNIT=20, FMT=*) 'Leverage ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', 	&
-	! 						& 'Cons_Firm',' ',' ',											&	 
-	! 						& 'Cons_Firms ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', & 
-	! 						& 'Size_AZ ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 '
-	! 	do age=1,MaxAge 
-	! 		WRITE(UNIT=20, FMT=*) age, leverage_age_z(age,:), ' ',&
-	! 							& age, constrained_firms_age(age), ' ', age, constrained_firms_age_z(age,:), ' ', &
-	! 							& age, size_by_age_z(age,:)
-	! 	enddo 
-	! CLOSE(UNIT=20)
+	! Leverage and constrained firms 
+		WRITE(UNIT=20, FMT=*) 'Leverage ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', 	&
+							& 'Cons_Firm',' ',' ',											&	 
+							& 'Cons_Firms ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', & 
+							& 'Size_AZ ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 '
+		do age=1,MaxAge 
+			WRITE(UNIT=20, FMT=*) age, leverage_age_z(age,:), ' ',&
+								& age, constrained_firms_age(age), ' ', age, constrained_firms_age_z(age,:), ' ', &
+								& age, size_by_age_z(age,:)
+		enddo 
+	CLOSE(UNIT=20)
 
 	! ! Save files of constrained index, output and profits
 	! if (solving_bench.eq.1) then
