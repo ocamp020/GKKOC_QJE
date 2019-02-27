@@ -4166,7 +4166,7 @@ SUBROUTINE COMPUTE_STATS()
 	use omp_lib
 
 	IMPLICIT NONE
-	INTEGER  :: prctile, group
+	INTEGER  :: prctile, group, i
 	REAL(DP), DIMENSION(nz)    :: cdf_Gz_DBN, Capital_by_z 
 	REAL(dp), DIMENSION(na,nz,nx) :: DBN_azx, Wealth_mat
 	REAL(DP) :: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz), Mean_Capital
@@ -4181,13 +4181,13 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP) :: size_Age(max_age_category), size_AZ(max_age_category,nz), size_W(3)
 	real(DP) :: leverage_age_z(MaxAge,nz), size_by_age_z(MaxAge,nz), constrained_firms_age_z(MaxAge,nz)
 	real(DP) :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
-	integer  :: constrained_firm_ind(MaxAge,na,nz,nlambda,ne,nx), i
 	real(DP) :: Firm_Output(MaxAge,na,nz,nlambda,ne,nx), Firm_Profit(MaxAge,na,nz,nlambda,ne,nx)
 	REAL(DP), DIMENSION(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq
 	real(DP) :: FW_top_x(6),  prctile_FW(6), prctile_bq(7), a, b, c, CCDF_c
 	character(100) :: rowname
 	integer , dimension(max_age_category+1) :: age_limit
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Labor_Income, Total_Income, K_L_Income, K_T_Income, DBN_bq
+	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP) :: Frisch_Aux, Frisch_Aux_2
 
 	print*, 'Inside Compute_Stats'
@@ -4196,6 +4196,7 @@ SUBROUTINE COMPUTE_STATS()
 	allocate( K_L_Income(MaxAge,na,nz,nlambda,ne,nx))
 	allocate( K_T_Income(MaxAge,na,nz,nlambda,ne,nx))
 	allocate( DBN_bq(MaxAge,na,nz,nlambda,ne,nx))
+	allocate( constrained_firm_ind(MaxAge,na,nz,nlambda,ne,nx))
 	allocate( DBN_vec(size(DBN1)))
 	allocate( Firm_Wealth_vec(size(DBN1)))
 	allocate( CDF_Firm_Wealth(size(DBN1)))
