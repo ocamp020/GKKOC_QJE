@@ -1086,44 +1086,44 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! 	CLOSE(UNIT=10)
 
 
-		! print*, ' '
-		! print*, 'Writing simulation results'
+		print*, ' '
+		print*, 'Writing simulation results'
 
-		! if (bench_indx.eq.1) then
-		! 	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_bench'		, STATUS='replace')
-		! 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_bench'	  	, STATUS='replace')
-		! 	OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_bench'		, STATUS='replace')
-		! 	OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/panellambda_bench'   , STATUS='replace')
-		! 	OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_bench'        , STATUS='replace')
-		! 	OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_bench'     , STATUS='replace')
-		! 	OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_bench'        , STATUS='replace')
-		! 	OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
-		! 	OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_bench'    	, STATUS='replace')
-		! else 
-		! 	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
-		! 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_exp'		, STATUS='replace')
-		! 	OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_exp'		 	, STATUS='replace')
-		! 	OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/panellambda_exp'   	, STATUS='replace')
-		! 	OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_exp'        	, STATUS='replace')
-		! 	OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_exp'       , STATUS='replace')
-		! 	OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_exp' 	        , STATUS='replace')
-		! 	OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_exp'	        , STATUS='replace')
-		! 	OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_exp'    	, STATUS='replace')
-		! endif 
+		if (bench_indx.eq.1) then
+			OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_bench'		, STATUS='replace')
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_bench'	  	, STATUS='replace')
+			OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_bench'		, STATUS='replace')
+			OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/panellambda_bench'   , STATUS='replace')
+			OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_bench'        , STATUS='replace')
+			OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_bench'     , STATUS='replace')
+			OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_bench'        , STATUS='replace')
+			OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
+			OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_bench'    	, STATUS='replace')
+		else 
+			OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_exp'		, STATUS='replace')
+			OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_exp'		 	, STATUS='replace')
+			OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/panellambda_exp'   	, STATUS='replace')
+			OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_exp'        	, STATUS='replace')
+			OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_exp'       , STATUS='replace')
+			OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_exp' 	        , STATUS='replace')
+			OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_exp'	        , STATUS='replace')
+			OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_exp'    	, STATUS='replace')
+		endif 
 
 
-		! WRITE  (UNIT=10, FMT=*) panela ! WRITE  (UNIT=10, FMT='(F12.4)') panela
-		! WRITE  (UNIT=11, FMT=*) panelage 
-		! WRITE  (UNIT=12, FMT=*) panelz 
-		! WRITE  (UNIT=13, FMT=*) panellambda 
-		! WRITE  (UNIT=14, FMT=*) panele 
-		! WRITE  (UNIT=26, FMT='(F12.4)') panelPV_a
-		! WRITE  (UNIT=27, FMT='(F12.4)') panelK
-		! WRITE  (UNIT=28, FMT=*) panelx
-		! WRITE  (UNIT=24, FMT='(F12.4)') panel_Y_L
+		WRITE  (UNIT=10, FMT=*) panela ! WRITE  (UNIT=10, FMT='(F12.4)') panela
+		WRITE  (UNIT=11, FMT=*) panelage 
+		WRITE  (UNIT=12, FMT=*) panelz 
+		WRITE  (UNIT=13, FMT=*) panellambda 
+		WRITE  (UNIT=14, FMT=*) panele 
+		WRITE  (UNIT=26, FMT='(F12.4)') panelPV_a
+		WRITE  (UNIT=27, FMT='(F12.4)') panelK
+		WRITE  (UNIT=28, FMT=*) panelx
+		WRITE  (UNIT=24, FMT='(F12.4)') panel_Y_L
 
-		! close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14)
-		! close (unit=26); close (unit=27); close (unit=28); close (unit=24) 
+		close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14)
+		close (unit=26); close (unit=27); close (unit=28); close (unit=24) 
 
 		! if (bench_indx==1) then
 		! 	OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_parents' 	, STATUS='replace')
