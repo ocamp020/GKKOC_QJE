@@ -4382,181 +4382,181 @@ SUBROUTINE COMPUTE_STATS()
     Mean_K_Return_by_z    = Mean_K_Return_by_z   / Capital_by_z
 
 
-	! VarATReturn = 0.0_DP
-	! VarReturn 	= 0.0_DP
-	! Var_AT_K_Return = 0.0_DP
-	! Var_K_Return 	= 0.0_DP
-	! DO xi=1,nx
-	! DO age=1,MaxAge
-	! DO zi=1,nz
-	! DO ai=1,na
-	! DO lambdai=1,nlambda
-	! DO ei=1, ne  
+	VarATReturn = 0.0_DP
+	VarReturn 	= 0.0_DP
+	Var_AT_K_Return = 0.0_DP
+	Var_K_Return 	= 0.0_DP
+	DO xi=1,nx
+	DO age=1,MaxAge
+	DO zi=1,nz
+	DO ai=1,na
+	DO lambdai=1,nlambda
+	DO ei=1, ne  
 
-	!     VarReturn    = VarReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
-	!     				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/agrid(ai)-MeanReturn)**2.0_dp
+	    VarReturn    = VarReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
+	    				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/agrid(ai)-MeanReturn)**2.0_dp
 
-	!     Var_K_Return = Var_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
-	!     				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp
+	    Var_K_Return = Var_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
+	    				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp
 
-	!     VarATReturn  = VarATReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
-	!     				& ((YGRID(ai,zi,xi)-agrid(ai))/agrid(ai)-MeanATReturn)**2.0_dp 
+	    VarATReturn  = VarATReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
+	    				& ((YGRID(ai,zi,xi)-agrid(ai))/agrid(ai)-MeanATReturn)**2.0_dp 
 
-	!     Var_AT_K_Return  = Var_AT_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
-	!     				& ((YGRID(ai,zi,xi)-agrid(ai))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp 
+	    Var_AT_K_Return  = Var_AT_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
+	    				& ((YGRID(ai,zi,xi)-agrid(ai))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp 
 	    
-	!     !VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
-	!     !				& ((MBGRID(ai,zi)-1.0_DP)-MeanATReturn)**2.0_dp
+	    !VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+	    !				& ((MBGRID(ai,zi)-1.0_DP)-MeanATReturn)**2.0_dp
 
-	!     !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
-	! 	!    VarReturn = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * (R-MeanReturn)**2.0_dp
-	!    	!else
-	! 	!	VarReturn = VarReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * & 
-	! 	!				& (( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) -MeanReturn)**2.0_dp
-	!    	!endif  
+	    !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
+		!    VarReturn = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * (R-MeanReturn)**2.0_dp
+	   	!else
+		!	VarReturn = VarReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * & 
+		!				& (( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) -MeanReturn)**2.0_dp
+	   	!endif  
 
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO    
-	! ENDDO    
-	! ENDDO  
-	! StdATReturn     = VarATReturn**0.5_DP
-	! StdReturn       = VarReturn**0.5_DP
-	! Std_AT_K_Return = Var_AT_K_Return**0.5_DP
-	! Std_K_Return    = Var_K_Return**0.5_DP
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO    
+	ENDDO    
+	ENDDO  
+	StdATReturn     = VarATReturn**0.5_DP
+	StdReturn       = VarReturn**0.5_DP
+	Std_AT_K_Return = Var_AT_K_Return**0.5_DP
+	Std_K_Return    = Var_K_Return**0.5_DP
 
 
- !    ! Debt to GDP Ratio
- !    External_Debt_GDP = 0.0_DP
-	! DO xi=1,nx
-	! DO zi=1,nz
-	! DO ai=1,na
-	!     External_Debt_GDP = External_Debt_GDP + sum(DBN1(:, ai, zi, :, :,xi))*abs(K_mat(ai,zi,xi)-agrid(ai))
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! External_Debt_GDP = 0.5_dp*External_Debt_GDP / YBAR
+    ! Debt to GDP Ratio
+    External_Debt_GDP = 0.0_DP
+	DO xi=1,nx
+	DO zi=1,nz
+	DO ai=1,na
+	    External_Debt_GDP = External_Debt_GDP + sum(DBN1(:, ai, zi, :, :,xi))*abs(K_mat(ai,zi,xi)-agrid(ai))
+	ENDDO
+	ENDDO
+	ENDDO
+	External_Debt_GDP = 0.5_dp*External_Debt_GDP / YBAR
 
-	! ! Savings Rate
-	! group 	 = 1
-	! A_Age 	 = 0.0_dp
-	! A_AZ  	 = 0.0_dp 
-	! A_W  	 = 0.0_dp
-	! Ap_Age 	 = 0.0_dp
-	! Ap_AZ  	 = 0.0_dp 
-	! Ap_W  	 = 0.0_dp
-	! Y_Age 	 = 0.0_dp
-	! Y_AZ  	 = 0.0_dp 
-	! Y_W   	 = 0.0_dp
-	! size_Age = 0.0_dp
-	! size_AZ  = 0.0_dp
-	! size_W   = 0.0_dp
-	! DO age=1,MaxAge 
+	! Savings Rate
+	group 	 = 1
+	A_Age 	 = 0.0_dp
+	A_AZ  	 = 0.0_dp 
+	A_W  	 = 0.0_dp
+	Ap_Age 	 = 0.0_dp
+	Ap_AZ  	 = 0.0_dp 
+	Ap_W  	 = 0.0_dp
+	Y_Age 	 = 0.0_dp
+	Y_AZ  	 = 0.0_dp 
+	Y_W   	 = 0.0_dp
+	size_Age = 0.0_dp
+	size_AZ  = 0.0_dp
+	size_W   = 0.0_dp
+	DO age=1,MaxAge 
 
-	!     DO while (age.gt.age_limit(group+1))
-	!         group = group+1
-	!     ENDDO    
+	    DO while (age.gt.age_limit(group+1))
+	        group = group+1
+	    ENDDO    
 	 
-	!  	DO xi=1,nx
-	!     DO ai=1,na
- !        DO zi=1,nz
- !        DO lambdai=1,nlambda
- !        DO ei=1,ne
- !        	size_Age(group)   = size_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)
- !        	size_AZ(group,zi) = size_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
+	 	DO xi=1,nx
+	    DO ai=1,na
+        DO zi=1,nz
+        DO lambdai=1,nlambda
+        DO ei=1,ne
+        	size_Age(group)   = size_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)
+        	size_AZ(group,zi) = size_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
 
- !        	A_Age(group)      = A_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
- !        	A_AZ(group,zi)    = A_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+        	A_Age(group)      = A_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+        	A_AZ(group,zi)    = A_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
 
- !        	Ap_Age(group)     = Ap_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
- !        	Ap_AZ(group,zi)   = Ap_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+        	Ap_Age(group)     = Ap_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+        	Ap_AZ(group,zi)   = Ap_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
 
- !        	if (age.lt.RetAge) then
- !        	Y_Age(group)      = Y_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*&
- !        						& ( YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
- !        	Y_AZ(group,zi)    = Y_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*&
- !        						& ( YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
- !        	else 
- !        	Y_Age(group)      = Y_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*( YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei) )
- !        	Y_AZ(group,zi)    = Y_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*( YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei) )
- !        	endif
+        	if (age.lt.RetAge) then
+        	Y_Age(group)      = Y_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*&
+        						& ( YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+        	Y_AZ(group,zi)    = Y_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*&
+        						& ( YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+        	else 
+        	Y_Age(group)      = Y_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*( YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei) )
+        	Y_AZ(group,zi)    = Y_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*( YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei) )
+        	endif
 
- !        	if (ai.le.prctile_ai_ind(90)) then 
- !        		size_W(1) = size_W(1) + DBN1(age,ai,zi,lambdai,ei,xi)
- !        		A_W(1)    = A_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
- !        		Ap_W(1)   = Ap_W(1)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
- !        		if (age.lt.RetAge) then 
- !        		Y_W(1)    = Y_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
- !        					& (YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
- !        		else 
- !        		Y_W(1)    = Y_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*(YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
- !        		endif 
- !        	else if  ((ai.gt.prctile_ai_ind(90)).and.(ai.le.prctile_ai_ind(99))) then
- !        		size_W(2) = size_W(2) + DBN1(age,ai,zi,lambdai,ei,xi)
- !        		A_W(2)    = A_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
- !        		Ap_W(2)   = Ap_W(2)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
- !        		if (age.lt.RetAge) then 
- !        		Y_W(2)    = Y_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
- !        					& (YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
- !        		else 
- !        		Y_W(2)    = Y_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
- !        					& (YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
- !        		endif
- !        	else 
- !        		size_W(3) = size_W(3) + DBN1(age,ai,zi,lambdai,ei,xi)
- !        		A_W(3)    = A_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
- !        		Ap_W(3)   = Ap_W(3)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
- !        		if (age.lt.RetAge) then 
- !        		Y_W(3)    = Y_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
- !        					&	(YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
- !        		else 
- !        		Y_W(3)    = Y_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*(YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
- !        		endif
- !        	endif 
- !        ENDDO
- !        ENDDO
- !        ENDDO
- !        ENDDO
-	!     ENDDO
-	! ENDDO
-	! S_Rate_A_Age = (Ap_Age-A_Age)/A_Age
-	! S_Rate_A_AZ  = (Ap_AZ-A_AZ)/A_AZ
-	! S_Rate_A_W   = (Ap_W-A_W)/A_W
-	! S_Rate_Y_Age = (Ap_Age-A_Age)/Y_Age
-	! S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
-	! S_Rate_Y_W   = (Ap_W-A_W)/Y_W
+        	if (ai.le.prctile_ai_ind(90)) then 
+        		size_W(1) = size_W(1) + DBN1(age,ai,zi,lambdai,ei,xi)
+        		A_W(1)    = A_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+        		Ap_W(1)   = Ap_W(1)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+        		if (age.lt.RetAge) then 
+        		Y_W(1)    = Y_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
+        					& (YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+        		else 
+        		Y_W(1)    = Y_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*(YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
+        		endif 
+        	else if  ((ai.gt.prctile_ai_ind(90)).and.(ai.le.prctile_ai_ind(99))) then
+        		size_W(2) = size_W(2) + DBN1(age,ai,zi,lambdai,ei,xi)
+        		A_W(2)    = A_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+        		Ap_W(2)   = Ap_W(2)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+        		if (age.lt.RetAge) then 
+        		Y_W(2)    = Y_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
+        					& (YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+        		else 
+        		Y_W(2)    = Y_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
+        					& (YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
+        		endif
+        	else 
+        		size_W(3) = size_W(3) + DBN1(age,ai,zi,lambdai,ei,xi)
+        		A_W(3)    = A_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+        		Ap_W(3)   = Ap_W(3)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+        		if (age.lt.RetAge) then 
+        		Y_W(3)    = Y_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
+        					&	(YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+        		else 
+        		Y_W(3)    = Y_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*(YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
+        		endif
+        	endif 
+        ENDDO
+        ENDDO
+        ENDDO
+        ENDDO
+	    ENDDO
+	ENDDO
+	S_Rate_A_Age = (Ap_Age-A_Age)/A_Age
+	S_Rate_A_AZ  = (Ap_AZ-A_AZ)/A_AZ
+	S_Rate_A_W   = (Ap_W-A_W)/A_W
+	S_Rate_Y_Age = (Ap_Age-A_Age)/Y_Age
+	S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
+	S_Rate_Y_W   = (Ap_W-A_W)/Y_W
 
-	! ! Leverage Ratio and fraction of constrainted firms 
-	! leverage_age_z = 0.0_dp 
-	! size_by_age_z  = 0.0_dp 
-	! constrained_firms_age_z = 0.0_dp
-	! constrained_firm_ind = 0
-	! do xi=1,nx
-	! do age = 1,MaxAge 
-	! do zi  = 1,nz 
- !        DO lambdai=1,nlambda
- !        DO ei=1,ne
- !        DO ai=1,na
- !        	size_by_age(age)       = size_by_age(age)       + DBN1(age,ai,zi,lambdai,ei,xi)
-	! 		size_by_age_z(age,zi)  = size_by_age_z(age,zi)  + DBN1(age,ai,zi,lambdai,ei,xi)
-	! 		leverage_age_z(age,zi) = leverage_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*K_mat(ai,zi,xi)/agrid(ai)
-	! 		if (K_mat(ai,zi,xi).ge.(theta(zi)*agrid(ai))) then 
-	! 			constrained_firms_age(age)      = constrained_firms_age(age)      + DBN1(age,ai,zi,lambdai,ei,xi)
-	! 			constrained_firms_age_z(age,zi) = constrained_firms_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
-	! 			constrained_firm_ind(age,ai,zi,lambdai,ei,xi) = 1
-	! 		endif 
-	! 		Firm_Output(age,ai,zi,lambdai,ei,xi) = xz_grid(xi,zi)*K_mat(ai,zi,xi)
-	! 		Firm_Profit(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi)
-	! 	enddo
-	! 	enddo 
-	! 	enddo 
-	! enddo 
-	! enddo 
-	! enddo 
-	! leverage_age_z = leverage_age_z/size_by_age_z
-	! constrained_firms_age_z = constrained_firms_age_z/size_by_age_z 
-	! constrained_firms_age   = constrained_firms_age/size_by_age 
+	! Leverage Ratio and fraction of constrainted firms 
+	leverage_age_z = 0.0_dp 
+	size_by_age_z  = 0.0_dp 
+	constrained_firms_age_z = 0.0_dp
+	constrained_firm_ind = 0
+	do xi=1,nx
+	do age = 1,MaxAge 
+	do zi  = 1,nz 
+        DO lambdai=1,nlambda
+        DO ei=1,ne
+        DO ai=1,na
+        	size_by_age(age)       = size_by_age(age)       + DBN1(age,ai,zi,lambdai,ei,xi)
+			size_by_age_z(age,zi)  = size_by_age_z(age,zi)  + DBN1(age,ai,zi,lambdai,ei,xi)
+			leverage_age_z(age,zi) = leverage_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*K_mat(ai,zi,xi)/agrid(ai)
+			if (K_mat(ai,zi,xi).ge.(theta(zi)*agrid(ai))) then 
+				constrained_firms_age(age)      = constrained_firms_age(age)      + DBN1(age,ai,zi,lambdai,ei,xi)
+				constrained_firms_age_z(age,zi) = constrained_firms_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
+				constrained_firm_ind(age,ai,zi,lambdai,ei,xi) = 1
+			endif 
+			Firm_Output(age,ai,zi,lambdai,ei,xi) = xz_grid(xi,zi)*K_mat(ai,zi,xi)
+			Firm_Profit(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi)
+		enddo
+		enddo 
+		enddo 
+	enddo 
+	enddo 
+	enddo 
+	leverage_age_z = leverage_age_z/size_by_age_z
+	constrained_firms_age_z = constrained_firms_age_z/size_by_age_z 
+	constrained_firms_age   = constrained_firms_age/size_by_age 
 
 
 	! if (solving_bench.eq.1) then
