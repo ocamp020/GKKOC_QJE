@@ -4191,6 +4191,7 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Labor_Income, Total_Income, K_L_Income, K_T_Income
 	real(DP) :: Frisch_Aux, Frisch_Aux_2
 
+	print*, 'Inside Compute_Stats'
 	allocate( Labor_Income(MaxAge,na,nz,nlambda,ne,nx))
 	allocate( Total_Income(MaxAge,na,nz,nlambda,ne,nx))
 	allocate( K_L_Income(MaxAge,na,nz,nlambda,ne,nx))
