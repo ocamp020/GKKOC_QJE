@@ -4588,54 +4588,54 @@ SUBROUTINE COMPUTE_STATS()
 
 
 
-	! ! Distribution of firm wealth
-	! 	do ai=1,na
-	! 		Firm_Wealth(:,ai,:,:,:,:) = V_Pr(:,ai,:,:,:,:) + (1.0_dp+R)*agrid(ai)
-	! 	enddo
-	! 	Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
+	! Distribution of firm wealth
+		do ai=1,na
+			Firm_Wealth(:,ai,:,:,:,:) = V_Pr(:,ai,:,:,:,:) + (1.0_dp+R)*agrid(ai)
+		enddo
+		Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
 
-	! 	DBN_vec         = reshape(DBN1       ,(/size(DBN1)/))
-	! 	Firm_Wealth_vec = reshape(Firm_Wealth,(/size(DBN1)/))
+		DBN_vec         = reshape(DBN1       ,(/size(DBN1)/))
+		Firm_Wealth_vec = reshape(Firm_Wealth,(/size(DBN1)/))
 
-	! 	if (solving_bench.eq.1) then
-	! 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Bench.txt', STATUS='replace')
-	! 	else
-	! 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Exp.txt', STATUS='replace')
-	! 	end if 
-	! 		WRITE(UNIT=11, FMT=*) ' '
-	! 		WRITE(UNIT=11, FMT=*) 'Firm_Wealth_Stats'
-	! 		WRITE(UNIT=11, FMT=*) 'Mean_Firm_Wealth= ', Mean_Firm_Wealth
-	! 		WRITE(UNIT=11, FMT=*) 'Top_x% ','x_percentile ','wealth_share_above_x ', 'Counter_CDF'
+		if (solving_bench.eq.1) then
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Bench.txt', STATUS='replace')
+		else
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Exp.txt', STATUS='replace')
+		end if 
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'Firm_Wealth_Stats'
+			WRITE(UNIT=11, FMT=*) 'Mean_Firm_Wealth= ', Mean_Firm_Wealth
+			WRITE(UNIT=11, FMT=*) 'Top_x% ','x_percentile ','wealth_share_above_x ', 'Counter_CDF'
 
-	! 	prctile_FW = (/0.40_DP, 0.20_dp, 0.10_dp, 0.01_dp, 0.001_dp, 0.0001_dp/)
-	! 	a = minval(Firm_Wealth_vec)
-	! 	b = maxval(Firm_Wealth_vec) 
-	! 	c = a
-	! 	do i=1,size(prctile_FW)
-	! 		a = c
-	! 		b = maxval(Firm_Wealth_vec)
-	! 		c = (a+b)/2.0_dp
-	! 		CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
-	! 		print*, ' '
-	! 		!print*, 'Percentile', prctile_FW(i)
-	! 		do while ((abs(CCDF_c-prctile_FW(i))>0.0001_dp).and.(b-a>1e-8))
-	! 			if (CCDF_c<prctile_FW(i)) then 
-	! 				b = c 
-	! 				c = (a+b)/2.0_dp
-	! 				CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
-	! 			else 
-	! 				a = c 
-	! 				c = (a+b)/2.0_dp
-	! 				CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
-	! 			endif
-	! 			!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', CCDF_c-prctile_FW(i)
-	! 		enddo 
-	! 		FW_top_x(i)       = c 
-	! 		FW_top_x_share(i) = 100*sum(Firm_Wealth_vec*DBN_vec,Firm_Wealth_vec>=c)/Mean_Firm_Wealth
-	! 		WRITE(UNIT=11, FMT=*) 100_dp*prctile_FW(i),FW_top_x(i),FW_top_x_share(i), CCDF_c
-	! 	enddo 
+		prctile_FW = (/0.40_DP, 0.20_dp, 0.10_dp, 0.01_dp, 0.001_dp, 0.0001_dp/)
+		a = minval(Firm_Wealth_vec)
+		b = maxval(Firm_Wealth_vec) 
+		c = a
+		do i=1,size(prctile_FW)
+			a = c
+			b = maxval(Firm_Wealth_vec)
+			c = (a+b)/2.0_dp
+			CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+			print*, ' '
+			!print*, 'Percentile', prctile_FW(i)
+			do while ((abs(CCDF_c-prctile_FW(i))>0.0001_dp).and.(b-a>1e-8))
+				if (CCDF_c<prctile_FW(i)) then 
+					b = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+				else 
+					a = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+				endif
+				!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', CCDF_c-prctile_FW(i)
+			enddo 
+			FW_top_x(i)       = c 
+			FW_top_x_share(i) = 100*sum(Firm_Wealth_vec*DBN_vec,Firm_Wealth_vec>=c)/Mean_Firm_Wealth
+			WRITE(UNIT=11, FMT=*) 100_dp*prctile_FW(i),FW_top_x(i),FW_top_x_share(i), CCDF_c
+		enddo 
 
-	! 		CLOSE(UNIT=11)
+			CLOSE(UNIT=11)
 
 	! ! Distribution of bequest
 	! 	Bequest_Wealth=0.0_DP
