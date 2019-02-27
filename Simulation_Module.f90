@@ -22,8 +22,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		REAL(DP) :: start_timet, finish_timet, h_i
 		INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
 		INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
-		INTEGER , DIMENSION(totpop) :: panelage, panelz, panellambda, panele, panelx, panelz_old, panellambda_old
-		REAL(SP), DIMENSION(totpop) :: panela, panelPV_a, panelK, panel_Y_L, panelRet, panelRet_K=0.0_sp 
+		INTEGER , DIMENSION(:), allocatable :: panelage, panelz, panellambda, panele, panelx, panelz_old, panellambda_old
+		REAL(SP), DIMENSION(:), allocatable :: panela, panelPV_a, panelK, panel_Y_L, panelRet, panelRet_K=0.0_sp 
 
 		! Intergenerational statistics
 		INTEGER , DIMENSION(totpop) 			  :: eligible, death_count
@@ -76,6 +76,24 @@ SUBROUTINE  SIMULATION(bench_indx)
 		INTEGER       :: top_ind(80), panel_top_ind(totpop), top_ind_aux(80), n_top
 		REAL(DP)      :: top_A(80), A_cut, A_hi, A_low
 		character(10) :: top_folder
+
+		! Allocate variables
+		allocate( panelage(   		totpop) )
+		allocate( panelz(     		totpop) )
+		allocate( panellambda(		totpop) )
+		allocate( panele(     		totpop) )
+		allocate( panelx(     		totpop) )
+		allocate( panelz_old(     	totpop) )
+		allocate( panellambda_old(	totpop) )
+		allocate( panela(			totpop) )
+		allocate( panelPV_a(		totpop) )
+		allocate( panelK(			totpop) )
+		allocate( panel_Y_L(		totpop) )
+		allocate( panelRet(			totpop) )
+		allocate( panelRet_K(		totpop) )
+			panelRet_K = 0.0_sp
+
+		print*, 'Starting Simulation Module'
 
 		call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
 
