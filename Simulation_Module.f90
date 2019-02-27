@@ -120,19 +120,19 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
 
-		! !$ call omp_set_num_threads(20)
+		!$ call omp_set_num_threads(20)
 
-		! 	! Set Seeds for each thread
-		! !$OMP parallel
-	 !    !$OMP critical
-		! 	thread_num = omp_get_thread_num()
-		! 	newiseed   = -5 - thread_num
-		! 	tempno     = omp_ran1(newiseed)
-	 !       	! write(*,'("inside critical myt=",i4,f12.8)') thread_num,tempno,newiseed
-	 !    !$OMP end critical
-	 !    !$OMP end parallel
+			! Set Seeds for each thread
+		!$OMP parallel
+	    !$OMP critical
+			thread_num = omp_get_thread_num()
+			newiseed   = -5 - thread_num
+			tempno     = omp_ran1(newiseed)
+	       	! write(*,'("inside critical myt=",i4,f12.8)') thread_num,tempno,newiseed
+	    !$OMP end critical
+	    !$OMP end parallel
 
-		! print*,'SIMULATION STARTED'
+		print*,'SIMULATION STARTED'
 
 	 !    age=1
 	 !    requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
