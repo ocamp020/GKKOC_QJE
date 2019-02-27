@@ -49,7 +49,7 @@ MODULE parameters
 	
 
 	! Life cycle: retirement age, maximum age
-	INTEGER(I4B), PARAMETER  :: MaxAge=81, RetAge=45, totpop=20000000
+	INTEGER(I4B), PARAMETER  :: MaxAge=81, RetAge=45, totpop=200000
 
 
 	! Asset grid: nodes (na,fine_na), min (amin), max (amax), curvature (a_curv) 
