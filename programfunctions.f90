@@ -4191,24 +4191,24 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: Frisch_Aux, Frisch_Aux_2
 
 	print*, 'Inside Compute_Stats'
-	! allocate( Labor_Income(MaxAge,na,nz,nlambda,ne,nx))
-	! allocate( Total_Income(MaxAge,na,nz,nlambda,ne,nx))
-	! allocate( K_L_Income(MaxAge,na,nz,nlambda,ne,nx))
-	! allocate( K_T_Income(MaxAge,na,nz,nlambda,ne,nx))
-	! allocate( DBN_bq(MaxAge,na,nz,nlambda,ne,nx))
-	! allocate( DBN_vec(size(DBN1)))
-	! allocate( Firm_Wealth_vec(size(DBN1)))
-	! allocate( CDF_Firm_Wealth(size(DBN1)))
-	! allocate( BQ_vec(size(DBN1)))
-	! allocate( DBN_bq_vec(size(DBN1)))
-	! allocate( CDF_bq(size(DBN1)))
+	allocate( Labor_Income(MaxAge,na,nz,nlambda,ne,nx))
+	allocate( Total_Income(MaxAge,na,nz,nlambda,ne,nx))
+	allocate( K_L_Income(MaxAge,na,nz,nlambda,ne,nx))
+	allocate( K_T_Income(MaxAge,na,nz,nlambda,ne,nx))
+	allocate( DBN_bq(MaxAge,na,nz,nlambda,ne,nx))
+	allocate( DBN_vec(size(DBN1)))
+	allocate( Firm_Wealth_vec(size(DBN1)))
+	allocate( CDF_Firm_Wealth(size(DBN1)))
+	allocate( BQ_vec(size(DBN1)))
+	allocate( DBN_bq_vec(size(DBN1)))
+	allocate( CDF_bq(size(DBN1)))
 
 
-	! !$ call omp_set_num_threads(20)
-	! !$ print *, "OMP Test Message"
+	!$ call omp_set_num_threads(20)
+	!$ print *, "OMP Test Message"
 	
-	! ! Age Brackets
-	! 	age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
+	! Age Brackets
+		age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
 
 
 
