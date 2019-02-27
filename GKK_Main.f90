@@ -79,7 +79,7 @@ PROGRAM main
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 
@@ -646,7 +646,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		V_Pr_nb_exp  	  = V_Pr_nb
 
 	! Compute moments
-	! CALL COMPUTE_STATS
+	CALL COMPUTE_STATS
 	
 	! Compute welfare gain between economies
 	CALL COMPUTE_WELFARE_GAIN

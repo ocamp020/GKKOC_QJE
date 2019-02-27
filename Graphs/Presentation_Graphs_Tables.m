@@ -1025,7 +1025,7 @@ status = xlwrite(Tables_file,share,'Wealth_Shares') ;
             % Maximum Likelihood
             a_ml(ii)  = sum(weights_V(panel_V>w_min(ii))) / sum(weights_V(panel_V>w_min(ii)).*log(panel_V(panel_V>w_min(ii))/w_min(ii))) ;
             % Regression
-            mdl_b     = fitlm(-x_bench',y_bench')         ;
+            mdl_b     = fitlm(x_bench',y_bench')         ;
             C_b       = mdl_b.Coefficients.Estimate(1)   ;
             a_b(ii)   = mdl_b.Coefficients.Estimate(2)   ; 
             mdl_V_s   = fitlm(x_V_s',y_V_s')             ;      
