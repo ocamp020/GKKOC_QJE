@@ -4289,97 +4289,97 @@ SUBROUTINE COMPUTE_STATS()
 	meanhours_25_60         = tothours_25_60 / pop_25_60
 	mean_log_earnings_25_60 = tot_log_earnings_25_60 / pop_pos_earn_25_60
 
-	! DO xi=1,nx
-	! DO age=5,40
-	! DO ai=1,na
-	! DO zi=1,nz
-	! DO lambdai=1,nlambda
-	! DO ei=1,ne
-	! 	IF (Hours(age, ai, zi, lambdai, ei,xi) .ge. 0.055) THEN
-	! 	    Var_Log_Earnings_25_60 =  Var_Log_Earnings_25_60 + DBN1(age, ai, zi, lambdai, ei,xi)  &
-	! 	                 			& * ( log( Y_h(Hours(age, ai, zi, lambdai, ei,xi),age,lambdai,ei,wage) ) &
-	! 	                 			& -   mean_log_earnings_25_60 ) ** 2.0_DP
-	! 	ENDIF
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! Var_Log_Earnings_25_60 = Var_Log_Earnings_25_60 / pop_pos_earn_25_60
-	! Std_Log_Earnings_25_60 = Var_Log_Earnings_25_60 ** 0.5_DP
+	DO xi=1,nx
+	DO age=5,40
+	DO ai=1,na
+	DO zi=1,nz
+	DO lambdai=1,nlambda
+	DO ei=1,ne
+		IF (Hours(age, ai, zi, lambdai, ei,xi) .ge. 0.055) THEN
+		    Var_Log_Earnings_25_60 =  Var_Log_Earnings_25_60 + DBN1(age, ai, zi, lambdai, ei,xi)  &
+		                 			& * ( log( Y_h(Hours(age, ai, zi, lambdai, ei,xi),age,lambdai,ei,wage) ) &
+		                 			& -   mean_log_earnings_25_60 ) ** 2.0_DP
+		ENDIF
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	Var_Log_Earnings_25_60 = Var_Log_Earnings_25_60 / pop_pos_earn_25_60
+	Std_Log_Earnings_25_60 = Var_Log_Earnings_25_60 ** 0.5_DP
 
-	! ! Sources of income
-	! 	Pr_mat = Profit_Matrix(R,P)
-	! 	K_mat  = K_Matrix(R,P)
-	! 	do zi=1,nz
-	! 	do xi=1,nx 
-	! 	do ai=1,na 
-	! 		YGRID(ai,zi,xi) = Y_a(agrid(ai),zi,xi)
-	! 	enddo 
-	! 	enddo 
-	! 	enddo
-	! 	CALL ComputeLaborUnits(Ebar, wage) 
+	! Sources of income
+		Pr_mat = Profit_Matrix(R,P)
+		K_mat  = K_Matrix(R,P)
+		do zi=1,nz
+		do xi=1,nx 
+		do ai=1,na 
+			YGRID(ai,zi,xi) = Y_a(agrid(ai),zi,xi)
+		enddo 
+		enddo 
+		enddo
+		CALL ComputeLaborUnits(Ebar, wage) 
 
-	! MeanWealth 	 = 0.0_dp
-	! MeanATReturn = 0.0_DP
-	! MeanReturn 	 = 0.0_DP
-	! MeanCons  	 = 0.0_DP
-	! Mean_Capital = 0.0_DP
+	MeanWealth 	 = 0.0_dp
+	MeanATReturn = 0.0_DP
+	MeanReturn 	 = 0.0_DP
+	MeanCons  	 = 0.0_DP
+	Mean_Capital = 0.0_DP
 	
-	! MeanATReturn_by_z     = 0.0_DP
-	! MeanReturn_by_z       = 0.0_DP
-	! Mean_AT_K_Return_by_z = 0.0_DP
-	! Mean_K_Return_by_z    = 0.0_DP
-	! size_by_z         	  = 0.0_DP
-	! Wealth_by_z 	  	  = 0.0_DP
-	! Capital_by_z 	  	  = 0.0_DP
-	! DO xi=1,nx
-	! DO age=1,MaxAge
-	! DO zi=1,nz
-	! DO ai=1,na
-	! DO lambdai=1,nlambda
-	! DO ei=1, ne
-	!     MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei, xi)*agrid(ai)
-	!     Mean_Capital = Mean_Capital + DBN1(age, ai, zi, lambdai, ei, xi)*K_mat(ai,zi,xi)
-	!     MeanCons     = MeanCons     + DBN1(age, ai, zi, lambdai, ei, xi)*cons(age, ai, zi, lambdai, ei, xi)
+	MeanATReturn_by_z     = 0.0_DP
+	MeanReturn_by_z       = 0.0_DP
+	Mean_AT_K_Return_by_z = 0.0_DP
+	Mean_K_Return_by_z    = 0.0_DP
+	size_by_z         	  = 0.0_DP
+	Wealth_by_z 	  	  = 0.0_DP
+	Capital_by_z 	  	  = 0.0_DP
+	DO xi=1,nx
+	DO age=1,MaxAge
+	DO zi=1,nz
+	DO ai=1,na
+	DO lambdai=1,nlambda
+	DO ei=1, ne
+	    MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei, xi)*agrid(ai)
+	    Mean_Capital = Mean_Capital + DBN1(age, ai, zi, lambdai, ei, xi)*K_mat(ai,zi,xi)
+	    MeanCons     = MeanCons     + DBN1(age, ai, zi, lambdai, ei, xi)*cons(age, ai, zi, lambdai, ei, xi)
 
-	!     size_by_z(zi)    = size_by_z(zi)    + DBN1(age, ai, zi, lambdai, ei, xi) 
-	!     Wealth_by_z(zi)  = Wealth_by_z(zi)  + DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)
-	!     Capital_by_z(zi) = Capital_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)
+	    size_by_z(zi)    = size_by_z(zi)    + DBN1(age, ai, zi, lambdai, ei, xi) 
+	    Wealth_by_z(zi)  = Wealth_by_z(zi)  + DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)
+	    Capital_by_z(zi) = Capital_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)
 
-	!     MeanReturn           = MeanReturn          + DBN1(age, ai, zi, lambdai, ei, xi) * &
-	!     							& (R*agrid(ai) + Pr_mat(ai,zi,xi))
-	!     MeanReturn_by_z(zi)  = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * &
-	!     							& (R*agrid(ai) + Pr_mat(ai,zi,xi)) 
+	    MeanReturn           = MeanReturn          + DBN1(age, ai, zi, lambdai, ei, xi) * &
+	    							& (R*agrid(ai) + Pr_mat(ai,zi,xi))
+	    MeanReturn_by_z(zi)  = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * &
+	    							& (R*agrid(ai) + Pr_mat(ai,zi,xi)) 
 	    
-	!     MeanATReturn           = MeanATReturn          + DBN1(age, ai, zi, lambdai, ei, xi) * (YGRID(ai,zi,xi)-agrid(ai))
-	!     MeanATReturn_by_z(zi)  = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * (YGRID(ai,zi,xi)-agrid(ai))
+	    MeanATReturn           = MeanATReturn          + DBN1(age, ai, zi, lambdai, ei, xi) * (YGRID(ai,zi,xi)-agrid(ai))
+	    MeanATReturn_by_z(zi)  = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * (YGRID(ai,zi,xi)-agrid(ai))
 	    
 
-	!     !MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)* agrid(ai)
-	!     !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
-	!     !  MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)    
-	!     !else
-	!     !  MeanReturn = MeanReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
-	!     !   			& ( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) 
-	!     !endif      
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO    
-	! ENDDO    
-	! ENDDO
-	! 	! Allocate MeanReturn to K
-	! 	Mean_K_Return_by_z    = MeanReturn_by_z
-	! 	Mean_AT_K_Return_by_z = MeanATReturn_by_z     
-	! Wealth_Output = MeanWealth/YBAR 
-	! MeanReturn    = MeanReturn/MeanWealth
-	! MeanATReturn  = MeanATReturn/MeanWealth
-	! MeanATReturn_by_z     = MeanATReturn_by_z / Wealth_by_z
- !    MeanReturn_by_z       = MeanReturn_by_z   / Wealth_by_z
- !    Mean_AT_K_Return_by_z = Mean_AT_K_Return_by_z / Capital_by_z
- !    Mean_K_Return_by_z    = Mean_K_Return_by_z   / Capital_by_z
+	    !MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)* agrid(ai)
+	    !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
+	    !  MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)    
+	    !else
+	    !  MeanReturn = MeanReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
+	    !   			& ( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) 
+	    !endif      
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO    
+	ENDDO    
+	ENDDO
+		! Allocate MeanReturn to K
+		Mean_K_Return_by_z    = MeanReturn_by_z
+		Mean_AT_K_Return_by_z = MeanATReturn_by_z     
+	Wealth_Output = MeanWealth/YBAR 
+	MeanReturn    = MeanReturn/MeanWealth
+	MeanATReturn  = MeanATReturn/MeanWealth
+	MeanATReturn_by_z     = MeanATReturn_by_z / Wealth_by_z
+    MeanReturn_by_z       = MeanReturn_by_z   / Wealth_by_z
+    Mean_AT_K_Return_by_z = Mean_AT_K_Return_by_z / Capital_by_z
+    Mean_K_Return_by_z    = Mean_K_Return_by_z   / Capital_by_z
 
 
 	! VarATReturn = 0.0_DP
