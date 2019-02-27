@@ -4191,699 +4191,699 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: Frisch_Aux, Frisch_Aux_2
 
 	print*, 'Inside Compute_Stats'
-	allocate( Labor_Income(MaxAge,na,nz,nlambda,ne,nx))
-	allocate( Total_Income(MaxAge,na,nz,nlambda,ne,nx))
-	allocate( K_L_Income(MaxAge,na,nz,nlambda,ne,nx))
-	allocate( K_T_Income(MaxAge,na,nz,nlambda,ne,nx))
-	allocate( DBN_bq(MaxAge,na,nz,nlambda,ne,nx))
-	allocate( DBN_vec(size(DBN1)))
-	allocate( Firm_Wealth_vec(size(DBN1)))
-	allocate( CDF_Firm_Wealth(size(DBN1)))
-	allocate( BQ_vec(size(DBN1)))
-	allocate( DBN_bq_vec(size(DBN1)))
-	allocate( CDF_bq(size(DBN1)))
+	! allocate( Labor_Income(MaxAge,na,nz,nlambda,ne,nx))
+	! allocate( Total_Income(MaxAge,na,nz,nlambda,ne,nx))
+	! allocate( K_L_Income(MaxAge,na,nz,nlambda,ne,nx))
+	! allocate( K_T_Income(MaxAge,na,nz,nlambda,ne,nx))
+	! allocate( DBN_bq(MaxAge,na,nz,nlambda,ne,nx))
+	! allocate( DBN_vec(size(DBN1)))
+	! allocate( Firm_Wealth_vec(size(DBN1)))
+	! allocate( CDF_Firm_Wealth(size(DBN1)))
+	! allocate( BQ_vec(size(DBN1)))
+	! allocate( DBN_bq_vec(size(DBN1)))
+	! allocate( CDF_bq(size(DBN1)))
 
 
-	!$ call omp_set_num_threads(20)
-	!$ print *, "OMP Test Message"
+	! !$ call omp_set_num_threads(20)
+	! !$ print *, "OMP Test Message"
 	
-	! Age Brackets
-		age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
+	! ! Age Brackets
+	! 	age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
 
 
 
 
-	! Distribution of Assets
-		DO ai=1,na
-		     pr_a_dbn(ai)          = sum(DBN1(:,ai,:,:,:,:)) 
-		     cdf_a_dbn(ai)         = sum( pr_a_dbn(1:ai) )      
-		     tot_a_by_grid(ai)     = sum(DBN1(:,ai,:,:,:,:) * agrid(ai) )
-		     cdf_tot_a_by_grid(ai) = sum(tot_a_by_grid(1:ai))   
-		!     print*, pr_a_dbn(ai), cdf_a_dbn(ai)
-		ENDDO
-		cdf_a_dbn = cdf_a_dbn + 1.0_DP - cdf_a_dbn(na)
+	! ! Distribution of Assets
+	! 	DO ai=1,na
+	! 	     pr_a_dbn(ai)          = sum(DBN1(:,ai,:,:,:,:)) 
+	! 	     cdf_a_dbn(ai)         = sum( pr_a_dbn(1:ai) )      
+	! 	     tot_a_by_grid(ai)     = sum(DBN1(:,ai,:,:,:,:) * agrid(ai) )
+	! 	     cdf_tot_a_by_grid(ai) = sum(tot_a_by_grid(1:ai))   
+	! 	!     print*, pr_a_dbn(ai), cdf_a_dbn(ai)
+	! 	ENDDO
+	! 	cdf_a_dbn = cdf_a_dbn + 1.0_DP - cdf_a_dbn(na)
 
-		! Percentage of the population above wealth tax threshold
-		! Compute distribution of agents by (a,z,x)
-		DBN_azx = sum(sum(sum(DBN1,5),4),1)
-		! Compute mean before tax wealth
-		Wealth_mat = Wealth_Matrix(R,P)
-		! Compute share of agents above threshold
-		Threshold_Share = 0.0_dp
-		do ai=1,na 
-			if (agrid(ai).gt.Y_a_threshold) then 
-				Threshold_Share = Threshold_Share + pr_a_dbn(ai)
-			end if 
-		end do 
+	! 	! Percentage of the population above wealth tax threshold
+	! 	! Compute distribution of agents by (a,z,x)
+	! 	DBN_azx = sum(sum(sum(DBN1,5),4),1)
+	! 	! Compute mean before tax wealth
+	! 	Wealth_mat = Wealth_Matrix(R,P)
+	! 	! Compute share of agents above threshold
+	! 	Threshold_Share = 0.0_dp
+	! 	do ai=1,na 
+	! 		if (agrid(ai).gt.Y_a_threshold) then 
+	! 			Threshold_Share = Threshold_Share + pr_a_dbn(ai)
+	! 		end if 
+	! 	end do 
 
 		
-		! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
-		DO prctile=1,100
-		    ai=1
-		    DO while (cdf_a_dbn(ai) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
-		        ai=ai+1
-		    ENDDO
-		    prctile_ai_ind(prctile) = ai
-		    prctile_ai(prctile)     = agrid(ai)
-		    ! print*,prctile, REAL(prctile,8)/100.0_DP,  ai
-		    IF (ai .gt. 1) THEN
-		        cdf_tot_a_by_prctile(prctile)  = cdf_tot_a_by_grid(ai-1) + (REAL(prctile,8)/100.0_DP - cdf_a_dbn(ai-1))*agrid(ai) 
-		    else
-		        cdf_tot_a_by_prctile(prctile)  = (REAL(prctile,8)/100.0_DP )*agrid(ai)     
-		    ENDIF
-		ENDDO
-		print*,''
-		prct1_wealth  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
-		prct10_wealth = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
-		prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
-		prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
+	! 	! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
+	! 	DO prctile=1,100
+	! 	    ai=1
+	! 	    DO while (cdf_a_dbn(ai) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
+	! 	        ai=ai+1
+	! 	    ENDDO
+	! 	    prctile_ai_ind(prctile) = ai
+	! 	    prctile_ai(prctile)     = agrid(ai)
+	! 	    ! print*,prctile, REAL(prctile,8)/100.0_DP,  ai
+	! 	    IF (ai .gt. 1) THEN
+	! 	        cdf_tot_a_by_prctile(prctile)  = cdf_tot_a_by_grid(ai-1) + (REAL(prctile,8)/100.0_DP - cdf_a_dbn(ai-1))*agrid(ai) 
+	! 	    else
+	! 	        cdf_tot_a_by_prctile(prctile)  = (REAL(prctile,8)/100.0_DP )*agrid(ai)     
+	! 	    ENDIF
+	! 	ENDDO
+	! 	print*,''
+	! 	prct1_wealth  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
+	! 	prct10_wealth = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
+	! 	prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
+	! 	prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
 	
 
-	! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
-	! COMPUTE VARIANCE OF LOG EARNINGS FOR 25-60 FOR THOSE WHO WORK MORE THAN 260 HOURS
-	! WHICH CORRESPOND TO 0.055 IN THE MODEL
-	pop_25_60        	   = 0.0_DP
-	tothours_25_60         = 0.0_DP
-	pop_pos_earn_25_60     = 0.0_DP
-	tot_log_earnings_25_60 = 0.0_DP 
-	Var_Log_Earnings_25_60 = 0.0_DP
-	do xi=1,nx
-	DO age=5,40
-	DO ai=1,na
-	DO zi=1,nz
-	DO lambdai=1,nlambda
-	DO ei=1,ne
-		tothours_25_60 = tothours_25_60 + DBN1(age, ai, zi, lambdai, ei, xi)  * Hours(age, ai, zi, lambdai,ei,xi)
-		pop_25_60      = pop_25_60 +  DBN1(age, ai, zi, lambdai, ei,xi)
-		IF (Hours(age, ai, zi, lambdai, ei,xi) .ge. 0.055) THEN
-		tot_log_earnings_25_60 = tot_log_earnings_25_60 + DBN1(age, ai, zi, lambdai, ei,xi)  &
-		                 		& *  log( Y_h(Hours(age, ai, zi, lambdai, ei,xi),age,lambdai,ei,wage) )
-		pop_pos_earn_25_60     = pop_pos_earn_25_60 +  DBN1(age, ai, zi, lambdai, ei,xi)
-		ENDIF
-	ENDDO
-	ENDDO
-	ENDDO
-	ENDDO
-	ENDDO
-	ENDDO
-	meanhours_25_60         = tothours_25_60 / pop_25_60
-	mean_log_earnings_25_60 = tot_log_earnings_25_60 / pop_pos_earn_25_60
+	! ! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
+	! ! COMPUTE VARIANCE OF LOG EARNINGS FOR 25-60 FOR THOSE WHO WORK MORE THAN 260 HOURS
+	! ! WHICH CORRESPOND TO 0.055 IN THE MODEL
+	! pop_25_60        	   = 0.0_DP
+	! tothours_25_60         = 0.0_DP
+	! pop_pos_earn_25_60     = 0.0_DP
+	! tot_log_earnings_25_60 = 0.0_DP 
+	! Var_Log_Earnings_25_60 = 0.0_DP
+	! do xi=1,nx
+	! DO age=5,40
+	! DO ai=1,na
+	! DO zi=1,nz
+	! DO lambdai=1,nlambda
+	! DO ei=1,ne
+	! 	tothours_25_60 = tothours_25_60 + DBN1(age, ai, zi, lambdai, ei, xi)  * Hours(age, ai, zi, lambdai,ei,xi)
+	! 	pop_25_60      = pop_25_60 +  DBN1(age, ai, zi, lambdai, ei,xi)
+	! 	IF (Hours(age, ai, zi, lambdai, ei,xi) .ge. 0.055) THEN
+	! 	tot_log_earnings_25_60 = tot_log_earnings_25_60 + DBN1(age, ai, zi, lambdai, ei,xi)  &
+	! 	                 		& *  log( Y_h(Hours(age, ai, zi, lambdai, ei,xi),age,lambdai,ei,wage) )
+	! 	pop_pos_earn_25_60     = pop_pos_earn_25_60 +  DBN1(age, ai, zi, lambdai, ei,xi)
+	! 	ENDIF
+	! ENDDO
+	! ENDDO
+	! ENDDO
+	! ENDDO
+	! ENDDO
+	! ENDDO
+	! meanhours_25_60         = tothours_25_60 / pop_25_60
+	! mean_log_earnings_25_60 = tot_log_earnings_25_60 / pop_pos_earn_25_60
 
-	DO xi=1,nx
-	DO age=5,40
-	DO ai=1,na
-	DO zi=1,nz
-	DO lambdai=1,nlambda
-	DO ei=1,ne
-		IF (Hours(age, ai, zi, lambdai, ei,xi) .ge. 0.055) THEN
-		    Var_Log_Earnings_25_60 =  Var_Log_Earnings_25_60 + DBN1(age, ai, zi, lambdai, ei,xi)  &
-		                 			& * ( log( Y_h(Hours(age, ai, zi, lambdai, ei,xi),age,lambdai,ei,wage) ) &
-		                 			& -   mean_log_earnings_25_60 ) ** 2.0_DP
-		ENDIF
-	ENDDO
-	ENDDO
-	ENDDO
-	ENDDO
-	ENDDO
-	ENDDO
-	Var_Log_Earnings_25_60 = Var_Log_Earnings_25_60 / pop_pos_earn_25_60
-	Std_Log_Earnings_25_60 = Var_Log_Earnings_25_60 ** 0.5_DP
+	! DO xi=1,nx
+	! DO age=5,40
+	! DO ai=1,na
+	! DO zi=1,nz
+	! DO lambdai=1,nlambda
+	! DO ei=1,ne
+	! 	IF (Hours(age, ai, zi, lambdai, ei,xi) .ge. 0.055) THEN
+	! 	    Var_Log_Earnings_25_60 =  Var_Log_Earnings_25_60 + DBN1(age, ai, zi, lambdai, ei,xi)  &
+	! 	                 			& * ( log( Y_h(Hours(age, ai, zi, lambdai, ei,xi),age,lambdai,ei,wage) ) &
+	! 	                 			& -   mean_log_earnings_25_60 ) ** 2.0_DP
+	! 	ENDIF
+	! ENDDO
+	! ENDDO
+	! ENDDO
+	! ENDDO
+	! ENDDO
+	! ENDDO
+	! Var_Log_Earnings_25_60 = Var_Log_Earnings_25_60 / pop_pos_earn_25_60
+	! Std_Log_Earnings_25_60 = Var_Log_Earnings_25_60 ** 0.5_DP
 
-	! Sources of income
-		Pr_mat = Profit_Matrix(R,P)
-		K_mat  = K_Matrix(R,P)
-		do zi=1,nz
-		do xi=1,nx 
-		do ai=1,na 
-			YGRID(ai,zi,xi) = Y_a(agrid(ai),zi,xi)
-		enddo 
-		enddo 
-		enddo
-		CALL ComputeLaborUnits(Ebar, wage) 
+	! ! Sources of income
+	! 	Pr_mat = Profit_Matrix(R,P)
+	! 	K_mat  = K_Matrix(R,P)
+	! 	do zi=1,nz
+	! 	do xi=1,nx 
+	! 	do ai=1,na 
+	! 		YGRID(ai,zi,xi) = Y_a(agrid(ai),zi,xi)
+	! 	enddo 
+	! 	enddo 
+	! 	enddo
+	! 	CALL ComputeLaborUnits(Ebar, wage) 
 
-	MeanWealth 	 = 0.0_dp
-	MeanATReturn = 0.0_DP
-	MeanReturn 	 = 0.0_DP
-	MeanCons  	 = 0.0_DP
-	Mean_Capital = 0.0_DP
+	! MeanWealth 	 = 0.0_dp
+	! MeanATReturn = 0.0_DP
+	! MeanReturn 	 = 0.0_DP
+	! MeanCons  	 = 0.0_DP
+	! Mean_Capital = 0.0_DP
 	
-	MeanATReturn_by_z     = 0.0_DP
-	MeanReturn_by_z       = 0.0_DP
-	Mean_AT_K_Return_by_z = 0.0_DP
-	Mean_K_Return_by_z    = 0.0_DP
-	size_by_z         	  = 0.0_DP
-	Wealth_by_z 	  	  = 0.0_DP
-	Capital_by_z 	  	  = 0.0_DP
-	DO xi=1,nx
-	DO age=1,MaxAge
-	DO zi=1,nz
-	DO ai=1,na
-	DO lambdai=1,nlambda
-	DO ei=1, ne
-	    MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei, xi)*agrid(ai)
-	    Mean_Capital = Mean_Capital + DBN1(age, ai, zi, lambdai, ei, xi)*K_mat(ai,zi,xi)
-	    MeanCons     = MeanCons     + DBN1(age, ai, zi, lambdai, ei, xi)*cons(age, ai, zi, lambdai, ei, xi)
+	! MeanATReturn_by_z     = 0.0_DP
+	! MeanReturn_by_z       = 0.0_DP
+	! Mean_AT_K_Return_by_z = 0.0_DP
+	! Mean_K_Return_by_z    = 0.0_DP
+	! size_by_z         	  = 0.0_DP
+	! Wealth_by_z 	  	  = 0.0_DP
+	! Capital_by_z 	  	  = 0.0_DP
+	! DO xi=1,nx
+	! DO age=1,MaxAge
+	! DO zi=1,nz
+	! DO ai=1,na
+	! DO lambdai=1,nlambda
+	! DO ei=1, ne
+	!     MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei, xi)*agrid(ai)
+	!     Mean_Capital = Mean_Capital + DBN1(age, ai, zi, lambdai, ei, xi)*K_mat(ai,zi,xi)
+	!     MeanCons     = MeanCons     + DBN1(age, ai, zi, lambdai, ei, xi)*cons(age, ai, zi, lambdai, ei, xi)
 
-	    size_by_z(zi)    = size_by_z(zi)    + DBN1(age, ai, zi, lambdai, ei, xi) 
-	    Wealth_by_z(zi)  = Wealth_by_z(zi)  + DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)
-	    Capital_by_z(zi) = Capital_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)
+	!     size_by_z(zi)    = size_by_z(zi)    + DBN1(age, ai, zi, lambdai, ei, xi) 
+	!     Wealth_by_z(zi)  = Wealth_by_z(zi)  + DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)
+	!     Capital_by_z(zi) = Capital_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)
 
-	    MeanReturn           = MeanReturn          + DBN1(age, ai, zi, lambdai, ei, xi) * &
-	    							& (R*agrid(ai) + Pr_mat(ai,zi,xi))
-	    MeanReturn_by_z(zi)  = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * &
-	    							& (R*agrid(ai) + Pr_mat(ai,zi,xi)) 
+	!     MeanReturn           = MeanReturn          + DBN1(age, ai, zi, lambdai, ei, xi) * &
+	!     							& (R*agrid(ai) + Pr_mat(ai,zi,xi))
+	!     MeanReturn_by_z(zi)  = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * &
+	!     							& (R*agrid(ai) + Pr_mat(ai,zi,xi)) 
 	    
-	    MeanATReturn           = MeanATReturn          + DBN1(age, ai, zi, lambdai, ei, xi) * (YGRID(ai,zi,xi)-agrid(ai))
-	    MeanATReturn_by_z(zi)  = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * (YGRID(ai,zi,xi)-agrid(ai))
+	!     MeanATReturn           = MeanATReturn          + DBN1(age, ai, zi, lambdai, ei, xi) * (YGRID(ai,zi,xi)-agrid(ai))
+	!     MeanATReturn_by_z(zi)  = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * (YGRID(ai,zi,xi)-agrid(ai))
 	    
 
-	    !MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)* agrid(ai)
-	    !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
-	    !  MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)    
-	    !else
-	    !  MeanReturn = MeanReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
-	    !   			& ( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) 
-	    !endif      
-	ENDDO
-	ENDDO
-	ENDDO
-	ENDDO    
-	ENDDO    
-	ENDDO
-		! Allocate MeanReturn to K
-		Mean_K_Return_by_z    = MeanReturn_by_z
-		Mean_AT_K_Return_by_z = MeanATReturn_by_z     
-	Wealth_Output = MeanWealth/YBAR 
-	MeanReturn    = MeanReturn/MeanWealth
-	MeanATReturn  = MeanATReturn/MeanWealth
-	MeanATReturn_by_z     = MeanATReturn_by_z / Wealth_by_z
-    MeanReturn_by_z       = MeanReturn_by_z   / Wealth_by_z
-    Mean_AT_K_Return_by_z = Mean_AT_K_Return_by_z / Capital_by_z
-    Mean_K_Return_by_z    = Mean_K_Return_by_z   / Capital_by_z
+	!     !MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)* agrid(ai)
+	!     !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
+	!     !  MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)    
+	!     !else
+	!     !  MeanReturn = MeanReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
+	!     !   			& ( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) 
+	!     !endif      
+	! ENDDO
+	! ENDDO
+	! ENDDO
+	! ENDDO    
+	! ENDDO    
+	! ENDDO
+	! 	! Allocate MeanReturn to K
+	! 	Mean_K_Return_by_z    = MeanReturn_by_z
+	! 	Mean_AT_K_Return_by_z = MeanATReturn_by_z     
+	! Wealth_Output = MeanWealth/YBAR 
+	! MeanReturn    = MeanReturn/MeanWealth
+	! MeanATReturn  = MeanATReturn/MeanWealth
+	! MeanATReturn_by_z     = MeanATReturn_by_z / Wealth_by_z
+ !    MeanReturn_by_z       = MeanReturn_by_z   / Wealth_by_z
+ !    Mean_AT_K_Return_by_z = Mean_AT_K_Return_by_z / Capital_by_z
+ !    Mean_K_Return_by_z    = Mean_K_Return_by_z   / Capital_by_z
 
 
-	VarATReturn = 0.0_DP
-	VarReturn 	= 0.0_DP
-	Var_AT_K_Return = 0.0_DP
-	Var_K_Return 	= 0.0_DP
-	DO xi=1,nx
-	DO age=1,MaxAge
-	DO zi=1,nz
-	DO ai=1,na
-	DO lambdai=1,nlambda
-	DO ei=1, ne  
+	! VarATReturn = 0.0_DP
+	! VarReturn 	= 0.0_DP
+	! Var_AT_K_Return = 0.0_DP
+	! Var_K_Return 	= 0.0_DP
+	! DO xi=1,nx
+	! DO age=1,MaxAge
+	! DO zi=1,nz
+	! DO ai=1,na
+	! DO lambdai=1,nlambda
+	! DO ei=1, ne  
 
-	    VarReturn    = VarReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
-	    				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/agrid(ai)-MeanReturn)**2.0_dp
+	!     VarReturn    = VarReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
+	!     				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/agrid(ai)-MeanReturn)**2.0_dp
 
-	    Var_K_Return = Var_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
-	    				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp
+	!     Var_K_Return = Var_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
+	!     				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp
 
-	    VarATReturn  = VarATReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
-	    				& ((YGRID(ai,zi,xi)-agrid(ai))/agrid(ai)-MeanATReturn)**2.0_dp 
+	!     VarATReturn  = VarATReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
+	!     				& ((YGRID(ai,zi,xi)-agrid(ai))/agrid(ai)-MeanATReturn)**2.0_dp 
 
-	    Var_AT_K_Return  = Var_AT_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
-	    				& ((YGRID(ai,zi,xi)-agrid(ai))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp 
+	!     Var_AT_K_Return  = Var_AT_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
+	!     				& ((YGRID(ai,zi,xi)-agrid(ai))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp 
 	    
-	    !VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
-	    !				& ((MBGRID(ai,zi)-1.0_DP)-MeanATReturn)**2.0_dp
+	!     !VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+	!     !				& ((MBGRID(ai,zi)-1.0_DP)-MeanATReturn)**2.0_dp
 
-	    !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
-		!    VarReturn = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * (R-MeanReturn)**2.0_dp
-	   	!else
-		!	VarReturn = VarReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * & 
-		!				& (( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) -MeanReturn)**2.0_dp
-	   	!endif  
+	!     !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
+	! 	!    VarReturn = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * (R-MeanReturn)**2.0_dp
+	!    	!else
+	! 	!	VarReturn = VarReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * & 
+	! 	!				& (( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) -MeanReturn)**2.0_dp
+	!    	!endif  
 
-	ENDDO
-	ENDDO
-	ENDDO
-	ENDDO    
-	ENDDO    
-	ENDDO  
-	StdATReturn     = VarATReturn**0.5_DP
-	StdReturn       = VarReturn**0.5_DP
-	Std_AT_K_Return = Var_AT_K_Return**0.5_DP
-	Std_K_Return    = Var_K_Return**0.5_DP
+	! ENDDO
+	! ENDDO
+	! ENDDO
+	! ENDDO    
+	! ENDDO    
+	! ENDDO  
+	! StdATReturn     = VarATReturn**0.5_DP
+	! StdReturn       = VarReturn**0.5_DP
+	! Std_AT_K_Return = Var_AT_K_Return**0.5_DP
+	! Std_K_Return    = Var_K_Return**0.5_DP
 
 
-    ! Debt to GDP Ratio
-    External_Debt_GDP = 0.0_DP
-	DO xi=1,nx
-	DO zi=1,nz
-	DO ai=1,na
-	    External_Debt_GDP = External_Debt_GDP + sum(DBN1(:, ai, zi, :, :,xi))*abs(K_mat(ai,zi,xi)-agrid(ai))
-	ENDDO
-	ENDDO
-	ENDDO
-	External_Debt_GDP = 0.5_dp*External_Debt_GDP / YBAR
+ !    ! Debt to GDP Ratio
+ !    External_Debt_GDP = 0.0_DP
+	! DO xi=1,nx
+	! DO zi=1,nz
+	! DO ai=1,na
+	!     External_Debt_GDP = External_Debt_GDP + sum(DBN1(:, ai, zi, :, :,xi))*abs(K_mat(ai,zi,xi)-agrid(ai))
+	! ENDDO
+	! ENDDO
+	! ENDDO
+	! External_Debt_GDP = 0.5_dp*External_Debt_GDP / YBAR
 
-	! Savings Rate
-	group 	 = 1
-	A_Age 	 = 0.0_dp
-	A_AZ  	 = 0.0_dp 
-	A_W  	 = 0.0_dp
-	Ap_Age 	 = 0.0_dp
-	Ap_AZ  	 = 0.0_dp 
-	Ap_W  	 = 0.0_dp
-	Y_Age 	 = 0.0_dp
-	Y_AZ  	 = 0.0_dp 
-	Y_W   	 = 0.0_dp
-	size_Age = 0.0_dp
-	size_AZ  = 0.0_dp
-	size_W   = 0.0_dp
-	DO age=1,MaxAge 
+	! ! Savings Rate
+	! group 	 = 1
+	! A_Age 	 = 0.0_dp
+	! A_AZ  	 = 0.0_dp 
+	! A_W  	 = 0.0_dp
+	! Ap_Age 	 = 0.0_dp
+	! Ap_AZ  	 = 0.0_dp 
+	! Ap_W  	 = 0.0_dp
+	! Y_Age 	 = 0.0_dp
+	! Y_AZ  	 = 0.0_dp 
+	! Y_W   	 = 0.0_dp
+	! size_Age = 0.0_dp
+	! size_AZ  = 0.0_dp
+	! size_W   = 0.0_dp
+	! DO age=1,MaxAge 
 
-	    DO while (age.gt.age_limit(group+1))
-	        group = group+1
-	    ENDDO    
+	!     DO while (age.gt.age_limit(group+1))
+	!         group = group+1
+	!     ENDDO    
 	 
-	 	DO xi=1,nx
-	    DO ai=1,na
-        DO zi=1,nz
-        DO lambdai=1,nlambda
-        DO ei=1,ne
-        	size_Age(group)   = size_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)
-        	size_AZ(group,zi) = size_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
+	!  	DO xi=1,nx
+	!     DO ai=1,na
+ !        DO zi=1,nz
+ !        DO lambdai=1,nlambda
+ !        DO ei=1,ne
+ !        	size_Age(group)   = size_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)
+ !        	size_AZ(group,zi) = size_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
 
-        	A_Age(group)      = A_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
-        	A_AZ(group,zi)    = A_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+ !        	A_Age(group)      = A_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+ !        	A_AZ(group,zi)    = A_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
 
-        	Ap_Age(group)     = Ap_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
-        	Ap_AZ(group,zi)   = Ap_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+ !        	Ap_Age(group)     = Ap_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+ !        	Ap_AZ(group,zi)   = Ap_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
 
-        	if (age.lt.RetAge) then
-        	Y_Age(group)      = Y_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*&
-        						& ( YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
-        	Y_AZ(group,zi)    = Y_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*&
-        						& ( YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
-        	else 
-        	Y_Age(group)      = Y_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*( YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei) )
-        	Y_AZ(group,zi)    = Y_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*( YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei) )
-        	endif
+ !        	if (age.lt.RetAge) then
+ !        	Y_Age(group)      = Y_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*&
+ !        						& ( YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+ !        	Y_AZ(group,zi)    = Y_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*&
+ !        						& ( YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+ !        	else 
+ !        	Y_Age(group)      = Y_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*( YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei) )
+ !        	Y_AZ(group,zi)    = Y_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*( YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei) )
+ !        	endif
 
-        	if (ai.le.prctile_ai_ind(90)) then 
-        		size_W(1) = size_W(1) + DBN1(age,ai,zi,lambdai,ei,xi)
-        		A_W(1)    = A_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
-        		Ap_W(1)   = Ap_W(1)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
-        		if (age.lt.RetAge) then 
-        		Y_W(1)    = Y_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
-        					& (YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
-        		else 
-        		Y_W(1)    = Y_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*(YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
-        		endif 
-        	else if  ((ai.gt.prctile_ai_ind(90)).and.(ai.le.prctile_ai_ind(99))) then
-        		size_W(2) = size_W(2) + DBN1(age,ai,zi,lambdai,ei,xi)
-        		A_W(2)    = A_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
-        		Ap_W(2)   = Ap_W(2)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
-        		if (age.lt.RetAge) then 
-        		Y_W(2)    = Y_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
-        					& (YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
-        		else 
-        		Y_W(2)    = Y_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
-        					& (YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
-        		endif
-        	else 
-        		size_W(3) = size_W(3) + DBN1(age,ai,zi,lambdai,ei,xi)
-        		A_W(3)    = A_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
-        		Ap_W(3)   = Ap_W(3)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
-        		if (age.lt.RetAge) then 
-        		Y_W(3)    = Y_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
-        					&	(YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
-        		else 
-        		Y_W(3)    = Y_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*(YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
-        		endif
-        	endif 
-        ENDDO
-        ENDDO
-        ENDDO
-        ENDDO
-	    ENDDO
-	ENDDO
-	S_Rate_A_Age = (Ap_Age-A_Age)/A_Age
-	S_Rate_A_AZ  = (Ap_AZ-A_AZ)/A_AZ
-	S_Rate_A_W   = (Ap_W-A_W)/A_W
-	S_Rate_Y_Age = (Ap_Age-A_Age)/Y_Age
-	S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
-	S_Rate_Y_W   = (Ap_W-A_W)/Y_W
+ !        	if (ai.le.prctile_ai_ind(90)) then 
+ !        		size_W(1) = size_W(1) + DBN1(age,ai,zi,lambdai,ei,xi)
+ !        		A_W(1)    = A_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+ !        		Ap_W(1)   = Ap_W(1)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+ !        		if (age.lt.RetAge) then 
+ !        		Y_W(1)    = Y_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
+ !        					& (YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+ !        		else 
+ !        		Y_W(1)    = Y_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*(YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
+ !        		endif 
+ !        	else if  ((ai.gt.prctile_ai_ind(90)).and.(ai.le.prctile_ai_ind(99))) then
+ !        		size_W(2) = size_W(2) + DBN1(age,ai,zi,lambdai,ei,xi)
+ !        		A_W(2)    = A_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+ !        		Ap_W(2)   = Ap_W(2)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+ !        		if (age.lt.RetAge) then 
+ !        		Y_W(2)    = Y_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
+ !        					& (YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+ !        		else 
+ !        		Y_W(2)    = Y_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
+ !        					& (YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
+ !        		endif
+ !        	else 
+ !        		size_W(3) = size_W(3) + DBN1(age,ai,zi,lambdai,ei,xi)
+ !        		A_W(3)    = A_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+ !        		Ap_W(3)   = Ap_W(3)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+ !        		if (age.lt.RetAge) then 
+ !        		Y_W(3)    = Y_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
+ !        					&	(YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+ !        		else 
+ !        		Y_W(3)    = Y_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*(YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
+ !        		endif
+ !        	endif 
+ !        ENDDO
+ !        ENDDO
+ !        ENDDO
+ !        ENDDO
+	!     ENDDO
+	! ENDDO
+	! S_Rate_A_Age = (Ap_Age-A_Age)/A_Age
+	! S_Rate_A_AZ  = (Ap_AZ-A_AZ)/A_AZ
+	! S_Rate_A_W   = (Ap_W-A_W)/A_W
+	! S_Rate_Y_Age = (Ap_Age-A_Age)/Y_Age
+	! S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
+	! S_Rate_Y_W   = (Ap_W-A_W)/Y_W
 
-	! Leverage Ratio and fraction of constrainted firms 
-	leverage_age_z = 0.0_dp 
-	size_by_age_z  = 0.0_dp 
-	constrained_firms_age_z = 0.0_dp
-	constrained_firm_ind = 0
-	do xi=1,nx
-	do age = 1,MaxAge 
-	do zi  = 1,nz 
-        DO lambdai=1,nlambda
-        DO ei=1,ne
-        DO ai=1,na
-        	size_by_age(age)       = size_by_age(age)       + DBN1(age,ai,zi,lambdai,ei,xi)
-			size_by_age_z(age,zi)  = size_by_age_z(age,zi)  + DBN1(age,ai,zi,lambdai,ei,xi)
-			leverage_age_z(age,zi) = leverage_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*K_mat(ai,zi,xi)/agrid(ai)
-			if (K_mat(ai,zi,xi).ge.(theta(zi)*agrid(ai))) then 
-				constrained_firms_age(age)      = constrained_firms_age(age)      + DBN1(age,ai,zi,lambdai,ei,xi)
-				constrained_firms_age_z(age,zi) = constrained_firms_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
-				constrained_firm_ind(age,ai,zi,lambdai,ei,xi) = 1
-			endif 
-			Firm_Output(age,ai,zi,lambdai,ei,xi) = xz_grid(xi,zi)*K_mat(ai,zi,xi)
-			Firm_Profit(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi)
-		enddo
-		enddo 
-		enddo 
-	enddo 
-	enddo 
-	enddo 
-	leverage_age_z = leverage_age_z/size_by_age_z
-	constrained_firms_age_z = constrained_firms_age_z/size_by_age_z 
-	constrained_firms_age   = constrained_firms_age/size_by_age 
+	! ! Leverage Ratio and fraction of constrainted firms 
+	! leverage_age_z = 0.0_dp 
+	! size_by_age_z  = 0.0_dp 
+	! constrained_firms_age_z = 0.0_dp
+	! constrained_firm_ind = 0
+	! do xi=1,nx
+	! do age = 1,MaxAge 
+	! do zi  = 1,nz 
+ !        DO lambdai=1,nlambda
+ !        DO ei=1,ne
+ !        DO ai=1,na
+ !        	size_by_age(age)       = size_by_age(age)       + DBN1(age,ai,zi,lambdai,ei,xi)
+	! 		size_by_age_z(age,zi)  = size_by_age_z(age,zi)  + DBN1(age,ai,zi,lambdai,ei,xi)
+	! 		leverage_age_z(age,zi) = leverage_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*K_mat(ai,zi,xi)/agrid(ai)
+	! 		if (K_mat(ai,zi,xi).ge.(theta(zi)*agrid(ai))) then 
+	! 			constrained_firms_age(age)      = constrained_firms_age(age)      + DBN1(age,ai,zi,lambdai,ei,xi)
+	! 			constrained_firms_age_z(age,zi) = constrained_firms_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
+	! 			constrained_firm_ind(age,ai,zi,lambdai,ei,xi) = 1
+	! 		endif 
+	! 		Firm_Output(age,ai,zi,lambdai,ei,xi) = xz_grid(xi,zi)*K_mat(ai,zi,xi)
+	! 		Firm_Profit(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi)
+	! 	enddo
+	! 	enddo 
+	! 	enddo 
+	! enddo 
+	! enddo 
+	! enddo 
+	! leverage_age_z = leverage_age_z/size_by_age_z
+	! constrained_firms_age_z = constrained_firms_age_z/size_by_age_z 
+	! constrained_firms_age   = constrained_firms_age/size_by_age 
 
 
-	if (solving_bench.eq.1) then
-		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats.txt', STATUS='replace')
-		WRITE(UNIT=11, FMT=*) ' '
-		WRITE(UNIT=11, FMT=*) 'Z ','Const_firms_by_z: ','Const_firms_z_x1 ','Const_firms_z_x1 ','Opt_K_x_1 ','Opt_K_x2 '
-		WRITE(UNIT=11, FMT=*) 'Benchmark'
-	else
-		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats_exp.txt', STATUS='replace') 
-		WRITE(UNIT=11, FMT=*) ' '
-		WRITE(UNIT=11, FMT=*) 'Z ','Const_firms_by_z: ','Const_firms_z_x1 ','Const_firms_z_x1 ','Opt_K_x_1 ','Opt_K_x2 '
-		WRITE(UNIT=11, FMT=*) 'Tax_Reform'
-	end if 
-		WRITE(UNIT=11, FMT=*) ' '
-		do zi=1,nz
-		WRITE(UNIT=11, FMT=*) zi, & 
-			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
-			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &
-			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
-			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) , & 
-			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
-		enddo 	
-		WRITE(UNIT=11, FMT=*) 'Total', 100.0_dp*sum(constrained_firm_ind*DBN1)
+	! if (solving_bench.eq.1) then
+	! 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats.txt', STATUS='replace')
+	! 	WRITE(UNIT=11, FMT=*) ' '
+	! 	WRITE(UNIT=11, FMT=*) 'Z ','Const_firms_by_z: ','Const_firms_z_x1 ','Const_firms_z_x1 ','Opt_K_x_1 ','Opt_K_x2 '
+	! 	WRITE(UNIT=11, FMT=*) 'Benchmark'
+	! else
+	! 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats_exp.txt', STATUS='replace') 
+	! 	WRITE(UNIT=11, FMT=*) ' '
+	! 	WRITE(UNIT=11, FMT=*) 'Z ','Const_firms_by_z: ','Const_firms_z_x1 ','Const_firms_z_x1 ','Opt_K_x_1 ','Opt_K_x2 '
+	! 	WRITE(UNIT=11, FMT=*) 'Tax_Reform'
+	! end if 
+	! 	WRITE(UNIT=11, FMT=*) ' '
+	! 	do zi=1,nz
+	! 	WRITE(UNIT=11, FMT=*) zi, & 
+	! 		100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
+	! 		100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &
+	! 		100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
+	! 		(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) , & 
+	! 		(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
+	! 	enddo 	
+	! 	WRITE(UNIT=11, FMT=*) 'Total', 100.0_dp*sum(constrained_firm_ind*DBN1)
 
-		CLOSE(UNIT=11)
+	! 	CLOSE(UNIT=11)
 		
 
 
 
 
-	! Distribution of firm wealth
-		do ai=1,na
-			Firm_Wealth(:,ai,:,:,:,:) = V_Pr(:,ai,:,:,:,:) + (1.0_dp+R)*agrid(ai)
-		enddo
-		Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
+	! ! Distribution of firm wealth
+	! 	do ai=1,na
+	! 		Firm_Wealth(:,ai,:,:,:,:) = V_Pr(:,ai,:,:,:,:) + (1.0_dp+R)*agrid(ai)
+	! 	enddo
+	! 	Mean_Firm_Wealth = sum(Firm_Wealth*DBN1)
 
-		DBN_vec         = reshape(DBN1       ,(/size(DBN1)/))
-		Firm_Wealth_vec = reshape(Firm_Wealth,(/size(DBN1)/))
+	! 	DBN_vec         = reshape(DBN1       ,(/size(DBN1)/))
+	! 	Firm_Wealth_vec = reshape(Firm_Wealth,(/size(DBN1)/))
 
-		if (solving_bench.eq.1) then
-			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Bench.txt', STATUS='replace')
-		else
-			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Exp.txt', STATUS='replace')
-		end if 
-			WRITE(UNIT=11, FMT=*) ' '
-			WRITE(UNIT=11, FMT=*) 'Firm_Wealth_Stats'
-			WRITE(UNIT=11, FMT=*) 'Mean_Firm_Wealth= ', Mean_Firm_Wealth
-			WRITE(UNIT=11, FMT=*) 'Top_x% ','x_percentile ','wealth_share_above_x ', 'Counter_CDF'
+	! 	if (solving_bench.eq.1) then
+	! 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Bench.txt', STATUS='replace')
+	! 	else
+	! 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Firm_Wealth_Exp.txt', STATUS='replace')
+	! 	end if 
+	! 		WRITE(UNIT=11, FMT=*) ' '
+	! 		WRITE(UNIT=11, FMT=*) 'Firm_Wealth_Stats'
+	! 		WRITE(UNIT=11, FMT=*) 'Mean_Firm_Wealth= ', Mean_Firm_Wealth
+	! 		WRITE(UNIT=11, FMT=*) 'Top_x% ','x_percentile ','wealth_share_above_x ', 'Counter_CDF'
 
-		prctile_FW = (/0.40_DP, 0.20_dp, 0.10_dp, 0.01_dp, 0.001_dp, 0.0001_dp/)
-		a = minval(Firm_Wealth_vec)
-		b = maxval(Firm_Wealth_vec) 
-		c = a
-		do i=1,size(prctile_FW)
-			a = c
-			b = maxval(Firm_Wealth_vec)
-			c = (a+b)/2.0_dp
-			CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
-			print*, ' '
-			!print*, 'Percentile', prctile_FW(i)
-			do while ((abs(CCDF_c-prctile_FW(i))>0.0001_dp).and.(b-a>1e-8))
-				if (CCDF_c<prctile_FW(i)) then 
-					b = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
-				else 
-					a = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
-				endif
-				!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', CCDF_c-prctile_FW(i)
-			enddo 
-			FW_top_x(i)       = c 
-			FW_top_x_share(i) = 100*sum(Firm_Wealth_vec*DBN_vec,Firm_Wealth_vec>=c)/Mean_Firm_Wealth
-			WRITE(UNIT=11, FMT=*) 100_dp*prctile_FW(i),FW_top_x(i),FW_top_x_share(i), CCDF_c
-		enddo 
+	! 	prctile_FW = (/0.40_DP, 0.20_dp, 0.10_dp, 0.01_dp, 0.001_dp, 0.0001_dp/)
+	! 	a = minval(Firm_Wealth_vec)
+	! 	b = maxval(Firm_Wealth_vec) 
+	! 	c = a
+	! 	do i=1,size(prctile_FW)
+	! 		a = c
+	! 		b = maxval(Firm_Wealth_vec)
+	! 		c = (a+b)/2.0_dp
+	! 		CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+	! 		print*, ' '
+	! 		!print*, 'Percentile', prctile_FW(i)
+	! 		do while ((abs(CCDF_c-prctile_FW(i))>0.0001_dp).and.(b-a>1e-8))
+	! 			if (CCDF_c<prctile_FW(i)) then 
+	! 				b = c 
+	! 				c = (a+b)/2.0_dp
+	! 				CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+	! 			else 
+	! 				a = c 
+	! 				c = (a+b)/2.0_dp
+	! 				CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
+	! 			endif
+	! 			!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', CCDF_c-prctile_FW(i)
+	! 		enddo 
+	! 		FW_top_x(i)       = c 
+	! 		FW_top_x_share(i) = 100*sum(Firm_Wealth_vec*DBN_vec,Firm_Wealth_vec>=c)/Mean_Firm_Wealth
+	! 		WRITE(UNIT=11, FMT=*) 100_dp*prctile_FW(i),FW_top_x(i),FW_top_x_share(i), CCDF_c
+	! 	enddo 
 
-			CLOSE(UNIT=11)
+	! 		CLOSE(UNIT=11)
 
-	! Distribution of bequest
-		Bequest_Wealth=0.0_DP
-		DO xi=1,nx
-		DO zi=1,nz
-		DO ai=1,na
-		DO lambdai=1,nlambda
-		DO ei=1, ne
-		   Bequest_Wealth = Bequest_Wealth  +   DBN1(1, ai, zi, lambdai, ei, xi) * agrid(ai)
-		ENDDO
-		ENDDO
-		ENDDO    
-		ENDDO 
-		ENDDO  
+	! ! Distribution of bequest
+	! 	Bequest_Wealth=0.0_DP
+	! 	DO xi=1,nx
+	! 	DO zi=1,nz
+	! 	DO ai=1,na
+	! 	DO lambdai=1,nlambda
+	! 	DO ei=1, ne
+	! 	   Bequest_Wealth = Bequest_Wealth  +   DBN1(1, ai, zi, lambdai, ei, xi) * agrid(ai)
+	! 	ENDDO
+	! 	ENDDO
+	! 	ENDDO    
+	! 	ENDDO 
+	! 	ENDDO  
 
 
-		! Distribution of bequest (matrix)	
-		do ai=1,MaxAge
-			DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
-		enddo 
-		DBN_bq = DBN_bq/sum(DBN_bq)
+	! 	! Distribution of bequest (matrix)	
+	! 	do ai=1,MaxAge
+	! 		DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
+	! 	enddo 
+	! 	DBN_bq = DBN_bq/sum(DBN_bq)
 		
-		! Vectorization
-		DBN_bq_vec        = reshape(DBN_bq,(/size(DBN1)/))
-		BQ_vec            = reshape(Aprime,(/size(DBN1)/))
+	! 	! Vectorization
+	! 	DBN_bq_vec        = reshape(DBN_bq,(/size(DBN1)/))
+	! 	BQ_vec            = reshape(Aprime,(/size(DBN1)/))
 
-		! Mean Bequest
-		Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
+	! 	! Mean Bequest
+	! 	Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
 
-		if (solving_bench.eq.1) then
-			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Bench.txt', STATUS='replace')
-		else
-			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Exp.txt', STATUS='replace')
-		end if 
-			WRITE(UNIT=11, FMT=*) ' '
-			WRITE(UNIT=11, FMT=*) 'Bequest_Stats'
-			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/Wealth= '		, Bequest_Wealth/MeanWealth 
-			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/PV_Wealth= '	, Bequest_Wealth/Mean_Firm_Wealth 
-			WRITE(UNIT=11, FMT=*) 'Bequests_Above_Threshold= '	, Threshold_Share_bq
-			WRITE(UNIT=11, FMT=*) 'Bequest_Revenue/YBAR= '		, 0
-			WRITE(UNIT=11, FMT=*) 'Top_x% ','x_percentile ','x_percentile/YBAR'
+	! 	if (solving_bench.eq.1) then
+	! 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Bench.txt', STATUS='replace')
+	! 	else
+	! 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Exp.txt', STATUS='replace')
+	! 	end if 
+	! 		WRITE(UNIT=11, FMT=*) ' '
+	! 		WRITE(UNIT=11, FMT=*) 'Bequest_Stats'
+	! 		WRITE(UNIT=11, FMT=*) 'Mean_Bequest/Wealth= '		, Bequest_Wealth/MeanWealth 
+	! 		WRITE(UNIT=11, FMT=*) 'Mean_Bequest/PV_Wealth= '	, Bequest_Wealth/Mean_Firm_Wealth 
+	! 		WRITE(UNIT=11, FMT=*) 'Bequests_Above_Threshold= '	, Threshold_Share_bq
+	! 		WRITE(UNIT=11, FMT=*) 'Bequest_Revenue/YBAR= '		, 0
+	! 		WRITE(UNIT=11, FMT=*) 'Top_x% ','x_percentile ','x_percentile/YBAR'
 
-		prctile_bq = (/0.90_dp, 0.70_dp, 0.5_dp, 0.30_dp, 0.10_dp, 0.02_dp, 0.01_dp/)
-		a = minval(BQ_vec)
-		b = maxval(BQ_vec) 
-		c = a
-		do i=1,size(prctile_bq)
-			a = c
-			b = maxval(BQ_vec)
-			c = (a+b)/2.0_dp
-			CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-			!print*, ' '
-			!print*, 'Percentile', prctile_bq(i)
-			do while ((abs(CCDF_c-prctile_bq(i))>0.0001_dp).and.(b-a>1e-8))
-				if (CCDF_c<prctile_bq(i)) then 
-					b = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-				else 
-					a = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-				endif
-				!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', abs(CCDF_c-prctile_bq(i))
-			enddo 
-			BQ_top_x(i) = c 
-			WRITE(UNIT=11, FMT=*) 100_dp*prctile_bq(i),BQ_top_x(i),BQ_top_x(i)/YBAR, CCDF_C
-		enddo 
+	! 	prctile_bq = (/0.90_dp, 0.70_dp, 0.5_dp, 0.30_dp, 0.10_dp, 0.02_dp, 0.01_dp/)
+	! 	a = minval(BQ_vec)
+	! 	b = maxval(BQ_vec) 
+	! 	c = a
+	! 	do i=1,size(prctile_bq)
+	! 		a = c
+	! 		b = maxval(BQ_vec)
+	! 		c = (a+b)/2.0_dp
+	! 		CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+	! 		!print*, ' '
+	! 		!print*, 'Percentile', prctile_bq(i)
+	! 		do while ((abs(CCDF_c-prctile_bq(i))>0.0001_dp).and.(b-a>1e-8))
+	! 			if (CCDF_c<prctile_bq(i)) then 
+	! 				b = c 
+	! 				c = (a+b)/2.0_dp
+	! 				CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+	! 			else 
+	! 				a = c 
+	! 				c = (a+b)/2.0_dp
+	! 				CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+	! 			endif
+	! 			!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', abs(CCDF_c-prctile_bq(i))
+	! 		enddo 
+	! 		BQ_top_x(i) = c 
+	! 		WRITE(UNIT=11, FMT=*) 100_dp*prctile_bq(i),BQ_top_x(i),BQ_top_x(i)/YBAR, CCDF_C
+	! 	enddo 
 
-			CLOSE(UNIT=11)
+	! 		CLOSE(UNIT=11)
 
 
-	! Frisch Elasticity 
-	! This is only for agents with positive hours worked
-		Frisch_Elasticity = 0.0_dp
-		Size_Frisch       = 0.0_dp 
-		Hours_Frisch	  = 0.0_dp
-		DO xi=1,nx
-		DO ei=1, ne
-		DO lambdai=1,nlambda
-		DO zi=1,nz
-		DO ai=1,na
-		DO age=1,RetAge-1
-		if (HOURS(age,ai,zi,lambdai,ei,xi).gt.0.001_dp) then 
-		Size_Frisch = Size_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)
-		Frisch_Elasticity = Frisch_Elasticity + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
-		& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
-		Hours_Frisch = Hours_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)*HOURS(age,ai,zi,lambdai,ei,xi)
-		endif 
-		ENDDO
-		ENDDO
-		ENDDO
-		ENDDO
-		ENDDO
-		ENDDO
-		Frisch_Elasticity = Frisch_Elasticity/Size_Frisch
-		Hours_Frisch 	  = Hours_Frisch/Size_Frisch
-		Frisch_Elasticity_2 = (1.0_dp-tauPL)/( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * Hours_Frisch/(1-Hours_Frisch) - tauPL )
-		print*, 'Frisch_Elasticity',Frisch_Elasticity,Frisch_Elasticity_2,Hours_Frisch, Size_Frisch
+	! ! Frisch Elasticity 
+	! ! This is only for agents with positive hours worked
+	! 	Frisch_Elasticity = 0.0_dp
+	! 	Size_Frisch       = 0.0_dp 
+	! 	Hours_Frisch	  = 0.0_dp
+	! 	DO xi=1,nx
+	! 	DO ei=1, ne
+	! 	DO lambdai=1,nlambda
+	! 	DO zi=1,nz
+	! 	DO ai=1,na
+	! 	DO age=1,RetAge-1
+	! 	if (HOURS(age,ai,zi,lambdai,ei,xi).gt.0.001_dp) then 
+	! 	Size_Frisch = Size_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)
+	! 	Frisch_Elasticity = Frisch_Elasticity + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
+	! 	& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
+	! 	Hours_Frisch = Hours_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)*HOURS(age,ai,zi,lambdai,ei,xi)
+	! 	endif 
+	! 	ENDDO
+	! 	ENDDO
+	! 	ENDDO
+	! 	ENDDO
+	! 	ENDDO
+	! 	ENDDO
+	! 	Frisch_Elasticity = Frisch_Elasticity/Size_Frisch
+	! 	Hours_Frisch 	  = Hours_Frisch/Size_Frisch
+	! 	Frisch_Elasticity_2 = (1.0_dp-tauPL)/( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * Hours_Frisch/(1-Hours_Frisch) - tauPL )
+	! 	print*, 'Frisch_Elasticity',Frisch_Elasticity,Frisch_Elasticity_2,Hours_Frisch, Size_Frisch
 		
 
 
 
-	!print*, 'MeanReturn=',MeanReturn, 'StdReturn=', StdReturn
-	!print*,'MeanReturn_by_z=',MeanReturn_by_z
+	! !print*, 'MeanReturn=',MeanReturn, 'StdReturn=', StdReturn
+	! !print*,'MeanReturn_by_z=',MeanReturn_by_z
 
-	SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP  + (1.0_DP-prct1_wealth/0.34_DP)**2.0_DP  + (prct10_wealth-0.69_DP)**2.0_DP &
-                   & + (1.0_DP-Std_Log_Earnings_25_60 / 0.8_DP)**2.0_DP + (1.0_DP-meanhours_25_60/0.4_DP)**2.0_DP &
-                   & + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
-	!print*,''
-	!print*,"Current parameters"
-	!print*,'beta',beta,'rho_z',rho_z,'sigma_z',sigma_z_eps,'sigma_lam',sigma_lambda_eps,'phi',phi
-	print*,"Statistics"
-	print*,'Debt/GDP',External_Debt_GDP,'W/GDP',Wealth_Output,'Top 1% A',prct1_wealth,'Top 10% A',prct10_wealth
-	print*,'STD Labor Earnings',Std_Log_Earnings_25_60,'Mean Labor (hours 25-60)',meanhours_25_60,'MeanReturn',MeanReturn
-	print*,'PV_Wealth_Top_1%', FW_top_x_share(4), 'PV_Top_10%', FW_top_x_share(3)
-	print*,'Z','Constrained_firms_by_z: ','Capital_high_shock','Capital_low_shock'
-	do zi=1,nz
-		print*, zi, & 
-			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
-			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &
-			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
-			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) , & 
-			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
-	enddo 
-	print*, 'Total Constrained', 100.0_dp*sum(constrained_firm_ind*DBN1)
-	print*,'Moments',SSE_Moments 
-	!print*,''
+	! SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP  + (1.0_DP-prct1_wealth/0.34_DP)**2.0_DP  + (prct10_wealth-0.69_DP)**2.0_DP &
+ !                   & + (1.0_DP-Std_Log_Earnings_25_60 / 0.8_DP)**2.0_DP + (1.0_DP-meanhours_25_60/0.4_DP)**2.0_DP &
+ !                   & + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
+	! !print*,''
+	! !print*,"Current parameters"
+	! !print*,'beta',beta,'rho_z',rho_z,'sigma_z',sigma_z_eps,'sigma_lam',sigma_lambda_eps,'phi',phi
+	! print*,"Statistics"
+	! print*,'Debt/GDP',External_Debt_GDP,'W/GDP',Wealth_Output,'Top 1% A',prct1_wealth,'Top 10% A',prct10_wealth
+	! print*,'STD Labor Earnings',Std_Log_Earnings_25_60,'Mean Labor (hours 25-60)',meanhours_25_60,'MeanReturn',MeanReturn
+	! print*,'PV_Wealth_Top_1%', FW_top_x_share(4), 'PV_Top_10%', FW_top_x_share(3)
+	! print*,'Z','Constrained_firms_by_z: ','Capital_high_shock','Capital_low_shock'
+	! do zi=1,nz
+	! 	print*, zi, & 
+	! 		100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
+	! 		100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &
+	! 		100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
+	! 		(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) , & 
+	! 		(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
+	! enddo 
+	! print*, 'Total Constrained', 100.0_dp*sum(constrained_firm_ind*DBN1)
+	! print*,'Moments',SSE_Moments 
+	! !print*,''
 
-	! Write in files some stats
-	if (solving_bench.eq.1) then
-		OPEN (UNIT=19, FILE=trim(Result_Folder)//'Asset_Stats_bench.txt', STATUS='replace')
-		OPEN (UNIT=20, FILE=trim(Result_Folder)//'leverage_bench.txt', STATUS='replace')
-	else
-		OPEN (UNIT=19, FILE=trim(Result_Folder)//'Asset_Stats_exp.txt', STATUS='replace')
-		OPEN (UNIT=20, FILE=trim(Result_Folder)//'leverage_exp.txt', STATUS='replace')
-	end if 
+	! ! Write in files some stats
+	! if (solving_bench.eq.1) then
+	! 	OPEN (UNIT=19, FILE=trim(Result_Folder)//'Asset_Stats_bench.txt', STATUS='replace')
+	! 	OPEN (UNIT=20, FILE=trim(Result_Folder)//'leverage_bench.txt', STATUS='replace')
+	! else
+	! 	OPEN (UNIT=19, FILE=trim(Result_Folder)//'Asset_Stats_exp.txt', STATUS='replace')
+	! 	OPEN (UNIT=20, FILE=trim(Result_Folder)//'leverage_exp.txt', STATUS='replace')
+	! end if 
 
-		WRITE(UNIT=19, FMT=*) 'Stats on assets, return and savings'
-		WRITE(UNIT=19, FMT=*) ' '
-	! Aggregate Assets and Capital
-		WRITE(UNIT=21, FMT=*) 'Assets and Capital'
-		WRITE(UNIT=21, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
-		WRITE(UNIT=19, FMT=*) 'A', Wealth_by_z  , MeanWealth
-		WRITE(UNIT=19, FMT=*) 'K', Capital_by_z , Mean_Capital 
-		WRITE(UNIT=19, FMT=*) ' '
-	! Return
-		WRITE(UNIT=19, FMT=*) 'Return Stats'
-		WRITE(UNIT=19, FMT=*) ' ', 'Assets', 'Capital'
-		WRITE(UNIT=19, FMT=*) 'Mean_Return', MeanReturn, MeanReturn
-		WRITE(UNIT=19, FMT=*) 'Std_Return', StdReturn, Std_K_Return
-		do zi=1,nz
-			write(rowname,*) zi 
-			rowname = 'Mean_Return_z'//trim(rowname)
-			WRITE(UNIT=19, FMT=*) trim(rowname), MeanReturn_by_z(zi), Mean_K_Return_by_z(zi)
-		enddo 
-		WRITE(UNIT=19, FMT=*) ' '
-		WRITE(UNIT=19, FMT=*) 'Mean_Return_AT', MeanATReturn, MeanATReturn
-		WRITE(UNIT=19, FMT=*) 'Std_Return_AT', StdATReturn, Std_AT_K_Return
-		do zi=1,nz
-			write(rowname,*) zi 
-			rowname = 'Mean_Return_z'//trim(rowname)//'_AT'
-			WRITE(UNIT=19, FMT=*) trim(rowname), MeanATReturn_by_z(zi), Mean_AT_K_Return_by_z(zi)
-		enddo 
-		WRITE(UNIT=19, FMT=*) ' '
-	! Savings
-		WRITE(UNIT=19, FMT=*) 'Saving Rates'
-		WRITE(UNIT=19, FMT=*) '(Ap-A)/A'
-		WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
-		do group=1,max_age_category
-			write(rowname,*) group  
-			rowname = 'Age_Group_'//trim(rowname)
-			WRITE(UNIT=19, FMT=*) rowname, S_Rate_A_AZ(group,:), S_Rate_A_Age(group)
-		enddo 
-		WRITE(UNIT=19, FMT=*) ' '
-		WRITE(UNIT=19, FMT=*) '(Ap-A)/Y'
-		WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
-		do group=1,max_age_category
-			write(rowname,*) group  
-			rowname = 'Age_Group_'//trim(rowname)
-			WRITE(UNIT=19, FMT=*) rowname, S_Rate_Y_AZ(group,:), S_Rate_Y_Age(group)
-		enddo
-		WRITE(UNIT=19, FMT=*) ' '
-		WRITE(UNIT=19, FMT=*) ' ', '<90% ','90%<99% ','99%<'
-		WRITE(UNIT=19, FMT=*) '(Ap-A)/A', S_Rate_A_W
-		WRITE(UNIT=19, FMT=*) '(Ap-A)/Y', S_Rate_Y_W
-		WRITE(UNIT=19, FMT=*) 'A', A_W
-		WRITE(UNIT=19, FMT=*) 'Ap', Ap_W
-		WRITE(UNIT=19, FMT=*) 'Y', Y_W
-		WRITE(UNIT=19, FMT=*) ' '
-		WRITE(UNIT=19, FMT=*) 'A'
-		WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
-		do group=1,max_age_category
-			write(rowname,*) group  
-			rowname = 'Age_Group_'//trim(rowname)
-			WRITE(UNIT=19, FMT=*) rowname, A_AZ(group,:), A_Age(group)
-		enddo 
-		WRITE(UNIT=19, FMT=*) ' '
-		WRITE(UNIT=19, FMT=*) 'Ap'
-		WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
-		do group=1,max_age_category
-			write(rowname,*) group  
-			rowname = 'Age_Group_'//trim(rowname)
-			WRITE(UNIT=19, FMT=*) rowname, Ap_AZ(group,:), Ap_Age(group)
-		enddo 
-		WRITE(UNIT=19, FMT=*) ' '
-		WRITE(UNIT=19, FMT=*) 'Y'
-		WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
-		do group=1,max_age_category
-			write(rowname,*) group  
-			rowname = 'Age_Group_'//trim(rowname)
-			WRITE(UNIT=19, FMT=*) rowname, Y_AZ(group,:), Y_Age(group)
-		enddo 
-		WRITE(UNIT=19, FMT=*) ' '
-	! Wealth percentiles
-		WRITE(UNIT=19, FMT=*) ' '
-		WRITE(UNIT=19, FMT=*) 'Percentiles of Asset Distribution'
-		WRITE(UNIT=19, FMT=*) prctile_ai
+	! 	WRITE(UNIT=19, FMT=*) 'Stats on assets, return and savings'
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! ! Aggregate Assets and Capital
+	! 	WRITE(UNIT=21, FMT=*) 'Assets and Capital'
+	! 	WRITE(UNIT=21, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
+	! 	WRITE(UNIT=19, FMT=*) 'A', Wealth_by_z  , MeanWealth
+	! 	WRITE(UNIT=19, FMT=*) 'K', Capital_by_z , Mean_Capital 
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! ! Return
+	! 	WRITE(UNIT=19, FMT=*) 'Return Stats'
+	! 	WRITE(UNIT=19, FMT=*) ' ', 'Assets', 'Capital'
+	! 	WRITE(UNIT=19, FMT=*) 'Mean_Return', MeanReturn, MeanReturn
+	! 	WRITE(UNIT=19, FMT=*) 'Std_Return', StdReturn, Std_K_Return
+	! 	do zi=1,nz
+	! 		write(rowname,*) zi 
+	! 		rowname = 'Mean_Return_z'//trim(rowname)
+	! 		WRITE(UNIT=19, FMT=*) trim(rowname), MeanReturn_by_z(zi), Mean_K_Return_by_z(zi)
+	! 	enddo 
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! 	WRITE(UNIT=19, FMT=*) 'Mean_Return_AT', MeanATReturn, MeanATReturn
+	! 	WRITE(UNIT=19, FMT=*) 'Std_Return_AT', StdATReturn, Std_AT_K_Return
+	! 	do zi=1,nz
+	! 		write(rowname,*) zi 
+	! 		rowname = 'Mean_Return_z'//trim(rowname)//'_AT'
+	! 		WRITE(UNIT=19, FMT=*) trim(rowname), MeanATReturn_by_z(zi), Mean_AT_K_Return_by_z(zi)
+	! 	enddo 
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! ! Savings
+	! 	WRITE(UNIT=19, FMT=*) 'Saving Rates'
+	! 	WRITE(UNIT=19, FMT=*) '(Ap-A)/A'
+	! 	WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
+	! 	do group=1,max_age_category
+	! 		write(rowname,*) group  
+	! 		rowname = 'Age_Group_'//trim(rowname)
+	! 		WRITE(UNIT=19, FMT=*) rowname, S_Rate_A_AZ(group,:), S_Rate_A_Age(group)
+	! 	enddo 
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! 	WRITE(UNIT=19, FMT=*) '(Ap-A)/Y'
+	! 	WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
+	! 	do group=1,max_age_category
+	! 		write(rowname,*) group  
+	! 		rowname = 'Age_Group_'//trim(rowname)
+	! 		WRITE(UNIT=19, FMT=*) rowname, S_Rate_Y_AZ(group,:), S_Rate_Y_Age(group)
+	! 	enddo
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! 	WRITE(UNIT=19, FMT=*) ' ', '<90% ','90%<99% ','99%<'
+	! 	WRITE(UNIT=19, FMT=*) '(Ap-A)/A', S_Rate_A_W
+	! 	WRITE(UNIT=19, FMT=*) '(Ap-A)/Y', S_Rate_Y_W
+	! 	WRITE(UNIT=19, FMT=*) 'A', A_W
+	! 	WRITE(UNIT=19, FMT=*) 'Ap', Ap_W
+	! 	WRITE(UNIT=19, FMT=*) 'Y', Y_W
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! 	WRITE(UNIT=19, FMT=*) 'A'
+	! 	WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
+	! 	do group=1,max_age_category
+	! 		write(rowname,*) group  
+	! 		rowname = 'Age_Group_'//trim(rowname)
+	! 		WRITE(UNIT=19, FMT=*) rowname, A_AZ(group,:), A_Age(group)
+	! 	enddo 
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! 	WRITE(UNIT=19, FMT=*) 'Ap'
+	! 	WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
+	! 	do group=1,max_age_category
+	! 		write(rowname,*) group  
+	! 		rowname = 'Age_Group_'//trim(rowname)
+	! 		WRITE(UNIT=19, FMT=*) rowname, Ap_AZ(group,:), Ap_Age(group)
+	! 	enddo 
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! 	WRITE(UNIT=19, FMT=*) 'Y'
+	! 	WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
+	! 	do group=1,max_age_category
+	! 		write(rowname,*) group  
+	! 		rowname = 'Age_Group_'//trim(rowname)
+	! 		WRITE(UNIT=19, FMT=*) rowname, Y_AZ(group,:), Y_Age(group)
+	! 	enddo 
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! ! Wealth percentiles
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! 	WRITE(UNIT=19, FMT=*) 'Percentiles of Asset Distribution'
+	! 	WRITE(UNIT=19, FMT=*) prctile_ai
 
-	CLOSE(Unit=19)
+	! CLOSE(Unit=19)
 
-	! Leverage and constrained firms 
-		WRITE(UNIT=20, FMT=*) 'Leverage ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', 	&
-							& 'Cons_Firm',' ',' ',											&	 
-							& 'Cons_Firms ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', & 
-							& 'Size_AZ ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 '
-		do age=1,MaxAge 
-			WRITE(UNIT=20, FMT=*) age, leverage_age_z(age,:), ' ',&
-								& age, constrained_firms_age(age), ' ', age, constrained_firms_age_z(age,:), ' ', &
-								& age, size_by_age_z(age,:)
-		enddo 
-	CLOSE(UNIT=20)
+	! ! Leverage and constrained firms 
+	! 	WRITE(UNIT=20, FMT=*) 'Leverage ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', 	&
+	! 						& 'Cons_Firm',' ',' ',											&	 
+	! 						& 'Cons_Firms ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', & 
+	! 						& 'Size_AZ ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 '
+	! 	do age=1,MaxAge 
+	! 		WRITE(UNIT=20, FMT=*) age, leverage_age_z(age,:), ' ',&
+	! 							& age, constrained_firms_age(age), ' ', age, constrained_firms_age_z(age,:), ' ', &
+	! 							& age, size_by_age_z(age,:)
+	! 	enddo 
+	! CLOSE(UNIT=20)
 
-	! Save files of constrained index, output and profits
-	if (solving_bench.eq.1) then
-		OPEN(UNIT=1,  FILE=trim(Result_Folder)//'constrained_ind_bench'  , STATUS='replace')
-		OPEN(UNIT=2,  FILE=trim(Result_Folder)//'firm_output_bench'      , STATUS='replace')
-		OPEN(UNIT=3,  FILE=trim(Result_Folder)//'firm_profit_bench' 	    , STATUS='replace')
-	else 
-		OPEN(UNIT=1,  FILE=trim(Result_Folder)//'constrained_ind_exp'    , STATUS='replace')
-		OPEN(UNIT=2,  FILE=trim(Result_Folder)//'firm_output_exp'        , STATUS='replace')
-		OPEN(UNIT=3,  FILE=trim(Result_Folder)//'firm_profit_exp'  	    , STATUS='replace')
-	endif
-		WRITE(UNIT=1,FMT=*) constrained_firm_ind
-		WRITE(UNIT=2,FMT=*) Firm_Output
-		WRITE(UNIT=3,FMT=*) Firm_Profit
-		CLOSE(UNIT=1)
-		CLOSE(UNIT=2)
-		CLOSE(UNIT=3)
+	! ! Save files of constrained index, output and profits
+	! if (solving_bench.eq.1) then
+	! 	OPEN(UNIT=1,  FILE=trim(Result_Folder)//'constrained_ind_bench'  , STATUS='replace')
+	! 	OPEN(UNIT=2,  FILE=trim(Result_Folder)//'firm_output_bench'      , STATUS='replace')
+	! 	OPEN(UNIT=3,  FILE=trim(Result_Folder)//'firm_profit_bench' 	    , STATUS='replace')
+	! else 
+	! 	OPEN(UNIT=1,  FILE=trim(Result_Folder)//'constrained_ind_exp'    , STATUS='replace')
+	! 	OPEN(UNIT=2,  FILE=trim(Result_Folder)//'firm_output_exp'        , STATUS='replace')
+	! 	OPEN(UNIT=3,  FILE=trim(Result_Folder)//'firm_profit_exp'  	    , STATUS='replace')
+	! endif
+	! 	WRITE(UNIT=1,FMT=*) constrained_firm_ind
+	! 	WRITE(UNIT=2,FMT=*) Firm_Output
+	! 	WRITE(UNIT=3,FMT=*) Firm_Profit
+	! 	CLOSE(UNIT=1)
+	! 	CLOSE(UNIT=2)
+	! 	CLOSE(UNIT=3)
 
 
 END SUBROUTINE COMPUTE_STATS
