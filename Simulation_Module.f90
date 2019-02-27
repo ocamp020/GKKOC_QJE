@@ -40,7 +40,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		REAL(SP), DIMENSION(:)  , allocatable :: panela_dad, panela_son, panelz_dad, panelz_son
 		REAL(SP), DIMENSION(:)  , allocatable :: panelr_dad, panelr_son, panelPV_dad, panelPV_son
 		INTEGER 						      :: IGM_index
-		
+
 		! ! Intergenerational statistics 40-60
 		! REAL(SP), DIMENSION(totpop) 	     :: assets_dad_2, assets_son_2, return_dad_2, return_son_2, PV_dad_2, PV_son_2
 		! INTEGER , DIMENSION(totpop) 	     :: age_dad_2, age_son_2, z_dad_2, z_son_2
@@ -134,24 +134,24 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		print*,'SIMULATION STARTED'
 
-	 !    age=1
-	 !    requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
-	 !    cdfrequirednumberby_age(age) = requirednumberby_age(age)
-	 !    DO age=2,MaxAge
-	 !        requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
-	 !        cdfrequirednumberby_age(age) = requirednumberby_age(age) + cdfrequirednumberby_age(age-1)
-	 !    ENDDO
-	 !    ! If the total number of people are not equal to the total population, then I will add the remainder to the last age
-	 !    requirednumberby_age(MaxAge) =  requirednumberby_age(MaxAge)-cdfrequirednumberby_age(MaxAge) + totpop
-	 !    cdfrequirednumberby_age(MaxAge) = totpop
+	    age=1
+	    requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
+	    cdfrequirednumberby_age(age) = requirednumberby_age(age)
+	    DO age=2,MaxAge
+	        requirednumberby_age(age)    = NINT(totpop*pop(age)/sum(pop))
+	        cdfrequirednumberby_age(age) = requirednumberby_age(age) + cdfrequirednumberby_age(age-1)
+	    ENDDO
+	    ! If the total number of people are not equal to the total population, then I will add the remainder to the last age
+	    requirednumberby_age(MaxAge) =  requirednumberby_age(MaxAge)-cdfrequirednumberby_age(MaxAge) + totpop
+	    cdfrequirednumberby_age(MaxAge) = totpop
 
-		! !=====================================================================
-		! !                     GENERATE   INITIAL   PANEL
-		! !=====================================================================
+		!=====================================================================
+		!                     GENERATE   INITIAL   PANEL
+		!=====================================================================
 
 
-		! newiseed=-1
-
+		newiseed=-1
+		print*, 'Starting simulation loop'
 		! !$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi)
 		! DO paneli=1,totpop
 
