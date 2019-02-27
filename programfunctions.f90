@@ -4183,7 +4183,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
 	integer  :: constrained_firm_ind(MaxAge,na,nz,nlambda,ne,nx), i
 	real(DP) :: Firm_Output(MaxAge,na,nz,nlambda,ne,nx), Firm_Profit(MaxAge,na,nz,nlambda,ne,nx)
-	real(DP), dimension(size(DBN1)) :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq
+	REAL(DP), DIMENSION(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq
 	real(DP) :: FW_top_x(6),  prctile_FW(6), prctile_bq(7), a, b, c, CCDF_c
 	character(100) :: rowname
 	integer , dimension(max_age_category+1) :: age_limit
@@ -4196,7 +4196,13 @@ SUBROUTINE COMPUTE_STATS()
 	allocate( K_L_Income(MaxAge,na,nz,nlambda,ne,nx))
 	allocate( K_T_Income(MaxAge,na,nz,nlambda,ne,nx))
 	allocate( DBN_bq(MaxAge,na,nz,nlambda,ne,nx))
-	
+	allocate( DBN_vec(size(DBN1)))
+	allocate( Firm_Wealth_vec(size(DBN1)))
+	allocate( CDF_Firm_Wealth(size(DBN1)))
+	allocate( BQ_vec(size(DBN1)))
+	allocate( DBN_bq_vec(size(DBN1)))
+	allocate( CDF_bq(size(DBN1)))
+
 
 	!$ call omp_set_num_threads(20)
 	!$ print *, "OMP Test Message"
