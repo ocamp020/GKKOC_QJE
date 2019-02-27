@@ -69,8 +69,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! REAL(DP) 						 	 :: Std_Dev_Return_W_Age(12)  , Mean_Return_W_Age(12)  , prc_Return_W_Age(12,9)
 		! REAL(DP) 						 	 :: Std_Dev_Return_K_Age(12)  , Mean_Return_K_Age(12)  , prc_Return_K_Age(12,9)
 		! REAL(DP) 						 	 :: Std_Dev_Return_K_W_Age(12), Mean_Return_K_W_Age(12), prc_Return_K_W_Age(12,9)
-		! REAL(DP)  							 :: K_aux, prctile_ret(9)
-		! INTEGER 							 :: i_pct
+		REAL(DP)  							 :: K_aux, prctile_ret(9)
+		INTEGER 							 :: i_pct
 		
 		REAL :: k_igm
 
