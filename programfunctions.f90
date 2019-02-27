@@ -4879,9 +4879,9 @@ SUBROUTINE COMPUTE_STATS()
 		OPEN(UNIT=2,  FILE=trim(Result_Folder)//'firm_output_exp'        , STATUS='replace')
 		OPEN(UNIT=3,  FILE=trim(Result_Folder)//'firm_profit_exp'  	    , STATUS='replace')
 	endif
-	! 	WRITE(UNIT=1,FMT=*) constrained_firm_ind
-	! 	WRITE(UNIT=2,FMT=*) Firm_Output
-	! 	WRITE(UNIT=3,FMT=*) Firm_Profit
+		WRITE(UNIT=1,FMT=*) constrained_firm_ind
+		WRITE(UNIT=2,FMT=*) Firm_Output
+		WRITE(UNIT=3,FMT=*) Firm_Profit
 		CLOSE(UNIT=1)
 		CLOSE(UNIT=2)
 		CLOSE(UNIT=3)
