@@ -1860,7 +1860,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
     	! CALL Write_Experimental_Results(.false.)
 
-	    DO tauindx=40,60,2
+	    DO tauindx=30,40,2
 	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_timing.txt', STATUS='old', POSITION='append')
 
             tauw_at     = real(tauindx,8)/1000_DP
