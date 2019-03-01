@@ -1861,7 +1861,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	CLOSE (unit=77) 
 
     	! Start psi value 
-    	psi = 0.85218161756107857_dp
+    	psi = 0.85197615585175968_dp
 
     	! CALL Write_Experimental_Results(.false.)
 
