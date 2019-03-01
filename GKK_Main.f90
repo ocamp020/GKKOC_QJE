@@ -1869,9 +1869,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_timing.txt', STATUS='old', POSITION='append')
 
             tauw_at     = real(tauindx,8)/1000_DP
-            ! brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
-            	CALL FIND_DBN_EQ
+            	! CALL FIND_DBN_EQ
             	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 				K_mat  = K_Matrix(R,P)
 				Pr_mat = Profit_Matrix(R,P)
@@ -1903,8 +1903,6 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 				V_Pr_exp          = V_Pr 
 				V_Pr_nb_exp  	  = V_Pr_nb
 
-		
-
 				! Compute moments
 				CALL COMPUTE_STATS
 				CALL GOVNT_BUDGET
@@ -1913,7 +1911,6 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 				CALL COMPUTE_WELFARE_GAIN
 
 				! Write experimental results in output.txt
-				print*,' About to enter Write_Variabales(0)'
 				CALL WRITE_VARIABLES(0)
 
 		    if (brentvaluet .gt. maxbrentvaluet) then
