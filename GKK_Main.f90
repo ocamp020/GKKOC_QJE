@@ -1938,6 +1938,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
       	  	CLOSE (unit=77)
 		    Call Write_Experimental_Results(.true.)
+		    deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	    ENDDO 
 
 
@@ -1978,6 +1979,11 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	endif 
 
 	CALL FIND_DBN_EQ
+	! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+	! K_mat  = K_Matrix(R,P)
+	! Pr_mat = Profit_Matrix(R,P)
+	! CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+	! CALL ComputeLaborUnits(EBAR,wage)
 	CALL GOVNT_BUDGET
 
 	! Compute value function and store policy functions, value function and distribution in file
