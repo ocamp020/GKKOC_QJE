@@ -1776,6 +1776,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 				Cons_exp          = Cons           
 				Hours_exp         = Hours
 				Aprime_exp        = Aprime 
+				V_Pr_exp          = V_Pr 
+				V_Pr_nb_exp  	  = V_Pr_nb
 
 				! Compute moments
 				CALL COMPUTE_STATS
@@ -1870,6 +1872,11 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
             ! brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
             	CALL FIND_DBN_EQ
+            	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+				K_mat  = K_Matrix(R,P)
+				Pr_mat = Profit_Matrix(R,P)
+				CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+				CALL ComputeLaborUnits(EBAR,wage)
             	CALL GOVNT_BUDGET
 
             ! Aggregate variable in experimental economy
@@ -1893,6 +1900,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 				Cons_exp          = Cons           
 				Hours_exp         = Hours
 				Aprime_exp        = Aprime 
+				V_Pr_exp          = V_Pr 
+				V_Pr_nb_exp  	  = V_Pr_nb
+
+		
 
 				! Compute moments
 				CALL COMPUTE_STATS
