@@ -6771,6 +6771,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 	integer, intent(in) :: bench_indx
 	integer :: prctile, status, zi
 
+	print*, 'Inside Write Variables'
 	if (bench_indx.eq.1) then
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='replace') 
 			WRITE(UNIT=19, FMT=*) "Parameters"
@@ -6782,9 +6783,12 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) "Results for benchmark economy"
 			WRITE(UNIT=19, FMT=*) ' '
 	else
+		print*, 'Inside Write Variables - Attempt to create output file'
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='old', POSITION='append', iostat=status) 
+		print*, 'Inside Write Variables - Attempt to create output file - status ',status
 			if (status.ne.0) then 
 			OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='replace') 
+			print*, 'Inside Write Variables - Output file created'
 			end if 
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Wealth Taxes'
@@ -6800,6 +6804,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) "Results for experimental economy"
 			WRITE(UNIT=19, FMT=*) ' '
+			print*, 'Test 1'
 
 	end if 
 			WRITE(UNIT=19, FMT=*) 'Aggregate Variables'
@@ -6863,9 +6868,12 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Cons_Tax/Total_Tax'		, GBAR_C/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
 			WRITE(UNIT=19, FMT=*) 'Cons_Tax/GDP'			, GBAR_C/YBAR
 			WRITE(UNIT=19, FMT=*) ' '
+			print*, 'Test 2'
 		CLOSE(Unit=19)
+		print*, 'Test 3'
 	if (bench_indx.ne.1) then
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='old', POSITION='append') 
+		print*, 'Test 4'
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Welfare and output gain'
 			WRITE(UNIT=19, FMT=*) ' '
@@ -6876,7 +6884,9 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) "Output_Gain(prct)"	  	, 100.0_DP*(Y_exp/Y_bench-1.0) 
 			WRITE(UNIT=19, FMT=*) "Av_Util_Pop(exp)"		, Av_Util_Pop
 			WRITE(UNIT=19, FMT=*) "Av_Util_NB(exp)"			, Av_Util_NB
+			print*, 'Test 5'
 		CLOSE(Unit=19)
+		print*, 'Test 6'
 	end if 
 
 			

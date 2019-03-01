@@ -124,7 +124,10 @@ FUNCTION EQ_WELFARE_GIVEN_TauW(tauW_in)
 	!CLOSE (unit=3)
 	!
 	!print*,'tauW=', tauW, ' CE_NEWBORN=', CE_NEWBORN, 'Av. Util=',sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+	print*, ' '
+	print*, 'EQ_WELFARE_GIVEN_TauW Completed'
 	print*, 'tauW_at=', tauW_at,'Av_Utility_NEWBORN=', -EQ_WELFARE_GIVEN_TAUW, 'Psi=', psi
+	print*, ' '
 
 END  FUNCTION EQ_WELFARE_GIVEN_TauW
 

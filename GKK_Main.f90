@@ -1858,6 +1858,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_timing.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
+    	! Start psi value 
+    	psi = 0.85218161756107857_dp
+
     	! CALL Write_Experimental_Results(.false.)
 
 	    DO tauindx=30,40,2
