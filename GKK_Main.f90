@@ -2401,6 +2401,7 @@ Subroutine Solve_Opt_Threshold
 	      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet, Threshold_Share
       	  	CLOSE (unit=77)
       	  	CALL Write_Experimental_Results(.true.)
+      	  	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	    ENDDO 
 
 	    ! Find optimal tax given threshold level
