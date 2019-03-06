@@ -2304,8 +2304,8 @@ Subroutine Solve_Opt_Threshold
 		Opt_TauW = 0.0_DP
 		maxbrentvaluet=-10000.0_DP
 
-		! CALL Write_Experimental_Results(.false.)
-		psi = 0.87549253468613175_dp
+		CALL Write_Experimental_Results(.false.)
+		!psi = 0.87549253468613175_dp
 	
 	print*,'Optimal Tax Loop'
 	OPEN(UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_tax_timing.txt', STATUS='replace')
