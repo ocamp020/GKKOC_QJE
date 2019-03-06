@@ -2305,7 +2305,7 @@ Subroutine Solve_Opt_Threshold
 		maxbrentvaluet=-10000.0_DP
 
 		! CALL Write_Experimental_Results(.false.)
-		psi = 0.85618318_dp
+		psi = 0.87549253468613175_dp
 	
 	print*,'Optimal Tax Loop'
 	OPEN(UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_tax_timing.txt', STATUS='replace')
@@ -2328,7 +2328,7 @@ Subroutine Solve_Opt_Threshold
 			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 			Wealth_factor = Y_a_threshold/W_bench
     	
-	    DO tauindx=35,45,2
+	    DO tauindx=40,50,1
 	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_tax_timing.txt', STATUS='old', POSITION='append')
 
             tauw_at     = real(tauindx,8)/1000_DP
@@ -2420,7 +2420,6 @@ Subroutine Solve_Opt_Threshold
 		CALL Write_Experimental_Results(.true.)
 
 		! ! Use this block if reading results only
-		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 		CALL Write_Experimental_Results(.false.)
 		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		K_mat  = K_Matrix(R,P)
