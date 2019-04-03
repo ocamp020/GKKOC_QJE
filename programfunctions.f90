@@ -1605,7 +1605,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    CE_draft_group(1,3)   = CE_draft_group_xz(1,4,1)
 		    ! % 90%-99%    of Current Productivity 
 		    !     % (z5,x1), (z6,x1)
-		    CE_draft_group(1,4)   = ( DBN_XZ(5,1)*CE_draft_group_xz(:,5,1) + DBN_XZ(6,1)*CE_draft_group_xz(:,6,1) )/sum(DBN_XZ(5:6,1))
+		    CE_draft_group(1,4)   = ( DBN_XZ(5,1)*CE_draft_group_xz(1,5,1) + DBN_XZ(6,1)*CE_draft_group_xz(1,6,1) )/sum(DBN_XZ(5:6,1))
 
 	! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
     	cdf_xz = sum(DBN_XZ(1:4,3))
