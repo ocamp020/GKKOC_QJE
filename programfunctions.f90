@@ -1548,22 +1548,6 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	enddo
 	enddo 
 
-	print*, ' '
-	print*, size_draft_group_xz(1,:,1)
-	print*, ' '
-	print*, size_draft_group_xz(1,:,2)
-	print*, ' '
-	print*, size_draft_group_xz(1,:,3)
-	print*, ' '
-	print*, sum(size_draft_group_xz)
-	print*, ' '
-	print*, sum(DBN_XZ)
-	print*, ' '
-	do xi=1,nx
-	print*, DBN_XZ(:,xi)
-	enddo 
-	print*, ' '
-
 
 	! Groups based on cross sectional productivity, not age dependent 
 	    ! % 0%-40%     of Current Productivity
@@ -1610,6 +1594,18 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 							&  DBN_XZ(8,1)*CE_draft_group_xz(:,8,1) + DBN_XZ(9,1)*CE_draft_group_xz(:,9,1) )/0.001_dp
 	CE_draft_group(:,7)   = 0
 	CE_draft_group(:,8)   = 0
+
+		! Adjustment for first age group
+		    ! % 40%-80%    of Current Productivity 
+		    !     % (z1,x1), (z2,x1), (z3,x1), (z4,x1)
+	    	CE_draft_group(1,2)   = ( DBN_XZ(1,1)*CE_draft_group_xz(1,1,1) + DBN_XZ(2,1)*CE_draft_group_xz(1,2,1) + &
+						& DBN_XZ(3,1)*CE_draft_group_xz(1,3,1) + DBN_XZ(4,1)*CE_draft_group_xz(1,4,1) )/sum(DBN_XZ(1:4,1))
+		    ! % 80%-90%    of Current Productivity
+		    !     % (z4,x1)
+		    CE_draft_group(1,3)   = CE_draft_group_xz(1,4,1)
+		    ! % 90%-99%    of Current Productivity 
+		    !     % (z5,x1), (z6,x1)
+		    CE_draft_group(1,4)   = ( DBN_XZ(5,1)*CE_draft_group_xz(:,5,1) + DBN_XZ(6,1)*CE_draft_group_xz(:,6,1) )/sum(DBN_XZ(5:6,1))
 
 	! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
     	cdf_xz = sum(DBN_XZ(1:4,3))
