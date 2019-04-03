@@ -1543,7 +1543,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
     	enddo 
     	enddo 
     	enddo 
-    	enddo 
+    	enddo 	
 	enddo  
 	enddo
 	enddo 
@@ -1592,7 +1592,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 							& DBN_XZ(3,1)*CE_draft_group_xz(:,3,1) + &
 							& (0.80_dp-cdf_xz)*CE_draft_group_xz(:,4,1) )/0.40_dp
 		cdf_xz = cdf_xz + DBN_XZ(4,1)
-	CE_draft_group(:,3)   = ( (cdf_xz-0.40_dp)*CE_draft_group_xz(:,4,1) + (0.80_dp-cdf_xz)*CE_draft_group_xz(:,5,2) )/0.10_dp
+	CE_draft_group(:,3)   = ( (cdf_xz-0.80_dp)*CE_draft_group_xz(:,4,1) + (0.90_dp-cdf_xz)*CE_draft_group_xz(:,5,2) )/0.10_dp
 		cdf_xz = cdf_xz + DBN_XZ(5,2)
 		cdf_xz_low = cdf_xz 
 		cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
@@ -1624,8 +1624,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 							& size_draft_group_xz(:,3,1) + &
 							& (0.80_dp-cdf_xz)*size_draft_group_xz(:,4,1)/DBN_XZ(4,1)
 		cdf_xz = cdf_xz + DBN_XZ(4,1)
-	size_draft_group(:,3)   = (cdf_xz-0.40_dp)*size_draft_group_xz(:,4,1)/DBN_XZ(4,1) + &
-							& (0.80_dp-cdf_xz)*size_draft_group_xz(:,5,2)/DBN_XZ(5,2)
+	size_draft_group(:,3)   = (cdf_xz-0.80_dp)*size_draft_group_xz(:,4,1)/DBN_XZ(4,1) + &
+							& (0.90_dp-cdf_xz)*size_draft_group_xz(:,5,2)/DBN_XZ(5,2)
 		cdf_xz = cdf_xz + DBN_XZ(5,2)
 		cdf_xz_low = cdf_xz 
 		cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
@@ -1659,8 +1659,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 							& frac_pos_welfare_draft_group_xz(:,3,1) + &
 							& (0.80_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(:,4,1)/DBN_XZ(4,1)
 		cdf_xz = cdf_xz + DBN_XZ(4,1)
-	frac_pos_welfare_draft_group(:,3)   = (cdf_xz-0.40_dp)*frac_pos_welfare_draft_group_xz(:,4,1)/DBN_XZ(4,1) + &
-										& (0.80_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(:,5,2)/DBN_XZ(5,2)
+	frac_pos_welfare_draft_group(:,3)   = (cdf_xz-0.80_dp)*frac_pos_welfare_draft_group_xz(:,4,1)/DBN_XZ(4,1) + &
+										& (0.90_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(:,5,2)/DBN_XZ(5,2)
 		cdf_xz = cdf_xz + DBN_XZ(5,2)
 		cdf_xz_low = cdf_xz 
 		cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
