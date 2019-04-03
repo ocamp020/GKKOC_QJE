@@ -1583,7 +1583,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 							& DBN_XZ(6,2)*CE_draft_group_xz(:,6,2) + DBN_XZ(7,2)*CE_draft_group_xz(:,7,2) + &
 							& DBN_XZ(8,2)*CE_draft_group_xz(:,8,2) + DBN_XZ(9,2)*CE_draft_group_xz(:,9,2) + &
 							& DBN_XZ(5,1)*CE_draft_group_xz(:,5,1) + &
-							& + (0.99_dp-cdf_xz)*CE_draft_group_xz(:,6,1) )/0.09_dp
+							& (0.99_dp-cdf_xz)*CE_draft_group_xz(:,6,1) )/0.09_dp
 		cdf_xz = cdf_xz + DBN_XZ(6,1)
 	CE_draft_group(:,5)   = ( (cdf_xz-0.99_dp)*CE_draft_group_xz(:,6,1) + (0.999_dp-cdf_xz)*CE_draft_group_xz(:,7,1) )/0.009_dp
 		cdf_xz = cdf_xz + DBN_XZ(7,1)
@@ -1616,7 +1616,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 							& size_draft_group_xz(:,6,2) + size_draft_group_xz(:,7,2) + &
 							& size_draft_group_xz(:,8,2) + size_draft_group_xz(:,9,2) + &
 							& size_draft_group_xz(:,5,1) + &
-							& + (0.99_dp-cdf_xz)*size_draft_group_xz(:,6,1)/DBN_XZ(6,1)
+							& (0.99_dp-cdf_xz)*size_draft_group_xz(:,6,1)/DBN_XZ(6,1)
 		cdf_xz = cdf_xz + DBN_XZ(6,1)
 	size_draft_group(:,5)   = (cdf_xz-0.99_dp)*size_draft_group_xz(:,6,1)/DBN_XZ(6,1) + &
 							& (0.999_dp-cdf_xz)*size_draft_group_xz(:,7,1)/DBN_XZ(7,1)
@@ -1651,7 +1651,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 							& frac_pos_welfare_draft_group_xz(:,6,2) + frac_pos_welfare_draft_group_xz(:,7,2) + &
 							& frac_pos_welfare_draft_group_xz(:,8,2) + frac_pos_welfare_draft_group_xz(:,9,2) + &
 							& frac_pos_welfare_draft_group_xz(:,5,1) + &
-							& + (0.99_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(:,6,1)/DBN_XZ(6,1)
+							& (0.99_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(:,6,1)/DBN_XZ(6,1)
 		cdf_xz = cdf_xz + DBN_XZ(6,1)
 	frac_pos_welfare_draft_group(:,5)   = (cdf_xz-0.99_dp)*frac_pos_welfare_draft_group_xz(:,6,1)/DBN_XZ(6,1) + &
 										& (0.999_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(:,7,1)/DBN_XZ(7,1)
