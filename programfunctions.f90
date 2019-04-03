@@ -1581,7 +1581,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
     	cdf_xz = sum(DBN_XZ(1:4,3))
 	CE_draft_group(:,1)   = ( DBN_XZ(1,3)*CE_draft_group_xz(:,1,3) + DBN_XZ(2,3)*CE_draft_group_xz(:,2,3) + &
 							& DBN_XZ(3,3)*CE_draft_group_xz(:,3,3) + DBN_XZ(4,3)*CE_draft_group_xz(:,4,3) + &
-							& (0.40_dp-cdf_xz)**CE_draft_group_xz(:,5,3) )/0.40_dp 
+							& (0.40_dp-cdf_xz)*CE_draft_group_xz(:,5,3) )/0.40_dp 
 		cdf_xz = cdf_xz + DBN_XZ(5,3)
 		cdf_xz_low = cdf_xz 
 		cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
@@ -1613,7 +1613,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
     	cdf_xz = sum(DBN_XZ(1:4,3))
 	size_draft_group(:,1)   = size_draft_group_xz(:,1,3) + size_draft_group_xz(:,2,3) + &
 							& size_draft_group_xz(:,3,3) + size_draft_group_xz(:,4,3) + &
-							& (0.40_dp-cdf_xz)**size_draft_group_xz(:,5,3)/DBN_XZ(5,3) 
+							& (0.40_dp-cdf_xz)*size_draft_group_xz(:,5,3)/DBN_XZ(5,3) 
 		cdf_xz = cdf_xz + DBN_XZ(5,3)
 		cdf_xz_low = cdf_xz 
 		cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
@@ -1648,7 +1648,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
     	cdf_xz = sum(DBN_XZ(1:4,3))
 	frac_pos_welfare_draft_group(:,1)   = frac_pos_welfare_draft_group_xz(:,1,3) + frac_pos_welfare_draft_group_xz(:,2,3) + &
 							& frac_pos_welfare_draft_group_xz(:,3,3) + frac_pos_welfare_draft_group_xz(:,4,3) + &
-							& (0.40_dp-cdf_xz)**frac_pos_welfare_draft_group_xz(:,5,3)/DBN_XZ(5,3) 
+							& (0.40_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(:,5,3)/DBN_XZ(5,3) 
 		cdf_xz = cdf_xz + DBN_XZ(5,3)
 		cdf_xz_low = cdf_xz 
 		cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
