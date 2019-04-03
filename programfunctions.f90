@@ -1559,7 +1559,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	print*, ' '
 	print*, sum(DBN_XZ)
 	print*, ' '
-	do xi=1:nx
+	do xi=1,nx
 	print*, DBN_XZ(:,xi)
 	enddo 
 	print*, ' '
