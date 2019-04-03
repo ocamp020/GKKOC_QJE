@@ -1518,6 +1518,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	frac_pos_welfare_draft_group_xz = 0.0_dp 
+	size_draft_group_xz = 0.0_dp
 	DBN_XZ = sum(sum(sum(sum(DBN_bench,5),4),2),1) 
 
 	do xi  = 1,nx
@@ -1547,6 +1548,13 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	enddo
 	enddo 
 
+	print*, ' '
+	print*, size_draft_group_xz(1,:,1)
+	print*, ' '
+	print*, size_draft_group_xz(1,:,2)
+	print*, ' '
+	print*, size_draft_group_xz(1,:,3)
+	print*, ' '
 
 	! CE of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
 		    ! % 0%-40%     of Current Productivity
