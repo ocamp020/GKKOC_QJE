@@ -852,6 +852,96 @@ status = xlwrite(Tables_file,share,'Wealth_Shares') ;
         else
             status = xlwrite(Tables_file,Mat,'XZ shares in Top x - Book Value') ;
         end 
+        
+%% Change in composition of top X% by Productivity Groups  
+
+% Distribution
+    eval(['load ',Bench_Folder,'DBN'])
+    DBN = reshape(DBN,[Max_Age,n_a,n_z,n_l,n_e,n_x]) ;
+
+% XZ variables
+    eval(['load ',Result_Folder,'zgrid']); zgrid = zgrid' ;
+    xz_mat          = repmat(exp(log(zgrid       ).*x_grid(1)),[1,n_x]) ;
+    xz_mat(5:n_z,2) =        exp(log(zgrid(5:n_z)).*x_grid(2))          ; 
+    xz_mat(:,3)     = 0 ;
+   
+% Distribution of XZ variable at desired age
+    DBN_xz = squeeze(sum(sum(sum(sum(DBN,1),2),4),5));
+    DBN_xz = DBN_xz/sum(DBN_xz(:)) ;
+    DBN_xz_aux = [DBN_xz(:,3);DBN_xz(1:4,1);DBN_xz(5:9,2);DBN_xz(5:9,1)] ; % Ranking of xz pairs
+    CDF_xz_aux = cumsum(DBN_xz_aux) ; 
+    disp('xz and CDF')
+    disp([ [[1:9]';[1:9]';[5:9]'],[3*ones(9,1);ones(4,1);2*ones(5,1);ones(5,1)],CDF_xz_aux])
+    % 0%-40%     of Current Productivity
+        % (z1,x3), (z2,x3), (z3,x3), (z4,x3), (z5,x3)
+    % 40%-80%    of Current Productivity 
+        % (z5,x3), (z6,x3), (z7,x3), (z8,x3), (z9,x3), (z1,x1), (z2,x1), (z3,x1), (z4,x1)
+    % 80%-90%    of Current Productivity
+        % (z4,x1), (z5,x2)
+    % 90%-99%    of Current Productivity 
+        % (z5,x2), (z6,x2), (z7,x2), (z8,x2), (z9,x2), (z5,x1), (z6,x1)
+    % 99%-99.9%  of Current Productivity 
+        % (z6,x1), (z7,x1)
+    % 99.9%-100% of Current Productivity 
+        % (z7,x1), (z8,x1), (z9,x1)
+        
+% Get Percentiles
+    prc_K = prctile(Wealth_K,[50 90 95 99]);
+    prc_W = prctile(Wealth_W,[50 90 95 99]);    
+    
+% Inline funciton for xz index
+    xz_ind = @(z,x)((z-1)*n_x+x) ; 
+    
+%  Wealth Shares by group
+for type = {'K','W'}
+    eval(['xz_top=xz_share_top_x_',type{1},';'])
+    xz_top_pg = NaN(numel(prc_K),6) ;
+    % 0%-40%     of Current Productivity 
+    cdf_xz = sum(DBN_xz(1:4,3)) ;
+    xz_top_pg(:,1) = xz_top(:,xz_ind(1,3))+xz_top(:,xz_ind(2,3))+xz_top(:,xz_ind(3,3))+xz_top(:,xz_ind(4,3)) ...
+                     + (0.4-cdf_xz)/DBN_xz(5,3)*xz_top(:,xz_ind(5,3)) ; 
+    cdf_xz = cdf_xz + DBN_xz(5,3) ;
+    % 40%-80%    of Current Productivity 
+    cdf_xz_low  = cdf_xz ;
+    cdf_xz = cdf_xz + sum(DBN_xz(6:9,3)) + sum(DBN_xz(1:3,1)) ;
+    xz_top_pg(:,2) = (cdf_xz_low-0.4)/DBN_xz(5,3)*xz_top(:,xz_ind(5,3)) + ...
+                     xz_top(:,xz_ind(6,3))+xz_top(:,xz_ind(7,3))+xz_top(:,xz_ind(8,3))+xz_top(:,xz_ind(9,3)) + ...
+                     xz_top(:,xz_ind(1,1))+xz_top(:,xz_ind(2,1))+xz_top(:,xz_ind(3,1)) + ...
+                     (0.8-cdf_xz)/DBN_xz(4,1)*xz_top(:,xz_ind(4,1)) ;
+    cdf_xz = cdf_xz + DBN_xz(4,1) ;
+    % 80%-90%    of Current Productivity                      
+    xz_top_pg(:,3) = (cdf_xz-0.8)/DBN_xz(4,1)*xz_top(:,xz_ind(4,1)) + (0.9-cdf_xz)/DBN_xz(5,2)*xz_top(:,xz_ind(5,2)) ;
+    cdf_xz = cdf_xz + DBN_xz(5,2) ;
+    % 90%-99%    of Current Productivity 
+    cdf_xz_low  = cdf_xz ;
+    cdf_xz = cdf_xz + sum(DBN_xz(6:9,2)) + DBN_xz(5,1) ;
+    xz_top_pg(:,4) = (cdf_xz_low-0.9)/DBN_xz(5,2)*xz_top(:,xz_ind(5,2)) + ...
+                     xz_top(:,xz_ind(6,2))+xz_top(:,xz_ind(7,2))+xz_top(:,xz_ind(8,2))+xz_top(:,xz_ind(9,2)) + ...
+                     xz_top(:,xz_ind(5,1)) + (0.99-cdf_xz)/DBN_xz(6,1)*xz_top(:,xz_ind(6,1)); 
+    cdf_xz = cdf_xz + DBN_xz(6,1) ;
+    % 99%-99.9%  of Current Productivity 
+    xz_top_pg(:,5) = (cdf_xz-0.99)/DBN_xz(6,1)*xz_top(:,xz_ind(6,1)) + (0.999-cdf_xz)/DBN_xz(7,1)*xz_top(:,xz_ind(7,1)) ;
+    cdf_xz = cdf_xz + DBN_xz(7,1) ;
+    % 99.9%-100% of Current Productivity 
+    xz_top_pg(:,6) = (cdf_xz-0.999)/DBN_xz(7,1)*xz_top(:,xz_ind(7,1)) + xz_top(:,xz_ind(8,1)) + xz_top(:,xz_ind(9,1)) ;
+   % Save 
+   eval(['xz_top_pg_',type{1},'=xz_top_pg;'])
+end
+
+    % Tables
+        col_title = {'Top X%','0%-40%','40%-80%','80%-90%','90%-99%','99%-99.9%','99.9%-100%'};
+        row_title = {'Top 1%';'Top 5%';'Top 10%';'Top 50%'};
+        Mat = [{'Benchmark'} cell(1,6); col_title; row_title num2cell(xz_top_pg_K);
+               {'Tax_Reform'} cell(1,6); col_title; row_title num2cell(xz_top_pg_W);
+               {'Difference'} cell(1,6); col_title; row_title num2cell(xz_top_pg_W-xz_top_pg_K);
+               {'% Difference'} cell(1,6); col_title; row_title num2cell(100*(xz_top_pg_W./xz_top_pg_K-1))]
+        if Switch_PV==1 
+            status = xlwrite(Tables_file,Mat,'PG shares in Top x - Present Value') ;
+        else
+            status = xlwrite(Tables_file,Mat,'PG shares in Top x - Book Value') ;
+        end 
+        
+
 
 %% Tax Reform welfare by age group and productivity
 

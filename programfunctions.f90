@@ -824,10 +824,12 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: Tax_Increase_tk_draft_group, Tax_Increase_tl_draft_group
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: Tax_Increase_draft_group, Tax_Rate_Increase_draft_group
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: Tax_Rate_Increase_tk_draft_group, Tax_Rate_Increase_tl_draft_group
+	REAL(DP), dimension(draft_age_category,nz,nx) :: CE_draft_group_xz,  size_draft_group_xz, frac_pos_welfare_draft_group_xz
 	REAL(DP), dimension(nz) :: DBN_Z, CDF_Z 
+	REAL(DP), dimension(nz,nx) :: DBN_XZ
 	INTEGER , dimension(draft_age_category+1) :: draft_age_limit
 	INTEGER :: age2, z2
-	REAL(DP):: K_Inc_aux, L_Inc_aux
+	REAL(DP):: K_Inc_aux, L_Inc_aux, cdf_xz, cdf_xz_low
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Income_bench, K_Tax_bench, L_Tax_bench
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Income_exp,   K_Tax_exp,   L_Tax_exp
 	allocate( Income_bench( MaxAge,na,nz,nlambda,ne,nx) )
@@ -1550,7 +1552,729 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	! print*,(/ (CDF_Z(8)-0.9999_dp) , DBN_Z(9) , (CDF_Z(8)-0.9999_dp)+DBN_Z(9) /)/0.0001_dp
 
 
-	!! Tables for Tax Burden
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! Draft Tables by xz producitivity groups
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	frac_pos_welfare_draft_group_xz = 0.0_dp 
+	size_draft_group_xz = 0.0_dp
+	DBN_XZ = sum(sum(sum(sum(DBN_bench,5),4),2),1) 
+
+	do xi  = 1,nx
+	do zi  = 1,nz
+	do age = 1,draft_age_category
+		size_draft_group_xz(age,zi,xi) = &
+			& sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,xi))
+
+		CE_draft_group_xz(age,zi,xi) =  100* &
+			& sum(Cons_Eq_Welfare(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,xi)* &
+            &     DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,xi))/&
+            & sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,xi))
+
+	    do ei=1,ne
+	    do lambdai=1,nlambda
+	    do ai=1,na
+	    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
+	    	If ( Cons_Eq_Welfare(age2,ai,zi,lambdai,ei,xi) .ge. 0.0_DP) then
+        	frac_pos_welfare_draft_group_xz(age,zi,xi) = frac_pos_welfare_draft_group_xz(age,zi,xi) + & 
+        												&  DBN_bench(age2,ai,zi,lambdai,ei,xi)
+        	endif 
+    	enddo 
+    	enddo 
+    	enddo 
+    	enddo 	
+	enddo  
+	enddo
+	enddo 
+
+
+	! Groups based on cross sectional productivity, not age dependent 
+	    ! % 0%-40%     of Current Productivity
+	    !     % (z1,x3), (z2,x3), (z3,x3), (z4,x3), (z5,x3)
+	    ! % 40%-80%    of Current Productivity 
+	    !     % (z5,x3), (z6,x3), (z7,x3), (z8,x3), (z9,x3), (z1,x1), (z2,x1), (z3,x1), (z4,x1)
+	    ! % 80%-90%    of Current Productivity
+	    !     % (z4,x1), (z5,x2)
+	    ! % 90%-99%    of Current Productivity 
+	    !     % (z5,x2), (z6,x2), (z7,x2), (z8,x2), (z9,x2), (z5,x1), (z6,x1)
+	    ! % 99%-99.9%  of Current Productivity 
+	    !     % (z6,x1), (z7,x1)
+	    ! % 99.9%-100% of Current Productivity 
+	    !     % (z7,x1), (z8,x1), (z9,x1)
+
+	! CE of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+    	cdf_xz = sum(DBN_XZ(1:4,3))
+	CE_draft_group(:,1)   = ( DBN_XZ(1,3)*CE_draft_group_xz(:,1,3) + DBN_XZ(2,3)*CE_draft_group_xz(:,2,3) + &
+							& DBN_XZ(3,3)*CE_draft_group_xz(:,3,3) + DBN_XZ(4,3)*CE_draft_group_xz(:,4,3) + &
+							& (0.40_dp-cdf_xz)*CE_draft_group_xz(:,5,3) )/0.40_dp 
+		cdf_xz = cdf_xz + DBN_XZ(5,3)
+		cdf_xz_low = cdf_xz 
+		cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
+	CE_draft_group(:,2)   = ( (cdf_xz_low-0.40_dp)*CE_draft_group_xz(:,5,3) + &
+							& DBN_XZ(6,3)*CE_draft_group_xz(:,6,3) + DBN_XZ(7,3)*CE_draft_group_xz(:,7,3) + &
+							& DBN_XZ(8,3)*CE_draft_group_xz(:,8,3) + DBN_XZ(9,3)*CE_draft_group_xz(:,9,3) + &
+							& DBN_XZ(1,1)*CE_draft_group_xz(:,1,1) + DBN_XZ(2,1)*CE_draft_group_xz(:,2,1) + &
+							& DBN_XZ(3,1)*CE_draft_group_xz(:,3,1) + &
+							& (0.80_dp-cdf_xz)*CE_draft_group_xz(:,4,1) )/0.40_dp
+		cdf_xz = cdf_xz + DBN_XZ(4,1)
+	CE_draft_group(:,3)   = ( (cdf_xz-0.80_dp)*CE_draft_group_xz(:,4,1) + (0.90_dp-cdf_xz)*CE_draft_group_xz(:,5,2) )/0.10_dp
+		cdf_xz = cdf_xz + DBN_XZ(5,2)
+		cdf_xz_low = cdf_xz 
+		cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
+	CE_draft_group(:,4)   = ( (cdf_xz_low-0.90_dp)*CE_draft_group_xz(:,5,2) + & 
+							& DBN_XZ(6,2)*CE_draft_group_xz(:,6,2) + DBN_XZ(7,2)*CE_draft_group_xz(:,7,2) + &
+							& DBN_XZ(8,2)*CE_draft_group_xz(:,8,2) + DBN_XZ(9,2)*CE_draft_group_xz(:,9,2) + &
+							& DBN_XZ(5,1)*CE_draft_group_xz(:,5,1) + &
+							& (0.99_dp-cdf_xz)*CE_draft_group_xz(:,6,1) )/0.09_dp
+		cdf_xz = cdf_xz + DBN_XZ(6,1)
+	CE_draft_group(:,5)   = ( (cdf_xz-0.99_dp)*CE_draft_group_xz(:,6,1) + (0.999_dp-cdf_xz)*CE_draft_group_xz(:,7,1) )/0.009_dp
+		cdf_xz = cdf_xz + DBN_XZ(7,1)
+	CE_draft_group(:,6)   = ( (CDF_xz-0.999_dp)*CE_draft_group_xz(:,7,1) + &
+							&  DBN_XZ(8,1)*CE_draft_group_xz(:,8,1) + DBN_XZ(9,1)*CE_draft_group_xz(:,9,1) )/0.001_dp
+	CE_draft_group(:,7)   = 0
+	CE_draft_group(:,8)   = 0
+
+		! Adjustment for first age group
+		    ! % 40%-80%    of Current Productivity 
+		    !     % (z1,x1), (z2,x1), (z3,x1), (z4,x1)
+	    	CE_draft_group(1,2)   = ( DBN_XZ(1,1)*CE_draft_group_xz(1,1,1) + DBN_XZ(2,1)*CE_draft_group_xz(1,2,1) + &
+						& DBN_XZ(3,1)*CE_draft_group_xz(1,3,1) + DBN_XZ(4,1)*CE_draft_group_xz(1,4,1) )/sum(DBN_XZ(1:4,1))
+		    ! % 80%-90%    of Current Productivity
+		    !     % (z4,x1)
+		    CE_draft_group(1,3)   = CE_draft_group_xz(1,4,1)
+		    ! % 90%-99%    of Current Productivity 
+		    !     % (z5,x1), (z6,x1)
+		    CE_draft_group(1,4)   = ( DBN_XZ(5,1)*CE_draft_group_xz(1,5,1) + DBN_XZ(6,1)*CE_draft_group_xz(1,6,1) )/sum(DBN_XZ(5:6,1))
+
+	! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+    	cdf_xz = sum(DBN_XZ(1:4,3))
+	size_draft_group(:,1)   = size_draft_group_xz(:,1,3) + size_draft_group_xz(:,2,3) + &
+							& size_draft_group_xz(:,3,3) + size_draft_group_xz(:,4,3) + &
+							& (0.40_dp-cdf_xz)*size_draft_group_xz(:,5,3)/DBN_XZ(5,3) 
+		cdf_xz = cdf_xz + DBN_XZ(5,3)
+		cdf_xz_low = cdf_xz 
+		cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
+	size_draft_group(:,2)   = (cdf_xz_low-0.40_dp)*size_draft_group_xz(:,5,3)/DBN_XZ(5,3) + &
+							& size_draft_group_xz(:,6,3) + size_draft_group_xz(:,7,3) + &
+							& size_draft_group_xz(:,8,3) + size_draft_group_xz(:,9,3) + &
+							& size_draft_group_xz(:,1,1) + size_draft_group_xz(:,2,1) + &
+							& size_draft_group_xz(:,3,1) + &
+							& (0.80_dp-cdf_xz)*size_draft_group_xz(:,4,1)/DBN_XZ(4,1)
+		cdf_xz = cdf_xz + DBN_XZ(4,1)
+	size_draft_group(:,3)   = (cdf_xz-0.80_dp)*size_draft_group_xz(:,4,1)/DBN_XZ(4,1) + &
+							& (0.90_dp-cdf_xz)*size_draft_group_xz(:,5,2)/DBN_XZ(5,2)
+		cdf_xz = cdf_xz + DBN_XZ(5,2)
+		cdf_xz_low = cdf_xz 
+		cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
+	size_draft_group(:,4)   = (cdf_xz_low-0.90_dp)*size_draft_group_xz(:,5,2)/DBN_XZ(5,2) + & 
+							& size_draft_group_xz(:,6,2) + size_draft_group_xz(:,7,2) + &
+							& size_draft_group_xz(:,8,2) + size_draft_group_xz(:,9,2) + &
+							& size_draft_group_xz(:,5,1) + &
+							& (0.99_dp-cdf_xz)*size_draft_group_xz(:,6,1)/DBN_XZ(6,1)
+		cdf_xz = cdf_xz + DBN_XZ(6,1)
+	size_draft_group(:,5)   = (cdf_xz-0.99_dp)*size_draft_group_xz(:,6,1)/DBN_XZ(6,1) + &
+							& (0.999_dp-cdf_xz)*size_draft_group_xz(:,7,1)/DBN_XZ(7,1)
+		cdf_xz = cdf_xz + DBN_XZ(7,1)
+	size_draft_group(:,6)   = (CDF_xz-0.999_dp)*size_draft_group_xz(:,7,1)/DBN_XZ(7,1) + &
+							&  size_draft_group_xz(:,8,1) + size_draft_group_xz(:,9,1)
+	size_draft_group(:,7)   = 0
+	size_draft_group(:,8)   = 0
+
+
+	! Frac. pos. welfare by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+    	cdf_xz = sum(DBN_XZ(1:4,3))
+	frac_pos_welfare_draft_group(:,1)   = frac_pos_welfare_draft_group_xz(:,1,3) + frac_pos_welfare_draft_group_xz(:,2,3) + &
+							& frac_pos_welfare_draft_group_xz(:,3,3) + frac_pos_welfare_draft_group_xz(:,4,3) + &
+							& (0.40_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(:,5,3)/DBN_XZ(5,3) 
+		cdf_xz = cdf_xz + DBN_XZ(5,3)
+		cdf_xz_low = cdf_xz 
+		cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
+	frac_pos_welfare_draft_group(:,2)   = (cdf_xz_low-0.40_dp)*frac_pos_welfare_draft_group_xz(:,5,3)/DBN_XZ(5,3) + &
+							& frac_pos_welfare_draft_group_xz(:,6,3) + frac_pos_welfare_draft_group_xz(:,7,3) + &
+							& frac_pos_welfare_draft_group_xz(:,8,3) + frac_pos_welfare_draft_group_xz(:,9,3) + &
+							& frac_pos_welfare_draft_group_xz(:,1,1) + frac_pos_welfare_draft_group_xz(:,2,1) + &
+							& frac_pos_welfare_draft_group_xz(:,3,1) + &
+							& (0.80_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(:,4,1)/DBN_XZ(4,1)
+		cdf_xz = cdf_xz + DBN_XZ(4,1)
+	frac_pos_welfare_draft_group(:,3)   = (cdf_xz-0.80_dp)*frac_pos_welfare_draft_group_xz(:,4,1)/DBN_XZ(4,1) + &
+										& (0.90_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(:,5,2)/DBN_XZ(5,2)
+		cdf_xz = cdf_xz + DBN_XZ(5,2)
+		cdf_xz_low = cdf_xz 
+		cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
+	frac_pos_welfare_draft_group(:,4)   = (cdf_xz_low-0.90_dp)*frac_pos_welfare_draft_group_xz(:,5,2)/DBN_XZ(5,2) + & 
+							& frac_pos_welfare_draft_group_xz(:,6,2) + frac_pos_welfare_draft_group_xz(:,7,2) + &
+							& frac_pos_welfare_draft_group_xz(:,8,2) + frac_pos_welfare_draft_group_xz(:,9,2) + &
+							& frac_pos_welfare_draft_group_xz(:,5,1) + &
+							& (0.99_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(:,6,1)/DBN_XZ(6,1)
+		cdf_xz = cdf_xz + DBN_XZ(6,1)
+	frac_pos_welfare_draft_group(:,5)   = (cdf_xz-0.99_dp)*frac_pos_welfare_draft_group_xz(:,6,1)/DBN_XZ(6,1) + &
+										& (0.999_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(:,7,1)/DBN_XZ(7,1)
+		cdf_xz = cdf_xz + DBN_XZ(7,1)
+	frac_pos_welfare_draft_group(:,6)   = (CDF_xz-0.999_dp)*frac_pos_welfare_draft_group_xz(:,7,1)/DBN_XZ(7,1) + &
+							&  frac_pos_welfare_draft_group_xz(:,8,1) + frac_pos_welfare_draft_group_xz(:,9,1)
+	frac_pos_welfare_draft_group(:,7)   = 0
+	frac_pos_welfare_draft_group(:,8)   = 0
+
+
+	! Fix fractions
+	frac_pos_welfare_draft_group = 100*frac_pos_welfare_draft_group/size_draft_group
+
+    OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE_xz.txt', STATUS='replace') 
+    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size_xz.txt', STATUS='replace') 
+    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_fpos_welfare_xz.txt', STATUS='replace') 
+	do age = 1,draft_age_category
+	    WRITE  (UNIT=80, FMT=*)  CE_draft_group(age,:)
+	    WRITE  (UNIT=81, FMT=*)  size_draft_group(age,:)
+	    WRITE  (UNIT=82, FMT=*)  frac_pos_welfare_draft_group(age,:)
+	ENDDO
+	close(unit=80)
+	close(unit=81)
+	close(unit=82)
+
+	! Groups based on age group productivity
+		! Age Group 1 
+			! 00%-40%   : (z1,x1), (z2,x1), (z3,x1), (z4,x1)
+			! 40%-80%   : (z4,x1), (z5,x1)
+			! 80%-90%   : (z5,x1)
+			! 90%-99%   : (z5,x1), (z6,x1)
+			! 99%-99.9% : (z6,x1), (z7,x1)
+			! 99.9%+    : (z7,x1), (z8,x1), (z9,x1)
+			age = 1 
+			DBN_XZ = sum(sum(sum(sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,:,:,:,:),5),4),2),1)
+			DBN_XZ = DBN_XZ/sum(DBN_XZ) 
+
+		! Welfare 
+	    	cdf_xz = sum(DBN_XZ(1:3,1))
+		CE_draft_group(age,1)   = ( DBN_XZ(1,1)*CE_draft_group_xz(age,1,1) + DBN_XZ(2,1)*CE_draft_group_xz(age,2,1) + &
+								&   DBN_XZ(3,1)*CE_draft_group_xz(age,3,1) +   &
+								&   (0.40_dp-cdf_xz)*CE_draft_group_xz(age,4,1) )/0.40_dp 
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+		CE_draft_group(age,2)   = ( (cdf_xz-0.40_dp)*CE_draft_group_xz(age,4,1) + (0.80_dp-cdf_xz)*CE_draft_group_xz(age,5,1) )/0.40_dp
+			cdf_xz = cdf_xz + DBN_XZ(5,1)
+		CE_draft_group(age,3)   = CE_draft_group_xz(age,5,1)
+		CE_draft_group(age,4)   = ( (cdf_xz-0.80_dp)*CE_draft_group_xz(age,5,1) + (0.99_dp-cdf_xz)*CE_draft_group_xz(age,6,1) )/0.09_dp
+			cdf_xz = cdf_xz + DBN_XZ(6,1)
+		CE_draft_group(age,5)   = ( (cdf_xz-0.99_dp)*CE_draft_group_xz(age,6,1) + (0.999_dp-cdf_xz)*CE_draft_group_xz(age,7,1) )/0.009_dp
+			cdf_xz = cdf_xz + DBN_XZ(7,1)
+		CE_draft_group(age,6)   = ( (CDF_xz-0.999_dp)*CE_draft_group_xz(age,7,1) + &
+								&  DBN_XZ(8,1)*CE_draft_group_xz(age,8,1) + DBN_XZ(9,1)*CE_draft_group_xz(age,9,1) )/0.001_dp
+		! Size of Each group
+	    	cdf_xz = sum(DBN_XZ(1:3,1))
+		size_draft_group(age,1)   = size_draft_group_xz(age,1,1) + size_draft_group_xz(age,2,1) + size_draft_group_xz(age,3,1) +   &
+								&   (0.40_dp-cdf_xz)*size_draft_group_xz(age,4,1)/DBN_XZ(4,1)
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+		size_draft_group(age,2)   = (cdf_xz-0.40_dp)*size_draft_group_xz(age,4,1)/DBN_XZ(4,1) + &
+								&               (0.80_dp-cdf_xz)*size_draft_group_xz(age,5,1)/DBN_XZ(5,1)
+			cdf_xz = cdf_xz + DBN_XZ(5,1)
+		size_draft_group(age,3)   = 0.1_dp*size_draft_group_xz(age,5,1)/DBN_XZ(5,1)
+		size_draft_group(age,4)   = (cdf_xz-0.80_dp)*size_draft_group_xz(age,5,1)/DBN_XZ(5,1) + &
+								&               (0.99_dp-cdf_xz)*size_draft_group_xz(age,6,1)/DBN_XZ(6,1)
+			cdf_xz = cdf_xz + DBN_XZ(6,1)
+		size_draft_group(age,5)   = (cdf_xz-0.99_dp)*size_draft_group_xz(age,6,1)/DBN_XZ(6,1) + &
+								&              (0.999_dp-cdf_xz)*size_draft_group_xz(age,7,1)/DBN_XZ(7,1)
+			cdf_xz = cdf_xz + DBN_XZ(7,1)
+		size_draft_group(age,6)   = (CDF_xz-0.999_dp)*size_draft_group_xz(age,7,1)/DBN_XZ(7,1) + &
+								&  size_draft_group_xz(age,8,1) + size_draft_group_xz(age,9,1)
+
+
+		! Fraction Positive Welfare
+	    	cdf_xz = sum(DBN_XZ(1:3,1))
+		frac_pos_welfare_draft_group(age,1)   = frac_pos_welfare_draft_group_xz(age,1,1) + &
+								&   frac_pos_welfare_draft_group_xz(age,2,1) + &
+								&   frac_pos_welfare_draft_group_xz(age,3,1) +   &
+								&   (0.40_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,4,1)/DBN_XZ(4,1)
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+		frac_pos_welfare_draft_group(age,2)   = (cdf_xz-0.40_dp)*frac_pos_welfare_draft_group_xz(age,4,1)/DBN_XZ(4,1) + &
+								&               (0.80_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,5,1)/DBN_XZ(5,1)
+			cdf_xz = cdf_xz + DBN_XZ(5,1)
+		frac_pos_welfare_draft_group(age,3)   = 0.1_dp*frac_pos_welfare_draft_group_xz(age,5,1)/DBN_XZ(5,1)
+		frac_pos_welfare_draft_group(age,4)   = (cdf_xz-0.80_dp)*frac_pos_welfare_draft_group_xz(age,5,1)/DBN_XZ(5,1) + &
+								&               (0.99_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,6,1)/DBN_XZ(6,1)
+			cdf_xz = cdf_xz + DBN_XZ(6,1)
+		frac_pos_welfare_draft_group(age,5)   = (cdf_xz-0.99_dp)*frac_pos_welfare_draft_group_xz(age,6,1)/DBN_XZ(6,1) + &
+								&              (0.999_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,7,1)/DBN_XZ(7,1)
+			cdf_xz = cdf_xz + DBN_XZ(7,1)
+		frac_pos_welfare_draft_group(age,6)   = (CDF_xz-0.999_dp)*frac_pos_welfare_draft_group_xz(age,7,1)/DBN_XZ(7,1) + &
+								&  frac_pos_welfare_draft_group_xz(age,8,1) + frac_pos_welfare_draft_group_xz(age,9,1)
+			
+		! Age Group 2
+			! 00%-40%   : (z1,x3), (z2,x3), (z3,x3), (z4,x3), (z5,x3), (z6,x3), (z7,x3), (z8,x3), (z9,x3), (z1,x1), (z2,x1), (z3,x1)
+			! 40%-80%   : (z3,x1), (z4,x1), (z5,x2)
+			! 80%-90%   : (z5,x2), (z6,x2), (z7,x2), (z8,x2), (z9,x2), (z5,x1)
+			! 90%-99%   : (z5,x1), (z6,x1)
+			! 99%-99.9% : (z6,x1), (z7,x1)
+			! 99.9%+    : (z7,x1), (z8,x1), (z9,x1)
+			age = 2
+			DBN_XZ = sum(sum(sum(sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,:,:,:,:),5),4),2),1) 
+			DBN_XZ = DBN_XZ/sum(DBN_XZ)
+
+		! Welfare
+	    	cdf_xz = sum(DBN_XZ(:,3)) + sum(DBN_XZ(1:2,1))
+		CE_draft_group(age,1)   = ( DBN_XZ(1,3)*CE_draft_group_xz(age,1,3) + DBN_XZ(2,3)*CE_draft_group_xz(age,2,3) + &
+								& DBN_XZ(3,3)*CE_draft_group_xz(age,3,3) + DBN_XZ(4,3)*CE_draft_group_xz(age,4,3) + &
+								& DBN_XZ(5,3)*CE_draft_group_xz(age,5,3) + DBN_XZ(6,3)*CE_draft_group_xz(age,6,3) + &
+								& DBN_XZ(7,3)*CE_draft_group_xz(age,7,3) + DBN_XZ(8,3)*CE_draft_group_xz(age,8,3) + &
+								& DBN_XZ(9,3)*CE_draft_group_xz(age,9,3) + &
+								& DBN_XZ(1,1)*CE_draft_group_xz(age,1,1) + DBN_XZ(2,1)*CE_draft_group_xz(age,2,1) + &
+								& (0.40_dp-cdf_xz)*CE_draft_group_xz(age,3,1) )/0.40_dp 
+			cdf_xz = cdf_xz + DBN_XZ(3,1)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+		CE_draft_group(age,2)   = ( (cdf_xz_low-0.40_dp)*CE_draft_group_xz(age,3,1) + &
+								& DBN_XZ(4,1)*CE_draft_group_xz(age,4,1) + &
+								& (0.80_dp-cdf_xz)*CE_draft_group_xz(age,5,2) )/0.40_dp
+			cdf_xz = cdf_xz + DBN_XZ(5,2)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2))
+		CE_draft_group(age,3)   = ( (cdf_xz-0.80_dp)*CE_draft_group_xz(age,5,2) + &
+								& DBN_XZ(6,2)*CE_draft_group_xz(age,6,2) + DBN_XZ(7,2)*CE_draft_group_xz(age,7,2) + &
+								& DBN_XZ(8,2)*CE_draft_group_xz(age,8,2) + DBN_XZ(9,2)*CE_draft_group_xz(age,9,2) + &
+								& (0.90_dp-cdf_xz)*CE_draft_group_xz(age,5,1) )/0.10_dp
+			cdf_xz = cdf_xz + DBN_XZ(5,1)
+		CE_draft_group(age,4)   = ( (cdf_xz-0.90_dp)*CE_draft_group_xz(age,5,1) + (0.99_dp-cdf_xz)*CE_draft_group_xz(age,6,1) )/0.09_dp
+			cdf_xz = cdf_xz + DBN_XZ(6,1)
+		CE_draft_group(age,5)   = ( (cdf_xz-0.99_dp)*CE_draft_group_xz(age,6,1) + (0.999_dp-cdf_xz)*CE_draft_group_xz(age,7,1) )/0.009_dp
+			cdf_xz = cdf_xz + DBN_XZ(7,1)
+		CE_draft_group(age,6)   = ( (CDF_xz-0.999_dp)*CE_draft_group_xz(age,7,1) + &
+								&  DBN_XZ(8,1)*CE_draft_group_xz(age,8,1) + DBN_XZ(9,1)*CE_draft_group_xz(age,9,1) )/0.001_dp
+
+		! Size of Each group
+	    	cdf_xz = sum(DBN_XZ(:,3)) + sum(DBN_XZ(1:2,1))
+		size_draft_group(age,1)   = size_draft_group_xz(age,1,3) + size_draft_group_xz(age,2,3) + &
+								& size_draft_group_xz(age,3,3) + size_draft_group_xz(age,4,3) + &
+								& size_draft_group_xz(age,5,3) + size_draft_group_xz(age,6,3) + &
+								& size_draft_group_xz(age,7,3) + size_draft_group_xz(age,8,3) + &
+								& size_draft_group_xz(age,9,3) + &
+								& size_draft_group_xz(age,1,1) + size_draft_group_xz(age,2,1) + &
+								& (0.40_dp-cdf_xz)*size_draft_group_xz(age,3,1)/DBN_XZ(3,1)
+			cdf_xz = cdf_xz + DBN_XZ(3,1)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+		size_draft_group(age,2)   = (cdf_xz_low-0.40_dp)*size_draft_group_xz(age,3,1)/DBN_XZ(3,1) + &
+								& size_draft_group_xz(age,4,1) + &
+								& (0.80_dp-cdf_xz)*size_draft_group_xz(age,5,2)/DBN_XZ(5,2)
+			cdf_xz = cdf_xz + DBN_XZ(5,2)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2))
+		size_draft_group(age,3)   = (cdf_xz-0.80_dp)*size_draft_group_xz(age,5,2)/DBN_XZ(5,2) + &
+								& size_draft_group_xz(age,6,2) + size_draft_group_xz(age,7,2) + &
+								& size_draft_group_xz(age,8,2) + size_draft_group_xz(age,9,2) + &
+								& (0.90_dp-cdf_xz)*size_draft_group_xz(age,5,1)/DBN_XZ(5,1)
+			cdf_xz = cdf_xz + DBN_XZ(5,1)
+		size_draft_group(age,4)   = (cdf_xz-0.90_dp)*size_draft_group_xz(age,5,1)/DBN_XZ(5,1) + &
+								&   (0.99_dp-cdf_xz)*size_draft_group_xz(age,6,1)/DBN_XZ(6,1)
+			cdf_xz = cdf_xz + DBN_XZ(6,1)
+		size_draft_group(age,5)   = (cdf_xz-0.99_dp)*size_draft_group_xz(age,6,1)/DBN_XZ(6,1) + &
+								&   (0.999_dp-cdf_xz)*size_draft_group_xz(age,7,1)/DBN_XZ(7,1)
+			cdf_xz = cdf_xz + DBN_XZ(7,1)
+		size_draft_group(age,6)   = (CDF_xz-0.999_dp)*size_draft_group_xz(age,7,1)/DBN_XZ(7,1) + &
+								&  size_draft_group_xz(age,8,1) + size_draft_group_xz(age,9,1)
+
+		! Fraction Positive Welfare
+	    	cdf_xz = sum(DBN_XZ(:,3)) + sum(DBN_XZ(1:2,1))
+		frac_pos_welfare_draft_group(age,1)   = frac_pos_welfare_draft_group_xz(age,1,3) + frac_pos_welfare_draft_group_xz(age,2,3) + &
+								& frac_pos_welfare_draft_group_xz(age,3,3) + frac_pos_welfare_draft_group_xz(age,4,3) + &
+								& frac_pos_welfare_draft_group_xz(age,5,3) + frac_pos_welfare_draft_group_xz(age,6,3) + &
+								& frac_pos_welfare_draft_group_xz(age,7,3) + frac_pos_welfare_draft_group_xz(age,8,3) + &
+								& frac_pos_welfare_draft_group_xz(age,9,3) + &
+								& frac_pos_welfare_draft_group_xz(age,1,1) + frac_pos_welfare_draft_group_xz(age,2,1) + &
+								& (0.40_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,3,1)/DBN_XZ(3,1)
+			cdf_xz = cdf_xz + DBN_XZ(3,1)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+		frac_pos_welfare_draft_group(age,2)   = (cdf_xz_low-0.40_dp)*frac_pos_welfare_draft_group_xz(age,3,1)/DBN_XZ(3,1) + &
+								& frac_pos_welfare_draft_group_xz(age,4,1) + &
+								& (0.80_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,5,2)/DBN_XZ(5,2)
+			cdf_xz = cdf_xz + DBN_XZ(5,2)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2))
+		frac_pos_welfare_draft_group(age,3)   = (cdf_xz-0.80_dp)*frac_pos_welfare_draft_group_xz(age,5,2)/DBN_XZ(5,2) + &
+								& frac_pos_welfare_draft_group_xz(age,6,2) + frac_pos_welfare_draft_group_xz(age,7,2) + &
+								& frac_pos_welfare_draft_group_xz(age,8,2) + frac_pos_welfare_draft_group_xz(age,9,2) + &
+								& (0.90_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,5,1)/DBN_XZ(5,1)
+			cdf_xz = cdf_xz + DBN_XZ(5,1)
+		frac_pos_welfare_draft_group(age,4)   = (cdf_xz-0.90_dp)*frac_pos_welfare_draft_group_xz(age,5,1)/DBN_XZ(5,1) + &
+								&               (0.99_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,6,1)/DBN_XZ(6,1)
+			cdf_xz = cdf_xz + DBN_XZ(6,1)
+		frac_pos_welfare_draft_group(age,5)   = (cdf_xz-0.99_dp)*frac_pos_welfare_draft_group_xz(age,6,1)/DBN_XZ(6,1) + &
+								&				(0.999_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,7,1)/DBN_XZ(7,1)
+			cdf_xz = cdf_xz + DBN_XZ(7,1)
+		frac_pos_welfare_draft_group(age,6)   = (CDF_xz-0.999_dp)*frac_pos_welfare_draft_group_xz(age,7,1)/DBN_XZ(7,1) + &
+								&  frac_pos_welfare_draft_group_xz(age,8,1) + frac_pos_welfare_draft_group_xz(age,9,1)
+
+		! Age Group 3
+			! 00%-40%   : (z1,x3), (z2,x3), (z3,x3), (z4,x3), (z5,x3)
+			! 40%-80%   : (z5,x3), (z6,x3), (z7,x3), (z8,x3), (z9,x3), (z1,x1), (z2,x1), (z3,x1), (z4,x1)
+			! 80%-90%   : (z4,x1), (z5,x2)
+			! 90%-99%   : (z5,x2), (z6,x2), (z7,x2), (z8,x2), (z9,x2), (z5,x1), (z6,x1)
+			! 99%-99.9% : (z6,x1), (z7,x1)
+			! 99.9%+    : (z7,x1), (z8,x1), (z9,x1)
+			age = 3
+			DBN_XZ = sum(sum(sum(sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,:,:,:,:),5),4),2),1) 
+			DBN_XZ = DBN_XZ/sum(DBN_XZ)
+
+		! Welfare
+	    	cdf_xz = sum(DBN_XZ(1:4,3))
+		CE_draft_group(age,1)   = ( DBN_XZ(1,3)*CE_draft_group_xz(age,1,3) + DBN_XZ(2,3)*CE_draft_group_xz(age,2,3) + &
+								& DBN_XZ(3,3)*CE_draft_group_xz(age,3,3) + DBN_XZ(4,3)*CE_draft_group_xz(age,4,3) + &
+								& (0.40_dp-cdf_xz)*CE_draft_group_xz(age,5,3) )/0.40_dp 
+			cdf_xz = cdf_xz + DBN_XZ(5,3)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
+		CE_draft_group(age,2)   = ( (cdf_xz_low-0.40_dp)*CE_draft_group_xz(age,5,3) + &
+								& DBN_XZ(6,3)*CE_draft_group_xz(age,6,3) + &
+								& DBN_XZ(7,3)*CE_draft_group_xz(age,7,3) + DBN_XZ(8,3)*CE_draft_group_xz(age,8,3) + &
+								& DBN_XZ(9,3)*CE_draft_group_xz(age,9,3) + &
+								& DBN_XZ(1,1)*CE_draft_group_xz(age,1,1) + DBN_XZ(2,1)*CE_draft_group_xz(age,2,1) + &
+								& DBN_XZ(4,1)*CE_draft_group_xz(age,3,1) + &
+								& (0.80_dp-cdf_xz)*CE_draft_group_xz(age,4,1) )/0.40_dp
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+		CE_draft_group(age,3)   = ( (cdf_xz-0.80_dp)*CE_draft_group_xz(age,4,1) + (0.90_dp-cdf_xz)*CE_draft_group_xz(age,5,2) )/0.10_dp
+			cdf_xz = cdf_xz + DBN_XZ(5,2)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
+		CE_draft_group(age,4)   = ( (cdf_xz-0.90_dp)*CE_draft_group_xz(age,5,2) + &
+								& DBN_XZ(6,2)*CE_draft_group_xz(age,6,2) + DBN_XZ(7,2)*CE_draft_group_xz(age,7,2) + &
+								& DBN_XZ(8,2)*CE_draft_group_xz(age,8,2) + DBN_XZ(9,2)*CE_draft_group_xz(age,9,2) + &
+								& DBN_XZ(5,1)*CE_draft_group_xz(age,5,1) + &
+								& (0.99_dp-cdf_xz)*CE_draft_group_xz(age,6,1) )/0.09_dp
+			cdf_xz = cdf_xz + DBN_XZ(6,1)
+		CE_draft_group(age,5)   = ( (cdf_xz-0.99_dp)*CE_draft_group_xz(age,6,1) + (0.999_dp-cdf_xz)*CE_draft_group_xz(age,7,1) )/0.009_dp
+			cdf_xz = cdf_xz + DBN_XZ(7,1)
+		CE_draft_group(age,6)   = ( (CDF_xz-0.999_dp)*CE_draft_group_xz(age,7,1) + &
+								&  DBN_XZ(8,1)*CE_draft_group_xz(age,8,1) + DBN_XZ(9,1)*CE_draft_group_xz(age,9,1) )/0.001_dp
+
+		! Size of Each group
+	    	cdf_xz = sum(DBN_XZ(1:4,3))
+		size_draft_group(age,1)   = size_draft_group_xz(age,1,3) + size_draft_group_xz(age,2,3) + &
+								& size_draft_group_xz(age,3,3) + size_draft_group_xz(age,4,3) + &
+								& (0.40_dp-cdf_xz)*size_draft_group_xz(age,5,3)/DBN_XZ(5,3)
+			cdf_xz = cdf_xz + DBN_XZ(5,3)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
+		size_draft_group(age,2)   = (cdf_xz_low-0.40_dp)*size_draft_group_xz(age,5,3)/DBN_XZ(5,3) + &
+								& size_draft_group_xz(age,6,3) + &
+								& size_draft_group_xz(age,7,3) + size_draft_group_xz(age,8,3) + &
+								& size_draft_group_xz(age,9,3) + &
+								& size_draft_group_xz(age,1,1) + size_draft_group_xz(age,2,1) + &
+								& size_draft_group_xz(age,3,1) + &
+								& (0.80_dp-cdf_xz)*size_draft_group_xz(age,4,1)/DBN_XZ(4,1)
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+		size_draft_group(age,3)   = (cdf_xz-0.80_dp)*size_draft_group_xz(age,4,1)/DBN_XZ(4,1) + &
+								&   (0.90_dp-cdf_xz)*size_draft_group_xz(age,5,2)/DBN_XZ(5,2)
+			cdf_xz = cdf_xz + DBN_XZ(5,2)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
+		size_draft_group(age,4)   = (cdf_xz-0.90_dp)*size_draft_group_xz(age,5,2)/DBN_XZ(5,2) + &
+								& size_draft_group_xz(age,6,2) + size_draft_group_xz(age,7,2) + &
+								& size_draft_group_xz(age,8,2) + size_draft_group_xz(age,9,2) + &
+								& size_draft_group_xz(age,5,1) + &
+								& (0.99_dp-cdf_xz)*size_draft_group_xz(age,6,1)/DBN_XZ(6,1)
+			cdf_xz = cdf_xz + DBN_XZ(6,1)
+		size_draft_group(age,5)   = (cdf_xz-0.99_dp)*size_draft_group_xz(age,6,1)/DBN_XZ(6,1) + &
+								& (0.999_dp-cdf_xz)*size_draft_group_xz(age,7,1)/DBN_XZ(7,1)
+			cdf_xz = cdf_xz + DBN_XZ(7,1)
+		size_draft_group(age,6)   = (CDF_xz-0.999_dp)*size_draft_group_xz(age,7,1)/DBN_XZ(7,1) + &
+								&  size_draft_group_xz(age,8,1) + size_draft_group_xz(age,9,1)
+
+
+		! Fraction Positive Welfare
+	    	cdf_xz = sum(DBN_XZ(1:4,3))
+		frac_pos_welfare_draft_group(age,1)   = frac_pos_welfare_draft_group_xz(age,1,3) + frac_pos_welfare_draft_group_xz(age,2,3) + &
+								& frac_pos_welfare_draft_group_xz(age,3,3) + frac_pos_welfare_draft_group_xz(age,4,3) + &
+								& (0.40_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,5,3)/DBN_XZ(5,3)
+			cdf_xz = cdf_xz + DBN_XZ(5,3)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
+		frac_pos_welfare_draft_group(age,2)   = (cdf_xz_low-0.40_dp)*frac_pos_welfare_draft_group_xz(age,5,3)/DBN_XZ(5,3) + &
+								& frac_pos_welfare_draft_group_xz(age,6,3) + &
+								& frac_pos_welfare_draft_group_xz(age,7,3) + frac_pos_welfare_draft_group_xz(age,8,3) + &
+								& frac_pos_welfare_draft_group_xz(age,9,3) + &
+								& frac_pos_welfare_draft_group_xz(age,1,1) + frac_pos_welfare_draft_group_xz(age,2,1) + &
+								& frac_pos_welfare_draft_group_xz(age,3,1) + &
+								& (0.80_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,4,1)/DBN_XZ(4,1)
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+		frac_pos_welfare_draft_group(age,3)   = (cdf_xz-0.80_dp)*frac_pos_welfare_draft_group_xz(age,4,1)/DBN_XZ(4,1) + &
+								& (0.90_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,5,2)/DBN_XZ(5,2)
+			cdf_xz = cdf_xz + DBN_XZ(5,2)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
+		frac_pos_welfare_draft_group(age,4)   = (cdf_xz-0.90_dp)*frac_pos_welfare_draft_group_xz(age,5,2)/DBN_XZ(5,2) + &
+								& frac_pos_welfare_draft_group_xz(age,6,2) + frac_pos_welfare_draft_group_xz(age,7,2) + &
+								& frac_pos_welfare_draft_group_xz(age,8,2) + frac_pos_welfare_draft_group_xz(age,9,2) + &
+								& frac_pos_welfare_draft_group_xz(age,5,1) + &
+								& (0.99_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,6,1)/DBN_XZ(6,1)
+			cdf_xz = cdf_xz + DBN_XZ(6,1)
+		frac_pos_welfare_draft_group(age,5)   = (cdf_xz-0.99_dp)*frac_pos_welfare_draft_group_xz(age,6,1)/DBN_XZ(6,1) + &
+								& (0.999_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,7,1)/DBN_XZ(7,1)
+			cdf_xz = cdf_xz + DBN_XZ(7,1)
+		frac_pos_welfare_draft_group(age,6)   = (CDF_xz-0.999_dp)*frac_pos_welfare_draft_group_xz(age,7,1)/DBN_XZ(7,1) + &
+								&  frac_pos_welfare_draft_group_xz(age,8,1) + frac_pos_welfare_draft_group_xz(age,9,1)
+
+		! Age Group 4
+			! 00%-40%   : (z1,x3), (z2,x3), (z3,x3), (z4,x3)
+			! 40%-80%   : (z4,x3), (z5,x3), (z6,x3), (z7,x3), (z8,x3), (z9,x3), (z1,x1), (z2,x1), (z3,x1), (z4,x1)
+			! 80%-90%   : (z4,x1), (z5,x2)
+			! 90%-99%   : (z5,x2), (z6,x2), (z7,x2), (z8,x2), (z9,x2), (z5,x1)
+			! 99%-99.9% : (z5,x1), (z6,x1)
+			! 99.9%+    : (z6,x1), (z7,x1), (z8,x1), (z9,x1)
+			age = 4
+			DBN_XZ = sum(sum(sum(sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,:,:,:,:),5),4),2),1)
+			DBN_XZ = DBN_XZ/sum(DBN_XZ)
+
+		! Welfare
+	    	cdf_xz = sum(DBN_XZ(1:3,3))
+		CE_draft_group(age,1)   = ( DBN_XZ(1,3)*CE_draft_group_xz(age,1,3) + DBN_XZ(2,3)*CE_draft_group_xz(age,2,3) + &
+								& DBN_XZ(3,3)*CE_draft_group_xz(age,3,3) + &
+								& (0.40_dp-cdf_xz)*CE_draft_group_xz(age,4,3) )/0.40_dp 
+			cdf_xz = cdf_xz + DBN_XZ(4,3)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(5:,3)) + sum(DBN_XZ(1:3,1))
+		CE_draft_group(age,2)   = ( (cdf_xz_low-0.40_dp)*CE_draft_group_xz(age,4,3) + &
+								& DBN_XZ(5,3)*CE_draft_group_xz(age,5,3) + DBN_XZ(6,3)*CE_draft_group_xz(age,6,3) + &
+								& DBN_XZ(7,3)*CE_draft_group_xz(age,7,3) + DBN_XZ(8,3)*CE_draft_group_xz(age,8,3) + &
+								& DBN_XZ(9,3)*CE_draft_group_xz(age,9,3) + &
+								& DBN_XZ(1,1)*CE_draft_group_xz(age,1,1) + DBN_XZ(2,1)*CE_draft_group_xz(age,2,1) + &
+								& DBN_XZ(3,1)*CE_draft_group_xz(age,3,1) + &
+								& (0.80_dp-cdf_xz)*CE_draft_group_xz(age,4,1) )/0.40_dp
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+		CE_draft_group(age,3)   = ( (cdf_xz-0.80_dp)*CE_draft_group_xz(age,4,1) + (0.90_dp-cdf_xz)*CE_draft_group_xz(age,5,2) )/0.10_dp
+			cdf_xz = cdf_xz + DBN_XZ(5,2)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) 
+		CE_draft_group(age,4)   = ( (cdf_xz-0.90_dp)*CE_draft_group_xz(age,5,2) + &
+								& DBN_XZ(6,2)*CE_draft_group_xz(age,6,2) + DBN_XZ(7,2)*CE_draft_group_xz(age,7,2) + &
+								& DBN_XZ(8,2)*CE_draft_group_xz(age,8,2) + DBN_XZ(9,2)*CE_draft_group_xz(age,9,2) + &
+								& (0.99_dp-cdf_xz)*CE_draft_group_xz(age,5,1) )/0.09_dp
+			cdf_xz = cdf_xz + DBN_XZ(5,1)
+		CE_draft_group(age,5)   = ( (cdf_xz-0.99_dp)*CE_draft_group_xz(age,5,1) + (0.999_dp-cdf_xz)*CE_draft_group_xz(age,6,1) )/0.009_dp
+			cdf_xz = cdf_xz + DBN_XZ(6,1)
+		CE_draft_group(age,6)   = ( (CDF_xz-0.999_dp)*CE_draft_group_xz(age,6,1) + DBN_XZ(7,1)*CE_draft_group_xz(age,7,1) + &
+								&  DBN_XZ(8,1)*CE_draft_group_xz(age,8,1) + DBN_XZ(9,1)*CE_draft_group_xz(age,9,1) )/0.001_dp
+
+		! Size of Each group
+	    	cdf_xz = sum(DBN_XZ(1:3,3))
+		size_draft_group(age,1)   = size_draft_group_xz(age,1,3) + size_draft_group_xz(age,2,3) + &
+								& size_draft_group_xz(age,3,3) + &
+								& (0.40_dp-cdf_xz)*size_draft_group_xz(age,4,3)/DBN_XZ(4,3)
+			cdf_xz = cdf_xz + DBN_XZ(4,3)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(5:,3)) + sum(DBN_XZ(1:3,1))
+		size_draft_group(age,2)   = (cdf_xz_low-0.40_dp)*size_draft_group_xz(age,4,3)/DBN_XZ(4,3) + &
+								& size_draft_group_xz(age,5,3) + size_draft_group_xz(age,6,3) + &
+								& size_draft_group_xz(age,7,3) + size_draft_group_xz(age,8,3) + &
+								& size_draft_group_xz(age,9,3) + &
+								& size_draft_group_xz(age,1,1) + size_draft_group_xz(age,2,1) + &
+								& size_draft_group_xz(age,3,1) + &
+								& (0.80_dp-cdf_xz)*size_draft_group_xz(age,4,1)/DBN_XZ(4,1)
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+		size_draft_group(age,3)   = (cdf_xz-0.80_dp)*size_draft_group_xz(age,4,1)/DBN_XZ(4,1) + &
+								& (0.90_dp-cdf_xz)*size_draft_group_xz(age,5,2)/DBN_XZ(5,2)
+			cdf_xz = cdf_xz + DBN_XZ(5,2)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) 
+		size_draft_group(age,4)   = (cdf_xz-0.90_dp)*size_draft_group_xz(age,5,2)/DBN_XZ(5,2) + &
+								& size_draft_group_xz(age,6,2) + size_draft_group_xz(age,7,2) + &
+								& size_draft_group_xz(age,8,2) + size_draft_group_xz(age,9,2) + &
+								& (0.99_dp-cdf_xz)*size_draft_group_xz(age,5,1)/DBN_XZ(5,1)
+			cdf_xz = cdf_xz + DBN_XZ(5,1)
+		size_draft_group(age,5)   = (cdf_xz-0.99_dp)*size_draft_group_xz(age,5,1)/DBN_XZ(5,1) + &
+								& (0.999_dp-cdf_xz)*size_draft_group_xz(age,6,1)/DBN_XZ(6,1)
+			cdf_xz = cdf_xz + DBN_XZ(6,1)
+		size_draft_group(age,6)   = (CDF_xz-0.999_dp)*size_draft_group_xz(age,6,1)/DBN_XZ(6,1) + size_draft_group_xz(age,7,1) + &
+								&  size_draft_group_xz(age,8,1) + size_draft_group_xz(age,9,1)
+
+		! Fraction Positive Welfare
+	    	cdf_xz = sum(DBN_XZ(1:3,3))
+		frac_pos_welfare_draft_group(age,1)   = frac_pos_welfare_draft_group_xz(age,1,3) + frac_pos_welfare_draft_group_xz(age,2,3) + &
+								& frac_pos_welfare_draft_group_xz(age,3,3) + &
+								& (0.40_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,4,3)/DBN_XZ(4,3)
+			cdf_xz = cdf_xz + DBN_XZ(4,3)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(5:,3)) + sum(DBN_XZ(1:3,1))
+		frac_pos_welfare_draft_group(age,2)   = (cdf_xz_low-0.40_dp)*frac_pos_welfare_draft_group_xz(age,4,3)/DBN_XZ(4,3) + &
+								& frac_pos_welfare_draft_group_xz(age,5,3) + frac_pos_welfare_draft_group_xz(age,6,3) + &
+								& frac_pos_welfare_draft_group_xz(age,7,3) + frac_pos_welfare_draft_group_xz(age,8,3) + &
+								& frac_pos_welfare_draft_group_xz(age,9,3) + &
+								& frac_pos_welfare_draft_group_xz(age,1,1) + frac_pos_welfare_draft_group_xz(age,2,1) + &
+								& frac_pos_welfare_draft_group_xz(age,3,1) + &
+								& (0.80_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,4,1)/DBN_XZ(4,1)
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+		frac_pos_welfare_draft_group(age,3)   = (cdf_xz-0.80_dp)*frac_pos_welfare_draft_group_xz(age,4,1)/DBN_XZ(4,1) + &
+								&               (0.90_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,5,2)/DBN_XZ(5,2)
+			cdf_xz = cdf_xz + DBN_XZ(5,2)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) 
+		frac_pos_welfare_draft_group(age,4)   = (cdf_xz-0.90_dp)*frac_pos_welfare_draft_group_xz(age,5,2)/DBN_XZ(5,2) + &
+								& frac_pos_welfare_draft_group_xz(age,6,2) + frac_pos_welfare_draft_group_xz(age,7,2) + &
+								& frac_pos_welfare_draft_group_xz(age,8,2) + frac_pos_welfare_draft_group_xz(age,9,2) + &
+								& (0.99_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,5,1)/DBN_XZ(5,1)
+			cdf_xz = cdf_xz + DBN_XZ(5,1)
+		frac_pos_welfare_draft_group(age,5)   = (cdf_xz-0.99_dp)*frac_pos_welfare_draft_group_xz(age,5,1)/DBN_XZ(5,1) + &
+								&				(0.999_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,6,1)/DBN_XZ(6,1)
+			cdf_xz = cdf_xz + DBN_XZ(6,1)
+		frac_pos_welfare_draft_group(age,6)   = (CDF_xz-0.999_dp)*frac_pos_welfare_draft_group_xz(age,6,1)/DBN_XZ(6,1) + &
+								&  frac_pos_welfare_draft_group_xz(age,7,1) + &
+								&  frac_pos_welfare_draft_group_xz(age,8,1) + frac_pos_welfare_draft_group_xz(age,9,1)
+
+
+		! Age Group 5
+			! 00%-40%   : (z1,x3), (z2,x3), (z3,x3), (z4,x3)
+			! 40%-80%   : (z4,x3), (z5,x3), (z6,x3)
+			! 80%-90%   : (z6,x3), (z7,x3), (z8,x3), (z9,x3), (z1,x1), (z2,x1), (z3,x1), (z4,x1)
+			! 90%-99%   : (z4,x1), (z5,x2), (z6,x2)
+			! 99%-99.9% : (z6,x2), (z7,x2), (z8,x2), (z9,x2), (z5,x1)
+			! 99.9%+    : (z5,x1), (z6,x1), (z7,x1), (z8,x1), (z9,x1)
+			age = 5
+			DBN_XZ = sum(sum(sum(sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,:,:,:,:),5),4),2),1) 
+			DBN_XZ = DBN_XZ/sum(DBN_XZ)
+
+		! Welfare
+	    	cdf_xz = sum(DBN_XZ(1:3,3))
+		CE_draft_group(age,1)   = ( DBN_XZ(1,3)*CE_draft_group_xz(age,1,3) + DBN_XZ(2,3)*CE_draft_group_xz(age,2,3) + &
+								& DBN_XZ(3,3)*CE_draft_group_xz(age,3,3) + &
+								& (0.40_dp-cdf_xz)*CE_draft_group_xz(age,4,3) )/0.40_dp 
+			cdf_xz = cdf_xz + DBN_XZ(4,3)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + DBN_XZ(5,3)
+		CE_draft_group(age,2)   = ( (cdf_xz_low-0.40_dp)*CE_draft_group_xz(age,4,3) + &
+								& DBN_XZ(5,3)*CE_draft_group_xz(age,5,3) + &
+								& (0.80_dp-cdf_xz)*CE_draft_group_xz(age,6,3) )/0.40_dp
+			cdf_xz = cdf_xz + DBN_XZ(6,3)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(7:,3)) + sum(DBN_XZ(1:3,1)) 
+		CE_draft_group(age,3)   = ( (cdf_xz_low-0.80_dp)*CE_draft_group_xz(age,6,3) + &
+								& DBN_XZ(7,3)*CE_draft_group_xz(age,7,3) + DBN_XZ(8,3)*CE_draft_group_xz(age,8,3) + &
+								& DBN_XZ(9,3)*CE_draft_group_xz(age,9,3) + &
+								& DBN_XZ(1,1)*CE_draft_group_xz(age,1,1) + DBN_XZ(2,1)*CE_draft_group_xz(age,2,1) + &
+								& DBN_XZ(3,1)*CE_draft_group_xz(age,3,1) + &
+								& (0.90_dp-cdf_xz)*CE_draft_group_xz(age,4,1) )/0.10_dp
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + DBN_XZ(5,2)
+		CE_draft_group(age,4)   = ( (cdf_xz-0.90_dp)*CE_draft_group_xz(age,4,1) + &
+								& DBN_XZ(5,2)*CE_draft_group_xz(age,5,2) + &
+								& (0.99_dp-cdf_xz)*CE_draft_group_xz(age,6,2) )/0.09_dp
+			cdf_xz = cdf_xz + DBN_XZ(6,2)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(7:,2))
+		CE_draft_group(age,5)   = ( (cdf_xz-0.99_dp)*CE_draft_group_xz(age,6,2) + &
+								& DBN_XZ(7,2)*CE_draft_group_xz(age,7,2) + DBN_XZ(8,2)*CE_draft_group_xz(age,8,2) + &
+								& DBN_XZ(9,2)*CE_draft_group_xz(age,9,2) + &
+								& (0.999_dp-cdf_xz)*CE_draft_group_xz(age,5,1) )/0.009_dp
+			cdf_xz = cdf_xz + DBN_XZ(5,1)
+		CE_draft_group(age,6)   = ( (CDF_xz-0.999_dp)*CE_draft_group_xz(age,5,1) + &
+								& DBN_XZ(6,1)*CE_draft_group_xz(age,6,1) + DBN_XZ(7,1)*CE_draft_group_xz(age,7,1) + &
+								& DBN_XZ(8,1)*CE_draft_group_xz(age,8,1) + DBN_XZ(9,1)*CE_draft_group_xz(age,9,1) )/0.001_dp
+
+		! Size of Each group
+	    	cdf_xz = sum(DBN_XZ(1:3,3))
+		size_draft_group(age,1)   = size_draft_group_xz(age,1,3) + size_draft_group_xz(age,2,3) + &
+								& size_draft_group_xz(age,3,3) + &
+								& (0.40_dp-cdf_xz)*size_draft_group_xz(age,4,3)/DBN_XZ(4,3)
+			cdf_xz = cdf_xz + DBN_XZ(4,3)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + DBN_XZ(5,3)
+		size_draft_group(age,2)   = (cdf_xz_low-0.40_dp)*size_draft_group_xz(age,4,3)/DBN_XZ(4,3) + &
+								& size_draft_group_xz(age,5,3) + &
+								& (0.80_dp-cdf_xz)*size_draft_group_xz(age,6,3)/DBN_XZ(6,3)
+			cdf_xz = cdf_xz + DBN_XZ(6,3)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(7:,3)) + sum(DBN_XZ(1:3,1)) 
+		size_draft_group(age,3)   = (cdf_xz_low-0.80_dp)*size_draft_group_xz(age,6,3)/DBN_XZ(6,3) + &
+								& size_draft_group_xz(age,7,3) + size_draft_group_xz(age,8,3) + &
+								& size_draft_group_xz(age,9,3) + &
+								& size_draft_group_xz(age,1,1) + size_draft_group_xz(age,2,1) + &
+								& size_draft_group_xz(age,3,1) + &
+								& (0.90_dp-cdf_xz)*size_draft_group_xz(age,4,1)/DBN_XZ(4,1)
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + DBN_XZ(5,2)
+		size_draft_group(age,4)   = (cdf_xz-0.90_dp)*size_draft_group_xz(age,4,1)/DBN_XZ(4,1) + &
+								& size_draft_group_xz(age,5,2) + &
+								& (0.99_dp-cdf_xz)*size_draft_group_xz(age,6,2)/DBN_XZ(6,2)
+			cdf_xz = cdf_xz + DBN_XZ(6,2)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(7:,2))
+		size_draft_group(age,5)   = (cdf_xz-0.99_dp)*size_draft_group_xz(age,6,2)/DBN_XZ(6,2) + &
+								& size_draft_group_xz(age,7,2) + size_draft_group_xz(age,8,2) + &
+								& size_draft_group_xz(age,9,2) + &
+								& (0.999_dp-cdf_xz)*size_draft_group_xz(age,5,1)/DBN_XZ(5,1)
+			cdf_xz = cdf_xz + DBN_XZ(5,1)
+		size_draft_group(age,6)   = (CDF_xz-0.999_dp)*size_draft_group_xz(age,5,1)/DBN_XZ(5,1) + &
+								& size_draft_group_xz(age,6,1) + size_draft_group_xz(age,7,1) + &
+								& size_draft_group_xz(age,8,1) + size_draft_group_xz(age,9,1)
+
+		! Fraction Positive Welfare
+	    	cdf_xz = sum(DBN_XZ(1:3,3))
+		frac_pos_welfare_draft_group(age,1)   = frac_pos_welfare_draft_group_xz(age,1,3) + frac_pos_welfare_draft_group_xz(age,2,3) + &
+								& frac_pos_welfare_draft_group_xz(age,3,3) + &
+								& (0.40_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,4,3)/DBN_XZ(4,3)
+			cdf_xz = cdf_xz + DBN_XZ(4,3)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + DBN_XZ(5,3)
+		frac_pos_welfare_draft_group(age,2)   = (cdf_xz_low-0.40_dp)*frac_pos_welfare_draft_group_xz(age,4,3)/DBN_XZ(4,3) + &
+								& frac_pos_welfare_draft_group_xz(age,5,3) + &
+								& (0.80_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,6,3)/DBN_XZ(6,3)
+			cdf_xz = cdf_xz + DBN_XZ(6,3)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(7:,3)) + sum(DBN_XZ(1:3,1)) 
+		frac_pos_welfare_draft_group(age,3)   = (cdf_xz_low-0.80_dp)*frac_pos_welfare_draft_group_xz(age,6,3)/DBN_XZ(6,3) + &
+								& frac_pos_welfare_draft_group_xz(age,7,3) + frac_pos_welfare_draft_group_xz(age,8,3) + &
+								& frac_pos_welfare_draft_group_xz(age,9,3) + &
+								& frac_pos_welfare_draft_group_xz(age,1,1) + frac_pos_welfare_draft_group_xz(age,2,1) + &
+								& frac_pos_welfare_draft_group_xz(age,3,1) + &
+								& (0.90_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,4,1)/DBN_XZ(4,1)
+			cdf_xz = cdf_xz + DBN_XZ(4,1)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + DBN_XZ(5,2)
+		frac_pos_welfare_draft_group(age,4)   = (cdf_xz-0.90_dp)*frac_pos_welfare_draft_group_xz(age,4,1)/DBN_XZ(4,1) + &
+								& frac_pos_welfare_draft_group_xz(age,5,2) + &
+								& (0.99_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,6,2)/DBN_XZ(6,2)
+			cdf_xz = cdf_xz + DBN_XZ(6,2)
+			cdf_xz_low = cdf_xz 
+			cdf_xz = cdf_xz + sum(DBN_XZ(7:,2))
+		frac_pos_welfare_draft_group(age,5)   = (cdf_xz-0.99_dp)*frac_pos_welfare_draft_group_xz(age,6,2)/DBN_XZ(6,2) + &
+								& frac_pos_welfare_draft_group_xz(age,7,2) + frac_pos_welfare_draft_group_xz(age,8,2) + &
+								& frac_pos_welfare_draft_group_xz(age,9,2) + &
+								& (0.999_dp-cdf_xz)*frac_pos_welfare_draft_group_xz(age,5,1)/DBN_XZ(5,1)
+			cdf_xz = cdf_xz + DBN_XZ(5,1)
+		frac_pos_welfare_draft_group(age,6)   = (CDF_xz-0.999_dp)*frac_pos_welfare_draft_group_xz(age,5,1)/DBN_XZ(5,1) + &
+								& frac_pos_welfare_draft_group_xz(age,6,1) + frac_pos_welfare_draft_group_xz(age,7,1) + &
+								& frac_pos_welfare_draft_group_xz(age,8,1) + frac_pos_welfare_draft_group_xz(age,9,1)
+
+	! Fill in additional unused columns
+		CE_draft_group(:,7)   = 0
+		CE_draft_group(:,8)   = 0
+
+		size_draft_group(:,7)   = 0
+		size_draft_group(:,8)   = 0
+
+		frac_pos_welfare_draft_group(:,7)   = 0
+		frac_pos_welfare_draft_group(:,8)   = 0
+
+
+	! Fix fractions
+	frac_pos_welfare_draft_group = 100*frac_pos_welfare_draft_group/size_draft_group
+
+    OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE_axz.txt', STATUS='replace') 
+    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size_axz.txt', STATUS='replace') 
+    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_fpos_welfare_axz.txt', STATUS='replace') 
+	do age = 1,draft_age_category
+	    WRITE  (UNIT=80, FMT=*)  CE_draft_group(age,:)
+	    WRITE  (UNIT=81, FMT=*)  size_draft_group(age,:)
+	    WRITE  (UNIT=82, FMT=*)  frac_pos_welfare_draft_group(age,:)
+	ENDDO
+	close(unit=80)
+	close(unit=81)
+	close(unit=82)
+
+
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! Draft Tables for Tax Burden
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 
 		!! Benchmark 
