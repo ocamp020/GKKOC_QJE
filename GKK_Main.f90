@@ -304,7 +304,7 @@ PROGRAM main
 			call Solve_Benchmark(compute_bench,Simul_Switch)
 
 			folder_aux = Result_Folder
-			Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold_check/'
+			Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold/'
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
 			
