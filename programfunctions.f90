@@ -1555,6 +1555,15 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	print*, ' '
 	print*, size_draft_group_xz(1,:,3)
 	print*, ' '
+	print*, sum(size_draft_group_xz)
+	print*, ' '
+	print*, sum(DBN_XZ)
+	print*, ' '
+	do xi=1:nx
+	print*, DBN_XZ(:,xi)
+	enddo 
+	print*, ' '
+
 
 	! CE of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
 		    ! % 0%-40%     of Current Productivity
