@@ -790,7 +790,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	REAL(DP), dimension(nz,nx) :: DBN_XZ
 	INTEGER , dimension(draft_age_category+1) :: draft_age_limit
 	INTEGER :: age2, z2
-	REAL(DP):: K_Inc_aux, L_Inc_aux, cdf_xz
+	REAL(DP):: K_Inc_aux, L_Inc_aux, cdf_xz, cdf_xz_low
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Income_bench, K_Tax_bench, L_Tax_bench
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Income_exp,   K_Tax_exp,   L_Tax_exp
 	allocate( Income_bench( MaxAge,na,nz,nlambda,ne,nx) )
