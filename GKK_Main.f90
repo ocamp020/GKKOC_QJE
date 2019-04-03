@@ -2233,6 +2233,12 @@ Subroutine Solve_Opt_Threshold
 	! Code for just replicating tables 
 	Threshold_Factor = 0.250_dp
 	CALL Write_Experimental_Results(.false.)
+	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+	K_mat  = K_Matrix(R,P)
+	Pr_mat = Profit_Matrix(R,P)
+	CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+	CALL ComputeLaborUnits(EBAR,wage)
+	CALL GOVNT_BUDGET
 		! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
 		QBAR_exp  = QBAR 
@@ -2254,8 +2260,11 @@ Subroutine Solve_Opt_Threshold
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime 
-	CALL COMPUTE_STATS
+	! CALL COMPUTE_STATS
 	CALL COMPUTE_WELFARE_GAIN
+
+
+	
 
 	stop 
 
