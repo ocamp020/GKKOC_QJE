@@ -7707,6 +7707,9 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN  (UNIT=4,  FILE=trim(bench_folder)//'v_pr_nb', STATUS='replace')
 		WRITE (UNIT=4,  FMT=*) V_Pr_nb
 		CLOSE (unit=4)
+		OPEN  (UNIT=4,  FILE=trim(bench_folder)//'Income_AT', STATUS='replace')
+		WRITE (UNIT=4,  FMT=*) Income_AT
+		CLOSE (unit=4)
 
 		OPEN  (UNIT=5,  FILE=trim(bench_folder)//'DBN'   , STATUS='replace')
 		WRITE (UNIT=5,  FMT=*) DBN1 
