@@ -5969,7 +5969,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	Aprime_t(age, :, :, :, :,:) = 0.0_DP
 	
 	! Rest of retirement
-	DO age=c,-1
+	DO age=MaxAge-1,RetAge,-1
 	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
 	!$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
     DO zi=1,nz
