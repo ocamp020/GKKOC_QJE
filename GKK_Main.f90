@@ -442,9 +442,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 			! print*,' ' 
 			! print*,'W_Bench=',W_bench
 			! STOP
-		CALL Compute_After_Tax_Income
 		CALL GOVNT_BUDGET
-		CALL Write_Benchmark_Results(.true.)
 	end if 
 
 		print*,"	Computing satitics"
@@ -618,9 +616,6 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
 	CALL ComputeLaborUnits(EBAR,wage)
 	CALL GOVNT_BUDGET
-	print*, " 	Computing After Tax Income"
-	CALL Compute_After_Tax_Income
-	CALL Write_Experimental_Results(.true.)
 
 	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
