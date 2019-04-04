@@ -5969,7 +5969,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	Aprime_t(age, :, :, :, :,:) = 0.0_DP
 	
 	! Rest of retirement
-	DO age=MaxAge-1,RetAge,-1
+	DO age=c,-1
 	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
 	!$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
     DO zi=1,nz
@@ -6731,6 +6731,37 @@ SUBROUTINE ComputeLaborUnits(Ebart,Waget)
 	endif 
 
 END SUBROUTINE ComputeLaborUnits
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+! This subroutine computes after tax income given current taxes for each point in the state space
+
+SUBROUTINE Compute_After_Tax_Income
+	real(dp) :: capital_income
+
+		DO xi=1,nx
+		DO zi=1,nz			   
+	    DO ai=1,na
+	    	capital_income = YGRID(ai,zi,xi)
+	    DO lambdai=1,nlambda
+	    DO ei=1,ne
+	    	DO age=RetAge,MaxAge
+			Income_AT(age,ai,zi,lambdai,ei,xi)   = capital_income + RetY_lambda_e(lambdai,ei) 
+			ENDDO !age        
+
+			DO age=1,RetAge-1
+			Income_AT(age,ai,zi,lambdai,ei,xi)   = capital_income + Y_h(hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,wage)
+			ENDDO !age        
+		ENDDO !ei         
+	    ENDDO !lambdai
+		ENDDO !ai
+		ENDDO !zi
+		ENDDO !xi
+
+
+
+END SUBROUTINE Compute_After_Tax_Income
 
 
 !========================================================================================
@@ -7839,6 +7870,9 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN  (UNIT=20,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr_nb', STATUS='replace')
 		WRITE (UNIT=20,  FMT=*) V_Pr_nb
 
+		OPEN  (UNIT=21,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_Income_AT', STATUS='replace')
+		WRITE (UNIT=21,  FMT=*) Income_AT
+
 		print*, "Writing of experimental results completed"
 
 	else 
@@ -7906,7 +7940,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 	CLOSE (unit=17)
 	CLOSE (unit=18)
 	CLOSE (unit=19)
-	CLOSE (unit=20)
+	CLOSE (unit=20); CLOSE (unit=21)
 
 END SUBROUTINE Write_Experimental_Results
 

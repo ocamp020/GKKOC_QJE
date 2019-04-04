@@ -57,7 +57,7 @@ MODULE global
 		REAL(DP), DIMENSION(MaxAge  , nlambda, ne) :: eff_un,  yh
 
 	! Policy function and value function (defined on the exogenous grid)
-    REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons, Hours, Aprime
+    REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons, Hours, Aprime, Income_AT
     REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_bench, Hours_bench, Aprime_bench, Cons_exp, Hours_exp, Aprime_exp 
     REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: ValueFunction, ValueFunction_bench, ValueFunction_exp
     REAL(DP), dimension(:,:,:,:,:,:), allocatable :: Cons_Eq_Welfare
@@ -170,6 +170,7 @@ Subroutine Allocate_Variables
     allocate( Cons(               MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Hours(              MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Aprime(             MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( Income_AT(          MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Cons_bench(         MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Hours_bench(        MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Aprime_bench(       MaxAge,na,nz,nlambda,ne,nx) )
