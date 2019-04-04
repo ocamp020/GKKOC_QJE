@@ -61,7 +61,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -72,7 +72,7 @@ PROGRAM main
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
-		Opt_Tax       = .false.
+		Opt_Tax       = .true.
 			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
@@ -1973,6 +1973,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
 	CALL ComputeLaborUnits(EBAR,wage)
 	CALL GOVNT_BUDGET
+	print*, " 	Computing After Tax Income"
+	CALL Compute_After_Tax_Income
+	CALL Write_Experimental_Results(.true.)
 	
 	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
