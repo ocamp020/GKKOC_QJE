@@ -61,7 +61,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
+		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -76,7 +76,7 @@ PROGRAM main
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
-		Opt_Threshold = .true.
+		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
 		Simul_Switch  = .false.
@@ -2236,40 +2236,40 @@ Subroutine Solve_Opt_Threshold
 	real(DP) :: OPT_Threshold
 	INTEGER  :: Threshold_ind
 
-	! Code for just replicating tables 
-	Threshold_Factor = 0.250_dp
-	CALL Write_Experimental_Results(.false.)
-	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-	K_mat  = K_Matrix(R,P)
-	Pr_mat = Profit_Matrix(R,P)
-	CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
-	CALL ComputeLaborUnits(EBAR,wage)
-	CALL GOVNT_BUDGET
-		! Aggregate variable in experimental economy
-		GBAR_exp  = GBAR
-		QBAR_exp  = QBAR 
-		NBAR_exp  = NBAR  
-		Y_exp 	  = YBAR
-		Ebar_exp  = EBAR
-		P_exp     = P
-		R_exp	  = R
-		wage_exp  = wage
-		tauK_exp  = tauK
-		tauPL_exp = tauPL
-		psi_exp   = psi
-		DBN_exp   = DBN1
-		tauw_bt_exp = tauW_bt
-		tauw_at_exp = tauW_at
-		Y_a_threshold_exp = Y_a_threshold
+	! ! Code for just replicating tables 
+	! Threshold_Factor = 0.250_dp
+	! CALL Write_Experimental_Results(.false.)
+	! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+	! K_mat  = K_Matrix(R,P)
+	! Pr_mat = Profit_Matrix(R,P)
+	! CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+	! CALL ComputeLaborUnits(EBAR,wage)
+	! CALL GOVNT_BUDGET
+	! 	! Aggregate variable in experimental economy
+	! 	GBAR_exp  = GBAR
+	! 	QBAR_exp  = QBAR 
+	! 	NBAR_exp  = NBAR  
+	! 	Y_exp 	  = YBAR
+	! 	Ebar_exp  = EBAR
+	! 	P_exp     = P
+	! 	R_exp	  = R
+	! 	wage_exp  = wage
+	! 	tauK_exp  = tauK
+	! 	tauPL_exp = tauPL
+	! 	psi_exp   = psi
+	! 	DBN_exp   = DBN1
+	! 	tauw_bt_exp = tauW_bt
+	! 	tauw_at_exp = tauW_at
+	! 	Y_a_threshold_exp = Y_a_threshold
 
-		ValueFunction_exp = ValueFunction
-		Cons_exp          = Cons           
-		Hours_exp         = Hours
-		Aprime_exp        = Aprime 
-	! CALL COMPUTE_STATS
-	CALL COMPUTE_WELFARE_GAIN
+	! 	ValueFunction_exp = ValueFunction
+	! 	Cons_exp          = Cons           
+	! 	Hours_exp         = Hours
+	! 	Aprime_exp        = Aprime 
+	! ! CALL COMPUTE_STATS
+	! CALL COMPUTE_WELFARE_GAIN
 
-	stop 
+	! stop 
 
 	!====================================================================================================
 	PRINT*,''
