@@ -1316,7 +1316,7 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(41+25,11)).^(1/(gamma*(1-s
     hgsave('fig/1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
     print -depsc 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
-%     plot(-0.3416*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
+%     plot(-0.1*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
     annotation('textarrow',[0.21 0.18],[0.76 0.72], 'string','Opt. \tau_k = -34.4%','linewidth',2,'FontSize',12)
     hgsave('fig/1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
     print -depsc 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
