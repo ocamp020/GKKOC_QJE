@@ -234,7 +234,8 @@ PROGRAM main
 					call system( 'mkdir -p ' // trim(Result_Folder) )
 					call Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W,Fixed_P,Fixed_R)
 			else
-				call Solve_Experiment(compute_exp,Simul_Switch)
+				call Solve_Experiment_Fixed_PF_Interp(.false.,Simul_Switch)
+				!call Solve_Experiment(compute_exp,Simul_Switch)
 			endif 
 
 			! Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
@@ -1134,7 +1135,7 @@ end Subroutine Solve_Experiment_Fixed_Policy_Functions
 !========================================================================================
 !========================================================================================
 
-Subroutine Solve_Experiment_Fixed_PF_Interp(compute_exp_pf_interp,Simul_Switch)
+Subroutine Solve_Experiment_Fixed_PF_Interp (compute_exp_pf_interp,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
@@ -1277,13 +1278,16 @@ Subroutine Solve_Experiment_Fixed_PF_Interp(compute_exp_pf_interp,Simul_Switch)
 
 	endif 
 
-	
+
 	CALL Write_Experimental_Results(compute_exp_pf_interp)
+	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+	K_mat  = K_Matrix(R,P)
+	Pr_mat = Profit_Matrix(R,P)
 	CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
 	CALL ComputeLaborUnits(EBAR,wage)
 	CALL GOVNT_BUDGET
-
-
+	
+	
 	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
 		QBAR_exp  = QBAR 
@@ -1309,7 +1313,7 @@ Subroutine Solve_Experiment_Fixed_PF_Interp(compute_exp_pf_interp,Simul_Switch)
 		V_Pr_nb_exp  	  = V_Pr_nb
 
 	! Compute moments
-	CALL COMPUTE_STATS
+	! CALL COMPUTE_STATS
 	
 	! Compute welfare gain between economies
 	CALL COMPUTE_WELFARE_GAIN
