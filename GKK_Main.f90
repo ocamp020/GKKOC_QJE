@@ -234,10 +234,7 @@ PROGRAM main
 					call system( 'mkdir -p ' // trim(Result_Folder) )
 					call Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W,Fixed_P,Fixed_R)
 			else
-				Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp/'
-				call system( 'mkdir -p ' // trim(Result_Folder) )
-				call Solve_Experiment_Fixed_PF_Interp(.false.,Simul_Switch)
-				!call Solve_Experiment(compute_exp,Simul_Switch)
+				call Solve_Experiment(compute_exp,Simul_Switch)
 			endif 
 
 			! Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
