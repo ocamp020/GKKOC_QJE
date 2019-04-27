@@ -5571,6 +5571,15 @@ SUBROUTINE EGM_Transition()
 		! endif 
 	ENDDO ! ai
 
+	    !$omp critical
+		if (any(isnan(EndoCons))) then 
+			print*, "isnan - Consumption endogenous"
+			print*, age,zi,ai,lambdai,ei,xi,ti
+			print*, EndoCons
+			STOP 
+		end if 
+		!$omp end critical
+
 		
 	
 	! Sort endogenous grid for interpolation
