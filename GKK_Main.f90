@@ -660,7 +660,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		CALL SIMULATION(solving_bench)
 	endif
 	! Call Simulation_Life_Cycle_Patterns(solving_bench)
-	Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
+	! Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
 
 
 	print*,'---------------------------'
