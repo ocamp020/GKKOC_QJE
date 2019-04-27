@@ -5472,6 +5472,7 @@ SUBROUTINE EGM_Transition()
 			Wealth_mat = Wealth_Matrix_t(R_tr(ti+1),P_tr(ti+1))
 		! Form YGRID for the capital income economy given interest rate "P"
 			CALL FORM_Y_MB_GRID_Transition(YGRID,MBGRID,YGRID_t,MBGRID_t,ti)
+			print*, 'YGRID_t(:,5,1)=',YGRID_t(:,5,1)
 
 		! print*, 'R=',R,'P=',P, 'W=',wage, 'na=', na, 'na_t=', na_t
 	!========================================================================================
@@ -5553,6 +5554,7 @@ SUBROUTINE EGM_Transition()
 	        print*,' Standard EGM - State:',age,ai,zi,lambdai,ei,xi,ti
 	        print*,' 	EndoCons(ai)=',EndoCons(ai)
 	        print*,' 	Cons_t+1=',Cons_t_tr(age+1,ai,zi,lambdai,ei,:,ti+1)
+	        print*,' 	Cons_t+1=',Cons_exp(age+1,ai,zi,lambdai,ei,:)
 	        !$omp end critical
 	    end if 
 
