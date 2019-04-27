@@ -577,7 +577,8 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 				
 
 				! Evaluate the squared residual of the Euler equation for working period
-				FOC_WH   = ( (1.0_dp/ctemp)- (beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * E_MU_cp) ) ) **2.0_DP 
+				FOC_WH_Transition   = &
+					& ( (1.0_dp/ctemp)- (beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * E_MU_cp) ) ) **2.0_DP 
 			else
 				! I have to evaluate the FOC in expectation over eindx prime given eindx
 				! Compute consumption and labor for eachvalue of eindx prime
@@ -599,7 +600,8 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 				enddo 
 
 				! Evaluate the squared residual of the Euler equation for working period
-				FOC_WH = ( ctemp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-ntemp)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
+				FOC_WH_Transition = &
+							& ( ctemp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-ntemp)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
 					         & - beta*survP(age_in)* sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp)  )**2.0_DP
 			end if 
 		else ! Linear Taxes 
@@ -617,7 +619,7 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 					& *((1.0_DP-nprime)**((1.0_DP-gamma)*(1.0_DP-sigma))))
 			enddo 
 
-			FOC_WH = ((ctemp**(gamma*(1.0_DP-sigma)-1))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
+			FOC_WH_Transition = ((ctemp**(gamma*(1.0_DP-sigma)-1))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
 					& - beta*survP(age_in)* sum( pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp ) )**2.0_DP
 		end if 
 	else 
@@ -729,7 +731,7 @@ END  FUNCTION FOC_WH_Transition
 		real(DP)             	:: FOC_H_NSU_Transition, cons, E_MU_cp(nx)
 		real(DP), dimension(ne) :: MU_cp
 		real(DP)                :: MB_aprime(nx)
-		integer                 :: age_in, a_in, z_in, l_in, e_in, x_in, xp_ind
+		integer                 :: age_in, a_in, z_in, l_in, e_in, x_in, t_in, xp_ind
 
 		! Allocate state and get indeces
 		age_in = int(par(1))
@@ -5257,7 +5259,7 @@ SUBROUTINE FIND_DBN_Transition()
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1,ti)
 	            DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1,ti), z2,lambda2,ne/2+1 , 1 , ti+1)   =  &
 	           		& DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1,ti), z2, lambda2, ne/2+1, 1 , ti+1) + &
-	           		&  DBN1(age1, a1, z1, lambda1, e1, x1,ti) & 
+	           		&  DBN_tr(age1, a1, z1, lambda1, e1s, x1,ti) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1,ti)   
 	        ENDDO
 	        ENDDO
@@ -5283,7 +5285,7 @@ SUBROUTINE FIND_DBN_Transition()
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1,ti)
 	            DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1,ti), z2,lambda2,ne/2+1 , 1,ti+1)   =  &
 	           		& DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1,ti), z2, lambda2, ne/2+1, 1,ti+1) + &
-	           		& DBN1(age1, a1, z1, lambda1, e1, x1,ti) & 
+	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1,ti)   
 	        ENDDO
 	        ENDDO
@@ -5381,7 +5383,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        P_tr(ti)     = alpha* QBAR2_tr(ti)**(alpha-mu) * NBAR2_tr(ti)**(1.0_DP-alpha)
 	        YBAR_tr(ti)  = QBAR2_tr(ti)**alpha * NBAR2_tr(ti)**(1.0_DP-alpha)
 	        wage_tr(ti)  = (1.0_DP-alpha)*QBAR2_tr(ti)**alpha * NBAR2_tr(ti)**(-alpha)
-	        Ebar_tr(ti)  = wage(ti)  * NBAR2_tr(ti) * sum(pop)/sum(pop(1:RetAge-1))
+	        Ebar_tr(ti)  = wage_tr(ti)  * NBAR2_tr(ti) * sum(pop)/sum(pop(1:RetAge-1))
 
 	    	! Solve for new R (that clears market under new guess for prices)
 	    	if (sum(theta)/nz .gt. 1.0_DP) then
@@ -5507,7 +5509,7 @@ SUBROUTINE EGM_Transition()
     		! Consumption on endogenous grid and implied asset income under tauW_bt
     		do xp_ind = 1,nx 	
     			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
-    				P = P_tr(time+1); R = R_tr(time+1) 
+    				P = P_tr(ti+1); R = R_tr(ti+1) 
     				MB_aprime_t(xp_ind) = MB_a_bt(agrid_t(ai),zi,xp_ind)
     			endif
     		enddo 
@@ -5517,7 +5519,7 @@ SUBROUTINE EGM_Transition()
 	        ! Consumption on endogenous grid and implied asset income under tauW_at
 	        do xp_ind = 1,nx 	
     			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
-    				P = P_tr(time+1); R = R_tr(time+1) 
+    				P = P_tr(ti+1); R = R_tr(ti+1) 
     				MB_aprime_t(xp_ind) = MB_a_at(agrid_t(ai),zi,xp_ind)
     			endif
     		enddo 
@@ -5685,7 +5687,7 @@ SUBROUTINE EGM_Transition()
 	    	! Below threshold
     		do xp_ind = 1,nx 	
     			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
-    				P = P_tr(time+1); R = R_tr(time+1) 
+    				P = P_tr(ti+1); R = R_tr(ti+1) 
     				MB_aprime_t(xp_ind) = MB_a_bt(agrid_t(ai),zi,xp_ind)
     			endif
     		enddo 
@@ -5695,7 +5697,7 @@ SUBROUTINE EGM_Transition()
 			! Above threshold
 			do xp_ind = 1,nx 	
     			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
-    				P = P_tr(time+1); R = R_tr(time+1) 
+    				P = P_tr(ti+1); R = R_tr(ti+1) 
     				MB_aprime_t(xp_ind) = MB_a_at(agrid_t(ai),zi,xp_ind)
     			endif
     		enddo 
@@ -5776,7 +5778,7 @@ SUBROUTINE EGM_Transition()
 					Hours_t_tr(age,ai,zi,lambdai,ei,xi,ti) = 0.0_dp
 				else
 					! Auxiliary variables for solving FOC for hours 
-					par_FOC(1:6) = (/age,ai,zi,lambdai,ei,xi,ti/) 
+					par_FOC(1:6) = (/age,ai,zi,lambdai,ei,xi/) 
 					par_FOC(7)   = Cons_t_tr(age,ai,zi,lambdai,ei,xi,ti)
 					! FOC (set wage to current wage)
 					wage = wage_tr(ti)
@@ -5938,11 +5940,11 @@ SUBROUTINE EGM_Transition()
 	    DO zi=1,nz
 	    DO ei=1,ne	                
 	    DO ai=1,na
-			Cons_tr(age,ai,zi,lambdai,ei,x,ti)   = &
+			Cons_tr(age,ai,zi,lambdai,ei,xi,ti)   = &
 				& Linear_Int(YGRID_t(:,zi,xi) , Cons_t_tr(age,:,zi,lambdai,ei,xi,ti)   , na_t , YGRID(ai,zi,xi))
-	    	Hours_tr(age,ai,zi,lambdai,ei,x,ti)  = &
+	    	Hours_tr(age,ai,zi,lambdai,ei,xi,ti)  = &
 	    		& Linear_Int(YGRID_t(:,zi,xi) , Hours_t_tr(age,:,zi,lambdai,ei,xi,ti)  , na_t , YGRID(ai,zi,xi))
-	    	Aprime_tr(age,ai,zi,lambdai,ei,x,ti) = &
+	    	Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) = &
 	    		& Linear_Int(YGRID_t(:,zi,xi) , Aprime_t_tr(age,:,zi,lambdai,ei,xi,ti) , na_t , YGRID(ai,zi,xi))
 		ENDDO !ai         
 		ENDDO !ei         
@@ -6031,7 +6033,7 @@ Subroutine EGM_Working_Period_Transition(MB_in,H_min,state_FOC,C_endo,H_endo,Y_e
 			enddo
 
 			C_euler = ( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp))) **(1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
-			C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage
+			C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
 
 			if (C_euler.ge.C_foc) then
 				C_endo  = C_euler 
