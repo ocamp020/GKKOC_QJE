@@ -5455,6 +5455,7 @@ SUBROUTINE EGM_Transition()
 		Cons_tr(:,:,:,:,:,:,T+1)   = Cons_exp
 		Hours_tr(:,:,:,:,:,:,T+1)  = Hours_exp
 		Aprime_tr(:,:,:,:,:,:,T+1) = Aprime_exp 
+		print*,'Cons_tr(T+1)=',Cons_tr(81,:,5,3,3,1,T+1)
 
 	! Solve backwards for all transition periods
 	do ti=T,1,-1
@@ -5473,6 +5474,7 @@ SUBROUTINE EGM_Transition()
 		! Form YGRID for the capital income economy given interest rate "P"
 			CALL FORM_Y_MB_GRID_Transition(YGRID,MBGRID,YGRID_t,MBGRID_t,ti)
 			print*, 'YGRID_t(:,5,1)=',YGRID_t(:,5,1)
+			print*, 'RetY_lambda_e=',RetY_lambda_e
 
 		! print*, 'R=',R,'P=',P, 'W=',wage, 'na=', na, 'na_t=', na_t
 	!========================================================================================
@@ -5550,12 +5552,12 @@ SUBROUTINE EGM_Transition()
 	    	EndoCons(ai)  = (beta*survP(age)* 	&
 	    				& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_tr(age+1,ai,zi,lambdai,ei,:,ti+1)**(1.0_dp/euler_power)) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
-	        !$omp critical
-	        print*,' Standard EGM - State:',age,ai,zi,lambdai,ei,xi,ti
-	        print*,' 	EndoCons(ai)=',EndoCons(ai)
-	        print*,' 	Cons_t+1=',Cons_t_tr(age+1,ai,zi,lambdai,ei,:,ti+1)
-	        print*,' 	Cons_t+1=',Cons_exp(age+1,ai,zi,lambdai,ei,:)
-	        !$omp end critical
+	        ! !$omp critical
+	        ! print*,' Standard EGM - State:',age,ai,zi,lambdai,ei,xi,ti
+	        ! print*,' 	EndoCons(ai)=',EndoCons(ai)
+	        ! print*,' 	Cons_t+1=',Cons_t_tr(age+1,ai,zi,lambdai,ei,:,ti+1)
+	        ! print*,' 	Cons_t+1=',Cons_exp(age+1,ai,zi,lambdai,ei,:)
+	        ! !$omp end critical
 	    end if 
 
 
