@@ -5549,6 +5549,11 @@ SUBROUTINE EGM_Transition()
 	    	EndoCons(ai)  = (beta*survP(age)* 	&
 	    				& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_tr(age+1,ai,zi,lambdai,ei,:,ti+1)**(1.0_dp/euler_power)) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
+	        !$omp critical
+	        print*,' Standard EGM - State:',age,ai,zi,lambdai,ei,xi,ti
+	        print*,' 	EndoCons(ai)=',EndoCons(ai)
+	        print*,' 	Cons_t+1=',Cons_t_tr(age+1,ai,zi,lambdai,ei,:,ti+1)
+	        !$omp end critical
 	    end if 
 
 
