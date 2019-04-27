@@ -5259,7 +5259,7 @@ SUBROUTINE FIND_DBN_Transition()
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1,ti)
 	            DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1,ti), z2,lambda2,ne/2+1 , 1 , ti+1)   =  &
 	           		& DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1,ti), z2, lambda2, ne/2+1, 1 , ti+1) + &
-	           		&  DBN_tr(age1, a1, z1, lambda1, e1s, x1,ti) & 
+	           		&  DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1,ti)   
 	        ENDDO
 	        ENDDO
