@@ -157,10 +157,19 @@ MODULE global
     REAL(DP) :: FW_top_x_share(6) 
 
     ! Frisch Elasticity
-    real(DP) :: Frisch_Elasticity, Size_Frisch, Hours_Frisch, Frisch_Elasticity_2
+    REAL(DP) :: Frisch_Elasticity, Size_Frisch, Hours_Frisch, Frisch_Elasticity_2
 
     ! Extra tax information
-    real(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, Tot_Lab_Inc
+    REAL(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, Tot_Lab_Inc
+
+    ! Transition 
+    INTEGER :: ti 
+    ! Prices and Quantities
+    REAL(DP), DIMENSION(T+1) :: R_tr, P_tr, QBAR_tr, NBAR_tr, YBAR_tr, Wage_tr, EBAR_tr
+    ! Policy function and value function (defined on the exogenous grid)
+    REAL(DP), DIMENSION(:,:,:,:,:,:,:), allocatable :: Cons_tr, Hours_tr, Aprime_tr, ValueFunction_tr, Cons_Eq_Welfare_tr, DBN_tr
+	! Policy function and value function (defined on the adjusted grid for breakpoints)
+	REAL(DP), DIMENSION(:,:,:,:,:,:,:), allocatable :: Cons_t_tr, Hours_t_tr, Aprime_t_tr
 
 
 Contains 
@@ -185,6 +194,17 @@ Subroutine Allocate_Variables
     allocate( V_Pr_bench(         MaxAge,na,nz,nlambda,ne,nx) )
     allocate( V_Pr_exp(           MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Firm_Wealth(        MaxAge,na,nz,nlambda,ne,nx) )
+
+
+    allocate( Cons_tr(            MaxAge,na,nz,nlambda,ne,nx,T+1) )
+    allocate( Hours_tr(           MaxAge,na,nz,nlambda,ne,nx,T+1) )
+    allocate( Aprime_tr(          MaxAge,na,nz,nlambda,ne,nx,T+1) )
+    allocate( ValueFunction_tr(   MaxAge,na,nz,nlambda,ne,nx,T+1) )
+    allocate( Cons_Eq_Welfare_tr( MaxAge,na,nz,nlambda,ne,nx,T+1) )
+    allocate( DBN_tr( 			  MaxAge,na,nz,nlambda,ne,nx,T+1) )
+	allocate( Cons_t_tr(          MaxAge,na,nz,nlambda,ne,nx,T+1) )
+	allocate( Hours_t_tr(         MaxAge,na,nz,nlambda,ne,nx,T+1) )
+	allocate( Aprime_t_tr(        MaxAge,na,nz,nlambda,ne,nx,T+1) )
 end Subroutine Allocate_Variables
    
 END MODULE global

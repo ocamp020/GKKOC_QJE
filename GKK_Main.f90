@@ -61,7 +61,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -79,6 +79,7 @@ PROGRAM main
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
+		Transition_Tax_Reform = .true.
 		Simul_Switch  = .false.
 
 
@@ -372,6 +373,10 @@ PROGRAM main
 		if (Tax_Reform_KW) then 
 			call Find_Capital_and_Wealth_Tax(compute_exp,Simul_Switch)
 		endif 
+
+		if (Transition_Tax_Reform) then
+			call Solve_Transition_Tax_Reform
+		endif
 
 
 	call cpu_time(finish_time)
@@ -3327,3 +3332,33 @@ end Subroutine Solve_Opt_Tau_CX
 !====================================================================
 
 
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Subroutine Solve_Transition_Tax_Reform
+	use parameters
+	use global 
+	use programfunctions
+	use Simulation_Module
+	use Toolbox
+	use omp_lib
+	implicit none 
+
+
+	! Load Benchmark Variables
+	call Solve_Benchmark(.false.,.false.)
+
+	! Load Tax Reform Variables
+	call Solve_Experiment(.false.,.false.)
+
+	! Set Results Folder
+	Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform/'
+	call system( 'mkdir -p ' // trim(Result_Folder) )
+
+	! Find the Distribution and Policy Functions Along Transition Path
+	call Find_DBN_Transition 
+
+
+
+End Subroutine Solve_Transition_Tax_Reform
