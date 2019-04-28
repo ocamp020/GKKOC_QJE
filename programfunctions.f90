@@ -5211,13 +5211,17 @@ SUBROUTINE FIND_DBN_Transition()
 			print*,' 	Period ',ti 
 		DO age=1,MaxAge
 			print*,' 		Age ',age
-		!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
+		! !$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
 		DO zi=1,nz
+			print*,' 			z ',zi 
 		DO xi=1,nx
+			print*,' 				x ',xi 
 		DO ai=1,na
+			print*,' 					a ',ai 
 		DO lambdai=1,nlambda
+			print*,' 					lambda ',lambdai 
 		DO ei=1, ne
-			print*, '  			State', ai,zi,lambdai,ei,xi
+			print*, '  						e', ei
 	        if ( Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .ge. amax) then
 	            tklo =na-1
 	        elseif (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .lt. amin) then
