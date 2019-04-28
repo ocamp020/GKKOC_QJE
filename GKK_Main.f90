@@ -3358,6 +3358,9 @@ Subroutine Solve_Transition_Tax_Reform
 	call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	! Find the Distribution and Policy Functions Along Transition Path
+	print*, ' '
+	print*,'---------------------------------------------------'
+	print*, ' 	Starting Transition'
 	call Find_DBN_Transition 
 
 

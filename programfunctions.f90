@@ -5437,6 +5437,12 @@ SUBROUTINE EGM_Transition()
 	integer  :: age, ai, zi, lambdai, ei, xi, xp_ind
 	real(dp), dimension(na_t+nz*nx+1) :: EndoYgrid_sort
 
+	print*,' '
+	print*,' ----------------------------'
+	print*,' Starting EGM Transition'
+	print*,' ----------------------------'
+	print*,' '
+
 	!$ call omp_set_num_threads(nz)
 
 	! Set a minimum value for labor to check in the FOC
@@ -5459,6 +5465,7 @@ SUBROUTINE EGM_Transition()
 
 	! Solve backwards for all transition periods
 	do ti=T,1,-1
+		print*,' Solving EGM for transition period ',ti
 
 
 	! Grids and auxiliary variables, must be solved per period 
@@ -5485,6 +5492,7 @@ SUBROUTINE EGM_Transition()
 
 	! Last period of life
 	age=MaxAge
+		print*,' 	Age=',age
 	!$omp parallel do private(lambdai,ei,ai,xi)
 	DO zi=1,nz
 	DO xi=1,nx
@@ -5501,6 +5509,7 @@ SUBROUTINE EGM_Transition()
 	
 	! Rest of retirement
 	DO age=MaxAge-1,RetAge,-1
+		print*,' 	Age=',age
 	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
 	!$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
     DO zi=1,nz
@@ -5694,6 +5703,7 @@ SUBROUTINE EGM_Transition()
 	!------Working Period Starts-------------------------------------------------------------
 
 	DO age=RetAge-1,1,-1
+		print*,' 	Age=',age
 	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai, &
 	!$omp& C_foc,state_FOC,par_FOC,MB_aprime_t)
     DO zi=1,nz
@@ -6006,6 +6016,12 @@ SUBROUTINE EGM_Transition()
 	! 		! 		& (1+tauC)*Cons(40,ai,4,3,3) + Aprime(40,ai,4,3,3) - YGRID(ai,4) -Y_h(Hours(40,ai,4,3,3),40,3,3,wage)
 	! 	end do 
 	! 	print*, ' '
+
+	print*,' '
+	print*,' ----------------------------'
+	print*,' End of EGM Transition'
+	print*,' ----------------------------'
+	print*,' '
 
 END SUBROUTINE EGM_Transition
 
