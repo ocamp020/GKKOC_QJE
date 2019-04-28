@@ -5556,7 +5556,7 @@ SUBROUTINE EGM_Transition()
 	        print*,' Standard EGM - State:',age,ai,zi,lambdai,ei,xi,ti
 	        print*,' 	EndoCons(ai)=',EndoCons(ai)
 	        print*,' 	Expected value=',&
-	        	& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_tr(age+1,ai,zi,lambdai,ei,:,ti+1)**(1.0_dp/euler_power)) )
+	        	& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_tr(age+1,ai,zi,lambdai,ei,:,ti+1)**(1.0_dp/euler_power))
 	        print*,' 	Cons_t+1=',Cons_t_tr(age+1,ai,zi,lambdai,ei,:,ti+1)
 	        print*,' 	Cons_t+1=',Cons_exp(age+1,ai,zi,lambdai,ei,:)
 	        !$omp end critical
