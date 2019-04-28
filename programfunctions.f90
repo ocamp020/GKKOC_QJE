@@ -5150,9 +5150,9 @@ END SUBROUTINE FIND_DBN_EQ_Prices
 SUBROUTINE FIND_DBN_Transition()
 	use omp_lib
 	IMPLICIT NONE
-	INTEGER:: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
-	REAL   :: DBN_dist, DBN_criteria, Q_dist, N_dist
-	real(dp)   ::BBAR, MeanWealth, brent_value
+	INTEGER    :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
+	REAL       :: DBN_dist, DBN_criteria, Q_dist, N_dist
+	REAL(dp)   :: BBAR, MeanWealth, brent_value
 	REAL(DP), DIMENSION(:,:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:,:), allocatable :: Aplo, Aphi
 	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr
@@ -5211,12 +5211,13 @@ SUBROUTINE FIND_DBN_Transition()
 			print*,' 	Period ',ti 
 		DO age=1,MaxAge
 			print*,' 		Age ',age
-		! !$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
+		!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
 		DO zi=1,nz
 		DO xi=1,nx
 		DO ai=1,na
 		DO lambdai=1,nlambda
 		DO ei=1, ne
+			print*, '  			State', ai,zi,lambdai,ei,xi
 	        if ( Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .ge. amax) then
 	            tklo =na-1
 	        elseif (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .lt. amin) then
