@@ -5452,9 +5452,9 @@ SUBROUTINE EGM_Transition()
 		end if 
 
 	! Policy functions set to tax reform in final period
-		Cons_tr(:,:,:,:,:,:,T+1)   = Cons_exp
-		Hours_tr(:,:,:,:,:,:,T+1)  = Hours_exp
-		Aprime_tr(:,:,:,:,:,:,T+1) = Aprime_exp 
+		Cons_tr(:,:,:,:,:,:,T+1)   = Cons_exp   ; Cons_t_tr(:,:,:,:,:,:,T+1)   = Cons_exp   ;
+		Hours_tr(:,:,:,:,:,:,T+1)  = Hours_exp  ; Hours_t_tr(:,:,:,:,:,:,T+1)  = Hours_exp  ;
+		Aprime_tr(:,:,:,:,:,:,T+1) = Aprime_exp ; Aprime_t_tr(:,:,:,:,:,:,T+1) = Aprime_exp ;
 		! print*,'Cons_tr(T+1)=',Cons_tr(81,:,5,3,3,1,T+1)
 
 	! Solve backwards for all transition periods
