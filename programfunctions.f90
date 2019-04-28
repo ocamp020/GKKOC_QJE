@@ -5211,7 +5211,7 @@ SUBROUTINE FIND_DBN_Transition()
 			print*,' 	Period ',ti 
 		DO age=1,MaxAge
 			print*,' 		Age ',age
-		!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
+		! !$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
 		DO zi=1,nz
 		DO xi=1,nx
 		DO ai=1,na
