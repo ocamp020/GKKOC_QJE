@@ -5208,14 +5208,14 @@ SUBROUTINE FIND_DBN_Transition()
 			! The grid points are selected with probability proportional to their distance to the optimal a'
 		print*,' Discretizing Policy Functions'
 		DO ti=1,T
-			print*,' 	Period ',ti 
+			! print*,' 	Period ',ti 
 		DO age=1,MaxAge
-			print*,' 		Age ',age
+			! print*,' 		Age ',age
 		! !$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
 		DO zi=1,nz
-			print*,' 			z ',zi 
+			! print*,' 			z ',zi 
 		DO xi=1,nx
-			print*,' 				x ',xi 
+			! print*,' 				x ',xi 
 		DO ai=1,na
 			! print*,' 					a ',ai 
 		DO lambdai=1,nlambda
