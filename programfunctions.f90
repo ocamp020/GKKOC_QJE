@@ -5206,6 +5206,7 @@ SUBROUTINE FIND_DBN_Transition()
 			! For each age and state vector bracket optimal a' between two grid points
 			! When at that age and state the optimal decision is approximated by selecting one the grid points
 			! The grid points are selected with probability proportional to their distance to the optimal a'
+		print*,' Discretizing Policy Functions'
 		DO ti=1,T
 		DO age=1,MaxAge
 		!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
@@ -5247,8 +5248,10 @@ SUBROUTINE FIND_DBN_Transition()
 	    ! First Period Starts at DBN_bench
 	    DBN_tr(:,:,:,:,:,:,1) = DBN_bench
 
+	    print*,' Starting DBN Forward Iteration '
 	    ! Fill in other periods starting at DBN bench following policy functions
 	    DO ti=1,T
+	    	print*,' 	Transition Period ',ti
 
 		! Everyone in MaxAge dies. Those who die, switch to z2, lambda2 and start at ne/2+1 and x=1
 	    age1=MaxAge
@@ -5356,7 +5359,10 @@ SUBROUTINE FIND_DBN_Transition()
 	    ENDDO
 	    ENDDO
 
+	    print*,' DBN Forward Iteration Completed'
+
 	    ! Compute prices and aggregates for the current period (Time: ti)
+	    print*,' Updating Prices and Quantities'
 
 	    	! Compute capital demand with current prices
 	    	K_mat  = K_Matrix(R_tr(ti),P_tr(ti))
@@ -5492,7 +5498,7 @@ SUBROUTINE EGM_Transition()
 
 	! Last period of life
 	age=MaxAge
-		print*,' 	Age=',age
+		! print*,' 	Age=',age
 	!$omp parallel do private(lambdai,ei,ai,xi)
 	DO zi=1,nz
 	DO xi=1,nx
@@ -5509,7 +5515,7 @@ SUBROUTINE EGM_Transition()
 	
 	! Rest of retirement
 	DO age=MaxAge-1,RetAge,-1
-		print*,' 	Age=',age
+		! print*,' 	Age=',age
 	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
 	!$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
     DO zi=1,nz
@@ -5703,7 +5709,7 @@ SUBROUTINE EGM_Transition()
 	!------Working Period Starts-------------------------------------------------------------
 
 	DO age=RetAge-1,1,-1
-		print*,' 	Age=',age
+		! print*,' 	Age=',age
 	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai, &
 	!$omp& C_foc,state_FOC,par_FOC,MB_aprime_t)
     DO zi=1,nz
@@ -5966,10 +5972,12 @@ SUBROUTINE EGM_Transition()
 	! Interpolate to get values of policy functions on agrid (note that policy functions are defined on agrid_t)
 	
 	if (Y_a_threshold.eq.0.0_dp) then 
+		print*,' Assigning value of policy functions'
 		Cons_tr(:,:,:,:,:,:,ti)   = Cons_t_tr(:,:,:,:,:,:,ti)
 		Hours_tr(:,:,:,:,:,:,ti)  = Hours_t_tr(:,:,:,:,:,:,ti)
 		Aprime_tr(:,:,:,:,:,:,ti) = Aprime_t_tr(:,:,:,:,:,:,ti)
 	else 
+		print*,' Interpolating policy functions'
 		DO xi=1,nx
 		DO age=1,MaxAge
 	    DO lambdai=1,nlambda
