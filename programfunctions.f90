@@ -5208,7 +5208,9 @@ SUBROUTINE FIND_DBN_Transition()
 			! The grid points are selected with probability proportional to their distance to the optimal a'
 		print*,' Discretizing Policy Functions'
 		DO ti=1,T
+			print*,' 	Period ',ti 
 		DO age=1,MaxAge
+			print*,' 		Age ',age
 		!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
 		DO zi=1,nz
 		DO xi=1,nx
@@ -5225,8 +5227,8 @@ SUBROUTINE FIND_DBN_Transition()
 	        tkhi = tklo + 1        
 	        Aplo(age,ai,zi,lambdai,ei,xi,ti)  	   = tklo
 	        Aphi(age,ai,zi,lambdai,ei,xi,ti)  	   = tkhi        
-	        PrAprimelo(age,ai,zi,lambdai,ei,xi,ti) = (agrid(tkhi) - Aprime_tr(age,ai,zi,lambdai,ei,xi,ti)) / (agrid(tkhi) -agrid(tklo))
-	        PrAprimehi(age,ai,zi,lambdai,ei,xi,ti) = (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) - agrid(tklo)) / (agrid(tkhi) -agrid(tklo))
+	        PrAprimelo(age,ai,zi,lambdai,ei,xi,ti) = (agrid(tkhi) - Aprime_tr(age,ai,zi,lambdai,ei,xi,ti))/(agrid(tkhi)-agrid(tklo))
+	        PrAprimehi(age,ai,zi,lambdai,ei,xi,ti) = (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) - agrid(tklo))/(agrid(tkhi)-agrid(tklo))
 		ENDDO
 		ENDDO
 		ENDDO
@@ -5972,12 +5974,12 @@ SUBROUTINE EGM_Transition()
 	! Interpolate to get values of policy functions on agrid (note that policy functions are defined on agrid_t)
 	
 	if (Y_a_threshold.eq.0.0_dp) then 
-		print*,' Assigning value of policy functions'
+		! print*,' Assigning value of policy functions'
 		Cons_tr(:,:,:,:,:,:,ti)   = Cons_t_tr(:,:,:,:,:,:,ti)
 		Hours_tr(:,:,:,:,:,:,ti)  = Hours_t_tr(:,:,:,:,:,:,ti)
 		Aprime_tr(:,:,:,:,:,:,ti) = Aprime_t_tr(:,:,:,:,:,:,ti)
 	else 
-		print*,' Interpolating policy functions'
+		! print*,' Interpolating policy functions'
 		DO xi=1,nx
 		DO age=1,MaxAge
 	    DO lambdai=1,nlambda
@@ -6003,18 +6005,18 @@ SUBROUTINE EGM_Transition()
 	! Adjust consumption by taxes
 	Cons_tr = Cons_tr/(1.0_DP+tauC)
 
-	if (any(isnan(Cons_tr))) then 
-		print*, "isnan - Consumption"
-		STOP 
-	end if 
-	if (any(isnan(Hours_tr))) then 
-		print*, "isnan - Hours"
-		STOP 
-	end if 
-	if (any(isnan(Aprime_tr))) then 
-		print*, "isnan - Hours"
-		STOP 
-	end if 
+	! if (any(isnan(Cons_tr))) then 
+	! 	print*, "isnan - Consumption"
+	! 	STOP 
+	! end if 
+	! if (any(isnan(Hours_tr))) then 
+	! 	print*, "isnan - Hours"
+	! 	STOP 
+	! end if 
+	! if (any(isnan(Aprime_tr))) then 
+	! 	print*, "isnan - Hours"
+	! 	STOP 
+	! end if 
 
 	! 	print*, 'Policy Functions'
 	! 	print*, ' YGRID ',' Cons ',' Hours ',' Aprime ',' A '
