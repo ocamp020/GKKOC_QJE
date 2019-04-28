@@ -5217,11 +5217,11 @@ SUBROUTINE FIND_DBN_Transition()
 		DO xi=1,nx
 			print*,' 				x ',xi 
 		DO ai=1,na
-			print*,' 					a ',ai 
+			! print*,' 					a ',ai 
 		DO lambdai=1,nlambda
-			print*,' 					lambda ',lambdai 
+			! print*,' 						lambda ',lambdai 
 		DO ei=1, ne
-			print*, '  						e', ei
+			! print*, '  							e', ei
 	        if ( Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .ge. amax) then
 	            tklo =na-1
 	        elseif (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .lt. amin) then
