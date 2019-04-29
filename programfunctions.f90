@@ -5200,7 +5200,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 	    ! Solve for policy functions by backwards induction and EGM
 	    	! Output is policy functions for all times and all ages
-	    	CALL EGM_Transition
+	    	! CALL EGM_Transition
 
 	    ! First Period Starts at DBN_bench
 	    print*, ' Set DBN_tr for first period to benchmark distribution'
