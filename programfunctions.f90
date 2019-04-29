@@ -5227,7 +5227,7 @@ SUBROUTINE FIND_DBN_Transition()
 			! For each age and state vector bracket optimal a' between two grid points
 			! When at that age and state the optimal decision is approximated by selecting one the grid points
 			! The grid points are selected with probability proportional to their distance to the optimal a'
-		print*,' Discretizing Policy Functions'
+		! print*,' Discretizing Policy Functions'
 		DO age=1,MaxAge
 			! print*,' 		Age ',age
 		!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
@@ -5374,10 +5374,9 @@ SUBROUTINE FIND_DBN_Transition()
 	    ENDDO
 	    ENDDO
 
-	    print*,' DBN Forward Iteration Completed'
 
 	    ! Compute prices and aggregates for the current period (Time: ti)
-	    print*,' Updating Prices and Quantities'
+	    ! print*,' Updating Prices and Quantities'
 
 	    	! Compute capital demand with current prices
 	    	K_mat  = K_Matrix(R_tr(ti),P_tr(ti))
@@ -5407,8 +5406,8 @@ SUBROUTINE FIND_DBN_Transition()
 	        	N_dist = max(N_dist,abs(NBAR2_tr(ti)/NBAR_tr(ti)-1))
 
             	! Dampened Update of QBAR and NBAR
-	        	QBAR_tr(ti)  = 0.8*QBAR_tr(ti) + 0.2*QBAR2_tr(ti)
-	        	NBAR_tr(ti)  = 0.8*NBAR_tr(ti) + 0.2*NBAR2_tr(ti)
+	        	QBAR_tr(ti)  = 0.7*QBAR_tr(ti) + 0.3*QBAR2_tr(ti)
+	        	NBAR_tr(ti)  = 0.7*NBAR_tr(ti) + 0.3*NBAR2_tr(ti)
 
         	! Update other prices and quantities             
 	        P_tr(ti)     = alpha* QBAR_tr(ti)**(alpha-mu) * NBAR_tr(ti)**(1.0_DP-alpha)
@@ -5429,12 +5428,18 @@ SUBROUTINE FIND_DBN_Transition()
 
 
     	ENDDO ! Transition Time
+
+	    print*,' DBN Forward Iteration Completed'
+	    print*,' '
 	    
 	    ! Compare distance to tax reform distribution
 		    DBN_dist = maxval(abs(DBN_tr(:,:,:,:,:,:,T+1)-DBN_exp))
 
 		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,' Q_dist=',Q_dist,' N_dist=',N_dist
-		    	print*,'QBAR','QBAR_2','NBAR','NBAR_2'
+		    	! print*,'QBAR','QBAR_2','NBAR','NBAR_2'
+		    	! do ti=1,T
+		    	! 	print*,QBAR_tr(ti),QBAR2_tr(ti),NBAR_tr(ti),NBAR2_tr(ti) 
+		    	! enddo 
 
 	    simutime  = simutime +1 
 	 
