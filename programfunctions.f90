@@ -5203,9 +5203,11 @@ SUBROUTINE FIND_DBN_Transition()
 	    	CALL EGM_Transition
 
 		! Initialize DBN_tr to zero 
+		print*, ' Initializing DBN_tr to zero'
 	    DBN_tr=0.0_DP
 
 	    ! First Period Starts at DBN_bench
+	    print*, ' Set DBN_tr for first period to benchmark distribution'
 	    DBN_tr(:,:,:,:,:,:,1) = DBN_bench
 
 	    print*,' Starting DBN Forward Iteration '
