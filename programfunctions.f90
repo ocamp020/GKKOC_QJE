@@ -5200,20 +5200,20 @@ SUBROUTINE FIND_DBN_Transition()
 
 	    ! Solve for policy functions by backwards induction and EGM
 	    	! Output is policy functions for all times and all ages
-	    	! CALL EGM_Transition
+	    	CALL EGM_Transition
 
 	    ! First Period Starts at DBN_bench
 	    print*, ' Set DBN_tr for first period to benchmark distribution'
 	    DBN_tr(:,:,:,:,:,:,1) = DBN_bench
-	    	
+
 		! Initialize DBN_tr to zero 
 		print*, ' Initializing remaining periods of DBN_tr to zero'
 		DO ti=2,T+1
-			print*,' 	Transition Period',ti
+			! print*,' 	Transition Period',ti
 	    	DBN_tr(:,:,:,:,:,:,ti)=0.0_DP
 	    ENDDO
 
-
+	    print*,' '
 	    print*,' Starting DBN Forward Iteration '
 	    ! Fill in other periods starting at DBN bench following policy functions
 	    DO ti=1,T
@@ -5238,22 +5238,18 @@ SUBROUTINE FIND_DBN_Transition()
 			! print*,' 						lambda ',lambdai 
 		DO ei=1, ne
 			! print*, '  							e', ei
-	        ! if ( Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .ge. amax) then
-	        !     tklo =na-1
-	        ! elseif (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .lt. amin) then
-	        !     tklo = 1
-	        ! else
-	        !     tklo = ((Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-	        ! endif
-	        ! tkhi = tklo + 1        
-	        ! Aplo(age,ai,zi,lambdai,ei,xi)  	   = tklo
-	        ! Aphi(age,ai,zi,lambdai,ei,xi)  	   = tkhi        
-	        ! PrAprimelo(age,ai,zi,lambdai,ei,xi) = (agrid(tkhi) - Aprime_tr(age,ai,zi,lambdai,ei,xi,ti))/(agrid(tkhi)-agrid(tklo))
-	        ! PrAprimehi(age,ai,zi,lambdai,ei,xi) = (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) - agrid(tklo))/(agrid(tkhi)-agrid(tklo))
-	        Aplo(age,ai,zi,lambdai,ei,xi)  	   = 1
-	        Aphi(age,ai,zi,lambdai,ei,xi)  	   = 2      
-	        PrAprimelo(age,ai,zi,lambdai,ei,xi) = 0.5_dp
-	        PrAprimehi(age,ai,zi,lambdai,ei,xi) = 0.5_dp
+	        if ( Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .ge. amax) then
+	            tklo =na-1
+	        elseif (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .lt. amin) then
+	            tklo = 1
+	        else
+	            tklo = ((Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+	        endif
+	        tkhi = tklo + 1        
+	        Aplo(age,ai,zi,lambdai,ei,xi)  	   = tklo
+	        Aphi(age,ai,zi,lambdai,ei,xi)  	   = tkhi        
+	        PrAprimelo(age,ai,zi,lambdai,ei,xi) = (agrid(tkhi) - Aprime_tr(age,ai,zi,lambdai,ei,xi,ti))/(agrid(tkhi)-agrid(tklo))
+	        PrAprimehi(age,ai,zi,lambdai,ei,xi) = (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) - agrid(tklo))/(agrid(tkhi)-agrid(tklo))
 		ENDDO
 		ENDDO
 		ENDDO
