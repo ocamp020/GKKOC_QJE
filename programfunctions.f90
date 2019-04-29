@@ -5197,6 +5197,9 @@ SUBROUTINE FIND_DBN_Transition()
 	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. ( simutime .le. 700 ) )
 		! print*, 'DBN_dist=', DBN_dist
 
+		! Start Q_dist and N_dist
+		Q_dist = 0.0 ; N_dist = 0.0 ;
+
 
 	    ! Solve for policy functions by backwards induction and EGM
 	    	! Output is policy functions for all times and all ages
@@ -5399,7 +5402,11 @@ SUBROUTINE FIND_DBN_Transition()
 	        ENDDO    
 	        QBAR2_tr(ti) = ( QBAR2_tr(ti))**(1.0_DP/mu) 
 
-            	! Dampen Update QBAR and NBAR
+	        	! Get Q_dist and N_dist before dampening 
+	        	Q_dist = maxval(Q_dist,abs(QBAR2_tr(ti)/QBAR_tr(ti)-1))
+	        	N_dist = maxval(N_dist,abs(NBAR2_tr(ti)/NBAR_tr(ti)-1))
+
+            	! Dampened Update of QBAR and NBAR
 	        	QBAR_tr(ti)  = 0.8*QBAR_tr(ti) + 0.2*QBAR2_tr(ti)
 	        	NBAR_tr(ti)  = 0.8*NBAR_tr(ti) + 0.2*NBAR2_tr(ti)
 
@@ -5425,10 +5432,9 @@ SUBROUTINE FIND_DBN_Transition()
 	    
 	    ! Compare distance to tax reform distribution
 		    DBN_dist = maxval(abs(DBN_tr(:,:,:,:,:,:,T+1)-DBN_exp))
-		    Q_dist   = maxval(abs(QBAR2_tr/QBAR_tr-1))   
-        	N_dist   = maxval(abs(NBAR2_tr/NBAR_tr-1))
 
 		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,' Q_dist=',Q_dist,' N_dist=',N_dist
+		    	print*,'QBAR','QBAR_2','NBAR','NBAR_2'
 
 	    simutime  = simutime +1 
 	 
