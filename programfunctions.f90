@@ -5202,13 +5202,17 @@ SUBROUTINE FIND_DBN_Transition()
 	    	! Output is policy functions for all times and all ages
 	    	CALL EGM_Transition
 
-		! Initialize DBN_tr to zero 
-		print*, ' Initializing DBN_tr to zero'
-	    DBN_tr=0.0_DP
-
 	    ! First Period Starts at DBN_bench
 	    print*, ' Set DBN_tr for first period to benchmark distribution'
 	    DBN_tr(:,:,:,:,:,:,1) = DBN_bench
+	    	
+		! Initialize DBN_tr to zero 
+		print*, ' Initializing remaining periods of DBN_tr to zero'
+		DO ti=2,T+1
+			print*,' 	Transition Period',ti
+	    	DBN_tr(:,:,:,:,:,:,ti)=0.0_DP
+	    ENDDO
+
 
 	    print*,' Starting DBN Forward Iteration '
 	    ! Fill in other periods starting at DBN bench following policy functions
