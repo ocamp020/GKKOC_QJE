@@ -5400,14 +5400,14 @@ SUBROUTINE FIND_DBN_Transition()
 	        QBAR2_tr(ti) = ( QBAR2_tr(ti))**(1.0_DP/mu) 
 
             	! Dampen Update QBAR and NBAR
-	        	QBAR_tr  = 0.8*QBAR_tr + 0.2*QBAR2_tr 
-	        	NBAR_tr  = 0.8*NBAR_tr + 0.2*NBAR2_tr
+	        	QBAR_tr(ti)  = 0.8*QBAR_tr(ti) + 0.2*QBAR2_tr(ti)
+	        	NBAR_tr(ti)  = 0.8*NBAR_tr(ti) + 0.2*NBAR2_tr(ti)
 
         	! Update other prices and quantities             
-	        P_tr(ti)     = alpha* QBAR2_tr(ti)**(alpha-mu) * NBAR2_tr(ti)**(1.0_DP-alpha)
-	        YBAR_tr(ti)  = QBAR2_tr(ti)**alpha * NBAR2_tr(ti)**(1.0_DP-alpha)
-	        wage_tr(ti)  = (1.0_DP-alpha)*QBAR2_tr(ti)**alpha * NBAR2_tr(ti)**(-alpha)
-	        Ebar_tr(ti)  = wage_tr(ti)  * NBAR2_tr(ti) * sum(pop)/sum(pop(1:RetAge-1))
+	        P_tr(ti)     = alpha* QBAR_tr(ti)**(alpha-mu) * NBAR_tr(ti)**(1.0_DP-alpha)
+	        YBAR_tr(ti)  = QBAR_tr(ti)**alpha * NBAR_tr(ti)**(1.0_DP-alpha)
+	        wage_tr(ti)  = (1.0_DP-alpha)*QBAR_tr(ti)**alpha * NBAR_tr(ti)**(-alpha)
+	        Ebar_tr(ti)  = wage_tr(ti)  * NBAR_tr(ti) * sum(pop)/sum(pop(1:RetAge-1))
 
 	    	! Solve for new R (that clears market under new guess for prices)
 	    	if (sum(theta)/nz .gt. 1.0_DP) then
