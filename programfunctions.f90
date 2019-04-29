@@ -5403,8 +5403,8 @@ SUBROUTINE FIND_DBN_Transition()
 	        QBAR2_tr(ti) = ( QBAR2_tr(ti))**(1.0_DP/mu) 
 
 	        	! Get Q_dist and N_dist before dampening 
-	        	Q_dist = maxval(Q_dist,abs(QBAR2_tr(ti)/QBAR_tr(ti)-1))
-	        	N_dist = maxval(N_dist,abs(NBAR2_tr(ti)/NBAR_tr(ti)-1))
+	        	Q_dist = max(Q_dist,abs(QBAR2_tr(ti)/QBAR_tr(ti)-1))
+	        	N_dist = max(N_dist,abs(NBAR2_tr(ti)/NBAR_tr(ti)-1))
 
             	! Dampened Update of QBAR and NBAR
 	        	QBAR_tr(ti)  = 0.8*QBAR_tr(ti) + 0.2*QBAR2_tr(ti)
