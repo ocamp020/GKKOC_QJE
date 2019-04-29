@@ -5250,7 +5250,6 @@ SUBROUTINE FIND_DBN_Transition()
 		ENDDO
 		ENDDO
 		ENDDO
-		ENDDO
 
 		! Probablities are adjusted to lie in [0,1]
 			PrAprimelo = min(PrAprimelo, 1.0_DP)
