@@ -5232,24 +5232,31 @@ SUBROUTINE FIND_DBN_Transition()
 			! print*,' 						lambda ',lambdai 
 		DO ei=1, ne
 			! print*, '  							e', ei
-	        if ( Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .ge. amax) then
-	            tklo =na-1
-	        elseif (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .lt. amin) then
-	            tklo = 1
-	        else
-	            tklo = ((Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-	        endif
-	        tkhi = tklo + 1        
-	        Aplo(age,ai,zi,lambdai,ei,xi)  	   = tklo
-	        Aphi(age,ai,zi,lambdai,ei,xi)  	   = tkhi        
-	        PrAprimelo(age,ai,zi,lambdai,ei,xi) = (agrid(tkhi) - Aprime_tr(age,ai,zi,lambdai,ei,xi,ti))/(agrid(tkhi)-agrid(tklo))
-	        PrAprimehi(age,ai,zi,lambdai,ei,xi) = (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) - agrid(tklo))/(agrid(tkhi)-agrid(tklo))
+	        ! if ( Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .ge. amax) then
+	        !     tklo =na-1
+	        ! elseif (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .lt. amin) then
+	        !     tklo = 1
+	        ! else
+	        !     tklo = ((Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+	        ! endif
+	        ! tkhi = tklo + 1        
+	        ! Aplo(age,ai,zi,lambdai,ei,xi)  	   = tklo
+	        ! Aphi(age,ai,zi,lambdai,ei,xi)  	   = tkhi        
+	        ! PrAprimelo(age,ai,zi,lambdai,ei,xi) = (agrid(tkhi) - Aprime_tr(age,ai,zi,lambdai,ei,xi,ti))/(agrid(tkhi)-agrid(tklo))
+	        ! PrAprimehi(age,ai,zi,lambdai,ei,xi) = (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) - agrid(tklo))/(agrid(tkhi)-agrid(tklo))
+	        Aplo(age,ai,zi,lambdai,ei,xi)  	   = 1
+	        Aphi(age,ai,zi,lambdai,ei,xi)  	   = 2      
+	        PrAprimelo(age,ai,zi,lambdai,ei,xi) = 0.5_dp
+	        PrAprimehi(age,ai,zi,lambdai,ei,xi) = 0.5_dp
 		ENDDO
 		ENDDO
 		ENDDO
 		ENDDO
 		ENDDO
 		ENDDO
+
+		print*, ' Discretizing Policy Functions Completed'
+		STOP
 
 		! Probablities are adjusted to lie in [0,1]
 			PrAprimelo = min(PrAprimelo, 1.0_DP)
