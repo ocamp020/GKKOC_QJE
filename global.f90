@@ -166,7 +166,6 @@ MODULE global
     INTEGER :: ti 
     ! Prices and Quantities
     REAL(DP), DIMENSION(T+1) :: R_tr, P_tr, QBAR_tr, NBAR_tr, YBAR_tr, Wage_tr, EBAR_tr
-    INTEGER :: aaaaa=8
     ! Policy function and value function (defined on the exogenous grid)
     REAL(DP), DIMENSION(:,:,:,:,:,:,:), allocatable :: Cons_tr, Hours_tr, Aprime_tr, ValueFunction_tr, Cons_Eq_Welfare_tr, DBN_tr
 	! Policy function and value function (defined on the adjusted grid for breakpoints)
