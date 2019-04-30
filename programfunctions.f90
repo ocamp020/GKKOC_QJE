@@ -5187,6 +5187,18 @@ SUBROUTINE FIND_DBN_Transition()
         wage_tr = (1.0_DP-alpha)*QBAR_tr**alpha * NBAR_tr**(-alpha)
         Ebar_tr = wage_tr  * NBAR_tr  * sum(pop)/sum(pop(1:RetAge-1))
 
+        ! Save initial guess of prices
+        OPEN (UNIT=77, FILE=trim(Result_Folder)//'Transition_NBAR.txt', STATUS='replace')
+        OPEN (UNIT=78, FILE=trim(Result_Folder)//'Transition_QBAR.txt', STATUS='replace')
+        OPEN (UNIT=79, FILE=trim(Result_Folder)//'Transition_R.txt', STATUS='replace')
+     		WRITE(UNIT=77, FMT=*) 'NBAR'
+        	WRITE(UNIT=78, FMT=*) 'QBAR'
+        	WRITE(UNIT=79, FMT=*) 'R'
+        	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR_tr, NBAR_exp
+        	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR_tr, QBAR_exp
+        	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
+    	CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
+
 
 	! Compute distribution of assets by age and state
 		! Distribution is obtained by iterating over an initial distribution using policy functions
@@ -5440,6 +5452,15 @@ SUBROUTINE FIND_DBN_Transition()
 		    	! do ti=1,T
 		    	! 	print*,QBAR_tr(ti),QBAR2_tr(ti),NBAR_tr(ti),NBAR2_tr(ti) 
 		    	! enddo 
+
+	    	! Save Prices
+	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Transition_NBAR.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=78, FILE=trim(Result_Folder)//'Transition_QBAR.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=79, FILE=trim(Result_Folder)//'Transition_R.txt', STATUS='old', POSITION='append')
+	        	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR2_tr, NBAR_exp
+	        	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR2_tr, QBAR_exp
+	        	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
+	    	CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
 
 	    simutime  = simutime +1 
 	 
