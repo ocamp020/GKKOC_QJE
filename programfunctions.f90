@@ -5191,13 +5191,26 @@ SUBROUTINE FIND_DBN_Transition()
         OPEN (UNIT=77, FILE=trim(Result_Folder)//'Transition_NBAR.txt', STATUS='replace')
         OPEN (UNIT=78, FILE=trim(Result_Folder)//'Transition_QBAR.txt', STATUS='replace')
         OPEN (UNIT=79, FILE=trim(Result_Folder)//'Transition_R.txt', STATUS='replace')
+        OPEN (UNIT=80, FILE=trim(Result_Folder)//'Transition_GBAR.txt', STATUS='replace')
+        OPEN (UNIT=81, FILE=trim(Result_Folder)//'Transition_GBAR_K.txt', STATUS='replace')
+        OPEN (UNIT=82, FILE=trim(Result_Folder)//'Transition_GBAR_W.txt', STATUS='replace')
+        OPEN (UNIT=83, FILE=trim(Result_Folder)//'Transition_GBAR_L.txt', STATUS='replace')
+        OPEN (UNIT=84, FILE=trim(Result_Folder)//'Transition_GBAR_C.txt', STATUS='replace')
+        OPEN (UNIT=85, FILE=trim(Result_Folder)//'Transition_SSC.txt', STATUS='replace')
      		WRITE(UNIT=77, FMT=*) 'NBAR'
         	WRITE(UNIT=78, FMT=*) 'QBAR'
         	WRITE(UNIT=79, FMT=*) 'R'
+        	WRITE(UNIT=80, FMT=*) 'GBAR'
+        	WRITE(UNIT=81, FMT=*) 'GBAR_K'
+        	WRITE(UNIT=82, FMT=*) 'GBAR_W'
+        	WRITE(UNIT=83, FMT=*) 'GBAR_L'
+        	WRITE(UNIT=84, FMT=*) 'GBAR_C'
+        	WRITE(UNIT=85, FMT=*) 'SSC'
         	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR_tr, NBAR_exp
         	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR_tr, QBAR_exp
         	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
     	CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
+    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
 
 
 	! Compute distribution of assets by age and state
@@ -5390,13 +5403,29 @@ SUBROUTINE FIND_DBN_Transition()
 	    ENDDO
 	    ENDDO
 
+	    ! Set global variables to current period  (Time: ti)
+	    	R = R_tr(ti) ; P = P_tr(ti) ; wage = wage_tr(ti) ;
+	    	K_mat  = K_Matrix(R,P)
+			Pr_mat = Profit_Matrix(R,P)
+			CALL ComputeLaborUnits(Ebar_tr(ti), wage_tr(ti)) 
+			DBN1  = DBN_tr(:,:,:,:,:,:,ti)
+			Cons  = Cons_tr(:,:,:,:,:,:,ti)
+			Hours = Hours_tr(:,:,:,:,:,:,ti)
+
+	    ! Compute government budget for the current preiod (Time: ti)
+	    ! print*,' Calculating tax revenue'
+	    	CALL GOVNT_BUDGET
+			    GBAR_tr(ti) 		= GBAR 
+			    GBAR_K_tr(ti) 		= GBAR_K 
+			    GBAR_W_tr(ti) 		= GBAR_W
+			    GBAR_L_tr(ti) 		= GBAR_L 
+			    GBAR_C_tr(ti) 		= GBAR_C 
+			    SSC_Payments_tr(ti) = SSC_Payments
+			    Tot_Lab_Inc_tr(ti) 	= Tot_Lab_Inc
+
 
 	    ! Compute prices and aggregates for the current period (Time: ti)
 	    ! print*,' Updating Prices and Quantities'
-
-	    	! Compute capital demand with current prices
-	    	K_mat  = K_Matrix(R_tr(ti),P_tr(ti))
-
     		! Compute aggregates with current distribution (Time: ti)
 	        QBAR2_tr(ti) =0.0
 	        NBAR2_tr(ti) =0.0
@@ -5450,12 +5479,29 @@ SUBROUTINE FIND_DBN_Transition()
 		print*,' 	--------------------------------------'
 		print*,' '
 
+	    ! Set global variables to current period  (Time: ti)
+	    	R = R_tr(T+1) ; P = P_tr(T+1) ; wage = wage_tr(T+1) ;
+	    	K_mat  = K_Matrix(R,P)
+			Pr_mat = Profit_Matrix(R,P)
+			CALL ComputeLaborUnits(Ebar_tr(T+1), wage_tr(T+1)) 
+			DBN1  = DBN_tr(:,:,:,:,:,:,T+1)
+			Cons  = Cons_tr(:,:,:,:,:,:,T+1)
+			Hours = Hours_tr(:,:,:,:,:,:,T+1)
+
+	    ! Compute government budget for the current preiod (Time: T+1)
+	    ! print*,' Calculating tax revenue'
+	    	CALL GOVNT_BUDGET
+			    GBAR_tr(T+1) 		 = GBAR 
+			    GBAR_K_tr(T+1) 		 = GBAR_K 
+			    GBAR_W_tr(T+1) 		 = GBAR_W
+			    GBAR_L_tr(T+1) 		 = GBAR_L 
+			    GBAR_C_tr(T+1) 		 = GBAR_C 
+			    SSC_Payments_tr(T+1) = SSC_Payments
+			    Tot_Lab_Inc_tr(T+1)  = Tot_Lab_Inc
+
 
 	    ! Compute prices and aggregates for the current period (Time: T+1)
 	    ! print*,' Updating Prices and Quantities fot T+1'
-	    	! Compute capital demand with current prices
-	    	K_mat  = K_Matrix(R_tr(T+1),P_tr(T+1))
-
     		! Compute aggregates with current distribution (Time: T+1)
 	        QBAR2_tr(ti) =0.0
 	        NBAR2_tr(T+1) =0.0
@@ -5504,20 +5550,31 @@ SUBROUTINE FIND_DBN_Transition()
 	    ! Compare distance to tax reform distribution
 		    DBN_dist = maxval(abs(DBN_tr(:,:,:,:,:,:,T+1)-DBN_exp))
 
-		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,' Q_dist=',Q_dist,' N_dist=',N_dist
-		    	! print*,'QBAR','QBAR_2','NBAR','NBAR_2'
-		    	! do ti=1,T
-		    	! 	print*,QBAR_tr(ti),QBAR2_tr(ti),NBAR_tr(ti),NBAR2_tr(ti) 
-		    	! enddo 
+		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,&
+		    	&   ' Q_dist=',Q_dist,' N_dist=',N_dist,' Q(T)-Q(SS)=',QBAR2_tr(T+1)-,' N_dist=',N_dist
+
 
 	    	! Save Prices
 	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Transition_NBAR.txt', STATUS='old', POSITION='append')
 	    	OPEN (UNIT=78, FILE=trim(Result_Folder)//'Transition_QBAR.txt', STATUS='old', POSITION='append')
 	    	OPEN (UNIT=79, FILE=trim(Result_Folder)//'Transition_R.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=80, FILE=trim(Result_Folder)//'Transition_GBAR.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=81, FILE=trim(Result_Folder)//'Transition_GBAR_K.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=82, FILE=trim(Result_Folder)//'Transition_GBAR_W.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=83, FILE=trim(Result_Folder)//'Transition_GBAR_L.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=84, FILE=trim(Result_Folder)//'Transition_GBAR_C.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=85, FILE=trim(Result_Folder)//'Transition_SSC.txt', STATUS='old', POSITION='append')
 	        	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR2_tr, NBAR_exp
 	        	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR2_tr, QBAR_exp
 	        	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
+	        	WRITE(UNIT=80, FMT=*) GBAR_bench, GBAR_tr, GBAR_exp
+	        	WRITE(UNIT=81, FMT=*) GBAR_K_tr
+	        	WRITE(UNIT=82, FMT=*) GBAR_W_tr
+	        	WRITE(UNIT=83, FMT=*) GBAR_L_tr
+	        	WRITE(UNIT=84, FMT=*) GBAR_C_tr
+	        	WRITE(UNIT=85, FMT=*) SSC_Payments_tr
 	    	CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
+	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
 
 	    simutime  = simutime +1 
 	 
