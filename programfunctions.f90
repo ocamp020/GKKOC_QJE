@@ -5221,7 +5221,9 @@ SUBROUTINE FIND_DBN_Transition()
 	    print*, ' Set DBN_tr for first period to benchmark distribution'
 	    DBN_tr(:,:,:,:,:,:,1) = DBN_bench
 
-		! Initialize DBN_tr to zero 
+
+
+		! Initialize DBN_tr to zero for other periods
 		print*, ' Initializing remaining periods of DBN_tr to zero'
 		DO ti=2,T+1
 			! print*,' 	Transition Period',ti
@@ -5232,7 +5234,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    print*,' Starting DBN Forward Iteration '
 	    ! Fill in other periods starting at DBN bench following policy functions
 	    DO ti=1,T
-	    	print*,' 	Transition Period ',ti
+	    	! print*,' 	Transition Period ',ti
 
 
 		! Discretize policy function for assets (a') for current period
@@ -5443,6 +5445,57 @@ SUBROUTINE FIND_DBN_Transition()
 
 	    print*,' DBN Forward Iteration Completed'
 	    print*,' '
+
+
+	    ! Compute prices and aggregates for the current period (Time: T+1)
+	    ! print*,' Updating Prices and Quantities fot T+1'
+	    	! Compute capital demand with current prices
+	    	K_mat  = K_Matrix(R_tr(T+1),P_tr(T+1))
+
+    		! Compute aggregates with current distribution (Time: T+1)
+	        QBAR2_tr(ti) =0.0
+	        NBAR2_tr(T+1) =0.0
+	        DO x1=1,nx
+	        DO age1=1,MaxAge
+	        DO z1=1,nz
+	        DO a1=1,na
+	        DO lambda1=1,nlambda
+	        DO e1=1, ne
+	             QBAR2_tr(T+1)= QBAR2_tr(T+1)+ DBN_tr(age1,a1,z1,lambda1,e1,x1,T+1) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
+	             NBAR2_tr(T+1)= NBAR2_tr(T+1)+ &
+	             		& DBN_tr(age1,a1,z1,lambda1,e1,x1,T+1) * eff_un(age1,lambda1,e1) * Hours_tr(age1,a1,z1,lambda1,e1,x1,T+1)
+	        ENDDO
+	        ENDDO
+	        ENDDO
+	        ENDDO    
+	        ENDDO    
+	        ENDDO    
+	        QBAR2_tr(T+1) = ( QBAR2_tr(T+1))**(1.0_DP/mu) 
+
+	        	! Get Q_dist and N_dist before dampening 
+	        	Q_dist = max(Q_dist,abs(QBAR2_tr(T+1)/QBAR_tr(T+1)-1))
+	        	N_dist = max(N_dist,abs(NBAR2_tr(T+1)/NBAR_tr(T+1)-1))
+
+            	! Dampened Update of QBAR and NBAR
+	        	QBAR_tr(T+1)  = 0.7*QBAR_tr(T+1) + 0.3*QBAR2_tr(T+1)
+	        	NBAR_tr(T+1)  = 0.7*NBAR_tr(T+1) + 0.3*NBAR2_tr(T+1)
+
+        	! Update other prices and quantities             
+	        P_tr(T+1)     = alpha* QBAR_tr(T+1)**(alpha-mu) * NBAR_tr(T+1)**(1.0_DP-alpha)
+	        YBAR_tr(T+1)  = QBAR_tr(T+1)**alpha * NBAR_tr(T+1)**(1.0_DP-alpha)
+	        wage_tr(T+1)  = (1.0_DP-alpha)*QBAR_tr(T+1)**alpha * NBAR_tr(T+1)**(-alpha)
+	        Ebar_tr(T+1)  = wage_tr(T+1)  * NBAR_tr(T+1) * sum(pop)/sum(pop(1:RetAge-1))
+
+	    	! Solve for new R (that clears market under new guess for prices)
+	    	if (sum(theta)/nz .gt. 1.0_DP) then
+	    		! Set price 
+	    		P = min(P_tr(T+1),1.0_dp)
+	    		! Set DBN1 as the distribution for the current period (Time: T+1)
+	    		DBN1  = DBN_tr(age1,a1,z1,lambda1,e1,x1,T+1)
+	            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R_tr(T+1))
+            else
+                R_tr(T+1) = 0.0_DP
+	        endif
 	    
 	    ! Compare distance to tax reform distribution
 		    DBN_dist = maxval(abs(DBN_tr(:,:,:,:,:,:,T+1)-DBN_exp))
@@ -5515,7 +5568,7 @@ SUBROUTINE EGM_Transition()
 
 	! Solve backwards for all transition periods
 	do ti=T,1,-1
-		print*,' Solving EGM for transition period ',ti
+		! print*,' Solving EGM for transition period ',ti
 
 
 	! Grids and auxiliary variables, must be solved per period 
