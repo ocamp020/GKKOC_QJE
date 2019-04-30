@@ -5550,8 +5550,8 @@ SUBROUTINE FIND_DBN_Transition()
 	    ! Compare distance to tax reform distribution
 		    DBN_dist = maxval(abs(DBN_tr(:,:,:,:,:,:,T+1)-DBN_exp))
 
-		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,&
-		    	&   ' Q_dist=',Q_dist,' N_dist=',N_dist,' Q(T)-Q(SS)=',QBAR2_tr(T+1)-,' N_dist=',N_dist
+		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,' Q_dist=',Q_dist,' N_dist=',N_dist,&
+		    	&' Q(T)/Q(SS)=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N(T)/N(SS)=',100*(NBAR2_tr(T+1)/NBAR_exp-1)
 
 
 	    	! Save Prices
