@@ -5567,7 +5567,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR2_tr, NBAR_exp
 	        	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR2_tr, QBAR_exp
 	        	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
-	        	! WRITE(UNIT=80, FMT=*) GBAR_bench, GBAR_tr, GBAR_exp
+	        	WRITE(UNIT=80, FMT=*) GBAR_bench, GBAR_tr, GBAR_exp
 	        	! WRITE(UNIT=81, FMT=*) GBAR_K_tr
 	        	! WRITE(UNIT=82, FMT=*) GBAR_W_tr
 	        	! WRITE(UNIT=83, FMT=*) GBAR_L_tr
