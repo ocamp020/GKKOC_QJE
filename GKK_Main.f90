@@ -3360,7 +3360,8 @@ Subroutine Solve_Transition_Tax_Reform
 	! Find the Distribution and Policy Functions Along Transition Path
 	print*, ' '
 	print*,'---------------------------------------------------'
-	print*, ' 	Starting Transition'
+	print*,' 	Starting Transition'
+	print*,'---------------------------------------------------'
 	call Find_DBN_Transition 
 
 

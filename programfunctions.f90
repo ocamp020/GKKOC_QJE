@@ -5218,20 +5218,22 @@ SUBROUTINE FIND_DBN_Transition()
 	    	CALL EGM_Transition
 
 	    ! First Period Starts at DBN_bench
-	    print*, ' Set DBN_tr for first period to benchmark distribution'
+	    ! print*, ' Set DBN_tr for first period to benchmark distribution'
 	    DBN_tr(:,:,:,:,:,:,1) = DBN_bench
 
 
 
 		! Initialize DBN_tr to zero for other periods
-		print*, ' Initializing remaining periods of DBN_tr to zero'
+		! print*, ' Initializing remaining periods of DBN_tr to zero'
 		DO ti=2,T+1
 			! print*,' 	Transition Period',ti
 	    	DBN_tr(:,:,:,:,:,:,ti)=0.0_DP
 	    ENDDO
 
-	    print*,' '
-	    print*,' Starting DBN Forward Iteration '
+    	print*,' '
+		print*,' 	--------------------------------------'
+		print*,' 	Starting DBN Forward Iteration'
+		print*,' 	--------------------------------------'
 	    ! Fill in other periods starting at DBN bench following policy functions
 	    DO ti=1,T
 	    	! print*,' 	Transition Period ',ti
@@ -5443,8 +5445,10 @@ SUBROUTINE FIND_DBN_Transition()
 
     	ENDDO ! Transition Time
 
-	    print*,' DBN Forward Iteration Completed'
-	    print*,' '
+		print*,' 	--------------------------------------'
+		print*,' 	DBN Forward Iteration Completed'
+		print*,' 	--------------------------------------'
+		print*,' '
 
 
 	    ! Compute prices and aggregates for the current period (Time: T+1)
@@ -5541,10 +5545,9 @@ SUBROUTINE EGM_Transition()
 	real(dp), dimension(na_t+nz*nx+1) :: EndoYgrid_sort
 
 	print*,' '
-	print*,' ----------------------------'
-	print*,' Starting EGM Transition'
-	print*,' ----------------------------'
-	print*,' '
+	print*,' 	----------------------------'
+	print*,' 	Starting EGM Transition'
+	print*,' 	----------------------------'
 
 	!$ call omp_set_num_threads(nz)
 
@@ -6122,10 +6125,9 @@ SUBROUTINE EGM_Transition()
 	! 	end do 
 	! 	print*, ' '
 
-	print*,' '
-	print*,' ----------------------------'
-	print*,' End of EGM Transition'
-	print*,' ----------------------------'
+	print*,' 	----------------------------'
+	print*,' 	End of EGM Transition'
+	print*,' 	----------------------------'
 	print*,' '
 
 END SUBROUTINE EGM_Transition
