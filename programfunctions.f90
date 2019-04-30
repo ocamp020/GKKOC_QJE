@@ -5156,6 +5156,8 @@ SUBROUTINE FIND_DBN_Transition()
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
 	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr
+	! Government Budget
+    REAL(DP), DIMENSION(T+1) :: GBAR_tr, GBAR_K_tr, GBAR_W_tr, GBAR_L_tr, GBAR_C_tr, SSC_Payments_tr, Tot_Lab_Inc_tr
 
 	! Allocate
 	allocate( PrAprimehi( MaxAge,na,nz,nlambda,ne,nx) )
