@@ -5417,13 +5417,13 @@ SUBROUTINE FIND_DBN_Transition()
 	    ! Compute government budget for the current preiod (Time: ti)
 	    ! print*,' Calculating tax revenue'
 	    	CALL GOVNT_BUDGET
-			    ! GBAR_tr(ti) 		= GBAR 
-			    ! GBAR_K_tr(ti) 		= GBAR_K 
-			    ! GBAR_W_tr(ti) 		= GBAR_W
-			    ! GBAR_L_tr(ti) 		= GBAR_L 
-			    ! GBAR_C_tr(ti) 		= GBAR_C 
-			    ! SSC_Payments_tr(ti) = SSC_Payments
-			    ! Tot_Lab_Inc_tr(ti) 	= Tot_Lab_Inc
+			    GBAR_tr(ti) 		= GBAR 
+			    GBAR_K_tr(ti) 		= GBAR_K 
+			    GBAR_W_tr(ti) 		= GBAR_W
+			    GBAR_L_tr(ti) 		= GBAR_L 
+			    GBAR_C_tr(ti) 		= GBAR_C 
+			    SSC_Payments_tr(ti) = SSC_Payments
+			    Tot_Lab_Inc_tr(ti) 	= Tot_Lab_Inc
 
 
 	    ! Compute prices and aggregates for the current period (Time: ti)
@@ -5493,13 +5493,13 @@ SUBROUTINE FIND_DBN_Transition()
 	    ! Compute government budget for the current preiod (Time: T+1)
 	    ! print*,' Calculating tax revenue'
 	    	CALL GOVNT_BUDGET
-			    ! GBAR_tr(T+1) 		 = GBAR 
-			    ! GBAR_K_tr(T+1) 		 = GBAR_K 
-			    ! GBAR_W_tr(T+1) 		 = GBAR_W
-			    ! GBAR_L_tr(T+1) 		 = GBAR_L 
-			    ! GBAR_C_tr(T+1) 		 = GBAR_C 
-			    ! SSC_Payments_tr(T+1) = SSC_Payments
-			    ! Tot_Lab_Inc_tr(T+1)  = Tot_Lab_Inc
+			    GBAR_tr(T+1) 		 = GBAR 
+			    GBAR_K_tr(T+1) 		 = GBAR_K 
+			    GBAR_W_tr(T+1) 		 = GBAR_W
+			    GBAR_L_tr(T+1) 		 = GBAR_L 
+			    GBAR_C_tr(T+1) 		 = GBAR_C 
+			    SSC_Payments_tr(T+1) = SSC_Payments
+			    Tot_Lab_Inc_tr(T+1)  = Tot_Lab_Inc
 
 
 	    ! Compute prices and aggregates for the current period (Time: T+1)
@@ -5570,11 +5570,11 @@ SUBROUTINE FIND_DBN_Transition()
 	        	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR2_tr, QBAR_exp
 	        	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
 	        	WRITE(UNIT=80, FMT=*) GBAR_bench, GBAR_tr, GBAR_exp
-	        	! WRITE(UNIT=81, FMT=*) GBAR_K_tr
-	        	! WRITE(UNIT=82, FMT=*) GBAR_W_tr
-	        	! WRITE(UNIT=83, FMT=*) GBAR_L_tr
-	        	! WRITE(UNIT=84, FMT=*) GBAR_C_tr
-	        	! WRITE(UNIT=85, FMT=*) SSC_Payments_tr
+	        	WRITE(UNIT=81, FMT=*) GBAR_K_tr
+	        	WRITE(UNIT=82, FMT=*) GBAR_W_tr
+	        	WRITE(UNIT=83, FMT=*) GBAR_L_tr
+	        	WRITE(UNIT=84, FMT=*) GBAR_C_tr
+	        	WRITE(UNIT=85, FMT=*) SSC_Payments_tr
 	    	CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
 	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
 
