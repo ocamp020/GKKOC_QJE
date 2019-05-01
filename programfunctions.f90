@@ -631,7 +631,7 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 			! Compute c' for each value of e'
 			do xp_ind=1,nx 
 			DO ep_ind=1,ne
-				cprime(ep_ind) = Linear_Int(Ygrid_t(:,z_in,xp_ind),Cons_t_pr(age+1,:,z_in,l_in,ep_ind,xp_ind,),na_t,yprime(xp_ind))
+				cprime(ep_ind) = Linear_Int(Ygrid_t(:,z_in,xp_ind),Cons_t_pr(age+1,:,z_in,l_in,ep_ind,xp_ind),na_t,yprime(xp_ind))
 			ENDDO
 			! Compute the expected value of 1/c' conditional on current ei
 			E_MU_cp(xp_ind) = SUM( pr_e(e_in,:) / cprime**sigma )
@@ -5626,7 +5626,7 @@ SUBROUTINE EGM_Transition()
 	! Policy functions set to tax reform in final period
 		Cons_tr(:,:,:,:,:,:,T+1)   = Cons_exp   ; Cons_t_pr   = Cons_exp   ;
 		Hours_tr(:,:,:,:,:,:,T+1)  = Hours_exp  ; Hours_t_pr  = Hours_exp  ;
-		Aprime_tr(:,:,:,:,:,:,T+1) = Aprime_exp ; Aprime_t_pr = Aprime_exp ;
+		Aprime_tr(:,:,:,:,:,:,T+1) = Aprime_exp ; 
 		! print*,'Cons_tr(T+1)=',Cons_tr(81,:,5,3,3,1,T+1)
 
 	! Solve backwards for all transition periods
@@ -5794,7 +5794,7 @@ SUBROUTINE EGM_Transition()
 		    ! CONSUMPTION ON EXOGENOUS GRIDS 
 		    Cons_t(age,ai,zi,lambdai, ei,xi)  = Linear_Int(EndoYgrid(1:na_t+sw), EndoCons(1:na_t+sw),na_t+sw, YGRID_t(ai,zi,xi))
 		    Aprime_t(age,ai,zi,lambdai,ei,xi) = &
-		    								& YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)-Cons_t_tr(age, ai, zi, lambdai, ei,xi,ti)
+		    								& YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)-Cons_t(age, ai, zi, lambdai, ei,xi)
 		    
 		    If (Aprime_t(age,ai,zi,lambdai,ei,xi).lt.amin) then
 		    	Aprime_t(age,ai,zi,lambdai,ei,xi) = amin
@@ -6026,7 +6026,7 @@ SUBROUTINE EGM_Transition()
 		        	brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, Hours_t(age,ai,zi,lambdai,ei,xi),par_FOC)
 		        end if  
 
-	            Cons_t_tr(age,ai,zi,lambdai,ei,xi,ti) = &
+	            Cons_t(age,ai,zi,lambdai,ei,xi) = &
 	            					& YGRID_t(ai,zi,xi)+  Y_h(Hours_t(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,wage_tr(ti))  &
 		                            & - Aprime_t(age,ai,zi,lambdai,ei,xi)
 
@@ -6132,7 +6132,6 @@ SUBROUTINE EGM_Transition()
     ! Update value for "next period's" policy functions
     Cons_t_pr   = Cons_t   ;
     Hours_t_pr  = Hours_t  ;
-    Aprime_t_pr = Aprime_t ;
 
 	! Interpolate to get values of policy functions on agrid (note that policy functions are defined on agrid_t)
 	
@@ -6274,7 +6273,7 @@ Subroutine EGM_Working_Period_Transition(MB_in,H_min,state_FOC,C_endo,H_endo,Y_e
 		else 
 			! Separable Utility
 			do xp_ind=1,nx
-				E_MU_cp(xp_ind) = SUM(pr_e(ei,:) * Cons_t_tr(age+1,ai,zi,lambdai,:,xp_ind,ti+1)**(-sigma) )
+				E_MU_cp(xp_ind) = SUM(pr_e(ei,:) * Cons_t_pr(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma) )
 			enddo
 			C_endo = 1.0_dp/( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_mu_cp)  ) **(1.0_dp/sigma) )
 			C_foc  = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
