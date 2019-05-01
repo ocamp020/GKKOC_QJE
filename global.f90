@@ -171,7 +171,7 @@ MODULE global
     ! Policy function and value function (defined on the exogenous grid)
     REAL(DP), DIMENSION(:,:,:,:,:,:,:), allocatable :: Cons_tr, Hours_tr, Aprime_tr, ValueFunction_tr, Cons_Eq_Welfare_tr, DBN_tr
 	! Policy function and value function (defined on the adjusted grid for breakpoints)
-	REAL(DP), DIMENSION(:,:,:,:,:,:,:), allocatable :: Cons_t_tr, Hours_t_tr, Aprime_t_tr
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_t_pr, Hours_t_pr, Aprime_t_pr
 
 
 Contains 
@@ -204,9 +204,9 @@ Subroutine Allocate_Variables
     allocate( ValueFunction_tr(   MaxAge,na,nz,nlambda,ne,nx,T+1) )
     allocate( Cons_Eq_Welfare_tr( MaxAge,na,nz,nlambda,ne,nx,T+1) )
     allocate( DBN_tr( 			  MaxAge,na,nz,nlambda,ne,nx,T+1) )
-	allocate( Cons_t_tr(          MaxAge,na,nz,nlambda,ne,nx,T+1) )
-	allocate( Hours_t_tr(         MaxAge,na,nz,nlambda,ne,nx,T+1) )
-	allocate( Aprime_t_tr(        MaxAge,na,nz,nlambda,ne,nx,T+1) )
+	allocate( Cons_t_pr(          MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Hours_t_pr(         MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Aprime_t_pr(        MaxAge,na,nz,nlambda,ne,nx) )
 end Subroutine Allocate_Variables
    
 END MODULE global
