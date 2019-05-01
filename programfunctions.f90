@@ -5731,8 +5731,8 @@ SUBROUTINE EGM_Transition()
 	        ! print*,' Standard EGM - State:',age,ai,zi,lambdai,ei,xi,ti
 	        ! print*,' 	EndoCons(ai)=',EndoCons(ai)
 	        ! print*,' 	Expected value=',&
-	        ! 	& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_tr(age+1,ai,zi,lambdai,ei,:,ti+1)**(1.0_dp/euler_power))
-	        ! print*,' 	Cons_t+1=',Cons_t_tr(age+1,ai,zi,lambdai,ei,:,ti+1)
+	        ! 	& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power))
+	        ! print*,' 	Cons_t+1=',Cons_t_pr(age+1,ai,zi,lambdai,ei,:)
 	        ! print*,' 	Cons_t+1=',Cons_exp(age+1,ai,zi,lambdai,ei,:)
 	        ! !$omp end critical
 	    end if 
@@ -6087,7 +6087,7 @@ SUBROUTINE EGM_Transition()
 	            brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, Hours_t(age,ai,zi,lambdai,ei,xi), par_FOC) 
  			end if 
 
-            Cons_t_tr(age,ai,zi,lambdai,ei,xi,ti)=  &
+            Cons_t(age,ai,zi,lambdai,ei,xi)=  &
             		& YGRID_t(ai,zi,xi) + Y_h(Hours_t(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,wage_tr(ti))  &
 					& - Aprime_t(age,ai,zi,lambdai,ei,xi)
 
