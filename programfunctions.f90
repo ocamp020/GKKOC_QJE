@@ -3614,8 +3614,9 @@ END SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR
 !========================================================================================
 
 
-SUBROUTINE GOVNT_BUDGET()
+SUBROUTINE GOVNT_BUDGET(print_flag)
 	IMPLICIT NONE
+	LOGICAL, INTENT(IN) :: print_flag
 
 	! Initialize variables
 	GBAR 		 = 0.0_DP
@@ -3680,7 +3681,7 @@ SUBROUTINE GOVNT_BUDGET()
 	! Set government expenditures as total expenditures minus social security payments
 	GBAR = GBAR -  SSC_Payments
 
-
+	IF (print_flag) THEN
 	! Print Results
 	print*, ' '
 	print*, "Government Budget - Revenues and taxes"
@@ -3713,7 +3714,7 @@ SUBROUTINE GOVNT_BUDGET()
 	WRITE(UNIT=11, FMT=*) 'Average Labor Tax', GBAR_L/Tot_Lab_Inc
 	WRITE(UNIT=11, FMT=*) 'Total Labor Income', Tot_Lab_Inc , 'EBAR', EBAR
 	Close(UNIT=11)
-	
+	ENDIF  
 END  SUBROUTINE GOVNT_BUDGET
 
 !========================================================================================
@@ -5417,7 +5418,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 	    ! Compute government budget for the current preiod (Time: ti)
 	    ! print*,' Calculating tax revenue'
-	    	CALL GOVNT_BUDGET
+	    	CALL GOVNT_BUDGET(.false.)
 			    GBAR_tr(ti) 		= GBAR 
 			    GBAR_K_tr(ti) 		= GBAR_K 
 			    GBAR_W_tr(ti) 		= GBAR_W
@@ -5493,7 +5494,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 	    ! Compute government budget for the current preiod (Time: T+1)
 	    ! print*,' Calculating tax revenue'
-	    	CALL GOVNT_BUDGET
+	    	CALL GOVNT_BUDGET(.false.)
 			    GBAR_tr(T+1) 		 = GBAR 
 			    GBAR_K_tr(T+1) 		 = GBAR_K 
 			    GBAR_W_tr(T+1) 		 = GBAR_W
@@ -8851,7 +8852,7 @@ Function Tax_Reform_Welfare(tk)
 			tauW_at  = tauWmin_at
 			! Solve the model
 				CALL FIND_DBN_EQ
-				CALL GOVNT_BUDGET
+				CALL GOVNT_BUDGET(.true.)
 			! Get new G
 				GBAR_exp = GBAR 
 			tauWindx = 0.0_DP
@@ -8865,7 +8866,7 @@ Function Tax_Reform_Welfare(tk)
 					tauW_at = tauWmin_at + tauWindx * tauWinc_at
 					! Solve the model
 					CALL FIND_DBN_EQ
-					CALL GOVNT_BUDGET
+					CALL GOVNT_BUDGET(.true.)
 
 					! Get new G
 					GBAR_exp = GBAR 
@@ -8891,7 +8892,7 @@ Function Tax_Reform_Welfare(tk)
 					tauW_at = tauWmin_at - tauWindx * tauWinc_at
 					! Solve the model
 					CALL FIND_DBN_EQ
-					CALL GOVNT_BUDGET
+					CALL GOVNT_BUDGET(.true.)
 
 					! Get new G
 					GBAR_exp = GBAR 
@@ -8918,7 +8919,7 @@ Function Tax_Reform_Welfare(tk)
 
 			! Solve (again) experimental economy
 				CALL FIND_DBN_EQ
-				CALL GOVNT_BUDGET
+				CALL GOVNT_BUDGET(.true.)
 
 			! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
 				GBAR_exp = GBAR
@@ -8939,7 +8940,7 @@ Function Tax_Reform_Welfare(tk)
 				    tauW_bt = (tauW_low_bt + tauW_up_bt)/2.0_DP
 				    tauW_at = (tauW_low_at + tauW_up_at)/2.0_DP
 				    CALL FIND_DBN_EQ
-				    CALL GOVNT_BUDGET
+				    CALL GOVNT_BUDGET(.true.)
 				    GBAR_exp = GBAR
 				    print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
 					print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
@@ -8959,7 +8960,7 @@ Function Tax_Reform_Welfare(tk)
 	Pr_mat = Profit_Matrix(R,P)
 	CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
 	CALL ComputeLaborUnits(EBAR,wage)
-	CALL GOVNT_BUDGET
+	CALL GOVNT_BUDGET(.true.)
 
 
 	! Aggregate variable in experimental economy
