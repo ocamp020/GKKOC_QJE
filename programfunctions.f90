@@ -4868,7 +4868,7 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-07_DP
-	DBN1 = DBN_bench
+	DBN1 = DBN_benchr
 
 	! Solve the model at current aggregate values
 		! Find the threshold for wealth taxes (a_bar)
@@ -5185,6 +5185,7 @@ SUBROUTINE FIND_DBN_Transition()
 			QBAR_tr(ti) = QBAR_tr(ti-1) + (QBAR_tr(T+1)-QBAR_tr(1))/T
 			R_tr(ti)    = R_tr(ti-1) + (R_tr(T+1)-R_tr(1))/T
 		enddo 
+			print*, "QBAR_tr", QBAR_tr
 		! Choose YBAR, EBAR, P and Wage to be consistent
 		P_tr    = alpha* QBAR_tr**(alpha-mu) * NBAR_tr**(1.0_DP-alpha)
         YBAR_tr = QBAR_tr ** alpha * NBAR_tr **(1.0_DP-alpha)
