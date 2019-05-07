@@ -3379,8 +3379,8 @@ Subroutine Solve_Transition_Tax_Reform
 
 	! Set Results Folder
 	! Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform/'
-	Result_Folder = trim(Result_Folder)//'Transition_Tk_Tk'
-	! Result_Folder = trim(Result_Folder)//'Transition_Tw_Tw'
+	Result_Folder = trim(Result_Folder)//'Transition_Tk_Tk/'
+	! Result_Folder = trim(Result_Folder)//'Transition_Tw_Tw/'
 	call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	! Find the Distribution and Policy Functions Along Transition Path
