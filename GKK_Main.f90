@@ -3351,10 +3351,36 @@ Subroutine Solve_Transition_Tax_Reform
 	call Solve_Benchmark(.false.,.false.)
 
 	! Load Tax Reform Variables
-	call Solve_Experiment(.false.,.false.)
+	! call Solve_Experiment(.false.,.false.)
+		! For experiment from tk to tk set "exp" variables to "bench" values
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+		ValueFunction_exp = ValueFunction
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime
+		V_Pr_exp          = V_Pr 
+		V_Pr_nb_exp  	  = V_Pr_nb
+
 
 	! Set Results Folder
-	Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform/'
+	! Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform/'
+	Result_Folder = trim(Result_Folder)//'Transition_Tk_Tk'
+	! Result_Folder = trim(Result_Folder)//'Transition_Tw_Tw'
 	call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	! Find the Distribution and Policy Functions Along Transition Path
