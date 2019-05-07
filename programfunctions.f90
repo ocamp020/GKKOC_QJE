@@ -5545,7 +5545,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    		! Set price 
 	    		P = min(P_tr(T+1),1.0_dp)
 	    		! Set DBN1 as the distribution for the current period (Time: T+1)
-	    		DBN1  = DBN_tr(age1,a1,z1,lambda1,e1,x1,T+1)
+	    		DBN1  = DBN_tr(:,:,:,:,:,:,T+1)
 	            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R_tr(T+1))
             else
                 R_tr(T+1) = 0.0_DP
