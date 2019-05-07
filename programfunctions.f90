@@ -5469,7 +5469,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    		! Set price 
 	    		P = min(P_tr(ti),1.0_dp)
 	    		! Set DBN1 as the distribution for the current period (Time: ti)
-	    		DBN1  = DBN_tr(age1,a1,z1,lambda1,e1,x1,ti)
+	    		DBN1  = DBN_tr(:,:,:,:,:,:,ti)
 	            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R_tr(ti))
             else
                 R_tr(ti) = 0.0_DP
@@ -8067,10 +8067,12 @@ Function Agg_Debt(R_in)
 
 	Wealth   = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 
-	Agg_Debt = (sum(DBN_azx*(K_matrix(R_in,P)-spread(spread(agrid,2,nz),3,nx)))/Wealth)**2.0_DP 
-	Kd       = (sum(DBN_azx*(K_matrix(R_in,P))))
-
 	K_mat = K_matrix(R_in,P)
+
+	Agg_Debt = (sum(DBN_azx*(K_mat-spread(spread(agrid,2,nz),3,nx)))/Wealth)**2.0_DP 
+	Kd       = (sum(DBN_azx*(K_mat)))
+
+	
 	Agg_Debt = 0.0_dp
 	do xi=1,nx
 	do zi=1,nz 
@@ -8082,7 +8084,7 @@ Function Agg_Debt(R_in)
 	! print*, mu, P, R_in, DepRate
 	! print*, xz_grid(1,5:)
 	! print*, (mu*P*xz_grid(1,5:)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu))
-	! print*, '------------',Wealth, Kd, Agg_Debt, R_in, P
+	print*, '------------',Wealth, Kd, Agg_Debt, R_in, P
 	Agg_Debt = (Agg_Debt/Wealth)**2.0_dp
 
 
