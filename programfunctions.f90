@@ -6368,7 +6368,8 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: FW_top_x(6),  prctile_FW(6), prctile_bq(7), a, b, c, CCDF_c
 	character(100) :: rowname
 	integer , dimension(max_age_category+1) :: age_limit
-	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq, Labor_Income, Total_Income, K_L_Income, K_T_Income
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: Labor_Income, Total_Income, K_L_Income, K_T_Income
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP) :: Frisch_Aux, Frisch_Aux_2
 
