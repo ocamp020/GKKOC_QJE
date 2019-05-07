@@ -6364,7 +6364,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: leverage_age_z(MaxAge,nz), size_by_age_z(MaxAge,nz), constrained_firms_age_z(MaxAge,nz)
 	real(DP) :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
 	integer  :: i
-	real(DP), dimension(size(DBN1)) :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq
+	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq
 	real(DP) :: FW_top_x(6),  prctile_FW(6), prctile_bq(7), a, b, c, CCDF_c
 	character(100) :: rowname
 	integer , dimension(max_age_category+1) :: age_limit
@@ -6373,6 +6373,12 @@ SUBROUTINE COMPUTE_STATS()
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP) :: Frisch_Aux, Frisch_Aux_2
 
+	allocate(DBN_vec(size(DBN1)))
+	allocate(Firm_Wealth_vec(size(DBN1)))
+	allocate(CDF_Firm_Wealth(size(DBN1)))
+	allocate(BQ_vec(size(DBN1)))
+	allocate(DBN_bq_vec(size(DBN1)))
+	allocate(CDF_bq(size(DBN1)))
 	allocate(Firm_Output(MaxAge,na,nz,nlambda,ne,nx))
 	allocate(Firm_Profit(MaxAge,na,nz,nlambda,ne,nx))
 	allocate(DBN_bq(MaxAge,na,nz,nlambda,ne,nx))
