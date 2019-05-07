@@ -6367,11 +6367,16 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: Firm_Output(MaxAge,na,nz,nlambda,ne,nx), Firm_Profit(MaxAge,na,nz,nlambda,ne,nx)
 	real(DP), dimension(size(DBN1)) :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq
 	real(DP) :: FW_top_x(6),  prctile_FW(6), prctile_bq(7), a, b, c, CCDF_c
-	real(DP) :: DBN_bq(MaxAge,na,nz,nlambda,ne,nx)
 	character(100) :: rowname
 	integer , dimension(max_age_category+1) :: age_limit
-	real(DP), dimension(MaxAge,na,nz,nlambda,ne,nx) :: Labor_Income, Total_Income, K_L_Income, K_T_Income
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Labor_Income, Total_Income, K_L_Income, K_T_Income
 	real(DP) :: Frisch_Aux, Frisch_Aux_2
+
+	allocate(DBN_bq(MaxAge,na,nz,nlambda,ne,nx))
+	allocate(Labor_Income(MaxAge,na,nz,nlambda,ne,nx))
+	allocate(Total_Income(MaxAge,na,nz,nlambda,ne,nx))
+	allocate(K_L_Income(MaxAge,na,nz,nlambda,ne,nx))
+	allocate(K_T_Income(MaxAge,na,nz,nlambda,ne,nx))
 
 	!$ call omp_set_num_threads(20)
 	!$ print *, "OMP Test Message"

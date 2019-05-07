@@ -452,7 +452,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	end if 
 
 		print*,"	Computing satitics"
-		!CALL COMPUTE_STATS
+		CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		!CALL WRITE_VARIABLES(1)
 		if (Simul_Switch) then 
