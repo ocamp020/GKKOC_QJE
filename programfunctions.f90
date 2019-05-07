@@ -5192,6 +5192,7 @@ SUBROUTINE FIND_DBN_Transition()
         wage_tr = (1.0_DP-alpha)*QBAR_tr**alpha * NBAR_tr**(-alpha)
         Ebar_tr = wage_tr  * NBAR_tr  * sum(pop)/sum(pop(1:RetAge-1))
 
+        print*, trim(Result_Folder)//'Transition_NBAR.txt'
         ! Save initial guess of prices
         OPEN (UNIT=77, FILE=trim(Result_Folder)//'Transition_NBAR.txt', STATUS='replace')
         OPEN (UNIT=78, FILE=trim(Result_Folder)//'Transition_QBAR.txt', STATUS='replace')
