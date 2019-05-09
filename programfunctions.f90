@@ -5687,7 +5687,7 @@ SUBROUTINE EGM_Transition()
 	ENDDO ! zi
 	Aprime_t(age, :, :, :, :,:) = 0.0_DP
 		print*,"Period",ti,"|Const_t-Const_bench|=",maxval(abs(Cons_t(MaxAge,:,:,:,:,:)-Cons_exp(MaxAge,:,:,:,:,:)))
-		print*,"Period",ti,"Test-Const_bench=",YGRID_t(50,5,2) + RetY_lambda_e(3,3)-Cons_bench(MaxAge,50,5,3,3,2)
+		print*,"Period",ti,"Test-Const_bench=",YGRID_aux(50,5,2) + RetY_lambda_e_aux(3,3)-Cons_bench(MaxAge,50,5,3,3,2)
 	
 	! Rest of retirement
 	DO age=MaxAge-1,RetAge,-1
