@@ -5190,9 +5190,8 @@ SUBROUTINE FIND_DBN_Transition()
         YBAR_tr = QBAR_tr ** alpha * NBAR_tr **(1.0_DP-alpha)
         wage_tr = (1.0_DP-alpha)*QBAR_tr**alpha * NBAR_tr**(-alpha)
         Ebar_tr = wage_tr  * NBAR_tr  * sum(pop)/sum(pop(1:RetAge-1))
-
-        print*, "wage", wage_bench, wage_tr(1), wage_tr(T), wage_tr(T+1)
-        print*, "P", P_bench, P_tr(1), P_tr(T), P_tr(T+1)
+	        ! print*, "wage", wage_bench, wage_tr(1), wage_tr(T), wage_tr(T+1)
+	        ! print*, "P   ", P_bench, P_tr(1), P_tr(T), P_tr(T+1)
 
         ! Save initial guess of prices
         OPEN (UNIT=77, FILE=trim(Result_Folder)//'Transition_NBAR.txt', STATUS='replace')
@@ -5679,6 +5678,7 @@ SUBROUTINE EGM_Transition()
 	ENDDO ! xi
 	ENDDO ! zi
 	Aprime_t(age, :, :, :, :,:) = 0.0_DP
+		print*,"Period",ti,"|Const_t-Const_bench|=",maxval(abs(Cons_t(MaxAge,:,:,:,:,:)-Cons_exp(MaxAge,:,:,:,:,:)))
 	
 	! Rest of retirement
 	DO age=MaxAge-1,RetAge,-1
