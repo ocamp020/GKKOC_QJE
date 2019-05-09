@@ -65,9 +65,9 @@ PROGRAM main
 		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
-			compute_exp_pf= .false.
+			compute_exp_pf= .true.
 				Fixed_PF        = .false.
-				Fixed_PF_interp = .false.
+				Fixed_PF_interp = .true.
 				Fixed_PF_prices = .true.
 			compute_exp_prices    = .false.
 				Fixed_W = .true. 
@@ -80,7 +80,7 @@ PROGRAM main
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
-		Transition_Tax_Reform = .true.
+		Transition_Tax_Reform = .false.
 		Simul_Switch  = .false.
 
 
