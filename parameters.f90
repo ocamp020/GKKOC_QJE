@@ -76,7 +76,7 @@ MODULE parameters
 		REAL(DP), PARAMETER  :: EBAR_data = 8.8891*(10**6)/(122.46)
 
 	! Transition Parameters
-		INTEGER(I4B), PARAMETER  :: T=20
+		INTEGER(I4B), PARAMETER  :: T=5
 
 
 END MODULE parameters
