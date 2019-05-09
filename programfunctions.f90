@@ -5478,6 +5478,9 @@ SUBROUTINE FIND_DBN_Transition()
                 R_tr(ti) = 0.0_DP
 	        endif
 
+	        ! Compute total assets and pring
+	        print*, "Period",ti,"Wealth=",sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+
 
     	ENDDO ! Transition Time
 
