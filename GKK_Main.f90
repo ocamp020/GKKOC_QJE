@@ -443,7 +443,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		Pr_mat = Profit_Matrix(R,P)
 		CALL ComputeLaborUnits(EBAR,wage)
 		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
-			YGRID = YGRID_aux; MBGRID = MBGRID_aux ; RetY_lambda_e = RetY_lambda_e_aux;
+			YGRID_aux = YGRID; MBGRID_aux = MBGRID ; RetY_lambda_e_aux = RetY_lambda_e;
 			! tauK = 0.0_dp 
 			! call Find_TauW_Threshold(DBN1,W_bench)  
 			! print*,' ' 
