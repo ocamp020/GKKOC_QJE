@@ -5658,8 +5658,8 @@ SUBROUTINE EGM_Transition()
 			CALL FORM_Y_MB_GRID_Transition(YGRID,MBGRID,YGRID_t,MBGRID_t,ti)
 			! print*, 'YGRID_t(:,5,1)=',YGRID_t(:,5,1)
 			! print*, 'RetY_lambda_e=',RetY_lambda_e
-			print*,"Period",ti,"|YGRID-YGRID_bench|=",maxval(abs(YGRID_t-YGRID_aux))),&
-				& "|RetY-RetY_bench|=",maxval(abs(RetY_lambda_e-RetY_lambda_e_aux)))
+			print*,"Period",ti,"|YGRID-YGRID_bench|=",maxval(abs(YGRID_t-YGRID_aux)),&
+				& "|RetY-RetY_bench|=",maxval(abs(RetY_lambda_e-RetY_lambda_e_aux))
 
 		! print*, 'R=',R,'P=',P, 'W=',wage, 'na=', na, 'na_t=', na_t
 	!========================================================================================
