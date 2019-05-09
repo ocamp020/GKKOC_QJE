@@ -5179,7 +5179,7 @@ SUBROUTINE FIND_DBN_Transition()
 		! Guess NBAR, QBAR and R as a linear combination of starting and end values
 		NBAR_tr(1)   = NBAR_bench ; NBAR_tr(T+1) = NBAR_exp   ;
 		QBAR_tr(1)   = QBAR_bench ; QBAR_tr(T+1) = QBAR_exp   ;
-		R_tr(1)      = R_bench ; R_tr(T+1) = R_exp            ;
+		R_tr(1)      = R_bench    ; R_tr(T+1)    = R_exp      ;
 		do ti=2,T
 			NBAR_tr(ti) = NBAR_tr(ti-1) + (NBAR_tr(T+1)-NBAR_tr(1))/T
 			QBAR_tr(ti) = QBAR_tr(ti-1) + (QBAR_tr(T+1)-QBAR_tr(1))/T
@@ -5190,6 +5190,9 @@ SUBROUTINE FIND_DBN_Transition()
         YBAR_tr = QBAR_tr ** alpha * NBAR_tr **(1.0_DP-alpha)
         wage_tr = (1.0_DP-alpha)*QBAR_tr**alpha * NBAR_tr**(-alpha)
         Ebar_tr = wage_tr  * NBAR_tr  * sum(pop)/sum(pop(1:RetAge-1))
+
+        print*, "wage", wage_bench, wage_tr(1), wage_tr(T), wage_tr(T+1)
+        print*, "P", P_bench, P_tr(1), P_tr(T), P_tr(T+1)
 
         ! Save initial guess of prices
         OPEN (UNIT=77, FILE=trim(Result_Folder)//'Transition_NBAR.txt', STATUS='replace')
