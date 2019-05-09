@@ -5480,8 +5480,8 @@ SUBROUTINE FIND_DBN_Transition()
                 R_tr(ti) = 0.0_DP
 	        endif
 
-	        ! Compute total assets and pring
-	        print*, "Period",ti,"Wealth=",sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+	        ! Compute total assets and print
+	        ! print*, "Period",ti,"Wealth=",sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 
 
     	ENDDO ! Transition Time
@@ -5686,8 +5686,8 @@ SUBROUTINE EGM_Transition()
 	ENDDO ! xi
 	ENDDO ! zi
 	Aprime_t(age, :, :, :, :,:) = 0.0_DP
-	print*,"Period",ti,"|Const_t-Const_bench|=",maxval(abs(Cons_t(MaxAge,:,:,:,:,:)-Cons_t_pr(MaxAge,:,:,:,:,:)))
-	print*,"Period",ti,"Test-Const_bench=",(YGRID_aux(50,5,2) + RetY_lambda_e_aux(3,3))/(1.0_DP+tauC)-Cons_bench(MaxAge,50,5,3,3,2)
+	! print*,"Period",ti,"|Const_t-Const_bench|=",maxval(abs(Cons_t(MaxAge,:,:,:,:,:)-Cons_t_pr(MaxAge,:,:,:,:,:)))
+	! print*,"Period",ti,"Test-Const_bench=",(YGRID_aux(50,5,2) + RetY_lambda_e_aux(3,3))/(1.0_DP+tauC)-Cons_bench(MaxAge,50,5,3,3,2)
 	
 	! Rest of retirement
 	DO age=MaxAge-1,RetAge,-1
