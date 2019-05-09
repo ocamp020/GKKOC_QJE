@@ -5658,10 +5658,10 @@ SUBROUTINE EGM_Transition()
 			CALL FORM_Y_MB_GRID_Transition(YGRID,MBGRID,YGRID_t,MBGRID_t,ti)
 			! print*, 'YGRID_t(:,5,1)=',YGRID_t(:,5,1)
 			! print*, 'RetY_lambda_e=',RetY_lambda_e
-			print*,"Period",ti,"|YGRID-YGRID_bench|=",maxval(abs(YGRID_t-YGRID_aux)),&
-				& "|RetY-RetY_bench|=",maxval(abs(RetY_lambda_e-RetY_lambda_e_aux))
-			print*,"Period",ti,"max(YGRID)=",maxval(YGRID_t),"max(YGRID_bench)=",maxval(YGRID_aux),&
-				& "max(RetY)=",maxval(RetY_lambda_e),"max(RetY_bench)=",minval(RetY_lambda_e_aux)
+			! print*,"Period",ti,"|YGRID-YGRID_bench|=",maxval(abs(YGRID_t-YGRID_aux)),&
+			! 	& "|RetY-RetY_bench|=",maxval(abs(RetY_lambda_e-RetY_lambda_e_aux))
+			! print*,"Period",ti,"max(YGRID)=",maxval(YGRID_t),"max(YGRID_bench)=",maxval(YGRID_aux),&
+			! 	& "max(RetY)=",maxval(RetY_lambda_e),"max(RetY_bench)=",minval(RetY_lambda_e_aux)
 
 		! print*, 'R=',R,'P=',P, 'W=',wage, 'na=', na, 'na_t=', na_t
 	!========================================================================================
@@ -5687,6 +5687,7 @@ SUBROUTINE EGM_Transition()
 	ENDDO ! zi
 	Aprime_t(age, :, :, :, :,:) = 0.0_DP
 		print*,"Period",ti,"|Const_t-Const_bench|=",maxval(abs(Cons_t(MaxAge,:,:,:,:,:)-Cons_exp(MaxAge,:,:,:,:,:)))
+		print*,"Period",ti,"|Test-Const_bench|=",maxval(abs(YGRID_t(50,5,2) + RetY_lambda_e(3,3)-Cons_bench(MaxAge,50,5,3,3,2)))
 	
 	! Rest of retirement
 	DO age=MaxAge-1,RetAge,-1
