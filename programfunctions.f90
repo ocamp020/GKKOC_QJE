@@ -5655,7 +5655,7 @@ SUBROUTINE EGM_Transition()
 	!------RETIREMENT PERIOD-----------------------------------------------------------------
 
 	! SET HOURS TO ZERO SO THAT RETIRED HAS ZERO HOURS
-	Hours_t(:,:,:,:,:,:) = 0.0_DP
+	Hours_t = 0.0_DP
 
 	! Last period of life
 	age=MaxAge
@@ -5689,6 +5689,7 @@ SUBROUTINE EGM_Transition()
 	    sw 		  = 0
     DO ai=1,na_t 
 		if (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8)) then 
+			! print*, ' Threshold section - EGM Retirement'
 			sw 			  = sw+1	
     		MB_aprime_t   = MBGRID_t(ai,zi,:)
     		! Consumption on endogenous grid and implied asset income under tauW_bt
@@ -5726,7 +5727,7 @@ SUBROUTINE EGM_Transition()
 	    else 
 	    	! Consumption on endogenous grid and implied asset income
 	    	EndoCons(ai)  = (beta*survP(age)* 	&
-	    		& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)))**euler_power
+	    		& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)))**euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! !$omp critical
 	        ! print*,' Standard EGM - State:',age,ai,zi,lambdai,ei,xi,ti
@@ -6311,7 +6312,7 @@ Subroutine EGM_Working_Period_Transition(MB_in,H_min,state_FOC,C_endo,H_endo,Y_e
 
 			! print*,' '
 			! print*,' 	Inside EGM'
-			! print*,' 	Consumption_t+1=',Cons_t(age+1,ai,zi,lambdai,:,:)
+			! print*,' 	Consumption_t+1=',Cons_t_pr(age+1,ai,zi,lambdai,:,:)
 		else 
 			! Separable Utility
 			do xp_ind=1,nx
