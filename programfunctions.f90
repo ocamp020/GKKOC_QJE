@@ -5190,8 +5190,11 @@ SUBROUTINE FIND_DBN_Transition()
         YBAR_tr = QBAR_tr ** alpha * NBAR_tr **(1.0_DP-alpha)
         wage_tr = (1.0_DP-alpha)*QBAR_tr**alpha * NBAR_tr**(-alpha)
         Ebar_tr = wage_tr  * NBAR_tr  * sum(pop)/sum(pop(1:RetAge-1))
-	        ! print*, "wage", wage_bench, wage_tr(1), wage_tr(T), wage_tr(T+1)
-	        ! print*, "P   ", P_bench, P_tr(1), P_tr(T), P_tr(T+1)
+        	print*, "Test Prices"
+	        print*, "P   ", P_bench, P_tr(1), P_tr(T), P_tr(T+1)
+	        print*, "wage", wage_bench, wage_tr(1), wage_tr(T), wage_tr(T+1)
+	        print*, "EBAR", EBAR_bench, EBAR_tr(1), EBAR_tr(T), EBAR_tr(T+1)
+	        print*, "Tau_K", tauK,"Tau_W",tauW,"Tau_W_at",tauW_at,"Tau_bt",tauW_bt
 
         ! Save initial guess of prices
         OPEN (UNIT=77, FILE=trim(Result_Folder)//'Transition_NBAR.txt', STATUS='replace')
@@ -5634,6 +5637,7 @@ SUBROUTINE EGM_Transition()
 		Hours_tr(:,:,:,:,:,:,T+1)  = Hours_exp  ; Hours_t_pr  = Hours_exp  ;
 		Aprime_tr(:,:,:,:,:,:,T+1) = Aprime_exp ; 
 		! print*,'Cons_tr(T+1)=',Cons_tr(81,:,5,3,3,1,T+1)
+		print*,"|Const_exp-Const_bench|=",maxval(abs(Cons_exp-Cons_bench))
 
 	! Solve backwards for all transition periods
 	do ti=T,1,-1
