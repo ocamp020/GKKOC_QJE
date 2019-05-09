@@ -5637,7 +5637,7 @@ SUBROUTINE EGM_Transition()
 		Hours_tr(:,:,:,:,:,:,T+1)  = Hours_exp  ; Hours_t_pr  = Hours_exp  ;
 		Aprime_tr(:,:,:,:,:,:,T+1) = Aprime_exp ; 
 		! print*,'Cons_tr(T+1)=',Cons_tr(81,:,5,3,3,1,T+1)
-		print*,"|Const_exp-Const_bench|=",maxval(abs(Cons_exp-Cons_bench))
+		! print*,"|Const_exp-Const_bench|=",maxval(abs(Cons_exp-Cons_bench))
 
 	! Solve backwards for all transition periods
 	do ti=T,1,-1
@@ -5658,6 +5658,8 @@ SUBROUTINE EGM_Transition()
 			CALL FORM_Y_MB_GRID_Transition(YGRID,MBGRID,YGRID_t,MBGRID_t,ti)
 			! print*, 'YGRID_t(:,5,1)=',YGRID_t(:,5,1)
 			! print*, 'RetY_lambda_e=',RetY_lambda_e
+			print*,"Period",ti,"|YGRID-YGRID_bench|=",maxval(abs(YGRID_t-YGRID_aux))),&
+				& "|RetY-RetY_bench|=",maxval(abs(RetY_lambda_e-RetY_lambda_e_aux)))
 
 		! print*, 'R=',R,'P=',P, 'W=',wage, 'na=', na, 'na_t=', na_t
 	!========================================================================================

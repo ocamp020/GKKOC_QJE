@@ -49,7 +49,7 @@ MODULE global
 
 	! Retirement income 
 	REAL(DP), DIMENSION(nlambda,ne) :: phi_lambda_e   ! phi_lambda_e is the income replacement ratio used to compute SS payments
-	REAL(DP), DIMENSION(nlambda,ne) :: RetY_lambda_e  ! Retirement income = phi_lambda_e*Ebar, the first 45 years are assigned zero. 
+	REAL(DP), DIMENSION(nlambda,ne) :: RetY_lambda_e, RetY_lambda_e_aux  ! Retirement income = phi_lambda_e*Ebar, the first 45 years are assigned zero. 
 
 	! Labor efficiency units
 		! eff_un(age,lambda,e) = kappa(age)*lambda*e
@@ -80,7 +80,7 @@ MODULE global
 		! For each tax rate we weill have different Y grids
 		REAL(DP), DIMENSION(na)      :: agrid
 	    REAL(DP), DIMENSION(fine_na) :: fine_agrid
-	    REAL(DP), DIMENSION(na,nz,nx):: YGRID, MBGRID
+	    REAL(DP), DIMENSION(na,nz,nx):: YGRID, MBGRID, YGRID_aux, MBGRID_aux
 	    REAL(DP), DIMENSION(:,:,:), ALLOCATABLE :: YGRID_t, MBGRID_t
 	    REAL(DP), DIMENSION(:)    , ALLOCATABLE :: agrid_t
 	    INTEGER                      :: na_t
