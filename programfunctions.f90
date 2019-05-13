@@ -5588,6 +5588,36 @@ SUBROUTINE FIND_DBN_Transition()
 	    	CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
 	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
 
+
+	    	! Write Variable Paths
+			print*, ' '
+			print*,'---------------------------------------------------'
+			print*,' 	Write Variables Paths'
+			print*,'---------------------------------------------------'
+			! OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'Cons_tr'  , STATUS='replace')
+			! OPEN  (UNIT=2,  FILE=trim(Result_Folder)//'Hours_tr'  , STATUS='replace')
+			! OPEN  (UNIT=3,  FILE=trim(Result_Folder)//'Aprime_tr'  , STATUS='replace')
+			OPEN  (UNIT=4,  FILE=trim(Result_Folder)//'GBAR_tr'  , STATUS='replace')
+			OPEN  (UNIT=5,  FILE=trim(Result_Folder)//'Wage_tr'  , STATUS='replace')
+			OPEN  (UNIT=6,  FILE=trim(Result_Folder)//'R_tr'     , STATUS='replace')
+			OPEN  (UNIT=7,  FILE=trim(Result_Folder)//'P_tr'     , STATUS='replace')
+			OPEN  (UNIT=8,  FILE=trim(Result_Folder)//'QBAR_tr'  , STATUS='replace')
+			OPEN  (UNIT=9,  FILE=trim(Result_Folder)//'NBAR_tr'  , STATUS='replace')
+			OPEN  (UNIT=10,  FILE=trim(Result_Folder)//'YBAR_tr' , STATUS='replace')
+				! WRITE (UNIT=1,  FMT=*) Cons_tr
+				! WRITE (UNIT=2,  FMT=*) Hours_tr
+				! WRITE (UNIT=3,  FMT=*) Aprime_tr
+				WRITE (UNIT=4,  FMT=*) GBAR_tr
+				WRITE (UNIT=5,  FMT=*) Wage_tr
+				WRITE (UNIT=6,  FMT=*) R_tr
+				WRITE (UNIT=7,  FMT=*) P_tr
+				WRITE (UNIT=8,  FMT=*) NBAR_tr
+				WRITE (UNIT=9,  FMT=*) QBAR_tr
+				WRITE (UNIT=10,  FMT=*) YBAR_tr
+			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
+			CLOSE (unit=4); CLOSE (unit=5); CLOSE (unit=6); CLOSE (unit=7); 
+			CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10); 
+
 	    simutime  = simutime +1 
 	 
 	ENDDO ! WHILE
