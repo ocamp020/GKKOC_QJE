@@ -5251,6 +5251,8 @@ SUBROUTINE FIND_DBN_Transition()
 	! Compute distribution of assets by age and state
 		! Distribution is obtained by iterating over an initial distribution using policy functions
 	DBN_dist=1.0_DP
+	Q_dist=1.0_DP
+	N_dist=1.0_DP
 	simutime = 1
 	iter_indx = 1
 	!print*, 'Computing Equilibrium Distribution'
