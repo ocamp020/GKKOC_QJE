@@ -5183,15 +5183,25 @@ SUBROUTINE FIND_DBN_Transition()
 
 
 	! Initial guess for transition path variables
-		! Guess NBAR, QBAR and R as a linear combination of starting and end values
-		NBAR_tr(1)   = NBAR_bench ; NBAR_tr(T+1) = NBAR_exp   ;
-		QBAR_tr(1)   = QBAR_bench ; QBAR_tr(T+1) = QBAR_exp   ;
-		R_tr(1)      = R_bench    ; R_tr(T+1)    = R_exp      ;
-		do ti=2,T
-			NBAR_tr(ti) = NBAR_tr(ti-1) + (NBAR_tr(T+1)-NBAR_tr(1))/T
-			QBAR_tr(ti) = QBAR_tr(ti-1) + (QBAR_tr(T+1)-QBAR_tr(1))/T
-			R_tr(ti)    = R_tr(ti-1) + (R_tr(T+1)-R_tr(1))/T
-		enddo 
+		! ! Guess NBAR, QBAR and R as a linear combination of starting and end values
+		! NBAR_tr(1)   = NBAR_bench ; NBAR_tr(T+1) = NBAR_exp   ;
+		! QBAR_tr(1)   = QBAR_bench ; QBAR_tr(T+1) = QBAR_exp   ;
+		! R_tr(1)      = R_bench    ; R_tr(T+1)    = R_exp      ;
+		! do ti=2,T
+		! 	NBAR_tr(ti) = NBAR_tr(ti-1) + (NBAR_tr(T+1)-NBAR_tr(1))/T
+		! 	QBAR_tr(ti) = QBAR_tr(ti-1) + (QBAR_tr(T+1)-QBAR_tr(1))/T
+		! 	R_tr(ti)    = R_tr(ti-1) + (R_tr(T+1)-R_tr(1))/T
+		! enddo 
+		! Load Guess From Files
+		OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'  , STATUS='old', ACTION='read')
+		OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	, STATUS='old', ACTION='read')
+		OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		, STATUS='old', ACTION='read')
+		READ (UNIT=1,  FMT=*), QBAR_tr
+		READ (UNIT=2,  FMT=*), NBAR_tr
+		READ (UNIT=3,  FMT=*), R_tr
+		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
+
+
 		! Choose YBAR, EBAR, P and Wage to be consistent
 		P_tr    = alpha* QBAR_tr**(alpha-mu) * NBAR_tr**(1.0_DP-alpha)
         YBAR_tr = QBAR_tr ** alpha * NBAR_tr **(1.0_DP-alpha)
@@ -5204,6 +5214,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        print*, "Tau_K", tauK,"Tau_W_at",tauW_at,"Tau_bt",tauW_bt
 
         ! Save initial guess of prices
+        OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='replace')
         OPEN (UNIT=77, FILE=trim(Result_Folder)//'Transition_NBAR.txt', STATUS='replace')
         OPEN (UNIT=78, FILE=trim(Result_Folder)//'Transition_QBAR.txt', STATUS='replace')
         OPEN (UNIT=79, FILE=trim(Result_Folder)//'Transition_R.txt', STATUS='replace')
@@ -5213,6 +5224,9 @@ SUBROUTINE FIND_DBN_Transition()
         OPEN (UNIT=83, FILE=trim(Result_Folder)//'Transition_GBAR_L.txt', STATUS='replace')
         OPEN (UNIT=84, FILE=trim(Result_Folder)//'Transition_GBAR_C.txt', STATUS='replace')
         OPEN (UNIT=85, FILE=trim(Result_Folder)//'Transition_SSC.txt', STATUS='replace')
+        OPEN (UNIT=86, FILE=trim(Result_Folder)//'Transition_K.txt', STATUS='replace')
+     		
+     		WRITE(UNIT=77, FMT=*) 'Iteration, DBN_dist, Q_dist, N_dist, Q(T)/Q(SS), N(T)/N(SS)'
      		WRITE(UNIT=77, FMT=*) 'NBAR'
         	WRITE(UNIT=78, FMT=*) 'QBAR'
         	WRITE(UNIT=79, FMT=*) 'R'
@@ -5222,11 +5236,15 @@ SUBROUTINE FIND_DBN_Transition()
         	WRITE(UNIT=83, FMT=*) 'GBAR_L'
         	WRITE(UNIT=84, FMT=*) 'GBAR_C'
         	WRITE(UNIT=85, FMT=*) 'SSC'
+        	WRITE(UNIT=86, FMT=*) 'K'
+
         	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR_tr, NBAR_exp
         	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR_tr, QBAR_exp
         	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
-    	CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
+
+    	CLOSE (unit=76); CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
     	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
+    	CLOSE (unit=86);
 
 
 	! Compute distribution of assets by age and state
@@ -5235,7 +5253,7 @@ SUBROUTINE FIND_DBN_Transition()
 	simutime = 1
 	iter_indx = 1
 	!print*, 'Computing Equilibrium Distribution'
-	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. ( simutime .le. 700 ) )
+	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. (max(Q_dist,N_dist).ge.DBN_criteria) .and. ( simutime .le. 700 ) )
 		! print*, 'DBN_dist=', DBN_dist
 
 		! Start Q_dist and N_dist
@@ -5424,9 +5442,11 @@ SUBROUTINE FIND_DBN_Transition()
 	    	K_mat  = K_Matrix(R,P)
 			Pr_mat = Profit_Matrix(R,P)
 			CALL ComputeLaborUnits(Ebar_tr(ti), wage_tr(ti)) 
+			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 			DBN1  = DBN_tr(:,:,:,:,:,:,ti)
 			Cons  = Cons_tr(:,:,:,:,:,:,ti)
 			Hours = Hours_tr(:,:,:,:,:,:,ti)
+
 
 	    ! Compute government budget for the current preiod (Time: ti)
 	    ! print*,' Calculating tax revenue'
@@ -5487,8 +5507,8 @@ SUBROUTINE FIND_DBN_Transition()
                 R_tr(ti) = 0.0_DP
 	        endif
 
-	        ! Compute total assets and print
-	        ! print*, "Period",ti,"Wealth=",sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+	        ! Compute total assets
+	        K_tr(ti) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 
 
     	ENDDO ! Transition Time
@@ -5503,6 +5523,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    	K_mat  = K_Matrix(R,P)
 			Pr_mat = Profit_Matrix(R,P)
 			CALL ComputeLaborUnits(Ebar_tr(T+1), wage_tr(T+1)) 
+			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 			DBN1  = DBN_tr(:,:,:,:,:,:,T+1)
 			Cons  = Cons_tr(:,:,:,:,:,:,T+1)
 			Hours = Hours_tr(:,:,:,:,:,:,T+1)
@@ -5565,12 +5586,19 @@ SUBROUTINE FIND_DBN_Transition()
             else
                 R_tr(T+1) = 0.0_DP
 	        endif
+
+	        ! Compute total assets
+	        K_tr(T+1) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 	    
 	    ! Compare distance to tax reform distribution
 		    DBN_dist = maxval(abs(DBN_tr(:,:,:,:,:,:,T+1)-DBN_exp))
 
 		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,' Q_dist=',Q_dist,' N_dist=',N_dist,&
 		    	&' Q(T)/Q(SS)=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N(T)/N(SS)=',100*(NBAR2_tr(T+1)/NBAR_exp-1)
+
+	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
+	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,N_dist,100*(QBAR2_tr(T+1)/QBAR_exp-1),100*(NBAR2_tr(T+1)/NBAR_exp-1)
+	    	CLOSE(UNIT=76)
 
 
 	    	! Save Prices
@@ -5583,6 +5611,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    	OPEN (UNIT=83, FILE=trim(Result_Folder)//'Transition_GBAR_L.txt', STATUS='old', POSITION='append')
 	    	OPEN (UNIT=84, FILE=trim(Result_Folder)//'Transition_GBAR_C.txt', STATUS='old', POSITION='append')
 	    	OPEN (UNIT=85, FILE=trim(Result_Folder)//'Transition_SSC.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=86, FILE=trim(Result_Folder)//'Transition_K.txt', STATUS='old', POSITION='append')
 	        	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR2_tr, NBAR_exp
 	        	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR2_tr, QBAR_exp
 	        	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
@@ -5592,8 +5621,10 @@ SUBROUTINE FIND_DBN_Transition()
 	        	WRITE(UNIT=83, FMT=*) GBAR_L_tr
 	        	WRITE(UNIT=84, FMT=*) GBAR_C_tr
 	        	WRITE(UNIT=85, FMT=*) SSC_Payments_tr
+	        	WRITE(UNIT=86, FMT=*) K_tr
 	    	CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
 	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
+	    	CLOSE (unit=86);
 
 
 	    	! Write Variable Paths
@@ -5611,6 +5642,7 @@ SUBROUTINE FIND_DBN_Transition()
 			OPEN  (UNIT=8,  FILE=trim(Result_Folder)//'QBAR_tr'  , STATUS='replace')
 			OPEN  (UNIT=9,  FILE=trim(Result_Folder)//'NBAR_tr'  , STATUS='replace')
 			OPEN  (UNIT=10,  FILE=trim(Result_Folder)//'YBAR_tr' , STATUS='replace')
+			OPEN  (UNIT=11,  FILE=trim(Result_Folder)//'K_tr' , STATUS='replace')
 				! WRITE (UNIT=1,  FMT=*) Cons_tr
 				! WRITE (UNIT=2,  FMT=*) Hours_tr
 				! WRITE (UNIT=3,  FMT=*) Aprime_tr
@@ -5618,12 +5650,13 @@ SUBROUTINE FIND_DBN_Transition()
 				WRITE (UNIT=5,  FMT=*) Wage_tr
 				WRITE (UNIT=6,  FMT=*) R_tr
 				WRITE (UNIT=7,  FMT=*) P_tr
-				WRITE (UNIT=8,  FMT=*) NBAR_tr
-				WRITE (UNIT=9,  FMT=*) QBAR_tr
+				WRITE (UNIT=8,  FMT=*) QBAR_tr
+				WRITE (UNIT=9,  FMT=*) NBAR_tr
 				WRITE (UNIT=10,  FMT=*) YBAR_tr
+				WRITE (UNIT=11,  FMT=*) K_tr
 			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
 			CLOSE (unit=4); CLOSE (unit=5); CLOSE (unit=6); CLOSE (unit=7); 
-			CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10); 
+			CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10); CLOSE (unit=11); 
 
 	    simutime  = simutime +1 
 	 
