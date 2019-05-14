@@ -165,7 +165,7 @@ MODULE global
     ! Transition 
     INTEGER :: ti 
     ! Prices and Quantities
-    REAL(DP), DIMENSION(T+1) :: R_tr, P_tr, QBAR_tr, NBAR_tr, YBAR_tr, Wage_tr, EBAR_tr, K_tr
+    REAL(DP), DIMENSION(T+1) :: R_tr, P_tr, QBAR_tr, NBAR_tr, YBAR_tr, Wage_tr, EBAR_tr, K_tr, C_tr
     ! Government Budget
     REAL(DP), DIMENSION(T+1) :: GBAR_tr, GBAR_K_tr, GBAR_W_tr, GBAR_L_tr, GBAR_C_tr, SSC_Payments_tr, Tot_Lab_Inc_tr
     ! Policy function and value function (defined on the exogenous grid)

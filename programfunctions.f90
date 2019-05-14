@@ -5226,6 +5226,7 @@ SUBROUTINE FIND_DBN_Transition()
         OPEN (UNIT=84, FILE=trim(Result_Folder)//'Transition_GBAR_C.txt', STATUS='replace')
         OPEN (UNIT=85, FILE=trim(Result_Folder)//'Transition_SSC.txt', STATUS='replace')
         OPEN (UNIT=86, FILE=trim(Result_Folder)//'Transition_K.txt', STATUS='replace')
+        OPEN (UNIT=87, FILE=trim(Result_Folder)//'Transition_C.txt', STATUS='replace')
      		
      		WRITE(UNIT=77, FMT=*) 'Iteration, DBN_dist, Q_dist, N_dist, Q(T)/Q(SS), N(T)/N(SS)'
      		WRITE(UNIT=77, FMT=*) 'NBAR'
@@ -5238,6 +5239,7 @@ SUBROUTINE FIND_DBN_Transition()
         	WRITE(UNIT=84, FMT=*) 'GBAR_C'
         	WRITE(UNIT=85, FMT=*) 'SSC'
         	WRITE(UNIT=86, FMT=*) 'K'
+        	WRITE(UNIT=87, FMT=*) 'C'
 
         	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR_tr, NBAR_exp
         	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR_tr, QBAR_exp
@@ -5245,7 +5247,7 @@ SUBROUTINE FIND_DBN_Transition()
 
     	CLOSE (unit=76); CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
     	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
-    	CLOSE (unit=86);
+    	CLOSE (unit=86); CLOSE (unit=87);
 
 
 	! Compute distribution of assets by age and state
@@ -5510,8 +5512,9 @@ SUBROUTINE FIND_DBN_Transition()
                 R_tr(ti) = 0.0_DP
 	        endif
 
-	        ! Compute total assets
+	        ! Compute total assets and consumption
 	        K_tr(ti) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+	        C_tr(ti) = sum( DBN1*Cons )
 
 
     	ENDDO ! Transition Time
@@ -5590,19 +5593,10 @@ SUBROUTINE FIND_DBN_Transition()
                 R_tr(T+1) = 0.0_DP
 	        endif
 
-	        ! Compute total assets
+	        ! Compute total assets and consumption
 	        K_tr(T+1) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+	        C_tr(T+1) = sum( DBN1*Cons )
 	    
-	    ! Compare distance to tax reform distribution
-		    DBN_dist = maxval(abs(DBN_tr(:,:,:,:,:,:,T+1)-DBN_exp))
-
-		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,' Q_dist=',Q_dist,' N_dist=',N_dist,&
-		    	&' Q(T)/Q(SS)=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N(T)/N(SS)=',100*(NBAR2_tr(T+1)/NBAR_exp-1)
-
-	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
-	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,N_dist,100*(QBAR2_tr(T+1)/QBAR_exp-1),100*(NBAR2_tr(T+1)/NBAR_exp-1)
-	    	CLOSE(UNIT=76)
-
 
 	    	! Save Prices
 	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Transition_NBAR.txt', STATUS='old', POSITION='append')
@@ -5615,6 +5609,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    	OPEN (UNIT=84, FILE=trim(Result_Folder)//'Transition_GBAR_C.txt', STATUS='old', POSITION='append')
 	    	OPEN (UNIT=85, FILE=trim(Result_Folder)//'Transition_SSC.txt', STATUS='old', POSITION='append')
 	    	OPEN (UNIT=86, FILE=trim(Result_Folder)//'Transition_K.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=87, FILE=trim(Result_Folder)//'Transition_C.txt', STATUS='old', POSITION='append')
 	        	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR2_tr, NBAR_exp
 	        	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR2_tr, QBAR_exp
 	        	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
@@ -5625,16 +5620,17 @@ SUBROUTINE FIND_DBN_Transition()
 	        	WRITE(UNIT=84, FMT=*) GBAR_C_tr
 	        	WRITE(UNIT=85, FMT=*) SSC_Payments_tr
 	        	WRITE(UNIT=86, FMT=*) K_tr
+	        	WRITE(UNIT=87, FMT=*) C_tr
 	    	CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
 	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
-	    	CLOSE (unit=86);
+	    	CLOSE (unit=86); CLOSE (unit=87);
 
 
 	    	! Write Variable Paths
-			print*, ' '
-			print*,'---------------------------------------------------'
-			print*,' 	Write Variables Paths'
-			print*,'---------------------------------------------------'
+	    	print*,' '
+			print*,' 	--------------------------------------'
+			print*,' 	Printing Variables'
+			print*,' 	--------------------------------------'
 			! OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'Cons_tr'  , STATUS='replace')
 			! OPEN  (UNIT=2,  FILE=trim(Result_Folder)//'Hours_tr'  , STATUS='replace')
 			! OPEN  (UNIT=3,  FILE=trim(Result_Folder)//'Aprime_tr'  , STATUS='replace')
@@ -5646,20 +5642,37 @@ SUBROUTINE FIND_DBN_Transition()
 			OPEN  (UNIT=9,  FILE=trim(Result_Folder)//'NBAR_tr'  , STATUS='replace')
 			OPEN  (UNIT=10,  FILE=trim(Result_Folder)//'YBAR_tr' , STATUS='replace')
 			OPEN  (UNIT=11,  FILE=trim(Result_Folder)//'K_tr' , STATUS='replace')
+			OPEN  (UNIT=12,  FILE=trim(Result_Folder)//'C_tr' , STATUS='replace')
 				! WRITE (UNIT=1,  FMT=*) Cons_tr
 				! WRITE (UNIT=2,  FMT=*) Hours_tr
 				! WRITE (UNIT=3,  FMT=*) Aprime_tr
-				WRITE (UNIT=4,  FMT=*) GBAR_tr
-				WRITE (UNIT=5,  FMT=*) Wage_tr
-				WRITE (UNIT=6,  FMT=*) R_tr
-				WRITE (UNIT=7,  FMT=*) P_tr
-				WRITE (UNIT=8,  FMT=*) QBAR_tr
-				WRITE (UNIT=9,  FMT=*) NBAR_tr
+				WRITE (UNIT=4 ,  FMT=*) GBAR_tr
+				WRITE (UNIT=5 ,  FMT=*) Wage_tr
+				WRITE (UNIT=6 ,  FMT=*) R_tr
+				WRITE (UNIT=7 ,  FMT=*) P_tr
+				WRITE (UNIT=8 ,  FMT=*) QBAR_tr
+				WRITE (UNIT=9 ,  FMT=*) NBAR_tr
 				WRITE (UNIT=10,  FMT=*) YBAR_tr
 				WRITE (UNIT=11,  FMT=*) K_tr
+				WRITE (UNIT=12,  FMT=*) C_tr
 			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
 			CLOSE (unit=4); CLOSE (unit=5); CLOSE (unit=6); CLOSE (unit=7); 
-			CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10); CLOSE (unit=11); 
+			CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10); CLOSE (unit=11); CLOSE (unit=12); 
+			print*,' 	--------------------------------------'
+			print*,' 	Variable Printing Completed'
+			print*,' 	--------------------------------------'
+			print*,' '
+
+		! Compare distance to tax reform distribution
+		    DBN_dist = maxval(abs(DBN_tr(:,:,:,:,:,:,T+1)-DBN_exp))
+
+		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,' Q_dist=',Q_dist,' N_dist=',N_dist,&
+		    	&' Q(T)/Q(SS)=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N(T)/N(SS)=',100*(NBAR2_tr(T+1)/NBAR_exp-1)
+
+	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
+	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,N_dist,100*(QBAR2_tr(T+1)/QBAR_exp-1),100*(NBAR2_tr(T+1)/NBAR_exp-1)
+	    	CLOSE(UNIT=76)
+
 
 	    simutime  = simutime +1 
 	 
