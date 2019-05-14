@@ -5193,6 +5193,7 @@ SUBROUTINE FIND_DBN_Transition()
 		! 	R_tr(ti)    = R_tr(ti-1) + (R_tr(T+1)-R_tr(1))/T
 		! enddo 
 		! Load Guess From Files
+		print*, 'Loading initial variables from file'
 		OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'  , STATUS='old', ACTION='read')
 		OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	, STATUS='old', ACTION='read')
 		OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		, STATUS='old', ACTION='read')
@@ -5200,7 +5201,7 @@ SUBROUTINE FIND_DBN_Transition()
 		READ (UNIT=2,  FMT=*), NBAR_tr
 		READ (UNIT=3,  FMT=*), R_tr
 		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
-
+		print*, 'Reading completed'
 
 		! Choose YBAR, EBAR, P and Wage to be consistent
 		P_tr    = alpha* QBAR_tr**(alpha-mu) * NBAR_tr**(1.0_DP-alpha)
