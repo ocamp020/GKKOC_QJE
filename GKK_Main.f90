@@ -80,7 +80,7 @@ PROGRAM main
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
-		Transition_Tax_Reform = .true.
+		Transition_Tax_Reform = .false.
 		Simul_Switch  = .false.
 
 
@@ -218,8 +218,8 @@ PROGRAM main
 					call Solve_Experiment_Fixed_Policy_Functions(Fixed_PF,Simul_Switch)
 				elseif ((Fixed_PF.eqv..false.).and.(Fixed_PF_interp).and.(Fixed_PF_prices.eqv..false.)) then
 					! If using benchmark prices
-						Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp/'
-						call system( 'mkdir -p ' // trim(Result_Folder) )
+						! Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp/'
+						! call system( 'mkdir -p ' // trim(Result_Folder) )
 					! If using tax reform prices
 						call Solve_Experiment(.false.,.false.)
 							Ebar   = EBAR_bench
