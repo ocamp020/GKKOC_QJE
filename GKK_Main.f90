@@ -3404,5 +3404,12 @@ Subroutine Solve_Transition_Tax_Reform
 	print*,'---------------------------------------------------'
 	call Find_DBN_Transition 
 
+	! Compute Value Functions for Cohorts Alive at Time of Policy Change
+	call COMPUTE_VALUE_FUNCTION_TRANSITION
+
+
+	! Compute Welfare Gain
+	call COMPUTE_WELFARE_GAIN_TRANSITION
+
 
 End Subroutine Solve_Transition_Tax_Reform

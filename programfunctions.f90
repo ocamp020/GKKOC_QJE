@@ -3380,6 +3380,191 @@ END SUBROUTINE  COMPUTE_WELFARE_GAIN
 !========================================================================================
 
 
+SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
+	IMPLICIT NONE
+	real(DP), dimension(MaxAge):: CumDiscountF
+	REAL(DP), dimension(draft_age_category,nz) :: CE_draft_group_z,  size_draft_group_z, frac_pos_welfare_draft_group_z
+	REAL(DP), dimension(draft_age_category,draft_z_category) :: CE_draft_group,  size_draft_group, frac_pos_welfare_draft_group
+	REAL(DP), dimension(nz) :: DBN_Z, CDF_Z 
+	REAL(DP), dimension(nz,nx) :: DBN_XZ
+	INTEGER , dimension(draft_age_category+1) :: draft_age_limit
+	INTEGER :: age2, z2
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Value_mat
+
+	allocate( Value_mat(  MaxAge,na,nz,nlambda,ne,nx) )
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! Routine Set Up
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	! Age Brackets
+		draft_age_limit = [0, 1, 15, 30, 45, MaxAge ] 
+
+	! Discount factor
+		CumDiscountF(MaxAge)=1.0_DP
+		DO age=MaxAge-1,1,-1
+		    CumDiscountF(age) = 1.0_DP + beta * survP(age) *CumDiscountF(age+1) 
+		ENDDO
+
+	! Select relevant values of value function
+		DO age=1,MaxAge
+			Value_mat(age,:,:,:,:,:) = ValueFunction_tr(age,:,:,:,:,:,age)
+		ENDDO
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! Measuring Consumption Equivalent Welfare
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	! Consumption Equivalent Welfare: CE 1
+		DO age=1,MaxAge
+			if (Log_Switch.eqv..true.) then 
+		    	CE1_tr(age,:,:,:,:,:)= & 
+		    		& exp((Value_mat(age,:,:,:,:,:)-ValueFunction_Bench(age,:,:,:,:,:))/CumDiscountF(age))-1.0_DP
+		    else 
+		    	CE1_tr(age,:,:,:,:,:)=(Value_mat(age,:,:,:,:,:)/ValueFunction_Bench(age,:,:,:,:,:)) &
+                                				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+		    end if 
+		ENDDO
+
+		! Aggregates 
+		CE1_nb_tr  = 100.0_DP*sum(CE1_tr(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+		CE1_pop_tr = 100.0_DP*sum(CE1_tr*DBN_bench)/sum(DBN_bench)
+
+	! Consumption Equivalent Welfare: CE 2
+		CE2_nb_tr  = 100.0_dp * (( sum(Value_mat(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) / &
+				&               sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) ) &
+				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+		CE2_pop_tr = 100*(( sum(Value_mat*DBN_bench) / sum(ValueFunction_Bench*DBN_bench)  ) &
+		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+
+	! Write Aggregate Results
+		OPEN (UNIT=50, FILE=trim(Result_Folder)//'CE_Transition.txt', STATUS='replace') 
+			WRITE  (UNIT=50, FMT=*) 'Measures of Consumption Equivalent Welfare for Transition'
+			WRITE  (UNIT=50, FMT=*) 'Welfare measured for cohorts alive at time of policy change'
+			WRITE  (UNIT=50, FMT=*) ' '
+			WRITE  (UNIT=50, FMT=*) 'Aggregate Measures'
+			WRITE  (UNIT=50, FMT=*) ' '
+			WRITE  (UNIT=50, FMT=*) 'CE 1: Average of welfare gain across agents'
+			WRITE  (UNIT=50, FMT=*) 'CE1_nb =',CE1_nb_tr
+			WRITE  (UNIT=50, FMT=*) 'CE1_pop =',CE1_pop_tr
+			WRITE  (UNIT=50, FMT=*) ' '
+			WRITE  (UNIT=50, FMT=*) 'CE 2: Welfare gain average agent'
+			WRITE  (UNIT=50, FMT=*) 'CE2_nb =',CE2_nb_tr
+			WRITE  (UNIT=50, FMT=*) 'CE2_pop =',CE2_pop_tr
+			WRITE  (UNIT=50, FMT=*) ' '
+			WRITE  (UNIT=50, FMT=*) 'All unites in percentage points (already multiplied by 100)'
+		close (unit=50)	
+
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! Draft Tables
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	frac_pos_welfare_draft_group_z = 0.0_dp 
+
+	do zi  = 1,nz
+	do age = 1,draft_age_category
+		size_draft_group_z(age,zi) = &
+			& sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:))
+
+		CE_draft_group_z(age,zi) =  100* &
+			& sum(CE1_tr(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:)* &
+            &     DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:))/&
+            & sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:))
+
+        do xi=1,nx
+	    do ei=1,ne
+	    do lambdai=1,nlambda
+	    do ai=1,na
+	    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
+	    	If ( CE1_tr(age2,ai,zi,lambdai,ei,xi) .ge. 0.0_DP) then
+        	frac_pos_welfare_draft_group_z(age,zi) = frac_pos_welfare_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
+        	endif 
+    	enddo 
+    	enddo 
+    	enddo 
+    	enddo 
+    	enddo  
+	enddo
+	enddo 
+
+	DBN_Z = sum(sum(sum(sum(sum(DBN_bench,6),5),4),2),1) 
+	do zi=1,nz 
+		CDF_Z(zi) = sum(DBN_Z(1:zi))
+	enddo 
+	! print*,' '
+	! print*,'DBN_Z=',DBN_Z
+	! print*,'CDF_Z=',CDF_Z 
+	! print*,' '
+
+	! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	size_draft_group(:,1) = size_draft_group_z(:,1) + size_draft_group_z(:,2) + size_draft_group_z(:,3) & 
+							&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*size_draft_group_z(:,4)
+	size_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*size_draft_group_z(:,4)+((0.80_dp-CDF_Z(4))/DBN_Z(5))*size_draft_group_z(:,5)
+	size_draft_group(:,3) = (0.10_dp/DBN_Z(5))*size_draft_group_z(:,5)
+	size_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*size_draft_group_z(:,5) + &
+						& ((0.99_dp-CDF_Z(5))/DBN_Z(6))*size_draft_group_z(:,6) 
+	size_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*size_draft_group_z(:,6) + & 
+						& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*size_draft_group_z(:,7) 
+	size_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*size_draft_group_z(:,7) + size_draft_group_z(:,8) + size_draft_group_z(:,9) 
+	size_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*size_draft_group_z(:,7) + &
+							& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*size_draft_group_z(:,8)
+	size_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*size_draft_group_z(:,8) + size_draft_group_z(:,9)
+
+	! CE of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	CE_draft_group(:,1)   = ( DBN_Z(1)*CE_draft_group_z(:,1) + DBN_Z(2)*CE_draft_group_z(:,2) + & 
+							& DBN_Z(3)*CE_draft_group_z(:,3) + (0.40_dp-CDF_Z(3))*CE_draft_group_z(:,4) )/0.40_dp
+	CE_draft_group(:,2)   = ( (CDF_Z(4)-0.40_dp)*CE_draft_group_z(:,4) + (0.80_dp-CDF_Z(4))*CE_draft_group_z(:,5) )/0.40_dp
+	CE_draft_group(:,3)   = CE_draft_group_z(:,5)
+	CE_draft_group(:,4)   = ( (CDF_Z(5)-0.90_dp)*CE_draft_group_z(:,5) + (0.99_dp-CDF_Z(5))*CE_draft_group_z(:,6) )/0.09_dp
+	CE_draft_group(:,5)   = ( (CDF_Z(6)-0.99_dp)*CE_draft_group_z(:,6) + (0.999_dp-CDF_Z(6))*CE_draft_group_z(:,7) )/0.009_dp
+	CE_draft_group(:,6)   = ( (CDF_Z(7)-0.999_dp)*CE_draft_group_z(:,7) + &
+							&  DBN_Z(8)*CE_draft_group_z(:,8) + DBN_Z(9)*CE_draft_group_z(:,9) )/0.001_dp
+	CE_draft_group(:,7)   = ( (CDF_Z(7)-0.999_dp)*CE_draft_group_z(:,7) + (0.9999_dp-CDF_Z(7))*CE_draft_group_z(:,8) )/0.0009_dp
+	CE_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*CE_draft_group_z(:,8) + DBN_Z(9)*CE_draft_group_z(:,9) )/0.0001_dp
+
+	! Frac. pos. welfare by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	frac_pos_welfare_draft_group(:,1) = frac_pos_welfare_draft_group_z(:,1) + frac_pos_welfare_draft_group_z(:,2) + &
+							&  frac_pos_welfare_draft_group_z(:,3) + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*frac_pos_welfare_draft_group_z(:,4)
+	frac_pos_welfare_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*frac_pos_welfare_draft_group_z(:,4) + & 
+							&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*frac_pos_welfare_draft_group_z(:,5)
+	frac_pos_welfare_draft_group(:,3) = (0.10_dp/DBN_Z(5))*frac_pos_welfare_draft_group_z(:,5)
+	frac_pos_welfare_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*frac_pos_welfare_draft_group_z(:,5) + & 
+							& ((0.99_dp-CDF_Z(5))/DBN_Z(6))*frac_pos_welfare_draft_group_z(:,6) 
+	frac_pos_welfare_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*frac_pos_welfare_draft_group_z(:,6) + &
+							& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*frac_pos_welfare_draft_group_z(:,7) 
+	frac_pos_welfare_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*frac_pos_welfare_draft_group_z(:,7) + &
+							& frac_pos_welfare_draft_group_z(:,8) + frac_pos_welfare_draft_group_z(:,9) 
+	frac_pos_welfare_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*frac_pos_welfare_draft_group_z(:,7) + &
+							& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*frac_pos_welfare_draft_group_z(:,8)
+	frac_pos_welfare_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*frac_pos_welfare_draft_group_z(:,8) + &
+							&  frac_pos_welfare_draft_group_z(:,9)
+
+	! Fix fractions
+	frac_pos_welfare_draft_group = 100*frac_pos_welfare_draft_group/size_draft_group
+
+    OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE_tr.txt', STATUS='replace') 
+    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size_tr.txt', STATUS='replace') 
+    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_fpos_welfare_tr.txt', STATUS='replace') 
+	do age = 1,draft_age_category
+	    WRITE  (UNIT=80, FMT=*)  CE_draft_group(age,:)
+	    WRITE  (UNIT=81, FMT=*)  size_draft_group(age,:)
+	    WRITE  (UNIT=82, FMT=*)  frac_pos_welfare_draft_group(age,:)
+	ENDDO
+	close(unit=80); close(unit=81); close(unit=82)
+
+
+
+END SUBROUTINE  COMPUTE_WELFARE_GAIN_TRANSITION
+
+
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+
 ! SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE()
 ! 	IMPLICIT NONE
 ! 	REAL(DP), DIMENSION(na) :: ValueP1, ValueP2, ValueP, ExpValueP
@@ -3607,6 +3792,58 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	ENDDO ! xi
 
 END SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR 
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+
+SUBROUTINE COMPUTE_VALUE_FUNCTION_TRANSITION
+	IMPLICIT NONE
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_mat, Hours_mat, Aprime_mat, Value_mat
+	INTEGER :: aux_T
+
+	allocate( Cons_mat(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Hours_mat(  MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Aprime_mat( MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Value_mat(  MaxAge,na,nz,nlambda,ne,nx) )
+
+	print*,'Computing Value Function'
+	print*,'	Value functions computed only for agents alive at the time of policy change'
+	print*,' 	Last index corresponds to cohort (age at time of policy change), not transition period'
+	do age=1,MaxAge
+		print*,'		Cohort of age',age,'at time of policy change'
+		! Set policy functions for cohort of age "age" at time of policy change
+			! Previous periods of life from benchmark
+			if (age>1) then 
+			Cons_mat(1:age-1,:,:,:,:,:)   = Cons_bench(1:age-1,:,:,:,:,:)
+			Hours_mat(1:age-1,:,:,:,:,:)  = Hours_bench(1:age-1,:,:,:,:,:)
+			Aprime_mat(1:age-1,:,:,:,:,:) = Aprime_bench(1:age-1,:,:,:,:,:)
+			endif 
+			! Remaining periods of life from transition matrices
+			aux_T = max(MaxAge-age+1,T+1)
+			do ti=1:aux_T
+			Cons_mat(age+ti-1,:,:,:,:,:)   = Cons_tr(age+ti-1,:,:,:,:,:,ti)
+			Hours_mat(age+ti-1,:,:,:,:,:)  = Hours_tr(age+ti-1,:,:,:,:,:,ti)
+			Aprime_mat(age+ti-1,:,:,:,:,:) = Aprime_tr(age+ti-1,:,:,:,:,:,ti)
+			enddo 
+			! Supplement with second steady state if needed
+			if (aux_T.lt.(MaxAge-age+1)) then
+			Cons_mat(T+2:,:,:,:,:,:)   = Cons_exp(T+2:,:,:,:,:,:)
+			Hours_mat(T+2:,:,:,:,:,:)  = Hours_exp(T+2:,:,:,:,:,:)
+			Aprime_mat(T+2:,:,:,:,:,:) = Aprime_exp(T+2:,:,:,:,:,:)
+			endif 
+		! Obtain value function 
+			COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat)
+
+		! Save value function
+			ValueFunction_tr(:,:,:,:,:,:,age) = Value_mat
+	enddo 
+
+END SUBROUTINE COMPUTE_VALUE_FUNCTION_TRANSITION
+
+
 
 
 !========================================================================================
@@ -5168,6 +5405,10 @@ SUBROUTINE FIND_DBN_Transition()
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
 	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr
 
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! Set Up
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	! Allocate
 	allocate( PrAprimehi( MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( PrAprimelo( MaxAge,na,nz,nlambda,ne,nx) )
@@ -5182,7 +5423,9 @@ SUBROUTINE FIND_DBN_Transition()
 		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 
 
-	! Initial guess for transition path variables
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! Initial guess for transition path variables
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		! ! Guess NBAR, QBAR and R as a linear combination of starting and end values
 		! NBAR_tr(1)   = NBAR_bench ; NBAR_tr(T+1) = NBAR_exp   ;
 		! QBAR_tr(1)   = QBAR_bench ; QBAR_tr(T+1) = QBAR_exp   ;
@@ -5249,6 +5492,9 @@ SUBROUTINE FIND_DBN_Transition()
     	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
     	CLOSE (unit=86); CLOSE (unit=87);
 
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! DBN Iteration 
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	! Compute distribution of assets by age and state
 		! Distribution is obtained by iterating over an initial distribution using policy functions
@@ -5258,7 +5504,7 @@ SUBROUTINE FIND_DBN_Transition()
 	simutime = 1
 	iter_indx = 1
 	!print*, 'Computing Equilibrium Distribution'
-	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. (max(Q_dist,N_dist).ge.DBN_criteria) .and. ( simutime .le. 700 ) )
+	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. (max(Q_dist,N_dist).ge.DBN_criteria) .and. ( simutime .le. 2 ) )
 		! print*, 'DBN_dist=', DBN_dist
 
 		! Start Q_dist and N_dist
@@ -5634,30 +5880,30 @@ SUBROUTINE FIND_DBN_Transition()
 			! OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'Cons_tr'  , STATUS='replace')
 			! OPEN  (UNIT=2,  FILE=trim(Result_Folder)//'Hours_tr'  , STATUS='replace')
 			! OPEN  (UNIT=3,  FILE=trim(Result_Folder)//'Aprime_tr'  , STATUS='replace')
-			OPEN  (UNIT=4,  FILE=trim(Result_Folder)//'GBAR_tr'  , STATUS='replace')
-			OPEN  (UNIT=5,  FILE=trim(Result_Folder)//'Wage_tr'  , STATUS='replace')
-			OPEN  (UNIT=6,  FILE=trim(Result_Folder)//'R_tr'     , STATUS='replace')
-			OPEN  (UNIT=7,  FILE=trim(Result_Folder)//'P_tr'     , STATUS='replace')
-			OPEN  (UNIT=8,  FILE=trim(Result_Folder)//'QBAR_tr'  , STATUS='replace')
-			OPEN  (UNIT=9,  FILE=trim(Result_Folder)//'NBAR_tr'  , STATUS='replace')
-			OPEN  (UNIT=10,  FILE=trim(Result_Folder)//'YBAR_tr' , STATUS='replace')
-			OPEN  (UNIT=11,  FILE=trim(Result_Folder)//'K_tr' , STATUS='replace')
-			OPEN  (UNIT=12,  FILE=trim(Result_Folder)//'C_tr' , STATUS='replace')
+			OPEN  (UNIT=77,  FILE=trim(Result_Folder)//'GBAR_tr'  , STATUS='replace')
+			OPEN  (UNIT=78,  FILE=trim(Result_Folder)//'Wage_tr'  , STATUS='replace')
+			OPEN  (UNIT=79,  FILE=trim(Result_Folder)//'R_tr'     , STATUS='replace')
+			OPEN  (UNIT=80,  FILE=trim(Result_Folder)//'P_tr'     , STATUS='replace')
+			OPEN  (UNIT=81,  FILE=trim(Result_Folder)//'QBAR_tr'  , STATUS='replace')
+			OPEN  (UNIT=82,  FILE=trim(Result_Folder)//'NBAR_tr'  , STATUS='replace')
+			OPEN  (UNIT=83,  FILE=trim(Result_Folder)//'YBAR_tr' , STATUS='replace')
+			OPEN  (UNIT=84,  FILE=trim(Result_Folder)//'K_tr'    , STATUS='replace')
+			OPEN  (UNIT=85,  FILE=trim(Result_Folder)//'C_tr'    , STATUS='replace')
 				! WRITE (UNIT=1,  FMT=*) Cons_tr
 				! WRITE (UNIT=2,  FMT=*) Hours_tr
 				! WRITE (UNIT=3,  FMT=*) Aprime_tr
-				WRITE (UNIT=4 ,  FMT=*) GBAR_tr
-				WRITE (UNIT=5 ,  FMT=*) Wage_tr
-				WRITE (UNIT=6 ,  FMT=*) R_tr
-				WRITE (UNIT=7 ,  FMT=*) P_tr
-				WRITE (UNIT=8 ,  FMT=*) QBAR_tr
-				WRITE (UNIT=9 ,  FMT=*) NBAR_tr
-				WRITE (UNIT=10,  FMT=*) YBAR_tr
-				WRITE (UNIT=11,  FMT=*) K_tr
-				WRITE (UNIT=12,  FMT=*) C_tr
+				WRITE (UNIT=77,  FMT=*) GBAR_tr
+				WRITE (UNIT=78,  FMT=*) Wage_tr
+				WRITE (UNIT=79,  FMT=*) R_tr
+				WRITE (UNIT=80,  FMT=*) P_tr
+				WRITE (UNIT=81,  FMT=*) QBAR_tr
+				WRITE (UNIT=82,  FMT=*) NBAR_tr
+				WRITE (UNIT=83,  FMT=*) YBAR_tr
+				WRITE (UNIT=84,  FMT=*) K_tr
+				WRITE (UNIT=85,  FMT=*) C_tr
 			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
-			CLOSE (unit=4); CLOSE (unit=5); CLOSE (unit=6); CLOSE (unit=7); 
-			CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10); CLOSE (unit=11); CLOSE (unit=12); 
+			CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
+	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
 			print*,' 	--------------------------------------'
 			print*,' 	Variable Printing Completed'
 			print*,' 	--------------------------------------'

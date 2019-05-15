@@ -162,14 +162,17 @@ MODULE global
     ! Extra tax information
     REAL(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, Tot_Lab_Inc
 
-    ! Transition 
+    ! Transition Yo
     INTEGER :: ti 
     ! Prices and Quantities
     REAL(DP), DIMENSION(T+1) :: R_tr, P_tr, QBAR_tr, NBAR_tr, YBAR_tr, Wage_tr, EBAR_tr, K_tr, C_tr
     ! Government Budget
     REAL(DP), DIMENSION(T+1) :: GBAR_tr, GBAR_K_tr, GBAR_W_tr, GBAR_L_tr, GBAR_C_tr, SSC_Payments_tr, Tot_Lab_Inc_tr
     ! Policy function and value function (defined on the exogenous grid)
-    REAL(DP), DIMENSION(:,:,:,:,:,:,:), allocatable :: Cons_tr, Hours_tr, Aprime_tr, ValueFunction_tr, Cons_Eq_Welfare_tr, DBN_tr
+    REAL(DP), DIMENSION(:,:,:,:,:,:,:), allocatable :: Cons_tr, Hours_tr, Aprime_tr, DBN_tr, ValueFunction_tr
+    ! Welfare Gain
+    REAL(DP), DIMENSION(:,:,:,:,:,:)  , allocatable :: CE1_tr
+    REAL(DP) :: CE1_nb_tr,  CE1_pop_tr, CE2_nb_tr,  CE2_pop_tr
 	! Policy function and value function (defined on the adjusted grid for breakpoints)
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_t_pr, Hours_t_pr
 
@@ -201,11 +204,11 @@ Subroutine Allocate_Variables
     allocate( Cons_tr(            MaxAge,na,nz,nlambda,ne,nx,T+1) )
     allocate( Hours_tr(           MaxAge,na,nz,nlambda,ne,nx,T+1) )
     allocate( Aprime_tr(          MaxAge,na,nz,nlambda,ne,nx,T+1) )
-    allocate( ValueFunction_tr(   MaxAge,na,nz,nlambda,ne,nx,T+1) )
-    allocate( Cons_Eq_Welfare_tr( MaxAge,na,nz,nlambda,ne,nx,T+1) )
     allocate( DBN_tr( 			  MaxAge,na,nz,nlambda,ne,nx,T+1) )
+    allocate( ValueFunction_tr(   MaxAge,na,nz,nlambda,ne,nx,MaxAge) )
 	allocate( Cons_t_pr(          MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Hours_t_pr(         MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( CE1_tr( 			  MaxAge,na,nz,nlambda,ne,nx) )
 end Subroutine Allocate_Variables
    
 END MODULE global
