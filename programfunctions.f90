@@ -3823,7 +3823,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_TRANSITION
 			endif 
 			! Remaining periods of life from transition matrices
 			aux_T = max(MaxAge-age+1,T+1)
-			do ti=1:aux_T
+			do ti=1,aux_T
 			Cons_mat(age+ti-1,:,:,:,:,:)   = Cons_tr(age+ti-1,:,:,:,:,:,ti)
 			Hours_mat(age+ti-1,:,:,:,:,:)  = Hours_tr(age+ti-1,:,:,:,:,:,ti)
 			Aprime_mat(age+ti-1,:,:,:,:,:) = Aprime_tr(age+ti-1,:,:,:,:,:,ti)
@@ -3835,7 +3835,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_TRANSITION
 			Aprime_mat(T+2:,:,:,:,:,:) = Aprime_exp(T+2:,:,:,:,:,:)
 			endif 
 		! Obtain value function 
-			COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat)
+			call COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat)
 
 		! Save value function
 			ValueFunction_tr(:,:,:,:,:,:,age) = Value_mat
