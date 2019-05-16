@@ -3373,10 +3373,6 @@ Subroutine Solve_Transition_Tax_Reform
 
 	! Find the Distribution and Policy Functions Along Transition Path
 	! This is done for the tax reform steady state
-	print*,' '
-	print*,'---------------------------------------------------'
-	print*,' 	Starting Transition'
-	print*,'---------------------------------------------------'
 	call Find_DBN_Transition 
 
 
