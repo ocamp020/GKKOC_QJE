@@ -3384,7 +3384,7 @@ Subroutine Solve_Transition_Tax_Reform
 		! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
 		tauWindx = 1.0_DP
 		Debt_tr  = 1.0_DP
-		DO WHILE (GBAR_exp .gt. (GBAR_bench+R_exp*Debt_tr))
+		DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
 			! Set old G and new value of tauW
 			GBAR_exp_old = GBAR_exp
 			tauW_bt = tauw_bt_exp + tauWindx * tauWinc_bt
