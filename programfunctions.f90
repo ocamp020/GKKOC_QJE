@@ -5509,7 +5509,7 @@ SUBROUTINE FIND_DBN_Transition()
 	simutime = 1
 	iter_indx = 1
 	!print*, 'Computing Equilibrium Distribution'
-	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. (max(Q_dist,N_dist).ge.DBN_criteria) .and. ( simutime .le. 50 ) )
+	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. (max(Q_dist,N_dist).ge.Price_criteria) .and. ( simutime .le. 50 ) )
 		! print*, 'DBN_dist=', DBN_dist
 
 		! Start Q_dist and N_dist
@@ -5937,6 +5937,12 @@ SUBROUTINE FIND_DBN_Transition()
 	    simutime  = simutime +1 
 	 
 	ENDDO ! WHILE
+
+	print*,'---------------------------------------------------'
+	print*,' 	Transition Completed'
+	print*,'---------------------------------------------------'
+	print*,' '
+
 
 
 END SUBROUTINE FIND_DBN_Transition
