@@ -3688,7 +3688,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	INTEGER  :: tklo, tkhi, xp_ind, age, xi, ai, zi, lambdai, ei
 	REAL(DP) :: PrAprimelo, PrAprimehi, E_MU_cp(nx), aux
 
-	print*,'VALUE FUNCTION LINEAR'
+	! print*,'VALUE FUNCTION LINEAR'
 
 	age=MaxAge
 	DO xi=1,nx
@@ -3813,7 +3813,8 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_TRANSITION
 	print*,'	Value functions computed only for agents alive at the time of policy change'
 	print*,' 	Last index corresponds to cohort (age at time of policy change), not transition period'
 	do age=1,MaxAge
-		print*,'		Cohort of age',age,'at time of policy change'
+		! print*,'		Cohort of age',age,'at time of policy change'
+
 		! Set policy functions for cohort of age "age" at time of policy change
 			! Previous periods of life from benchmark
 			if (age>1) then 
@@ -5399,7 +5400,7 @@ SUBROUTINE FIND_DBN_Transition()
 	use omp_lib
 	IMPLICIT NONE
 	INTEGER    :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
-	REAL       :: DBN_dist, DBN_criteria, Q_dist, N_dist
+	REAL       :: DBN_dist, DBN_criteria, Q_dist, N_dist, Price_criteria
 	REAL(dp)   :: BBAR, MeanWealth, brent_value
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
@@ -5416,7 +5417,8 @@ SUBROUTINE FIND_DBN_Transition()
 	allocate( Aphi(       MaxAge,na,nz,nlambda,ne,nx) )
 
 	!$ call omp_set_num_threads(nz)
-	DBN_criteria = 1.0E-07_DP
+	DBN_criteria   = 1.0E-07_DP
+	Price_criteria = 1.0E-06_DP
 
 	! Set grids that depend on wealth tax threshold
 		! Adjust agrid to include breaking points
@@ -5495,7 +5497,10 @@ SUBROUTINE FIND_DBN_Transition()
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	!! DBN Iteration 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+	print*,' '
+	print*,'---------------------------------------------------'
+	print*,' 	Starting Transition'
+	print*,'---------------------------------------------------'
 	! Compute distribution of assets by age and state
 		! Distribution is obtained by iterating over an initial distribution using policy functions
 	DBN_dist=1.0_DP
@@ -5504,11 +5509,14 @@ SUBROUTINE FIND_DBN_Transition()
 	simutime = 1
 	iter_indx = 1
 	!print*, 'Computing Equilibrium Distribution'
-	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. (max(Q_dist,N_dist).ge.DBN_criteria) .and. ( simutime .le. 2 ) )
+	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. (max(Q_dist,N_dist).ge.DBN_criteria) .and. ( simutime .le. 50 ) )
 		! print*, 'DBN_dist=', DBN_dist
 
 		! Start Q_dist and N_dist
 		Q_dist = 0.0 ; N_dist = 0.0 ;
+
+		! Start Debt to zero
+		Debt_tr = 0.0_dp
 
 
 	    ! Solve for policy functions by backwards induction and EGM
@@ -5709,6 +5717,7 @@ SUBROUTINE FIND_DBN_Transition()
 			    GBAR_C_tr(ti) 		= GBAR_C 
 			    SSC_Payments_tr(ti) = SSC_Payments
 			    Tot_Lab_Inc_tr(ti) 	= Tot_Lab_Inc
+			    Debt_tr             = Debt_tr*(1+R_tr(ti)) + (GBAR_tr(ti)-GBAR_bench) 
 
 
 	    ! Compute prices and aggregates for the current period (Time: ti)
@@ -5790,6 +5799,7 @@ SUBROUTINE FIND_DBN_Transition()
 			    GBAR_C_tr(T+1) 		 = GBAR_C 
 			    SSC_Payments_tr(T+1) = SSC_Payments
 			    Tot_Lab_Inc_tr(T+1)  = Tot_Lab_Inc
+			    ! Note that Debt_tr is not computed for T+1 since that would increase interest payments
 
 
 	    ! Compute prices and aggregates for the current period (Time: T+1)
@@ -5886,9 +5896,10 @@ SUBROUTINE FIND_DBN_Transition()
 			OPEN  (UNIT=80,  FILE=trim(Result_Folder)//'P_tr'     , STATUS='replace')
 			OPEN  (UNIT=81,  FILE=trim(Result_Folder)//'QBAR_tr'  , STATUS='replace')
 			OPEN  (UNIT=82,  FILE=trim(Result_Folder)//'NBAR_tr'  , STATUS='replace')
-			OPEN  (UNIT=83,  FILE=trim(Result_Folder)//'YBAR_tr' , STATUS='replace')
-			OPEN  (UNIT=84,  FILE=trim(Result_Folder)//'K_tr'    , STATUS='replace')
-			OPEN  (UNIT=85,  FILE=trim(Result_Folder)//'C_tr'    , STATUS='replace')
+			OPEN  (UNIT=83,  FILE=trim(Result_Folder)//'YBAR_tr'  , STATUS='replace')
+			OPEN  (UNIT=84,  FILE=trim(Result_Folder)//'K_tr'     , STATUS='replace')
+			OPEN  (UNIT=85,  FILE=trim(Result_Folder)//'C_tr'     , STATUS='replace')
+			OPEN  (UNIT=86,  FILE=trim(Result_Folder)//'Debt_tr'  , STATUS='replace')
 				! WRITE (UNIT=1,  FMT=*) Cons_tr
 				! WRITE (UNIT=2,  FMT=*) Hours_tr
 				! WRITE (UNIT=3,  FMT=*) Aprime_tr
@@ -5901,9 +5912,11 @@ SUBROUTINE FIND_DBN_Transition()
 				WRITE (UNIT=83,  FMT=*) YBAR_tr
 				WRITE (UNIT=84,  FMT=*) K_tr
 				WRITE (UNIT=85,  FMT=*) C_tr
+				WRITE (UNIT=86,  FMT=*) Debt_tr
 			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
 			CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
-	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
+	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); 
+	    	CLOSE (unit=84); CLOSE (unit=85); CLOSE (unit=86);
 			print*,' 	--------------------------------------'
 			print*,' 	Variable Printing Completed'
 			print*,' 	--------------------------------------'
@@ -5914,6 +5927,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,' Q_dist=',Q_dist,' N_dist=',N_dist,&
 		    	&' Q(T)/Q(SS)=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N(T)/N(SS)=',100*(NBAR2_tr(T+1)/NBAR_exp-1)
+	    	print*,'	GBAR_exp=',GBAR_tr(T+1),'Debt/GDP=',Debt_tr/YBAR_tr(T+1),'Deficit=',GBAR_tr(T+1)-GBAR_bench-R(T+1)*Debt_tr
 
 	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
 	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,N_dist,100*(QBAR2_tr(T+1)/QBAR_exp-1),100*(NBAR2_tr(T+1)/NBAR_exp-1)
