@@ -5927,7 +5927,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,' Q_dist=',Q_dist,' N_dist=',N_dist,&
 		    	&' Q(T)/Q(SS)=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N(T)/N(SS)=',100*(NBAR2_tr(T+1)/NBAR_exp-1)
-	    	print*,'	GBAR_exp=',GBAR_tr(T+1),'Debt/GDP=',Debt_tr/YBAR_tr(T+1),'Deficit=',GBAR_tr(T+1)-GBAR_bench-R(T+1)*Debt_tr
+	    	print*,'	GBAR_exp=',GBAR_tr(T+1),'Debt/GDP=',Debt_tr/YBAR_tr(T+1),'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr
 
 	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
 	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,N_dist,100*(QBAR2_tr(T+1)/QBAR_exp-1),100*(NBAR2_tr(T+1)/NBAR_exp-1)
