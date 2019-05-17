@@ -3397,7 +3397,6 @@ Subroutine Solve_Transition_Tax_Reform
 				Ebar_exp  = EBAR
 				R_exp	  = R
 			! Find the Distribution and Policy Functions Along Transition Path
-			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 			call Find_DBN_Transition 
 			! Get new G
 			GBAR_exp = GBAR_tr(T+1) 
@@ -3432,7 +3431,6 @@ Subroutine Solve_Transition_Tax_Reform
 				Ebar_exp  = EBAR
 				R_exp	  = R
 			! Find the Distribution and Policy Functions Along Transition Path
-			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 			call Find_DBN_Transition 
 
 		! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
@@ -3459,7 +3457,6 @@ Subroutine Solve_Transition_Tax_Reform
 					Ebar_exp  = EBAR
 					R_exp	  = R
 				! Find the Distribution and Policy Functions Along Transition Path
-				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 				call Find_DBN_Transition 
 				! Get new G
 				GBAR_exp = GBAR_tr(T+1) 
