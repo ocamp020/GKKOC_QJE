@@ -5520,7 +5520,7 @@ SUBROUTINE FIND_DBN_Transition()
 	iter_indx    = 1
 	!print*, 'Computing Equilibrium Distribution'
 	DO WHILE ((DBN_dist.ge.DBN_criteria).and.(max(Q_dist,N_dist).ge.Price_criteria)&
-			& .and.(simutime.le.50).and.(Old_DBN_dist.ge.Chg_criteria) )
+			& .and.(simutime.le.50).and.(Chg_dist.ge.Chg_criteria) )
 		! print*, 'DBN_dist=', DBN_dist
 
 		! Start Q_dist and N_dist
