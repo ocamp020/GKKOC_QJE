@@ -5407,7 +5407,7 @@ SUBROUTINE FIND_DBN_Transition()
 	use omp_lib
 	IMPLICIT NONE
 	INTEGER    :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
-	REAL       :: DBN_dist, DBN_criteria, Q_dist, N_dist, Price_criteria
+	REAL       :: DBN_dist, DBN_criteria, Q_dist, N_dist, Price_criteria, Chg_criteria, Old_DBN_dist, Chg_dist
 	REAL(dp)   :: BBAR, MeanWealth, brent_value
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
@@ -5424,8 +5424,9 @@ SUBROUTINE FIND_DBN_Transition()
 	allocate( Aphi(       MaxAge,na,nz,nlambda,ne,nx) )
 
 	!$ call omp_set_num_threads(nz)
-	DBN_criteria   = 1.0E-06_DP
-	Price_criteria = 1.6E-06_DP
+	DBN_criteria    = 1.0E-06_DP
+	Price_criteria  = 1.0E-05_DP
+	Chg_criteria = 1.0E-08_DP
 
 	! Set grids that depend on wealth tax threshold
 		! Adjust agrid to include breaking points
@@ -5510,13 +5511,15 @@ SUBROUTINE FIND_DBN_Transition()
 	print*,'---------------------------------------------------'
 	! Compute distribution of assets by age and state
 		! Distribution is obtained by iterating over an initial distribution using policy functions
-	DBN_dist=1.0_DP
-	Q_dist=1.0_DP
-	N_dist=1.0_DP
-	simutime = 1
-	iter_indx = 1
+	DBN_dist     = 1.0_DP
+	Q_dist       = 1.0_DP
+	N_dist       = 1.0_DP
+	Chg_dist     = 1.0_DP 
+	Old_DBN_dist = 0.0_DP 
+	simutime     = 1
+	iter_indx    = 1
 	!print*, 'Computing Equilibrium Distribution'
-	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. (max(Q_dist,N_dist).ge.Price_criteria) .and. ( simutime .le. 50 ) )
+	DO WHILE ((DBN_dist.ge.DBN_criteria).and.(max(Q_dist,N_dist).ge.Price_criteria).and.(simutime.le.50).and.(Old_DBN_dist.ge.Chg_criteria) )
 		! print*, 'DBN_dist=', DBN_dist
 
 		! Start Q_dist and N_dist
@@ -5931,9 +5934,12 @@ SUBROUTINE FIND_DBN_Transition()
 
 		! Compare distance to tax reform distribution
 		    DBN_dist = maxval(abs(DBN_tr(:,:,:,:,:,:,T+1)-DBN_exp))
+		    Chg_dist = abs(DBN_dist-Old_DBN_dist)
+		    Old_DBN_dist = DBN_dist
 
 		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,' Q_dist=',Q_dist,' N_dist=',N_dist,&
-		    	&' Q(T)/Q(SS)=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N(T)/N(SS)=',100*(NBAR2_tr(T+1)/NBAR_exp-1)
+		    	&' Q(T)/Q(SS)=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N(T)/N(SS)=',100*(NBAR2_tr(T+1)/NBAR_exp-1),&
+		    	&' Chg_dist=',Chg_dist
 	    	print*,'	GBAR_exp=',GBAR_tr(T+1),'Debt/GDP=',Debt_tr/YBAR_tr(T+1),'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr
 
 	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
