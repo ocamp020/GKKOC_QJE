@@ -3390,12 +3390,14 @@ Subroutine Solve_Transition_Tax_Reform
 			tauW_bt = tauw_bt_exp + tauWindx * tauWinc_bt
 			tauW_at = tauw_at_exp + tauWindx * tauWinc_at
 			! Solve for New Steady State
+			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 			CALL FIND_DBN_EQ
 				QBAR_exp  = QBAR 
 				NBAR_exp  = NBAR  
 				Ebar_exp  = EBAR
 				R_exp	  = R
 			! Find the Distribution and Policy Functions Along Transition Path
+			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 			call Find_DBN_Transition 
 			! Get new G
 			GBAR_exp = GBAR_tr(T+1) 
@@ -3423,12 +3425,14 @@ Subroutine Solve_Transition_Tax_Reform
 
 		! Solve (again) experimental economy
 			! Solve for New Steady State
+			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 			CALL FIND_DBN_EQ
 				QBAR_exp  = QBAR 
 				NBAR_exp  = NBAR  
 				Ebar_exp  = EBAR
 				R_exp	  = R
 			! Find the Distribution and Policy Functions Along Transition Path
+			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 			call Find_DBN_Transition 
 
 		! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
@@ -3448,12 +3452,14 @@ Subroutine Solve_Transition_Tax_Reform
 			    tauW_bt = (tauW_low_bt + tauW_up_bt)/2.0_DP
 			    tauW_at = (tauW_low_at + tauW_up_at)/2.0_DP
 				! Solve for New Steady State
+				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 				CALL FIND_DBN_EQ
 					QBAR_exp  = QBAR 
 					NBAR_exp  = NBAR  
 					Ebar_exp  = EBAR
 					R_exp	  = R
 				! Find the Distribution and Policy Functions Along Transition Path
+				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 				call Find_DBN_Transition 
 				! Get new G
 				GBAR_exp = GBAR_tr(T+1) 
