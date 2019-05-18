@@ -5426,7 +5426,7 @@ SUBROUTINE FIND_DBN_Transition()
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria    = 1.0E-06_DP
 	Price_criteria  = 1.0E-05_DP
-	Chg_criteria = 1.0E-08_DP
+	Chg_criteria    = 1.5E-07_DP
 
 	! Set grids that depend on wealth tax threshold
 		! Adjust agrid to include breaking points
@@ -5520,7 +5520,7 @@ SUBROUTINE FIND_DBN_Transition()
 	iter_indx    = 1
 	!print*, 'Computing Equilibrium Distribution'
 	DO WHILE ((DBN_dist.ge.DBN_criteria).and.(max(Q_dist,N_dist).ge.Price_criteria)&
-			& .and.(simutime.le.50).and.(Chg_dist.ge.Chg_criteria) )
+			& .and.(simutime.le.25).and.(Chg_dist.ge.Chg_criteria) )
 		! print*, 'DBN_dist=', DBN_dist
 
 		! Start Q_dist and N_dist
@@ -5728,7 +5728,7 @@ SUBROUTINE FIND_DBN_Transition()
 			    GBAR_C_tr(ti) 		= GBAR_C 
 			    SSC_Payments_tr(ti) = SSC_Payments
 			    Tot_Lab_Inc_tr(ti) 	= Tot_Lab_Inc
-			    Debt_tr             = Debt_tr*(1+R_tr(ti)) + (GBAR_tr(ti)-GBAR_bench) 
+			    Debt_tr             = Debt_tr*(1+R_tr(ti)) + (GBAR_bench-GBAR_tr(ti)) 
 
 
 	    ! Compute prices and aggregates for the current period (Time: ti)

@@ -3360,6 +3360,9 @@ Subroutine Solve_Transition_Tax_Reform
 	use omp_lib
 	implicit none 
 
+	! Set step for increments
+	tauWinc_bt=0.000_DP
+	tauWinc_at=0.001_DP
 
 	! Load Benchmark Variables
 	call Solve_Benchmark(.false.,.false.)
@@ -3389,6 +3392,7 @@ Subroutine Solve_Transition_Tax_Reform
 			GBAR_exp_old = GBAR_exp
 			tauW_bt = tauw_bt_exp + tauWindx * tauWinc_bt
 			tauW_at = tauw_at_exp + tauWindx * tauWinc_at
+			print*, 'Bracketing Iteration',tauWindx*100,'tauW_bt=',tauW_bt*100,"tauW_at=",tauW_at*100
 			! Solve for New Steady State
 			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 			CALL FIND_DBN_EQ
@@ -3406,7 +3410,7 @@ Subroutine Solve_Transition_Tax_Reform
 			print*,' ' 
 			write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
 			print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
-			print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr
+			print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
 		ENDDO
 
 		! Set tauW as weighted average of point in  the grid to balance budget more precisely
@@ -3418,8 +3422,8 @@ Subroutine Solve_Transition_Tax_Reform
 			tauW_at     = tauW_low_at + tauWinc_at * (GBAR_bench+R_exp*Debt_tr - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
 			print*,''
 			print*,'GBAR bracketed by taxes:'
-			print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
-			print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
+			print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_bt=', tauW_bt*100, "%", '% tauW_up_bt=', tauW_up_bt*100
+			print*,'tauW_low_at =', tauW_low_at*100, '% tauW_at=', tauW_at*100, "%", '% tauW_up_at=', tauW_up_at*100
 			print*,''
 
 		! Solve (again) experimental economy
@@ -3439,8 +3443,8 @@ Subroutine Solve_Transition_Tax_Reform
 			print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr
 			print*,''
 			print*,'Bisection for TauW:'
-			DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr))) .gt. 0.001 ) ! as long as the difference is greater than 0.1% continue
-			    if (GBAR_exp .gt. GBAR_bench ) then
+			DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr))) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
+			    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
 			        tauW_up_bt  = tauW_bt 
 			        tauW_up_at  = tauW_at 
 			    else
@@ -3464,7 +3468,7 @@ Subroutine Solve_Transition_Tax_Reform
 			    print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
 				print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
 				print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
-				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr
+				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
 			ENDDO
 
 	! Compute Value Functions for Cohorts Alive at Time of Policy Change
