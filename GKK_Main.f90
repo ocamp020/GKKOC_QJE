@@ -3376,7 +3376,7 @@ Subroutine Solve_Transition_Tax_Reform
 
 	! Find the Distribution and Policy Functions Along Transition Path
 	! This is done for the tax reform steady state
-	call Find_DBN_Transition 
+	! call Find_DBN_Transition 
 
 
 	! Find Taxes that balance the budget 
@@ -3385,14 +3385,14 @@ Subroutine Solve_Transition_Tax_Reform
 	print*,' 	Balancing the Budget'
 	print*,'---------------------------------------------------'
 		! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-		tauWindx = 1.0_DP
+		tauWindx = 4.0_DP
 		Debt_tr  = 1.0_DP
 		DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
 			! Set old G and new value of tauW
 			GBAR_exp_old = GBAR_exp
 			tauW_bt = tauw_bt_exp + tauWindx * tauWinc_bt
 			tauW_at = tauw_at_exp + tauWindx * tauWinc_at
-			print*, 'Bracketing Iteration',tauWindx*100,'tauW_bt=',tauW_bt*100,"tauW_at=",tauW_at*100
+			print*, 'Bracketing Iteration',tauWindx,'tauW_bt=',tauW_bt*100,"tauW_at=",tauW_at*100
 			! Solve for New Steady State
 			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 			CALL FIND_DBN_EQ
@@ -3416,10 +3416,10 @@ Subroutine Solve_Transition_Tax_Reform
 		! Set tauW as weighted average of point in  the grid to balance budget more precisely
 			tauW_up_bt  = tauW_bt
 			tauW_low_bt = tauW_bt  -  tauWinc_bt
-			tauW_bt     = tauW_low_bt + tauWinc_bt * (GBAR_bench+R_exp*Debt_tr - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+			tauW_bt     = tauW_low_bt + tauWinc_bt * 0.5_dp ! GBAR_bench+R_exp*Debt_tr - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
 			tauW_up_at  = tauW_at
 			tauW_low_at = tauW_at  -  tauWinc_at  
-			tauW_at     = tauW_low_at + tauWinc_at * (GBAR_bench+R_exp*Debt_tr - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+			tauW_at     = tauW_low_at + tauWinc_at * 0.5_dp ! (GBAR_bench+R_exp*Debt_tr - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
 			print*,''
 			print*,'GBAR bracketed by taxes:'
 			print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_bt=', tauW_bt*100, "%", '% tauW_up_bt=', tauW_up_bt*100
@@ -3436,10 +3436,11 @@ Subroutine Solve_Transition_Tax_Reform
 				R_exp	  = R
 			! Find the Distribution and Policy Functions Along Transition Path
 			call Find_DBN_Transition 
+			! Get new G
+			GBAR_exp = GBAR_tr(T+1) 
 
 		! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
-			GBAR_exp = GBAR_tr(T+1) 
-			print*,"Gbar at midpoint of bracket and GBAR at benchmark"
+			print*,"Gbar at midpoint of bracket"
 			print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr
 			print*,''
 			print*,'Bisection for TauW:'
