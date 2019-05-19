@@ -3376,7 +3376,7 @@ Subroutine Solve_Transition_Tax_Reform
 
 	! Find the Distribution and Policy Functions Along Transition Path
 	! This is done for the tax reform steady state
-	! call Find_DBN_Transition 
+	call Find_DBN_Transition 
 
 
 	! Find Taxes that balance the budget 
