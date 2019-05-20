@@ -3481,6 +3481,14 @@ Subroutine Solve_Transition_Tax_Reform
 			READ (UNIT=4,  FMT=*), tauW_at
 			CLOSE(unit=4)
 
+		! Solve for New Steady State
+			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+			CALL FIND_DBN_EQ
+				QBAR_exp  = QBAR 
+				NBAR_exp  = NBAR  
+				Ebar_exp  = EBAR
+				R_exp	  = R
+
 		! Find the Distribution and Policy Functions Along Transition Path
 			call Find_DBN_Transition 
 	endif
