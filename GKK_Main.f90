@@ -3479,7 +3479,7 @@ Subroutine Solve_Transition_Tax_Reform
 		! Read Tax
 			OPEN (UNIT=4,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='old', ACTION='read')
 			READ (UNIT=4,  FMT=*), tauW_at
-
+			CLOSE(unit=4)
 
 		! Find the Distribution and Policy Functions Along Transition Path
 			call Find_DBN_Transition 

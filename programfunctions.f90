@@ -5450,12 +5450,10 @@ SUBROUTINE FIND_DBN_Transition()
 		OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'   , STATUS='old', ACTION='read')
 		OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
 		OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		 , STATUS='old', ACTION='read')
-		OPEN (UNIT=4,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='old', ACTION='read')
 		READ (UNIT=1,  FMT=*), QBAR_tr
 		READ (UNIT=2,  FMT=*), NBAR_tr
 		READ (UNIT=3,  FMT=*), R_tr
-		READ (UNIT=4,  FMT=*), tauW_at
-		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); 
+		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3);
 		print*, 'Reading completed'
 
 		! Choose YBAR, EBAR, P and Wage to be consistent
