@@ -3476,12 +3476,18 @@ Subroutine Solve_Transition_Tax_Reform
 
 	else 
 
+	print*,' '
+	print*,'---------------------------------------------------'
+	print*,' 	Computing Steady State at desired tax level'
+	print*,'---------------------------------------------------'
 		! Read Tax
 			OPEN (UNIT=4,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='old', ACTION='read')
 			READ (UNIT=4,  FMT=*), tauW_at
 			CLOSE(unit=4)
 			R=   1.9480499900981853E-002 
 			P=  0.13847606093758086 
+			print*,' '
+			print* '	Wealth taxes =',tauW_at*100,'%'
 
 		! Solve for New Steady State
 			CALL FIND_DBN_EQ
@@ -3524,9 +3530,7 @@ Subroutine Solve_Transition_Tax_Reform
 				CALL COMPUTE_WELFARE_GAIN
 
 				print*,'---------------------------'
-				print*,''
 				print*,'SS Output Gain Prct=', 100.0_DP*(Y_exp/Y_bench-1.0) 
-				print*,''
 				print*,'---------------------------'
 
 
