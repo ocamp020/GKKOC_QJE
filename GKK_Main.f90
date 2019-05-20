@@ -3485,13 +3485,59 @@ Subroutine Solve_Transition_Tax_Reform
 			OPEN (UNIT=4,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='old', ACTION='read')
 			READ (UNIT=4,  FMT=*), tauW_at
 			CLOSE(unit=4)
+			R=   1.9480499900981853E-002 
+			P=  0.13847606093758086 
 
 		! Solve for New Steady State
 			CALL FIND_DBN_EQ
+			CALL Write_Experimental_Results(.true.)
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			K_mat  = K_Matrix(R,P)
+			Pr_mat = Profit_Matrix(R,P)
+			CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+			CALL ComputeLaborUnits(EBAR,wage)
+			CALL GOVNT_BUDGET(.true.)
+
+			! Aggregate variable in experimental economy
+				GBAR_exp  = GBAR
 				QBAR_exp  = QBAR 
 				NBAR_exp  = NBAR  
+				Y_exp 	  = YBAR
 				Ebar_exp  = EBAR
+				P_exp     = P
 				R_exp	  = R
+				wage_exp  = wage
+				tauK_exp  = tauK
+				tauPL_exp = tauPL
+				psi_exp   = psi
+				DBN_exp   = DBN1
+				tauw_bt_exp = tauW_bt
+				tauw_at_exp = tauW_at
+				Y_a_threshold_exp = Y_a_threshold
+
+				ValueFunction_exp = ValueFunction
+				Cons_exp          = Cons           
+				Hours_exp         = Hours
+				Aprime_exp        = Aprime
+				V_Pr_exp          = V_Pr 
+				V_Pr_nb_exp  	  = V_Pr_nb
+
+			! Compute moments
+			! CALL COMPUTE_STATS
+			
+			! Compute welfare and output gain between economies
+				CALL COMPUTE_WELFARE_GAIN
+
+				print*,'---------------------------'
+				print*,''
+				print*,'SS Output Gain Prct=', 100.0_DP*(Y_exp/Y_bench-1.0) 
+				print*,''
+				print*,'---------------------------'
+
+
+			! Deallocate variables
+				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
 
 		! Find the Distribution and Policy Functions Along Transition Path
 			call Find_DBN_Transition 
