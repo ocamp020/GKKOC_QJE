@@ -5447,13 +5447,15 @@ SUBROUTINE FIND_DBN_Transition()
 		! enddo 
 		! Load Guess From Files
 		print*, 'Loading initial variables from file'
-		OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'  , STATUS='old', ACTION='read')
-		OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	, STATUS='old', ACTION='read')
-		OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		, STATUS='old', ACTION='read')
+		OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'   , STATUS='old', ACTION='read')
+		OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
+		OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		 , STATUS='old', ACTION='read')
+		OPEN (UNIT=4,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='old', ACTION='read')
 		READ (UNIT=1,  FMT=*), QBAR_tr
 		READ (UNIT=2,  FMT=*), NBAR_tr
 		READ (UNIT=3,  FMT=*), R_tr
-		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
+		READ (UNIT=4,  FMT=*), tauW_at
+		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); 
 		print*, 'Reading completed'
 
 		! Choose YBAR, EBAR, P and Wage to be consistent
@@ -5901,16 +5903,17 @@ SUBROUTINE FIND_DBN_Transition()
 			! OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'Cons_tr'  , STATUS='replace')
 			! OPEN  (UNIT=2,  FILE=trim(Result_Folder)//'Hours_tr'  , STATUS='replace')
 			! OPEN  (UNIT=3,  FILE=trim(Result_Folder)//'Aprime_tr'  , STATUS='replace')
-			OPEN  (UNIT=77,  FILE=trim(Result_Folder)//'GBAR_tr'  , STATUS='replace')
-			OPEN  (UNIT=78,  FILE=trim(Result_Folder)//'Wage_tr'  , STATUS='replace')
-			OPEN  (UNIT=79,  FILE=trim(Result_Folder)//'R_tr'     , STATUS='replace')
-			OPEN  (UNIT=80,  FILE=trim(Result_Folder)//'P_tr'     , STATUS='replace')
-			OPEN  (UNIT=81,  FILE=trim(Result_Folder)//'QBAR_tr'  , STATUS='replace')
-			OPEN  (UNIT=82,  FILE=trim(Result_Folder)//'NBAR_tr'  , STATUS='replace')
-			OPEN  (UNIT=83,  FILE=trim(Result_Folder)//'YBAR_tr'  , STATUS='replace')
-			OPEN  (UNIT=84,  FILE=trim(Result_Folder)//'K_tr'     , STATUS='replace')
-			OPEN  (UNIT=85,  FILE=trim(Result_Folder)//'C_tr'     , STATUS='replace')
-			OPEN  (UNIT=86,  FILE=trim(Result_Folder)//'Debt_tr'  , STATUS='replace')
+			OPEN  (UNIT=77,  FILE=trim(Result_Folder)//'GBAR_tr'   , STATUS='replace')
+			OPEN  (UNIT=78,  FILE=trim(Result_Folder)//'Wage_tr'   , STATUS='replace')
+			OPEN  (UNIT=79,  FILE=trim(Result_Folder)//'R_tr'      , STATUS='replace')
+			OPEN  (UNIT=80,  FILE=trim(Result_Folder)//'P_tr'      , STATUS='replace')
+			OPEN  (UNIT=81,  FILE=trim(Result_Folder)//'QBAR_tr'   , STATUS='replace')
+			OPEN  (UNIT=82,  FILE=trim(Result_Folder)//'NBAR_tr'   , STATUS='replace')
+			OPEN  (UNIT=83,  FILE=trim(Result_Folder)//'YBAR_tr'   , STATUS='replace')
+			OPEN  (UNIT=84,  FILE=trim(Result_Folder)//'K_tr'      , STATUS='replace')
+			OPEN  (UNIT=85,  FILE=trim(Result_Folder)//'C_tr'      , STATUS='replace')
+			OPEN  (UNIT=86,  FILE=trim(Result_Folder)//'Debt_tr'   , STATUS='replace')
+			OPEN  (UNIT=87,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='replace')
 				! WRITE (UNIT=1,  FMT=*) Cons_tr
 				! WRITE (UNIT=2,  FMT=*) Hours_tr
 				! WRITE (UNIT=3,  FMT=*) Aprime_tr
@@ -5924,10 +5927,11 @@ SUBROUTINE FIND_DBN_Transition()
 				WRITE (UNIT=84,  FMT=*) K_tr
 				WRITE (UNIT=85,  FMT=*) C_tr
 				WRITE (UNIT=86,  FMT=*) Debt_tr
+				WRITE (UNIT=87,  FMT=*) tauW_at
 			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
 			CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
 	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); 
-	    	CLOSE (unit=84); CLOSE (unit=85); CLOSE (unit=86);
+	    	CLOSE (unit=84); CLOSE (unit=85); CLOSE (unit=86); CLOSE (unit=87);
 			print*,' 	--------------------------------------'
 			print*,' 	Variable Printing Completed'
 			print*,' 	--------------------------------------'

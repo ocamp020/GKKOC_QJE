@@ -3360,6 +3360,7 @@ Subroutine Solve_Transition_Tax_Reform
 	use omp_lib
 	implicit none 
 
+
 	! Set step for increments
 	tauWinc_bt=0.000_DP
 	tauWinc_at=0.001_DP
@@ -3374,10 +3375,11 @@ Subroutine Solve_Transition_Tax_Reform
 	Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform/'
 	call system( 'mkdir -p ' // trim(Result_Folder) )
 
+	if (.false.) then 
+
 	! Find the Distribution and Policy Functions Along Transition Path
 	! This is done for the tax reform steady state
 	call Find_DBN_Transition 
-
 
 	! Find Taxes that balance the budget 
 	print*,' '
@@ -3471,6 +3473,17 @@ Subroutine Solve_Transition_Tax_Reform
 				print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
 				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
 			ENDDO
+
+	else 
+
+		! Read Tax
+			OPEN (UNIT=4,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='old', ACTION='read')
+			READ (UNIT=4,  FMT=*), tauW_at
+
+
+		! Find the Distribution and Policy Functions Along Transition Path
+			call Find_DBN_Transition 
+	end
 
 	! Compute Value Functions for Cohorts Alive at Time of Policy Change
 	call COMPUTE_VALUE_FUNCTION_TRANSITION
