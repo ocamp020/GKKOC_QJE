@@ -3360,7 +3360,6 @@ Subroutine Solve_Transition_Tax_Reform
 	use omp_lib
 	implicit none 
 
-	if (.false.) then 
 
 	! Set step for increments
 	tauWinc_bt=0.000_DP
@@ -3375,6 +3374,8 @@ Subroutine Solve_Transition_Tax_Reform
 	! Set Results Folder
 	Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform/'
 	call system( 'mkdir -p ' // trim(Result_Folder) )
+
+	if (.false.) then 
 
 	! Find the Distribution and Policy Functions Along Transition Path
 	! This is done for the tax reform steady state
@@ -3474,12 +3475,6 @@ Subroutine Solve_Transition_Tax_Reform
 			ENDDO
 
 	else 
-		! Load Benchmark Variables
-			call Solve_Benchmark(.false.,.false.)
-
-		! Set Results Folder
-			Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform/'
-			call system( 'mkdir -p ' // trim(Result_Folder) )
 
 		! Read Tax
 			OPEN (UNIT=4,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='old', ACTION='read')
