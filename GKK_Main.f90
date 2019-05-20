@@ -3483,7 +3483,7 @@ Subroutine Solve_Transition_Tax_Reform
 
 		! Find the Distribution and Policy Functions Along Transition Path
 			call Find_DBN_Transition 
-	end
+	endif
 
 	! Compute Value Functions for Cohorts Alive at Time of Policy Change
 	call COMPUTE_VALUE_FUNCTION_TRANSITION
