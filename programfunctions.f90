@@ -5969,14 +5969,14 @@ SUBROUTINE FIND_DBN_Transition()
 	OPEN  (UNIT=77,  FILE=trim(Result_Folder)//'Transition_Summary.txt'   , STATUS='replace')
 	WRITE (UNIT=77,  FMT=*) 'Period, Q, N, R, Wage, Y, K, C, GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC'
 	WRITE (UNIT=77,  FMT=*) 'SS_1,',QBAR_bench,',',NBAR_bench,',',R_bench,',',wage_bench,',' & 
-								&  ,YBAR_bench,',',K_bench,',',C_bench,',',GBAR_bench
+								&  ,Y_bench,',',K_bench,',',C_bench,',',GBAR_bench
 	do ti=1,T+1
 	WRITE (UNIT=77,  FMT=*) ti,',',QBAR_tr(ti),',',NBAR_tr(ti),',',R_tr(ti),',',Wage_tr(ti),',' & 
 								& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),',',GBAR_tr(ti),',' &
 								& ,GBAR_K_tr(ti),',',GBAR_W_tr(ti),',',GBAR_L_tr(ti),',',GBAR_C_tr(ti),',',SSC_Payments_tr(ti)
 	enddo 
 	WRITE (UNIT=77,  FMT=*) 'SS_2,',QBAR_exp,',',NBAR_exp,',',R_exp,',',wage_exp,',' & 
-								&  ,YBAR_exp,',',K_exp,',',C_exp,',',GBAR_exp
+								&  ,Y_exp,',',K_exp,',',C_exp,',',GBAR_exp
 	CLOSE (UNIT=77);
 
 
