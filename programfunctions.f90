@@ -5541,13 +5541,13 @@ SUBROUTINE FIND_DBN_Transition()
 	    	CALL EGM_Transition
 
 	    ! First Period Starts at DBN_bench
-	    ! print*, ' Set DBN_tr for first period to benchmark distribution'
+	    print*, ' Set DBN_tr for first period to benchmark distribution'
 	    DBN_tr(:,:,:,:,:,:,1) = DBN_bench
 
 
 
 		! Initialize DBN_tr to zero for other periods
-		! print*, ' Initializing remaining periods of DBN_tr to zero'
+		print*, ' Initializing remaining periods of DBN_tr to zero'
 		DO ti=2,T+1
 			! print*,' 	Transition Period',ti
 	    	DBN_tr(:,:,:,:,:,:,ti)=0.0_DP
@@ -5966,18 +5966,18 @@ SUBROUTINE FIND_DBN_Transition()
 	print*,' '
 
 	! Print Summary File
-	OPEN  (UNIT=77,  FILE=trim(Result_Folder)//'Transition_Summary.txt'   , STATUS='replace')
-	WRITE (UNIT=77,  FMT=*) 'Period, Q, N, R, Wage, Y, K, C, GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC'
-	WRITE (UNIT=77,  FMT=*) 'SS_1,',QBAR_bench,',',NBAR_bench,',',R_bench,',',wage_bench,',' & 
+	OPEN  (UNIT=78,  FILE=trim(Result_Folder)//'Transition_Summary.txt'   , STATUS='replace')
+	WRITE (UNIT=78,  FMT=*) 'Period, Q, N, R, Wage, Y, K, C, GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC'
+	WRITE (UNIT=78,  FMT=*) 'SS_1,',QBAR_bench,',',NBAR_bench,',',R_bench,',',wage_bench,',' & 
 								&  ,Y_bench,',',K_bench,',',C_bench,',',GBAR_bench
 	do ti=1,T+1
-	WRITE (UNIT=77,  FMT=*) ti,',',QBAR_tr(ti),',',NBAR_tr(ti),',',R_tr(ti),',',Wage_tr(ti),',' & 
+	WRITE (UNIT=78,  FMT=*) ti,',',QBAR_tr(ti),',',NBAR_tr(ti),',',R_tr(ti),',',Wage_tr(ti),',' & 
 								& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),',',GBAR_tr(ti),',' &
 								& ,GBAR_K_tr(ti),',',GBAR_W_tr(ti),',',GBAR_L_tr(ti),',',GBAR_C_tr(ti),',',SSC_Payments_tr(ti)
 	enddo 
-	WRITE (UNIT=77,  FMT=*) 'SS_2,',QBAR_exp,',',NBAR_exp,',',R_exp,',',wage_exp,',' & 
+	WRITE (UNIT=78,  FMT=*) 'SS_2,',QBAR_exp,',',NBAR_exp,',',R_exp,',',wage_exp,',' & 
 								&  ,Y_exp,',',K_exp,',',C_exp,',',GBAR_exp
-	CLOSE (UNIT=77);
+	CLOSE (UNIT=78);
 
 
 
