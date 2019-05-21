@@ -42,7 +42,7 @@ PROGRAM main
 		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, Opt_Tax_K_and_W, Tax_Reform_KW
 		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices
 		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R 
-		logical  :: Transition_Tax_Reform
+		logical  :: Transition_Tax_Reform, Transition_OTW
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -80,7 +80,8 @@ PROGRAM main
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
-		Transition_Tax_Reform = .true.
+		Transition_Tax_Reform = .false.
+		Transition_OTW = .true.
 		Simul_Switch  = .false.
 
 
@@ -390,6 +391,10 @@ PROGRAM main
 
 		if (Transition_Tax_Reform) then
 			call Solve_Transition_Tax_Reform
+		endif
+
+		if (Transition_OTW) then
+			call Solve_Transition_Opt_Wealth_Taxes
 		endif
 
 
@@ -3398,10 +3403,24 @@ Subroutine Solve_Transition_Tax_Reform
 			! Solve for New Steady State
 			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 			CALL FIND_DBN_EQ
+				GBAR_exp  = GBAR
 				QBAR_exp  = QBAR 
 				NBAR_exp  = NBAR  
+				Y_exp 	  = YBAR
 				Ebar_exp  = EBAR
+				P_exp     = P
 				R_exp	  = R
+				wage_exp  = wage
+				tauK_exp  = tauK
+				tauPL_exp = tauPL
+				psi_exp   = psi
+				DBN_exp   = DBN1
+				tauw_bt_exp = tauW_bt
+				tauw_at_exp = tauW_at
+				Y_a_threshold_exp = Y_a_threshold
+				Cons_exp          = Cons           
+				Hours_exp         = Hours
+				Aprime_exp        = Aprime
 			! Find the Distribution and Policy Functions Along Transition Path
 			call Find_DBN_Transition 
 			! Get new G
@@ -3432,10 +3451,24 @@ Subroutine Solve_Transition_Tax_Reform
 			! Solve for New Steady State
 			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 			CALL FIND_DBN_EQ
+				GBAR_exp  = GBAR
 				QBAR_exp  = QBAR 
 				NBAR_exp  = NBAR  
+				Y_exp 	  = YBAR
 				Ebar_exp  = EBAR
+				P_exp     = P
 				R_exp	  = R
+				wage_exp  = wage
+				tauK_exp  = tauK
+				tauPL_exp = tauPL
+				psi_exp   = psi
+				DBN_exp   = DBN1
+				tauw_bt_exp = tauW_bt
+				tauw_at_exp = tauW_at
+				Y_a_threshold_exp = Y_a_threshold
+				Cons_exp          = Cons           
+				Hours_exp         = Hours
+				Aprime_exp        = Aprime
 			! Find the Distribution and Policy Functions Along Transition Path
 			call Find_DBN_Transition 
 			! Get new G
@@ -3459,10 +3492,24 @@ Subroutine Solve_Transition_Tax_Reform
 				! Solve for New Steady State
 				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 				CALL FIND_DBN_EQ
+					GBAR_exp  = GBAR
 					QBAR_exp  = QBAR 
 					NBAR_exp  = NBAR  
+					Y_exp 	  = YBAR
 					Ebar_exp  = EBAR
+					P_exp     = P
 					R_exp	  = R
+					wage_exp  = wage
+					tauK_exp  = tauK
+					tauPL_exp = tauPL
+					psi_exp   = psi
+					DBN_exp   = DBN1
+					tauw_bt_exp = tauW_bt
+					tauw_at_exp = tauW_at
+					Y_a_threshold_exp = Y_a_threshold
+					Cons_exp          = Cons           
+					Hours_exp         = Hours
+					Aprime_exp        = Aprime
 				! Find the Distribution and Policy Functions Along Transition Path
 				call Find_DBN_Transition 
 				! Get new G
@@ -3553,3 +3600,80 @@ Subroutine Solve_Transition_Tax_Reform
 
 
 End Subroutine Solve_Transition_Tax_Reform
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Subroutine Solve_Transition_Opt_Wealth_Taxes
+	use parameters
+	use global 
+	use programfunctions
+	use Simulation_Module
+	use Toolbox
+	use omp_lib
+	implicit none 
+
+	! Save base folder
+		folder_aux = Result_Folder
+
+	! Load Benchmark Variables
+		call Solve_Benchmark(.false.,.false.)
+
+	! Load Optimal Wealth Tax Variables
+		! Change to optimal tax folder 
+		Result_Folder = trim(folder_aux)//'Opt_Tax_W/'
+		call system( 'mkdir -p ' // trim(Result_Folder) )
+		
+		! Load variables
+		CALL Write_Experimental_Results(.false.)
+		
+		! Compute auxiliary variables
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		K_mat  = K_Matrix(R,P)
+		Pr_mat = Profit_Matrix(R,P)
+		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		CALL ComputeLaborUnits(EBAR,wage)
+		CALL GOVNT_BUDGET(.true.)
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+		! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+		ValueFunction_exp = ValueFunction
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime 
+
+
+	! Set Results Folder
+		Result_Folder = trim(folder_aux)//'Transition_Opt_Tax_W/'
+		call system( 'mkdir -p ' // trim(Result_Folder) )
+
+	! Find the Distribution and Policy Functions Along Transition Path
+		call Find_DBN_Transition 
+
+	! Compute Value Functions for Cohorts Alive at Time of Policy Change
+		call COMPUTE_VALUE_FUNCTION_TRANSITION
+
+	! Compute Welfare Gain
+		call COMPUTE_WELFARE_GAIN_TRANSITION
+
+
+End Subroutine Solve_Transition_Tax_Reform
+

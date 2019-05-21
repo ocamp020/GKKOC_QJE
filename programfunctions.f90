@@ -5408,7 +5408,7 @@ SUBROUTINE FIND_DBN_Transition()
 	IMPLICIT NONE
 	INTEGER    :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL       :: DBN_dist, DBN_criteria, Q_dist, N_dist, Price_criteria, Chg_criteria, Old_DBN_dist, Chg_dist
-	REAL(dp)   :: BBAR, MeanWealth, brent_value
+	REAL(dp)   :: BBAR, MeanWealth, brent_value, K_bench, C_bench, K_exp, C_exp
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
 	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr
@@ -5431,6 +5431,12 @@ SUBROUTINE FIND_DBN_Transition()
 	! Set grids that depend on wealth tax threshold
 		! Adjust agrid to include breaking points
 		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+
+	! Wealth and consumption in benchmark and experiment
+		K_bench = sum( sum(sum(sum(sum(sum(DBN_bench,6),5),4),3),1)*agrid )
+		K_exp   = sum( sum(sum(sum(sum(sum(DBN_exp  ,6),5),4),3),1)*agrid )
+		C_bench = sum( DBN_bench*Cons_bench )
+		C_exp   = sum( DBN_exp  *Cons_exp   )
 
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -5958,6 +5964,20 @@ SUBROUTINE FIND_DBN_Transition()
 	print*,' 	Transition Completed'
 	print*,'---------------------------------------------------'
 	print*,' '
+
+	! Print Summary File
+	OPEN  (UNIT=77,  FILE=trim(Result_Folder)//'Transition_Summary.txt'   , STATUS='replace')
+	WRITE (UNIT=77,  FMT=*) 'Period, Q, N, R, Wage, Y, K, C, GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC'
+	WRITE (UNIT=77,  FMT=*) 'SS_1,',QBAR_bench,',',NBAR_bench,',',R_bench,',',wage_bench,',' & 
+								&  ,YBAR_bench,',',K_bench,',',C_bench,',',GBAR_bench
+	do ti=1,T+1
+	WRITE (UNIT=77,  FMT=*) ti,',',QBAR_tr(ti),',',NBAR_tr(ti),',',R_tr(ti),',',Wage_tr(ti),',' & 
+								& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),',',GBAR_tr(ti),',' &
+								& ,GBAR_K_tr(ti),',',GBAR_W_tr(ti),',',GBAR_L_tr(ti),',',GBAR_C_tr(ti),',',SSC_Payments_tr(ti)
+	enddo 
+	WRITE (UNIT=77,  FMT=*) 'SS_2,',QBAR_exp,',',NBAR_exp,',',R_exp,',',wage_exp,',' & 
+								&  ,YBAR_exp,',',K_exp,',',C_exp,',',GBAR_exp
+	CLOSE (UNIT=77);
 
 
 
