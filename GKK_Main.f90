@@ -391,11 +391,11 @@ PROGRAM main
 		endif 
 
 		if (Transition_Tax_Reform) then
-			call Solve_Transition_Tax_Reform
+			call Solve_Transition_Tax_Reform(budget_balance)
 		endif
 
 		if (Transition_OTW) then
-			call Solve_Transition_Opt_Wealth_Taxes
+			call Solve_Transition_Opt_Wealth_Taxes(budget_balance)
 		endif
 
 
@@ -3624,7 +3624,7 @@ End Subroutine Solve_Transition_Tax_Reform
 !========================================================================================
 !========================================================================================
 
-Subroutine Solve_Transition_Opt_Wealth_Taxes
+Subroutine Solve_Transition_Opt_Wealth_Taxes(budget_balance)
 	use parameters
 	use global 
 	use programfunctions
@@ -3632,6 +3632,7 @@ Subroutine Solve_Transition_Opt_Wealth_Taxes
 	use Toolbox
 	use omp_lib
 	implicit none 
+	logical, intent(in) :: budget_balance
 	character(100) :: folder_aux
 
 	! Save base folder
@@ -3680,12 +3681,23 @@ Subroutine Solve_Transition_Opt_Wealth_Taxes
 		Aprime_exp        = Aprime 
 
 
-	! Set Results Folder
-		Result_Folder = trim(folder_aux)//'Transition_Opt_Tax_W/'
-		call system( 'mkdir -p ' // trim(Result_Folder) )
+	if (budget_balance) then 
+		print*, ' Section not coded yet. Run code with budget_balance=.false.'
 
-	! Find the Distribution and Policy Functions Along Transition Path
-		call Find_DBN_Transition 
+		! Set Results Folder
+			Result_Folder = trim(folder_aux)//'Transition_OTW_Budget_Balance/'
+			call system( 'mkdir -p ' // trim(Result_Folder) )
+
+	else
+
+		! Set Results Folder
+			Result_Folder = trim(folder_aux)//'Transition_OTW/'
+			call system( 'mkdir -p ' // trim(Result_Folder) )
+
+		! Find the Distribution and Policy Functions Along Transition Path
+			call Find_DBN_Transition 
+
+	endif
 
 	! Compute Value Functions for Cohorts Alive at Time of Policy Change
 		call COMPUTE_VALUE_FUNCTION_TRANSITION
