@@ -5541,7 +5541,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    	CALL EGM_Transition
 
 	    ! First Period Starts at DBN_bench
-	    print*, ' Set DBN_tr for first period to benchmark distribution'
+	    ! print*, ' Set DBN_tr for first period to benchmark distribution'
 	    DBN_tr(:,:,:,:,:,:,1) = DBN_bench
 
 
@@ -5549,7 +5549,7 @@ SUBROUTINE FIND_DBN_Transition()
 		! Initialize DBN_tr to zero for other periods
 		print*, ' Initializing remaining periods of DBN_tr to zero'
 		DO ti=2,T+1
-			! print*,' 	Transition Period',ti
+			print*,' 	Transition Period',ti
 	    	DBN_tr(:,:,:,:,:,:,ti)=0.0_DP
 	    ENDDO
 
