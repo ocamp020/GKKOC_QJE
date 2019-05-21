@@ -3675,5 +3675,5 @@ Subroutine Solve_Transition_Opt_Wealth_Taxes
 		call COMPUTE_WELFARE_GAIN_TRANSITION
 
 
-End Subroutine Solve_Transition_Tax_Reform
+End Subroutine Solve_Transition_Opt_Wealth_Taxes
 
