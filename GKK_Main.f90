@@ -3533,6 +3533,8 @@ Subroutine Solve_Transition_Tax_Reform
 				print*,'SS Output Gain Prct=', 100.0_DP*(Y_exp/Y_bench-1.0) 
 				print*,'---------------------------'
 
+			! Write experimental results in output.txt
+				CALL WRITE_VARIABLES(0)
 
 			! Deallocate variables
 				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
