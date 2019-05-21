@@ -5548,12 +5548,13 @@ SUBROUTINE FIND_DBN_Transition()
 
 		! Initialize DBN_tr to zero for other periods
 		print*, ' Initializing remaining periods of DBN_tr to zero'
-		DO ti=2,T+1
-			print*,' 	Transition Period',ti
-			DO age=1,MaxAge 
-	    		DBN_tr(age,:,:,:,:,:,ti)=0.0_DP
-	    	ENDDO
-	    ENDDO
+		! DO ti=2,T+1
+		! 	print*,' 	Transition Period',ti
+		! 	DO age=1,MaxAge 
+	 !    		DBN_tr(age,:,:,:,:,:,ti)=0.0_DP
+	 !    	ENDDO
+	 !    ENDDO
+	 	DBN_tr=0.0_DP
 
     	print*,' '
 		print*,' 	--------------------------------------'
