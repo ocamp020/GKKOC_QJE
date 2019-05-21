@@ -42,7 +42,7 @@ PROGRAM main
 		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, Opt_Tax_K_and_W, Tax_Reform_KW
 		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices
 		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R 
-		logical  :: Transition_Tax_Reform, Transition_OTW
+		logical  :: Transition_Tax_Reform, Transition_OTW, budget_balance
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -80,8 +80,9 @@ PROGRAM main
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
-		Transition_Tax_Reform = .false.
-		Transition_OTW = .true.
+		Transition_Tax_Reform = .true.
+		Transition_OTW = .false.
+			budget_balance = .false.
 		Simul_Switch  = .false.
 
 
@@ -3356,7 +3357,7 @@ end Subroutine Solve_Opt_Tau_CX
 !========================================================================================
 !========================================================================================
 
-Subroutine Solve_Transition_Tax_Reform
+Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	use parameters
 	use global 
 	use programfunctions
@@ -3364,7 +3365,7 @@ Subroutine Solve_Transition_Tax_Reform
 	use Toolbox
 	use omp_lib
 	implicit none 
-
+	logical, intent(in) :: budget_balance
 
 	! Set step for increments
 	tauWinc_bt=0.000_DP
@@ -3376,119 +3377,32 @@ Subroutine Solve_Transition_Tax_Reform
 	! Load Tax Reform Variables
 	call Solve_Experiment(.false.,.false.)
 
-	! Set Results Folder
-	Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform/'
-	call system( 'mkdir -p ' // trim(Result_Folder) )
+	if (budget_balance) then 
+
+		! Set Results Folder
+		Result_Folder = trim(Result_Folder)//'Transition_Balanced_Budget/'
+		call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	if (.false.) then 
 
-	! Find the Distribution and Policy Functions Along Transition Path
-	! This is done for the tax reform steady state
-	call Find_DBN_Transition 
+		! Find the Distribution and Policy Functions Along Transition Path
+		! This is done for the tax reform steady state
+		call Find_DBN_Transition 
 
-	! Find Taxes that balance the budget 
-	print*,' '
-	print*,'---------------------------------------------------'
-	print*,' 	Balancing the Budget'
-	print*,'---------------------------------------------------'
-		! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-		tauWindx = 4.0_DP
-		Debt_tr  = 1.0_DP
-		DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
-			! Set old G and new value of tauW
-			GBAR_exp_old = GBAR_exp
-			tauW_bt = tauw_bt_exp + tauWindx * tauWinc_bt
-			tauW_at = tauw_at_exp + tauWindx * tauWinc_at
-			print*, 'Bracketing Iteration',tauWindx,'tauW_bt=',tauW_bt*100,"tauW_at=",tauW_at*100
-			! Solve for New Steady State
-			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-			CALL FIND_DBN_EQ
-				GBAR_exp  = GBAR
-				QBAR_exp  = QBAR 
-				NBAR_exp  = NBAR  
-				Y_exp 	  = YBAR
-				Ebar_exp  = EBAR
-				P_exp     = P
-				R_exp	  = R
-				wage_exp  = wage
-				tauK_exp  = tauK
-				tauPL_exp = tauPL
-				psi_exp   = psi
-				DBN_exp   = DBN1
-				tauw_bt_exp = tauW_bt
-				tauw_at_exp = tauW_at
-				Y_a_threshold_exp = Y_a_threshold
-				Cons_exp          = Cons           
-				Hours_exp         = Hours
-				Aprime_exp        = Aprime
-			! Find the Distribution and Policy Functions Along Transition Path
-			call Find_DBN_Transition 
-			! Get new G
-			GBAR_exp = GBAR_tr(T+1) 
-			! Iteratioins  
-			tauWindx = tauWindx + 1.0_DP  
-			print*,' ' 
-			print*,' ' 
-			write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
-			print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
-			print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
-		ENDDO
-
-		! Set tauW as weighted average of point in  the grid to balance budget more precisely
-			tauW_up_bt  = tauW_bt
-			tauW_low_bt = tauW_bt  -  tauWinc_bt
-			tauW_bt     = tauW_low_bt + tauWinc_bt * 0.5_dp ! GBAR_bench+R_exp*Debt_tr - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
-			tauW_up_at  = tauW_at
-			tauW_low_at = tauW_at  -  tauWinc_at  
-			tauW_at     = tauW_low_at + tauWinc_at * 0.5_dp ! (GBAR_bench+R_exp*Debt_tr - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
-			print*,''
-			print*,'GBAR bracketed by taxes:'
-			print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_bt=', tauW_bt*100, "%", '% tauW_up_bt=', tauW_up_bt*100
-			print*,'tauW_low_at =', tauW_low_at*100, '% tauW_at=', tauW_at*100, "%", '% tauW_up_at=', tauW_up_at*100
-			print*,''
-
-		! Solve (again) experimental economy
-			! Solve for New Steady State
-			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-			CALL FIND_DBN_EQ
-				GBAR_exp  = GBAR
-				QBAR_exp  = QBAR 
-				NBAR_exp  = NBAR  
-				Y_exp 	  = YBAR
-				Ebar_exp  = EBAR
-				P_exp     = P
-				R_exp	  = R
-				wage_exp  = wage
-				tauK_exp  = tauK
-				tauPL_exp = tauPL
-				psi_exp   = psi
-				DBN_exp   = DBN1
-				tauw_bt_exp = tauW_bt
-				tauw_at_exp = tauW_at
-				Y_a_threshold_exp = Y_a_threshold
-				Cons_exp          = Cons           
-				Hours_exp         = Hours
-				Aprime_exp        = Aprime
-			! Find the Distribution and Policy Functions Along Transition Path
-			call Find_DBN_Transition 
-			! Get new G
-			GBAR_exp = GBAR_tr(T+1) 
-
-		! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
-			print*,"Gbar at midpoint of bracket"
-			print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr
-			print*,''
-			print*,'Bisection for TauW:'
-			DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr))) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
-			    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
-			        tauW_up_bt  = tauW_bt 
-			        tauW_up_at  = tauW_at 
-			    else
-			        tauW_low_bt = tauW_bt
-			        tauW_low_at = tauW_at
-			    endif
-			    tauW_bt = (tauW_low_bt + tauW_up_bt)/2.0_DP
-			    tauW_at = (tauW_low_at + tauW_up_at)/2.0_DP
+		! Find Taxes that balance the budget 
+		print*,' '
+		print*,'---------------------------------------------------'
+		print*,' 	Balancing the Budget'
+		print*,'---------------------------------------------------'
+			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
+			tauWindx = 4.0_DP
+			Debt_tr  = 1.0_DP
+			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
+				! Set old G and new value of tauW
+				GBAR_exp_old = GBAR_exp
+				tauW_bt = tauw_bt_exp + tauWindx * tauWinc_bt
+				tauW_at = tauw_at_exp + tauWindx * tauWinc_at
+				print*, 'Bracketing Iteration',tauWindx,'tauW_bt=',tauW_bt*100,"tauW_at=",tauW_at*100
 				! Solve for New Steady State
 				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 				CALL FIND_DBN_EQ
@@ -3514,19 +3428,108 @@ Subroutine Solve_Transition_Tax_Reform
 				call Find_DBN_Transition 
 				! Get new G
 				GBAR_exp = GBAR_tr(T+1) 
-				! Print Results 
-			    print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
-				print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
+				! Iteratioins  
+				tauWindx = tauWindx + 1.0_DP  
+				print*,' ' 
+				print*,' ' 
+				write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
 				print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
 				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
 			ENDDO
 
+			! Set tauW as weighted average of point in  the grid to balance budget more precisely
+				tauW_up_bt  = tauW_bt
+				tauW_low_bt = tauW_bt  -  tauWinc_bt
+				tauW_bt     = tauW_low_bt + tauWinc_bt * 0.5_dp ! GBAR_bench+R_exp*Debt_tr - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				tauW_up_at  = tauW_at
+				tauW_low_at = tauW_at  -  tauWinc_at  
+				tauW_at     = tauW_low_at + tauWinc_at * 0.5_dp ! (GBAR_bench+R_exp*Debt_tr - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				print*,''
+				print*,'GBAR bracketed by taxes:'
+				print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_bt=', tauW_bt*100, "%", '% tauW_up_bt=', tauW_up_bt*100
+				print*,'tauW_low_at =', tauW_low_at*100, '% tauW_at=', tauW_at*100, "%", '% tauW_up_at=', tauW_up_at*100
+				print*,''
+
+			! Solve (again) experimental economy
+				! Solve for New Steady State
+				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+				CALL FIND_DBN_EQ
+					GBAR_exp  = GBAR
+					QBAR_exp  = QBAR 
+					NBAR_exp  = NBAR  
+					Y_exp 	  = YBAR
+					Ebar_exp  = EBAR
+					P_exp     = P
+					R_exp	  = R
+					wage_exp  = wage
+					tauK_exp  = tauK
+					tauPL_exp = tauPL
+					psi_exp   = psi
+					DBN_exp   = DBN1
+					tauw_bt_exp = tauW_bt
+					tauw_at_exp = tauW_at
+					Y_a_threshold_exp = Y_a_threshold
+					Cons_exp          = Cons           
+					Hours_exp         = Hours
+					Aprime_exp        = Aprime
+				! Find the Distribution and Policy Functions Along Transition Path
+				call Find_DBN_Transition 
+				! Get new G
+				GBAR_exp = GBAR_tr(T+1) 
+
+			! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
+				print*,"Gbar at midpoint of bracket"
+				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr
+				print*,''
+				print*,'Bisection for TauW:'
+				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr))) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
+				    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
+				        tauW_up_bt  = tauW_bt 
+				        tauW_up_at  = tauW_at 
+				    else
+				        tauW_low_bt = tauW_bt
+				        tauW_low_at = tauW_at
+				    endif
+				    tauW_bt = (tauW_low_bt + tauW_up_bt)/2.0_DP
+				    tauW_at = (tauW_low_at + tauW_up_at)/2.0_DP
+					! Solve for New Steady State
+					deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+					CALL FIND_DBN_EQ
+						GBAR_exp  = GBAR
+						QBAR_exp  = QBAR 
+						NBAR_exp  = NBAR  
+						Y_exp 	  = YBAR
+						Ebar_exp  = EBAR
+						P_exp     = P
+						R_exp	  = R
+						wage_exp  = wage
+						tauK_exp  = tauK
+						tauPL_exp = tauPL
+						psi_exp   = psi
+						DBN_exp   = DBN1
+						tauw_bt_exp = tauW_bt
+						tauw_at_exp = tauW_at
+						Y_a_threshold_exp = Y_a_threshold
+						Cons_exp          = Cons           
+						Hours_exp         = Hours
+						Aprime_exp        = Aprime
+					! Find the Distribution and Policy Functions Along Transition Path
+					call Find_DBN_Transition 
+					! Get new G
+					GBAR_exp = GBAR_tr(T+1) 
+					! Print Results 
+				    print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
+					print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
+					print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
+					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
+				ENDDO
+
 	else 
 
-	print*,' '
-	print*,'---------------------------------------------------'
-	print*,' 	Computing Steady State at desired tax level'
-	print*,'---------------------------------------------------'
+		print*,' '
+		print*,'---------------------------------------------------'
+		print*,' 	Computing Steady State at desired tax level'
+		print*,'---------------------------------------------------'
 		! Read Tax
 			OPEN (UNIT=4,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='old', ACTION='read')
 			READ (UNIT=4,  FMT=*), tauW_at
@@ -3591,6 +3594,21 @@ Subroutine Solve_Transition_Tax_Reform
 			call Find_DBN_Transition 
 	endif
 
+	else ! If budget isn't balanced: Transition between steady states
+
+		! Set Results Folder
+		Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform/'
+		call system( 'mkdir -p ' // trim(Result_Folder) )
+
+		! Find the Distribution and Policy Functions Along Transition Path
+		! This is done for the tax reform steady state
+		call Find_DBN_Transition 
+
+	endif 
+
+
+
+
 	! Compute Value Functions for Cohorts Alive at Time of Policy Change
 	call COMPUTE_VALUE_FUNCTION_TRANSITION
 
@@ -3636,7 +3654,7 @@ Subroutine Solve_Transition_Opt_Wealth_Taxes
 		Pr_mat = Profit_Matrix(R,P)
 		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
 		CALL ComputeLaborUnits(EBAR,wage)
-		CALL GOVNT_BUDGET(.true.)
+		CALL GOVNT_BUDGET(.false.)
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
 		! Aggregate variable in experimental economy
