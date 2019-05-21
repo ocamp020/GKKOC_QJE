@@ -3534,7 +3534,7 @@ Subroutine Solve_Transition_Tax_Reform
 			R=   1.9480499900981853E-002 
 			P=  0.13847606093758086 
 			print*,' '
-			print* '	Wealth taxes =',tauW_at*100,'%'
+			print*,'	Wealth taxes =',tauW_at*100,'%'
 
 		! Solve for New Steady State
 			CALL FIND_DBN_EQ
@@ -3614,6 +3614,7 @@ Subroutine Solve_Transition_Opt_Wealth_Taxes
 	use Toolbox
 	use omp_lib
 	implicit none 
+	character(100) :: folder_aux
 
 	! Save base folder
 		folder_aux = Result_Folder
