@@ -197,7 +197,7 @@ PROGRAM Optimal_Taxes
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
 		print*,"	Computing government spending"
-		CALL GOVNT_BUDGET
+		CALL GOVNT_BUDGET(.false.)
 		print*,"	Computing Value Function"
 		CALL COMPUTE_VALUE_FUNCTION_SPLINE 
 		print*,"	Saving results in text files to be read later"
@@ -372,7 +372,7 @@ PROGRAM Optimal_Taxes
 		tauW_at = Opt_TauW
 
 		CALL FIND_DBN_EQ
-		CALL GOVNT_BUDGET
+		CALL GOVNT_BUDGET(.false.)
 
 		! Compute value function and store policy functions, value function and distribution in file
 		CALL COMPUTE_VALUE_FUNCTION_SPLINE 

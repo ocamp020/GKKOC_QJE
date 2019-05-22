@@ -49,7 +49,7 @@ MODULE global
 
 	! Retirement income 
 	REAL(DP), DIMENSION(nlambda,ne) :: phi_lambda_e   ! phi_lambda_e is the income replacement ratio used to compute SS payments
-	REAL(DP), DIMENSION(nlambda,ne) :: RetY_lambda_e  ! Retirement income = phi_lambda_e*Ebar, the first 45 years are assigned zero. 
+	REAL(DP), DIMENSION(nlambda,ne) :: RetY_lambda_e, RetY_lambda_e_aux  ! Retirement income = phi_lambda_e*Ebar, the first 45 years are assigned zero. 
 
 	! Labor efficiency units
 		! eff_un(age,lambda,e) = kappa(age)*lambda*e
@@ -80,7 +80,7 @@ MODULE global
 		! For each tax rate we weill have different Y grids
 		REAL(DP), DIMENSION(na)      :: agrid
 	    REAL(DP), DIMENSION(fine_na) :: fine_agrid
-	    REAL(DP), DIMENSION(na,nz,nx):: YGRID, MBGRID
+	    REAL(DP), DIMENSION(na,nz,nx):: YGRID, MBGRID, YGRID_aux, MBGRID_aux
 	    REAL(DP), DIMENSION(:,:,:), ALLOCATABLE :: YGRID_t, MBGRID_t
 	    REAL(DP), DIMENSION(:)    , ALLOCATABLE :: agrid_t
 	    INTEGER                      :: na_t
@@ -157,10 +157,25 @@ MODULE global
     REAL(DP) :: FW_top_x_share(6) 
 
     ! Frisch Elasticity
-    real(DP) :: Frisch_Elasticity, Size_Frisch, Hours_Frisch, Frisch_Elasticity_2
+    REAL(DP) :: Frisch_Elasticity, Size_Frisch, Hours_Frisch, Frisch_Elasticity_2
 
     ! Extra tax information
-    real(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, Tot_Lab_Inc
+    REAL(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, Tot_Lab_Inc
+
+    ! Transition Yo
+    INTEGER :: ti 
+    ! Prices and Quantities
+    REAL(DP), DIMENSION(T+1) :: R_tr, P_tr, QBAR_tr, NBAR_tr, YBAR_tr, Wage_tr, EBAR_tr, K_tr, C_tr
+    ! Government Budget
+    REAL(DP), DIMENSION(T+1) :: GBAR_tr, GBAR_K_tr, GBAR_W_tr, GBAR_L_tr, GBAR_C_tr, SSC_Payments_tr, Tot_Lab_Inc_tr
+    REAL(DP)                 :: Debt_tr
+    ! Policy function and value function (defined on the exogenous grid)
+    REAL(DP), DIMENSION(:,:,:,:,:,:,:), allocatable :: Cons_tr, Hours_tr, Aprime_tr, DBN_tr, ValueFunction_tr
+    ! Welfare Gain
+    REAL(DP), DIMENSION(:,:,:,:,:,:)  , allocatable :: CE1_tr
+    REAL(DP) :: CE1_nb_tr,  CE1_pop_tr, CE2_nb_tr,  CE2_pop_tr
+	! Policy function and value function (defined on the adjusted grid for breakpoints)
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_t_pr, Hours_t_pr
 
 
 Contains 
@@ -185,6 +200,16 @@ Subroutine Allocate_Variables
     allocate( V_Pr_bench(         MaxAge,na,nz,nlambda,ne,nx) )
     allocate( V_Pr_exp(           MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Firm_Wealth(        MaxAge,na,nz,nlambda,ne,nx) )
+
+
+    allocate( Cons_tr(            MaxAge,na,nz,nlambda,ne,nx,T+1) )
+    allocate( Hours_tr(           MaxAge,na,nz,nlambda,ne,nx,T+1) )
+    allocate( Aprime_tr(          MaxAge,na,nz,nlambda,ne,nx,T+1) )
+    allocate( DBN_tr( 			  MaxAge,na,nz,nlambda,ne,nx,T+1) )
+    allocate( ValueFunction_tr(   MaxAge,na,nz,nlambda,ne,nx,MaxAge) )
+	allocate( Cons_t_pr(          MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Hours_t_pr(         MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( CE1_tr( 			  MaxAge,na,nz,nlambda,ne,nx) )
 end Subroutine Allocate_Variables
    
 END MODULE global
