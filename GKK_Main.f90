@@ -649,6 +649,9 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
 	CALL ComputeLaborUnits(EBAR,wage)
 	CALL GOVNT_BUDGET(.true.)
+		print*, " 	Computing After Tax Income"
+		CALL Compute_After_Tax_Income
+		CALL Write_Experimental_Results(.true.)
 
 	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
