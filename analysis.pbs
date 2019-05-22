@@ -1,7 +1,9 @@
 # To run this type:
 #	qsub analysis.pbs 
 
-# For more information: http://latisresearch.umn.edu/creating-a-PBS-script
+# For more information: 
+#	http://latisresearch.umn.edu/creating-a-PBS-script
+#	http://latisresearch.umn.edu/using-computecla
 
 # Define 
 	#! /bin/tcsh
