@@ -273,6 +273,55 @@ end Subroutine Asset_Grid_Threshold
 
 	END  FUNCTION FOC_R
 
+	FUNCTION FOC_R_Transition(aprimet,state)
+		IMPLICIT NONE   
+		real(DP), intent(in)  :: aprimet
+		real(DP), dimension(:), intent(in) :: state
+		real(DP)              :: FOC_R_Transition
+		real(DP)              :: MB_aprime(nx), yprime(nx), cprime(nx), euler_power
+		integer               :: age_in, a_in, z_in, l_in, e_in, x_in, t_in, xp_ind 
+
+		! Allocate state and get indeces
+		age_in = int(state(1))
+		a_in   = int(state(2))
+		z_in   = int(state(3))
+		l_in   = int(state(4))
+		e_in   = int(state(5))
+		x_in   = int(state(6))
+		t_in   = int(state(7))
+
+		! Set the power used in the Euler equation for the retirement period
+		if (NSU_Switch.eqv..true.) then 
+			! Non-Separable Utility
+			euler_power = (1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
+		else 
+			! Separable Utility
+			euler_power = (-1.0_dp/sigma)
+		end if 
+
+		! Set prices for next period
+		R = R_tr(t_in+1); P = P_tr(t_in+1);
+
+		do xp_ind=1,nx
+		! Compute marginal benefit of next period at a' (given zi)
+		MB_aprime(xp_ind) = MB_a(aprimet,z_in,xp_ind)
+		 
+		! Compute asset income of next period at a' (given zi)
+		yprime(xp_ind)   = Y_a(aprimet,z_in,xp_ind)
+		 
+		! Compute consumption of next period given a' (given zi, lambdai and ei)
+			! The value of c' comes from interpolating next period's consumption policy function
+			! The policy function is defined over a grid of asset income Y, and is interpolated for y'
+		cprime(xp_ind)   = Linear_Int(Ygrid_t(:,z_in,xp_ind), Cons_t_pr(age_in+1,:,z_in,l_in,e_in,xp_ind),na_t, yprime(xp_ind))    
+		enddo 
+
+		! Evaluate square residual of Euler equation at current state (given by (ai,zi,lambdai,ei)) and savings given by a'
+		FOC_R_Transition	= ( (YGRID_t(a_in,z_in,x_in)+RetY_lambda_e(l_in,e_in)-aprimet)    &
+		           & - ( beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * cprime**(1.0_dp/euler_power) ) ) &
+		           & **euler_power) ** 2.0_DP
+
+	END  FUNCTION FOC_R_Transition
+
 !========================================================================================
 !========================================================================================
 !========================================================================================
@@ -295,130 +344,267 @@ end Subroutine Asset_Grid_Threshold
 !
 ! Remarks: This function performs a optimization for labor. Labor taxes are taken into account
 !
-	FUNCTION FOC_WH(aprimet,state)
-		IMPLICIT NONE   
-		real(DP), intent(in) :: aprimet
-		real(DP), dimension(:), intent(in) :: state
-		real(DP)             :: ctemp, ntemp, yprime(nx), MB_aprime(nx), FOC_WH, exp1overcprime, E_MU_cp(nx)
-		REAL(DP)             :: brentvaluet, consin, H_min, c_foc, c_budget, cp, hp
-		integer              :: ep_ind, xp_ind
-		real(DP), dimension(ne) :: cprime, nprime, MU_cp
-		REAL(DP), DIMENSION(7)  :: par_FOC
-		integer                 :: age_in, a_in, z_in, l_in, e_in, x_in
+FUNCTION FOC_WH(aprimet,state)
+	IMPLICIT NONE   
+	real(DP), intent(in) :: aprimet
+	real(DP), dimension(:), intent(in) :: state
+	real(DP)             :: ctemp, ntemp, yprime(nx), MB_aprime(nx), FOC_WH, exp1overcprime, E_MU_cp(nx)
+	REAL(DP)             :: brentvaluet, consin, H_min, c_foc, c_budget, cp, hp
+	integer              :: ep_ind, xp_ind
+	real(DP), dimension(ne) :: cprime, nprime, MU_cp
+	REAL(DP), DIMENSION(7)  :: par_FOC
+	integer                 :: age_in, a_in, z_in, l_in, e_in, x_in
 
-		! Allocate state and get indeces
-		age_in = int(state(1))
-		a_in   = int(state(2))
-		z_in   = int(state(3))
-		l_in   = int(state(4))
-		e_in   = int(state(5))
-		x_in   = int(state(6))
+	! Allocate state and get indeces
+	age_in = int(state(1))
+	a_in   = int(state(2))
+	z_in   = int(state(3))
+	l_in   = int(state(4))
+	e_in   = int(state(5))
+	x_in   = int(state(6))
 
-		par_FOC(1:6) = state
+	par_FOC(1:6) = state
 
-		H_min = 0.000001 
+	H_min = 0.000001 
 
-		do xp_ind=1,nx 
-		! Compute marginal benefit of next period at a' (given zi)
-		MB_aprime(xp_ind) = MB_a(aprimet,z_in,x_in)
-		! Compute asset income of next period at a' (given zi)
-		yprime(xp_ind)    = Y_a(aprimet,z_in,x_in)
-		enddo 
+	do xp_ind=1,nx 
+	! Compute marginal benefit of next period at a' (given zi)
+	MB_aprime(xp_ind) = MB_a(aprimet,z_in,x_in)
+	! Compute asset income of next period at a' (given zi)
+	yprime(xp_ind)    = Y_a(aprimet,z_in,x_in)
+	enddo 
 
-		! Set auxiliary variable for FOC_HA
-		par_FOC(7) = aprimet
-		! Solve for hours choice by solving the FOC for labor
-			brentvaluet = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp, par_FOC)  
-				! 			if (NSU_Switch.eqv..true.) then
-				! 				c_foc = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
-				! 			else 
-				! 				c_foc = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
-				! 			end if 
-				! 			c_budget = YGRID_t(ai,zi) - aprimet   
-				! 			if (c_budget.ge.c_foc) then
-				! 				ntemp = 0.0_dp
-				! 			else
-				! 				brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp)  
-				! 			end if 
-		! Current consumption given ntemp
-			ctemp   = YGRID_t(a_in,z_in,x_in) + Y_h(ntemp,age_in,l_in,e_in,wage) - aprimet   
+	! Set auxiliary variable for FOC_HA
+	par_FOC(7) = aprimet
+	! Solve for hours choice by solving the FOC for labor
+		brentvaluet = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp, par_FOC)  
+			! 			if (NSU_Switch.eqv..true.) then
+			! 				c_foc = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
+			! 			else 
+			! 				c_foc = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
+			! 			end if 
+			! 			c_budget = YGRID_t(ai,zi) - aprimet   
+			! 			if (c_budget.ge.c_foc) then
+			! 				ntemp = 0.0_dp
+			! 			else
+			! 				brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp)  
+			! 			end if 
+	! Current consumption given ntemp
+		ctemp   = YGRID_t(a_in,z_in,x_in) + Y_h(ntemp,age_in,l_in,e_in,wage) - aprimet   
 
-		if (NSU_Switch.eqv..true.) then
-			if (Progressive_Tax_Switch) then 
-				! Non-Separable Utility
-				if (Log_Switch.eqv..true.) then
-					! I have to evaluate the FOC in expectation over eindx prime given eindx
-					! Compute c' for each value of e'
-					do xp_ind=1,nx
-					DO ep_ind=1,ne
-					    cprime(ep_ind) = Linear_Int(Ygrid_t(:,z_in,xp_ind),Cons_t(age_in+1,:,z_in,l_in,ep_ind,xp_ind),&
-					    						&	 na_t, yprime(xp_ind) )
-					ENDDO
-						! Compute the expected value of 1/c' conditional on current ei
-						E_MU_cp(xp_ind) = SUM( pr_e(e_in,:) / cprime )
-					enddo 
-					
-
-					! Evaluate the squared residual of the Euler equation for working period
-					FOC_WH   = ( (1.0_dp/ctemp)- (beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * E_MU_cp) ) ) **2.0_DP 
-				else
-					! I have to evaluate the FOC in expectation over eindx prime given eindx
-					! Compute consumption and labor for eachvalue of eindx prime
-					do xp_ind=1,nx 
-					DO ep_ind=1,ne
-					    cp     = Linear_Int(Ygrid_t(:,z_in,xp_ind),Cons_t(age_in+1,:,z_in,l_in,ep_ind,xp_ind), na_t, yprime(xp_ind))
-						c_foc  = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age_in,l_in,e_in,wage)
-							if (cp.ge.c_foc) then
-								hp = 0.0_dp
-							else
-								par_FOC(4) = ep_ind
-								par_FOC(7) = cp 
-								brentvaluet = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, hp, par_FOC ) 
-							end if 
-					    MU_cp(ep_ind) = cp*((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hp)**((1.0_dp-sigma)*(1.0_dp-gamma))
-					END DO
-					! Compute the expected value of 1/c' conditional on current ei
-					E_MU_cp(xp_ind) = SUM( pr_e(e_in,:) * MU_cp )
-					enddo 
-
-					! Evaluate the squared residual of the Euler equation for working period
-					FOC_WH = ( ctemp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-ntemp)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
-						         & - beta*survP(age_in)* sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp)  )**2.0_DP
-				end if 
-			else ! Linear Taxes 
-				ntemp = max(0.0_DP , gamma - (1.0_DP-gamma)*(YGRID_t(a_in,z_in,x_in) - aprimet)/(psi*yh(age_in,l_in,e_in)) )
-				ctemp = YGRID_t(a_in,z_in,x_in) + psi*yh(age_in,l_in,e_in) * ntemp - aprimet
-
-				do xp_ind=1,nx
-				DO ep_ind=1,ne
-				    cprime(ep_ind) = Linear_Int(Ygrid(:,z_in,xp_ind), Cons_t(age_in+1,:,z_in,l_in,ep_ind,xp_ind),na,yprime(xp_ind))
-				    nprime(ep_ind) = 1.0_DP-(1.0_DP-gamma)*cprime(ep_ind)/(gamma*psi*yh(age_in,l_in,e_in))
-				ENDDO
-					nprime = max(0.0_DP,nprime)
-					E_MU_cp(xp_ind) = sum( pr_e(e_in,:) * (cprime**(gamma*(1.0_DP-sigma)-1.0_DP)) &
-						& *((1.0_DP-nprime)**((1.0_DP-gamma)*(1.0_DP-sigma))))
-				enddo 
-
-				FOC_WH = ((ctemp**(gamma*(1.0_DP-sigma)-1))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
-						& - beta*survP(age_in)* sum( pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp ) )**2.0_DP
-			end if 
-		else 
-			! Separable Utility
+	if (NSU_Switch.eqv..true.) then
+		if (Progressive_Tax_Switch) then 
+			! Non-Separable Utility
+			if (Log_Switch.eqv..true.) then
 				! I have to evaluate the FOC in expectation over eindx prime given eindx
 				! Compute c' for each value of e'
+				do xp_ind=1,nx
+				DO ep_ind=1,ne
+				    cprime(ep_ind) = Linear_Int(Ygrid_t(:,z_in,xp_ind),Cons_t(age_in+1,:,z_in,l_in,ep_ind,xp_ind),&
+				    						&	 na_t, yprime(xp_ind) )
+				ENDDO
+					! Compute the expected value of 1/c' conditional on current ei
+					E_MU_cp(xp_ind) = SUM( pr_e(e_in,:) / cprime )
+				enddo 
+				
+
+				! Evaluate the squared residual of the Euler equation for working period
+				FOC_WH   = ( (1.0_dp/ctemp)- (beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * E_MU_cp) ) ) **2.0_DP 
+			else
+				! I have to evaluate the FOC in expectation over eindx prime given eindx
+				! Compute consumption and labor for eachvalue of eindx prime
 				do xp_ind=1,nx 
 				DO ep_ind=1,ne
-					cprime(ep_ind) = Linear_Int(Ygrid_t(:,z_in,xp_ind),Cons_t(age+1,:,z_in,l_in,ep_ind,xp_ind),na_t,yprime(xp_ind))
-				ENDDO
+				    cp     = Linear_Int(Ygrid_t(:,z_in,xp_ind),Cons_t(age_in+1,:,z_in,l_in,ep_ind,xp_ind), na_t, yprime(xp_ind))
+					c_foc  = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age_in,l_in,e_in,wage)
+						if (cp.ge.c_foc) then
+							hp = 0.0_dp
+						else
+							par_FOC(4) = ep_ind
+							par_FOC(7) = cp 
+							brentvaluet = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, hp, par_FOC ) 
+						end if 
+				    MU_cp(ep_ind) = cp*((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hp)**((1.0_dp-sigma)*(1.0_dp-gamma))
+				END DO
 				! Compute the expected value of 1/c' conditional on current ei
-				E_MU_cp(xp_ind) = SUM( pr_e(e_in,:) / cprime**sigma )
+				E_MU_cp(xp_ind) = SUM( pr_e(e_in,:) * MU_cp )
 				enddo 
 
 				! Evaluate the squared residual of the Euler equation for working period
-				FOC_WH   = (ctemp - 1.0_dp/(beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp))**(1.0_dp/sigma)) **2.0_DP 
-		end if 
+				FOC_WH = ( ctemp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-ntemp)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
+					         & - beta*survP(age_in)* sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp)  )**2.0_DP
+			end if 
+		else ! Linear Taxes 
+			ntemp = max(0.0_DP , gamma - (1.0_DP-gamma)*(YGRID_t(a_in,z_in,x_in) - aprimet)/(psi*yh(age_in,l_in,e_in)) )
+			ctemp = YGRID_t(a_in,z_in,x_in) + psi*yh(age_in,l_in,e_in) * ntemp - aprimet
 
-	END  FUNCTION FOC_WH
+			do xp_ind=1,nx
+			DO ep_ind=1,ne
+			    cprime(ep_ind) = Linear_Int(Ygrid(:,z_in,xp_ind), Cons_t(age_in+1,:,z_in,l_in,ep_ind,xp_ind),na,yprime(xp_ind))
+			    nprime(ep_ind) = 1.0_DP-(1.0_DP-gamma)*cprime(ep_ind)/(gamma*psi*yh(age_in,l_in,e_in))
+			ENDDO
+				nprime = max(0.0_DP,nprime)
+				E_MU_cp(xp_ind) = sum( pr_e(e_in,:) * (cprime**(gamma*(1.0_DP-sigma)-1.0_DP)) &
+					& *((1.0_DP-nprime)**((1.0_DP-gamma)*(1.0_DP-sigma))))
+			enddo 
+
+			FOC_WH = ((ctemp**(gamma*(1.0_DP-sigma)-1))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
+					& - beta*survP(age_in)* sum( pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp ) )**2.0_DP
+		end if 
+	else 
+		! Separable Utility
+			! I have to evaluate the FOC in expectation over eindx prime given eindx
+			! Compute c' for each value of e'
+			do xp_ind=1,nx 
+			DO ep_ind=1,ne
+				cprime(ep_ind) = Linear_Int(Ygrid_t(:,z_in,xp_ind),Cons_t(age+1,:,z_in,l_in,ep_ind,xp_ind),na_t,yprime(xp_ind))
+			ENDDO
+			! Compute the expected value of 1/c' conditional on current ei
+			E_MU_cp(xp_ind) = SUM( pr_e(e_in,:) / cprime**sigma )
+			enddo 
+
+			! Evaluate the squared residual of the Euler equation for working period
+			FOC_WH   = (ctemp - 1.0_dp/(beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp))**(1.0_dp/sigma)) **2.0_DP 
+	end if 
+
+END  FUNCTION FOC_WH
+
+
+FUNCTION FOC_WH_Transition(aprimet,state)
+	IMPLICIT NONE   
+	real(DP), intent(in) :: aprimet
+	real(DP), dimension(:), intent(in) :: state
+	real(DP)             :: ctemp, ntemp, yprime(nx), MB_aprime(nx), FOC_WH_Transition, exp1overcprime, E_MU_cp(nx)
+	REAL(DP)             :: brentvaluet, consin, H_min, c_foc, c_budget, cp, hp
+	integer              :: ep_ind, xp_ind
+	real(DP), dimension(ne) :: cprime, nprime, MU_cp
+	REAL(DP), DIMENSION(7)  :: par_FOC
+	integer                 :: age_in, a_in, z_in, l_in, e_in, x_in, t_in
+
+	! Allocate state and get indeces
+	age_in = int(state(1))
+	a_in   = int(state(2))
+	z_in   = int(state(3))
+	l_in   = int(state(4))
+	e_in   = int(state(5))
+	x_in   = int(state(6))
+	t_in   = int(state(7))
+
+	par_FOC(1:6) = state
+
+	H_min = 0.000001 
+
+
+	! Update prices for computing MB and yprime
+		P = P_tr(t_in+1); R = R_tr(t_in+1) 
+	do xp_ind=1,nx 
+	! Compute marginal benefit of next period at a' (given zi)
+	MB_aprime(xp_ind) = MB_a(aprimet,z_in,x_in)
+	! Compute asset income of next period at a' (given zi)
+	yprime(xp_ind)    = Y_a(aprimet,z_in,x_in)
+	enddo 
+	! Set prices to current period
+		P = P_tr(t_in); R = R_tr(t_in) 
+
+	! Set auxiliary variable for FOC_HA
+	par_FOC(7) = aprimet
+	! Solve for hours choice by solving the FOC for labor
+		brentvaluet = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp, par_FOC)  
+			! 			if (NSU_Switch.eqv..true.) then
+			! 				c_foc = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
+			! 			else 
+			! 				c_foc = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
+			! 			end if 
+			! 			c_budget = YGRID_t(ai,zi) - aprimet   
+			! 			if (c_budget.ge.c_foc) then
+			! 				ntemp = 0.0_dp
+			! 			else
+			! 				brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp)  
+			! 			end if 
+	! Current consumption given ntemp
+		ctemp   = YGRID_t(a_in,z_in,x_in) + Y_h(ntemp,age_in,l_in,e_in,wage) - aprimet   
+
+	if (NSU_Switch.eqv..true.) then
+		if (Progressive_Tax_Switch) then 
+			! Non-Separable Utility
+			if (Log_Switch.eqv..true.) then
+				! I have to evaluate the FOC in expectation over eindx prime given eindx
+				! Compute c' for each value of e'
+				do xp_ind=1,nx
+				DO ep_ind=1,ne
+				    cprime(ep_ind) = Linear_Int(Ygrid_t(:,z_in,xp_ind),Cons_t_pr(age_in+1,:,z_in,l_in,ep_ind,xp_ind),&
+				    						&	 na_t, yprime(xp_ind) )
+				ENDDO
+					! Compute the expected value of 1/c' conditional on current ei
+					E_MU_cp(xp_ind) = SUM( pr_e(e_in,:) / cprime )
+				enddo 
+				
+
+				! Evaluate the squared residual of the Euler equation for working period
+				FOC_WH_Transition   = &
+					& ( (1.0_dp/ctemp)- (beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * E_MU_cp) ) ) **2.0_DP 
+			else
+				! I have to evaluate the FOC in expectation over eindx prime given eindx
+				! Compute consumption and labor for eachvalue of eindx prime
+				do xp_ind=1,nx 
+				DO ep_ind=1,ne
+				    cp     = Linear_Int(Ygrid_t(:,z_in,xp_ind),Cons_t_pr(age_in+1,:,z_in,l_in,ep_ind,xp_ind), na_t, yprime(xp_ind))
+					c_foc  = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age_in,l_in,e_in,wage_tr(t_in))
+						if (cp.ge.c_foc) then
+							hp = 0.0_dp
+						else
+							par_FOC(4) = ep_ind
+							par_FOC(7) = cp 
+							brentvaluet = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, hp, par_FOC ) 
+						end if 
+				    MU_cp(ep_ind) = cp*((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hp)**((1.0_dp-sigma)*(1.0_dp-gamma))
+				END DO
+				! Compute the expected value of 1/c' conditional on current ei
+				E_MU_cp(xp_ind) = SUM( pr_e(e_in,:) * MU_cp )
+				enddo 
+
+				! Evaluate the squared residual of the Euler equation for working period
+				FOC_WH_Transition = &
+							& ( ctemp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-ntemp)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
+					         & - beta*survP(age_in)* sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp)  )**2.0_DP
+			end if 
+		else ! Linear Taxes 
+			ntemp = max(0.0_DP , gamma - (1.0_DP-gamma)*(YGRID_t(a_in,z_in,x_in) - aprimet)/(psi*yh(age_in,l_in,e_in)) )
+			ctemp = YGRID_t(a_in,z_in,x_in) + psi*yh(age_in,l_in,e_in) * ntemp - aprimet
+
+			do xp_ind=1,nx
+			DO ep_ind=1,ne
+			    cprime(ep_ind) = &
+			    	& Linear_Int(Ygrid(:,z_in,xp_ind), Cons_t_pr(age_in+1,:,z_in,l_in,ep_ind,xp_ind),na,yprime(xp_ind))
+			    nprime(ep_ind) = 1.0_DP-(1.0_DP-gamma)*cprime(ep_ind)/(gamma*psi*yh(age_in,l_in,e_in))
+			ENDDO
+				nprime = max(0.0_DP,nprime)
+				E_MU_cp(xp_ind) = sum( pr_e(e_in,:) * (cprime**(gamma*(1.0_DP-sigma)-1.0_DP)) &
+					& *((1.0_DP-nprime)**((1.0_DP-gamma)*(1.0_DP-sigma))))
+			enddo 
+
+			FOC_WH_Transition = ((ctemp**(gamma*(1.0_DP-sigma)-1))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
+					& - beta*survP(age_in)* sum( pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp ) )**2.0_DP
+		end if 
+	else 
+		! Separable Utility
+			! I have to evaluate the FOC in expectation over eindx prime given eindx
+			! Compute c' for each value of e'
+			do xp_ind=1,nx 
+			DO ep_ind=1,ne
+				cprime(ep_ind) = Linear_Int(Ygrid_t(:,z_in,xp_ind),Cons_t_pr(age+1,:,z_in,l_in,ep_ind,xp_ind),na_t,yprime(xp_ind))
+			ENDDO
+			! Compute the expected value of 1/c' conditional on current ei
+			E_MU_cp(xp_ind) = SUM( pr_e(e_in,:) / cprime**sigma )
+			enddo 
+
+			! Evaluate the squared residual of the Euler equation for working period
+			FOC_WH_Transition  = &
+				& (ctemp - 1.0_dp/(beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp))**(1.0_dp/sigma)) **2.0_DP
+	end if 
+
+END  FUNCTION FOC_WH_Transition
+
 
 !========================================================================================
 !========================================================================================
@@ -500,6 +686,42 @@ end Subroutine Asset_Grid_Threshold
 			         	& - beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp)  )**2.0_DP
 
 	END  FUNCTION FOC_H_NSU
+
+
+	FUNCTION FOC_H_NSU_Transition(hoursin,par)
+		IMPLICIT NONE   
+		real(DP), intent(in) 	:: hoursin
+		real(DP), dimension(:), intent(in) :: par
+		real(DP)             	:: FOC_H_NSU_Transition, cons, E_MU_cp(nx)
+		real(DP), dimension(ne) :: MU_cp
+		real(DP)                :: MB_aprime(nx)
+		integer                 :: age_in, a_in, z_in, l_in, e_in, x_in, t_in, xp_ind
+
+		! Allocate state and get indeces
+		age_in = int(par(1))
+		a_in   = int(par(2))
+		z_in   = int(par(3))
+		l_in   = int(par(4))
+		e_in   = int(par(5))
+		x_in   = int(par(6))
+		t_in   = int(par(7))
+		MB_aprime = par(8:7+nx)
+
+		! Compute current consumption implied by hours and labor FOC
+			cons  = (gamma/(1.0_dp-gamma))*(1.0_dp-hoursin)*MB_h(hoursin,age_in,l_in,e_in,wage)
+		do xp_ind=1,nx
+		! Compute marginal utility of consumption for next period at a' (for all values of e)
+	    	MU_cp = Cons_t_pr(age_in+1,a_in,z_in,l_in,:,xp_ind)**((1.0_dp-sigma)*gamma-1.0_dp) &
+	    	        * (1.0_dp-Hours_t_pr(age_in+1,a_in,z_in,l_in,:,xp_ind))**((1.0_dp-sigma)*(1.0_dp-gamma))
+	    ! Compute expected value of marginal uitility of consumption
+	    	E_MU_cp(xp_ind)  = SUM( pr_e(e_in,:) * MU_cp )
+	    enddo 
+		! Compute square residual of Euler FOC
+			FOC_H_NSU_Transition = &
+						& ( cons**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hoursin)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
+			         	& - beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp)  )**2.0_DP
+
+	END  FUNCTION FOC_H_NSU_Transition
 
 !========================================================================================
 !========================================================================================
@@ -1085,13 +1307,23 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		close (unit=50)  
 
 	! Consumption Equivalent Welfare
-		OPEN (UNIT=50, FILE=trim(Result_Folder)//'CE_alternative', STATUS='replace') 
-		    WRITE  (UNIT=50, FMT=*) 'CE Newborn=', ( sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:)) / &
+		OPEN (UNIT=50, FILE=trim(Result_Folder)//'CE_alternative.txt', STATUS='replace') 
+		    WRITE  (UNIT=50, FMT=*) 'CE2_NB =', 100*(( sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:)) / &
 		                                &  sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  ) &
-		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
-		    WRITE  (UNIT=50, FMT=*) 'CE =', ( sum(ValueFunction_exp(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:)) / &
-		                                &  sum(ValueFunction_Bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))  ) &
-		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+		    WRITE  (UNIT=50, FMT=*) 'CE2_Pop =', 100*(( sum(ValueFunction_exp*DBN1) / sum(ValueFunction_Bench*DBN_bench)  ) &
+		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+		    WRITE  (UNIT=50, FMT=*) 'CE2_NB_bench =', 100*(( sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) / &
+		                                &  sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  ) &
+		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+		    WRITE  (UNIT=50, FMT=*) 'CE2_Pop_bench =', 100*(( sum(ValueFunction_exp*DBN_bench)/sum(ValueFunction_Bench*DBN_bench)) &
+		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+            WRITE  (UNIT=50, FMT=*) 'CE2_NB_exp =', 100*(( sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:)) / &
+		                                &  sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))  ) &
+		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+		    WRITE  (UNIT=50, FMT=*) 'CE2_Pop_exp =', 100*(( sum(ValueFunction_exp*DBN1) / sum(ValueFunction_Bench*DBN1)  ) &
+		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+            WRITE  (UNIT=50, FMT=*) ' '
 
 		    WRITE  (UNIT=50, FMT=*) 'Av Utility NB (bench) =',sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  
 		    WRITE  (UNIT=50, FMT=*) 'Av Utility NB (exp  ) =',sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))    
@@ -1352,7 +1584,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	print*,''
 	print*,'---------------------------'
 
-	! Compute Average Utility
+	! Compute Average Utility - CE2
 
 	Av_Util_NB  =  100.0_dp * (( sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:)) / &
 				&               sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) ) &
@@ -2236,7 +2468,6 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	!! Draft Tables for Tax Burden
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
 		!! Benchmark 
 		Pr_mat = Profit_Matrix(R_bench,P_bench)
 		CALL ComputeLaborUnits(EBAR_bench,wage_bench)
@@ -3110,6 +3341,191 @@ END SUBROUTINE  COMPUTE_WELFARE_GAIN
 !========================================================================================
 
 
+SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
+	IMPLICIT NONE
+	real(DP), dimension(MaxAge):: CumDiscountF
+	REAL(DP), dimension(draft_age_category,nz) :: CE_draft_group_z,  size_draft_group_z, frac_pos_welfare_draft_group_z
+	REAL(DP), dimension(draft_age_category,draft_z_category) :: CE_draft_group,  size_draft_group, frac_pos_welfare_draft_group
+	REAL(DP), dimension(nz) :: DBN_Z, CDF_Z 
+	REAL(DP), dimension(nz,nx) :: DBN_XZ
+	INTEGER , dimension(draft_age_category+1) :: draft_age_limit
+	INTEGER :: age2, z2
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Value_mat
+
+	allocate( Value_mat(  MaxAge,na,nz,nlambda,ne,nx) )
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! Routine Set Up
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	! Age Brackets
+		draft_age_limit = [0, 1, 15, 30, 45, MaxAge ] 
+
+	! Discount factor
+		CumDiscountF(MaxAge)=1.0_DP
+		DO age=MaxAge-1,1,-1
+		    CumDiscountF(age) = 1.0_DP + beta * survP(age) *CumDiscountF(age+1) 
+		ENDDO
+
+	! Select relevant values of value function
+		DO age=1,MaxAge
+			Value_mat(age,:,:,:,:,:) = ValueFunction_tr(age,:,:,:,:,:,age)
+		ENDDO
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! Measuring Consumption Equivalent Welfare
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	! Consumption Equivalent Welfare: CE 1
+		DO age=1,MaxAge
+			if (Log_Switch.eqv..true.) then 
+		    	CE1_tr(age,:,:,:,:,:)= & 
+		    		& exp((Value_mat(age,:,:,:,:,:)-ValueFunction_Bench(age,:,:,:,:,:))/CumDiscountF(age))-1.0_DP
+		    else 
+		    	CE1_tr(age,:,:,:,:,:)=(Value_mat(age,:,:,:,:,:)/ValueFunction_Bench(age,:,:,:,:,:)) &
+                                				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+		    end if 
+		ENDDO
+
+		! Aggregates 
+		CE1_nb_tr  = 100.0_DP*sum(CE1_tr(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+		CE1_pop_tr = 100.0_DP*sum(CE1_tr*DBN_bench)/sum(DBN_bench)
+
+	! Consumption Equivalent Welfare: CE 2
+		CE2_nb_tr  = 100.0_dp * (( sum(Value_mat(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) / &
+				&               sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) ) &
+				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+		CE2_pop_tr = 100*(( sum(Value_mat*DBN_bench) / sum(ValueFunction_Bench*DBN_bench)  ) &
+		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+
+	! Write Aggregate Results
+		OPEN (UNIT=50, FILE=trim(Result_Folder)//'CE_Transition.txt', STATUS='replace') 
+			WRITE  (UNIT=50, FMT=*) 'Measures of Consumption Equivalent Welfare for Transition'
+			WRITE  (UNIT=50, FMT=*) 'Welfare measured for cohorts alive at time of policy change'
+			WRITE  (UNIT=50, FMT=*) ' '
+			WRITE  (UNIT=50, FMT=*) 'Aggregate Measures'
+			WRITE  (UNIT=50, FMT=*) ' '
+			WRITE  (UNIT=50, FMT=*) 'CE 1: Average of welfare gain across agents'
+			WRITE  (UNIT=50, FMT=*) 'CE1_nb =',CE1_nb_tr
+			WRITE  (UNIT=50, FMT=*) 'CE1_pop =',CE1_pop_tr
+			WRITE  (UNIT=50, FMT=*) ' '
+			WRITE  (UNIT=50, FMT=*) 'CE 2: Welfare gain average agent'
+			WRITE  (UNIT=50, FMT=*) 'CE2_nb =',CE2_nb_tr
+			WRITE  (UNIT=50, FMT=*) 'CE2_pop =',CE2_pop_tr
+			WRITE  (UNIT=50, FMT=*) ' '
+			WRITE  (UNIT=50, FMT=*) 'All unites in percentage points (already multiplied by 100)'
+		close (unit=50)	
+
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! Draft Tables
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	frac_pos_welfare_draft_group_z = 0.0_dp 
+
+	do zi  = 1,nz
+	do age = 1,draft_age_category
+		size_draft_group_z(age,zi) = &
+			& sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:))
+
+		CE_draft_group_z(age,zi) =  100* &
+			& sum(CE1_tr(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:)* &
+            &     DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:))/&
+            & sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:))
+
+        do xi=1,nx
+	    do ei=1,ne
+	    do lambdai=1,nlambda
+	    do ai=1,na
+	    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
+	    	If ( CE1_tr(age2,ai,zi,lambdai,ei,xi) .ge. 0.0_DP) then
+        	frac_pos_welfare_draft_group_z(age,zi) = frac_pos_welfare_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
+        	endif 
+    	enddo 
+    	enddo 
+    	enddo 
+    	enddo 
+    	enddo  
+	enddo
+	enddo 
+
+	DBN_Z = sum(sum(sum(sum(sum(DBN_bench,6),5),4),2),1) 
+	do zi=1,nz 
+		CDF_Z(zi) = sum(DBN_Z(1:zi))
+	enddo 
+	! print*,' '
+	! print*,'DBN_Z=',DBN_Z
+	! print*,'CDF_Z=',CDF_Z 
+	! print*,' '
+
+	! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	size_draft_group(:,1) = size_draft_group_z(:,1) + size_draft_group_z(:,2) + size_draft_group_z(:,3) & 
+							&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*size_draft_group_z(:,4)
+	size_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*size_draft_group_z(:,4)+((0.80_dp-CDF_Z(4))/DBN_Z(5))*size_draft_group_z(:,5)
+	size_draft_group(:,3) = (0.10_dp/DBN_Z(5))*size_draft_group_z(:,5)
+	size_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*size_draft_group_z(:,5) + &
+						& ((0.99_dp-CDF_Z(5))/DBN_Z(6))*size_draft_group_z(:,6) 
+	size_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*size_draft_group_z(:,6) + & 
+						& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*size_draft_group_z(:,7) 
+	size_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*size_draft_group_z(:,7) + size_draft_group_z(:,8) + size_draft_group_z(:,9) 
+	size_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*size_draft_group_z(:,7) + &
+							& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*size_draft_group_z(:,8)
+	size_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*size_draft_group_z(:,8) + size_draft_group_z(:,9)
+
+	! CE of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	CE_draft_group(:,1)   = ( DBN_Z(1)*CE_draft_group_z(:,1) + DBN_Z(2)*CE_draft_group_z(:,2) + & 
+							& DBN_Z(3)*CE_draft_group_z(:,3) + (0.40_dp-CDF_Z(3))*CE_draft_group_z(:,4) )/0.40_dp
+	CE_draft_group(:,2)   = ( (CDF_Z(4)-0.40_dp)*CE_draft_group_z(:,4) + (0.80_dp-CDF_Z(4))*CE_draft_group_z(:,5) )/0.40_dp
+	CE_draft_group(:,3)   = CE_draft_group_z(:,5)
+	CE_draft_group(:,4)   = ( (CDF_Z(5)-0.90_dp)*CE_draft_group_z(:,5) + (0.99_dp-CDF_Z(5))*CE_draft_group_z(:,6) )/0.09_dp
+	CE_draft_group(:,5)   = ( (CDF_Z(6)-0.99_dp)*CE_draft_group_z(:,6) + (0.999_dp-CDF_Z(6))*CE_draft_group_z(:,7) )/0.009_dp
+	CE_draft_group(:,6)   = ( (CDF_Z(7)-0.999_dp)*CE_draft_group_z(:,7) + &
+							&  DBN_Z(8)*CE_draft_group_z(:,8) + DBN_Z(9)*CE_draft_group_z(:,9) )/0.001_dp
+	CE_draft_group(:,7)   = ( (CDF_Z(7)-0.999_dp)*CE_draft_group_z(:,7) + (0.9999_dp-CDF_Z(7))*CE_draft_group_z(:,8) )/0.0009_dp
+	CE_draft_group(:,8)   = ( (CDF_Z(8)-0.9999_dp)*CE_draft_group_z(:,8) + DBN_Z(9)*CE_draft_group_z(:,9) )/0.0001_dp
+
+	! Frac. pos. welfare by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	frac_pos_welfare_draft_group(:,1) = frac_pos_welfare_draft_group_z(:,1) + frac_pos_welfare_draft_group_z(:,2) + &
+							&  frac_pos_welfare_draft_group_z(:,3) + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*frac_pos_welfare_draft_group_z(:,4)
+	frac_pos_welfare_draft_group(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*frac_pos_welfare_draft_group_z(:,4) + & 
+							&  ((0.80_dp-CDF_Z(4))/DBN_Z(5))*frac_pos_welfare_draft_group_z(:,5)
+	frac_pos_welfare_draft_group(:,3) = (0.10_dp/DBN_Z(5))*frac_pos_welfare_draft_group_z(:,5)
+	frac_pos_welfare_draft_group(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*frac_pos_welfare_draft_group_z(:,5) + & 
+							& ((0.99_dp-CDF_Z(5))/DBN_Z(6))*frac_pos_welfare_draft_group_z(:,6) 
+	frac_pos_welfare_draft_group(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*frac_pos_welfare_draft_group_z(:,6) + &
+							& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*frac_pos_welfare_draft_group_z(:,7) 
+	frac_pos_welfare_draft_group(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*frac_pos_welfare_draft_group_z(:,7) + &
+							& frac_pos_welfare_draft_group_z(:,8) + frac_pos_welfare_draft_group_z(:,9) 
+	frac_pos_welfare_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*frac_pos_welfare_draft_group_z(:,7) + &
+							& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*frac_pos_welfare_draft_group_z(:,8)
+	frac_pos_welfare_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*frac_pos_welfare_draft_group_z(:,8) + &
+							&  frac_pos_welfare_draft_group_z(:,9)
+
+	! Fix fractions
+	frac_pos_welfare_draft_group = 100*frac_pos_welfare_draft_group/size_draft_group
+
+    OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE_tr.txt', STATUS='replace') 
+    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size_tr.txt', STATUS='replace') 
+    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_fpos_welfare_tr.txt', STATUS='replace') 
+	do age = 1,draft_age_category
+	    WRITE  (UNIT=80, FMT=*)  CE_draft_group(age,:)
+	    WRITE  (UNIT=81, FMT=*)  size_draft_group(age,:)
+	    WRITE  (UNIT=82, FMT=*)  frac_pos_welfare_draft_group(age,:)
+	ENDDO
+	close(unit=80); close(unit=81); close(unit=82)
+
+
+
+END SUBROUTINE  COMPUTE_WELFARE_GAIN_TRANSITION
+
+
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+
 ! SUBROUTINE COMPUTE_VALUE_FUNCTION_SPLINE()
 ! 	IMPLICIT NONE
 ! 	REAL(DP), DIMENSION(na) :: ValueP1, ValueP2, ValueP, ExpValueP
@@ -3233,7 +3649,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	INTEGER  :: tklo, tkhi, xp_ind, age, xi, ai, zi, lambdai, ei
 	REAL(DP) :: PrAprimelo, PrAprimehi, E_MU_cp(nx), aux
 
-	print*,'VALUE FUNCTION LINEAR'
+	! print*,'VALUE FUNCTION LINEAR'
 
 	age=MaxAge
 	DO xi=1,nx
@@ -3344,8 +3760,62 @@ END SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR
 !========================================================================================
 
 
-SUBROUTINE GOVNT_BUDGET()
+SUBROUTINE COMPUTE_VALUE_FUNCTION_TRANSITION
 	IMPLICIT NONE
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_mat, Hours_mat, Aprime_mat, Value_mat
+	INTEGER :: aux_T
+
+	allocate( Cons_mat(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Hours_mat(  MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Aprime_mat( MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Value_mat(  MaxAge,na,nz,nlambda,ne,nx) )
+
+	print*,'Computing Value Function'
+	print*,'	Value functions computed only for agents alive at the time of policy change'
+	print*,' 	Last index corresponds to cohort (age at time of policy change), not transition period'
+	do age=1,MaxAge
+		! print*,'		Cohort of age',age,'at time of policy change'
+
+		! Set policy functions for cohort of age "age" at time of policy change
+			! Previous periods of life from benchmark
+			if (age>1) then 
+			Cons_mat(1:age-1,:,:,:,:,:)   = Cons_bench(1:age-1,:,:,:,:,:)
+			Hours_mat(1:age-1,:,:,:,:,:)  = Hours_bench(1:age-1,:,:,:,:,:)
+			Aprime_mat(1:age-1,:,:,:,:,:) = Aprime_bench(1:age-1,:,:,:,:,:)
+			endif 
+			! Remaining periods of life from transition matrices
+			aux_T = max(MaxAge-age+1,T+1)
+			do ti=1,aux_T
+			Cons_mat(age+ti-1,:,:,:,:,:)   = Cons_tr(age+ti-1,:,:,:,:,:,ti)
+			Hours_mat(age+ti-1,:,:,:,:,:)  = Hours_tr(age+ti-1,:,:,:,:,:,ti)
+			Aprime_mat(age+ti-1,:,:,:,:,:) = Aprime_tr(age+ti-1,:,:,:,:,:,ti)
+			enddo 
+			! Supplement with second steady state if needed
+			if (aux_T.lt.(MaxAge-age+1)) then
+			Cons_mat(T+2:,:,:,:,:,:)   = Cons_exp(T+2:,:,:,:,:,:)
+			Hours_mat(T+2:,:,:,:,:,:)  = Hours_exp(T+2:,:,:,:,:,:)
+			Aprime_mat(T+2:,:,:,:,:,:) = Aprime_exp(T+2:,:,:,:,:,:)
+			endif 
+		! Obtain value function 
+			call COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat)
+
+		! Save value function
+			ValueFunction_tr(:,:,:,:,:,:,age) = Value_mat
+	enddo 
+
+END SUBROUTINE COMPUTE_VALUE_FUNCTION_TRANSITION
+
+
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+
+SUBROUTINE GOVNT_BUDGET(print_flag)
+	IMPLICIT NONE
+	LOGICAL, INTENT(IN) :: print_flag
 
 	! Initialize variables
 	GBAR 		 = 0.0_DP
@@ -3410,7 +3880,7 @@ SUBROUTINE GOVNT_BUDGET()
 	! Set government expenditures as total expenditures minus social security payments
 	GBAR = GBAR -  SSC_Payments
 
-
+	IF (print_flag) THEN
 	! Print Results
 	print*, ' '
 	print*, "Government Budget - Revenues and taxes"
@@ -3443,7 +3913,7 @@ SUBROUTINE GOVNT_BUDGET()
 	WRITE(UNIT=11, FMT=*) 'Average Labor Tax', GBAR_L/Tot_Lab_Inc
 	WRITE(UNIT=11, FMT=*) 'Total Labor Income', Tot_Lab_Inc , 'EBAR', EBAR
 	Close(UNIT=11)
-	
+	ENDIF  
 END  SUBROUTINE GOVNT_BUDGET
 
 !========================================================================================
@@ -3666,7 +4136,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
 	    	if (sum(theta)/nz .gt. 1.0_DP) then
 	    		P = min(P,1.0_dp)
-	           brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R)
+	            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R)
             else
                 R = 0.0_DP
 	        endif
@@ -4018,9 +4488,16 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
 	INTEGER:: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL   :: DBN_dist, DBN_criteria
 	real(dp)   :: BBAR, MeanWealth, brent_value
-	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, DBN2
-	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi, DBN2
+	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
 	real(dp), dimension(na,nz,nx) :: YGRID_old
+
+	! Allocate
+	allocate( PrAprimehi( MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrAprimelo( MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Aplo(       MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Aphi(       MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( DBN2(       MaxAge,na,nz,nlambda,ne,nx) )
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-07_DP
@@ -4880,6 +5357,1353 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 END SUBROUTINE FIND_DBN_EQ_Prices
 
 
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+
+SUBROUTINE FIND_DBN_Transition()
+	use omp_lib
+	IMPLICIT NONE
+	INTEGER    :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
+	REAL       :: DBN_dist, DBN_criteria, Q_dist, N_dist, Price_criteria, Chg_criteria, Old_DBN_dist, Chg_dist
+	REAL(DP)   :: BBAR, MeanWealth, brent_value, K_bench, C_bench, K_exp, C_exp
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
+	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
+	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr
+
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! Set Up
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	! Allocate
+	allocate( PrAprimehi( MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrAprimelo( MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Aplo(       MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Aphi(       MaxAge,na,nz,nlambda,ne,nx) )
+
+	!$ call omp_set_num_threads(nz)
+	DBN_criteria    = 1.0E-06_DP
+	Price_criteria  = 1.0E-05_DP
+	Chg_criteria    = 1.5E-07_DP
+
+	! Set grids that depend on wealth tax threshold
+		! Adjust agrid to include breaking points
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+
+	! Wealth and consumption in benchmark and experiment
+		K_bench = sum( sum(sum(sum(sum(sum(DBN_bench,6),5),4),3),1)*agrid )
+		K_exp   = sum( sum(sum(sum(sum(sum(DBN_exp  ,6),5),4),3),1)*agrid )
+		C_bench = sum( DBN_bench*Cons_bench )
+		C_exp   = sum( DBN_exp  *Cons_exp   )
+
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! Initial guess for transition path variables
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		! Guess NBAR, QBAR and R as a linear combination of starting and end values
+			NBAR_tr(1)   = NBAR_bench ; NBAR_tr(T+1) = NBAR_exp   ;
+			QBAR_tr(1)   = QBAR_bench ; QBAR_tr(T+1) = QBAR_exp   ;
+			R_tr(1)      = R_bench    ; R_tr(T+1)    = R_exp      ;
+			do ti=2,T
+				NBAR_tr(ti) = NBAR_tr(ti-1) + (NBAR_tr(T+1)-NBAR_tr(1))/T
+				QBAR_tr(ti) = QBAR_tr(ti-1) + (QBAR_tr(T+1)-QBAR_tr(1))/T
+				R_tr(ti)    = R_tr(ti-1) + (R_tr(T+1)-R_tr(1))/T
+			enddo 
+		! Load Guess From Files
+			! print*, 'Loading initial variables from file'
+			! OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'   , STATUS='old', ACTION='read')
+			! OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
+			! OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		 , STATUS='old', ACTION='read')
+			! READ (UNIT=1,  FMT=*), QBAR_tr
+			! READ (UNIT=2,  FMT=*), NBAR_tr
+			! READ (UNIT=3,  FMT=*), R_tr
+			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3);
+			! print*, 'Reading completed'
+
+		! Choose YBAR, EBAR, P and Wage to be consistent
+		P_tr    = alpha* QBAR_tr**(alpha-mu) * NBAR_tr**(1.0_DP-alpha)
+        YBAR_tr = QBAR_tr ** alpha * NBAR_tr **(1.0_DP-alpha)
+        wage_tr = (1.0_DP-alpha)*QBAR_tr**alpha * NBAR_tr**(-alpha)
+        Ebar_tr = wage_tr  * NBAR_tr  * sum(pop)/sum(pop(1:RetAge-1))
+        	print*, "Test Prices"
+	        print*, "P   ", P_bench, P_tr(1), P_tr(T), P_tr(T+1)
+	        print*, "wage", wage_bench, wage_tr(1), wage_tr(T), wage_tr(T+1)
+	        print*, "EBAR", EBAR_bench, EBAR_tr(1), EBAR_tr(T), EBAR_tr(T+1)
+	        print*, "Tau_K", tauK,"Tau_W_at",tauW_at,"Tau_bt",tauW_bt
+
+        ! Save initial guess of prices
+        OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='replace')
+        OPEN (UNIT=77, FILE=trim(Result_Folder)//'Transition_NBAR.txt', STATUS='replace')
+        OPEN (UNIT=78, FILE=trim(Result_Folder)//'Transition_QBAR.txt', STATUS='replace')
+        OPEN (UNIT=79, FILE=trim(Result_Folder)//'Transition_R.txt', STATUS='replace')
+        OPEN (UNIT=80, FILE=trim(Result_Folder)//'Transition_GBAR.txt', STATUS='replace')
+        OPEN (UNIT=81, FILE=trim(Result_Folder)//'Transition_GBAR_K.txt', STATUS='replace')
+        OPEN (UNIT=82, FILE=trim(Result_Folder)//'Transition_GBAR_W.txt', STATUS='replace')
+        OPEN (UNIT=83, FILE=trim(Result_Folder)//'Transition_GBAR_L.txt', STATUS='replace')
+        OPEN (UNIT=84, FILE=trim(Result_Folder)//'Transition_GBAR_C.txt', STATUS='replace')
+        OPEN (UNIT=85, FILE=trim(Result_Folder)//'Transition_SSC.txt', STATUS='replace')
+        OPEN (UNIT=86, FILE=trim(Result_Folder)//'Transition_K.txt', STATUS='replace')
+        OPEN (UNIT=87, FILE=trim(Result_Folder)//'Transition_C.txt', STATUS='replace')
+     		
+     		WRITE(UNIT=77, FMT=*) 'Iteration, DBN_dist, Q_dist, N_dist, Q(T)/Q(SS), N(T)/N(SS)'
+     		WRITE(UNIT=77, FMT=*) 'NBAR'
+        	WRITE(UNIT=78, FMT=*) 'QBAR'
+        	WRITE(UNIT=79, FMT=*) 'R'
+        	WRITE(UNIT=80, FMT=*) 'GBAR'
+        	WRITE(UNIT=81, FMT=*) 'GBAR_K'
+        	WRITE(UNIT=82, FMT=*) 'GBAR_W'
+        	WRITE(UNIT=83, FMT=*) 'GBAR_L'
+        	WRITE(UNIT=84, FMT=*) 'GBAR_C'
+        	WRITE(UNIT=85, FMT=*) 'SSC'
+        	WRITE(UNIT=86, FMT=*) 'K'
+        	WRITE(UNIT=87, FMT=*) 'C'
+
+        	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR_tr, NBAR_exp
+        	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR_tr, QBAR_exp
+        	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
+
+    	CLOSE (unit=76); CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
+    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
+    	CLOSE (unit=86); CLOSE (unit=87);
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! DBN Iteration 
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	print*,' '
+	print*,'---------------------------------------------------'
+	print*,' 	Starting Transition'
+	print*,'---------------------------------------------------'
+	! Compute distribution of assets by age and state
+		! Distribution is obtained by iterating over an initial distribution using policy functions
+	DBN_dist     = 1.0_DP
+	Q_dist       = 1.0_DP
+	N_dist       = 1.0_DP
+	Chg_dist     = 1.0_DP 
+	Old_DBN_dist = 0.0_DP 
+	simutime     = 1
+	iter_indx    = 1
+	!print*, 'Computing Equilibrium Distribution'
+	DO WHILE ((DBN_dist.ge.DBN_criteria).and.(max(Q_dist,N_dist).ge.Price_criteria)&
+			& .and.(simutime.le.25).and.(Chg_dist.ge.Chg_criteria) )
+		! print*, 'DBN_dist=', DBN_dist
+
+		! Start Q_dist and N_dist
+		Q_dist = 0.0 ; N_dist = 0.0 ;
+
+		! Start Debt to zero
+		Debt_tr = 0.0_dp
+
+
+	    ! Solve for policy functions by backwards induction and EGM
+	    	! Output is policy functions for all times and all ages
+	    	CALL EGM_Transition
+
+	    ! First Period Starts at DBN_bench
+	    ! print*, ' Set DBN_tr for first period to benchmark distribution'
+	    DBN_tr(:,:,:,:,:,:,1) = DBN_bench
+
+
+
+		! Initialize DBN_tr to zero for other periods
+		! print*, ' Initializing remaining periods of DBN_tr to zero'
+		! DO ti=2,T+1
+		! 	! print*,' 	Transition Period',ti
+	 	! 		DBN_tr(:,:,:,:,:,:,ti)=0.0_DP
+	 	! ENDDO
+	 	DBN_tr(:,:,:,:,:,:,2:) = 0.0_DP
+
+    	print*,' '
+		print*,' 	--------------------------------------'
+		print*,' 	Starting DBN Forward Iteration'
+		print*,' 	--------------------------------------'
+	    ! Fill in other periods starting at DBN bench following policy functions
+	    DO ti=1,T
+	    	! print*,' 	Transition Period ',ti
+
+
+		! Discretize policy function for assets (a') for current period
+			! For each age and state vector bracket optimal a' between two grid points
+			! When at that age and state the optimal decision is approximated by selecting one the grid points
+			! The grid points are selected with probability proportional to their distance to the optimal a'
+		! print*,' Discretizing Policy Functions'
+		DO age=1,MaxAge
+			! print*,' 		Age ',age
+		!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
+		DO zi=1,nz
+			! print*,' 			z ',zi 
+		DO xi=1,nx
+			! print*,' 				x ',xi 
+		DO ai=1,na
+			! print*,' 					a ',ai 
+		DO lambdai=1,nlambda
+			! print*,' 						lambda ',lambdai 
+		DO ei=1, ne
+			! print*, '  							e', ei
+	        if ( Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .ge. amax) then
+	            tklo =na-1
+	        elseif (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .lt. amin) then
+	            tklo = 1
+	        else
+	            tklo = ((Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+	        endif
+	        tkhi = tklo + 1        
+	        Aplo(age,ai,zi,lambdai,ei,xi)  	   = tklo
+	        Aphi(age,ai,zi,lambdai,ei,xi)  	   = tkhi        
+	        PrAprimelo(age,ai,zi,lambdai,ei,xi) = (agrid(tkhi) - Aprime_tr(age,ai,zi,lambdai,ei,xi,ti))/(agrid(tkhi)-agrid(tklo))
+	        PrAprimehi(age,ai,zi,lambdai,ei,xi) = (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) - agrid(tklo))/(agrid(tkhi)-agrid(tklo))
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		! print*, ' Discretizing Policy Functions Completed'
+
+		! Probablities are adjusted to lie in [0,1]
+			PrAprimelo = min(PrAprimelo, 1.0_DP)
+			PrAprimelo = max(PrAprimelo, 0.0_DP)
+			PrAprimehi = min(PrAprimehi, 1.0_DP)
+			PrAprimehi = max(PrAprimehi, 0.0_DP)
+
+
+		! Everyone in MaxAge dies. Those who die, switch to z2, lambda2 and start at ne/2+1 and x=1
+	    age1=MaxAge
+	    DO x1=1,nx
+	    DO z1=1,nz
+	    DO a1=1,na
+	    DO lambda1=1,nlambda
+	    DO e1=1, ne
+	        DO z2=1,nz
+	        DO lambda2=1,nlambda
+	        	DBN_tr(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 , ti+1)   =  &
+	           		& DBN_tr(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1 , ti+1) + &
+	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
+	            DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 , ti+1)   =  &
+	           		& DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1 , ti+1) + &
+	           		&  DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        ENDDO
+	        ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO    
+	    ENDDO
+	    ENDDO    
+
+		! retirees "e" stays the same for benefit retirement calculation purposes
+	    DO x1=1,nx
+	    DO age1=RetAge-1, MaxAge-1
+	    DO a1=1,na
+	    DO z1=1,nz
+	    DO lambda1=1,nlambda
+	    DO e1=1, ne
+	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
+	        DO z2=1,nz
+	        DO lambda2=1,nlambda
+	        	DBN_tr(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1,ti+1)   =  &
+	           		& DBN_tr(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1,ti+1) + &
+	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
+	            DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1,ti+1)   =  &
+	           		& DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1,ti+1) + &
+	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        ENDDO
+	        ENDDO
+	        
+	        ! Those who live stay at z1, lambda1, and also e1 since they are retired
+	        !e2=e1
+	        DO x2=1,nx
+		        DBN_tr(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2,ti+1) =  &
+		        	& DBN_tr(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2,ti+1) + &
+		        	& DBN_tr(age1, a1, z1, lambda1, e1,x1,ti) &
+		            & * survP(age1) * PrAprimelo(age1,a1,z1,lambda1,e1,x1) * pr_x(x1,x2,z1,age1)     
+		        DBN_tr(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2,ti+1) =  &
+		          	& DBN_tr(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2,ti+1) + &
+		          	& DBN_tr(age1, a1, z1, lambda1, e1,x1,ti) &
+		            & * survP(age1) * PrAprimehi(age1,a1,z1,lambda1,e1,x1) * pr_x(x1,x2,z1,age1)  
+	        ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    
+	    ! Working age agents
+	    DO x1=1,nx
+	    DO age1=1,RetAge-2
+	    DO a1=1,na
+	    DO z1=1,nz
+	    DO lambda1=1,nlambda
+	    DO e1=1, ne
+	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
+	        DO z2=1,nz
+	        DO lambda2=1,nlambda
+	        	DBN_tr(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1,ti+1)   =  &
+	           		& DBN_tr(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1,ti+1) + & 
+	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
+	            DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1,ti+1)   =  &
+	           		& DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1,ti+1) + & 
+	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        ENDDO
+	        ENDDO
+	        
+	        ! Those who live stay at z1, lambda1, but switch to e2 and x2
+	        DO x2=1,nx
+	        DO e2=1,ne
+				DBN_tr(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2,ti+1) =  &
+	          		& DBN_tr(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2,ti+1) + &
+	          		& DBN_tr(age1, a1, z1, lambda1, e1,x1,ti) &
+	                & * survP(age1) * pr_e(e1,e2) * pr_x(x1,x2,z1,age1) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
+	            DBN_tr(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2,ti+1) =  &
+	          		& DBN_tr(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2,ti+1) + &
+	          		& DBN_tr(age1, a1, z1, lambda1, e1,x1,ti) &
+	                & * survP(age1) * pr_e(e1,e2) * pr_x(x1,x2,z1,age1) * PrAprimehi(age1,a1,z1,lambda1,e1,x1) 
+	        ENDDO
+	        ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+	    ENDDO
+
+	    ! Set global variables to current period  (Time: ti)
+	    	R = R_tr(ti) ; P = P_tr(ti) ; wage = wage_tr(ti) ;
+	    	K_mat  = K_Matrix(R,P)
+			Pr_mat = Profit_Matrix(R,P)
+			CALL ComputeLaborUnits(Ebar_tr(ti), wage_tr(ti)) 
+			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
+			DBN1  = DBN_tr(:,:,:,:,:,:,ti)
+			Cons  = Cons_tr(:,:,:,:,:,:,ti)
+			Hours = Hours_tr(:,:,:,:,:,:,ti)
+
+
+	    ! Compute government budget for the current preiod (Time: ti)
+	    ! print*,' Calculating tax revenue'
+	    	CALL GOVNT_BUDGET(.false.)
+			    GBAR_tr(ti) 		= GBAR 
+			    GBAR_K_tr(ti) 		= GBAR_K 
+			    GBAR_W_tr(ti) 		= GBAR_W
+			    GBAR_L_tr(ti) 		= GBAR_L 
+			    GBAR_C_tr(ti) 		= GBAR_C 
+			    SSC_Payments_tr(ti) = SSC_Payments
+			    Tot_Lab_Inc_tr(ti) 	= Tot_Lab_Inc
+			    Debt_tr             = Debt_tr*(1+R_tr(ti)) + (GBAR_bench-GBAR_tr(ti)) 
+
+
+	    ! Compute prices and aggregates for the current period (Time: ti)
+	    ! print*,' Updating Prices and Quantities'
+    		! Compute aggregates with current distribution (Time: ti)
+	        QBAR2_tr(ti) =0.0
+	        NBAR2_tr(ti) =0.0
+	        DO x1=1,nx
+	        DO age1=1,MaxAge
+	        DO z1=1,nz
+	        DO a1=1,na
+	        DO lambda1=1,nlambda
+	        DO e1=1, ne
+	             QBAR2_tr(ti)= QBAR2_tr(ti)+ DBN_tr(age1,a1,z1,lambda1,e1,x1,ti) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
+	             NBAR2_tr(ti)= NBAR2_tr(ti)+ &
+	             			& DBN_tr(age1,a1,z1,lambda1,e1,x1,ti) * eff_un(age1,lambda1,e1) * Hours_tr(age1,a1,z1,lambda1,e1,x1,ti)
+	        ENDDO
+	        ENDDO
+	        ENDDO
+	        ENDDO    
+	        ENDDO    
+	        ENDDO    
+	        QBAR2_tr(ti) = ( QBAR2_tr(ti))**(1.0_DP/mu) 
+
+	        	! Get Q_dist and N_dist before dampening 
+	        	Q_dist = max(Q_dist,abs(QBAR2_tr(ti)/QBAR_tr(ti)-1))
+	        	N_dist = max(N_dist,abs(NBAR2_tr(ti)/NBAR_tr(ti)-1))
+
+            	! Dampened Update of QBAR and NBAR
+	        	QBAR_tr(ti)  = 0.7*QBAR_tr(ti) + 0.3*QBAR2_tr(ti)
+	        	NBAR_tr(ti)  = 0.7*NBAR_tr(ti) + 0.3*NBAR2_tr(ti)
+
+        	! Update other prices and quantities             
+	        P_tr(ti)     = alpha* QBAR_tr(ti)**(alpha-mu) * NBAR_tr(ti)**(1.0_DP-alpha)
+	        YBAR_tr(ti)  = QBAR_tr(ti)**alpha * NBAR_tr(ti)**(1.0_DP-alpha)
+	        wage_tr(ti)  = (1.0_DP-alpha)*QBAR_tr(ti)**alpha * NBAR_tr(ti)**(-alpha)
+	        Ebar_tr(ti)  = wage_tr(ti)  * NBAR_tr(ti) * sum(pop)/sum(pop(1:RetAge-1))
+
+	    	! Solve for new R (that clears market under new guess for prices)
+	    	if (sum(theta)/nz .gt. 1.0_DP) then
+	    		! Set price 
+	    		P = min(P_tr(ti),1.0_dp)
+	    		! Set DBN1 as the distribution for the current period (Time: ti)
+	    		DBN1  = DBN_tr(:,:,:,:,:,:,ti)
+	            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R_tr(ti))
+            else
+                R_tr(ti) = 0.0_DP
+	        endif
+
+	        ! Compute total assets and consumption
+	        K_tr(ti) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+	        C_tr(ti) = sum( DBN1*Cons )
+
+
+    	ENDDO ! Transition Time
+
+		print*,' 	--------------------------------------'
+		print*,' 	DBN Forward Iteration Completed'
+		print*,' 	--------------------------------------'
+		print*,' '
+
+	    ! Set global variables to current period  (Time: ti)
+	    	R = R_tr(T+1) ; P = P_tr(T+1) ; wage = wage_tr(T+1) ;
+	    	K_mat  = K_Matrix(R,P)
+			Pr_mat = Profit_Matrix(R,P)
+			CALL ComputeLaborUnits(Ebar_tr(T+1), wage_tr(T+1)) 
+			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
+			DBN1  = DBN_tr(:,:,:,:,:,:,T+1)
+			Cons  = Cons_tr(:,:,:,:,:,:,T+1)
+			Hours = Hours_tr(:,:,:,:,:,:,T+1)
+
+	    ! Compute government budget for the current preiod (Time: T+1)
+	    ! print*,' Calculating tax revenue'
+	    	CALL GOVNT_BUDGET(.false.)
+			    GBAR_tr(T+1) 		 = GBAR 
+			    GBAR_K_tr(T+1) 		 = GBAR_K 
+			    GBAR_W_tr(T+1) 		 = GBAR_W
+			    GBAR_L_tr(T+1) 		 = GBAR_L 
+			    GBAR_C_tr(T+1) 		 = GBAR_C 
+			    SSC_Payments_tr(T+1) = SSC_Payments
+			    Tot_Lab_Inc_tr(T+1)  = Tot_Lab_Inc
+			    ! Note that Debt_tr is not computed for T+1 since that would increase interest payments
+
+
+	    ! Compute prices and aggregates for the current period (Time: T+1)
+	    ! print*,' Updating Prices and Quantities fot T+1'
+    		! Compute aggregates with current distribution (Time: T+1)
+	        QBAR2_tr(ti) =0.0
+	        NBAR2_tr(T+1) =0.0
+	        DO x1=1,nx
+	        DO age1=1,MaxAge
+	        DO z1=1,nz
+	        DO a1=1,na
+	        DO lambda1=1,nlambda
+	        DO e1=1, ne
+	             QBAR2_tr(T+1)= QBAR2_tr(T+1)+ DBN_tr(age1,a1,z1,lambda1,e1,x1,T+1) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
+	             NBAR2_tr(T+1)= NBAR2_tr(T+1)+ &
+	             		& DBN_tr(age1,a1,z1,lambda1,e1,x1,T+1) * eff_un(age1,lambda1,e1) * Hours_tr(age1,a1,z1,lambda1,e1,x1,T+1)
+	        ENDDO
+	        ENDDO
+	        ENDDO
+	        ENDDO    
+	        ENDDO    
+	        ENDDO    
+	        QBAR2_tr(T+1) = ( QBAR2_tr(T+1))**(1.0_DP/mu) 
+
+	        	! Get Q_dist and N_dist before dampening 
+	        	Q_dist = max(Q_dist,abs(QBAR2_tr(T+1)/QBAR_tr(T+1)-1))
+	        	N_dist = max(N_dist,abs(NBAR2_tr(T+1)/NBAR_tr(T+1)-1))
+
+            	! Dampened Update of QBAR and NBAR
+	        	QBAR_tr(T+1)  = 0.7*QBAR_tr(T+1) + 0.3*QBAR2_tr(T+1)
+	        	NBAR_tr(T+1)  = 0.7*NBAR_tr(T+1) + 0.3*NBAR2_tr(T+1)
+
+        	! Update other prices and quantities             
+	        P_tr(T+1)     = alpha* QBAR_tr(T+1)**(alpha-mu) * NBAR_tr(T+1)**(1.0_DP-alpha)
+	        YBAR_tr(T+1)  = QBAR_tr(T+1)**alpha * NBAR_tr(T+1)**(1.0_DP-alpha)
+	        wage_tr(T+1)  = (1.0_DP-alpha)*QBAR_tr(T+1)**alpha * NBAR_tr(T+1)**(-alpha)
+	        Ebar_tr(T+1)  = wage_tr(T+1)  * NBAR_tr(T+1) * sum(pop)/sum(pop(1:RetAge-1))
+
+	    	! Solve for new R (that clears market under new guess for prices)
+	    	if (sum(theta)/nz .gt. 1.0_DP) then
+	    		! Set price 
+	    		P = min(P_tr(T+1),1.0_dp)
+	    		! Set DBN1 as the distribution for the current period (Time: T+1)
+	    		DBN1  = DBN_tr(:,:,:,:,:,:,T+1)
+	            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R_tr(T+1))
+            else
+                R_tr(T+1) = 0.0_DP
+	        endif
+
+	        ! Compute total assets and consumption
+	        K_tr(T+1) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+	        C_tr(T+1) = sum( DBN1*Cons )
+	    
+
+	    	! Save Prices
+	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Transition_NBAR.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=78, FILE=trim(Result_Folder)//'Transition_QBAR.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=79, FILE=trim(Result_Folder)//'Transition_R.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=80, FILE=trim(Result_Folder)//'Transition_GBAR.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=81, FILE=trim(Result_Folder)//'Transition_GBAR_K.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=82, FILE=trim(Result_Folder)//'Transition_GBAR_W.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=83, FILE=trim(Result_Folder)//'Transition_GBAR_L.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=84, FILE=trim(Result_Folder)//'Transition_GBAR_C.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=85, FILE=trim(Result_Folder)//'Transition_SSC.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=86, FILE=trim(Result_Folder)//'Transition_K.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=87, FILE=trim(Result_Folder)//'Transition_C.txt', STATUS='old', POSITION='append')
+	        	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR2_tr, NBAR_exp
+	        	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR2_tr, QBAR_exp
+	        	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
+	        	WRITE(UNIT=80, FMT=*) GBAR_bench, GBAR_tr, GBAR_exp
+	        	WRITE(UNIT=81, FMT=*) GBAR_K_tr
+	        	WRITE(UNIT=82, FMT=*) GBAR_W_tr
+	        	WRITE(UNIT=83, FMT=*) GBAR_L_tr
+	        	WRITE(UNIT=84, FMT=*) GBAR_C_tr
+	        	WRITE(UNIT=85, FMT=*) SSC_Payments_tr
+	        	WRITE(UNIT=86, FMT=*) K_tr
+	        	WRITE(UNIT=87, FMT=*) C_tr
+	    	CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
+	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
+	    	CLOSE (unit=86); CLOSE (unit=87);
+
+
+	    	! Write Variable Paths
+	    	print*,' '
+			print*,' 	--------------------------------------'
+			print*,' 	Printing Variables'
+			print*,' 	--------------------------------------'
+			! OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'Cons_tr'  , STATUS='replace')
+			! OPEN  (UNIT=2,  FILE=trim(Result_Folder)//'Hours_tr'  , STATUS='replace')
+			! OPEN  (UNIT=3,  FILE=trim(Result_Folder)//'Aprime_tr'  , STATUS='replace')
+			OPEN  (UNIT=77,  FILE=trim(Result_Folder)//'GBAR_tr'   , STATUS='replace')
+			OPEN  (UNIT=78,  FILE=trim(Result_Folder)//'Wage_tr'   , STATUS='replace')
+			OPEN  (UNIT=79,  FILE=trim(Result_Folder)//'R_tr'      , STATUS='replace')
+			OPEN  (UNIT=80,  FILE=trim(Result_Folder)//'P_tr'      , STATUS='replace')
+			OPEN  (UNIT=81,  FILE=trim(Result_Folder)//'QBAR_tr'   , STATUS='replace')
+			OPEN  (UNIT=82,  FILE=trim(Result_Folder)//'NBAR_tr'   , STATUS='replace')
+			OPEN  (UNIT=83,  FILE=trim(Result_Folder)//'YBAR_tr'   , STATUS='replace')
+			OPEN  (UNIT=84,  FILE=trim(Result_Folder)//'K_tr'      , STATUS='replace')
+			OPEN  (UNIT=85,  FILE=trim(Result_Folder)//'C_tr'      , STATUS='replace')
+			OPEN  (UNIT=86,  FILE=trim(Result_Folder)//'Debt_tr'   , STATUS='replace')
+			OPEN  (UNIT=87,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='replace')
+				! WRITE (UNIT=1,  FMT=*) Cons_tr
+				! WRITE (UNIT=2,  FMT=*) Hours_tr
+				! WRITE (UNIT=3,  FMT=*) Aprime_tr
+				WRITE (UNIT=77,  FMT=*) GBAR_tr
+				WRITE (UNIT=78,  FMT=*) Wage_tr
+				WRITE (UNIT=79,  FMT=*) R_tr
+				WRITE (UNIT=80,  FMT=*) P_tr
+				WRITE (UNIT=81,  FMT=*) QBAR_tr
+				WRITE (UNIT=82,  FMT=*) NBAR_tr
+				WRITE (UNIT=83,  FMT=*) YBAR_tr
+				WRITE (UNIT=84,  FMT=*) K_tr
+				WRITE (UNIT=85,  FMT=*) C_tr
+				WRITE (UNIT=86,  FMT=*) Debt_tr
+				WRITE (UNIT=87,  FMT=*) tauW_at
+			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
+			CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
+	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); 
+	    	CLOSE (unit=84); CLOSE (unit=85); CLOSE (unit=86); CLOSE (unit=87);
+			print*,' 	--------------------------------------'
+			print*,' 	Variable Printing Completed'
+			print*,' 	--------------------------------------'
+			print*,' '
+
+		! Compare distance to tax reform distribution
+		    DBN_dist = maxval(abs(DBN_tr(:,:,:,:,:,:,T+1)-DBN_exp))
+		    Chg_dist = abs(DBN_dist-Old_DBN_dist)
+		    Old_DBN_dist = DBN_dist
+
+		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,' Q_dist=',Q_dist,' N_dist=',N_dist,&
+		    	&' Q(T)/Q(SS)=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N(T)/N(SS)=',100*(NBAR2_tr(T+1)/NBAR_exp-1),&
+		    	&' Chg_dist=',Chg_dist
+	    	print*,'	GBAR_exp=',GBAR_tr(T+1),'Debt/GDP=',Debt_tr/YBAR_tr(T+1),'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr
+
+	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
+	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,N_dist,100*(QBAR2_tr(T+1)/QBAR_exp-1),100*(NBAR2_tr(T+1)/NBAR_exp-1)
+	    	CLOSE(UNIT=76)
+
+
+	    simutime  = simutime +1 
+	 
+	ENDDO ! WHILE
+
+	print*,'---------------------------------------------------'
+	print*,' 	Transition Completed'
+	print*,'---------------------------------------------------'
+	print*,' '
+
+	! Print Summary File
+	OPEN  (UNIT=78,  FILE=trim(Result_Folder)//'Transition_Summary.txt'   , STATUS='replace')
+	WRITE (UNIT=78,  FMT=*) 'Period, Q, N, R, Wage, Y, K, C, GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC'
+	WRITE (UNIT=78,  FMT=*) 'SS_1,',QBAR_bench,',',NBAR_bench,',',R_bench,',',wage_bench,',' & 
+								&  ,Y_bench,',',K_bench,',',C_bench,',',GBAR_bench
+	do ti=1,T+1
+	WRITE (UNIT=78,  FMT=*) ti,',',QBAR_tr(ti),',',NBAR_tr(ti),',',R_tr(ti),',',Wage_tr(ti),',' & 
+								& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),',',GBAR_tr(ti),',' &
+								& ,GBAR_K_tr(ti),',',GBAR_W_tr(ti),',',GBAR_L_tr(ti),',',GBAR_C_tr(ti),',',SSC_Payments_tr(ti)
+	enddo 
+	WRITE (UNIT=78,  FMT=*) 'SS_2,',QBAR_exp,',',NBAR_exp,',',R_exp,',',wage_exp,',' & 
+								&  ,Y_exp,',',K_exp,',',C_exp,',',GBAR_exp
+	CLOSE (UNIT=78);
+
+
+
+END SUBROUTINE FIND_DBN_Transition
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+SUBROUTINE EGM_Transition()
+	use omp_lib
+	IMPLICIT NONE
+	REAL(DP) :: brentvalue, C_foc, H_min, euler_power
+	INTEGER  :: tempai, sw 
+	REAL(DP), DIMENSION(na_t+nz*nx+1)  	:: EndoCons, EndoYgrid, EndoHours
+	INTEGER , DIMENSION(na_t+nz*nx+1)   :: sort_ind 
+	REAL(DP), DIMENSION(na_t,nz,nx) :: Wealth_mat
+	REAL(DP), DIMENSION(7)       	:: state_FOC
+	REAL(DP), DIMENSION(7)       	:: par_FOC
+	REAL(DP), DIMENSION(nx)       	:: MB_aprime_t
+	integer  :: age, ai, zi, lambdai, ei, xi, xp_ind
+	real(dp), dimension(na_t+nz*nx+1) :: EndoYgrid_sort
+
+	print*,' '
+	print*,' 	----------------------------'
+	print*,' 	Starting EGM Transition'
+	print*,' 	----------------------------'
+
+	!$ call omp_set_num_threads(nz)
+
+	! Set a minimum value for labor to check in the FOC
+		H_min = 0.000001_dp
+
+	! Set the power used in the Euler equation for the retirement period
+		if (NSU_Switch.eqv..true.) then 
+			! Non-Separable Utility
+				euler_power = (1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
+		else 
+			! Separable Utility
+				euler_power = (-1.0_dp/sigma)
+		end if 
+
+	! Policy functions set to tax reform in final period
+		Cons_tr(:,:,:,:,:,:,T+1)   = Cons_exp*(1.0_DP+tauC) ; Cons_t_pr   = Cons_exp*(1.0_DP+tauC) ;
+		Hours_tr(:,:,:,:,:,:,T+1)  = Hours_exp  			; Hours_t_pr  = Hours_exp  			   ;
+		Aprime_tr(:,:,:,:,:,:,T+1) = Aprime_exp 			; 
+		! print*,'Cons_tr(T+1)=',Cons_tr(81,:,5,3,3,1,T+1)
+		! print*,"|Const_exp-Const_bench|=",maxval(abs(Cons_exp-Cons_bench))
+
+	! Solve backwards for all transition periods
+	do ti=T,1,-1
+		! print*,' Solving EGM for transition period ',ti
+
+
+	! Grids and auxiliary variables, must be solved per period 
+
+		! Solve the model at current aggregate values
+		! Compute labor units 
+			CALL ComputeLaborUnits(Ebar_tr(ti), wage_tr(ti)) 
+		! Compute Capital demand and Profits by (a,z)
+			K_mat  = K_Matrix(R_tr(ti),P_tr(ti))
+			Pr_mat = Profit_Matrix(R_tr(ti),P_tr(ti))
+		! Compute wealth given current R and P
+			Wealth_mat = Wealth_Matrix_t(R_tr(ti+1),P_tr(ti+1))
+		! Form YGRID for the capital income economy given interest rate "P"
+			CALL FORM_Y_MB_GRID_Transition(YGRID,MBGRID,YGRID_t,MBGRID_t,ti)
+			! print*, 'YGRID_t(:,5,1)=',YGRID_t(:,5,1)
+			! print*, 'RetY_lambda_e=',RetY_lambda_e
+			! print*,"Period",ti,"|YGRID-YGRID_bench|=",maxval(abs(YGRID_t-YGRID_aux)),&
+			! 	& "|RetY-RetY_bench|=",maxval(abs(RetY_lambda_e-RetY_lambda_e_aux))
+			! print*,"Period",ti,"max(YGRID)=",maxval(YGRID_t),"max(YGRID_bench)=",maxval(YGRID_aux),&
+			! 	& "max(RetY)=",maxval(RetY_lambda_e),"max(RetY_bench)=",minval(RetY_lambda_e_aux)
+
+		! print*, 'R=',R,'P=',P, 'W=',wage, 'na=', na, 'na_t=', na_t
+	!========================================================================================
+	!------RETIREMENT PERIOD-----------------------------------------------------------------
+
+	! SET HOURS TO ZERO SO THAT RETIRED HAS ZERO HOURS
+	Hours_t = 0.0_DP
+
+	! Last period of life
+	age=MaxAge
+		! print*,' 	Age=',age
+	!$omp parallel do private(lambdai,ei,ai,xi)
+	DO zi=1,nz
+	DO xi=1,nx
+    DO lambdai=1,nlambda
+    DO ei=1,ne
+    DO ai=1,na_t
+        Cons_t(age,ai,zi,lambdai,ei,xi) =  YGRID_t(ai,zi,xi) + RetY_lambda_e(lambdai,ei) 
+	ENDDO ! ai
+    ENDDO ! ei
+	ENDDO ! lambdai
+	ENDDO ! xi
+	ENDDO ! zi
+	Aprime_t(age, :, :, :, :,:) = 0.0_DP
+	! print*,"Period",ti,"|Const_t-Const_bench|=",maxval(abs(Cons_t(MaxAge,:,:,:,:,:)-Cons_t_pr(MaxAge,:,:,:,:,:)))
+	! print*,"Period",ti,"Test-Const_bench=",(YGRID_aux(50,5,2) + RetY_lambda_e_aux(3,3))/(1.0_DP+tauC)-Cons_bench(MaxAge,50,5,3,3,2)
+	
+	! Rest of retirement
+	DO age=MaxAge-1,RetAge,-1
+		! print*,' 	Age=',age
+	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
+	!$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
+    DO zi=1,nz
+    DO xi=1,nx
+    DO lambdai=1,nlambda
+    DO ei=1,ne
+    	! Endogenous grid and consumption are initialized
+	    EndoCons  = big_p 
+	    EndoYgrid = big_p 
+	    sw 		  = 0
+    DO ai=1,na_t 
+		if (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8)) then 
+			! print*, ' Threshold section - EGM Retirement'
+			sw 			  = sw+1	
+    		MB_aprime_t   = MBGRID_t(ai,zi,:)
+    		! Consumption on endogenous grid and implied asset income under tauW_bt
+    		do xp_ind = 1,nx 	
+    			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
+    				P = P_tr(ti+1); R = R_tr(ti+1) 
+    				MB_aprime_t(xp_ind) = MB_a_bt(agrid_t(ai),zi,xp_ind)
+    			endif
+    		enddo 
+    		EndoCons(ai)  =  (beta*survP(age)* 	&
+    			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) )**euler_power
+	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
+	        ! Consumption on endogenous grid and implied asset income under tauW_at
+	        do xp_ind = 1,nx 	
+    			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
+    				P = P_tr(ti+1); R = R_tr(ti+1) 
+    				MB_aprime_t(xp_ind) = MB_a_at(agrid_t(ai),zi,xp_ind)
+    			endif
+    		enddo 
+	        EndoCons(na_t+sw)  = (beta*survP(age)*	&
+	        	& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) )**euler_power
+	    	EndoYgrid(na_t+sw) = agrid_t(ai) +  EndoCons(na_t+sw) - RetY_lambda_e(lambdai,ei)
+
+	  !   	print*, ' '
+			! print*, ' Threshold test - Retirement'
+			! print*, ' Current State', age, ai, zi, lambdai, ei, xi
+			! print*, ' ', (pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold))
+			! print*, ' ', (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8))
+			! print*, ' ', MBGRID_t(ai,zi,:)
+			! print*, ' ', MB_a_bt(agrid(ai),zi,xi)
+			! print*, ' ', MB_a_at(agrid(ai),zi,xi)
+			! print*, ' ', EndoCons(ai)
+			! print*, ' ', EndoCons(na_t+sw)
+			! print*, ' '
+	    else 
+	    	! Consumption on endogenous grid and implied asset income
+	    	EndoCons(ai)  = (beta*survP(age)* 	&
+	    		& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)))**euler_power
+	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
+	        ! !$omp critical
+	        ! print*,' Standard EGM - State:',age,ai,zi,lambdai,ei,xi,ti
+	        ! print*,' 	EndoCons(ai)=',EndoCons(ai)
+	        ! print*,' 	Expected value=',&
+	        ! 	& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power))
+	        ! print*,' 	Cons_t+1=',Cons_t_pr(age+1,ai,zi,lambdai,ei,:)
+	        ! print*,' 	Cons_t+1=',Cons_exp(age+1,ai,zi,lambdai,ei,:)
+	        ! !$omp end critical
+	    end if 
+
+
+	 !    if (any(isnan(EndoCons))) then 
+	 !    	print*,' '
+		! 	print*,' '
+		! 	print*,' '
+		! 	print*,' Endo Consumption in retirement', age,ai,zi,lambdai,ei,xi
+		! 	print*,' ',EndoCons(ai),(beta*survP(age)* 	&
+	 !    				& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
+		! 	print*,' MBGRID_t=',MBGRID_t(ai,zi,:)
+		! 	print*,' cons(t+1)=',Cons_t(age+1,ai,zi,lambdai,ei,:)
+		! 	print*,' Size(endoCons)=',size(EndoCons)
+		! 	print*,' sw=',sw,'na_t=',na_t
+		! 	print*,' Threshold_test=',(any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8))
+		! 	print*,' '
+		! 	print*,' ',EndoCons
+		! 	print*,' '
+		! 	STOP
+		! endif 
+	ENDDO ! ai
+
+	    !$omp critical
+		if (any(isnan(EndoCons))) then 
+			print*, "isnan - Consumption endogenous"
+			print*, age,zi,ai,lambdai,ei,xi,ti
+			print*, EndoCons
+			STOP 
+		end if 
+		!$omp end critical
+
+		
+	
+	! Sort endogenous grid for interpolation
+	call Sort(na_t+nx*nz+1,EndoYgrid,EndoYgrid_sort,sort_ind)
+	! print*,' Yendo'
+	! print*, EndoYgrid
+	! print*,' Yendo_sort'
+	! print*, EndoYgrid_sort
+	! print*,' indices'
+	! print*, sort_ind
+
+	EndoYgrid = EndoYgrid_sort
+	EndoCons = EndoCons(sort_ind)
+
+	! print*, ' '
+	! print*, ' isnan(endocons)', any(isnan(EndoCons))
+
+	! Find  decision rules on exogenous grids
+		! decision rules are obtained taking care of extrapolations
+		tempai=1           
+		DO WHILE ( YGRID_t(tempai,zi,xi) .lt. EndoYgrid(1) )
+            tempai = tempai + 1
+        ENDDO
+	                
+		DO ai=tempai,na_t              
+		    ! CONSUMPTION ON EXOGENOUS GRIDS 
+		    Cons_t(age,ai,zi,lambdai, ei,xi)  = Linear_Int(EndoYgrid(1:na_t+sw), EndoCons(1:na_t+sw),na_t+sw, YGRID_t(ai,zi,xi))
+		    Aprime_t(age,ai,zi,lambdai,ei,xi) = &
+		    								& YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)-Cons_t(age, ai, zi, lambdai, ei,xi)
+		    
+		    If (Aprime_t(age,ai,zi,lambdai,ei,xi).lt.amin) then
+		    	Aprime_t(age,ai,zi,lambdai,ei,xi) = amin
+	            Cons_t(age,ai,zi,lambdai,ei,xi)   = &
+	            	& YGRID_t(ai,zi,xi) + RetY_lambda_e(lambdai,ei) - Aprime_t(age,ai,zi,lambdai,ei,xi)
+				IF (Cons_t(age,ai,zi,lambdai,ei,xi) .le. 0.0_DP)  THEN
+				    print*,'r1: Cons(age, ai, zi, lambdai,ei)=',Cons_t(age, ai, zi, lambdai, ei,ti)
+				ENDIF                   
+	        endif 
+
+	        ! ! !$omp critical 
+	        ! if (isnan(Cons_t(age,ai,zi,lambdai,ei,xi))) then
+	        ! 	print*,' '
+	        ! 	print*,' '
+	        ! 	print*,' '
+	        ! 	print*,' isnan Consumption', age,ai,zi,lambdai,ei,xi
+	        ! 	print*,' sw=',sw 
+	        ! 	print*,' Yendo'
+	        ! 	print*, EndoYgrid(1:na_t+sw)
+	        ! 	print*,' Cendo'
+	        ! 	print*, EndoCons(1:na_t+sw)
+	        ! 	print*,' YGRID'
+	        ! 	print*, YGRID_t(ai,zi,xi)
+	        ! 	print*,' Linear Interpolation',Linear_Int(EndoYgrid(1:na_t+sw), EndoCons(1:na_t+sw),na_t+sw, YGRID_t(ai,zi,xi))
+	        ! 	print*,' Aprime=',Aprime_t(age,ai,zi,lambdai,ei,xi)
+	        ! 	call Sort(na_t+nx*nz+1,EndoYgrid,EndoYgrid_sort,sort_ind)
+	        ! 	print*,' Yendo'
+	        ! 	print*, EndoYgrid_sort
+	        ! 	print*,' indices'
+	        ! 	print*, sort_ind
+	        ! 	print*, ' '
+	        ! 	print*, ' ',minval(EndoYgrid),maxval(EndoYgrid)
+	        ! 	print*, ' ',minval(EndoYgrid_sort),maxval(EndoYgrid_sort)
+	        ! 	print*, ' The end'
+	        ! 	STOP
+	        ! endif 
+	        ! ! !$omp end critical
+		ENDDO ! ai  
+
+        ai=1           
+        DO WHILE ( YGRID_t(ai,zi,xi) .lt. EndoYgrid(1) )
+			! Solve for a' directly by solving the Euler equation for retirement FOC_R
+			state_FOC  = (/age,ai,zi,lambdai,ei,xi,ti/)
+			brentvalue = brent_p(min(amin,YGRID_t(ai,zi,xi)), (amin+YGRID_t(ai,zi,xi))/2.0_DP , &
+			                & YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei) *0.95_DP, &
+			                & FOC_R_Transition, brent_tol, Aprime_t(age,ai,zi,lambdai,ei,xi),state_FOC)
+			
+			Cons_t(age,ai,zi,lambdai,ei,xi) = &
+					& YGRID_t(ai,zi,xi) + RetY_lambda_e(lambdai,ei) - Aprime_t(age,ai,zi,lambdai,ei,xi)
+			
+			IF (Cons_t(age, ai, zi, lambdai, ei,xi) .le. 0.0_DP)  THEN
+			    print*,'r2: Cons(age,ai,zi,lambdai,ei,xi,ti)=',Cons_t(age,ai,zi,lambdai,ei,xi)
+			    print*,'Aprime(age,ai,zi,lambdai,ei,xi,ti)=',Aprime_t(age,ai,zi,lambdai,ei,xi)
+			    print*,'YGRID(ai,zi,xi)+RetY_lambda_e(lambdai,ei)=',YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)
+			    print*,'YGRID(ai,zi,xi)=',YGRID(ai,zi,xi),'EndoYgrid(1)=',EndoYgrid(1)
+			    print*,'RetY_lambda_e(lambdai,ei)=',RetY_lambda_e(lambdai,ei)
+			    print*,'lambdai=',lambdai
+			ENDIF                   
+			ai = ai + 1
+		ENDDO  
+	              
+    ENDDO ! ei     
+    ENDDO ! lambda
+    ENDDO ! xi 
+	ENDDO ! zi
+    ENDDO !age
+
+	!------RETIREMENT PERIOD ENDS------------------------------------------------------------
+	!========================================================================================
+	
+	!========================================================================================
+	!------Working Period Starts-------------------------------------------------------------
+
+	DO age=RetAge-1,1,-1
+		! print*,' 	Age=',age
+	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai, &
+	!$omp& C_foc,state_FOC,par_FOC,MB_aprime_t)
+    DO zi=1,nz
+    DO xi=1,nx
+    DO lambdai=1,nlambda
+    DO ei=1,ne	
+    	! Endogenous grid and consumption are initialized
+	    EndoCons  = big_p 
+	    EndoYgrid = big_p 
+	    EndoHours = big_p 
+	    sw 		  = 0                    
+        DO ai=1,na_t
+        state_FOC  = (/age,ai,zi,lambdai,ei,xi,ti/)
+		if (any(pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8)) then 
+			sw 			  = sw+1	
+    		MB_aprime_t   = MBGRID_t(ai,zi,:)
+	    	! Below threshold
+    		do xp_ind = 1,nx 	
+    			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
+    				P = P_tr(ti+1); R = R_tr(ti+1) 
+    				MB_aprime_t(xp_ind) = MB_a_bt(agrid_t(ai),zi,xp_ind)
+    			endif
+    		enddo 
+			call EGM_Working_Period_Transition( MB_aprime_t , H_min , state_FOC , & 
+			      & EndoCons(ai), EndoHours(ai) , EndoYgrid(ai)  )
+			
+			! Above threshold
+			do xp_ind = 1,nx 	
+    			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
+    				P = P_tr(ti+1); R = R_tr(ti+1) 
+    				MB_aprime_t(xp_ind) = MB_a_at(agrid_t(ai),zi,xp_ind)
+    			endif
+    		enddo 
+			call EGM_Working_Period_Transition( MB_aprime_t , H_min , state_FOC , & 
+			      & EndoCons(na_t+sw), EndoHours(na_t+sw) , EndoYgrid(na_t+sw)  )
+
+	    	!print*, ' '
+	    	!print*, State_FOC 
+	    	!print*, MB_a_bt(agrid_t(ai),zgrid(zi)), MB_a_at(agrid_t(ai),zgrid(zi))
+	  !   	print*, ' '
+			! print*, ' Threshold test - Working Period'
+			! print*, ' Current State', age, ai, zi, lambdai, ei, xi
+			! print*, ' ', (pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold))
+			! print*, ' ', (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8))
+			! print*, ' ', MBGRID_t(ai,zi,:)
+			! print*, ' ', MB_a_bt(agrid(ai),zi,xi)
+			! print*, ' ', MB_a_at(agrid(ai),zi,xi)
+			! print*, ' ', MB_aprime_t
+			! print*, ' ', EndoCons(ai)
+			! print*, ' ', EndoCons(na_t+sw)
+			! print*, ' '
+		else 
+			! Usual EGM
+			call EGM_Working_Period_Transition( MBGRID_t(ai,zi,:) , H_min , state_FOC , & 
+			      & EndoCons(ai), EndoHours(ai) , EndoYgrid(ai)  )
+	
+		end if 
+
+    	ENDDO ! ai
+
+	    ! !$omp critical
+		if (any(isnan(EndoCons))) then 
+			print*, "isnan - Consumption endogenous"
+			print*, age,zi,ai,lambdai,ei,xi,ti
+			print*, EndoCons
+			STOP 
+		end if 
+		! !$omp end critical
+
+    ! Sort endogenous grid for interpolation
+	call Sort(na_t+nx*nz+1,EndoYgrid,EndoYgrid,sort_ind)
+	EndoHours = EndoHours(sort_ind)
+	EndoCons  = EndoCons(sort_ind)
+	! 	print*, ' '
+	! 	do ai=1,na_t+1
+	! 		print*, EndoHours(ai), EndoCons(ai), EndoYgrid(ai)
+	! 	end do
+	! 	print*, ' '
+
+		if (any(isnan(EndoCons)).or.any(isnan(EndoHours)).or.any(isnan(EndoYgrid))) then 
+			print*, "isnan - Consumption working 4"
+			print*, age,lambdai,ai,zi,ei,xi,ti
+			STOP 
+		end if 
+
+    	! Find  decision rules on exogenous grids
+        tempai=1           
+        DO WHILE ( YGRID_t(tempai,zi,xi) .lt. EndoYgrid(1) )
+              tempai = tempai + 1
+        ENDDO
+	                
+		! decision rules are obtained taking care of extrapolations
+		DO ai=tempai,na_t 
+			! Interpolate for value of consumption in exogenous grid
+			Cons_t(age,ai,zi,lambdai,ei,xi) = Linear_Int(EndoYgrid(1:na_t+sw),EndoCons(1:na_t+sw),na_t+sw,YGRID_t(ai,zi,xi))
+
+			if (Progressive_Tax_Switch.eqv..true.) then
+			! Check FOC for implied consumption 
+				if (NSU_Switch.eqv..true.) then 
+					! Non-Separable Utility
+					C_foc = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage_tr(ti))
+				else
+					! Separable Utility
+					C_foc = (MB_h(H_min,age,lambdai,ei,wage_tr(ti))*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
+				end if 
+			! Hours
+				if (Cons_t(age,ai,zi,lambdai,ei,xi).ge.C_foc) then
+					Hours_t(age,ai,zi,lambdai,ei,xi) = 0.0_dp
+				else
+					! Auxiliary variables for solving FOC for hours 
+					par_FOC(1:6) = (/age,ai,zi,lambdai,ei,xi/) 
+					par_FOC(7)   = Cons_t(age,ai,zi,lambdai,ei,xi)
+					! FOC (set wage to current wage)
+					wage = wage_tr(ti)
+					brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol,Hours_t(age,ai,zi,lambdai,ei,xi) , par_FOC) 
+				end if
+			else 
+				if (NSU_Switch.eqv..true.) then 
+					Hours_t(age,ai,zi,lambdai,ei,xi) = max( 0.0_dp , &
+						&  1.0_DP - (1.0_DP-gamma)*Cons_t(age,ai,zi,lambdai,ei,xi)/(gamma*psi*yh(age,lambdai,ei)) )
+				else 
+					Hours_t(age,ai,zi,lambdai,ei,xi) = max( 0.0_DP , &
+						&  1.0_DP - phi*Cons_t(age,ai,zi,lambdai,ei,xi)/(psi*yh(age, lambdai,ei)) )
+				end if 
+			end if 
+
+			if (Hours_t(age,ai,zi,lambdai,ei,xi).ge.1.0_dp) then 
+				print*, ' '
+				print*, 'Hours highers than 1', age,ai,zi,lambdai,ei,xi,ti
+				print*, Cons_t(age,ai,zi,lambdai,ei,xi)
+				STOP
+			endif 
+
+
+			! Savings 
+				Aprime_t(age,ai,zi,lambdai,ei,xi) = & 
+								& YGRID_t(ai,zi,xi)  + Y_h(Hours_t(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,wage_tr(ti))  & 
+            					& - Cons_t(age,ai,zi,lambdai,ei,xi) 
+		                    
+		    If (Aprime_t(age,ai,zi,lambdai,ei,xi)  .lt. amin) then
+
+		    	! print*, ' Aprime was below minimum!!!!
+            	Aprime_t(age,ai,zi,lambdai,ei,xi) = amin
+		         
+	           	! Compute hours
+		        if (NSU_Switch.and.(Progressive_Tax_Switch.eqv..false.)) then 
+		        	Hours_t(age,ai,zi,lambdai,ei,xi)  = max( 0.0_dp , &
+		        	&  gamma - (1.0_DP-gamma)*(YGRID_t(ai,zi,xi)-Aprime_t(age,ai,zi,lambdai,ei,xi))/(psi*yh(age,lambdai,ei)))
+                else               	        
+                	!compute  hours using FOC_HA                              
+		        	par_FOC(1:6) = (/age,ai,zi,lambdai,ei,xi/) 
+		        	par_FOC(7)   = amin
+					wage = wage_tr(ti)
+		        	brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, Hours_t(age,ai,zi,lambdai,ei,xi),par_FOC)
+		        end if  
+
+	            Cons_t(age,ai,zi,lambdai,ei,xi) = &
+	            					& YGRID_t(ai,zi,xi)+  Y_h(Hours_t(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,wage_tr(ti))  &
+		                            & - Aprime_t(age,ai,zi,lambdai,ei,xi)
+
+				IF (Cons_t(age,ai,zi,lambdai,ei,xi) .le. 0.0_DP)  THEN
+					print*,'w1: Cons(age,ai,zi,lambdai,ei,xi,ti)=',Cons_t(age,ai,zi,lambdai,ei,xi)
+					STOP
+				ENDIF 
+				if (Hours_t(age,ai,zi,lambdai,ei,xi).ge.1.0_dp) then 
+					print*, ' '
+					print*, 'w1 Hours highers than 1', age,ai,zi,lambdai,ei,xi,ti
+					print*, Cons_t(age,ai,zi,lambdai,ei,xi)
+					STOP
+				endif                   
+		     endif  
+		    !$omp critical
+		    IF (Cons_t(age,ai,zi,lambdai,ei,xi) .le. 0.0_DP)  THEN
+				print*,'w1: Cons(age,ai,zi,lambdai,ei,xi)=',Cons_t(age,ai,zi,lambdai,ei,xi)
+				STOP
+			ENDIF 
+			if (Hours_t(age,ai,zi,lambdai,ei,xi).ge.1.0_dp) then 
+				print*, ' '
+				print*, 'w1 Hours highers than 1', age,ai,zi,lambdai,ei,xi,ti
+				print*, Cons_t(age,ai,zi,lambdai,ei,xi)
+				STOP
+			endif    
+			!$omp end critical
+		ENDDO ! ai   
+
+		!$omp critical
+		if (any(isnan(Cons_t(age,:,zi,lambdai,ei,xi)))) then 
+			print*, "isnan - Consumption working 3"
+			print*, age,lambdai,ai,zi,ei,xi,ti
+			print*, 'Cons'
+			print*, Cons_t(age,:,zi,lambdai,ei,xi)
+			print*, 'Hours'
+			print*, Hours_t(age,:,zi,lambdai,ei,xi) 
+			STOP 
+		end if         
+		!$omp end critical        
+
+		ai=1           
+        DO WHILE ( YGRID_t(ai,zi,xi) .lt. EndoYgrid(1) )
+        	! print*, ' Extrapolation between YGRID and EndoYgrid!!!!'
+	        ! Solve for the Euler equation directly
+	        state_FOC  = (/age,ai,zi,lambdai,ei,xi,ti/)
+			brentvalue = brent_p( min(amin,YGRID_t(ai,zi,xi))   ,  (amin+YGRID_t(ai,zi,xi))/2.0_DP  ,  &
+                             	& YGRID_t(ai,zi,xi)  + psi * ( yh(age, lambdai,ei)*0.95_DP )**(1.0_DP-tauPL)  ,  &
+	                             & FOC_WH_Transition, brent_tol, Aprime_t(age,ai,zi,lambdai,ei,xi) , state_FOC )
+
+			! Compute hours
+	        if (NSU_Switch.and.(Progressive_Tax_Switch.eqv..false.)) then 
+	        	Hours_t(age,ai,zi,lambdai,ei,xi)  = max( 0.0_dp , &
+	        	&  gamma - (1.0_DP-gamma) *( YGRID_t(ai,zi,xi) - Aprime_t(age,ai,zi,lambdai,ei,xi))/(psi*yh(age,lambdai,ei)))
+            else               	        
+				!compute  hours using FOC_HA                              
+				par_FOC(1:6) = (/age,ai,zi,lambdai,ei,xi/)
+				par_FOC(7)   = Aprime_t(age,ai,zi,lambdai,ei,xi)
+	            brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, Hours_t(age,ai,zi,lambdai,ei,xi), par_FOC) 
+ 			end if 
+
+            Cons_t(age,ai,zi,lambdai,ei,xi)=  &
+            		& YGRID_t(ai,zi,xi) + Y_h(Hours_t(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,wage_tr(ti))  &
+					& - Aprime_t(age,ai,zi,lambdai,ei,xi)
+
+           IF (Cons_t(age,ai,zi,lambdai,ei,xi) .le. 0.0_DP)  THEN
+                print*,'w2:',age,zi,lambdai,ei,ai,xi,ti, 'Cons=',Cons_t(age,ai,zi,lambdai,ei,xi), &
+                    & 'Aprime=',Aprime_t(age,ai,zi,lambdai,ei,xi), &
+                    & 'Hours=', Hours_t(age,ai,zi,lambdai,ei,xi), &
+                    & 'yh(age, lambdai,ei)=', yh(age, lambdai,ei),'YGRID(ai,zi)=',YGRID_t(ai,zi,xi)
+                !pause
+                print*, "there is a problem in line 2063 (Transition)"
+                STOP
+            ENDIF 
+
+            if (Hours_t(age,ai,zi,lambdai,ei,xi).ge.1.0_dp) then 
+				print*, ' '
+				print*, 'w2 Hours highers than 1', age,ai,zi,lambdai,ei,xi,ti
+				print*, Cons_t(age,ai,zi,lambdai,ei,xi)
+				STOP
+			endif 
+
+            ai = ai + 1
+        ENDDO  
+
+	    if (any(isnan(Cons_t(age,:,zi,lambdai,ei,xi)))) then 
+			print*, "isnan - Consumption working 2"
+			print*, age,lambdai,ai,zi,ei,xi,ti
+			print*, 'Cons'
+			print*, Cons_t(age,:,zi,lambdai,ei,xi)
+			print*, 'Hours'
+			print*, Hours_t(age,:,zi,lambdai,ei,xi) 
+			STOP 
+		end if 
+
+	                 
+    ENDDO !ei         
+    ENDDO !lambdai
+    ENDDO ! xi 
+	ENDDO !zi
+    ENDDO !age
+
+
+    ! Update value for "next period's" policy functions
+    Cons_t_pr   = Cons_t   ;
+    Hours_t_pr  = Hours_t  ;
+
+	! Interpolate to get values of policy functions on agrid (note that policy functions are defined on agrid_t)
+	
+	if (Y_a_threshold.eq.0.0_dp) then 
+		! print*,' Assigning value of policy functions'
+		Cons_tr(:,:,:,:,:,:,ti)   = Cons_t
+		Hours_tr(:,:,:,:,:,:,ti)  = Hours_t
+		Aprime_tr(:,:,:,:,:,:,ti) = Aprime_t
+	else 
+		! print*,' Interpolating policy functions'
+		DO xi=1,nx
+		DO age=1,MaxAge
+	    DO lambdai=1,nlambda
+	    DO zi=1,nz
+	    DO ei=1,ne	                
+	    DO ai=1,na
+			Cons_tr(age,ai,zi,lambdai,ei,xi,ti)   = &
+				& Linear_Int(YGRID_t(:,zi,xi) , Cons_t(age,:,zi,lambdai,ei,xi)   , na_t , YGRID(ai,zi,xi))
+	    	Hours_tr(age,ai,zi,lambdai,ei,xi,ti)  = &
+	    		& Linear_Int(YGRID_t(:,zi,xi) , Hours_t(age,:,zi,lambdai,ei,xi)  , na_t , YGRID(ai,zi,xi))
+	    	Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) = &
+	    		& Linear_Int(YGRID_t(:,zi,xi) , Aprime_t(age,:,zi,lambdai,ei,xi) , na_t , YGRID(ai,zi,xi))
+		ENDDO !ai         
+		ENDDO !ei         
+	    ENDDO !zi
+	    ENDDO !lambdai
+		ENDDO !age
+		ENDDO !xi
+	end if 
+
+	enddo ! Time 
+
+	! Adjust consumption by taxes
+	Cons_tr = Cons_tr/(1.0_DP+tauC)
+
+	! if (any(isnan(Cons_tr))) then 
+	! 	print*, "isnan - Consumption"
+	! 	STOP 
+	! end if 
+	! if (any(isnan(Hours_tr))) then 
+	! 	print*, "isnan - Hours"
+	! 	STOP 
+	! end if 
+	! if (any(isnan(Aprime_tr))) then 
+	! 	print*, "isnan - Hours"
+	! 	STOP 
+	! end if 
+
+	! 	print*, 'Policy Functions'
+	! 	print*, ' YGRID ',' Cons ',' Hours ',' Aprime ',' A '
+	! 	do ai=1,na
+	! 		! print*, YGRID(ai,4), Cons(40,ai,4,3,3), Hours(40,ai,4,3,3), Aprime(40,ai,4,3,3), agrid(ai),&
+	! 		! 		& Y_h(Hours(40,ai,4,3,3),40,3,3,wage),&
+	! 		! 		& (1+tauC)*Cons(40,ai,4,3,3) + Aprime(40,ai,4,3,3) - YGRID(ai,4) -Y_h(Hours(40,ai,4,3,3),40,3,3,wage)
+	! 	end do 
+	! 	print*, ' '
+
+	print*,' 	----------------------------'
+	print*,' 	End of EGM Transition'
+	print*,' 	----------------------------'
+	print*,' '
+
+END SUBROUTINE EGM_Transition
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+! EGM_Working_Period: Solves for the endogenous grid during the working period
+!
+! Usage: call EGM_Working_Period(MB_in,H_min,C_endo,H_endo,Y_endo)
+!
+! Input: MB_in   , real(dp), marginal benefit from assets in t+1
+!        H_min   , real(dp), minimum value of hours
+!
+! Implicit inputs: ai     , integer , index of current level of assets
+!				   zi     , integer , index of agent's permanent entreprenurial ability
+!				   lambdai, integer , index of agent's permanent labor income component
+!				   ei     , integer , index of agent's transitory labor income component
+!				   age    , integer , agent's age
+!
+! Output: C_endo , real(dp), Endogenous value of consumption in t
+! 		  H_endo , real(dp), Endogenous value of hours in t
+! 		  Y_endo , real(dp), Endogenous value of Y grid in t
+!
+Subroutine EGM_Working_Period_Transition(MB_in,H_min,state_FOC,C_endo,H_endo,Y_endo)
+	Implicit None 
+	real(dp), intent(in)   	  :: MB_in(nx), H_min, state_FOC(7)
+	real(dp), intent(out)  	  :: C_endo, H_endo, Y_endo
+	real(dp)               	  :: C_euler, C_foc, brentvalue, E_MU_cp(nx), MB_a_vec(nx)
+	REAL(DP), DIMENSION(7+nx) :: par_FOC
+	integer                	  :: age, ai, zi, lambdai, ei, xi, ti, xp_ind
+
+	! Allocate state and get indeces
+	age 	= int(state_FOC(1))
+	ai   	= int(state_FOC(2))
+	zi      = int(state_FOC(3))
+	lambdai = int(state_FOC(4))
+	ei      = int(state_FOC(5))
+	xi      = int(state_FOC(6))
+	ti      = int(state_FOC(7))
+
+	! Set current wage
+		wage = wage_tr(ti)
+
+	if (Progressive_Tax_Switch.eqv..true.) then !Progressive labor taxes 
+		if (NSU_Switch.eqv..true.) then 
+			! Non-Separable Utility
+			do xp_ind=1,nx
+				E_MU_cp(xp_ind) = SUM(pr_e(ei,:) * &
+			        & Cons_t_pr(age+1,ai,zi,lambdai,:,xp_ind)**((1.0_dp-sigma)*gamma-1.0_dp)    * &
+			        & (1.0_dp-Hours_t_pr(age+1,ai,zi,lambdai,:,xp_ind))**((1.0_dp-sigma)*(1.0_dp-gamma))  )
+			enddo
+
+			C_euler = ( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp))) **(1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
+			C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
+
+			if (C_euler.ge.C_foc) then
+				C_endo  = C_euler 
+				H_endo = 0.0_dp
+			else 
+				if (Log_Switch.eqv..true.) then
+		  			! Auxiliary consumption variable for FOC_H 
+		  			par_FOC(1:6) = state_FOC(1:6)       
+				    par_FOC(7) = C_euler
+				    ! Solution for hours from Euler or FOC  equation according to sigma 
+				    brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, H_endo , par_FOC ) 
+				    C_endo = C_euler
+				else 
+				    ! Set Marginal benefit of assets to the below threshold level
+				    par_FOC(1:7) = state_FOC
+				    par_FOC(8:7+nx) = MB_in
+				    ! Solution for hours from Euler or FOC  equation according to sigma 
+				    brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H_NSU_Transition, brent_tol, H_endo , par_FOC ) 
+				    ! Implied consumption by hours from Labor FOC
+				    C_endo = (gamma/(1.0_dp-gamma))*(1.0_dp-H_endo)*MB_h(H_endo,age,lambdai,ei,wage)
+				end if 
+			end if 
+
+		else 
+			! Separable Utility
+			do xp_ind=1,nx
+				E_MU_cp(xp_ind) = SUM(pr_e(ei,:) * Cons_t_pr(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma) )
+			enddo
+			C_endo = 1.0_dp/( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_mu_cp)  ) **(1.0_dp/sigma) )
+			C_foc  = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
+
+			if (C_endo.ge.C_foc) then
+			  H_endo = 0.0_dp
+			else 
+			  ! Auxiliary consumption variable for FOC_H 
+			  par_FOC(1:6) = state_FOC(1:6)              
+			  par_FOC(7) = C_endo
+			  ! Solution for hours from Euler or FOC  equation according to sigma 
+			  brentvalue = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, H_endo , par_FOC ) 
+			end if  
+
+			end if 
+
+	else ! Linear labor taxes 
+		if (NSU_Switch.eqv..true.) then 
+			! Non-Separable Utility
+			do xp_ind=1,nx
+				E_MU_cp(xp_ind) = &
+				& sum( pr_e(ei,:) * (Cons_t_pr(age+1,ai,zi,lambdai,:,xp_ind)**(gamma*(1.0_DP-sigma)-1.0_DP)) &
+			    & *  ( (1.0_DP-Hours_t_pr(age+1, ai, zi, lambdai,:,xp_ind))**((1.0_DP-gamma)*(1.0_DP-sigma))))
+			enddo
+			  C_endo = ((gamma*psi*yh(age, lambdai,ei)/(1.0_DP-gamma))**((1.0_DP-gamma)*(1.0_DP-sigma)) &
+			    & *  beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp)  )**(-1.0_DP/sigma)
+
+			  H_endo = 1.0_DP - (1.0_DP-gamma)*C_endo/(gamma*psi*yh(age, lambdai,ei))   
+
+			If (H_endo .lt. 0.0_DP) then
+			    H_endo = 0.0_DP 
+			    C_endo = ( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) )**(1.0_DP/(gamma*(1.0_DP-sigma)-1.0_DP))
+			endif 
+
+			! print*,' '
+			! print*,' 	Inside EGM'
+			! print*,' 	Consumption_t+1=',Cons_t_pr(age+1,ai,zi,lambdai,:,:)
+		else 
+			! Separable Utility
+			do xp_ind=1,nx
+				E_MU_cp(xp_ind) = sum( pr_e(ei,:) * (Cons_t_pr(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma)) )
+			enddo
+			C_endo  = 1.0_DP/( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) )**(1.0_DP/sigma)
+
+			H_endo = max(0.0_DP , 1.0_DP - (phi*C_endo**sigma/(psi*yh(age, lambdai,ei)))**(1.0_dp/gamma) )  
+
+		end if 
+	end if
+
+
+	! Endogenous grid for asset income
+	Y_endo = agrid_t(ai) + C_endo - Y_h(H_endo,age,lambdai,ei,wage)
+
+	! 		!$omp critical
+	! 		if ((zi.eq.1).and.(ai.eq.16)) then 
+	! 		print*, "EGM Working Periods"
+	! 		print*, C_endo,H_endo,Y_endo
+	! 		print*, MB_in,state_FOC
+	! 		print*, ' '
+	! 		endif 
+	! 		!$omp end critical
+end Subroutine EGM_Working_Period_Transition
+
+
 !========================================================================================
 !========================================================================================
 !========================================================================================
@@ -4904,28 +6728,29 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP) :: size_Age(max_age_category), size_AZ(max_age_category,nz), size_W(3)
 	real(DP) :: leverage_age_z(MaxAge,nz), size_by_age_z(MaxAge,nz), constrained_firms_age_z(MaxAge,nz)
 	real(DP) :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
-	real(DP) :: Firm_Output(MaxAge,na,nz,nlambda,ne,nx), Firm_Profit(MaxAge,na,nz,nlambda,ne,nx)
-	REAL(DP), DIMENSION(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq
 	real(DP) :: FW_top_x(6),  prctile_FW(6), prctile_bq(7), a, b, c, CCDF_c
-	character(100) :: rowname
-	integer , dimension(max_age_category+1) :: age_limit
-	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Labor_Income, Total_Income, K_L_Income, K_T_Income, DBN_bq
-	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: constrained_firm_ind
+	REAL(DP), DIMENSION(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: Labor_Income, Total_Income, K_L_Income, K_T_Income
+	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP) :: Frisch_Aux, Frisch_Aux_2
+	integer , dimension(max_age_category+1) :: age_limit
+	character(100) :: rowname
 
-	print*, 'Inside Compute_Stats'
-	allocate( Labor_Income(MaxAge,na,nz,nlambda,ne,nx))
-	allocate( Total_Income(MaxAge,na,nz,nlambda,ne,nx))
-	allocate( K_L_Income(MaxAge,na,nz,nlambda,ne,nx))
-	allocate( K_T_Income(MaxAge,na,nz,nlambda,ne,nx))
-	allocate( DBN_bq(MaxAge,na,nz,nlambda,ne,nx))
-	allocate( constrained_firm_ind(MaxAge,na,nz,nlambda,ne,nx))
-	allocate( DBN_vec(size(DBN1)))
-	allocate( Firm_Wealth_vec(size(DBN1)))
-	allocate( CDF_Firm_Wealth(size(DBN1)))
-	allocate( BQ_vec(size(DBN1)))
-	allocate( DBN_bq_vec(size(DBN1)))
-	allocate( CDF_bq(size(DBN1)))
+	allocate(DBN_vec(size(DBN1)))
+	allocate(Firm_Wealth_vec(size(DBN1)))
+	allocate(CDF_Firm_Wealth(size(DBN1)))
+	allocate(BQ_vec(size(DBN1)))
+	allocate(DBN_bq_vec(size(DBN1)))
+	allocate(CDF_bq(size(DBN1)))
+	allocate(Firm_Output(MaxAge,na,nz,nlambda,ne,nx))
+	allocate(Firm_Profit(MaxAge,na,nz,nlambda,ne,nx))
+	allocate(DBN_bq(MaxAge,na,nz,nlambda,ne,nx))
+	allocate(Labor_Income(MaxAge,na,nz,nlambda,ne,nx))
+	allocate(Total_Income(MaxAge,na,nz,nlambda,ne,nx))
+	allocate(K_L_Income(MaxAge,na,nz,nlambda,ne,nx))
+	allocate(K_T_Income(MaxAge,na,nz,nlambda,ne,nx))
+	allocate(constrained_firm_ind(MaxAge,na,nz,nlambda,ne,nx))
 
 
 	!$ call omp_set_num_threads(20)
@@ -6613,10 +8438,12 @@ Function Agg_Debt(R_in)
 
 	Wealth   = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 
-	Agg_Debt = (sum(DBN_azx*(K_matrix(R_in,P)-spread(spread(agrid,2,nz),3,nx)))/Wealth)**2.0_DP 
-	Kd       = (sum(DBN_azx*(K_matrix(R_in,P))))
-
 	K_mat = K_matrix(R_in,P)
+
+	Agg_Debt = (sum(DBN_azx*(K_mat-spread(spread(agrid,2,nz),3,nx)))/Wealth)**2.0_DP 
+	Kd       = (sum(DBN_azx*(K_mat)))
+
+	
 	Agg_Debt = 0.0_dp
 	do xi=1,nx
 	do zi=1,nz 
@@ -6674,6 +8501,46 @@ SUBROUTINE FORM_Y_MB_GRID(TYGRID,TMBGRID,TYGRID_t,TMBGRID_t)
 
 END SUBROUTINE FORM_Y_MB_GRID
 
+SUBROUTINE FORM_Y_MB_GRID_Transition(TYGRID,TMBGRID,TYGRID_t,TMBGRID_t,time)
+	IMPLICIT NONE
+	INTEGER, INTENT(IN) :: time
+	REAL(DP), DIMENSION(na,nz,nx),   INTENT(OUT) :: TYGRID, TMBGRID
+	REAL(DP), DIMENSION(na_t,nz,nx), INTENT(OUT) :: TYGRID_t, TMBGRID_t
+	!REAL(DP), INTENT(IN) :: P
+	!integer :: ai, zi
+
+	DO xi=1,nx 
+	DO zi=1,nz
+		DO ai=1,na
+			P = P_tr(time); R = R_tr(time) 
+			TYGRID(ai,zi,xi)  = Y_a(agrid(ai),zi,xi)
+			P = P_tr(time+1); R = R_tr(time+1) 
+			TMBGRID(ai,zi,xi) = MB_a(agrid(ai),zi,xi)
+		ENDDO 
+		if (Y_a_threshold.eq.0.0_dp) then
+			TYGRID_t  = TYGRID
+			TMBGRID_t = TMBGRID 
+		else 
+			DO ai=1,na_t
+				P = P_tr(time); R = R_tr(time) 
+				TYGRID_t(ai,zi,xi)  = Y_a(agrid_t(ai),zi,xi)
+				P = P_tr(time+1); R = R_tr(time+1) 
+				TMBGRID_t(ai,zi,xi) = MB_a(agrid_t(ai),zi,xi)
+			ENDDO
+		endif 
+	ENDDO
+	ENDDO
+	! Return P and R to current time
+	P = P_tr(time); R = R_tr(time) 
+
+	!print *, "Grid for asset income"
+	!do ai=1,na
+	!	write(*,*) TMBGRID_t(ai,:)
+ 	!end do
+	!pause
+
+END SUBROUTINE FORM_Y_MB_GRID_Transition
+
 
 !========================================================================================
 !========================================================================================
@@ -6704,6 +8571,37 @@ SUBROUTINE ComputeLaborUnits(Ebart,Waget)
 	endif 
 
 END SUBROUTINE ComputeLaborUnits
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+! This subroutine computes after tax income given current taxes for each point in the state space
+
+SUBROUTINE Compute_After_Tax_Income
+	real(dp) :: capital_income
+
+		DO xi=1,nx
+		DO zi=1,nz			   
+	    DO ai=1,na
+	    	capital_income = YGRID(ai,zi,xi)
+	    DO lambdai=1,nlambda
+	    DO ei=1,ne
+	    	DO age=RetAge,MaxAge
+			Income_AT(age,ai,zi,lambdai,ei,xi)   = capital_income + RetY_lambda_e(lambdai,ei) 
+			ENDDO !age        
+
+			DO age=1,RetAge-1
+			Income_AT(age,ai,zi,lambdai,ei,xi)   = capital_income + Y_h(hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,wage)
+			ENDDO !age        
+		ENDDO !ei         
+	    ENDDO !lambdai
+		ENDDO !ai
+		ENDDO !zi
+		ENDDO !xi
+
+
+
+END SUBROUTINE Compute_After_Tax_Income
 
 
 !========================================================================================
@@ -7327,7 +9225,7 @@ Function Tax_Reform_Welfare(tk)
 			tauW_at  = tauWmin_at
 			! Solve the model
 				CALL FIND_DBN_EQ
-				CALL GOVNT_BUDGET
+				CALL GOVNT_BUDGET(.true.)
 			! Get new G
 				GBAR_exp = GBAR 
 			tauWindx = 0.0_DP
@@ -7341,7 +9239,7 @@ Function Tax_Reform_Welfare(tk)
 					tauW_at = tauWmin_at + tauWindx * tauWinc_at
 					! Solve the model
 					CALL FIND_DBN_EQ
-					CALL GOVNT_BUDGET
+					CALL GOVNT_BUDGET(.true.)
 
 					! Get new G
 					GBAR_exp = GBAR 
@@ -7367,7 +9265,7 @@ Function Tax_Reform_Welfare(tk)
 					tauW_at = tauWmin_at - tauWindx * tauWinc_at
 					! Solve the model
 					CALL FIND_DBN_EQ
-					CALL GOVNT_BUDGET
+					CALL GOVNT_BUDGET(.true.)
 
 					! Get new G
 					GBAR_exp = GBAR 
@@ -7394,7 +9292,7 @@ Function Tax_Reform_Welfare(tk)
 
 			! Solve (again) experimental economy
 				CALL FIND_DBN_EQ
-				CALL GOVNT_BUDGET
+				CALL GOVNT_BUDGET(.true.)
 
 			! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
 				GBAR_exp = GBAR
@@ -7415,7 +9313,7 @@ Function Tax_Reform_Welfare(tk)
 				    tauW_bt = (tauW_low_bt + tauW_up_bt)/2.0_DP
 				    tauW_at = (tauW_low_at + tauW_up_at)/2.0_DP
 				    CALL FIND_DBN_EQ
-				    CALL GOVNT_BUDGET
+				    CALL GOVNT_BUDGET(.true.)
 				    GBAR_exp = GBAR
 				    print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
 					print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
@@ -7435,7 +9333,7 @@ Function Tax_Reform_Welfare(tk)
 	Pr_mat = Profit_Matrix(R,P)
 	CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
 	CALL ComputeLaborUnits(EBAR,wage)
-	CALL GOVNT_BUDGET
+	CALL GOVNT_BUDGET(.true.)
 
 
 	! Aggregate variable in experimental economy
@@ -7650,6 +9548,9 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN  (UNIT=4,  FILE=trim(bench_folder)//'v_pr_nb', STATUS='replace')
 		WRITE (UNIT=4,  FMT=*) V_Pr_nb
 		CLOSE (unit=4)
+		OPEN  (UNIT=4,  FILE=trim(bench_folder)//'Income_AT', STATUS='replace')
+		WRITE (UNIT=4,  FMT=*) Income_AT
+		CLOSE (unit=4)
 
 		OPEN  (UNIT=5,  FILE=trim(bench_folder)//'DBN'   , STATUS='replace')
 		WRITE (UNIT=5,  FMT=*) DBN1 
@@ -7725,6 +9626,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		! OPEN (UNIT=20, FILE=trim(bench_folder)//'v_pr_nb' , STATUS='old', ACTION='read')		
 
 		OPEN (UNIT=21, FILE=trim(bench_folder)//'SSC_Payments' , STATUS='old', ACTION='read')
+		OPEN (UNIT=22, FILE=trim(bench_folder)//'Income_AT' , STATUS='old', ACTION='read')
 
 		READ (UNIT=1,  FMT=*), cons
 		READ (UNIT=2,  FMT=*), aprime
@@ -7749,12 +9651,13 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		READ (UNIT=19, FMT=*), V_Pr
 		! READ (UNIT=20, FMT=*), V_Pr_nb
 		READ (UNIT=21, FMT=*), SSC_Payments
+		READ (UNIT=22, FMT=*), Income_AT
 
 		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=5)
 		CLOSE (unit=60); CLOSE (unit=7); CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10)
 		CLOSE (unit=11); CLOSE (unit=12); CLOSE (unit=13); CLOSE (unit=14); CLOSE (unit=15)
 		CLOSE (unit=16); CLOSE (unit=17); CLOSE (unit=18); CLOSE (unit=19); !CLOSE (unit=20)
-		CLOSE (unit=21)
+		CLOSE (unit=21); CLOSE (unit=22);
 
 		print*, "Reading of benchmark results completed"
 	END IF 
@@ -7813,6 +9716,9 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN  (UNIT=20,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr_nb', STATUS='replace')
 		WRITE (UNIT=20,  FMT=*) V_Pr_nb
 
+		OPEN  (UNIT=21,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_Income_AT', STATUS='replace')
+		WRITE (UNIT=21,  FMT=*) Income_AT
+
 		print*, "Writing of experimental results completed"
 
 	else 
@@ -7837,6 +9743,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN (UNIT=18, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_at', STATUS='old', ACTION='read')
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr'   , STATUS='old', ACTION='read')
 		OPEN (UNIT=20, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr_nb', STATUS='old', ACTION='read')
+		OPEN (UNIT=21, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_Income_AT', STATUS='old', ACTION='read')
 
 		READ (UNIT=1,  FMT=*), cons
 		READ (UNIT=2,  FMT=*), aprime
@@ -7858,6 +9765,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		READ (UNIT=18, FMT=*), tauW_at
 		READ (UNIT=19, FMT=*), V_Pr
 		READ (UNIT=20, FMT=*), V_Pr_nb
+		READ (UNIT=21, FMT=*), Income_AT
 		print*, "Reading of experimental results completed"
 	endif 
 
@@ -7880,7 +9788,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 	CLOSE (unit=17)
 	CLOSE (unit=18)
 	CLOSE (unit=19)
-	CLOSE (unit=20)
+	CLOSE (unit=20); CLOSE (unit=21)
 
 END SUBROUTINE Write_Experimental_Results
 

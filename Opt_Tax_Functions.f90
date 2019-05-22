@@ -149,7 +149,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 		! Solve model at current taxes 
 		print*,'tauC=',tauC,'tauK=',tauK
 		CALL FIND_DBN_EQ
-	    CALL GOVNT_BUDGET
+	    CALL GOVNT_BUDGET(.false.)
 	    GBAR_exp = GBAR  
 	    print*, ' '; print*, 'tauC=',tauC,'tauK=',tauK,'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' ' 
 	    if (GBAR_exp>GBAR_bench) then 
@@ -158,7 +158,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 			tauK = tauK - 0.05_dp
 			print*,'tauC=',tauC,'tauK=',tauK
 			CALL FIND_DBN_EQ
-		    CALL GOVNT_BUDGET
+		    CALL GOVNT_BUDGET(.false.)
 		    GBAR_exp = GBAR 
 		    print*, ' '; print*, 'tauC=',tauC,'tauK=',tauK,'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' ' 
 		enddo 
@@ -170,7 +170,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 			tauK = tauK + 0.05_dp
 			print*,'tauC=',tauC,'tauK=',tauK
 			CALL FIND_DBN_EQ
-		    CALL GOVNT_BUDGET
+		    CALL GOVNT_BUDGET(.false.)
 		    GBAR_exp = GBAR 
 		    print*, ' '; print*, 'tauC=',tauC,'tauK=',tauK,'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' ' 
 		enddo 
@@ -182,7 +182,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 		tau_indicator = 0.0_dp 
 		! Solve model at current taxes 
 		CALL FIND_DBN_EQ
-	    CALL GOVNT_BUDGET
+	    CALL GOVNT_BUDGET(.false.)
 	    GBAR_exp = GBAR  
 	    print*, ' '; print*, 'tauC=',tauC,'tauK=',tauK,'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' ' 
 	    if (GBAR_exp>GBAR_bench) then 
@@ -190,7 +190,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 		do while (GBAR_exp>GBAR_bench) 
 			tauW_at = tauW_at - 0.001_dp
 			CALL FIND_DBN_EQ
-		    CALL GOVNT_BUDGET
+		    CALL GOVNT_BUDGET(.false.)
 		    GBAR_exp = GBAR  
 		    print*, ' '; print*, 'tauC=',tauC,'tauW=',tauW_at,'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' ' 
 		enddo 
@@ -201,7 +201,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 		do while (GBAR_exp>GBAR_bench) 
 			tauW_at = tauW_at + 0.001_dp
 			CALL FIND_DBN_EQ
-		    CALL GOVNT_BUDGET
+		    CALL GOVNT_BUDGET(.false.)
 		    GBAR_exp = GBAR  
 		    print*, ' '; print*, 'tauC=',tauC,'tauW=',tauW_at,'GBAR_exp=',GBAR_exp,'GBAR_bench=',GBAR_bench; print*,' ' 
 		enddo 
@@ -361,7 +361,7 @@ Function diff_GBAR(tau_in,tau_indicator)
 
 	! Solve the model
 	CALL FIND_DBN_EQ
-    CALL GOVNT_BUDGET
+    CALL GOVNT_BUDGET(.false.)
     GBAR_exp = GBAR  
 
     ! Get GBAR difference

@@ -167,6 +167,7 @@ elseif X_Switch==1.2
         Etc_Sim_Folder= strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Tau_C_Experiment/Simul/') ;
         Top_Folder    = strcat('../../NSU_ZS_LT_Results/Theta_',num2str(theta_folder,'%.2f'),'/Factor_',num2str(Threshold_Factor,'%.2f'),'/Model_1.2_bv/Simul/Top_A/') ;
         Simul_Folder_Exp = Simul_Folder ;
+
         Tables_file   = 'Tables_Presentation_Model_12_bv.xls' ;
         
 %    mkdir('/Users/ocamp020/Dropbox/ra_guvenen/wealth_tax/cggk_codes/Sergio/Graphs/Model_1.2_bv/')
@@ -943,6 +944,88 @@ end
         end 
         
 
+%% Change in wealth shares among of top X% by permanent productivity Z
+    Switch_PV = 0;
+
+    % Load PV wealth and Z
+        eval(['load ',Simul_Folder,'panelz_bench']) ; eval(['load ',Simul_Folder,'panelx_bench']) ; 
+        eval(['load ',Simul_Folder_Exp,'panelz_exp'])   ; eval(['load ',Simul_Folder_Exp,'panelx_exp'])   ;
+        if Switch_PV==1
+        eval(['load ',Simul_Folder,'panelPV_a_bench']) ; eval(['load ',Simul_Folder_Exp,'panelPV_a_exp'])   ;
+        Wealth_K = panelPV_a_bench; Wealth_W = panelPV_a_exp;
+        else
+        eval(['load ',Simul_Folder,'panela_bench']) ; eval(['load ',Simul_Folder_Exp,'panela_exp'])   ;
+        Wealth_K = panela_bench; Wealth_W = panela_exp;
+        end
+        
+	% Get Percentiles
+        prc_K = prctile(Wealth_K,[50 90 95 99]);
+        prc_W = prctile(Wealth_W,[50 90 95 99]);
+    % Get composition by top x%
+        ii = 1;
+        for i=numel(prc_K):-1:1
+            ind_K = Wealth_K>=prc_K(i) ;
+            ind_W = Wealth_W>=prc_W(i) ;
+            for z=1:n_z
+                ind_z_K = ind_K & panelz_bench'==z ;
+                ind_z_W = ind_W & panelz_exp'==z   ;
+                z_wealth_share_top_x_K(ii,z) = 100*sum(Wealth_K(ind_z_K))/sum(Wealth_K(ind_K)) ;
+                z_wealth_share_top_x_W(ii,z) = 100*sum(Wealth_W(ind_z_W))/sum(Wealth_W(ind_W)) ;
+            end
+            ii= ii+1;
+        end 
+	% Tables
+        col_title = {'Top X%','z1','z2','z3','z4','z5','z6','z7','z8','z9'};
+        row_title = {'Top 1%';'Top 5%';'Top 10%';'Top 50%'};
+        Mat = [{'Benchmark'} cell(1,n_z); col_title; row_title num2cell(z_wealth_share_top_x_K);
+               {'Tax_Reform'} cell(1,n_z); col_title; row_title num2cell(z_wealth_share_top_x_W);
+               {'Difference'} cell(1,n_z); col_title; row_title num2cell(z_wealth_share_top_x_W-z_wealth_share_top_x_K);
+               {'% Difference'} cell(1,n_z); col_title; row_title num2cell(100*(z_wealth_share_top_x_W./z_wealth_share_top_x_K-1))]
+        if Switch_PV==1 
+            status = xlwrite(Tables_file,Mat,'Z wealth shares in Top x - Present Value') ;
+        else
+            status = xlwrite(Tables_file,Mat,'Z wealth shares in Top x - Book Value') ;
+        end 
+        
+    % Productivity Groups
+    eval(['load ',Bench_Folder,'DBN'])
+    DBN = reshape(DBN,[Max_Age,n_a,n_z,n_l,n_e,n_x]) ;
+    DBN = squeeze(sum(sum(sum(sum(sum(DBN,1),2),4),5),6));
+    CDF = cumsum(DBN) ; 
+    
+        % 0%-40%     of Permanent Productivity 
+        pg_wealth_share_top_x_K(:,1) = z_wealth_share_top_x_K(:,1) + z_wealth_share_top_x_K(:,2) + z_wealth_share_top_x_K(:,3) + (0.4-CDF(3))*z_wealth_share_top_x_K(:,4)/DBN(4) ;
+        pg_wealth_share_top_x_W(:,1) = z_wealth_share_top_x_W(:,1) + z_wealth_share_top_x_W(:,2) + z_wealth_share_top_x_W(:,3) + (0.4-CDF(3))*z_wealth_share_top_x_W(:,4)/DBN(4) ;
+        % 40%-80%    of Permanent Productivity 
+        pg_wealth_share_top_x_K(:,2) = (CDF(4)-0.4)/DBN(4)*z_wealth_share_top_x_K(:,4) + (0.8-CDF(4))/DBN(5)*z_wealth_share_top_x_K(:,5) ;
+        pg_wealth_share_top_x_W(:,2) = (CDF(4)-0.4)/DBN(4)*z_wealth_share_top_x_W(:,4) + (0.8-CDF(4))/DBN(5)*z_wealth_share_top_x_W(:,5) ;
+        % 80%-90%    of Permanent Productivity 
+        pg_wealth_share_top_x_K(:,3) = 0.1/DBN(5)*z_wealth_share_top_x_K(:,5) ;
+        pg_wealth_share_top_x_W(:,3) = 0.1/DBN(5)*z_wealth_share_top_x_W(:,5) ;
+        % 90%-99%    of Permanent Productivity 
+        pg_wealth_share_top_x_K(:,4) = (CDF(5)-0.9)/DBN(5)*z_wealth_share_top_x_K(:,5) + (0.99-CDF(5))/DBN(6)*z_wealth_share_top_x_K(:,6) ;
+        pg_wealth_share_top_x_W(:,4) = (CDF(5)-0.9)/DBN(5)*z_wealth_share_top_x_W(:,5) + (0.99-CDF(5))/DBN(6)*z_wealth_share_top_x_W(:,6) ;
+        % 99%-99.9%  of Permanent Productivity 
+        pg_wealth_share_top_x_K(:,5) = (CDF(6)-0.99)/DBN(6)*z_wealth_share_top_x_K(:,6) + (0.999-CDF(6))/DBN(7)*z_wealth_share_top_x_K(:,7) ;
+        pg_wealth_share_top_x_W(:,5) = (CDF(6)-0.99)/DBN(6)*z_wealth_share_top_x_W(:,6) + (0.999-CDF(6))/DBN(7)*z_wealth_share_top_x_W(:,7) ;
+        % 99.9%-100% of Permanent Productivity 
+        pg_wealth_share_top_x_K(:,6) = (CDF(7)-0.999)/DBN(7)*z_wealth_share_top_x_K(:,7) + z_wealth_share_top_x_K(:,8) + z_wealth_share_top_x_K(:,9)  ;
+        pg_wealth_share_top_x_W(:,6) = (CDF(7)-0.999)/DBN(7)*z_wealth_share_top_x_W(:,7) + z_wealth_share_top_x_W(:,8) + z_wealth_share_top_x_W(:,9)  ;
+
+    % Tables
+        col_title = {'Top X%','0%-40%','40%-80%','80%-90%','90%-99%','99%-99.9%','99.9%-100%'};
+        row_title = {'Top 1%';'Top 5%';'Top 10%';'Top 50%'};
+        Mat = [{'Benchmark'} cell(1,6); col_title;  row_title num2cell(pg_wealth_share_top_x_K);
+               {'Tax_Reform'} cell(1,6); col_title; row_title num2cell(pg_wealth_share_top_x_W);
+               {'Difference'} cell(1,6); col_title; row_title num2cell(pg_wealth_share_top_x_W-pg_wealth_share_top_x_K);
+               {'% Difference'} cell(1,6); col_title; row_title num2cell(100*(pg_wealth_share_top_x_W./pg_wealth_share_top_x_K-1))]
+        if Switch_PV==1 
+            status = xlwrite(Tables_file,Mat,'PG wealth shares in Top x - Present Value') ;
+        else
+            status = xlwrite(Tables_file,Mat,'PG wealth shares in Top x - Book Value') ;
+        end 
+
+
 %% Tax Reform welfare by age group and productivity
 
     % Load Distribution
@@ -1235,7 +1318,7 @@ CE2_NB_w =100*( (Stats_by_tau_w(:,11)./Stats_by_tau_k(41+25,11)).^(1/(gamma*(1-s
     hgsave('fig/1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
     print -depsc 1.1.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
 
-%     plot(-0.3416*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
+%     plot(-0.1*ones(2),[min(CE2_NB_k-CE2_NB_k(tauindx))-1 8],'k--', 'linewidth',2)
     annotation('textarrow',[0.21 0.18],[0.76 0.72], 'string','Opt. \tau_k = -34.4%','linewidth',2,'FontSize',12)
     hgsave('fig/1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.fig')
     print -depsc 1.2.fig_Opt_Tax_Welfare_by_CAP_TAX_REV.eps
