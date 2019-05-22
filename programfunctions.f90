@@ -6052,26 +6052,22 @@ SUBROUTINE EGM_Transition()
 	    EndoYgrid = big_p 
 	    sw 		  = 0
     DO ai=1,na_t 
-		if (any((pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold)).lt.1e-8)) then 
+		if (abs(agrid_t(ai)-Y_a_threshold).lt.1e-8) then 
 			! print*, ' Threshold section - EGM Retirement'
 			sw 			  = sw+1	
-    		MB_aprime_t   = MBGRID_t(ai,zi,:)
+
     		! Consumption on endogenous grid and implied asset income under tauW_bt
     		do xp_ind = 1,nx 	
-    			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
-    				P = P_tr(ti+1); R = R_tr(ti+1) 
-    				MB_aprime_t(xp_ind) = MB_a_bt(agrid_t(ai),zi,xp_ind)
-    			endif
+				P = P_tr(ti+1); R = R_tr(ti+1) 
+				MB_aprime_t(xp_ind) = MB_a_bt(agrid_t(ai),zi,xp_ind)
     		enddo 
     		EndoCons(ai)  =  (beta*survP(age)* 	&
     			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) )**euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! Consumption on endogenous grid and implied asset income under tauW_at
 	        do xp_ind = 1,nx 	
-    			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
-    				P = P_tr(ti+1); R = R_tr(ti+1) 
-    				MB_aprime_t(xp_ind) = MB_a_at(agrid_t(ai),zi,xp_ind)
-    			endif
+				P = P_tr(ti+1); R = R_tr(ti+1) 
+				MB_aprime_t(xp_ind) = MB_a_at(agrid_t(ai),zi,xp_ind)
     		enddo 
 	        EndoCons(na_t+sw)  = (beta*survP(age)*	&
 	        	& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) )**euler_power
@@ -6249,25 +6245,21 @@ SUBROUTINE EGM_Transition()
 	    sw 		  = 0                    
         DO ai=1,na_t
         state_FOC  = (/age,ai,zi,lambdai,ei,xi,ti/)
-		if (any(pr_x(xi,:,zi,age)/pr_x(xi,:,zi,age)*abs(Wealth_mat(ai,zi,:)-Y_a_threshold).lt.1e-8)) then 
+		if (abs(agrid_t(ai)-Y_a_threshold).lt.1e-8) then 
 			sw 			  = sw+1	
-    		MB_aprime_t   = MBGRID_t(ai,zi,:)
+
 	    	! Below threshold
     		do xp_ind = 1,nx 	
-    			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
-    				P = P_tr(ti+1); R = R_tr(ti+1) 
-    				MB_aprime_t(xp_ind) = MB_a_bt(agrid_t(ai),zi,xp_ind)
-    			endif
+				P = P_tr(ti+1); R = R_tr(ti+1) 
+				MB_aprime_t(xp_ind) = MB_a_bt(agrid_t(ai),zi,xp_ind)
     		enddo 
 			call EGM_Working_Period_Transition( MB_aprime_t , H_min , state_FOC , & 
 			      & EndoCons(ai), EndoHours(ai) , EndoYgrid(ai)  )
 			
 			! Above threshold
 			do xp_ind = 1,nx 	
-    			if (pr_x(xi,xp_ind,zi,age)/pr_x(xi,xp_ind,zi,age)*abs(Wealth_mat(ai,zi,xp_ind)-Y_a_threshold).lt.1e-8) then 
-    				P = P_tr(ti+1); R = R_tr(ti+1) 
-    				MB_aprime_t(xp_ind) = MB_a_at(agrid_t(ai),zi,xp_ind)
-    			endif
+				P = P_tr(ti+1); R = R_tr(ti+1) 
+				MB_aprime_t(xp_ind) = MB_a_at(agrid_t(ai),zi,xp_ind)
     		enddo 
 			call EGM_Working_Period_Transition( MB_aprime_t , H_min , state_FOC , & 
 			      & EndoCons(na_t+sw), EndoHours(na_t+sw) , EndoYgrid(na_t+sw)  )
