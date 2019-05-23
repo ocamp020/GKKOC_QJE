@@ -2798,17 +2798,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 
 		
 		!! Experiment 
-		print*, 'test 1 '
-		print*,R_exp
-		print*,P_exp
-		print*,EBAR_exp
-		print*,wage_exp
 		Pr_mat = Profit_Matrix(R_exp,P_exp)
-		print*, 'test 1.1'
 		CALL ComputeLaborUnits(EBAR_exp,wage_exp)
-		print*, 'test 1.2'
 		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
-		print*, 'test 1.3'
 
 		K_Tax_draft_group_z			= 0.0_dp
 		L_Tax_draft_group_z			= 0.0_dp
@@ -2822,7 +2814,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		L_Tax_Inc_draft_group_z		= 0.0_dp
 		C_Tax_Inc_draft_group_z		= 0.0_dp
 		wealth_draft_group_z 	    = 0.0_dp
-		print*, 'test 2 '
+
 		do zi  = 1,nz
 		do age = 1,draft_age_category
 	        do xi=1,nx
@@ -2892,7 +2884,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	    	enddo  
 		enddo
 		enddo
-print*, 'test 3 '
+
 		! Total Capital Tax adjusted by productivity group
 		K_Tax_draft_group(:,1) = K_Tax_draft_group_z(:,1) + K_Tax_draft_group_z(:,2) + K_Tax_draft_group_z(:,3) & 
 								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*K_Tax_draft_group_z(:,4)
