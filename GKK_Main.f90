@@ -73,11 +73,11 @@ PROGRAM main
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
-		Opt_Tax       = .true.
+		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
-		Opt_Threshold = .false.
+		Opt_Threshold = .true.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
 		Transition_Tax_Reform = .false.
@@ -1893,12 +1893,13 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	CLOSE (unit=77) 
 
     	CALL Write_Experimental_Results(.false.)
+    	psi=  0.40669492552483588 
 
 	    DO tauindx=-40,40,2
 
             tauw_at     = real(tauindx,8)/1000_DP
-            ! brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
-
+            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+ 
             ! Aggregate variable in experimental economy
 				GBAR_exp  = GBAR
 				QBAR_exp  = QBAR 
@@ -2381,6 +2382,7 @@ Subroutine Solve_Opt_Threshold
 				Aprime_exp        = Aprime 
 
 			! Compute moments
+				CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 				CALL COMPUTE_STATS
 				CALL GOVNT_BUDGET(.false.)
 				
@@ -2416,6 +2418,8 @@ Subroutine Solve_Opt_Threshold
 	      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet, Threshold_Share
       	  	CLOSE (unit=77)
       	  	CALL Write_Experimental_Results(.true.)
+      	  	! Deallocate variables
+			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	    ENDDO 
 
 			! tauW_at = OPT_tauW
@@ -2447,6 +2451,7 @@ Subroutine Solve_Opt_Threshold
 			! 	Aprime_exp        = Aprime 
 
 			! ! Compute moments
+			! 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 			! 	CALL COMPUTE_STATS
 			! 	CALL GOVNT_BUDGET(.false.)
 				
@@ -2490,6 +2495,8 @@ Subroutine Solve_Opt_Threshold
    !    	  	CLOSE (unit=77)
 
    !    	  	CALL Write_Experimental_Results(.true.)
+  !  		! Deallocate variables
+		! deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
 
 	    ENDDO
@@ -2536,6 +2543,7 @@ Subroutine Solve_Opt_Threshold
 		Aprime_exp        = Aprime 
 
 	! Compute moments
+	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 	CALL COMPUTE_STATS
 	
 	! Compute welfare gain between economies
@@ -2560,6 +2568,9 @@ Subroutine Solve_Opt_Threshold
       & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
   	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet, Threshold_Share
   	CLOSE (unit=77)
+
+  	! Deallocate variables
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
 end Subroutine Solve_Opt_Threshold
 
