@@ -73,11 +73,11 @@ PROGRAM main
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
-		Opt_Tax       = .false.
+		Opt_Tax       = .true.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
-		Opt_Threshold = .true.
+		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
 		Transition_Tax_Reform = .false.
@@ -1809,6 +1809,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 				! Compute moments
 				CALL COMPUTE_STATS
 				CALL GOVNT_BUDGET(.true.)
+				CALL Compute_After_Tax_Income
 				
 				! Compute welfare gain between economies
 				CALL COMPUTE_WELFARE_GAIN
@@ -1892,12 +1893,12 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	      	  & 'GBAR ', 'GBAR_K ', 'GBAR_W ', 'GBAR_L ', 'GBAR_C ', 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet '
     	CLOSE (unit=77) 
 
-    	! CALL Write_Experimental_Results(.false.)
+    	CALL Write_Experimental_Results(.false.)
 
 	    DO tauindx=-40,40,2
 
             tauw_at     = real(tauindx,8)/1000_DP
-            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+            ! brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
             ! Aggregate variable in experimental economy
 				GBAR_exp  = GBAR
