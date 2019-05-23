@@ -2357,7 +2357,7 @@ Subroutine Solve_Opt_Threshold
     	
 	    DO tauindx=250,400,5
             tauw_at     = real(tauindx,8)/10000_DP
-            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+            ! brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
             ! Aggregate variable in experimental economy
 				GBAR_exp  = GBAR
