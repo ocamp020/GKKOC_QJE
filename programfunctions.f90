@@ -1022,7 +1022,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	allocate( K_Tax_exp(    MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( L_Tax_exp(    MaxAge,na,nz,nlambda,ne,nx) )
 
-
+	print*, ' Start of compute welfare gain'
 
 	! Age Brackets
 		age_limit       = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
@@ -3331,7 +3331,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		ENDDO
 		close(unit=80); close(unit=81); close(unit=82); close(unit=83); close(unit=84); close(unit=85)
 
-
+	print*, ' End of compute welfare gain'
 
 END SUBROUTINE  COMPUTE_WELFARE_GAIN
 
@@ -3513,7 +3513,6 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 	    WRITE  (UNIT=82, FMT=*)  frac_pos_welfare_draft_group(age,:)
 	ENDDO
 	close(unit=80); close(unit=81); close(unit=82)
-
 
 
 END SUBROUTINE  COMPUTE_WELFARE_GAIN_TRANSITION
@@ -9384,7 +9383,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 	integer, intent(in) :: bench_indx
 	integer :: prctile, status, zi
 
-	
+	print*, ' Writing summary of results in output.txt'
 	if (bench_indx.eq.1) then
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='replace') 
 			WRITE(UNIT=19, FMT=*) "Parameters"

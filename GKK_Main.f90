@@ -1925,6 +1925,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 				! Compute moments
 				CALL COMPUTE_STATS
 				CALL GOVNT_BUDGET(.false.)
+				CALL Compute_After_Tax_Income
 				
 				! Compute welfare gain between economies
 				CALL COMPUTE_WELFARE_GAIN
