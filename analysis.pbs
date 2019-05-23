@@ -9,15 +9,15 @@
 	#! /bin/tcsh
 
 # Define instructions for virtual machine set up
-	#PBS -q short
+	#PBS -q highmem
 	#PBS -l nodes=1:ppn=9
-	#PBS -l walltime=24:00:00
+	#PBS -l walltime=168:00:00
 	#PBS -l mem=20GB
 	#PBS -V
 	#PBS -m abe
 	#PBS -M ocamp020@umn.edu
 	#PBS -j oe
-	#PBS -N batch_main
+	#PBS -N batch_SS_reform
 	#PBS -S /bin/tcsh
 	#PBS -e analysis.err
 
