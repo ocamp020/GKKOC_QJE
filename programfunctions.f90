@@ -2804,8 +2804,11 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		print*,EBAR_exp
 		print*,wage_exp
 		Pr_mat = Profit_Matrix(R_exp,P_exp)
+		print*, 'test 1.1'
 		CALL ComputeLaborUnits(EBAR_exp,wage_exp)
+		print*, 'test 1.2'
 		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		print*, 'test 1.3'
 
 		K_Tax_draft_group_z			= 0.0_dp
 		L_Tax_draft_group_z			= 0.0_dp
