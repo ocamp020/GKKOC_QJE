@@ -1975,6 +1975,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		CALL COMPUTE_STATS
 		CALL GOVNT_BUDGET(.false.)
+		CALL Compute_After_Tax_Income
 		
 		! Compute welfare gain between economies
 		CALL COMPUTE_WELFARE_GAIN
@@ -2000,6 +2001,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	CALL FIND_DBN_EQ
 	CALL GOVNT_BUDGET(.true.)
+	CALL Compute_After_Tax_Income
 
 	! Compute value function and store policy functions, value function and distribution in file
 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
@@ -2332,7 +2334,7 @@ Subroutine Solve_Opt_Threshold
 		maxbrentvaluet=-10000.0_DP
 
 		! CALL Write_Experimental_Results(.false.)
-		psi = 0.85618318_dp
+		psi = 0.83327506045113120
 	
 	print*,'Optimal Tax Loop'
 	OPEN(UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_timing.txt', STATUS='replace')
@@ -2357,7 +2359,7 @@ Subroutine Solve_Opt_Threshold
     	
 	    DO tauindx=250,400,5
             tauw_at     = real(tauindx,8)/10000_DP
-            ! brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
             ! Aggregate variable in experimental economy
 				GBAR_exp  = GBAR
@@ -2385,6 +2387,7 @@ Subroutine Solve_Opt_Threshold
 				CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 				CALL COMPUTE_STATS
 				CALL GOVNT_BUDGET(.false.)
+				CALL Compute_After_Tax_Income
 				
 			! Compute welfare gain between economies
 				CALL COMPUTE_WELFARE_GAIN
@@ -2454,6 +2457,7 @@ Subroutine Solve_Opt_Threshold
 			! 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 			! 	CALL COMPUTE_STATS
 			! 	CALL GOVNT_BUDGET(.false.)
+			! 	CALL Compute_After_Tax_Income
 				
 			! ! Compute welfare gain between economies
 			! 	CALL COMPUTE_WELFARE_GAIN
@@ -2514,6 +2518,7 @@ Subroutine Solve_Opt_Threshold
 
 	CALL FIND_DBN_EQ
 	CALL GOVNT_BUDGET(.true.)
+	CALL Compute_After_Tax_Income
 
 	! Compute value function and store policy functions, value function and distribution in file
 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
