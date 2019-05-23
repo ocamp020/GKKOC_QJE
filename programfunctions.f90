@@ -2798,7 +2798,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 
 		
 		!! Experiment 
-		print*, 'test 1 ',
+		print*, 'test 1 '
 		print*,R_exp
 		print*,P_exp
 		print*,EBAR_exp
