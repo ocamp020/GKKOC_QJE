@@ -2798,7 +2798,11 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 
 		
 		!! Experiment 
-		print*, 'test 1 '
+		print*, 'test 1 ',
+		print*,R_exp
+		print*,P_exp
+		print*,EBAR_exp
+		print*,wage_exp
 		Pr_mat = Profit_Matrix(R_exp,P_exp)
 		CALL ComputeLaborUnits(EBAR_exp,wage_exp)
 		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
