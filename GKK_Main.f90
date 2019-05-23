@@ -1807,8 +1807,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 				Aprime_exp        = Aprime 
 
 				! Compute moments
+				CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 				CALL COMPUTE_STATS
-				CALL GOVNT_BUDGET(.true.)
+				CALL GOVNT_BUDGET(.false.)
 				CALL Compute_After_Tax_Income
 				
 				! Compute welfare gain between economies
@@ -1841,12 +1842,12 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet
 	      	CLOSE (unit=77) 
 	    	Call Write_Experimental_Results(.true.)
+	    	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	    ENDDO 
 
 	    tauK = OPT_tauK
 		psi  = OPT_psi
 
-	 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
 
 		tauK = OPT_tauK
 		psi  = OPT_psi
@@ -1856,10 +1857,11 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		OPT_psi  = psi
 
 		! Compute moments
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		CALL COMPUTE_STATS
 
 		print*, "Optimal tau_K=", tauK, "Optimal psi=", psi
-
+		OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
 		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 		    &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 		    &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
@@ -1872,11 +1874,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	 	    &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
 	 	    & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
   		    & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
-
-
 		CLOSE (UNIT=77)
 		Call Write_Experimental_Results(.true.)
-
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	else
 		PRINT*,''
 		Print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
@@ -1923,6 +1923,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 				Aprime_exp        = Aprime 
 
 				! Compute moments
+				CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 				CALL COMPUTE_STATS
 				CALL GOVNT_BUDGET(.false.)
 				CALL Compute_After_Tax_Income
@@ -1959,6 +1960,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
       	  	CLOSE (unit=77)
 
 		    Call Write_Experimental_Results(.true.)
+		    deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	    ENDDO 
 
 	    ! opt_psi = 0.860830826876844_dp 
@@ -1970,6 +1972,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		OPT_psi = psi
 
 		! Compute moments
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		CALL COMPUTE_STATS
 		CALL GOVNT_BUDGET(.false.)
 		
@@ -1992,6 +1995,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
       	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
 		CLOSE (UNIT=77)
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	endif 
 
 	CALL FIND_DBN_EQ
@@ -2037,6 +2041,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime 
 
+	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 	! Compute moments
 	CALL COMPUTE_STATS
 	
@@ -2050,6 +2055,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	! !  	print*,"	Optimal Tax Simulation"
 	! ! 	CALL SIMULATION(solving_bench)
 	! ! endif
+
+	! Deallocate variables
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
 end Subroutine Solve_Opt_Tax
 
