@@ -254,7 +254,10 @@ PROGRAM main
 				if (KeepSSatBench .eq. 1) then 
 				Result_Folder = trim(Result_Folder)//'Tax_Reform_Timing/'
 				else 
-				Result_Folder = trim(Result_Folder)//'Tax_Reform_Timing_SS/'
+				folder_aux = Result_Folder
+				Result_Folder = trim(folder_aux)//'Tax_Reform_Timing/'
+				CALL Write_Experimental_Results(.false.)
+				Result_Folder = trim(folder_aux)//'Tax_Reform_Timing_SS/'
 				endif
 				call system( 'mkdir -p ' // trim(Result_Folder) )
 				call Solve_Experiment(compute_exp,Simul_Switch)
