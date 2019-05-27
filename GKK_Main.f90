@@ -568,7 +568,10 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 		Wealth_factor = Y_a_threshold/W_bench
 
+		if (KeepSSatBench .eq. 0) then
 		tauWmin_at = 0.015_dp
+		tauWinc_at = 0.002_dp
+		endif 
 
 	if (compute_exp) then 
 		! Find wealth taxes that balances budget
@@ -602,10 +605,15 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 			! Set tauW as weighted average of point in  the grid to balance budget more precisely
 				tauW_up_bt  = tauW_bt
 				tauW_low_bt = tauW_bt  -  tauWinc_bt
-				tauW_bt     = tauW_low_bt + tauWinc_bt * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
 				tauW_up_at  = tauW_at
-				tauW_low_at = tauW_at  -  tauWinc_at  
+				tauW_low_at = tauW_at  -  tauWinc_at
+				if (KeepSSatBench .eq. 1) then 
+				tauW_bt     = tauW_low_bt + tauWinc_bt * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)  
 				tauW_at     = tauW_low_at + tauWinc_at * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				else
+				tauW_bt     = (tauW_low_bt + tauW_up_bt)*0.5_dp
+				tauW_at     = (tauW_low_at + tauW_up_at)*0.5_dp
+				endif
 				print*,''
 				print*,'GBAR bracketed by taxes:'
 				print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
