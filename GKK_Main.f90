@@ -565,6 +565,8 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 		Wealth_factor = Y_a_threshold/W_bench
 
+		tauWmin_at = 0.015_dp
+
 	if (compute_exp) then 
 		! Find wealth taxes that balances budget
 		print*, "	Computing Wealth Tax to balance the budget"
