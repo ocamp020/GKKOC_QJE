@@ -65,7 +65,7 @@ PROGRAM main
 		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
-			compute_exp_pf= .false.
+			compute_exp_pf= .true.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .true.
 				Fixed_PF_prices = .false.
@@ -83,7 +83,7 @@ PROGRAM main
 		Transition_Tax_Reform = .false.
 		Transition_OTW = .false.
 			budget_balance = .false.
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 
@@ -220,7 +220,7 @@ PROGRAM main
 					call Solve_Experiment_Fixed_Policy_Functions(Fixed_PF,Simul_Switch)
 				elseif ((Fixed_PF.eqv..false.).and.(Fixed_PF_interp).and.(Fixed_PF_prices.eqv..false.)) then
 					! If using benchmark prices
-						! Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp/'
+						! Result_Folder = trim(Result_Folder)//'Tax_Reform_Timing_PF2_BP/'
 						! call system( 'mkdir -p ' // trim(Result_Folder) )
 					! If using tax reform prices
 						call Solve_Experiment(.false.,.false.)
@@ -232,7 +232,7 @@ PROGRAM main
 							Cons   = Cons_bench        
 							Hours  = Hours_bench
 							Aprime = Aprime_bench
-						Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp_Prices_Exp/'
+						Result_Folder = trim(Result_Folder)//'Tax_Reform_Timing_PF2_EP/'
 						call system( 'mkdir -p ' // trim(Result_Folder) )
 					call Solve_Experiment_Fixed_PF_Interp(Fixed_PF_interp,Simul_Switch)
 				elseif ((Fixed_PF.eqv..false.).and.(Fixed_PF_interp.eqv..false.).and.(Fixed_PF_prices)) then
