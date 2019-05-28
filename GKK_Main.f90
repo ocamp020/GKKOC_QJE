@@ -64,7 +64,7 @@ PROGRAM main
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
 			compute_bench = .false.
-			compute_exp   = .true.
+			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .true.
@@ -83,7 +83,7 @@ PROGRAM main
 		Transition_Tax_Reform = .false.
 		Transition_OTW = .false.
 			budget_balance = .false.
-		Simul_Switch  = .false.
+		Simul_Switch  = .true.
 
 
 
@@ -484,10 +484,10 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		CALL WRITE_VARIABLES(1)
-		if (Simul_Switch) then 
-			print*,"	Simulation"
-			CALL SIMULATION(solving_bench)
-		endif
+		! if (Simul_Switch) then 
+		! 	print*,"	Simulation"
+		! 	CALL SIMULATION(solving_bench)
+		! endif
 		
 
 	! Aggregate variables in benchmark economy
