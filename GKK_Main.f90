@@ -1911,7 +1911,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	! CALL Write_Experimental_Results(.false.)
     	psi=  0.4078
 
-	    DO tauindx=-40,40,2
+	    DO tauindx=-40,40,1
 
             tauw_at     = real(tauindx,8)/1000_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
