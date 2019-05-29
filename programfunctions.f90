@@ -3824,6 +3824,7 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	GBAR_C       = 0.0_DP
 	SSC_Payments = 0.0_DP
 	Tot_Lab_Inc  = 0.0_DP
+	Tot_Cap_Inc  = 0.0_DP
 
 	! Compute total expenditure = total revenue
 		! For each state accumulate tax income weighted by equilibrium distribution
@@ -3851,7 +3852,9 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 
       	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei,xi) * tauC * cons(age, ai, zi, lambdai,ei,xi)
 
-	    Tot_Lab_Inc = Tot_Lab_Inc + DBN1(age,ai,zi,lambdai,ei,xi) * yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi) 
+	    Tot_Lab_Inc = Tot_Lab_Inc + DBN1(age,ai,zi,lambdai,ei,xi) * yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)
+
+	    Tot_Cap_Inc = Tot_Cap_Inc + DBN1(age,ai,zi,lambdai,ei,xi) * ( R*agrid(ai) + Pr_mat(ai,zi,xi) )
 	ENDDO
 	ENDDO
 	ENDDO
@@ -3910,7 +3913,7 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	WRITE(UNIT=11, FMT=*) 'Labor Tax / Total Tax', GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
 	WRITE(UNIT=11, FMT=*) 'Labor Tax / GDP', GBAR_L/YBAR
 	WRITE(UNIT=11, FMT=*) 'Average Labor Tax', GBAR_L/Tot_Lab_Inc
-	WRITE(UNIT=11, FMT=*) 'Total Labor Income', Tot_Lab_Inc , 'EBAR', EBAR
+	WRITE(UNIT=11, FMT=*) 'Total Labor Income', Tot_Lab_Inc , 'EBAR', EBAR, 'Total Capital Income', Tot_Cap_Inc
 	Close(UNIT=11)
 	ENDIF  
 END  SUBROUTINE GOVNT_BUDGET
