@@ -25,5 +25,5 @@
 	module load gcc/4.8.5
 	cd RA_Guvenen/GKKC_Code/
 	make clean
-	rm -f log_timing_SS_reform.txt
-	make GKK_Main > log_timing_SS_reform.txt
+	rm -f log_timing_threshold_2.txt
+	make GKK_Main > log_timing_threshold_2.txt
