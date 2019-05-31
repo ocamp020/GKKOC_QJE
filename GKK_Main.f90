@@ -2036,6 +2036,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		! print*, " 	Computing After Tax Income"
 		! CALL Compute_After_Tax_Income
 		! CALL Write_Experimental_Results(.true.)
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	
 	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
