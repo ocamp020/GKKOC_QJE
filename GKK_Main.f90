@@ -2069,10 +2069,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
 
-	if (((theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp).and.(Simul_Switch)) then 
-	 	print*,"	Optimal Tax Simulation"
-		CALL SIMULATION(solving_bench)
-	endif
+	! Simulation
+	if (Simul_Switch) then 
+	CALL SIMULATION(solving_bench)
+	endif 
 
 	! Deallocate variables
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
