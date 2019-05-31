@@ -10,14 +10,14 @@
 
 # Define instructions for virtual machine set up
 	#PBS -q batch
-	#PBS -l nodes=1:ppn=9
+	#PBS -l nodes=1:ppn=10
 	#PBS -l walltime=168:00:00
-	#PBS -l mem=20GB
+	#PBS -l mem=60GB
 	#PBS -V
 	#PBS -m abe
 	#PBS -M ocamp020@umn.edu
 	#PBS -j oe
-	#PBS -N batch_SS_reform
+	#PBS -N batch_OTW_Transition
 	#PBS -S /bin/tcsh
 	#PBS -e analysis.err
 
@@ -25,5 +25,5 @@
 	module load gcc/4.8.5
 	cd RA_Guvenen/GKKC_Code/
 	make clean
-	rm -f log_timing_threshold_2.txt
-	make GKK_Main > log_timing_threshold_2.txt
+	rm -f log_timing_Transition_OTW.txt
+	make GKK_Main > log_timing_Transition_OTW.txt

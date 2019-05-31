@@ -80,8 +80,8 @@ PROGRAM main
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
-		Transition_Tax_Reform = .true.
-		Transition_OTW = .false.
+		Transition_Tax_Reform = .false.
+		Transition_OTW = .true.
 			budget_balance = .false.
 		Simul_Switch  = .false.
 
@@ -3758,13 +3758,13 @@ Subroutine Solve_Transition_Opt_Wealth_Taxes(budget_balance)
 		print*, ' Section not coded yet. Run code with budget_balance=.false.'
 
 		! Set Results Folder
-			Result_Folder = trim(folder_aux)//'Transition_OTW_Budget_Balance/'
+			Result_Folder = trim(folder_aux)//'Transition_OTW_Budget_Balance_Timing/'
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	else
 
 		! Set Results Folder
-			Result_Folder = trim(folder_aux)//'Transition_OTW/'
+			Result_Folder = trim(folder_aux)//'Transition_OTW_Timing/'
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
 		! Find the Distribution and Policy Functions Along Transition Path
