@@ -73,17 +73,17 @@ PROGRAM main
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
-		Opt_Tax       = .false.
+		Opt_Tax       = .true.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
-		Opt_Threshold = .true.
+		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
 		Transition_Tax_Reform = .false.
 		Transition_OTW = .false.
 			budget_balance = .false.
-		Simul_Switch  = .false.
+		Simul_Switch  = .true.
 
 
 
@@ -1786,253 +1786,253 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		Opt_TauW = 0.0_DP
 		maxbrentvaluet=-10000.0_DP
 	
-	print*,'Optimal Tax Loop'
-	If (Opt_Tax_KW) then
-		PRINT*,''
-		Print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
-		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_no_tax_3.txt', STATUS='replace')
-    	CLOSE (unit=77) 
+	! print*,'Optimal Tax Loop'
+	! If (Opt_Tax_KW) then
+	! 	PRINT*,''
+	! 	Print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
+	! 	PRINT*,''
+ !    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_no_tax_3.txt', STATUS='replace')
+ !    	CLOSE (unit=77) 
 
-	    DO tauindx=0,25,1
+	!     DO tauindx=0,25,1
             
-            tauK        = real(tauindx,8)/100_DP
-            brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
+ !            tauK        = real(tauindx,8)/100_DP
+ !            brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
-             ! Aggregate variable in experimental economy
-				GBAR_exp  = GBAR
-				QBAR_exp  = QBAR 
-				NBAR_exp  = NBAR  
-				Y_exp 	  = YBAR
-				Ebar_exp  = EBAR
-				P_exp     = P
-				R_exp	  = R
-				wage_exp  = wage
-				tauK_exp  = tauK
-				tauPL_exp = tauPL
-				psi_exp   = psi
-				DBN_exp   = DBN1
-				tauw_bt_exp = tauW_bt
-				tauw_at_exp = tauW_at
-				Y_a_threshold_exp = Y_a_threshold
+ !             ! Aggregate variable in experimental economy
+	! 			GBAR_exp  = GBAR
+	! 			QBAR_exp  = QBAR 
+	! 			NBAR_exp  = NBAR  
+	! 			Y_exp 	  = YBAR
+	! 			Ebar_exp  = EBAR
+	! 			P_exp     = P
+	! 			R_exp	  = R
+	! 			wage_exp  = wage
+	! 			tauK_exp  = tauK
+	! 			tauPL_exp = tauPL
+	! 			psi_exp   = psi
+	! 			DBN_exp   = DBN1
+	! 			tauw_bt_exp = tauW_bt
+	! 			tauw_at_exp = tauW_at
+	! 			Y_a_threshold_exp = Y_a_threshold
 
-				ValueFunction_exp = ValueFunction
-				Cons_exp          = Cons           
-				Hours_exp         = Hours
-				Aprime_exp        = Aprime 
+	! 			ValueFunction_exp = ValueFunction
+	! 			Cons_exp          = Cons           
+	! 			Hours_exp         = Hours
+	! 			Aprime_exp        = Aprime 
 
-				! Compute moments
-				CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-				CALL COMPUTE_STATS
-				CALL GOVNT_BUDGET(.false.)
-				CALL Compute_After_Tax_Income
+	! 			! Compute moments
+	! 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+	! 			CALL COMPUTE_STATS
+	! 			CALL GOVNT_BUDGET(.false.)
+	! 			CALL Compute_After_Tax_Income
 				
-				! Compute welfare gain between economies
-				CALL COMPUTE_WELFARE_GAIN
+	! 			! Compute welfare gain between economies
+	! 			CALL COMPUTE_WELFARE_GAIN
 
-				! Write experimental results in output.txt
-				CALL WRITE_VARIABLES(0)
+	! 			! Write experimental results in output.txt
+	! 			CALL WRITE_VARIABLES(0)
 
-		    if (brentvaluet .gt. maxbrentvaluet) then
-		        maxbrentvaluet = brentvaluet
-				OPT_tauK = tauK
-				OPT_psi  = psi
-			endif
+	! 	    if (brentvaluet .gt. maxbrentvaluet) then
+	! 	        maxbrentvaluet = brentvaluet
+	! 			OPT_tauK = tauK
+	! 			OPT_psi  = psi
+	! 		endif
 
-			! Print Results 
-		    print*, 'tauK=', tauK, 'YBAR=', YBAR, & 
-		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
-		    OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_no_tax_3.txt', STATUS='old', POSITION='append')
-		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
-			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-			      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
-				!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-			      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
-			      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
-			      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-			      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
-			      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
-			      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-			      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet, Tot_Cap_Inc
-	      	CLOSE (unit=77) 
-	    	Call Write_Experimental_Results(.true.)
-	    	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-	    ENDDO 
+	! 		! Print Results 
+	! 	    print*, 'tauK=', tauK, 'YBAR=', YBAR, & 
+	! 	    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+	! 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_no_tax_3.txt', STATUS='old', POSITION='append')
+	! 	    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+	! 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+	! 		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+	! 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+	! 		      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
+	! 		      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
+	! 		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+	! 		      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
+	! 		      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
+	! 		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+	! 		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+	! 	      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet, Tot_Cap_Inc
+	!       	CLOSE (unit=77) 
+	!     	Call Write_Experimental_Results(.true.)
+	!     	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+	!     ENDDO 
 
-	    tauK = OPT_tauK
-		psi  = OPT_psi
+	!     tauK = OPT_tauK
+	! 	psi  = OPT_psi
 
 
-		tauK = OPT_tauK
-		psi  = OPT_psi
-		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.02_dp,Opt_TauK+0.02_dp) 
+	! 	tauK = OPT_tauK
+	! 	psi  = OPT_psi
+	! 	call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.02_dp,Opt_TauK+0.02_dp) 
 
-		tauK     = OPT_tauK
-		OPT_psi  = psi
+	! 	tauK     = OPT_tauK
+	! 	OPT_psi  = psi
 
-		! Compute moments
-		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-		CALL COMPUTE_STATS
+	! 	! Compute moments
+	! 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+	! 	CALL COMPUTE_STATS
 
-		print*, "Optimal tau_K=", tauK, "Optimal psi=", psi
-		OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
-		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
-		    &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-		    &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
-		!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-	 	    &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
-	 	    &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
-	 	    &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	 	    &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
-	 	    &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
-	 	    &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	 	    & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-  		    & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
-		CLOSE (UNIT=77)
-		Call Write_Experimental_Results(.true.)
-		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-	else
-		PRINT*,''
-		Print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
-		PRINT*,''
-    	! Set Y_a_threshold
-			call Find_TauW_Threshold(DBN_bench,W_bench)  
-			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
-			Wealth_factor = Y_a_threshold/W_bench
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_timing_2.txt', STATUS='replace')
-    	WRITE(UNIT=77, FMT=*) 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
-		      & 'MeanWealth ','QBAR ','NBAR ','YBAR ','Y_Growth ', 'wage ', &
-		      & 'Av_Util_NB ', 'CE2_NB ', 'CE2_Pop ', &
-		      & 'Wealth_Output ', 'prct1_wealth ' , 'prct10_wealth ', 'Std_Log_Earnings ', 'mean_hours ', &
-	      	  & 'GBAR ', 'GBAR_K ', 'GBAR_W ', 'GBAR_L ', 'GBAR_C ', 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet ','Cap_Inc '
-    	CLOSE (unit=77) 
+	! 	print*, "Optimal tau_K=", tauK, "Optimal psi=", psi
+	! 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
+	! 	WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+	! 	    &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+	! 	    &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+	! 	!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+	!  	    &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
+	!  	    &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
+	!  	    &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+	!  	    &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
+	!  	    &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
+	!  	    &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+	!  	    & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+ !  		    & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
+	! 	CLOSE (UNIT=77)
+	! 	Call Write_Experimental_Results(.true.)
+	! 	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+	! else
+	! 	PRINT*,''
+	! 	Print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
+	! 	PRINT*,''
+ !    	! Set Y_a_threshold
+	! 		call Find_TauW_Threshold(DBN_bench,W_bench)  
+	! 		Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
+	! 		Wealth_factor = Y_a_threshold/W_bench
+ !    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_timing_2.txt', STATUS='replace')
+ !    	WRITE(UNIT=77, FMT=*) 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
+	! 	      & 'MeanWealth ','QBAR ','NBAR ','YBAR ','Y_Growth ', 'wage ', &
+	! 	      & 'Av_Util_NB ', 'CE2_NB ', 'CE2_Pop ', &
+	! 	      & 'Wealth_Output ', 'prct1_wealth ' , 'prct10_wealth ', 'Std_Log_Earnings ', 'mean_hours ', &
+	!       	  & 'GBAR ', 'GBAR_K ', 'GBAR_W ', 'GBAR_L ', 'GBAR_C ', 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet ','Cap_Inc '
+ !    	CLOSE (unit=77) 
 
-    	! CALL Write_Experimental_Results(.false.)
-    	psi=  0.4078
+ !    	! CALL Write_Experimental_Results(.false.)
+ !    	psi=  0.4078
 
-	    DO tauindx=-40,40,1
+	!     DO tauindx=-40,40,1
 
-            tauw_at     = real(tauindx,8)/1000_DP
-            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+ !            tauw_at     = real(tauindx,8)/1000_DP
+ !            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
  
-            ! Aggregate variable in experimental economy
-				GBAR_exp  = GBAR
-				QBAR_exp  = QBAR 
-				NBAR_exp  = NBAR  
-				Y_exp 	  = YBAR
-				Ebar_exp  = EBAR
-				P_exp     = P
-				R_exp	  = R
-				wage_exp  = wage
-				tauK_exp  = tauK
-				tauPL_exp = tauPL
-				psi_exp   = psi
-				DBN_exp   = DBN1
-				tauw_bt_exp = tauW_bt
-				tauw_at_exp = tauW_at
-				Y_a_threshold_exp = Y_a_threshold
+ !            ! Aggregate variable in experimental economy
+	! 			GBAR_exp  = GBAR
+	! 			QBAR_exp  = QBAR 
+	! 			NBAR_exp  = NBAR  
+	! 			Y_exp 	  = YBAR
+	! 			Ebar_exp  = EBAR
+	! 			P_exp     = P
+	! 			R_exp	  = R
+	! 			wage_exp  = wage
+	! 			tauK_exp  = tauK
+	! 			tauPL_exp = tauPL
+	! 			psi_exp   = psi
+	! 			DBN_exp   = DBN1
+	! 			tauw_bt_exp = tauW_bt
+	! 			tauw_at_exp = tauW_at
+	! 			Y_a_threshold_exp = Y_a_threshold
 
-				ValueFunction_exp = ValueFunction
-				Cons_exp          = Cons           
-				Hours_exp         = Hours
-				Aprime_exp        = Aprime 
+	! 			ValueFunction_exp = ValueFunction
+	! 			Cons_exp          = Cons           
+	! 			Hours_exp         = Hours
+	! 			Aprime_exp        = Aprime 
 
-				! Compute moments
-				CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-				CALL COMPUTE_STATS
-				CALL GOVNT_BUDGET(.false.)
-				CALL Compute_After_Tax_Income
+	! 			! Compute moments
+	! 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+	! 			CALL COMPUTE_STATS
+	! 			CALL GOVNT_BUDGET(.false.)
+	! 			CALL Compute_After_Tax_Income
 				
-				! Compute welfare gain between economies
-				CALL COMPUTE_WELFARE_GAIN
+	! 			! Compute welfare gain between economies
+	! 			CALL COMPUTE_WELFARE_GAIN
 
-				! Write experimental results in output.txt
-				CALL WRITE_VARIABLES(0)
+	! 			! Write experimental results in output.txt
+	! 			CALL WRITE_VARIABLES(0)
 
-		    if (brentvaluet .gt. maxbrentvaluet) then
-		        maxbrentvaluet = brentvaluet
-				OPT_tauW = tauW_at
-				OPT_psi  = psi
-			endif
+	! 	    if (brentvaluet .gt. maxbrentvaluet) then
+	! 	        maxbrentvaluet = brentvaluet
+	! 			OPT_tauW = tauW_at
+	! 			OPT_psi  = psi
+	! 		endif
 
-			! Print Results 
-		    print*, 'tauW=', tauW_at, 'YBAR=', YBAR, & 
-		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+	! 		! Print Results 
+	! 	    print*, 'tauW=', tauW_at, 'YBAR=', YBAR, & 
+	! 	    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
 
-		    OPEN  (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_timing_2.txt', STATUS='old', POSITION='append')
-		    WRITE (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
-			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-			      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
-				!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-			      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
-			      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
-			      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-			      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
-			      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
-			      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-			      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet,Tot_Cap_Inc
-      	  	CLOSE (unit=77)
+	! 	    OPEN  (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_timing_2.txt', STATUS='old', POSITION='append')
+	! 	    WRITE (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+	! 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+	! 		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+	! 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+	! 		      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
+	! 		      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
+	! 		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+	! 		      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
+	! 		      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
+	! 		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+	! 		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+	! 	      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet,Tot_Cap_Inc
+ !      	  	CLOSE (unit=77)
 
-		    Call Write_Experimental_Results(.true.)
-		    deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-	    ENDDO 
+	! 	    Call Write_Experimental_Results(.true.)
+	! 	    deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+	!     ENDDO 
 
-	    ! opt_psi = 0.860830826876844_dp 
-	    ! Opt_TauW = 0.031_dp 
-		tauW_at = OPT_tauW
-		psi     = OPT_psi
-		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.002_dp,Opt_TauW+0.002_dp)
-		tauW_at = OPT_tauW
-		OPT_psi = psi
+	!     ! opt_psi = 0.860830826876844_dp 
+	!     ! Opt_TauW = 0.031_dp 
+	! 	tauW_at = OPT_tauW
+	! 	psi     = OPT_psi
+	! 	call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.002_dp,Opt_TauW+0.002_dp)
+	! 	tauW_at = OPT_tauW
+	! 	OPT_psi = psi
 
-		! Compute moments
-		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-		CALL COMPUTE_STATS
-		CALL GOVNT_BUDGET(.false.)
-		CALL Compute_After_Tax_Income
+	! 	! Compute moments
+	! 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+	! 	CALL COMPUTE_STATS
+	! 	CALL GOVNT_BUDGET(.false.)
+	! 	CALL Compute_After_Tax_Income
 		
-		! Compute welfare gain between economies
-		CALL COMPUTE_WELFARE_GAIN
+	! 	! Compute welfare gain between economies
+	! 	CALL COMPUTE_WELFARE_GAIN
 
-		print*, "Optimal tau_W=", tauW_at, "Optimal psi=", psi
+	! 	print*, "Optimal tau_W=", tauW_at, "Optimal psi=", psi
 		
-		OPEN  (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_timing_2.txt', STATUS='replace')
-		WRITE (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
-	      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-	      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
-		!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-	      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
-	      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
-	      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
-	      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
-	      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet, Tot_Cap_Inc
-		CLOSE (UNIT=77)
-		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-	endif 
+	! 	OPEN  (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_timing_2.txt', STATUS='replace')
+	! 	WRITE (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+	!       &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+	!       &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+	! 	!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+	!       &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
+	!       &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
+	!       &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+	!       &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
+	!       &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
+	!       &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+	!       & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+ !      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet, Tot_Cap_Inc
+	! 	CLOSE (UNIT=77)
+	! 	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+	! endif 
 
-	CALL FIND_DBN_EQ
-	CALL GOVNT_BUDGET(.true.)
-	CALL Compute_After_Tax_Income
+	! CALL FIND_DBN_EQ
+	! CALL GOVNT_BUDGET(.true.)
+	! CALL Compute_After_Tax_Income
 
-	! Compute value function and store policy functions, value function and distribution in file
-	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
-	CALL Firm_Value
-	CALL Write_Experimental_Results(.true.)
+	! ! Compute value function and store policy functions, value function and distribution in file
+	! CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	! CALL Firm_Value
+	! CALL Write_Experimental_Results(.true.)
 
 	! Load results 
 	! Use this block if commenting everything above
-		! CALL Write_Experimental_Results(.false.)
-		! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-		! K_mat  = K_Matrix(R,P)
-		! Pr_mat = Profit_Matrix(R,P)
-		! CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
-		! CALL ComputeLaborUnits(EBAR,wage)
-		! CALL GOVNT_BUDGET(.true.)
+		CALL Write_Experimental_Results(.false.)
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		K_mat  = K_Matrix(R,P)
+		Pr_mat = Profit_Matrix(R,P)
+		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		CALL ComputeLaborUnits(EBAR,wage)
+		CALL GOVNT_BUDGET(.true.)
 		! print*, " 	Computing After Tax Income"
 		! CALL Compute_After_Tax_Income
 		! CALL Write_Experimental_Results(.true.)
@@ -2069,10 +2069,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
 
-	! ! if (((theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp).and.(Simul_Switch)) then 
-	! !  	print*,"	Optimal Tax Simulation"
-	! ! 	CALL SIMULATION(solving_bench)
-	! ! endif
+	if (((theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp).and.(Simul_Switch)) then 
+	 	print*,"	Optimal Tax Simulation"
+		CALL SIMULATION(solving_bench)
+	endif
 
 	! Deallocate variables
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
