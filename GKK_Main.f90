@@ -62,7 +62,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -80,7 +80,7 @@ PROGRAM main
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
-		Transition_Tax_Reform = .false.
+		Transition_Tax_Reform = .true.
 		Transition_OTW = .false.
 			budget_balance = .false.
 		Simul_Switch  = .false.
@@ -3453,10 +3453,10 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	if (budget_balance) then 
 
 		! Set Results Folder
-		Result_Folder = trim(Result_Folder)//'Transition_Balanced_Budget/'
+		Result_Folder = trim(Result_Folder)//'Transition_Balanced_Budget_Timing/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
-	if (.false.) then 
+	if (.true.) then 
 
 		! Find the Distribution and Policy Functions Along Transition Path
 		! This is done for the tax reform steady state
@@ -3604,13 +3604,13 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 		print*,' 	Computing Steady State at desired tax level'
 		print*,'---------------------------------------------------'
 		! Read Tax
-			OPEN (UNIT=4,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='old', ACTION='read')
-			READ (UNIT=4,  FMT=*), tauW_at
-			CLOSE(unit=4)
-			R=   1.9480499900981853E-002 
-			P=  0.13847606093758086 
-			print*,' '
-			print*,'	Wealth taxes =',tauW_at*100,'%'
+			! OPEN (UNIT=4,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='old', ACTION='read')
+			! READ (UNIT=4,  FMT=*), tauW_at
+			! CLOSE(unit=4)
+			! R=   1.9480499900981853E-002 
+			! P=  0.13847606093758086 
+			! print*,' '
+			! print*,'	Wealth taxes =',tauW_at*100,'%'
 
 		! Solve for New Steady State
 			CALL FIND_DBN_EQ
@@ -3670,7 +3670,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	else ! If budget isn't balanced: Transition between steady states
 
 		! Set Results Folder
-		Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform/'
+		Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform_Timing/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
 		! Find the Distribution and Policy Functions Along Transition Path
