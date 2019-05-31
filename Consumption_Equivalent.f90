@@ -4,7 +4,7 @@ Program Consumption_Equivalent
 	use programfunctions
 	use Toolbox
 	Implicit None
-	character(100) :: Bench_Folder, Result_Folder_aux
+	character(100) :: Bench_Folder, Result_Folder_aux, CE_Folder
 	character(4)   :: string_theta
 	character(100) :: folder_aux
 	integer        :: i
@@ -116,11 +116,12 @@ Program Consumption_Equivalent
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
-		call system( 'mkdir -p ' // trim(Result_Folder)//'CE_Files/' )
-		print*, "Results are stored in directory: ", Result_Folder
+		CE_Folder = trim(Result_Folder)//'CE_Files_Timing/'
+		call system( 'mkdir -p ' // trim(CE_Folder) )
+		print*, "Results are stored in directory: ", CE_Folder
 
 	! Bench_Folder
-		Bench_Folder = trim(Result_Folder)//'Bench_Files/'
+		Bench_Folder = trim(Result_Folder_aux)//'Bench_Files/'
 
 	! Initialize program and load functions
 		print*,"	Initializing program"
@@ -173,13 +174,13 @@ do i=1,3
 
 	if (i.eq.1) then 
 		! Tax Reform
-		Result_Folder = Result_Folder 
+		Result_Folder = trim(Result_Folder_aux)//'Tax_Reform_Timing/'
 	elseif (i.eq.2) then 
 		! Optimal tax: Capital
 		Result_Folder = trim(Result_Folder_aux)//'Opt_Tax_K/' 
 	elseif (i.eq.3) then 
 		! Optimal tax: Wealth
-		Result_Folder = trim(Result_Folder_aux)//'Opt_Tax_W/' 
+		Result_Folder = trim(Result_Folder_aux)//'Opt_Tax_W_Timing/' 
 	endif 
 
 
@@ -395,19 +396,19 @@ do i=1,3
 
 	if (i.eq.1) then 
 		! Tax Reform
-		OPEN  (UNIT=1,  FILE=trim(Result_Folder_aux)//'CE_output.txt'  , STATUS='replace')
+		OPEN  (UNIT=1,  FILE=trim(CE_Folder)//'CE_output.txt'  , STATUS='replace')
 		WRITE (UNIT=1,  FMT=*) ' '
 		WRITE (UNIT=1,  FMT=*) 'Consumption Equivalent Welfare - Tax Reform'
 		WRITE (UNIT=1,  FMT=*) ' '
 	elseif (i.eq.2) then 
 		! Optimal tax: Capital
-		OPEN  (UNIT=1,  FILE=trim(Result_Folder_aux)//'CE_output_otk.txt'  , STATUS='replace')
+		OPEN  (UNIT=1,  FILE=trim(CE_Folder)//'CE_output_otk.txt'  , STATUS='replace')
 		WRITE (UNIT=1,  FMT=*) ' '
 		WRITE (UNIT=1,  FMT=*) 'Consumption Equivalent Welfare - Optimal Capital Taxes'
 		WRITE (UNIT=1,  FMT=*) ' '
 	elseif (i.eq.3) then 
 		! Optimal tax: Wealth
-		OPEN  (UNIT=1,  FILE=trim(Result_Folder_aux)//'CE_output_otw.txt'  , STATUS='replace')
+		OPEN  (UNIT=1,  FILE=trim(CE_Folder)//'CE_output_otw.txt'  , STATUS='replace')
 		WRITE (UNIT=1,  FMT=*) ' '
 		WRITE (UNIT=1,  FMT=*) 'Consumption Equivalent Welfare - Optimal Wealth Taxes'
 		WRITE (UNIT=1,  FMT=*) ' '
