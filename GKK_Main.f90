@@ -3439,6 +3439,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	use omp_lib
 	implicit none 
 	logical, intent(in) :: budget_balance
+	character(100) :: folder_aux
 
 	! Set step for increments
 	tauWinc_bt=0.000_DP
@@ -3448,12 +3449,14 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	call Solve_Benchmark(.false.,.false.)
 
 	! Load Tax Reform Variables
+	folder_aux = Result_Folder
+	Result_Folder = trim(folder_aux)//'Tax_Reform_Timing/'
 	call Solve_Experiment(.false.,.false.)
 
 	if (budget_balance) then 
 
 		! Set Results Folder
-		Result_Folder = trim(Result_Folder)//'Transition_Balanced_Budget_Timing/'
+		Result_Folder = trim(folder_aux)//'Transition_Balanced_Budget_Timing/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	if (.true.) then 
@@ -3670,7 +3673,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	else ! If budget isn't balanced: Transition between steady states
 
 		! Set Results Folder
-		Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform_Timing/'
+		Result_Folder = trim(folder_aux)//'Transition_Tax_Reform_Timing/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
 		! Find the Distribution and Policy Functions Along Transition Path
@@ -3716,7 +3719,7 @@ Subroutine Solve_Transition_Opt_Wealth_Taxes(budget_balance)
 
 	! Load Optimal Wealth Tax Variables
 		! Change to optimal tax folder 
-		Result_Folder = trim(folder_aux)//'Opt_Tax_W/'
+		Result_Folder = trim(folder_aux)//'Opt_Tax_W_Timing/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 		
 		! Load variables
