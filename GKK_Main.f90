@@ -80,8 +80,8 @@ PROGRAM main
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
-		Transition_Tax_Reform = .true.
-		Transition_OTW = .false.
+		Transition_Tax_Reform = .false.
+		Transition_OTW = .true.
 			budget_balance = .true.
 		Simul_Switch  = .false.
 
@@ -3456,7 +3456,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	if (budget_balance) then 
 
 		! Set Results Folder
-		Result_Folder = trim(folder_aux)//'Transition_Balanced_Budget_Timing/'
+		Result_Folder = trim(folder_aux)//'Transition_Tax_Reform_Timing_BB/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	if (.true.) then 
@@ -3758,11 +3758,113 @@ Subroutine Solve_Transition_Opt_Wealth_Taxes(budget_balance)
 
 
 	if (budget_balance) then 
-		print*, ' Section not coded yet. Run code with budget_balance=.false.'
 
 		! Set Results Folder
-			Result_Folder = trim(folder_aux)//'Transition_OTW_Budget_Balance_Timing/'
+			Result_Folder = trim(folder_aux)//'Transition_OTW_Timing_BB/'
 			call system( 'mkdir -p ' // trim(Result_Folder) )
+
+		! Find the Distribution and Policy Functions Along Transition Path
+		! This is done for the tax reform steady state
+		call Find_DBN_Transition 
+
+		! Find Taxes that balance the budget 
+		print*,' '
+		print*,'---------------------------------------------------'
+		print*,' 	Balancing the Budget with Labor Taxes'
+		print*,'---------------------------------------------------'
+			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
+			psi_indx = 1.0_DP
+			psi_chg  = 0.01_DP
+			Debt_tr  = 1.0_DP
+			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
+				! Set old G and new value of tauW
+				GBAR_exp_old = GBAR_exp
+				psi = psi_exp - psi_indx*psi_chg ! Decreasing psi increases labor taxes
+				print*, 'Bracketing Iteration',psi_indx,'tau_L=',(1.0_dp-psi)*100
+				! Solve for New Steady State
+				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+				CALL FIND_DBN_EQ
+					GBAR_exp  = GBAR
+					QBAR_exp  = QBAR 
+					NBAR_exp  = NBAR  
+					Y_exp 	  = YBAR
+					Ebar_exp  = EBAR
+					P_exp     = P
+					R_exp	  = R
+					wage_exp  = wage
+					tauK_exp  = tauK
+					tauPL_exp = tauPL
+					psi_exp   = psi
+					DBN_exp   = DBN1
+					tauw_bt_exp = tauW_bt
+					tauw_at_exp = tauW_at
+					Y_a_threshold_exp = Y_a_threshold
+					Cons_exp          = Cons           
+					Hours_exp         = Hours
+					Aprime_exp        = Aprime
+				! Find the Distribution and Policy Functions Along Transition Path
+				call Find_DBN_Transition 
+				! Get new G
+				GBAR_exp = GBAR_tr(T+1) 
+				! Iteratioins  
+				psi_indx = psi_indx + 1.0_DP  
+				print*,' ' 
+				print*,' ' 
+				print*, "Bracketing GBAR: tau_L=", (1.0_dp-psi)*100
+				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
+			ENDDO
+
+			! Set the upper bound of psi as the second to last iteration
+				psi_up  = psi + psi_chg
+			! Set the lower bound of psi as the last iteration
+				psi_low = psi
+				print*,''
+				print*,'GBAR bracketed by taxes:'
+				print*,'tau_L_low =', (1.0_dp-psi_up)*100, '% tau_L=', (1.0_dp-psi-0.5_dp*psi_chg)*100, "%",&
+					& '% tau_L_up=', (1.0_dp-psi_low)*100º
+				print*,''
+
+			! Find psi that exactly balances the budget (up to precisioin 0.1%) using bisection
+				print*,'Bisection for TauW:'
+				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr))) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
+				    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
+				        psi_low  = psi ! If there is a surplus don't decrease psi (increase tau_L). Set a floor.
+				    else
+				        psi_up   = psi ! If there is a deficit don't increase psi (decrease tau_L). Set a ceiling.
+				    endif
+				    ! Set new psi
+				    psi = (psi_low + psi_up)/2.0_DP
+					! Solve for New Steady State
+					deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+					CALL FIND_DBN_EQ
+						GBAR_exp  = GBAR
+						QBAR_exp  = QBAR 
+						NBAR_exp  = NBAR  
+						Y_exp 	  = YBAR
+						Ebar_exp  = EBAR
+						P_exp     = P
+						R_exp	  = R
+						wage_exp  = wage
+						tauK_exp  = tauK
+						tauPL_exp = tauPL
+						psi_exp   = psi
+						DBN_exp   = DBN1
+						tauw_bt_exp = tauW_bt
+						tauw_at_exp = tauW_at
+						Y_a_threshold_exp = Y_a_threshold
+						Cons_exp          = Cons           
+						Hours_exp         = Hours
+						Aprime_exp        = Aprime
+					! Find the Distribution and Policy Functions Along Transition Path
+					call Find_DBN_Transition 
+					! Get new G
+					GBAR_exp = GBAR_tr(T+1) 
+					! Print Results 
+					print*,' '
+				    print*,'tau_L_low =', (1.0_dp-psi_up)*100, '% tau_L_up=', (1.0_dp-psi_low)*100, '% psi=', (1.0_dp-psi)*100, "%"
+					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
+				ENDDO
+
 
 	else
 

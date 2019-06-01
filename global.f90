@@ -108,7 +108,7 @@ MODULE global
 		REAL(DP) :: tauC=0.075_DP
     ! Labor income tax: This is a progresive tax.
 	! 1-psi controls the level of tax, and tauPL controls progressivity
-		REAL(DP) :: tauPL, psi
+		REAL(DP) :: tauPL, psi, psi_chg, psi_indx
 
 
     ! Auxiliary variables to find wealth tax that balances the budget in experiment economy
