@@ -82,7 +82,7 @@ PROGRAM main
 		Opt_Tau_CX = .false.
 		Transition_Tax_Reform = .true.
 		Transition_OTW = .false.
-			budget_balance = .false.
+			budget_balance = .true.
 		Simul_Switch  = .false.
 
 
