@@ -3821,7 +3821,7 @@ Subroutine Solve_Transition_Opt_Wealth_Taxes(budget_balance)
 				print*,''
 				print*,'GBAR bracketed by taxes:'
 				print*,'tau_L_low =', (1.0_dp-psi_up)*100, '% tau_L=', (1.0_dp-psi-0.5_dp*psi_chg)*100, "%",&
-					& '% tau_L_up=', (1.0_dp-psi_low)*100º
+					& '% tau_L_up=', (1.0_dp-psi_low)*100
 				print*,''
 
 			! Find psi that exactly balances the budget (up to precisioin 0.1%) using bisection
