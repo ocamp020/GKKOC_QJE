@@ -80,9 +80,9 @@ PROGRAM main
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
-		Transition_Tax_Reform = .false.
-		Transition_OTW = .true.
-			budget_balance = .false.
+		Transition_Tax_Reform = .true.
+		Transition_OTW = .false.
+			budget_balance = .true.
 		Simul_Switch  = .false.
 
 
