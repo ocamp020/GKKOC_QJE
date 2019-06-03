@@ -3767,10 +3767,16 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 	if (budget_balance) then 
 
 		! Set Results Folder
-			if (Opt_Tax_KW) then 
-				Result_Folder = trim(folder_aux)//'Transition_OTK_BB/'
-			else 
-				Result_Folder = trim(folder_aux)//'Transition_OTW_Timing_BB/'
+			if (balance_tau_L) then 
+				if (Opt_Tax_KW) then 
+				Result_Folder = trim(folder_aux)//'Transition_OTK_BB_tau_L/'
+				else 
+				Result_Folder = trim(folder_aux)//'Transition_OTW_Timing_BB_tau_L/'
+				endif 
+			elseif (Opt_Tax_KW) then 
+				Result_Folder = trim(folder_aux)//'Transition_OTK_BB_tau_K/'
+			else
+				Result_Folder = trim(folder_aux)//'Transition_OTW_Timing_BB_tau_W/'
 			endif 
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
