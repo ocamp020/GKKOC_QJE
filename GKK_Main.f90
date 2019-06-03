@@ -3799,13 +3799,13 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 				GBAR_exp_old = GBAR_exp
 				if (balance_tau_L) then 
 				psi = psi_exp - BB_tax_ind*BB_tax_chg ! Decreasing psi increases labor taxes
-				print*, 'Bracketing Iteration',psi_indx,'tau_L=',(1.0_dp-psi)*100
+				print*, 'Bracketing Iteration',BB_tax_ind,'tau_L=',(1.0_dp-psi)*100
 				elseif (Opt_Tax_KW) then 
 				tauK = tauK_exp + BB_tax_ind * BB_tax_chg 
-				print*, 'Bracketing Iteration',psi_indx,"tauK=",tauK*100
+				print*, 'Bracketing Iteration',BB_tax_ind,"tauK=",tauK*100
 				else
 				tauW_at = tauw_at_exp + BB_tax_ind * BB_tax_chg 
-				print*, 'Bracketing Iteration',psi_indx,"tauW_at=",tauW_at*100
+				print*, 'Bracketing Iteration',BB_tax_ind,"tauW_at=",tauW_at*100
 				endif 
 				
 				! Solve for New Steady State
@@ -3836,7 +3836,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 				! Iteratioins  
 				BB_tax_ind = BB_tax_ind + 1.0_DP  
 				print*,' ' 
-				print*,'Bracketing GBAR: tau_L=', (1.0_dp-psi)*100,'tauK=',100*tauK,'tauW=',1''*tauW_at
+				print*,'Bracketing GBAR: tau_L=', (1.0_dp-psi)*100,'tauK=',100*tauK,'tauW=',100*tauW_at
 				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
 			ENDDO
 
