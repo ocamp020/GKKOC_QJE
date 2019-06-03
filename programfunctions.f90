@@ -5405,24 +5405,24 @@ SUBROUTINE FIND_DBN_Transition()
 	!! Initial guess for transition path variables
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		! Guess NBAR, QBAR and R as a linear combination of starting and end values
-			! NBAR_tr(1)   = NBAR_bench ; NBAR_tr(T+1) = NBAR_exp   ;
-			! QBAR_tr(1)   = QBAR_bench ; QBAR_tr(T+1) = QBAR_exp   ;
-			! R_tr(1)      = R_bench    ; R_tr(T+1)    = R_exp      ;
-			! do ti=2,T
-			! 	NBAR_tr(ti) = NBAR_tr(ti-1) + (NBAR_tr(T+1)-NBAR_tr(1))/T
-			! 	QBAR_tr(ti) = QBAR_tr(ti-1) + (QBAR_tr(T+1)-QBAR_tr(1))/T
-			! 	R_tr(ti)    = R_tr(ti-1) + (R_tr(T+1)-R_tr(1))/T
-			! enddo 
+			NBAR_tr(1)   = NBAR_bench ; NBAR_tr(T+1) = NBAR_exp   ;
+			QBAR_tr(1)   = QBAR_bench ; QBAR_tr(T+1) = QBAR_exp   ;
+			R_tr(1)      = R_bench    ; R_tr(T+1)    = R_exp      ;
+			do ti=2,T
+				NBAR_tr(ti) = NBAR_tr(ti-1) + (NBAR_tr(T+1)-NBAR_tr(1))/T
+				QBAR_tr(ti) = QBAR_tr(ti-1) + (QBAR_tr(T+1)-QBAR_tr(1))/T
+				R_tr(ti)    = R_tr(ti-1) + (R_tr(T+1)-R_tr(1))/T
+			enddo 
 		! Load Guess From Files
-			print*, 'Loading initial variables from file'
-			OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'   , STATUS='old', ACTION='read')
-			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
-			OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		 , STATUS='old', ACTION='read')
-			READ (UNIT=1,  FMT=*), QBAR_tr
-			READ (UNIT=2,  FMT=*), NBAR_tr
-			READ (UNIT=3,  FMT=*), R_tr
-			CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3);
-			print*, 'Reading completed'
+			! print*, 'Loading initial variables from file'
+			! OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'   , STATUS='old', ACTION='read')
+			! OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
+			! OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		 , STATUS='old', ACTION='read')
+			! READ (UNIT=1,  FMT=*), QBAR_tr
+			! READ (UNIT=2,  FMT=*), NBAR_tr
+			! READ (UNIT=3,  FMT=*), R_tr
+			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3);
+			! print*, 'Reading completed'
 
 		! Choose YBAR, EBAR, P and Wage to be consistent
 		P_tr    = alpha* QBAR_tr**(alpha-mu) * NBAR_tr**(1.0_DP-alpha)
