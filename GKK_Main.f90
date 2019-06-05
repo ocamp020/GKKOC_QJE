@@ -3794,6 +3794,8 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		! Find the Distribution and Policy Functions Along Transition Path
 		! This is done for the tax reform steady state
 		! call Find_DBN_Transition 
+			! If previous line is commented you need this:
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 
 		! Find Taxes that balance the budget 
 		if (balance_tau_L) then
