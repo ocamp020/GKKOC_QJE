@@ -3442,6 +3442,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	implicit none 
 	logical, intent(in) :: budget_balance
 	character(100) :: folder_aux
+	real(dp) :: tauW_at_0, tauW_bt_0
 
 	! Set step for increments
 	tauWinc_bt=0.000_DP
@@ -3454,6 +3455,10 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	folder_aux = Result_Folder
 	Result_Folder = trim(folder_aux)//'Tax_Reform_Timing/'
 	call Solve_Experiment(.false.,.false.)
+
+	! Set reference value for wealth taxes
+		tauW_at_0 = tauW_at
+		tauW_bt_0 = tauW_bt
 
 	if (budget_balance) then 
 
@@ -3478,8 +3483,8 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
 				! Set old G and new value of tauW
 				GBAR_exp_old = GBAR_exp
-				tauW_bt = tauw_bt_exp + tauWindx * tauWinc_bt
-				tauW_at = tauw_at_exp + tauWindx * tauWinc_at
+				tauW_bt = tauw_bt_0 + tauWindx * tauWinc_bt
+				tauW_at = tauw_at_0 + tauWindx * tauWinc_at
 				print*, 'Bracketing Iteration',tauWindx,'tauW_bt=',tauW_bt*100,"tauW_at=",tauW_at*100
 				! Solve for New Steady State
 				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
@@ -3711,6 +3716,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 	use omp_lib
 	implicit none 
 	logical, intent(in) :: budget_balance, Opt_Tax_KW, balance_tau_L
+	real(dp) :: psi_0, tauK_0, tauW_0
 	character(100) :: folder_aux
 
 	! Save base folder
@@ -3763,6 +3769,11 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime 
 
+	! Set reference value for psi, tau_K and tau_W
+		psi_0  = psi 
+		tauK_0 = tauK 
+		tauW_0 = tauW_at
+
 
 	if (budget_balance) then 
 
@@ -3797,22 +3808,24 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		print*,'---------------------------------------------------'
 		endif 
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-			BB_tax_ind = 1.0_DP
+			BB_tax_ind = 10.0_DP
 			BB_tax_chg = 0.005_DP
 			Debt_tr  = 1.0_DP
 			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
 				! Set old G and new value of tauW
 				GBAR_exp_old = GBAR_exp
+				print*,' '
 				if (balance_tau_L) then 
-				psi = psi_exp - BB_tax_ind*BB_tax_chg ! Decreasing psi increases labor taxes
-				print*, 'Bracketing Iteration',BB_tax_ind,'tau_L=',(1.0_dp-psi)*100
+				psi = psi_0 - BB_tax_ind*BB_tax_chg ! Decreasing psi increases labor taxes
+				print*, 'Bracketing Iteration',BB_tax_ind,'Increment',BB_tax_chg,'tau_L=',(1.0_dp-psi)*100
 				elseif (Opt_Tax_KW) then 
-				tauK = tauK_exp + BB_tax_ind * BB_tax_chg 
-				print*, 'Bracketing Iteration',BB_tax_ind,"tauK=",tauK*100
+				tauK = tauK_0 + BB_tax_ind * BB_tax_chg 
+				print*, 'Bracketing Iteration',BB_tax_ind,'Increment',BB_tax_chg,"tauK=",tauK*100
 				else
-				tauW_at = tauw_at_exp + BB_tax_ind * BB_tax_chg 
-				print*, 'Bracketing Iteration',BB_tax_ind,"tauW_at=",tauW_at*100
+				tauW_at = tauW_0 + BB_tax_ind * BB_tax_chg 
+				print*, 'Bracketing Iteration',BB_tax_ind,'Increment',BB_tax_chg,"tauW_at=",tauW_at*100
 				endif 
+				print*,' '
 				
 				! Solve for New Steady State
 				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
