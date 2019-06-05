@@ -3793,7 +3793,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 
 		! Find the Distribution and Policy Functions Along Transition Path
 		! This is done for the tax reform steady state
-		call Find_DBN_Transition 
+		! call Find_DBN_Transition 
 
 		! Find Taxes that balance the budget 
 		if (balance_tau_L) then
