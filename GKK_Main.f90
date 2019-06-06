@@ -84,7 +84,7 @@ PROGRAM main
 		Transition_OT = .true.
 			budget_balance = .true.
 			balance_tau_L  = .false. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
-			Opt_Tax_KW     = .false. ! true=tau_K, false=tau_W
+			Opt_Tax_KW     = .true. ! true=tau_K, false=tau_W
 		Simul_Switch  = .false.
 
 
