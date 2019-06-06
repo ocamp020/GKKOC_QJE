@@ -83,8 +83,8 @@ PROGRAM main
 		Transition_Tax_Reform = .false.
 		Transition_OT = .true.
 			budget_balance = .true.
-			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
-			Opt_Tax_KW     = .true. ! true=tau_K, false=tau_W
+			balance_tau_L  = .false. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
+			Opt_Tax_KW     = .false. ! true=tau_K, false=tau_W
 		Simul_Switch  = .false.
 
 
@@ -3793,9 +3793,9 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 
 		! Find the Distribution and Policy Functions Along Transition Path
 		! This is done for the tax reform steady state
-		! call Find_DBN_Transition 
+		call Find_DBN_Transition 
 			! If previous line is commented you need this:
-			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 
 		! Find Taxes that balance the budget 
 		if (balance_tau_L) then

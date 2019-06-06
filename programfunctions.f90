@@ -5896,7 +5896,7 @@ SUBROUTINE FIND_DBN_Transition()
 				WRITE (UNIT=85,  FMT=*) C_tr
 				WRITE (UNIT=86,  FMT=*) Debt_tr
 				WRITE (UNIT=87,  FMT=*) tauW_at
-				WRITE (UNIT=89,  FMT=*) 1.0_dp-psi
+				WRITE (UNIT=88,  FMT=*) 1.0_dp-psi
 			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
 			CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
 	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); 
