@@ -1,0 +1,29 @@
+# To run this type:
+#	qsub analysis.pbs 
+
+# For more information: 
+#	http://latisresearch.umn.edu/creating-a-PBS-script
+#	http://latisresearch.umn.edu/using-computecla
+
+# Define 
+	#! /bin/tcsh
+
+# Define instructions for virtual machine set up
+	#PBS -q batch
+	#PBS -l nodes=1:ppn=10
+	#PBS -l walltime=168:00:00
+	#PBS -l mem=60GB
+	#PBS -V
+	#PBS -m abe
+	#PBS -M ocamp020@umn.edu
+	#PBS -j oe
+	#PBS -N batch_OTW_Transition_BB_tw
+	#PBS -S /bin/tcsh
+	#PBS -e analysis.err
+
+# Commands to be excecuted 
+	module load gcc/4.8.5
+	cd RA_Guvenen/GKKC_Code/
+	make clean
+	rm -f log_Transition_OTW_BB_tw.txt
+	make GKK_Main > log_Transition_OTW_BB_tw.txt
