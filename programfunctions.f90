@@ -5425,7 +5425,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria    = 1.0E-06_DP
-	Price_criteria  = 1.0E-05_DP
+	Price_criteria  = 1.5E-05_DP
 	Chg_criteria    = 1.5E-07_DP
 
 	! Set grids that depend on wealth tax threshold
@@ -5443,24 +5443,24 @@ SUBROUTINE FIND_DBN_Transition()
 	!! Initial guess for transition path variables
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		! Guess NBAR, QBAR and R as a linear combination of starting and end values
-			NBAR_tr(1)   = NBAR_bench ; NBAR_tr(T+1) = NBAR_exp   ;
-			QBAR_tr(1)   = QBAR_bench ; QBAR_tr(T+1) = QBAR_exp   ;
-			R_tr(1)      = R_bench    ; R_tr(T+1)    = R_exp      ;
-			do ti=2,T
-				NBAR_tr(ti) = NBAR_tr(ti-1) + (NBAR_tr(T+1)-NBAR_tr(1))/T
-				QBAR_tr(ti) = QBAR_tr(ti-1) + (QBAR_tr(T+1)-QBAR_tr(1))/T
-				R_tr(ti)    = R_tr(ti-1) + (R_tr(T+1)-R_tr(1))/T
-			enddo 
+			! NBAR_tr(1)   = NBAR_bench ; NBAR_tr(T+1) = NBAR_exp   ;
+			! QBAR_tr(1)   = QBAR_bench ; QBAR_tr(T+1) = QBAR_exp   ;
+			! R_tr(1)      = R_bench    ; R_tr(T+1)    = R_exp      ;
+			! do ti=2,T
+			! 	NBAR_tr(ti) = NBAR_tr(ti-1) + (NBAR_tr(T+1)-NBAR_tr(1))/T
+			! 	QBAR_tr(ti) = QBAR_tr(ti-1) + (QBAR_tr(T+1)-QBAR_tr(1))/T
+			! 	R_tr(ti)    = R_tr(ti-1) + (R_tr(T+1)-R_tr(1))/T
+			! enddo 
 		! Load Guess From Files
-			! print*, 'Loading initial variables from file'
-			! OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'   , STATUS='old', ACTION='read')
-			! OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
-			! OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		 , STATUS='old', ACTION='read')
-			! READ (UNIT=1,  FMT=*), QBAR_tr
-			! READ (UNIT=2,  FMT=*), NBAR_tr
-			! READ (UNIT=3,  FMT=*), R_tr
-			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3);
-			! print*, 'Reading completed'
+			print*, 'Loading initial variables from file'
+			OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'   , STATUS='old', ACTION='read')
+			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
+			OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		 , STATUS='old', ACTION='read')
+			READ (UNIT=1,  FMT=*), QBAR_tr
+			READ (UNIT=2,  FMT=*), NBAR_tr
+			READ (UNIT=3,  FMT=*), R_tr
+			CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3);
+			print*, 'Reading completed'
 
 		! Choose YBAR, EBAR, P and Wage to be consistent
 		P_tr    = alpha* QBAR_tr**(alpha-mu) * NBAR_tr**(1.0_DP-alpha)
@@ -5471,7 +5471,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        print*, "P   ", P_bench, P_tr(1), P_tr(T), P_tr(T+1)
 	        print*, "wage", wage_bench, wage_tr(1), wage_tr(T), wage_tr(T+1)
 	        print*, "EBAR", EBAR_bench, EBAR_tr(1), EBAR_tr(T), EBAR_tr(T+1)
-	        print*, "Tau_K", tauK,"Tau_W_at",tauW_at,"Tau_bt",tauW_bt
+	        print*, "Tau_K", tauK,"Tau_W_at",tauW_at,"Tau_W_bt",tauW_bt,"tau_L",1.0_dp-psi
 
         ! Save initial guess of prices
         OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='replace')
@@ -5919,6 +5919,8 @@ SUBROUTINE FIND_DBN_Transition()
 			OPEN  (UNIT=85,  FILE=trim(Result_Folder)//'C_tr'      , STATUS='replace')
 			OPEN  (UNIT=86,  FILE=trim(Result_Folder)//'Debt_tr'   , STATUS='replace')
 			OPEN  (UNIT=87,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='replace')
+			OPEN  (UNIT=88,  FILE=trim(Result_Folder)//'tauL_tr'   , STATUS='replace')
+			OPEN  (UNIT=89,  FILE=trim(Result_Folder)//'tauK_tr'   , STATUS='replace')
 				! WRITE (UNIT=1,  FMT=*) Cons_tr
 				! WRITE (UNIT=2,  FMT=*) Hours_tr
 				! WRITE (UNIT=3,  FMT=*) Aprime_tr
@@ -5933,10 +5935,12 @@ SUBROUTINE FIND_DBN_Transition()
 				WRITE (UNIT=85,  FMT=*) C_tr
 				WRITE (UNIT=86,  FMT=*) Debt_tr
 				WRITE (UNIT=87,  FMT=*) tauW_at
+				WRITE (UNIT=88,  FMT=*) 1.0_dp-psi
+				WRITE (UNIT=89,  FMT=*) tauK
 			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
 			CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
-	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); 
-	    	CLOSE (unit=84); CLOSE (unit=85); CLOSE (unit=86); CLOSE (unit=87);
+	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); 
+	    	CLOSE (unit=85); CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89); 
 			print*,' 	--------------------------------------'
 			print*,' 	Variable Printing Completed'
 			print*,' 	--------------------------------------'

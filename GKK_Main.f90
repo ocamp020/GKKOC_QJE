@@ -42,7 +42,7 @@ PROGRAM main
 		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, Opt_Tax_K_and_W, Tax_Reform_KW
 		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices
 		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R 
-		logical  :: Transition_Tax_Reform, Transition_OTW, budget_balance
+		logical  :: Transition_Tax_Reform, Transition_OT, budget_balance, balance_tau_L
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -81,8 +81,10 @@ PROGRAM main
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
 		Transition_Tax_Reform = .false.
-		Transition_OTW = .true.
-			budget_balance = .false.
+		Transition_OT = .true.
+			budget_balance = .true.
+			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
+			Opt_Tax_KW     = .false. ! true=tau_K, false=tau_W
 		Simul_Switch  = .false.
 
 
@@ -394,8 +396,8 @@ PROGRAM main
 			call Solve_Transition_Tax_Reform(budget_balance)
 		endif
 
-		if (Transition_OTW) then
-			call Solve_Transition_Opt_Wealth_Taxes(budget_balance)
+		if (Transition_OT) then
+			call Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		endif
 
 
@@ -3380,7 +3382,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	if (budget_balance) then 
 
 		! Set Results Folder
-		Result_Folder = trim(Result_Folder)//'Transition_Balanced_Budget/'
+		Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform_BB/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	if (.false.) then 
@@ -3624,7 +3626,7 @@ End Subroutine Solve_Transition_Tax_Reform
 !========================================================================================
 !========================================================================================
 
-Subroutine Solve_Transition_Opt_Wealth_Taxes(budget_balance)
+Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 	use parameters
 	use global 
 	use programfunctions
@@ -3632,7 +3634,8 @@ Subroutine Solve_Transition_Opt_Wealth_Taxes(budget_balance)
 	use Toolbox
 	use omp_lib
 	implicit none 
-	logical, intent(in) :: budget_balance
+	logical, intent(in) :: budget_balance, Opt_Tax_KW, balance_tau_L
+	real(dp) :: psi_0, tauK_0, tauW_0
 	character(100) :: folder_aux
 
 	! Save base folder
@@ -3641,10 +3644,15 @@ Subroutine Solve_Transition_Opt_Wealth_Taxes(budget_balance)
 	! Load Benchmark Variables
 		call Solve_Benchmark(.false.,.false.)
 
-	! Load Optimal Wealth Tax Variables
+	! Load Optimal Tax Variables
 		! Change to optimal tax folder 
+		if (Opt_Tax_KW) then 
+		Result_Folder = trim(folder_aux)//'Opt_Tax_K/'
+		call system( 'mkdir -p ' // trim(Result_Folder) )
+		else 
 		Result_Folder = trim(folder_aux)//'Opt_Tax_W/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )
+		endif 
 		
 		! Load variables
 		CALL Write_Experimental_Results(.false.)
@@ -3680,18 +3688,198 @@ Subroutine Solve_Transition_Opt_Wealth_Taxes(budget_balance)
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime 
 
+	! Set reference value for psi, tau_K and tau_W
+		psi_0  = psi 
+		tauK_0 = tauK 
+		tauW_0 = tauW_at
+
 
 	if (budget_balance) then 
-		print*, ' Section not coded yet. Run code with budget_balance=.false.'
 
 		! Set Results Folder
-			Result_Folder = trim(folder_aux)//'Transition_OTW_Budget_Balance/'
+			if (balance_tau_L) then 
+				if (Opt_Tax_KW) then 
+				Result_Folder = trim(folder_aux)//'Transition_OTK_BB_tau_L/'
+				else 
+				Result_Folder = trim(folder_aux)//'Transition_OTW_BB_tau_L/'
+				endif 
+			elseif (Opt_Tax_KW) then 
+				Result_Folder = trim(folder_aux)//'Transition_OTK_BB_tau_K/'
+			else
+				Result_Folder = trim(folder_aux)//'Transition_OTW_BB_tau_W/'
+			endif 
 			call system( 'mkdir -p ' // trim(Result_Folder) )
+
+		! Find the Distribution and Policy Functions Along Transition Path
+		! This is done for the tax reform steady state
+		call Find_DBN_Transition 
+			! If previous line is commented you need this:
+			! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+
+		! Find Taxes that balance the budget 
+		if (balance_tau_L) then
+		print*,' '
+		print*,'---------------------------------------------------'
+		print*,' 	Balancing the Budget with Labor Taxes'
+		print*,'---------------------------------------------------'
+		else 
+		print*,' '
+		print*,'---------------------------------------------------'
+		print*,' 	Balancing the Budget with Capital/True Taxes'
+		print*,'---------------------------------------------------'
+		endif 
+			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
+			BB_tax_ind = 1.0_DP
+			BB_tax_chg = 0.005_DP
+			Debt_tr  = 1.0_DP
+			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
+				! Set old G and new value of tauW
+				GBAR_exp_old = GBAR_exp
+				print*,' '
+				if (balance_tau_L) then 
+				psi = psi_0 - BB_tax_ind*BB_tax_chg ! Decreasing psi increases labor taxes
+				print*, 'Bracketing Iteration',BB_tax_ind,'Increment',BB_tax_chg,'tau_L=',(1.0_dp-psi)*100
+				elseif (Opt_Tax_KW) then 
+				tauK = tauK_0 + BB_tax_ind * BB_tax_chg 
+				print*, 'Bracketing Iteration',BB_tax_ind,'Increment',BB_tax_chg,"tauK=",tauK*100
+				else
+				tauW_at = tauW_0 + BB_tax_ind * BB_tax_chg 
+				print*, 'Bracketing Iteration',BB_tax_ind,'Increment',BB_tax_chg,"tauW_at=",tauW_at*100
+				endif 
+				print*,' '
+				
+				! Solve for New Steady State
+				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+				CALL FIND_DBN_EQ
+					GBAR_exp  = GBAR
+					QBAR_exp  = QBAR 
+					NBAR_exp  = NBAR  
+					Y_exp 	  = YBAR
+					Ebar_exp  = EBAR
+					P_exp     = P
+					R_exp	  = R
+					wage_exp  = wage
+					tauK_exp  = tauK
+					tauPL_exp = tauPL
+					psi_exp   = psi
+					DBN_exp   = DBN1
+					tauw_bt_exp = tauW_bt
+					tauw_at_exp = tauW_at
+					Y_a_threshold_exp = Y_a_threshold
+					Cons_exp          = Cons           
+					Hours_exp         = Hours
+					Aprime_exp        = Aprime
+				! Find the Distribution and Policy Functions Along Transition Path
+				call Find_DBN_Transition 
+				! Get new G
+				GBAR_exp = GBAR_tr(T+1) 
+				! Iteratioins  
+				BB_tax_ind = BB_tax_ind + 1.0_DP  
+				print*,' ' 
+				print*,'Bracketing GBAR: tau_L=', (1.0_dp-psi)*100,'tauK=',100*tauK,'tauW=',100*tauW_at
+				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
+			ENDDO
+
+				print*,''
+				print*,'GBAR bracketed by taxes:'
+			if (balance_tau_L) then 
+			! Set the upper bound of psi as the second to last iteration
+				BB_tax_up  = psi + BB_tax_chg
+			! Set the lower bound of psi as the last iteration
+				BB_tax_low = psi
+				print*,'tauL_low =',(1.0-BB_tax_up)*100,'tauL=',(1.0-psi-0.5_dp*BB_tax_chg)*100,'tauL_up=',(1.0-BB_tax_low)*100
+			elseif (Opt_Tax_KW) then 
+			! Set the upper bound of tau_K as the last iteration
+				BB_tax_up  = tauK
+			! Set the lower bound of tau_K as the second to last iteration
+				BB_tax_low = tauK - BB_tax_chg
+				print*,'tauK_low =',BB_tax_low*100,'tauK=',(tauK-0.5_dp*BB_tax_chg)*100,'tauK_up=',BB_tax_up*100
+			else
+			! Set the upper bound of tau_W as the last iteration
+				BB_tax_up  = tauW_at 
+			! Set the lower bound of tau_W as the second to last iteration
+				BB_tax_low = tauW_at - BB_tax_chg
+				print*,'tauW_low =',BB_tax_low*100,'tauW=',(tauW_at-0.5_dp*BB_tax_chg)*100,'tauW_up=',BB_tax_up*100
+			endif 
+				print*,''
+
+			! Find psi that exactly balances the budget (up to precisioin 0.1%) using bisection
+				print*,'Bisection for Taxes:'
+				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr))) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
+			    	
+					if (balance_tau_L) then 
+					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
+					        BB_tax_low  = psi ! If there is a surplus don't decrease psi (increase tau_L). Set a floor.
+					    else
+					        BB_tax_up   = psi ! If there is a deficit don't increase psi (decrease tau_L). Set a ceiling.
+					    endif
+    				    ! Set new tax
+						    psi = (BB_tax_low + BB_tax_up)/2.0_DP
+					elseif (Opt_Tax_KW) then 
+					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
+					        BB_tax_up   = tauK ! If there is a surplus don't increase tau_K. Set a ceiling.
+					    else
+					        BB_tax_low  = tauK ! If there is a deficit don't decrease tau_K. Set a floor.
+					    endif
+    				    ! Set new tax
+						    tauK = (BB_tax_low + BB_tax_up)/2.0_DP
+					else
+					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
+					        BB_tax_up   = tauW_at ! If there is a surplus don't increase tau_W. Set a ceiling.
+					    else
+					        BB_tax_low  = tauW_at ! If there is a deficit don't decrease tau_W. Set a floor.
+					    endif
+    				    ! Set new tax
+						    tauW_at = (BB_tax_low + BB_tax_up)/2.0_DP
+					endif 
+
+
+					! Solve for New Steady State
+					deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+					CALL FIND_DBN_EQ
+						GBAR_exp  = GBAR
+						QBAR_exp  = QBAR 
+						NBAR_exp  = NBAR  
+						Y_exp 	  = YBAR
+						Ebar_exp  = EBAR
+						P_exp     = P
+						R_exp	  = R
+						wage_exp  = wage
+						tauK_exp  = tauK
+						tauPL_exp = tauPL
+						psi_exp   = psi
+						DBN_exp   = DBN1
+						tauw_bt_exp = tauW_bt
+						tauw_at_exp = tauW_at
+						Y_a_threshold_exp = Y_a_threshold
+						Cons_exp          = Cons           
+						Hours_exp         = Hours
+						Aprime_exp        = Aprime
+					! Find the Distribution and Policy Functions Along Transition Path
+					call Find_DBN_Transition 
+					! Get new G
+					GBAR_exp = GBAR_tr(T+1) 
+					! Print Results 
+					print*,' '
+					if (balance_tau_L) then 
+					print*,'tax_L_low =', (1.0_dp-BB_tax_up)*100, 'tau_L_up=', (1.0_dp-BB_tax_low)*100, 'tau_L=', (1.0_dp-psi)*100
+					elseif (Opt_Tax_KW) then 
+					print*,'tax_K_low =', BB_tax_low*100, 'tau_W_up=', BB_tax_up*100, 'tau_K=', tauK*100
+					else
+					print*,'tax_W_low =', BB_tax_low*100, 'tau_W_up=', BB_tax_up*100, 'tau_W=', tauW_at*100
+					endif 
+					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
+				ENDDO
+
 
 	else
 
 		! Set Results Folder
-			Result_Folder = trim(folder_aux)//'Transition_OTW/'
+			if (Opt_Tax_KW) then 
+				Result_Folder = trim(folder_aux)//'Transition_OTK/'
+			else 
+				Result_Folder = trim(folder_aux)//'Transition_OTW/'
+			endif 
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
 		! Find the Distribution and Policy Functions Along Transition Path
@@ -3706,5 +3894,5 @@ Subroutine Solve_Transition_Opt_Wealth_Taxes(budget_balance)
 		call COMPUTE_WELFARE_GAIN_TRANSITION
 
 
-End Subroutine Solve_Transition_Opt_Wealth_Taxes
+End Subroutine Solve_Transition_Opt_Taxes
 
