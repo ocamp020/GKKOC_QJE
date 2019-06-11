@@ -113,6 +113,7 @@ MODULE global
 
     ! Auxiliary variables to find wealth tax that balances the budget in experiment economy
     REAL(DP) :: tauWindx, tauW_low_bt, tauW_up_bt, tauW_low_at, tauW_up_at
+    REAL(DP) :: BB_tax_chg, BB_tax_ind, BB_tax_up, BB_tax_low
 
 	! Counters for the age, and index of lamnbda, z, a and e
     INTEGER :: age, lambdai, zi, ai, ei, xi    
