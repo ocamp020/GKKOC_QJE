@@ -3874,13 +3874,13 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 				BB_tax_up  = tauK
 			! Set the lower bound of tau_K as the second to last iteration
 				BB_tax_low = tauK - BB_tax_chg
-				print*,'tauK_low =',BB_tax_low*100,'tauK=',tauK-0.5_dp*BB_tax_chg*100,'tauK_up=',BB_tax_up*100
+				print*,'tauK_low =',BB_tax_low*100,'tauK=',(tauK-0.5_dp*BB_tax_chg)*100,'tauK_up=',BB_tax_up*100
 			else
 			! Set the upper bound of tau_W as the last iteration
 				BB_tax_up  = tauW_at 
 			! Set the lower bound of tau_W as the second to last iteration
 				BB_tax_low = tauW_at - BB_tax_chg
-				print*,'tauW_low =',BB_tax_low*100,'tauW=',tauK-0.5_dp*BB_tax_chg*100,'tauW_up=',BB_tax_up*100
+				print*,'tauW_low =',BB_tax_low*100,'tauW=',(tauW_at-0.5_dp*BB_tax_chg)*100,'tauW_up=',BB_tax_up*100
 			endif 
 				print*,''
 

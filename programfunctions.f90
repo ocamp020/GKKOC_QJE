@@ -5881,7 +5881,8 @@ SUBROUTINE FIND_DBN_Transition()
 			OPEN  (UNIT=85,  FILE=trim(Result_Folder)//'C_tr'      , STATUS='replace')
 			OPEN  (UNIT=86,  FILE=trim(Result_Folder)//'Debt_tr'   , STATUS='replace')
 			OPEN  (UNIT=87,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='replace')
-			OPEN  (UNIT=88,  FILE=trim(Result_Folder)//'tauL_tr', STATUS='replace')
+			OPEN  (UNIT=88,  FILE=trim(Result_Folder)//'tauL_tr'   , STATUS='replace')
+			OPEN  (UNIT=89,  FILE=trim(Result_Folder)//'tauK_tr'   , STATUS='replace')
 				! WRITE (UNIT=1,  FMT=*) Cons_tr
 				! WRITE (UNIT=2,  FMT=*) Hours_tr
 				! WRITE (UNIT=3,  FMT=*) Aprime_tr
@@ -5897,10 +5898,11 @@ SUBROUTINE FIND_DBN_Transition()
 				WRITE (UNIT=86,  FMT=*) Debt_tr
 				WRITE (UNIT=87,  FMT=*) tauW_at
 				WRITE (UNIT=88,  FMT=*) 1.0_dp-psi
+				WRITE (UNIT=89,  FMT=*) tauK
 			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
 			CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
-	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); 
-	    	CLOSE (unit=84); CLOSE (unit=85); CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88);
+	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); 
+	    	CLOSE (unit=85); CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89); 
 			print*,' 	--------------------------------------'
 			print*,' 	Variable Printing Completed'
 			print*,' 	--------------------------------------'
