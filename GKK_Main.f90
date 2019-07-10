@@ -1766,6 +1766,7 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 		! Set YGRID for interpolation
 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 			CALL FORM_Y_MB_GRID(YGRID_exp,MBGRID,YGRID_t,MBGRID_t)
+			CALL ComputeLaborUnits(EBAR,wage)
 			! deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
 	!====================================================================================================
@@ -1835,11 +1836,11 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 	!====================================================================================================
 	! Compute stats and tables
 		CALL Write_Experimental_Results(.true.)
-		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		K_mat  = K_Matrix(R,P)
 		Pr_mat = Profit_Matrix(R,P)
-		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
-		CALL ComputeLaborUnits(EBAR,wage)
+		! CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		! CALL ComputeLaborUnits(EBAR,wage)
 
 
 		! Aggregate variable in experimental economy
