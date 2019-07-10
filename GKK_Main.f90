@@ -40,7 +40,7 @@ PROGRAM main
 	! Compute benchmark or load results
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
 		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, Opt_Tax_K_and_W, Tax_Reform_KW
-		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices
+		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices, compute_exp_fixed_prices_and_taxes
 		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R 
 		logical  :: Transition_Tax_Reform, Transition_OT, budget_balance, balance_tau_L
 	! Auxiliary variable for writing file
@@ -1756,7 +1756,8 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 	use omp_lib
 	implicit none 
 	REAL(DP), DIMENSION(na,nz,nx) :: YGRID_exp
-
+	integer :: aa, age1, a1, z1, lambda1, e1, x1
+	
 	!====================================================================================================
 	! Get Benchmark Values
 		call Solve_Benchmarkr(.false.,.false.)
