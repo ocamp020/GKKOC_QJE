@@ -73,6 +73,7 @@ PROGRAM main
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
+		compute_exp_fixed_prices_and_taxes = .true.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Tax_K_and_W = .false.
@@ -81,7 +82,7 @@ PROGRAM main
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
 		Transition_Tax_Reform = .false.
-		Transition_OT = .true.
+		Transition_OT = .false.
 			budget_balance = .true.
 			balance_tau_L  = .false. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW     = .false. ! true=tau_K, false=tau_W
@@ -224,18 +225,22 @@ PROGRAM main
 					! If using benchmark prices
 						! Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp/'
 						! call system( 'mkdir -p ' // trim(Result_Folder) )
-					! If using tax reform prices
-						call Solve_Experiment(.false.,.false.)
-							Ebar   = EBAR_bench
-							P      = P_exp
-							R	   = R_exp 
-							wage   = wage_exp
-							DBN1   = DBN_bench
-							Cons   = Cons_bench        
-							Hours  = Hours_bench
-							Aprime = Aprime_bench
-						Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp_Prices_Exp/'
+					! If using benchmark prices and taxes 
+						Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp_fixed_price_and_tax/'
 						call system( 'mkdir -p ' // trim(Result_Folder) )
+					! If using tax reform prices
+						! call Solve_Experiment(.false.,.false.)
+						! 	Ebar   = EBAR_bench
+						! 	P      = P_exp
+						! 	R	   = R_exp 
+						! 	wage   = wage_exp
+						! 	DBN1   = DBN_bench
+						! 	Cons   = Cons_bench        
+						! 	Hours  = Hours_bench
+						! 	Aprime = Aprime_bench
+						! Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp_Prices_Exp/'
+						! call system( 'mkdir -p ' // trim(Result_Folder) )
+
 					call Solve_Experiment_Fixed_PF_Interp(Fixed_PF_interp,Simul_Switch)
 				elseif ((Fixed_PF.eqv..false.).and.(Fixed_PF_interp.eqv..false.).and.(Fixed_PF_prices)) then
 					Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Prices/'
@@ -261,6 +266,10 @@ PROGRAM main
 			! call Solve_Experiment_tauC(compute_exp,Simul_Switch)
 
 			compute_bench = .false.
+		endif 
+
+		if (compute_exp_fixed_prices_and_taxes) then
+			call Solve_Experiment_Fixed_Prices_and_Taxes
 		endif 
 
 		! Optimal Tax
@@ -310,7 +319,7 @@ PROGRAM main
 			! 	V_Pr_exp          = V_Pr 
 			! 	V_Pr_nb_exp  	  = V_Pr_nb
 
-			! ! Compute moments
+			! ! Compute momentsr
 			! CALL COMPUTE_STATS
 			
 			! ! Compute welfare gain between economies
@@ -1731,6 +1740,139 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 
 
 end Subroutine Solve_Experiment_Fixed_Prices
+
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
+	use parameters
+	use global 
+	use programfunctions
+	use Simulation_Module
+	use Toolbox
+	use omp_lib
+	implicit none 
+	REAL(DP), DIMENSION(na,nz,nx) :: YGRID_exp
+
+	!====================================================================================================
+	! Get Benchmark Values
+		call Solve_Benchmarkr(.false.,.false.)
+
+
+	!====================================================================================================
+	! Get Experiment Values
+		call Solve_Experiment(.false.,.false.)
+		! Set YGRID for interpolation
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			CALL FORM_Y_MB_GRID(YGRID_exp,MBGRID,YGRID_t,MBGRID_t)
+			! deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+	!====================================================================================================
+	! Choose values for prices and policy functions
+		P_exp        = P_bench
+		R_exp	     = R_bench
+		wage_exp     = wage_bench
+		tauK_exp     = tauK_bench
+		tauPL_exp    = tauPL_bench
+		psi_exp      = psi_bench
+		tauw_bt_exp  = tauW_bt_bench
+		tauw_at_exp  = tauW_at_bench 
+		Y_a_threshold_exp = Y_a_threshold_bench 
+
+		P 			 = P_bench 
+		R 			 = R_bench 
+		wage 		 = wage_bench 
+		tauK 		 = tauK_bench 
+		tauPL 		 = tauPL_bench 
+		tauw_bt      = tauw_bt_bench 
+		tauw_at      = tauw_at_bench 
+
+		Cons_bench   = Cons_exp 
+		Hours_bench  = Hours_exp
+		Aprime_bench = Aprime_exp
+
+
+	!====================================================================================================
+	! Solve Equilibrium with policy function interpolation
+		CALL FIND_DBN_EQ_PF_Interp(YGRID_exp)
+		CALL GOVNT_BUDGET(.true.)
+
+    	! Compute aggregates with current distribution
+	        QBAR =0.0
+	        NBAR =0.0
+	        DO x1=1,nx
+	        DO age1=1,MaxAge
+	        DO z1=1,nz
+	        DO a1=1,na
+	        DO lambda1=1,nlambda
+	        DO e1=1, ne
+	             QBAR= QBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
+	             NBAR= NBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * eff_un(age1, lambda1, e1) * Hours(age1, a1, z1, lambda1,e1,x1)
+	        ENDDO
+	        ENDDO
+	        ENDDO
+	        ENDDO    
+	        ENDDO    
+	        ENDDO    
+	    
+	        QBAR = ( QBAR)**(1.0_DP/mu)                
+	        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
+	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+
+		! Compute value function and store policy functions, value function and distribution in file
+			! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+			CALL Firm_Value
+
+
+
+	!====================================================================================================
+	! Compute stats and tables
+		CALL Write_Experimental_Results(.true.)
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		K_mat  = K_Matrix(R,P)
+		Pr_mat = Profit_Matrix(R,P)
+		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		CALL ComputeLaborUnits(EBAR,wage)
+
+
+		! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+		ValueFunction_exp = ValueFunction
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime
+		V_Pr_exp          = V_Pr 
+		V_Pr_nb_exp  	  = V_Pr_nb
+
+		! Compute moments
+		CALL COMPUTE_STATS
+	
+		! Compute welfare gain between economies
+		CALL COMPUTE_WELFARE_GAIN
+
+	! Deallocate variables
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+end Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 
 
 !========================================================================================
