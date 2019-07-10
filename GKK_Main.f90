@@ -223,10 +223,7 @@ PROGRAM main
 					call Solve_Experiment_Fixed_Policy_Functions(Fixed_PF,Simul_Switch)
 				elseif ((Fixed_PF.eqv..false.).and.(Fixed_PF_interp).and.(Fixed_PF_prices.eqv..false.)) then
 					! If using benchmark prices
-						! Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp/'
-						! call system( 'mkdir -p ' // trim(Result_Folder) )
-					! If using benchmark prices and taxes 
-						Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp_fixed_price_and_tax/'
+						Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp/'
 						call system( 'mkdir -p ' // trim(Result_Folder) )
 					! If using tax reform prices
 						! call Solve_Experiment(.false.,.false.)
@@ -1770,6 +1767,11 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 			CALL FORM_Y_MB_GRID(YGRID_exp,MBGRID,YGRID_t,MBGRID_t)
 			! deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+	!====================================================================================================
+	! Change folder		
+		Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp_fixed_price_and_tax/'
+		call system( 'mkdir -p ' // trim(Result_Folder) )			
 
 	!====================================================================================================
 	! Choose values for prices and policy functions
