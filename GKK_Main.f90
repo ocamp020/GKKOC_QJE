@@ -1770,7 +1770,7 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 
 	!====================================================================================================
 	! Change folder		
-		Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp_fixed_price_and_tax/'
+		Result_Folder = trim(Result_Folder)//'Exp_PF_Interp_fixed_price_and_tax/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )			
 
 	!====================================================================================================
