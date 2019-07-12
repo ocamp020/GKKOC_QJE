@@ -73,7 +73,7 @@ PROGRAM main
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
-		compute_exp_fixed_prices_and_taxes = .true.
+		compute_exp_fixed_prices_and_taxes = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Tax_K_and_W = .false.
@@ -82,10 +82,10 @@ PROGRAM main
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
 		Transition_Tax_Reform = .false.
-		Transition_OT = .false.
+		Transition_OT = .true.
 			budget_balance = .true.
-			balance_tau_L  = .false. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
-			Opt_Tax_KW     = .false. ! true=tau_K, false=tau_W
+			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
+			Opt_Tax_KW     = .true. ! true=tau_K, false=tau_W
 		Simul_Switch  = .false.
 
 
@@ -3789,6 +3789,8 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 
 	! Load Benchmark Variables
 		call Solve_Benchmark(.false.,.false.)
+		! Change flag 
+		solving_bench=0
 
 	! Load Optimal Tax Variables
 		! Change to optimal tax folder 
@@ -3858,9 +3860,9 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 
 		! Find the Distribution and Policy Functions Along Transition Path
 		! This is done for the tax reform steady state
-		call Find_DBN_Transition 
+		! call Find_DBN_Transition 
 			! If previous line is commented you need this:
-			! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 
 		! Find Taxes that balance the budget 
 		if (balance_tau_L) then
@@ -3875,8 +3877,8 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		print*,'---------------------------------------------------'
 		endif 
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-			BB_tax_ind = 1.0_DP
-			BB_tax_chg = 0.005_DP
+			BB_tax_ind = 3.0_DP ! Originally 1.0_DP
+			BB_tax_chg = 0.01_DP ! Originally 0.005_DP
 			Debt_tr  = 1.0_DP
 			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
 				! Set old G and new value of tauW
