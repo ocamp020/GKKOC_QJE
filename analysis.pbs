@@ -25,5 +25,5 @@
 	module load gcc/4.8.5
 	cd RA_Guvenen/GKKC_Code/
 	make clean
-	rm -f log_Transition_OTW_BB_tl.txt
-	make GKK_Main > log_Transition_OTW_BB_tl.txt
+	rm -f log_Transition_OTW_BB_tw.txt
+	make GKK_Main > log_Transition_OTW_BB_tw.txt
