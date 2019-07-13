@@ -84,7 +84,7 @@ PROGRAM main
 		Transition_Tax_Reform = .false.
 		Transition_OT = .true.
 			budget_balance = .true.
-			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
+			balance_tau_L  = .false. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW     = .true. ! true=tau_K, false=tau_W
 		Simul_Switch  = .false.
 
@@ -3877,7 +3877,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		print*,'---------------------------------------------------'
 		endif 
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-			BB_tax_ind = 2.0_DP ! Originally 1.0_DP
+			BB_tax_ind = 15.0_DP ! Originally 1.0_DP
 			BB_tax_chg = 0.01_DP ! Originally 0.005_DP
 			Debt_tr  = 1.0_DP
 			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
