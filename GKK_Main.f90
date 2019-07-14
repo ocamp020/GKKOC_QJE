@@ -3873,11 +3873,11 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		else 
 		print*,' '
 		print*,'---------------------------------------------------'
-		print*,' 	Balancing the Budget with Capital/True Taxes'
+		print*,' 	Balancing the Budget with Capital/Wealth Taxes'
 		print*,'---------------------------------------------------'
 		endif 
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-			BB_tax_ind = 10.0_DP ! Originally 1.0_DP
+			BB_tax_ind = 8.0_DP ! Originally 1.0_DP
 			BB_tax_chg = 0.01_DP ! Originally 0.005_DP
 			Debt_tr  = 1.0_DP
 			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
@@ -3926,6 +3926,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 				print*,' ' 
 				print*,'Bracketing GBAR: tau_L=', (1.0_dp-psi)*100,'tauK=',100*tauK,'tauW=',100*tauW_at
 				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
+				print*,' ' 
 			ENDDO
 
 				print*,''
