@@ -1918,7 +1918,7 @@ Subroutine Solve_Tax_Reform_Decomposition
 			P_aux = P_exp
 			R_aux = R_exp 
 			wage_aux = wage_exp
-
+print*,'ooo'
 	!====================================================================================================
 	! Change only taxes
 	!====================================================================================================
@@ -1928,7 +1928,7 @@ Subroutine Solve_Tax_Reform_Decomposition
 	! Change folder		
 		Result_Folder = trim(Result_Folder)//'Tax_Reform_Decomposition/Only_Taxes/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )			
-
+print*,'aaa'
 	!====================================================================================================
 	! Choose values for prices and policy functions
 		P_exp        = P_bench
@@ -1942,10 +1942,10 @@ Subroutine Solve_Tax_Reform_Decomposition
 		tauPL 		 = tauPL_exp
 		tauw_bt      = tauw_bt_exp
 		tauw_at      = tauw_at_exp
-
+print*,'bbb'
 	! Solve Interpolated Economy
 	call Solve_Interpolated_Economy(YGRID_exp)
-
+print*,'ccc'
 	!====================================================================================================
 	! Change taxes and prices
 	!====================================================================================================
@@ -1955,7 +1955,7 @@ Subroutine Solve_Tax_Reform_Decomposition
 	! Change folder		
 		Result_Folder = trim(aux_folder)//'Tax_Reform_Decomposition/Taxes_and_Prices/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )			
-
+print*,'ddd'
 	!====================================================================================================
 	! Choose values for prices and policy functions
 		P_exp        = P_aux
@@ -1965,7 +1965,7 @@ Subroutine Solve_Tax_Reform_Decomposition
 		P 			 = P_exp
 		R 			 = R_exp 
 		wage 		 = wage_exp
-
+print*,'eee'
 	! Solve Interpolated Economy
 	call Solve_Interpolated_Economy(YGRID_exp)
 
