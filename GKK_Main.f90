@@ -1918,8 +1918,7 @@ Subroutine Solve_Tax_Reform_Decomposition
 			P_aux = P_exp
 			R_aux = R_exp 
 			wage_aux = wage_exp
-			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-print*,'ooo'
+
 	!====================================================================================================
 	! Change only taxes
 	!====================================================================================================
@@ -1929,7 +1928,7 @@ print*,'ooo'
 	! Change folder		
 		Result_Folder = trim(Result_Folder)//'Tax_Reform_Decomposition/Only_Taxes/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )			
-print*,'aaa'
+
 	!====================================================================================================
 	! Choose values for prices and policy functions
 		P_exp        = P_bench
@@ -1943,10 +1942,12 @@ print*,'aaa'
 		tauPL 		 = tauPL_exp
 		tauw_bt      = tauw_bt_exp
 		tauw_at      = tauw_at_exp
-print*,'bbb'
+
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+
 	! Solve Interpolated Economy
 	call Solve_Interpolated_Economy(YGRID_exp)
-print*,'ccc'
+
 	!====================================================================================================
 	! Change taxes and prices
 	!====================================================================================================
@@ -1956,7 +1957,7 @@ print*,'ccc'
 	! Change folder		
 		Result_Folder = trim(aux_folder)//'Tax_Reform_Decomposition/Taxes_and_Prices/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )			
-print*,'ddd'
+
 	!====================================================================================================
 	! Choose values for prices and policy functions
 		P_exp        = P_aux
@@ -1966,7 +1967,9 @@ print*,'ddd'
 		P 			 = P_exp
 		R 			 = R_exp 
 		wage 		 = wage_exp
-print*,'eee'
+
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+
 	! Solve Interpolated Economy
 	call Solve_Interpolated_Economy(YGRID_exp)
 
@@ -1986,7 +1989,7 @@ Subroutine Solve_Interpolated_Economy(YGRID_exp)
 
 	!====================================================================================================
 	! Solve Equilibrium with policy function interpolation
-	print*, 'hhh'
+	
 		CALL FIND_DBN_EQ_PF_Interp(YGRID_exp)
 		CALL GOVNT_BUDGET(.true.)
 
