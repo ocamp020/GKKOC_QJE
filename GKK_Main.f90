@@ -1906,16 +1906,16 @@ Subroutine Solve_Tax_Reform_Decomposition
 	!====================================================================================================
 	! Get Benchmark Values
 		call Solve_Benchmark(.false.,.false.)
-
-
-	!====================================================================================================
-	! Get Experiment Values
-		call Solve_Experiment(.false.,.false.)
 		! Set YGRID for interpolation
 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 			CALL FORM_Y_MB_GRID(YGRID_exp,MBGRID,YGRID_t,MBGRID_t)
 			CALL ComputeLaborUnits(EBAR,wage)
 			! deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+
+	!====================================================================================================
+	! Get Experiment Values
+		call Solve_Experiment(.false.,.false.)
 			P_aux = P_exp
 			R_aux = R_exp 
 			wage_aux = wage_exp
