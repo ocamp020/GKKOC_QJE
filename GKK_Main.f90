@@ -1899,8 +1899,9 @@ Subroutine Solve_Tax_Reform_Decomposition
 	implicit none 
 	REAL(DP), DIMENSION(na,nz,nx) :: YGRID_exp
 	REAL(DP) :: P_aux, R_aux, wage_aux
+	character(100) :: aux_folder
 
-	folder_aux = Result_Folder
+	aux_folder = Result_Folder
 
 	!====================================================================================================
 	! Get Benchmark Values
@@ -1953,7 +1954,7 @@ Subroutine Solve_Tax_Reform_Decomposition
 
 	!====================================================================================================
 	! Change folder		
-		Result_Folder = trim(folder_aux)//'Tax_Reform_Decomposition/Taxes_and_Prices/'
+		Result_Folder = trim(aux_folder)//'Tax_Reform_Decomposition/Taxes_and_Prices/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )			
 
 	!====================================================================================================
