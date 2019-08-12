@@ -41,7 +41,7 @@ PROGRAM main
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
 		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, Opt_Tax_K_and_W, Tax_Reform_KW
 		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices, compute_exp_fixed_prices_and_taxes
-		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R 
+		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R , Tax_Reform_Decomposition
 		logical  :: Transition_Tax_Reform, Transition_OT, budget_balance, balance_tau_L
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
@@ -65,7 +65,7 @@ PROGRAM main
 		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
-			compute_exp_pf= .true.
+			compute_exp_pf= .false.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .true.
 				Fixed_PF_prices = .false.
@@ -73,6 +73,7 @@ PROGRAM main
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
+		Tax_Reform_Decomposition = .true.
 		compute_exp_fixed_prices_and_taxes = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
@@ -267,6 +268,10 @@ PROGRAM main
 
 		if (compute_exp_fixed_prices_and_taxes) then
 			call Solve_Experiment_Fixed_Prices_and_Taxes
+		endif 
+
+		if (Tax_Reform_Decomposition) then 
+			call Solve_Tax_Reform_Decomposition
 		endif 
 
 		! Optimal Tax
@@ -1877,6 +1882,179 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
 end Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
+
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Subroutine Solve_Tax_Reform_Decomposition
+	use parameters
+	use global 
+	use programfunctions
+	use Simulation_Module
+	use Toolbox
+	use omp_lib
+	implicit none 
+	REAL(DP), DIMENSION(na,nz,nx) :: YGRID_exp
+	REAL(DP) :: P_aux, R_aux, wage_aux
+
+	folder_aux = Result_Folder
+
+	!====================================================================================================
+	! Get Benchmark Values
+		call Solve_Benchmark(.false.,.false.)
+
+
+	!====================================================================================================
+	! Get Experiment Values
+		call Solve_Experiment(.false.,.false.)
+		! Set YGRID for interpolation
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			CALL FORM_Y_MB_GRID(YGRID_exp,MBGRID,YGRID_t,MBGRID_t)
+			CALL ComputeLaborUnits(EBAR,wage)
+			! deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+			P_aux = P_exp
+			R_aux = R_exp 
+			wage_aux = wage_exp
+
+	!====================================================================================================
+	! Change only taxes
+	!====================================================================================================
+
+
+	!====================================================================================================
+	! Change folder		
+		Result_Folder = trim(Result_Folder)//'Tax_Reform_Decomposition/Only_Taxes/'
+		call system( 'mkdir -p ' // trim(Result_Folder) )			
+
+	!====================================================================================================
+	! Choose values for prices and policy functions
+		P_exp        = P_bench
+		R_exp	     = R_bench
+		wage_exp     = wage_bench
+		
+		P 			 = P_bench
+		R 			 = R_bench 
+		wage 		 = wage_bench 
+		tauK 		 = tauK_exp
+		tauPL 		 = tauPL_exp
+		tauw_bt      = tauw_bt_exp
+		tauw_at      = tauw_at_exp
+
+	! Solve Interpolated Economy
+	call Solve_Interpolated_Economy(YGRID_exp)
+
+	!====================================================================================================
+	! Change taxes and prices
+	!====================================================================================================
+
+
+	!====================================================================================================
+	! Change folder		
+		Result_Folder = trim(folder_aux)//'Tax_Reform_Decomposition/Taxes_and_Prices/'
+		call system( 'mkdir -p ' // trim(Result_Folder) )			
+
+	!====================================================================================================
+	! Choose values for prices and policy functions
+		P_exp        = P_aux
+		R_exp	     = R_aux
+		wage_exp     = wage_aux
+		
+		P 			 = P_exp
+		R 			 = R_exp 
+		wage 		 = wage_exp
+
+	! Solve Interpolated Economy
+	call Solve_Interpolated_Economy(YGRID_exp)
+
+end Subroutine Solve_Tax_Reform_Decomposition
+
+
+Subroutine Solve_Interpolated_Economy(YGRID_exp)
+	REAL(DP), DIMENSION(na,nz,nx) :: YGRID_exp
+	INTEGER  :: aa, age1, a1, z1, lambda1, e1, x1
+
+	!====================================================================================================
+	! Solve Equilibrium with policy function interpolation
+		CALL FIND_DBN_EQ_PF_Interp(YGRID_exp)
+		CALL GOVNT_BUDGET(.true.)
+
+    	! Compute aggregates with current distribution
+	        QBAR =0.0
+	        NBAR =0.0
+	        DO x1=1,nx
+	        DO age1=1,MaxAge
+	        DO z1=1,nz
+	        DO a1=1,na
+	        DO lambda1=1,nlambda
+	        DO e1=1, ne
+	             QBAR= QBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
+	             NBAR= NBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * eff_un(age1, lambda1, e1) * Hours(age1, a1, z1, lambda1,e1,x1)
+	        ENDDO
+	        ENDDO
+	        ENDDO
+	        ENDDO    
+	        ENDDO    
+	        ENDDO    
+	    
+	        QBAR = ( QBAR)**(1.0_DP/mu)                
+	        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
+	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+
+		! Compute value function and store policy functions, value function and distribution in file
+			! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+			CALL Firm_Value
+
+
+
+	!====================================================================================================
+	! Compute stats and tables
+		CALL Write_Experimental_Results(.true.)
+		! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		K_mat  = K_Matrix(R,P)
+		Pr_mat = Profit_Matrix(R,P)
+		! CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		! CALL ComputeLaborUnits(EBAR,wage)
+
+
+		! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+		ValueFunction_exp = ValueFunction
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime
+		V_Pr_exp          = V_Pr 
+		V_Pr_nb_exp  	  = V_Pr_nb
+
+		! Compute moments
+		CALL COMPUTE_STATS
+	
+		! Compute welfare gain between economies
+		CALL COMPUTE_WELFARE_GAIN
+
+	! Deallocate variables
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+
+end Subroutine Solve_Interpolated_Economy
 
 
 !========================================================================================

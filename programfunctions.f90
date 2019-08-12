@@ -5725,7 +5725,7 @@ SUBROUTINE FIND_DBN_Transition()
 			Hours = Hours_tr(:,:,:,:,:,:,ti)
 
 
-	    ! Compute government budget for the current preiod (Time: ti)
+	    ! Compute government budget for the current preiod (Time: sti)
 	    ! print*,' Calculating tax revenue'
 	    	CALL GOVNT_BUDGET(.false.)
 			    GBAR_tr(ti) 		= GBAR 
