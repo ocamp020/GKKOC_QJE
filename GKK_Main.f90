@@ -1973,6 +1973,13 @@ end Subroutine Solve_Tax_Reform_Decomposition
 
 
 Subroutine Solve_Interpolated_Economy(YGRID_exp)
+	use parameters
+	use global 
+	use programfunctions
+	use Simulation_Module
+	use Toolbox
+	use omp_lib
+	implicit none 
 	REAL(DP), DIMENSION(na,nz,nx) :: YGRID_exp
 	INTEGER  :: aa, age1, a1, z1, lambda1, e1, x1
 
