@@ -1918,6 +1918,7 @@ Subroutine Solve_Tax_Reform_Decomposition
 			P_aux = P_exp
 			R_aux = R_exp 
 			wage_aux = wage_exp
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 print*,'ooo'
 	!====================================================================================================
 	! Change only taxes
@@ -1985,6 +1986,7 @@ Subroutine Solve_Interpolated_Economy(YGRID_exp)
 
 	!====================================================================================================
 	! Solve Equilibrium with policy function interpolation
+	print*, 'hhh'
 		CALL FIND_DBN_EQ_PF_Interp(YGRID_exp)
 		CALL GOVNT_BUDGET(.true.)
 
