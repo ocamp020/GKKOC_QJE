@@ -4542,10 +4542,10 @@ print*,'kkk'
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-07_DP
 	DBN1 = DBN_bench
-
+print*,'lll'
 		! Form YGRID for the capital income economy given interest rate "P"
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
-print*,'lll'
+print*,'mmm'
 		
 
 	! Solve for policy and value functions 
