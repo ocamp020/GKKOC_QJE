@@ -4531,14 +4531,14 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi, DBN2
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
 	real(dp), dimension(na,nz,nx) :: YGRID_old
-
+print*,'jjj'
 	! Allocate
 	allocate( PrAprimehi( MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( PrAprimelo( MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Aplo(       MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Aphi(       MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( DBN2(       MaxAge,na,nz,nlambda,ne,nx) )
-
+print*,'kkk'
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-07_DP
 	DBN1 = DBN_bench
@@ -4546,7 +4546,7 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
 		! Form YGRID for the capital income economy given interest rate "P"
 			YGRID_old = YGRID 
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
-
+print*,'lll'
 		
 
 	! Solve for policy and value functions 
