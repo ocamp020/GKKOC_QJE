@@ -4530,7 +4530,7 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
 	real(dp)   :: BBAR, MeanWealth, brent_value
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi, DBN2
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
-	real(dp), dimension(na,nz,nx) :: YGRID_old
+
 print*,'jjj'
 	! Allocate
 	allocate( PrAprimehi( MaxAge,na,nz,nlambda,ne,nx) )
@@ -4544,7 +4544,6 @@ print*,'kkk'
 	DBN1 = DBN_bench
 
 		! Form YGRID for the capital income economy given interest rate "P"
-			YGRID_old = YGRID 
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 print*,'lll'
 		
