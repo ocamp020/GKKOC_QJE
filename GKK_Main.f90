@@ -1910,7 +1910,7 @@ Subroutine Solve_Tax_Reform_Decomposition
 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 			CALL FORM_Y_MB_GRID(YGRID_exp,MBGRID,YGRID_t,MBGRID_t)
 			CALL ComputeLaborUnits(EBAR,wage)
-			! deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
 
 	!====================================================================================================
