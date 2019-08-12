@@ -712,7 +712,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 
 	! print*,"	Efficiency Computation"
 	! 	CALL Hsieh_Klenow_Efficiency(solving_bench)
-
+	print*, ' End of Solve_Experiment'
 
 end Subroutine Solve_Experiment
 
@@ -1907,13 +1907,11 @@ Subroutine Solve_Tax_Reform_Decomposition
 	! Get Benchmark Values
 		call Solve_Benchmark(.false.,.false.)
 		! Set YGRID for interpolation
-		print*, 'ccc'
 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 			CALL FORM_Y_MB_GRID(YGRID_exp,MBGRID,YGRID_t,MBGRID_t)
 			CALL ComputeLaborUnits(EBAR,wage)
-			print*, 'bbb'
 			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-print*, 'aaa'
+
 	!====================================================================================================
 	! Get Experiment Values
 		call Solve_Experiment(.false.,.false.)
