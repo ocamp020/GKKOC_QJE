@@ -5410,6 +5410,7 @@ SUBROUTINE FIND_DBN_Transition()
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
 	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr, Wealth_Top_1_Tr, Wealth_Top_10_Tr
+	INTEGER    :: prctile
 
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -8599,7 +8600,7 @@ Function Agg_Debt_Tr(R_in)
 	do xi=1,nx
 	do zi=1,nz 
 	do ai=1,na
-		Private_Demand = Private_Debt + sum(DBN1(:,ai,zi,:,:,xi)*K_mat(ai,zi,xi))
+		Private_Demand = Private_Demand + sum(DBN1(:,ai,zi,:,:,xi)*K_mat(ai,zi,xi))
 	enddo 
 	enddo 
 	enddo 
@@ -8613,7 +8614,7 @@ Function Agg_Debt_Tr(R_in)
 	Agg_Demand    = Private_Demand + Public_Demand
 	
 	! Function outputs aggregate demand relative to total wealth (squared to have a min at 0)
-	Agg_Debt_Tr = ((Agg_Demand-Wealth))/Wealth)**2.0_dp
+	Agg_Debt_Tr = ((Agg_Demand-Wealth)/Wealth)**2.0_dp
 
 
 end Function Agg_Debt_Tr
