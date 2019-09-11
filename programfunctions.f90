@@ -5485,6 +5485,8 @@ SUBROUTINE FIND_DBN_Transition()
         OPEN (UNIT=85, FILE=trim(Result_Folder)//'Transition_SSC.txt', STATUS='replace')
         OPEN (UNIT=86, FILE=trim(Result_Folder)//'Transition_K.txt', STATUS='replace')
         OPEN (UNIT=87, FILE=trim(Result_Folder)//'Transition_C.txt', STATUS='replace')
+        OPEN (UNIT=88, FILE=trim(Result_Folder)//'Transition_Top1.txt', STATUS='replace')
+        OPEN (UNIT=89, FILE=trim(Result_Folder)//'Transition_Top10.txt', STATUS='replace')
      		
      		WRITE(UNIT=76, FMT=*) 'Iteration, DBN_dist, Q_dist, N_dist, Q(T)/Q(SS), N(T)/N(SS)'
      		WRITE(UNIT=77, FMT=*) 'NBAR'
@@ -5498,14 +5500,17 @@ SUBROUTINE FIND_DBN_Transition()
         	WRITE(UNIT=85, FMT=*) 'SSC'
         	WRITE(UNIT=86, FMT=*) 'K'
         	WRITE(UNIT=87, FMT=*) 'C'
+        	WRITE(UNIT=88, FMT=*) 'Wealth_Top_1'
+        	WRITE(UNIT=89, FMT=*) 'Wealth_Top_10'
 
         	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR_tr, NBAR_exp
         	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR_tr, QBAR_exp
         	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
 
+
     	CLOSE (unit=76); CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
     	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
-    	CLOSE (unit=86); CLOSE (unit=87);
+    	CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89);
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	!! DBN Iteration 
