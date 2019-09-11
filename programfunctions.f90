@@ -5409,7 +5409,7 @@ SUBROUTINE FIND_DBN_Transition()
 	REAL(DP)   :: BBAR, MeanWealth, brent_value, K_bench, C_bench, K_exp, C_exp
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
-	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr
+	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr, Wealth_Top_1_Tr, Wealth_Top_10_Tr
 
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -5485,7 +5485,7 @@ SUBROUTINE FIND_DBN_Transition()
         OPEN (UNIT=86, FILE=trim(Result_Folder)//'Transition_K.txt', STATUS='replace')
         OPEN (UNIT=87, FILE=trim(Result_Folder)//'Transition_C.txt', STATUS='replace')
      		
-     		WRITE(UNIT=77, FMT=*) 'Iteration, DBN_dist, Q_dist, N_dist, Q(T)/Q(SS), N(T)/N(SS)'
+     		WRITE(UNIT=76, FMT=*) 'Iteration, DBN_dist, Q_dist, N_dist, Q(T)/Q(SS), N(T)/N(SS)'
      		WRITE(UNIT=77, FMT=*) 'NBAR'
         	WRITE(UNIT=78, FMT=*) 'QBAR'
         	WRITE(UNIT=79, FMT=*) 'R'
@@ -5778,7 +5778,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    		P = min(P_tr(ti),1.0_dp)
 	    		! Set DBN1 as the distribution for the current period (Time: ti)
 	    		DBN1  = DBN_tr(:,:,:,:,:,:,ti)
-	            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R_tr(ti))
+	            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt_Tr, brent_tol,R_tr(ti))
             else
                 R_tr(ti) = 0.0_DP
 	        endif
@@ -5786,6 +5786,35 @@ SUBROUTINE FIND_DBN_Transition()
 	        ! Compute total assets and consumption
 	        K_tr(ti) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 	        C_tr(ti) = sum( DBN1*Cons )
+
+	        ! Compute top wealth concentration
+	    		DO ai=1,na
+					pr_a_dbn(ai)          = sum(DBN1(:,ai,:,:,:,:)) 
+					cdf_a_dbn(ai)         = sum( pr_a_dbn(1:ai) )      
+					tot_a_by_grid(ai)     = sum(DBN1(:,ai,:,:,:,:) * agrid(ai) )
+					cdf_tot_a_by_grid(ai) = sum(tot_a_by_grid(1:ai))   
+				ENDDO
+				cdf_a_dbn = cdf_a_dbn + 1.0_DP - cdf_a_dbn(na)
+
+		
+				! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
+				DO prctile=90,100
+				    ai=1
+				    DO while (cdf_a_dbn(ai) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
+				        ai=ai+1
+				    ENDDO
+				    prctile_ai_ind(prctile) = ai
+				    prctile_ai(prctile)     = agrid(ai)
+
+				    IF (ai .gt. 1) THEN
+				        cdf_tot_a_by_prctile(prctile)  = cdf_tot_a_by_grid(ai-1) + (REAL(prctile,8)/100.0_DP - cdf_a_dbn(ai-1))*agrid(ai) 
+				    else
+				        cdf_tot_a_by_prctile(prctile)  = (REAL(prctile,8)/100.0_DP )*agrid(ai)     
+				    ENDIF
+				ENDDO
+				! Store top wealth shares 
+			        Wealth_Top_1_Tr(ti)  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
+			        Wealth_Top_10_Tr(ti) = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
 
 
     	ENDDO ! Transition Time
@@ -5860,7 +5889,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    		P = min(P_tr(T+1),1.0_dp)
 	    		! Set DBN1 as the distribution for the current period (Time: T+1)
 	    		DBN1  = DBN_tr(:,:,:,:,:,:,T+1)
-	            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R_tr(T+1))
+	            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt_Tr, brent_tol,R_tr(T+1))
             else
                 R_tr(T+1) = 0.0_DP
 	        endif
@@ -5868,6 +5897,35 @@ SUBROUTINE FIND_DBN_Transition()
 	        ! Compute total assets and consumption
 	        K_tr(T+1) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 	        C_tr(T+1) = sum( DBN1*Cons )
+
+	        ! Compute top wealth concentration
+	    		DO ai=1,na
+					pr_a_dbn(ai)          = sum(DBN1(:,ai,:,:,:,:)) 
+					cdf_a_dbn(ai)         = sum( pr_a_dbn(1:ai) )      
+					tot_a_by_grid(ai)     = sum(DBN1(:,ai,:,:,:,:) * agrid(ai) )
+					cdf_tot_a_by_grid(ai) = sum(tot_a_by_grid(1:ai))   
+				ENDDO
+				cdf_a_dbn = cdf_a_dbn + 1.0_DP - cdf_a_dbn(na)
+
+		
+				! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
+				DO prctile=90,100
+				    ai=1
+				    DO while (cdf_a_dbn(ai) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
+				        ai=ai+1
+				    ENDDO
+				    prctile_ai_ind(prctile) = ai
+				    prctile_ai(prctile)     = agrid(ai)
+
+				    IF (ai .gt. 1) THEN
+				        cdf_tot_a_by_prctile(prctile)  = cdf_tot_a_by_grid(ai-1) + (REAL(prctile,8)/100.0_DP - cdf_a_dbn(ai-1))*agrid(ai) 
+				    else
+				        cdf_tot_a_by_prctile(prctile)  = (REAL(prctile,8)/100.0_DP )*agrid(ai)     
+				    ENDIF
+				ENDDO
+				! Store top wealth shares 
+			        Wealth_Top_1_Tr(ti)  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
+			        Wealth_Top_10_Tr(ti) = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
 	    
 
 	    	! Save Prices
@@ -5882,6 +5940,8 @@ SUBROUTINE FIND_DBN_Transition()
 	    	OPEN (UNIT=85, FILE=trim(Result_Folder)//'Transition_SSC.txt', STATUS='old', POSITION='append')
 	    	OPEN (UNIT=86, FILE=trim(Result_Folder)//'Transition_K.txt', STATUS='old', POSITION='append')
 	    	OPEN (UNIT=87, FILE=trim(Result_Folder)//'Transition_C.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=88, FILE=trim(Result_Folder)//'Transition_Top1.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=89, FILE=trim(Result_Folder)//'Transition_Top10.txt', STATUS='old', POSITION='append')
 	        	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR2_tr, NBAR_exp
 	        	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR2_tr, QBAR_exp
 	        	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
@@ -5893,9 +5953,11 @@ SUBROUTINE FIND_DBN_Transition()
 	        	WRITE(UNIT=85, FMT=*) SSC_Payments_tr
 	        	WRITE(UNIT=86, FMT=*) K_tr
 	        	WRITE(UNIT=87, FMT=*) C_tr
+	        	WRITE(UNIT=88, FMT=*) Wealth_Top_1_Tr
+	        	WRITE(UNIT=89, FMT=*) Wealth_Top_10_Tr
 	    	CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
 	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
-	    	CLOSE (unit=86); CLOSE (unit=87);
+	    	CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89);
 
 
 	    	! Write Variable Paths
@@ -5919,6 +5981,7 @@ SUBROUTINE FIND_DBN_Transition()
 			OPEN  (UNIT=87,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='replace')
 			OPEN  (UNIT=88,  FILE=trim(Result_Folder)//'tauL_tr'   , STATUS='replace')
 			OPEN  (UNIT=89,  FILE=trim(Result_Folder)//'tauK_tr'   , STATUS='replace')
+			OPEN  (UNIT=90,  FILE=trim(Result_Folder)//'tauC_tr'   , STATUS='replace')
 				! WRITE (UNIT=1,  FMT=*) Cons_tr
 				! WRITE (UNIT=2,  FMT=*) Hours_tr
 				! WRITE (UNIT=3,  FMT=*) Aprime_tr
@@ -5935,10 +5998,11 @@ SUBROUTINE FIND_DBN_Transition()
 				WRITE (UNIT=87,  FMT=*) tauW_at
 				WRITE (UNIT=88,  FMT=*) 1.0_dp-psi
 				WRITE (UNIT=89,  FMT=*) tauK
+				WRITE (UNIT=90,  FMT=*) tauC
 			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
 			CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
 	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); 
-	    	CLOSE (unit=85); CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89); 
+	    	CLOSE (unit=85); CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89); CLOSE (unit=90); 
 			print*,' 	--------------------------------------'
 			print*,' 	Variable Printing Completed'
 			print*,' 	--------------------------------------'
@@ -5970,16 +6034,17 @@ SUBROUTINE FIND_DBN_Transition()
 
 	! Print Summary File
 	OPEN  (UNIT=78,  FILE=trim(Result_Folder)//'Transition_Summary.txt'   , STATUS='replace')
-	WRITE (UNIT=78,  FMT=*) 'Period, Q, N, R, Wage, Y, K, C, GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC'
+	WRITE (UNIT=78,  FMT=*) 'Period, Q, N, R, Wage, Y, K, C, GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC, Wealth_Top_1, Wealth_Top_10'
 	WRITE (UNIT=78,  FMT=*) 'SS_1,',QBAR_bench,',',NBAR_bench,',',R_bench,',',wage_bench,',' & 
 								&  ,Y_bench,',',K_bench,',',C_bench,',',GBAR_bench
 	do ti=1,T+1
 	WRITE (UNIT=78,  FMT=*) ti,',',QBAR_tr(ti),',',NBAR_tr(ti),',',R_tr(ti),',',Wage_tr(ti),',' & 
-								& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),',',GBAR_tr(ti),',' &
-								& ,GBAR_K_tr(ti),',',GBAR_W_tr(ti),',',GBAR_L_tr(ti),',',GBAR_C_tr(ti),',',SSC_Payments_tr(ti)
+							& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),',',GBAR_tr(ti),',' &
+							& ,GBAR_K_tr(ti),',',GBAR_W_tr(ti),',',GBAR_L_tr(ti),',',GBAR_C_tr(ti),',',SSC_Payments_tr(ti),',' &
+							& ,Wealth_Top_1_tr(ti),',',Wealth_Top_10_tr(ti)
 	enddo 
 	WRITE (UNIT=78,  FMT=*) 'SS_2,',QBAR_exp,',',NBAR_exp,',',R_exp,',',wage_exp,',' & 
-								&  ,Y_exp,',',K_exp,',',C_exp,',',GBAR_exp
+						&  ,Y_exp,',',K_exp,',',C_exp,',',GBAR_exp,',99,99,99,99,99,',Wealth_Top_1_tr(T+1),',',Wealth_Top_1_tr(T+1)
 	CLOSE (UNIT=78);
 
 
@@ -8508,6 +8573,47 @@ Function Agg_Debt(R_in)
 	! print*, (mu*P*xz_grid(1,5:)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu))
 	! print*, '------------',Wealth, Kd, Agg_Debt, R_in, P
 	Agg_Debt = (Agg_Debt/Wealth)**2.0_dp
+
+
+end Function Agg_Debt
+
+!========================================================================================
+!========================================================================================
+! This function computes the difference between capital demand and supply
+! The function is modified for the transition experiments
+! Government debt is included
+! The function uses the interest rate R and implicitely the price of intermediate good P and distribution DBN1
+Function Agg_Debt_Tr(R_in)
+	Implicit None 
+	real(dp), intent(in) :: R_in
+	real(dp)             :: Agg_Debt, Private_Demand, Public_Demand, Agg_Demand
+	real(dp), dimension(na,nz,nx) :: K_mat
+	real(dp)             :: Wealth
+
+	! Total wealth - Supply of assets in the economy
+	Wealth   = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+
+	! Private demand is computed as total demand for capital in the economy 
+	K_mat = K_matrix(R_in,P)
+	Private_Demand = 0.0_dp
+	do xi=1,nx
+	do zi=1,nz 
+	do ai=1,na
+		Private_Demand = Private_Debt + sum(DBN1(:,ai,zi,:,:,xi)*K_mat(ai,zi,xi))
+	enddo 
+	enddo 
+	enddo 
+
+	! Public demand is computed as current debt plus governemnt deficit
+		! Debt_tr(t) = (1+R)*Debt_tr(t-1) + Deficit(t)
+		! Deficit(t) = GBAR_bench - GBAR_Tr(t) 
+	Public_Demand = Debt_tr
+
+	! Aggregate debt is the sum of private and public demand for funds 
+	Agg_Demand    = Private_Demand + Public_Demand
+	
+	! Function outputs aggregate demand relative to total wealth (squared to have a min at 0)
+	Agg_Debt = ((Agg_Demand-Wealth))/Wealth)**2.0_dp
 
 
 end Function Agg_Debt

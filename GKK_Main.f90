@@ -73,7 +73,7 @@ PROGRAM main
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
-		Tax_Reform_Decomposition = .true.
+		Tax_Reform_Decomposition = .false.
 		compute_exp_fixed_prices_and_taxes = .false.
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
@@ -82,7 +82,7 @@ PROGRAM main
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
-		Transition_Tax_Reform = .false.
+		Transition_Tax_Reform = .true.
 		Transition_OT = .false.
 			budget_balance = .true.
 			balance_tau_L  = .false. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
@@ -3718,10 +3718,10 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	if (budget_balance) then 
 
 		! Set Results Folder
-		Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform_BB/'
+		Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform_BB_cfm/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
-	if (.false.) then 
+	if (.true.) then 
 
 		! Find the Distribution and Policy Functions Along Transition Path
 		! This is done for the tax reform steady state
@@ -3733,7 +3733,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 		print*,' 	Balancing the Budget'
 		print*,'---------------------------------------------------'
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-			tauWindx = 4.0_DP
+			tauWindx = 1.0_DP
 			Debt_tr  = 1.0_DP
 			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
 				! Set old G and new value of tauW
