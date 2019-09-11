@@ -83,7 +83,7 @@ PROGRAM main
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
 		Transition_Tax_Reform = .false.
-		Transition_OT = .true.
+		Transition_OT = .false.
 			budget_balance = .true.
 			balance_tau_L  = .false. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW     = .true. ! true=tau_K, false=tau_W
