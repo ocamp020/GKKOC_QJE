@@ -8586,7 +8586,7 @@ end Function Agg_Debt
 Function Agg_Debt_Tr(R_in)
 	Implicit None 
 	real(dp), intent(in) :: R_in
-	real(dp)             :: Agg_Debt, Private_Demand, Public_Demand, Agg_Demand
+	real(dp)             :: Agg_Debt_Tr, Private_Demand, Public_Demand, Agg_Demand
 	real(dp), dimension(na,nz,nx) :: K_mat
 	real(dp)             :: Wealth
 
@@ -8613,10 +8613,10 @@ Function Agg_Debt_Tr(R_in)
 	Agg_Demand    = Private_Demand + Public_Demand
 	
 	! Function outputs aggregate demand relative to total wealth (squared to have a min at 0)
-	Agg_Debt = ((Agg_Demand-Wealth))/Wealth)**2.0_dp
+	Agg_Debt_Tr = ((Agg_Demand-Wealth))/Wealth)**2.0_dp
 
 
-end Function Agg_Debt
+end Function Agg_Debt_Tr
 
 
 !========================================================================================
