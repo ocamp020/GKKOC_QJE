@@ -3733,7 +3733,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 		print*,' 	Balancing the Budget'
 		print*,'---------------------------------------------------'
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-			tauWindx = 1.0_DP
+			tauWindx = 6.0_DP
 			Debt_tr  = 1.0_DP
 			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
 				! Set old G and new value of tauW
