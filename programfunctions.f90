@@ -5784,7 +5784,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    		P = min(P_tr(ti),1.0_dp)
 	    		! Set DBN1 as the distribution for the current period (Time: ti)
 	    		DBN1  = DBN_tr(:,:,:,:,:,:,ti)
-	            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt_Tr, brent_tol,R_tr(ti))
+	            brent_value = brent(-0.1_DP,0.01_DP,1.0_DP,Agg_Debt_Tr, brent_tol,R_tr(ti))
             else
                 R_tr(ti) = 0.0_DP
 	        endif
@@ -5822,7 +5822,7 @@ SUBROUTINE FIND_DBN_Transition()
 			        Wealth_Top_1_Tr(ti)  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
 			        Wealth_Top_10_Tr(ti) = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
 
-
+	        print*, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr,'Wealth=',K_tr(ti),'R=',R_tr(ti)
     	ENDDO ! Transition Time
 
 		print*,' 	--------------------------------------'
