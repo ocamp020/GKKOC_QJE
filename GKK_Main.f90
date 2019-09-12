@@ -3725,7 +3725,8 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 
 		! Find the Distribution and Policy Functions Along Transition Path
 		! This is done for the tax reform steady state
-		call Find_DBN_Transition 
+		! call Find_DBN_Transition 
+		GBAR_exp = GBAR_bench - 1 ; Dbet_tr = 0 ; 
 
 		! Find Taxes that balance the budget 
 		print*,' '
@@ -3733,7 +3734,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 		print*,' 	Balancing the Budget'
 		print*,'---------------------------------------------------'
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-			tauWindx = 6.0_DP
+			tauWindx = 5.0_DP
 			Debt_tr  = 1.0_DP
 			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
 				! Set old G and new value of tauW
