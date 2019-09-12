@@ -3726,7 +3726,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 		! Find the Distribution and Policy Functions Along Transition Path
 		! This is done for the tax reform steady state
 		! call Find_DBN_Transition 
-		GBAR_exp = GBAR_bench - 1 ; Dbet_tr = 0 ; 
+		GBAR_exp = GBAR_bench - 1 ; Debt_tr = 0 ; 
 
 		! Find Taxes that balance the budget 
 		print*,' '
