@@ -956,8 +956,8 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 	! Deallocate variables
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
-	print*,"	Efficiency Computation"
-		CALL Hsieh_Klenow_Efficiency(solving_bench)
+	! print*,"	Efficiency Computation"
+	! 	CALL Hsieh_Klenow_Efficiency(solving_bench)
 
 
 end Subroutine Solve_Experiment_tauC
@@ -3735,7 +3735,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 		print*,' 	Balancing the Budget'
 		print*,'---------------------------------------------------'
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-			tauWindx = 6.0_DP
+			tauWindx = 4.0_DP
 			Debt_tr  = 1.0_DP
 			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
 				! Set old G and new value of tauW
