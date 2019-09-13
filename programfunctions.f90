@@ -5784,7 +5784,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    		P = min(P_tr(ti),1.0_dp)
 	    		! Set DBN1 as the distribution for the current period (Time: ti)
 	    		DBN1  = DBN_tr(:,:,:,:,:,:,ti)
-	            brent_value = brent(-0.1_DP,0.01_DP,1.0_DP,Agg_Debt_Tr, brent_tol,R_tr(ti))
+	            brent_value = brent(-0.1_DP,0.01_DP,0.1_DP,Agg_Debt_Tr, brent_tol,R_tr(ti))
             else
                 R_tr(ti) = 0.0_DP
 	        endif
@@ -5895,7 +5895,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    		P = min(P_tr(T+1),1.0_dp)
 	    		! Set DBN1 as the distribution for the current period (Time: T+1)
 	    		DBN1  = DBN_tr(:,:,:,:,:,:,T+1)
-	            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt_Tr, brent_tol,R_tr(T+1))
+	            brent_value = brent(-0.1_DP,0.01_DP,0.1_DP,Agg_Debt_Tr, brent_tol,R_tr(T+1))
             else
                 R_tr(T+1) = 0.0_DP
 	        endif
