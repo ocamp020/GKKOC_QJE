@@ -43,6 +43,7 @@ PROGRAM main
 		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices, compute_exp_fixed_prices_and_taxes
 		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R , Tax_Reform_Decomposition
 		logical  :: Transition_Tax_Reform, Transition_OT, budget_balance, balance_tau_L
+		logical  :: Tax_Reform_tau_C, compute_exp_tau_c
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -64,7 +65,7 @@ PROGRAM main
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .false.
 			compute_bench = .false.
-			compute_exp   = .false.
+			compute_exp   = .true.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .true.
@@ -73,8 +74,13 @@ PROGRAM main
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
+
+		Tax_Reform_tau_C = .true.
+			compute_exp_tau_c = .true.
+
 		Tax_Reform_Decomposition = .false.
 		compute_exp_fixed_prices_and_taxes = .false.
+
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Tax_K_and_W = .false.
@@ -82,11 +88,13 @@ PROGRAM main
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
-		Transition_Tax_Reform = .true.
+
+		Transition_Tax_Reform = .false.
 		Transition_OT = .false.
 			budget_balance = .true.
 			balance_tau_L  = .false. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW     = .true. ! true=tau_K, false=tau_W
+			
 		Simul_Switch  = .false.
 
 
@@ -259,10 +267,6 @@ PROGRAM main
 				call Solve_Experiment(compute_exp,Simul_Switch)
 			endif 
 
-			! Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
-			! call system( 'mkdir -p ' // trim(Result_Folder) )
-			! call Solve_Experiment_tauC(compute_exp,Simul_Switch)
-
 			compute_bench = .false.
 		endif 
 
@@ -273,6 +277,19 @@ PROGRAM main
 		if (Tax_Reform_Decomposition) then 
 			call Solve_Tax_Reform_Decomposition
 		endif 
+
+		! Tax Reform Tau_C
+		if (Tax_Reform_tau_C) then
+			! Solve Benchmark 
+			call Solve_Benchmark(compute_bench,Simul_Switch)
+			Bench_Simul_Folder = trim(Result_Folder)//'Simul/'
+			compute_bench = .false.
+			! Result folder for tau_C reform 
+			Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
+			call system( 'mkdir -p ' // trim(Result_Folder) )
+			! Solve tax reform
+			call Solve_Experiment_tauC(compute_exp_tau_c,Simul_Switch)
+		endif	 
 
 		! Optimal Tax
 		if (Opt_Tax) then 
@@ -823,7 +840,9 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 	! Experiment economy
 		solving_bench=0
 	! Set capital taxes to zero
-		tauK = 0.0_DP
+		tauK    = 0.0_DP
+		tauW_bt = 0.0_DP
+		tauW_at = 0.0_DP
 	! Set Y_a_threshold
 		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
 		!Y_a_threshold = 0.0_dp ! big_p   !8.1812138704441200
@@ -958,6 +977,8 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 
 	! print*,"	Efficiency Computation"
 	! 	CALL Hsieh_Klenow_Efficiency(solving_bench)
+
+	print*, ' End of Solve_Experiment_tauC'
 
 
 end Subroutine Solve_Experiment_tauC
