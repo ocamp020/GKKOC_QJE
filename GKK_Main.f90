@@ -3101,7 +3101,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			! psi = 1.50_dp 
 
 		    DO tauC_ind = 10,15,1
-		    	tauC = real(tauC_ind,8)/10.0_dp
+		    	tauC = real(tauC_ind,8)/100.0_dp
 				print*, ' '
 				print*, ' Consumption Taxes=',tauC
 				print*, ' '
