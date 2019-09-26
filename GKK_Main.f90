@@ -3091,21 +3091,24 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
     	! CALL Write_Experimental_Results(.false.)
     	! psi = 1.8
 
-    	DO tauC_ind = 10,15,1
-
-    		
-
-			tauC = real(tauC_ind,8)/10.0_dp
-			print*, ' '
-			print*, ' Consumption Taxes=',tauC
+    	DO tauindx=0,20,5
+    		tauw_at     = real(tauindx,8)/1000_DP
+            print*, ' '
+			print*, ' Wealth Taxes=',tauw_at
 			print*, ' '
 
 			! psi = 0.776_dp
 			! psi = 1.50_dp 
 
-		    DO tauindx=0,20,5
-	            tauw_at     = real(tauindx,8)/1000_DP
-	            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+		    DO tauC_ind = 10,15,1
+		    	tauC = real(tauC_ind,8)/10.0_dp
+				print*, ' '
+				print*, ' Consumption Taxes=',tauC
+				print*, ' '
+
+				! Solve model with current taxes (tauC is taken as a global)
+				brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+	            
 
 	            ! Aggregate variable in experimental economy
 				GBAR_exp  = GBAR
