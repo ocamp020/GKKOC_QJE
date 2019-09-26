@@ -43,7 +43,7 @@ PROGRAM main
 		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices, compute_exp_fixed_prices_and_taxes
 		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R , Tax_Reform_Decomposition
 		logical  :: Transition_Tax_Reform, Transition_OT, budget_balance, balance_tau_L
-		logical  :: Tax_Reform_tau_C, compute_exp_tau_c
+		logical  :: Tax_Reform_tau_C, compute_exp_tau_c, Opt_Tax_KW_TR
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -93,7 +93,7 @@ PROGRAM main
 		Transition_OT = .false.
 			budget_balance = .true.
 			balance_tau_L  = .false. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
-			Opt_Tax_KW     = .true. ! true=tau_K, false=tau_W
+			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 
 		Simul_Switch  = .false.
 
@@ -360,7 +360,7 @@ PROGRAM main
 
 		if (Opt_Tau_C) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
-			print*, Opt_Tax_KW
+
 			folder_aux = Result_Folder
 			if (Opt_Tax_KW) then 
 				Result_Folder = trim(folder_aux)//'Opt_Tax_K_Tau_C_aux/'
@@ -368,7 +368,6 @@ PROGRAM main
 				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Tau_C/'
 			endif
 			call system( 'mkdir -p ' // trim(Result_Folder) )
-			print*, Result_Folder 
 			
 			call Solve_Opt_Tau_C(Opt_Tax_KW)
 			
@@ -425,7 +424,7 @@ PROGRAM main
 		endif
 
 		if (Transition_OT) then
-			call Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
+			call Solve_Transition_Opt_Taxes(Opt_Tax_KW_TR,budget_balance,balance_tau_L)
 		endif
 
 
@@ -2926,7 +2925,6 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		maxbrentvaluet=-10000.0_DP
 	
 	print*,'Optimal Tax Loop'
-	print*, Opt_Tax_KW
 		
 
 	If (Opt_Tax_KW) then
