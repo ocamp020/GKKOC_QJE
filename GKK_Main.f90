@@ -360,7 +360,7 @@ PROGRAM main
 
 		if (Opt_Tau_C) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
-
+			print*, Opt_Tax_KW
 			folder_aux = Result_Folder
 			if (Opt_Tax_KW) then 
 				Result_Folder = trim(folder_aux)//'Opt_Tax_K_Tau_C_aux/'
@@ -368,7 +368,7 @@ PROGRAM main
 				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Tau_C/'
 			endif
 			call system( 'mkdir -p ' // trim(Result_Folder) )
-
+			print*, Result_Folder 
 			
 			call Solve_Opt_Tau_C(Opt_Tax_KW)
 			
@@ -3225,7 +3225,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
 
 		print*, "Optimal tau_W=", tauW_at, "Optimal psi=", psi
-		
+
 		OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_cons_tax.txt', STATUS='replace')
 		WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
