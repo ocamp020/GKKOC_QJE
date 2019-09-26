@@ -75,7 +75,7 @@ PROGRAM main
 				Fixed_P = .true.
 				Fixed_R = .true.
 
-		Tax_Reform_tau_C = .true.
+		Tax_Reform_tau_C = .false.
 			compute_exp_tau_c = .true.
 
 		Tax_Reform_Decomposition = .false.
