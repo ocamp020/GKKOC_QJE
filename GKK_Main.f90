@@ -2906,7 +2906,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 	implicit none 
 	logical, intent(in) :: Opt_Tax_KW
 	real(DP) :: OPT_tauC
-	INTEGER  :: tauC_ind
+	INTEGER  :: tauC_ind, tauL_ind
 
 
 	!====================================================================================================
@@ -3100,14 +3100,22 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			! psi = 0.776_dp
 			! psi = 1.50_dp 
 
-		    DO tauC_ind = 10,15,1
-		    	tauC = real(tauC_ind,8)/100.0_dp
+		    ! DO tauC_ind = 10,15,1
+		    DO tauL_ind = 0,20,5
+	    		! tauC = 1.0_dp - real(tauC_ind,8)/100.0_dp
+		    	psi  = 1.0_dp - real(tauL_ind,8)/100.0_dp
+		    
 				print*, ' '
-				print*, ' Consumption Taxes=',tauC
+				print*, '-----------------------------------------------------------'
+				print*, ' Labor Income Taxes=',1.0_dp-psi
 				print*, ' '
 
 				! Solve model with current taxes (tauC is taken as a global)
-				brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+				! brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+				brentvaluet = - EQ_WELFARE_GIVEN_PSI(tauK,tauW_at,psi)
+				print*, ' '
+				print*, ' Consumption Taxes=',tauC
+				print*, ' '
 	            
 
 	            ! Aggregate variable in experimental economy

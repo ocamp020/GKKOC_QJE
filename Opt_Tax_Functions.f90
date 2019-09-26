@@ -244,6 +244,58 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 END  FUNCTION EQ_WELFARE_GIVEN_TauC
 
 
+!================================================================================
+
+FUNCTION EQ_WELFARE_GIVEN_PSI(tauK_in,tauW_in,psi_in)
+	IMPLICIT NONE 
+	real(DP), intent(in) :: tauK_in, tauW_in, psi_in
+	real(DP) ::EQ_WELFARE_GIVEN_PSI
+
+	tauK    = tauK_in
+	tauW_at = tauW_in
+	psi     = psi_in
+
+	GBAR_exp = 0.0_DP
+	DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.001 ) ! as long as the difference is greater than 0.05% continue
+	    CALL FIND_DBN_EQ
+	    CALL GOVNT_BUDGET_OPT_TauC
+	    GBAR_exp = GBAR    
+	ENDDO
+
+	! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+	!CALL COMPUTE_WELFARE_GAIN
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL Firm_Value
+    	EQ_WELFARE_GIVEN_PSI = - sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+    !CALL COMPUTE_STATS
+
+	!OPEN   (UNIT=3, FILE='psi', STATUS='replace')
+	!print*,'Budget balancing psi=',psi
+	!WRITE(unit=3, FMT=*) psi
+	!CLOSE (unit=3)
+	!
+	!print*,'tauW=', tauW, ' CE_NEWBORN=', CE_NEWBORN, 'Av. Util=',sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+	print*, 'tauK=', tauK,'tauW_at=', tauW_at,'Psi=', psi,'Av_Utility_NEWBORN=', -EQ_WELFARE_GIVEN_PSI,'tauC=',tauC 
+
+END  FUNCTION EQ_WELFARE_GIVEN_PSI
+
+
 !====================================================================
 
 SUBROUTINE GOVNT_BUDGET_OPT()
@@ -338,6 +390,105 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 
 END SUBROUTINE GOVNT_BUDGET_OPT
 
+
+!====================================================================
+
+SUBROUTINE GOVNT_BUDGET_OPT_TauC()
+	IMPLICIT NONE
+
+	real(DP) :: GBAR_W,  GBAR_L, GBAR_C, GBAR_NL, BT_EARNINGS , A_EARNINGS, SSC_Payments, C_bar
+	real(DP) :: new_tauC, aux_var 
+
+	GBAR        = 0.0_DP
+	GBAR_K 		= 0.0_DP
+	GBAR_W		= 0.0_DP
+	GBAR_C 		= 0.0_DP
+	GBAR_L 		= 0.0_DP
+	GBAR_NL 	= 0.0_DP
+	BT_EARNINGS = 0.0_DP
+	A_EARNINGS 	= 0.0_DP
+	C_bar       = 0.0_DP
+
+	DO xi=1,nx
+	DO age=1, MaxAge
+	DO ai=1,na
+	DO zi=1,nz
+	DO lambdai=1,nlambda
+	DO ei=1,ne
+		GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei,xi) * ( tauK*( R*agrid(ai) + Pr_mat(ai,zi,xi) )  	    &
+	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi) 	&	
+	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)  									&
+	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)  			&
+	          & + tauC * cons(age, ai, zi, lambdai,ei,xi)  )   
+
+	    GBAR_NL = GBAR_NL + DBN1(age,ai,zi,lambdai,ei,xi) * ( tauK*( R*agrid(ai) + Pr_mat(ai,zi,xi) )   &
+	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi)  & 
+	          & + tauC * cons(age, ai, zi, lambdai,ei,xi)  )         
+
+	    GBAR_L = GBAR_L  + DBN1(age,ai,zi,lambdai,ei,xi) * (  yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi) &
+	          &- psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL) )
+
+	    BT_EARNINGS = BT_EARNINGS + DBN1(age,ai,zi,lambdai,ei,xi) * yh(age,lambdai,ei)* Hours(age, ai, zi, lambdai,ei,xi) 
+	    
+	    A_EARNINGS  = A_EARNINGS  + DBN1(age,ai,zi,lambdai,ei,xi) *&
+	                    & (yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)
+	    
+	    GBAR_K = GBAR_K +DBN1(age,ai,zi,lambdai,ei,xi) * (  tauK*( R*agrid(ai) + Pr_mat(ai,zi,xi) )   &
+	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi) )
+
+      	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei,xi) * tauC * cons(age, ai, zi, lambdai,ei,xi)
+
+      	C_bar = C_bar +  DBN1(age,ai,zi,lambdai,ei,xi) * cons(age, ai, zi, lambdai,ei,xi)
+	    
+	   
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+
+	SSC_Payments = 0.0_DP
+
+	DO xi=1,nx
+	DO age=RetAge, MaxAge
+	DO ai=1,na
+	DO zi=1,nz
+	DO lambdai=1,nlambda
+	DO ei=1,ne
+
+	    SSC_Payments = SSC_Payments + DBN1(age,ai,zi,lambdai,ei,xi) * RetY_lambda_e(lambdai,ei) 
+	    
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+
+	GBAR = GBAR -  SSC_Payments
+
+	print*,' '
+	print*,'Results from GOVNT_BUDGET'
+	print*, 'GBAR_bench',GBAR_bench, 'GBAR=',GBAR, 'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=',GBAR_L/Ebar 
+	print*, 'GBAR_NL  =',GBAR_NL, 'BT_EARNINGS=',BT_EARNINGS,'A_EARNINGS=',A_EARNINGS 
+	PRINT*,'PSI=',psi, 'tauK=', tauK, 'tauW_at=',tauW_at, 'tauC', tauC
+
+	! OBTAIN NEW Tau_C IF GOVETNMENT BUDGET DOES NOT BALANCE
+	! Formula exploits that consumption expenditure is constant
+	if (solving_bench .eq. 0) then
+	    IF (  abs(100.0_DP*(1.0_DP-GBAR/GBAR_bench)) .gt. 0.001 ) THEN
+	    	aux_var  = ( GBAR_bench - (GBAR - GBAR_C) )/C_bar
+	    	new_tauC = aux_var/(1.0_dp-aux_var)
+	        PRINT*,'NEW Tau_C=',new_tauC,'Old Tau_C=',tauC
+	        tauC = new_tauC
+	        ! tauC = 0.5_dp*new_tauC+0.5_dp*tauC
+	    ENDIF
+	endif     
+
+
+
+END SUBROUTINE GOVNT_BUDGET_OPT_TauC
 
 
 !================================================================================
