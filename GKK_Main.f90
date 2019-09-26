@@ -2926,7 +2926,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		maxbrentvaluet=-10000.0_DP
 	
 	print*,'Optimal Tax Loop'
-	
+	print*, Opt_Tax_KW
 		
 
 	If (Opt_Tax_KW) then
@@ -3090,12 +3090,12 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
-    	CALL Write_Experimental_Results(.false.)
+    	! CALL Write_Experimental_Results(.false.)
     	! psi = 1.8
 
     	DO tauC_ind = 10,15,1
 
-    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax.txt', STATUS='old', POSITION='append')
+    		
 
 			tauC = real(tauC_ind,8)/10.0_dp
 			print*, ' '
@@ -3152,7 +3152,8 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			    print*, 'tauW=', tauW_at, 'YBAR=', YBAR, & 
 			    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
 			    	  & 'tauC=', tauC,'psi=',psi
-			      
+			     
+		     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax.txt', STATUS='old', POSITION='append') 
 			    WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
 			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 			      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
@@ -3164,15 +3165,16 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
 			      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
 			      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-		      & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_NB
+		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_NB
+		      	CLOSE (unit=77)
 		    ENDDO 
-		    CLOSE (unit=77)
+		    
 		    Call Write_Experimental_Results(.true.)
 
 	    ENDDO
 
 
-	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_cons_tax.txt', STATUS='replace')
+	    
 
 		tauW_at = OPT_tauW
 		psi 	= OPT_psi
@@ -3224,6 +3226,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
 		print*, "Optimal tau_W=", tauW_at, "Optimal psi=", psi
 		
+		OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_cons_tax.txt', STATUS='replace')
 		WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
