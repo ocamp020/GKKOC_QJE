@@ -3097,7 +3097,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			print*, ' Wealth Taxes=',tauw_at
 			print*, ' '
 
-			! psi = 0.776_dp
+			tauC = 0.295359_dp
 			! psi = 1.50_dp 
 
 		    ! DO tauC_ind = 10,15,1
@@ -3116,7 +3116,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 				print*, ' '
 				print*, ' Consumption Taxes=',tauC
 				print*, ' '
-	            
+
 
 	            ! Aggregate variable in experimental economy
 				GBAR_exp  = GBAR
@@ -3140,9 +3140,17 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 				Hours_exp         = Hours
 				Aprime_exp        = Aprime 
 
+
+				CALL Write_Experimental_Results(.true.)
+				CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+				K_mat  = K_Matrix(R,P)
+				Pr_mat = Profit_Matrix(R,P)
+				CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+				CALL ComputeLaborUnits(EBAR,wage)
+				CALL GOVNT_BUDGET(.true.)
+
 				! Compute moments
 				CALL COMPUTE_STATS
-				CALL GOVNT_BUDGET(.true.)
 				
 				! Compute welfare gain between economies
 				CALL COMPUTE_WELFARE_GAIN
@@ -3176,9 +3184,8 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
 		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_NB
 		      	CLOSE (unit=77)
+		      	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 		    ENDDO 
-		    
-		    Call Write_Experimental_Results(.true.)
 
 	    ENDDO
 
