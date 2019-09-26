@@ -478,9 +478,9 @@ SUBROUTINE GOVNT_BUDGET_OPT_TauC()
 	! Formula exploits that consumption expenditure is constant
 	if (solving_bench .eq. 0) then
 	    IF (  abs(100.0_DP*(1.0_DP-GBAR/GBAR_bench)) .gt. 0.001 ) THEN
-	    	aux_var  = ( GBAR_bench - (GBAR - GBAR_C) )/C_bar
+	    	aux_var  = ( GBAR_bench - (GBAR - GBAR_C) )/(C_bar+GBAR_C)
 	    	new_tauC = aux_var/(1.0_dp-aux_var)
-	        PRINT*,'NEW Tau_C=',new_tauC,'Old Tau_C=',tauC
+	        PRINT*,'NEW Tau_C=',new_tauC,'Old Tau_C=',tauC,'aux_var=',aux_var,'Rev=',GBAR - GBAR_C
 	        tauC = new_tauC
 	        ! tauC = 0.5_dp*new_tauC+0.5_dp*tauC
 	    ENDIF
