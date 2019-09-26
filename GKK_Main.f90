@@ -86,7 +86,7 @@ PROGRAM main
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
 		Opt_Threshold = .false.
-		Opt_Tau_C = .false.
+		Opt_Tau_C = .true.
 		Opt_Tau_CX = .false.
 
 		Transition_Tax_Reform = .false.
@@ -3025,8 +3025,44 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		tauK     = OPT_tauK
 		OPT_psi  = psi
 
+		CALL FIND_DBN_EQ
+		CALL GOVNT_BUDGET(.true.)
+
+		! Compute value function and store policy functions, value function and distribution in file
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL Firm_Value
+		CALL Write_Experimental_Results(.true.)
+		
+		! Aggregate variable in experimental economy
+			GBAR_exp  = GBAR
+			QBAR_exp  = QBAR 
+			NBAR_exp  = NBAR  
+			Y_exp 	  = YBAR
+			Ebar_exp  = EBAR
+			P_exp     = P
+			R_exp	  = R
+			wage_exp  = wage
+			tauK_exp  = tauK
+			tauPL_exp = tauPL
+			psi_exp   = psi
+			DBN_exp   = DBN1
+			tauw_bt_exp = tauW_bt
+			tauw_at_exp = tauW_at
+			Y_a_threshold_exp = Y_a_threshold
+
+			ValueFunction_exp = ValueFunction
+			Cons_exp          = Cons           
+			Hours_exp         = Hours
+			Aprime_exp        = Aprime 
+
 		! Compute moments
 		CALL COMPUTE_STATS
+		
+		! Compute welfare gain between economies
+		CALL COMPUTE_WELFARE_GAIN
+
+		! Write experimental results in output.txt
+		CALL WRITE_VARIABLES(0)
 
 		print*, "Optimal tau_K=", tauK, "Optimal psi=", psi, 'Optimal tauC=',tauC
 
@@ -3045,14 +3081,13 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
 
 		CLOSE (UNIT=77)
-		Call Write_Experimental_Results(.true.)
 
 
 	else 
 		PRINT*,''
 		Print*,'--------------- OPTIMAL WEALTH TAXES - Consumption Taxes -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_8.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
     	CALL Write_Experimental_Results(.false.)
@@ -3060,7 +3095,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
     	DO tauC_ind = 10,15,1
 
-    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_8.txt', STATUS='old', POSITION='append')
+    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax.txt', STATUS='old', POSITION='append')
 
 			tauC = real(tauC_ind,8)/10.0_dp
 			print*, ' '
@@ -3070,7 +3105,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			! psi = 0.776_dp
 			! psi = 1.50_dp 
 
-		    DO tauindx=-03,03,1
+		    DO tauindx=0,20,5
 	            tauw_at     = real(tauindx,8)/1000_DP
 	            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
@@ -3137,7 +3172,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 	    ENDDO
 
 
-	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_cons_tax_8.txt', STATUS='replace')
+	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_cons_tax.txt', STATUS='replace')
 
 		tauW_at = OPT_tauW
 		psi 	= OPT_psi
@@ -3147,8 +3182,45 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		tauW_at = OPT_tauW
 		OPT_psi  = psi
 
+		CALL FIND_DBN_EQ
+		CALL GOVNT_BUDGET(.true.)
+
+		! Compute value function and store policy functions, value function and distribution in file
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL Firm_Value
+		CALL Write_Experimental_Results(.true.)
+		
+		! Aggregate variable in experimental economy
+			GBAR_exp  = GBAR
+			QBAR_exp  = QBAR 
+			NBAR_exp  = NBAR  
+			Y_exp 	  = YBAR
+			Ebar_exp  = EBAR
+			P_exp     = P
+			R_exp	  = R
+			wage_exp  = wage
+			tauK_exp  = tauK
+			tauPL_exp = tauPL
+			psi_exp   = psi
+			DBN_exp   = DBN1
+			tauw_bt_exp = tauW_bt
+			tauw_at_exp = tauW_at
+			Y_a_threshold_exp = Y_a_threshold
+
+			ValueFunction_exp = ValueFunction
+			Cons_exp          = Cons           
+			Hours_exp         = Hours
+			Aprime_exp        = Aprime 
+
 		! Compute moments
 		CALL COMPUTE_STATS
+		
+		! Compute welfare gain between economies
+		CALL COMPUTE_WELFARE_GAIN
+
+		! Write experimental results in output.txt
+		CALL WRITE_VARIABLES(0)
+
 
 		print*, "Optimal tau_W=", tauW_at, "Optimal psi=", psi
 		
@@ -3167,53 +3239,15 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
 
 		CLOSE (UNIT=77)
-		Call Write_Experimental_Results(.true.)
+
 	endif 
 
 
-	CALL FIND_DBN_EQ
-	CALL GOVNT_BUDGET(.true.)
 
-	! Compute value function and store policy functions, value function and distribution in file
-	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
-	CALL Firm_Value
-	! CALL Write_Experimental_Results(.true.)
-	
-	! Aggregate variable in experimental economy
-		GBAR_exp  = GBAR
-		QBAR_exp  = QBAR 
-		NBAR_exp  = NBAR  
-		Y_exp 	  = YBAR
-		Ebar_exp  = EBAR
-		P_exp     = P
-		R_exp	  = R
-		wage_exp  = wage
-		tauK_exp  = tauK
-		tauPL_exp = tauPL
-		psi_exp   = psi
-		DBN_exp   = DBN1
-		tauw_bt_exp = tauW_bt
-		tauw_at_exp = tauW_at
-		Y_a_threshold_exp = Y_a_threshold
+	! print*,"	Efficiency Computation"
+	! 	CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		ValueFunction_exp = ValueFunction
-		Cons_exp          = Cons           
-		Hours_exp         = Hours
-		Aprime_exp        = Aprime 
-
-	! Compute moments
-	CALL COMPUTE_STATS
-	
-	! Compute welfare gain between economies
-	CALL COMPUTE_WELFARE_GAIN
-
-	! Write experimental results in output.txt
-	CALL WRITE_VARIABLES(0)
-
-	print*,"	Efficiency Computation"
-		CALL Hsieh_Klenow_Efficiency(solving_bench)
-
-	CALL SIMULATION(0)
+	! CALL SIMULATION(0)
 
     
 
