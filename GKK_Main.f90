@@ -94,7 +94,7 @@ PROGRAM main
 			budget_balance = .true.
 			balance_tau_L  = .false. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW     = .true. ! true=tau_K, false=tau_W
-			
+
 		Simul_Switch  = .false.
 
 
@@ -829,7 +829,7 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 	use omp_lib
 	implicit none 
 	logical, intent(in) :: compute_exp, Simul_Switch
-	real(dp)            :: tauCmin=0.075_dp, tauCindx=0.0_dp, tauCinc=0.05_dp, tauC_up, tauC_low
+	real(dp)            :: tauCmin=0.075_dp, tauCindx=0.0_dp, tauCinc=0.01_dp, tauC_up, tauC_low
 
 	!====================================================================================================
 	PRINT*,''
