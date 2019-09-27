@@ -3085,13 +3085,13 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		PRINT*,''
 		Print*,'--------------- OPTIMAL WEALTH TAXES - Consumption Taxes -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_0.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
     	! CALL Write_Experimental_Results(.false.)
     	! psi = 1.8
 
-    	DO tauindx=0,20,5
+    	DO tauindx=-4,4,1
     		tauw_at     = real(tauindx,8)/1000_DP
             print*, ' '
 			print*, ' Wealth Taxes=',tauw_at
@@ -3101,7 +3101,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			! psi = 1.50_dp 
 
 		    ! DO tauC_ind = 10,15,1
-		    DO tauL_ind = 0,20,5
+		    DO tauL_ind = -4,4,1
 	    		! tauC = 1.0_dp - real(tauC_ind,8)/100.0_dp
 		    	psi  = 1.0_dp - real(tauL_ind,8)/100.0_dp
 		    
@@ -3170,7 +3170,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
 			    	  & 'tauC=', tauC,'psi=',psi
 			     
-		     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax.txt', STATUS='old', POSITION='append') 
+		     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_0.txt', STATUS='old', POSITION='append') 
 			    WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
 			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 			      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
@@ -3206,7 +3206,6 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		! Compute value function and store policy functions, value function and distribution in file
 		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
 		CALL Firm_Value
-		CALL Write_Experimental_Results(.true.)
 		
 		! Aggregate variable in experimental economy
 			GBAR_exp  = GBAR
@@ -3230,14 +3229,23 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			Hours_exp         = Hours
 			Aprime_exp        = Aprime 
 
-		! Compute moments
-		CALL COMPUTE_STATS
-		
-		! Compute welfare gain between economies
-		CALL COMPUTE_WELFARE_GAIN
+			CALL Write_Experimental_Results(.true.)
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			K_mat  = K_Matrix(R,P)
+			Pr_mat = Profit_Matrix(R,P)
+			CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+			CALL ComputeLaborUnits(EBAR,wage)
 
-		! Write experimental results in output.txt
-		CALL WRITE_VARIABLES(0)
+			! Compute moments
+			CALL COMPUTE_STATS
+			
+			! Compute welfare gain between economies
+			CALL COMPUTE_WELFARE_GAIN
+
+			! Write experimental results in output.txt
+			CALL WRITE_VARIABLES(0)
+
+
 
 
 		print*, "Optimal tau_W=", tauW_at, "Optimal psi=", psi
@@ -3258,7 +3266,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
 
 		CLOSE (UNIT=77)
-
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	endif 
 
 
