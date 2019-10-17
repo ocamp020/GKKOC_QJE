@@ -5775,8 +5775,8 @@ SUBROUTINE FIND_DBN_Transition()
 	        	N_dist = max(N_dist,abs(NBAR2_tr(ti)/NBAR_tr(ti)-1))
 
             	! Dampened Update of QBAR and NBAR
-	        	QBAR_tr(ti)  = 0.7*QBAR_tr(ti) + 0.3*QBAR2_tr(ti)
-	        	NBAR_tr(ti)  = 0.7*NBAR_tr(ti) + 0.3*NBAR2_tr(ti)
+	        	QBAR_tr(ti)  = 0.8*QBAR_tr(ti) + 0.2*QBAR2_tr(ti)
+	        	NBAR_tr(ti)  = 0.8*NBAR_tr(ti) + 0.2*NBAR2_tr(ti)
 
         	! Update other prices and quantities             
 	        P_tr(ti)     = alpha* QBAR_tr(ti)**(alpha-mu) * NBAR_tr(ti)**(1.0_DP-alpha)
@@ -5886,8 +5886,8 @@ SUBROUTINE FIND_DBN_Transition()
 	        	N_dist = max(N_dist,abs(NBAR2_tr(T+1)/NBAR_tr(T+1)-1))
 
             	! Dampened Update of QBAR and NBAR
-	        	QBAR_tr(T+1)  = 0.7*QBAR_tr(T+1) + 0.3*QBAR2_tr(T+1)
-	        	NBAR_tr(T+1)  = 0.7*NBAR_tr(T+1) + 0.3*NBAR2_tr(T+1)
+	        	QBAR_tr(T+1)  = 0.8*QBAR_tr(T+1) + 0.2*QBAR2_tr(T+1)
+	        	NBAR_tr(T+1)  = 0.8*NBAR_tr(T+1) + 0.2*NBAR2_tr(T+1)
 
         	! Update other prices and quantities             
 	        P_tr(T+1)     = alpha* QBAR_tr(T+1)**(alpha-mu) * NBAR_tr(T+1)**(1.0_DP-alpha)
