@@ -2839,6 +2839,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		
 		!! Experiment 
 		Pr_mat = Profit_Matrix(R_exp,P_exp)
+		K_mat  = K_Matrix(R_exp,P_exp)
 		CALL ComputeLaborUnits(EBAR_exp,wage_exp)
 		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
 
@@ -5739,7 +5740,12 @@ SUBROUTINE FIND_DBN_Transition()
 			    GBAR_C_tr(ti) 		= GBAR_C 
 			    SSC_Payments_tr(ti) = SSC_Payments
 			    Tot_Lab_Inc_tr(ti) 	= Tot_Lab_Inc
-			    Debt_tr             = Debt_tr*(1+R_tr(ti)) + (GBAR_bench-GBAR_tr(ti)) 
+			    if (ti.eq.1) then 
+			    	Debt_tr         = (GBAR_bench-GBAR_tr(ti)) ! First period debt is equal to  the deficit
+			    else
+			    	Debt_tr         = Debt_tr*(1+R_tr(ti-1)) + (GBAR_bench-GBAR_tr(ti)) ! Debt is equal to  the deficit plus (compunded) previous debt
+			    endif 
+			    
 
 
 	    ! Compute prices and aggregates for the current period (Time: ti)

@@ -86,10 +86,10 @@ PROGRAM main
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
 		Opt_Threshold = .false.
-		Opt_Tau_C = .true.
+		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
 
-		Transition_Tax_Reform = .false.
+		Transition_Tax_Reform = .true.
 		Transition_OT = .false.
 			budget_balance = .true.
 			balance_tau_L  = .false. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
