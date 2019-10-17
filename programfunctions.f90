@@ -5828,7 +5828,7 @@ SUBROUTINE FIND_DBN_Transition()
 			        Wealth_Top_1_Tr(ti)  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
 			        Wealth_Top_10_Tr(ti) = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
 
-	        print*, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr,'Wealth=',K_tr(ti),'R=',R_tr(ti)
+	        print*, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr,'Wealth=',K_tr(ti),'R=',R_tr(ti),'Q=',QBAR2_tr(ti)
     	ENDDO ! Transition Time
 
 		print*,' 	--------------------------------------'
@@ -5862,7 +5862,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    ! Compute prices and aggregates for the current period (Time: T+1)
 	    ! print*,' Updating Prices and Quantities fot T+1'
     		! Compute aggregates with current distribution (Time: T+1)
-	        QBAR2_tr(ti) =0.0
+	        QBAR2_tr(T+1) =0.0
 	        NBAR2_tr(T+1) =0.0
 	        DO x1=1,nx
 	        DO age1=1,MaxAge
@@ -5909,6 +5909,9 @@ SUBROUTINE FIND_DBN_Transition()
 	        ! Compute total assets and consumption
 	        K_tr(T+1) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 	        C_tr(T+1) = sum( DBN1*Cons )
+
+	        print*, 't=',T+1,'Deficit=',(GBAR_bench-GBAR_tr(T+1)),'Debt=',Debt_tr,'Wealth=',K_tr(T+1),'R=',R_tr(T+1),'Q=',QBAR2_tr(T+1)
+	        print*,' '
 
 	        ! Compute top wealth concentration
 	    		DO ai=1,na
