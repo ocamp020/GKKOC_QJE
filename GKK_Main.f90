@@ -3788,10 +3788,6 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	logical, intent(in) :: budget_balance
 	real(dp) :: tauw_bt_0, tauw_at_0
 
-	! Base level for taxes (current experimental value)
-	tauw_bt_0 = tauW_bt_exp 
-	tauw_at_0 = tauW_at_exp 
-
 	! Set step for increments
 	tauWinc_bt=0.000_DP
 	tauWinc_at=0.001_DP
@@ -3801,6 +3797,10 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 
 	! Load Tax Reform Variables
 	call Solve_Experiment(.false.,.false.)
+
+	! Base level for taxes (current experimental value)
+	tauw_bt_0 = tauW_bt_exp 
+	tauw_at_0 = tauW_at_exp 
 
 	if (budget_balance) then 
 
