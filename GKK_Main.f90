@@ -3786,6 +3786,11 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	use omp_lib
 	implicit none 
 	logical, intent(in) :: budget_balance
+	real(dp) :: tauw_bt_0, tauw_at_0
+
+	! Base level for taxes (current experimental value)
+	tauw_bt_0 = tauW_bt_exp 
+	tauw_at_0 = tauW_at_exp 
 
 	! Set step for increments
 	tauWinc_bt=0.000_DP
@@ -3822,8 +3827,8 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
 				! Set old G and new value of tauW
 				GBAR_exp_old = GBAR_exp
-				tauW_bt = tauw_bt_exp + tauWindx * tauWinc_bt
-				tauW_at = tauw_at_exp + tauWindx * tauWinc_at
+				tauW_bt = tauw_bt_0 + tauWindx * tauWinc_bt
+				tauW_at = tauw_at_0 + tauWindx * tauWinc_at
 				print*, 'Bracketing Iteration',tauWindx,'tauW_bt=',tauW_bt*100,"tauW_at=",tauW_at*100
 				! Solve for New Steady State
 				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
