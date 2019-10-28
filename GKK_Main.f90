@@ -2139,7 +2139,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
-	    DO tauindx=25,0,-1
+	    DO tauindx=20,40,1
 	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
             
             tauK        = real(tauindx,8)/100_DP
