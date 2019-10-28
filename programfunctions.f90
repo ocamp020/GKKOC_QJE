@@ -6875,7 +6875,7 @@ SUBROUTINE COMPUTE_STATS()
 	allocate(K_T_Income(MaxAge,na,nz,nlambda,ne,nx))
 	allocate(constrained_firm_ind(MaxAge,na,nz,nlambda,ne,nx))
 
-	!$ call omp_set_num_threads(20)
+	!$ call omp_set_num_threads(5)
 	!$ print *, "OMP Test Message"
 	
 	! Age Brackets
