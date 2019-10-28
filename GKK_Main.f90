@@ -53,9 +53,13 @@ PROGRAM main
 
 	! Capital Market
 		theta_folder = 1.50_dp
-		do zi=1,nz
-		theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
-		enddo
+		if (zi.gt.1) then 
+			do zi=1,nz
+			theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+			enddo
+		else 
+			theta(zi)    = 1.50_dp
+		endif 
 	! Threshold 
 		Threshold_Factor = 0.00_dp 
 
