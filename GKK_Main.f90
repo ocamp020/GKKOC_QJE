@@ -2141,8 +2141,15 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
-	    DO tauindx=25,00,-1
+	    DO tauindx=25,10,-1
 	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
+
+	    	! Load benchmark results and start from there
+		    	DBN1 = DBN_bench
+		    	P    = P_bench
+		    	R    = R_bench
+		    	wage = W_bench
+		    	EBAR = EBAR_bench
             
             tauK        = real(tauindx,8)/100_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
@@ -2221,6 +2228,13 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	    print*, ' '
 
 	 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
+
+	    	! Load benchmark results and start from there
+		    	DBN1 = DBN_bench
+		    	P    = P_bench
+		    	R    = R_bench
+		    	wage = W_bench
+		    	EBAR = EBAR_bench
 
 		tauK = OPT_tauK
 		psi  = OPT_psi
