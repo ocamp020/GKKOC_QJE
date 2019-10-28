@@ -7435,7 +7435,7 @@ SUBROUTINE COMPUTE_STATS()
 	! enddo 
 	print*, 'Total Constrained', 100.0_dp*sum(constrained_firm_ind*DBN1)
 	print*,'Moments',SSE_Moments 
-	!print*,''
+	print*,' '
 
 
 	print*, 'Printing stats in files'
@@ -7530,7 +7530,6 @@ SUBROUTINE COMPUTE_STATS()
 		WRITE(UNIT=19, FMT=*) prctile_ai
 
 	CLOSE(Unit=19)
-	print*, 'Test 1'
 
 	! Leverage and constrained firms 
 		WRITE(UNIT=20, FMT=*) 'Leverage ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', 	&
@@ -7543,7 +7542,6 @@ SUBROUTINE COMPUTE_STATS()
 								& age, size_by_age_z(age,:)
 		enddo 
 	CLOSE(UNIT=20)
-	print*, 'Test 2'
 
 	! Save files of constrained index, output and profits
 	if (solving_bench.eq.1) then
