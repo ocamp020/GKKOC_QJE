@@ -4177,7 +4177,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
 	    	if (sum(theta)/nz .gt. 1.0_DP) then
 	    		P = min(P,1.0_dp)
-	            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R)
+	            brent_value = brent(-0.10_DP,0.02_DP,0.10_DP,Agg_Debt, brent_tol,R)
             else
             	print*,' '
             	print*, 'No Capital Market: Setting R=0'
@@ -4187,7 +4187,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        endif
 
 	    	!!
-	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P,'Res=',brent_value,Agg_Debt(R)
+	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P,'Res=',brent_value
 	    	!!
 
 	    	! Solve the model at current aggregate values
