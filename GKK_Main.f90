@@ -64,7 +64,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
+			compute_bench = .false.
 			compute_exp   = .true.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
@@ -502,8 +502,8 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 
 		print*,"	Computing satitics"
 		CALL COMPUTE_STATS
-		print*,"	Writing variables"
-		!CALL WRITE_VARIABLES(1)
+		print*,"	Writing results in output.txt"
+		CALL WRITE_VARIABLES(1)
 		if (Simul_Switch) then 
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
