@@ -7336,60 +7336,60 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO  
 
 
-		! Distribution of bequest (matrix)	
-		do ai=1,MaxAge
-			DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
-		enddo 
-		DBN_bq = DBN_bq/sum(DBN_bq)
+		! ! Distribution of bequest (matrix)	
+		! do ai=1,MaxAge
+		! 	DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
+		! enddo 
+		! DBN_bq = DBN_bq/sum(DBN_bq)
 		
-		! Vectorization
-		DBN_bq_vec        = reshape(DBN_bq,(/size(DBN1)/))
-		BQ_vec            = reshape(Aprime,(/size(DBN1)/))
+		! ! Vectorization
+		! DBN_bq_vec        = reshape(DBN_bq,(/size(DBN1)/))
+		! BQ_vec            = reshape(Aprime,(/size(DBN1)/))
 
-		! Mean Bequest
-		Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
+		! ! Mean Bequest
+		! Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
 
-		if (solving_bench.eq.1) then
-			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Bench.txt', STATUS='replace')
-		else
-			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Exp.txt', STATUS='replace')
-		end if 
-			WRITE(UNIT=11, FMT=*) ' '
-			WRITE(UNIT=11, FMT=*) 'Bequest_Stats'
-			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/Wealth= '		, Bequest_Wealth/MeanWealth 
-			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/PV_Wealth= '	, Bequest_Wealth/Mean_Firm_Wealth 
-			WRITE(UNIT=11, FMT=*) 'Bequests_Above_Threshold= '	, Threshold_Share_bq
-			WRITE(UNIT=11, FMT=*) 'Bequest_Revenue/YBAR= '		, 0
-			WRITE(UNIT=11, FMT=*) 'Top_x% ','x_percentile ','x_percentile/YBAR'
+		! if (solving_bench.eq.1) then
+		! 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Bench.txt', STATUS='replace')
+		! else
+		! 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Exp.txt', STATUS='replace')
+		! end if 
+		! 	WRITE(UNIT=11, FMT=*) ' '
+		! 	WRITE(UNIT=11, FMT=*) 'Bequest_Stats'
+		! 	WRITE(UNIT=11, FMT=*) 'Mean_Bequest/Wealth= '		, Bequest_Wealth/MeanWealth 
+		! 	WRITE(UNIT=11, FMT=*) 'Mean_Bequest/PV_Wealth= '	, Bequest_Wealth/Mean_Firm_Wealth 
+		! 	WRITE(UNIT=11, FMT=*) 'Bequests_Above_Threshold= '	, Threshold_Share_bq
+		! 	WRITE(UNIT=11, FMT=*) 'Bequest_Revenue/YBAR= '		, 0
+		! 	WRITE(UNIT=11, FMT=*) 'Top_x% ','x_percentile ','x_percentile/YBAR'
 
-		prctile_bq = (/0.90_dp, 0.70_dp, 0.5_dp, 0.30_dp, 0.10_dp, 0.02_dp, 0.01_dp/)
-		a = minval(BQ_vec)
-		b = maxval(BQ_vec) 
-		c = a
-		do i=1,size(prctile_bq)
-			a = c
-			b = maxval(BQ_vec)
-			c = (a+b)/2.0_dp
-			CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-			!print*, ' '
-			!print*, 'Percentile', prctile_bq(i)
-			do while ((abs(CCDF_c-prctile_bq(i))>0.0001_dp).and.(b-a>1e-8))
-				if (CCDF_c<prctile_bq(i)) then 
-					b = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-				else 
-					a = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-				endif
-				!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', abs(CCDF_c-prctile_bq(i))
-			enddo 
-			BQ_top_x(i) = c 
-			WRITE(UNIT=11, FMT=*) 100_dp*prctile_bq(i),BQ_top_x(i),BQ_top_x(i)/YBAR, CCDF_C
-		enddo 
+		! prctile_bq = (/0.90_dp, 0.70_dp, 0.5_dp, 0.30_dp, 0.10_dp, 0.02_dp, 0.01_dp/)
+		! a = minval(BQ_vec)
+		! b = maxval(BQ_vec) 
+		! c = a
+		! do i=1,size(prctile_bq)
+		! 	a = c
+		! 	b = maxval(BQ_vec)
+		! 	c = (a+b)/2.0_dp
+		! 	CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+		! 	!print*, ' '
+		! 	!print*, 'Percentile', prctile_bq(i)
+		! 	do while ((abs(CCDF_c-prctile_bq(i))>0.0001_dp).and.(b-a>1e-8))
+		! 		if (CCDF_c<prctile_bq(i)) then 
+		! 			b = c 
+		! 			c = (a+b)/2.0_dp
+		! 			CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+		! 		else 
+		! 			a = c 
+		! 			c = (a+b)/2.0_dp
+		! 			CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+		! 		endif
+		! 		!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', abs(CCDF_c-prctile_bq(i))
+		! 	enddo 
+		! 	BQ_top_x(i) = c 
+		! 	WRITE(UNIT=11, FMT=*) 100_dp*prctile_bq(i),BQ_top_x(i),BQ_top_x(i)/YBAR, CCDF_C
+		! enddo 
 
-			CLOSE(UNIT=11)
+		! 	CLOSE(UNIT=11)
 
 
 	! ! Frisch Elasticity 
