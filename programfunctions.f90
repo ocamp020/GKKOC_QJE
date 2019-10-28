@@ -4187,7 +4187,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        endif
 
 	    	!!
-	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P
+	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P,'Res=',brent_value,Agg_Debt(R)
 	    	!!
 
 	    	! Solve the model at current aggregate values
