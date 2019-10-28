@@ -7437,6 +7437,8 @@ SUBROUTINE COMPUTE_STATS()
 	print*,'Moments',SSE_Moments 
 	!print*,''
 
+
+	print*, 'Printing stats in files'
 	! Write in files some stats
 	if (solving_bench.eq.1) then
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'Asset_Stats_bench.txt', STATUS='replace')
@@ -7528,6 +7530,7 @@ SUBROUTINE COMPUTE_STATS()
 		WRITE(UNIT=19, FMT=*) prctile_ai
 
 	CLOSE(Unit=19)
+	print*, 'Test 1'
 
 	! Leverage and constrained firms 
 		WRITE(UNIT=20, FMT=*) 'Leverage ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', 	&
@@ -7540,6 +7543,7 @@ SUBROUTINE COMPUTE_STATS()
 								& age, size_by_age_z(age,:)
 		enddo 
 	CLOSE(UNIT=20)
+	print*, 'Test 2'
 
 	! Save files of constrained index, output and profits
 	if (solving_bench.eq.1) then
@@ -7556,7 +7560,9 @@ SUBROUTINE COMPUTE_STATS()
 		WRITE(UNIT=3,FMT=*) Firm_Profit
 		CLOSE(UNIT=1)
 		CLOSE(UNIT=2)
-		CLOSE(UNIT=3)
+		CLOSE(UNIT=3)		
+
+	print*, "End of COMPUTE_STATS"
 
 
 END SUBROUTINE COMPUTE_STATS
