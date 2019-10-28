@@ -73,9 +73,9 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
-			compute_bench = .true.
-			compute_exp   = .true.
+		Tax_Reform    = .false.
+			compute_bench = .false.
+			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .true.
@@ -2187,7 +2187,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 			! Print Results 
 		    print*, 'tauK=', tauK, 'YBAR=', YBAR, & 
-		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
+		    	  & 'CE2_NB=',Av_Util_NB
 		      
 		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
@@ -2205,8 +2206,13 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	    	Call Write_Experimental_Results(.true.)
 	    ENDDO 
 
-	    tauK = OPT_tauK
-		psi  = OPT_psi
+	    print*, ' '
+	    print*, '---------------------------------------------------'
+	    print*, ' '
+	    print*, 'End of opt. tax loop: tauK=',OPT_tauK,'tauL=',1-OPT_psi,'Val=',maxbrentvaluet
+	    print*, ' '
+	    print*, '---------------------------------------------------'
+	    print*, ' '
 
 	 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
 
@@ -2298,7 +2304,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 			! Print Results 
 		    print*, 'tauW=', tauW_at, 'YBAR=', YBAR, & 
-		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
+		    	  & 'CE2_NB=',Av_Util_NB
 		      
 		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
@@ -2316,6 +2323,14 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
       	  	CLOSE (unit=77)
 		    Call Write_Experimental_Results(.true.)
 	    ENDDO 
+
+	    print*, ' '
+	    print*, '---------------------------------------------------'
+	    print*, ' '
+	    print*, 'End of opt. tax loop: tauK=',OPT_tauK,'tauL=',1-OPT_psi,'Val=',maxbrentvaluet
+	    print*, ' '
+	    print*, '---------------------------------------------------'
+	    print*, ' '
 
 
 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w.txt', STATUS='replace')
