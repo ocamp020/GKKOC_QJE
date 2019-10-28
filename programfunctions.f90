@@ -7336,11 +7336,11 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO  
 
 
-		! ! Distribution of bequest (matrix)	
-		! do ai=1,MaxAge
-		! 	DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
-		! enddo 
-		! DBN_bq = DBN_bq/sum(DBN_bq)
+		! Distribution of bequest (matrix)	
+		do ai=1,MaxAge
+			DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
+		enddo 
+		DBN_bq = DBN_bq/sum(DBN_bq)
 		
 		! ! Vectorization
 		! DBN_bq_vec        = reshape(DBN_bq,(/size(DBN1)/))
