@@ -626,10 +626,12 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 			! Set tauW as weighted average of point in  the grid to balance budget more precisely
 				tauW_up_bt  = tauW_bt
 				tauW_low_bt = tauW_bt  -  tauWinc_bt
-				tauW_bt     = tauW_low_bt + tauWinc_bt * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				! tauW_bt     = tauW_low_bt + tauWinc_bt * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				tauW_bt = (tauW_low_bt + tauW_up_bt)/2.0_DP
 				tauW_up_at  = tauW_at
 				tauW_low_at = tauW_at  -  tauWinc_at  
-				tauW_at     = tauW_low_at + tauWinc_at * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				! tauW_at     = tauW_low_at + tauWinc_at * (GBAR_bench - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				tauW_at = (tauW_low_at + tauW_up_at)/2.0_DP
 				print*,''
 				print*,'GBAR bracketed by taxes:'
 				print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
