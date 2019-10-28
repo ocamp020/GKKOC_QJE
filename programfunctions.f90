@@ -6944,55 +6944,55 @@ SUBROUTINE COMPUTE_STATS()
 		prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
 	
 
-	! ! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
-	! ! COMPUTE VARIANCE OF LOG EARNINGS FOR 25-60 FOR THOSE WHO WORK MORE THAN 260 HOURS
-	! ! WHICH CORRESPOND TO 0.055 IN THE MODEL
-	! pop_25_60        	   = 0.0_DP
-	! tothours_25_60         = 0.0_DP
-	! pop_pos_earn_25_60     = 0.0_DP
-	! tot_log_earnings_25_60 = 0.0_DP 
-	! Var_Log_Earnings_25_60 = 0.0_DP
-	! do xi=1,nx
-	! DO age=5,40
-	! DO ai=1,na
-	! DO zi=1,nz
-	! DO lambdai=1,nlambda
-	! DO ei=1,ne
-	! 	tothours_25_60 = tothours_25_60 + DBN1(age, ai, zi, lambdai, ei, xi)  * Hours(age, ai, zi, lambdai,ei,xi)
-	! 	pop_25_60      = pop_25_60 +  DBN1(age, ai, zi, lambdai, ei,xi)
-	! 	IF (Hours(age, ai, zi, lambdai, ei,xi) .ge. 0.055) THEN
-	! 	tot_log_earnings_25_60 = tot_log_earnings_25_60 + DBN1(age, ai, zi, lambdai, ei,xi)  &
-	! 	                 		& *  log( Y_h(Hours(age, ai, zi, lambdai, ei,xi),age,lambdai,ei,wage) )
-	! 	pop_pos_earn_25_60     = pop_pos_earn_25_60 +  DBN1(age, ai, zi, lambdai, ei,xi)
-	! 	ENDIF
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! meanhours_25_60         = tothours_25_60 / pop_25_60
-	! mean_log_earnings_25_60 = tot_log_earnings_25_60 / pop_pos_earn_25_60
+	! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
+	! COMPUTE VARIANCE OF LOG EARNINGS FOR 25-60 FOR THOSE WHO WORK MORE THAN 260 HOURS
+	! WHICH CORRESPOND TO 0.055 IN THE MODEL
+	pop_25_60        	   = 0.0_DP
+	tothours_25_60         = 0.0_DP
+	pop_pos_earn_25_60     = 0.0_DP
+	tot_log_earnings_25_60 = 0.0_DP 
+	Var_Log_Earnings_25_60 = 0.0_DP
+	do xi=1,nx
+	DO age=5,40
+	DO ai=1,na
+	DO zi=1,nz
+	DO lambdai=1,nlambda
+	DO ei=1,ne
+		tothours_25_60 = tothours_25_60 + DBN1(age, ai, zi, lambdai, ei, xi)  * Hours(age, ai, zi, lambdai,ei,xi)
+		pop_25_60      = pop_25_60 +  DBN1(age, ai, zi, lambdai, ei,xi)
+		IF (Hours(age, ai, zi, lambdai, ei,xi) .ge. 0.055) THEN
+		tot_log_earnings_25_60 = tot_log_earnings_25_60 + DBN1(age, ai, zi, lambdai, ei,xi)  &
+		                 		& *  log( Y_h(Hours(age, ai, zi, lambdai, ei,xi),age,lambdai,ei,wage) )
+		pop_pos_earn_25_60     = pop_pos_earn_25_60 +  DBN1(age, ai, zi, lambdai, ei,xi)
+		ENDIF
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	meanhours_25_60         = tothours_25_60 / pop_25_60
+	mean_log_earnings_25_60 = tot_log_earnings_25_60 / pop_pos_earn_25_60
 
-	! DO xi=1,nx
-	! DO age=5,40
-	! DO ai=1,na
-	! DO zi=1,nz
-	! DO lambdai=1,nlambda
-	! DO ei=1,ne
-	! 	IF (Hours(age, ai, zi, lambdai, ei,xi) .ge. 0.055) THEN
-	! 	    Var_Log_Earnings_25_60 =  Var_Log_Earnings_25_60 + DBN1(age, ai, zi, lambdai, ei,xi)  &
-	! 	                 			& * ( log( Y_h(Hours(age, ai, zi, lambdai, ei,xi),age,lambdai,ei,wage) ) &
-	! 	                 			& -   mean_log_earnings_25_60 ) ** 2.0_DP
-	! 	ENDIF
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! Var_Log_Earnings_25_60 = Var_Log_Earnings_25_60 / pop_pos_earn_25_60
-	! Std_Log_Earnings_25_60 = Var_Log_Earnings_25_60 ** 0.5_DP
+	DO xi=1,nx
+	DO age=5,40
+	DO ai=1,na
+	DO zi=1,nz
+	DO lambdai=1,nlambda
+	DO ei=1,ne
+		IF (Hours(age, ai, zi, lambdai, ei,xi) .ge. 0.055) THEN
+		    Var_Log_Earnings_25_60 =  Var_Log_Earnings_25_60 + DBN1(age, ai, zi, lambdai, ei,xi)  &
+		                 			& * ( log( Y_h(Hours(age, ai, zi, lambdai, ei,xi),age,lambdai,ei,wage) ) &
+		                 			& -   mean_log_earnings_25_60 ) ** 2.0_DP
+		ENDIF
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	Var_Log_Earnings_25_60 = Var_Log_Earnings_25_60 / pop_pos_earn_25_60
+	Std_Log_Earnings_25_60 = Var_Log_Earnings_25_60 ** 0.5_DP
 
 	! ! Sources of income
 	! 	Pr_mat = Profit_Matrix(R,P)
