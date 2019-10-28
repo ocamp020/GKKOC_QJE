@@ -63,6 +63,9 @@ PROGRAM main
 		else 
 			theta(zi)    = 1.50_dp
 		endif 
+		print*,' '
+		print*,' Setting theta'
+		print*,' theta=',theta
 	! Threshold 
 		Threshold_Factor = 0.00_dp 
 
