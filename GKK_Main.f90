@@ -2146,6 +2146,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	    	! Load benchmark results and start from there
 		    	DBN1 = DBN_bench
+		    	P    = P_bench
+		    	R    = R_bench
+		    	wage = wage_bench
+		    	EBAR = EBAR_bench
             
             tauK        = real(tauindx,8)/100_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
@@ -2227,6 +2231,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	    	! Load benchmark results and start from there
 		    	DBN1 = DBN_bench
+		    	P    = P_bench
+		    	R    = R_bench
+		    	wage = wage_bench
+		    	EBAR = EBAR_bench
 
 		tauK = OPT_tauK
 		psi  = OPT_psi
