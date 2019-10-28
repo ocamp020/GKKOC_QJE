@@ -2186,9 +2186,15 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			endif
 
 			! Print Results 
+			print*, ' '
+			print*, '---------------------------------------------------'
+			print*, ' '
 		    print*, 'tauK=', tauK, 'YBAR=', YBAR, & 
 		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
 		    	  & 'CE2_NB=',Av_Util_NB
+	    	print*, ' '
+			print*, '---------------------------------------------------'
+			print*, ' '
 		      
 		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
@@ -2303,9 +2309,16 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			endif
 
 			! Print Results 
+			print*, ' '
+			print*, '---------------------------------------------------'
+			print*, ' '
 		    print*, 'tauW=', tauW_at, 'YBAR=', YBAR, & 
 		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
 		    	  & 'CE2_NB=',Av_Util_NB
+	    	print*, ' '
+			print*, '---------------------------------------------------'
+			print*, ' '
+		    
 		      
 		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
