@@ -7338,7 +7338,17 @@ SUBROUTINE COMPUTE_STATS()
 
 		! Distribution of bequest (matrix)	
 		do ai=1,MaxAge
-			DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
+		DO xi=1,nx
+		DO zi=1,nz
+		DO ai=1,na
+		DO lambdai=1,nlambda
+		DO ei=1, ne
+			DBN_bq(age,ai, zi, lambdai, ei, xi) = DBN1(age,ai, zi, lambdai, ei, xi)*(1.0_DP-survP(age))
+		ENDDO
+		ENDDO
+		ENDDO    
+		ENDDO 
+		ENDDO  
 		enddo 
 		DBN_bq = DBN_bq/sum(DBN_bq)
 		
