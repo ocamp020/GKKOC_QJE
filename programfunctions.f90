@@ -7392,33 +7392,33 @@ SUBROUTINE COMPUTE_STATS()
 		! 	CLOSE(UNIT=11)
 
 
-	! Frisch Elasticity 
-	! This is only for agents with positive hours worked
-		Frisch_Elasticity = 0.0_dp
-		Size_Frisch       = 0.0_dp 
-		Hours_Frisch	  = 0.0_dp
-		DO xi=1,nx
-		DO ei=1, ne
-		DO lambdai=1,nlambda
-		DO zi=1,nz
-		DO ai=1,na
-		DO age=1,RetAge-1
-		if (HOURS(age,ai,zi,lambdai,ei,xi).gt.0.001_dp) then 
-		Size_Frisch = Size_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)
-		Frisch_Elasticity = Frisch_Elasticity + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
-		& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
-		Hours_Frisch = Hours_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)*HOURS(age,ai,zi,lambdai,ei,xi)
-		endif 
-		ENDDO
-		ENDDO
-		ENDDO
-		ENDDO
-		ENDDO
-		ENDDO
-		Frisch_Elasticity = Frisch_Elasticity/Size_Frisch
-		Hours_Frisch 	  = Hours_Frisch/Size_Frisch
-		Frisch_Elasticity_2 = (1.0_dp-tauPL)/( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * Hours_Frisch/(1-Hours_Frisch) - tauPL )
-		print*, 'Frisch_Elasticity',Frisch_Elasticity,Frisch_Elasticity_2,Hours_Frisch, Size_Frisch
+	! ! Frisch Elasticity 
+	! ! This is only for agents with positive hours worked
+	! 	Frisch_Elasticity = 0.0_dp
+	! 	Size_Frisch       = 0.0_dp 
+	! 	Hours_Frisch	  = 0.0_dp
+	! 	DO xi=1,nx
+	! 	DO ei=1, ne
+	! 	DO lambdai=1,nlambda
+	! 	DO zi=1,nz
+	! 	DO ai=1,na
+	! 	DO age=1,RetAge-1
+	! 	if (HOURS(age,ai,zi,lambdai,ei,xi).gt.0.001_dp) then 
+	! 	Size_Frisch = Size_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)
+	! 	Frisch_Elasticity = Frisch_Elasticity + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
+	! 	& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
+	! 	Hours_Frisch = Hours_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)*HOURS(age,ai,zi,lambdai,ei,xi)
+	! 	endif 
+	! 	ENDDO
+	! 	ENDDO
+	! 	ENDDO
+	! 	ENDDO
+	! 	ENDDO
+	! 	ENDDO
+	! 	Frisch_Elasticity = Frisch_Elasticity/Size_Frisch
+	! 	Hours_Frisch 	  = Hours_Frisch/Size_Frisch
+	! 	Frisch_Elasticity_2 = (1.0_dp-tauPL)/( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * Hours_Frisch/(1-Hours_Frisch) - tauPL )
+	! 	print*, 'Frisch_Elasticity',Frisch_Elasticity,Frisch_Elasticity_2,Hours_Frisch, Size_Frisch
 		
 
 
