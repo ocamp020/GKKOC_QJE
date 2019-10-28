@@ -2273,7 +2273,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	    print*, ' '
 	    print*, '---------------------------------------------------'
 	    print*, ' '
-	    print*, 'End of opt. tax search: tauK=',OPT_tauK,'tauL=',1-OPT_psi
+	    print*, 'End of opt. tax search: tauK=',OPT_tauK,'tauL=',1-OPT_psi,'Val=', & 
+	    	& - sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
 	    print*, ' '
 	    print*, '---------------------------------------------------'
 	    print*, ' '
