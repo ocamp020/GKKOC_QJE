@@ -26,7 +26,7 @@ MODULE parameters
 
     ! Entrepreneurial ability (z)
     REAL(DP)         	    :: rho_z, sigma_z_eps, mu_z
-    INTEGER(I4B), PARAMETER :: nz=3, nz_aux=3  ! Number of grid points
+    INTEGER(I4B), PARAMETER :: nz=4, nz_aux=4  ! Number of grid points
 
     ! Transitory entrepreneurial ablity (x)
     INTEGER(I4B), PARAMETER :: nx=3
