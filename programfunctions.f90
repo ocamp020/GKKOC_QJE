@@ -7067,61 +7067,61 @@ SUBROUTINE COMPUTE_STATS()
     Mean_K_Return_by_z    = Mean_K_Return_by_z   / Capital_by_z
 
 
-	! VarATReturn = 0.0_DP
-	! VarReturn 	= 0.0_DP
-	! Var_AT_K_Return = 0.0_DP
-	! Var_K_Return 	= 0.0_DP
-	! DO xi=1,nx
-	! DO age=1,MaxAge
-	! DO zi=1,nz
-	! DO ai=1,na
-	! DO lambdai=1,nlambda
-	! DO ei=1, ne  
+	VarATReturn = 0.0_DP
+	VarReturn 	= 0.0_DP
+	Var_AT_K_Return = 0.0_DP
+	Var_K_Return 	= 0.0_DP
+	DO xi=1,nx
+	DO age=1,MaxAge
+	DO zi=1,nz
+	DO ai=1,na
+	DO lambdai=1,nlambda
+	DO ei=1, ne  
 
-	!     VarReturn    = VarReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
-	!     				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/agrid(ai)-MeanReturn)**2.0_dp
+	    VarReturn    = VarReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
+	    				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/agrid(ai)-MeanReturn)**2.0_dp
 
-	!     Var_K_Return = Var_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
-	!     				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp
+	    Var_K_Return = Var_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
+	    				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp
 
-	!     VarATReturn  = VarATReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
-	!     				& ((YGRID(ai,zi,xi)-agrid(ai))/agrid(ai)-MeanATReturn)**2.0_dp 
+	    VarATReturn  = VarATReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
+	    				& ((YGRID(ai,zi,xi)-agrid(ai))/agrid(ai)-MeanATReturn)**2.0_dp 
 
-	!     Var_AT_K_Return  = Var_AT_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
-	!     				& ((YGRID(ai,zi,xi)-agrid(ai))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp 
+	    Var_AT_K_Return  = Var_AT_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
+	    				& ((YGRID(ai,zi,xi)-agrid(ai))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp 
 	    
-	!     !VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
-	!     !				& ((MBGRID(ai,zi)-1.0_DP)-MeanATReturn)**2.0_dp
+	    !VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+	    !				& ((MBGRID(ai,zi)-1.0_DP)-MeanATReturn)**2.0_dp
 
-	!     !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
-	! 	!    VarReturn = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * (R-MeanReturn)**2.0_dp
-	!    	!else
-	! 	!	VarReturn = VarReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * & 
-	! 	!				& (( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) -MeanReturn)**2.0_dp
-	!    	!endif  
+	    !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
+		!    VarReturn = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * (R-MeanReturn)**2.0_dp
+	   	!else
+		!	VarReturn = VarReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * & 
+		!				& (( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) -MeanReturn)**2.0_dp
+	   	!endif  
 
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! ENDDO    
-	! ENDDO    
-	! ENDDO  
-	! StdATReturn     = VarATReturn**0.5_DP
-	! StdReturn       = VarReturn**0.5_DP
-	! Std_AT_K_Return = Var_AT_K_Return**0.5_DP
-	! Std_K_Return    = Var_K_Return**0.5_DP
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO    
+	ENDDO    
+	ENDDO  
+	StdATReturn     = VarATReturn**0.5_DP
+	StdReturn       = VarReturn**0.5_DP
+	Std_AT_K_Return = Var_AT_K_Return**0.5_DP
+	Std_K_Return    = Var_K_Return**0.5_DP
 
 
- !    ! Debt to GDP Ratio
- !    External_Debt_GDP = 0.0_DP
-	! DO xi=1,nx
-	! DO zi=1,nz
-	! DO ai=1,na
-	!     External_Debt_GDP = External_Debt_GDP + sum(DBN1(:, ai, zi, :, :,xi))*abs(K_mat(ai,zi,xi)-agrid(ai))
-	! ENDDO
-	! ENDDO
-	! ENDDO
-	! External_Debt_GDP = 0.5_dp*External_Debt_GDP / YBAR
+    ! Debt to GDP Ratio
+    External_Debt_GDP = 0.0_DP
+	DO xi=1,nx
+	DO zi=1,nz
+	DO ai=1,na
+	    External_Debt_GDP = External_Debt_GDP + sum(DBN1(:, ai, zi, :, :,xi))*abs(K_mat(ai,zi,xi)-agrid(ai))
+	ENDDO
+	ENDDO
+	ENDDO
+	External_Debt_GDP = 0.5_dp*External_Debt_GDP / YBAR
 
 	! ! Savings Rate
 	! group 	 = 1
