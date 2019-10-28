@@ -7336,18 +7336,18 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO  
 
 
-		! Distribution of bequest (matrix)	
-		do ai=1,MaxAge
-			DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
-		enddo 
-		DBN_bq = DBN_bq/sum(DBN_bq)
+		! ! Distribution of bequest (matrix)	
+		! do ai=1,MaxAge
+		! 	DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
+		! enddo 
+		! DBN_bq = DBN_bq/sum(DBN_bq)
 		
-		! Vectorization
-		DBN_bq_vec        = reshape(DBN_bq,(/size(DBN1)/))
-		BQ_vec            = reshape(Aprime,(/size(DBN1)/))
+		! ! Vectorization
+		! DBN_bq_vec        = reshape(DBN_bq,(/size(DBN1)/))
+		! BQ_vec            = reshape(Aprime,(/size(DBN1)/))
 
-		! Mean Bequest
-		Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
+		! ! Mean Bequest
+		! Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
 
 		! if (solving_bench.eq.1) then
 		! 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Bench.txt', STATUS='replace')
