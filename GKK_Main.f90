@@ -57,8 +57,9 @@ PROGRAM main
 			! do zi=1,nz
 			! theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 			! enddo
-			print*, 'Code hardwired for nz=1, if nz>1 uncomment the lines above.'
-			STOP 
+			theta(zi)    = 1.50_dp
+			! print*, 'Code hardwired for nz=1, if nz>1 uncomment the lines above.'
+			! STOP 
 		else 
 			theta(zi)    = 1.50_dp
 		endif 
