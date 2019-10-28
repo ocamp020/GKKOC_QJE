@@ -2230,10 +2230,14 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 		tauK = OPT_tauK
 		psi  = OPT_psi
-		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.01_dp,Opt_TauK+0.01_dp) 
 
-		tauK     = OPT_tauK
-		OPT_psi  = psi
+		! call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.01_dp,Opt_TauK+0.01_dp) 
+		! tauK     = OPT_tauK
+		! OPT_psi  = psi
+			! If not finding Opt tax then solve at current optimal value
+			CALL FIND_DBN_EQ
+			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+			CALL GOVNT_BUDGET(.true.)
 
             ! Aggregate variable in experimental economy
 				GBAR_exp  = GBAR
@@ -2258,8 +2262,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 				Aprime_exp        = Aprime 
 
 		! Compute moments
-		CALL COMPUTE_STATS
-		CALL GOVNT_BUDGET(.true.)
+		CALL COMPUTE_STATS	
 		
 		! Compute welfare gain between economies
 		CALL COMPUTE_WELFARE_GAIN

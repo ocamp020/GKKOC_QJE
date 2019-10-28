@@ -1633,6 +1633,14 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 				& 	            sum(ValueFunction_Bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:)) ) &
 				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 
+	print*,''
+	print*,'---------------------------'
+	print*,''
+	print*,'CE2_NB=',Av_Util_NB
+	print*,'CE2_Pop=',Av_Util_Pop
+	print*,''
+	print*,'---------------------------'
+
 
 	! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	! !! Draft Tables
