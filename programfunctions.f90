@@ -7336,18 +7336,18 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO  
 
 
-		! ! Distribution of bequest (matrix)	
-		! do ai=1,MaxAge
-		! 	DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
-		! enddo 
-		! DBN_bq = DBN_bq/sum(DBN_bq)
+		! Distribution of bequest (matrix)	
+		do ai=1,MaxAge
+			DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
+		enddo 
+		DBN_bq = DBN_bq/sum(DBN_bq)
 		
-		! ! Vectorization
-		! DBN_bq_vec        = reshape(DBN_bq,(/size(DBN1)/))
-		! BQ_vec            = reshape(Aprime,(/size(DBN1)/))
+		! Vectorization
+		DBN_bq_vec        = reshape(DBN_bq,(/size(DBN1)/))
+		BQ_vec            = reshape(Aprime,(/size(DBN1)/))
 
-		! ! Mean Bequest
-		! Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
+		! Mean Bequest
+		Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
 
 		! if (solving_bench.eq.1) then
 		! 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Bench.txt', STATUS='replace')
@@ -7392,33 +7392,33 @@ SUBROUTINE COMPUTE_STATS()
 		! 	CLOSE(UNIT=11)
 
 
-	! ! Frisch Elasticity 
-	! ! This is only for agents with positive hours worked
-	! 	Frisch_Elasticity = 0.0_dp
-	! 	Size_Frisch       = 0.0_dp 
-	! 	Hours_Frisch	  = 0.0_dp
-	! 	DO xi=1,nx
-	! 	DO ei=1, ne
-	! 	DO lambdai=1,nlambda
-	! 	DO zi=1,nz
-	! 	DO ai=1,na
-	! 	DO age=1,RetAge-1
-	! 	if (HOURS(age,ai,zi,lambdai,ei,xi).gt.0.001_dp) then 
-	! 	Size_Frisch = Size_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)
-	! 	Frisch_Elasticity = Frisch_Elasticity + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
-	! 	& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
-	! 	Hours_Frisch = Hours_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)*HOURS(age,ai,zi,lambdai,ei,xi)
-	! 	endif 
-	! 	ENDDO
-	! 	ENDDO
-	! 	ENDDO
-	! 	ENDDO
-	! 	ENDDO
-	! 	ENDDO
-	! 	Frisch_Elasticity = Frisch_Elasticity/Size_Frisch
-	! 	Hours_Frisch 	  = Hours_Frisch/Size_Frisch
-	! 	Frisch_Elasticity_2 = (1.0_dp-tauPL)/( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * Hours_Frisch/(1-Hours_Frisch) - tauPL )
-	! 	print*, 'Frisch_Elasticity',Frisch_Elasticity,Frisch_Elasticity_2,Hours_Frisch, Size_Frisch
+	! Frisch Elasticity 
+	! This is only for agents with positive hours worked
+		Frisch_Elasticity = 0.0_dp
+		Size_Frisch       = 0.0_dp 
+		Hours_Frisch	  = 0.0_dp
+		DO xi=1,nx
+		DO ei=1, ne
+		DO lambdai=1,nlambda
+		DO zi=1,nz
+		DO ai=1,na
+		DO age=1,RetAge-1
+		if (HOURS(age,ai,zi,lambdai,ei,xi).gt.0.001_dp) then 
+		Size_Frisch = Size_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)
+		Frisch_Elasticity = Frisch_Elasticity + DBN1(age,ai,zi,lambdai,ei,xi)*(1.0_dp-tauPL)/ &
+		& ( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * HOURS(age,ai,zi,lambdai,ei,xi)/(1-HOURS(age,ai,zi,lambdai,ei,xi)) - tauPL )
+		Hours_Frisch = Hours_Frisch + DBN1(age,ai,zi,lambdai,ei,xi)*HOURS(age,ai,zi,lambdai,ei,xi)
+		endif 
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		Frisch_Elasticity = Frisch_Elasticity/Size_Frisch
+		Hours_Frisch 	  = Hours_Frisch/Size_Frisch
+		Frisch_Elasticity_2 = (1.0_dp-tauPL)/( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * Hours_Frisch/(1-Hours_Frisch) - tauPL )
+		print*, 'Frisch_Elasticity',Frisch_Elasticity,Frisch_Elasticity_2,Hours_Frisch, Size_Frisch
 		
 
 
