@@ -92,7 +92,7 @@ PROGRAM main
 		compute_exp_fixed_prices_and_taxes = .false.
 
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
 		Opt_Threshold = .false.
@@ -2241,10 +2241,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	    ! 	wage = wage_bench
 	    ! 	EBAR = EBAR_bench
 	    ! 	psi  = psi_bench		
-
 		! call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.01_dp,Opt_TauK+0.01_dp) 
 		! tauK     = OPT_tauK
 		! OPT_psi  = psi
+
 			! If not finding Opt tax then solve at current optimal value
 			Call Write_Experimental_Results(.false.)
 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
@@ -2328,6 +2328,14 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	    DO tauindx=00,30,1
 	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='old', POSITION='append')
 
+	    	! Load benchmark results and start from there
+		    	DBN1 = DBN_bench
+		    	P    = P_bench
+		    	R    = R_bench
+		    	wage = wage_bench
+		    	EBAR = EBAR_bench
+		    	psi  = psi_bench
+
             tauw_at     = real(tauindx,8)/1000_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
@@ -2367,6 +2375,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		        maxbrentvaluet = brentvaluet
 				OPT_tauW = tauW_at
 				OPT_psi  = psi
+				Call Write_Experimental_Results(.true.)
 			endif
 
 			! Print Results 
@@ -2395,7 +2404,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet
 
       	  	CLOSE (unit=77)
-		    Call Write_Experimental_Results(.true.)
+		    
 	    ENDDO 
 
 	    print*, ' '
@@ -2409,49 +2418,61 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w.txt', STATUS='replace')
 
-	    ! opt_psi = 0.860830826876844_dp 
-	    ! Opt_TauW = 0.031_dp 
+	    
 		tauW_at = OPT_tauW
 		psi     = OPT_psi
-		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.001_dp,Opt_TauW+0.001_dp)
 
-		! tauW_at = 0.025_dp
-		! call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,0.023_dp,0.028_dp)
+		! ! Load benchmark results and start from there
+	    ! 	DBN1 = DBN_bench
+	    ! 	P    = P_bench
+	    ! 	R    = R_bench
+	    ! 	wage = wage_bench
+	    ! 	EBAR = EBAR_bench
+	    ! 	psi  = psi_bench		
+		! call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.001_dp,Opt_TauW+0.001_dp)
+		! tauW_at = OPT_tauW
+		! OPT_psi = psi
 
-		tauW_at = OPT_tauW
-		OPT_psi = psi
+			! If not finding Opt tax then solve at current optimal value
+			Call Write_Experimental_Results(.false.)
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			K_mat  = K_Matrix(R,P)
+			Pr_mat = Profit_Matrix(R,P)
+			CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+			CALL ComputeLaborUnits(EBAR,wage)
+			CALL GOVNT_BUDGET(.true.)
 
-            ! Aggregate variable in experimental economy
-				GBAR_exp  = GBAR
-				QBAR_exp  = QBAR 
-				NBAR_exp  = NBAR  
-				Y_exp 	  = YBAR
-				Ebar_exp  = EBAR
-				P_exp     = P
-				R_exp	  = R
-				wage_exp  = wage
-				tauK_exp  = tauK
-				tauPL_exp = tauPL
-				psi_exp   = psi
-				DBN_exp   = DBN1
-				tauw_bt_exp = tauW_bt
-				tauw_at_exp = tauW_at
-				Y_a_threshold_exp = Y_a_threshold
+        ! Aggregate variable in experimental economy
+			GBAR_exp  = GBAR
+			QBAR_exp  = QBAR 
+			NBAR_exp  = NBAR  
+			Y_exp 	  = YBAR
+			Ebar_exp  = EBAR
+			P_exp     = P
+			R_exp	  = R
+			wage_exp  = wage
+			tauK_exp  = tauK
+			tauPL_exp = tauPL
+			psi_exp   = psi
+			DBN_exp   = DBN1
+			tauw_bt_exp = tauW_bt
+			tauw_at_exp = tauW_at
+			Y_a_threshold_exp = Y_a_threshold
 
-				ValueFunction_exp = ValueFunction
-				Cons_exp          = Cons           
-				Hours_exp         = Hours
-				Aprime_exp        = Aprime 
+			ValueFunction_exp = ValueFunction
+			Cons_exp          = Cons           
+			Hours_exp         = Hours
+			Aprime_exp        = Aprime 
 
 		! Compute moments
-		CALL COMPUTE_STATS
-		CALL GOVNT_BUDGET(.true.)
+		CALL COMPUTE_STATS	
 		
 		! Compute welfare gain between economies
 		CALL COMPUTE_WELFARE_GAIN
 
 		! Write experimental results in output.txt
 		CALL WRITE_VARIABLES(0)
+
 
 	    print*, ' '
 	    print*, '---------------------------------------------------'
