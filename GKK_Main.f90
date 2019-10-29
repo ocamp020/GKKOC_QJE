@@ -709,7 +709,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		V_Pr_nb_exp  	  = V_Pr_nb
 
 	! Compute moments
-	! CALL COMPUTE_STATS
+	CALL COMPUTE_STATS
 	
 	! Compute welfare gain between economies
 	CALL COMPUTE_WELFARE_GAIN
