@@ -2150,6 +2150,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		    	R    = R_bench
 		    	wage = wage_bench
 		    	EBAR = EBAR_bench
+		    	psi  = psi_bench
             
             tauK        = real(tauindx,8)/100_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
@@ -2190,6 +2191,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		        maxbrentvaluet = brentvaluet
 				OPT_tauK = tauK
 				OPT_psi  = psi
+				Call Write_Experimental_Results(.true.)
 			endif
 
 			! Print Results 
@@ -2216,7 +2218,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
 		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet
 	      	CLOSE (unit=77) 
-	    	Call Write_Experimental_Results(.true.)
+
 	    ENDDO 
 
 	    print*, ' '
@@ -2229,45 +2231,50 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
 
-	    	! Load benchmark results and start from there
-		    	DBN1 = DBN_bench
-		    	P    = P_bench
-		    	R    = R_bench
-		    	wage = wage_bench
-		    	EBAR = EBAR_bench
-
-		tauK = OPT_tauK
+	 	tauK = OPT_tauK
 		psi  = OPT_psi
+
+    	! ! Load benchmark results and start from there
+	    ! 	DBN1 = DBN_bench
+	    ! 	P    = P_bench
+	    ! 	R    = R_bench
+	    ! 	wage = wage_bench
+	    ! 	EBAR = EBAR_bench
+	    ! 	psi  = psi_bench		
 
 		! call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.01_dp,Opt_TauK+0.01_dp) 
 		! tauK     = OPT_tauK
 		! OPT_psi  = psi
 			! If not finding Opt tax then solve at current optimal value
-			CALL FIND_DBN_EQ
-			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+			Call Write_Experimental_Results(.false.)
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			K_mat  = K_Matrix(R,P)
+			Pr_mat = Profit_Matrix(R,P)
+			CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+			CALL ComputeLaborUnits(EBAR,wage)
 			CALL GOVNT_BUDGET(.true.)
 
-            ! Aggregate variable in experimental economy
-				GBAR_exp  = GBAR
-				QBAR_exp  = QBAR 
-				NBAR_exp  = NBAR  
-				Y_exp 	  = YBAR
-				Ebar_exp  = EBAR
-				P_exp     = P
-				R_exp	  = R
-				wage_exp  = wage
-				tauK_exp  = tauK
-				tauPL_exp = tauPL
-				psi_exp   = psi
-				DBN_exp   = DBN1
-				tauw_bt_exp = tauW_bt
-				tauw_at_exp = tauW_at
-				Y_a_threshold_exp = Y_a_threshold
+        ! Aggregate variable in experimental economy
+			GBAR_exp  = GBAR
+			QBAR_exp  = QBAR 
+			NBAR_exp  = NBAR  
+			Y_exp 	  = YBAR
+			Ebar_exp  = EBAR
+			P_exp     = P
+			R_exp	  = R
+			wage_exp  = wage
+			tauK_exp  = tauK
+			tauPL_exp = tauPL
+			psi_exp   = psi
+			DBN_exp   = DBN1
+			tauw_bt_exp = tauW_bt
+			tauw_at_exp = tauW_at
+			Y_a_threshold_exp = Y_a_threshold
 
-				ValueFunction_exp = ValueFunction
-				Cons_exp          = Cons           
-				Hours_exp         = Hours
-				Aprime_exp        = Aprime 
+			ValueFunction_exp = ValueFunction
+			Cons_exp          = Cons           
+			Hours_exp         = Hours
+			Aprime_exp        = Aprime 
 
 		! Compute moments
 		CALL COMPUTE_STATS	
