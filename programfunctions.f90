@@ -8821,7 +8821,7 @@ SUBROUTINE  INITIALIZE()
 	
 	! Initiliaze grids for z, lamda and e	
 		CALL tauchen(mtauchen_z,rho_z,sigma_z_eps,nz_aux,zgrid_aux,pr_z_aux,Gz_aux)
-		CALL tauchen(mtauchen_z,rho_e,sigma_e_eps,ne,egrid,pr_e,Ge)
+		CALL tauchen(mtauchen,rho_e,sigma_e_eps,ne,egrid,pr_e,Ge)
 		CALL tauchen(mtauchen,rho_lambda,sigma_lambda_eps,nlambda,lambdagrid,pr_lambda,Glambda)
 
 		! Tauchen gives grids for the log of the variables. Exponentiate to adjust
