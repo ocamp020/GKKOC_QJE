@@ -139,7 +139,7 @@ PROGRAM main
 		rho_z  	= 0.1_dp ! params(3) 
 		sigma_z_eps      =  0.072_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
 		sigma_lambda_eps = 0.305_dp ! params(5)
-		gamma  	=  0.475_dp ! 0.46_dp (Baseline calibration)
+		gamma  	=  0.477_dp ! 0.46_dp (Baseline calibration)
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
 		
 		sigma  	= 4.0_dp
