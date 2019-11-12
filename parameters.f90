@@ -22,7 +22,7 @@ MODULE parameters
 
     ! Transitory labor earnings componenet (e)
     REAL(DP), PARAMETER  	:: rho_e=0.95_DP, sigma_e_eps=0.20_DP
-    INTEGER(I4B), PARAMETER :: ne=9              ! Number of grid points
+    INTEGER(I4B), PARAMETER :: ne=7              ! Number of grid points
 
     ! Entrepreneurial ability (z)
     REAL(DP)         	    :: rho_z, sigma_z_eps, mu_z
