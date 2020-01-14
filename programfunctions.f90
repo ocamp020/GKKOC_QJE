@@ -6122,7 +6122,7 @@ SUBROUTINE EGM_Transition()
 
 	! Solve backwards for all transition periods
 	do ti=T,1,-1
-		! print*,' Solving EGM for transition period ',ti
+		print*,' Solving EGM for transition period ',ti
 
 
 	! Grids and auxiliary variables, must be solved per period 
@@ -6360,11 +6360,14 @@ SUBROUTINE EGM_Transition()
 	ENDDO ! zi
     ENDDO !age
 
+
+    print*, ' 			Retirement Period Ends'
 	!------RETIREMENT PERIOD ENDS------------------------------------------------------------
 	!========================================================================================
 	
 	!========================================================================================
 	!------Working Period Starts-------------------------------------------------------------
+	print*, ' 			Working Period Starts'
 
 	DO age=RetAge-1,1,-1
 		! print*,' 	Age=',age
@@ -6626,6 +6629,8 @@ SUBROUTINE EGM_Transition()
 	ENDDO !zi
     ENDDO !age
 
+
+    print*, ' 			Clean-up and Interpolation'
 
     ! Update value for "next period's" policy functions
     Cons_t_pr   = Cons_t   ;
