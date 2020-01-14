@@ -5544,15 +5544,16 @@ SUBROUTINE FIND_DBN_Transition()
 	    ! Solve for policy functions by backwards induction and EGM
 	    	! Output is policy functions for all times and all ages
 	    	CALL EGM_Transition
+	    	print*, ' '
 
 	    ! First Period Starts at DBN_bench
-	    ! print*, ' Set DBN_tr for first period to benchmark distribution'
+	    print*, ' Set DBN_tr for first period to benchmark distribution'
 	    DBN_tr(:,:,:,:,:,:,1) = DBN_bench
 
 
 
 		! Initialize DBN_tr to zero for other periods
-		! print*, ' Initializing remaining periods of DBN_tr to zero'
+		print*, ' Initializing remaining periods of DBN_tr to zero'
 		! DO ti=2,T+1
 		! 	! print*,' 	Transition Period',ti
 	 	! 		DBN_tr(:,:,:,:,:,:,ti)=0.0_DP
@@ -5565,7 +5566,7 @@ SUBROUTINE FIND_DBN_Transition()
 		print*,' 	--------------------------------------'
 	    ! Fill in other periods starting at DBN bench following policy functions
 	    DO ti=1,T
-	    	! print*,' 	Transition Period ',ti
+	    	print*,' 	Transition Period ',ti
 
 
 		! Discretize policy function for assets (a') for current period
@@ -6126,7 +6127,7 @@ SUBROUTINE EGM_Transition()
 
 	! Solve backwards for all transition periods
 	do ti=T,1,-1
-		print*,' Solving EGM for transition period ',ti
+		! print*,' Solving EGM for transition period ',ti
 
 
 	! Grids and auxiliary variables, must be solved per period 
@@ -6365,13 +6366,13 @@ SUBROUTINE EGM_Transition()
     ENDDO !age
 
 
-    print*, ' 			Retirement Period Ends'
+    ! print*, ' 			Retirement Period Ends'
 	!------RETIREMENT PERIOD ENDS------------------------------------------------------------
 	!========================================================================================
 	
 	!========================================================================================
 	!------Working Period Starts-------------------------------------------------------------
-	print*, ' 			Working Period Starts'
+	! print*, ' 			Working Period Starts'
 
 	DO age=RetAge-1,1,-1
 		! print*,' 	Age=',age
@@ -6634,7 +6635,7 @@ SUBROUTINE EGM_Transition()
     ENDDO !age
 
 
-    print*, ' 			Clean-up and Interpolation'
+    ! print*, ' 			Clean-up and Interpolation'
 
     ! Update value for "next period's" policy functions
     Cons_t_pr   = Cons_t   ;
