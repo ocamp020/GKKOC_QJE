@@ -6040,7 +6040,8 @@ SUBROUTINE FIND_DBN_Transition()
 		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,' Q_dist=',Q_dist,' N_dist=',N_dist,&
 		    	&' Q(T)/Q(SS)=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N(T)/N(SS)=',100*(NBAR2_tr(T+1)/NBAR_exp-1),&
 		    	&' Chg_dist=',Chg_dist
-	    	print*,'	GBAR_exp=',GBAR_tr(T+1),'Debt/GDP=',Debt_tr(T+1)/YBAR_tr(T+1),'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr(T+1)
+	    	print*,'	GBAR_exp=',GBAR_tr(T+1),'Debt/GDP=',Debt_tr(T+1)/YBAR_tr(T+1),&
+	    		&'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr(T+1)
 
 	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
 	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,N_dist,100*(QBAR2_tr(T+1)/QBAR_exp-1),100*(NBAR2_tr(T+1)/NBAR_exp-1)
@@ -9203,12 +9204,13 @@ Function Agg_Debt_Tr(R_in)
 	real(dp), dimension(na,nz,nx) :: K_mat
 	real(dp)             :: Wealth
 	INTEGER :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, x1, x2
-	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Ap_aux, DBN_aux
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Ap_aux, DBN_aux, DBN_2
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
 
-	allocate( Ap_aux(MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( DBN_aux(MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Ap_aux(     MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( DBN_aux(    MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( DBN_2(      MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( PrAprimehi( MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( PrAprimelo( MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Aplo(       MaxAge,na,nz,nlambda,ne,nx) )
@@ -9216,6 +9218,8 @@ Function Agg_Debt_Tr(R_in)
 
 	! Initialize new distribution
 	DBN_aux = 0.0_dp
+	! Set previous distribution 
+	DBN_2   = DBN_tr(:,:,:,:,:,:,ti-1)
 
 	! Compute auxiliary distribution of assets 
 	if (ti.ge.2) then
@@ -9281,11 +9285,11 @@ Function Agg_Debt_Tr(R_in)
 	        DO lambda2=1,nlambda
 	        	DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
 	           		& DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1 ) + &
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti-1) &
+	           		& DBN_2(age1, a1, z1, lambda1, e1, x1) &
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
 	            DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
 	           		& DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1 ) + &
-	           		&  DBN_tr(age1, a1, z1, lambda1, e1, x1,ti-1) & 
+	           		&  DBN_2(age1, a1, z1, lambda1, e1, x1) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
@@ -9307,11 +9311,11 @@ Function Agg_Debt_Tr(R_in)
 	        DO lambda2=1,nlambda
 	        	DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
 	           		& DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + &
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti-1) &
+	           		& DBN_2(age1, a1, z1, lambda1, e1, x1) &
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
 	            DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
 	           		& DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + &
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti-1) & 
+	           		& DBN_2(age1, a1, z1, lambda1, e1, x1) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
@@ -9321,11 +9325,11 @@ Function Agg_Debt_Tr(R_in)
 	        DO x2=1,nx
 		        DBN_aux(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) =  &
 		        	& DBN_aux(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) + &
-		        	& DBN_tr(age1, a1, z1, lambda1, e1,x1,ti-1) &
+		        	& DBN_2(age1, a1, z1, lambda1, e1,x1) &
 		            & * survP(age1) * PrAprimelo(age1,a1,z1,lambda1,e1,x1) * pr_x(x1,x2,z1,age1)     
 		        DBN_aux(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) =  &
 		          	& DBN_aux(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) + &
-		          	& DBN_tr(age1, a1, z1, lambda1, e1,x1,ti-1) &
+		          	& DBN_2(age1, a1, z1, lambda1, e1,x1) &
 		            & * survP(age1) * PrAprimehi(age1,a1,z1,lambda1,e1,x1) * pr_x(x1,x2,z1,age1)  
 	        ENDDO
 	    ENDDO
@@ -9347,11 +9351,11 @@ Function Agg_Debt_Tr(R_in)
 	        DO lambda2=1,nlambda
 	        	DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
 	           		& DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + & 
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti-1) &
+	           		& DBN_2(age1, a1, z1, lambda1, e1, x1) &
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
 	            DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
 	           		& DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + & 
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti-1) & 
+	           		& DBN_2(age1, a1, z1, lambda1, e1, x1) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
@@ -9361,11 +9365,11 @@ Function Agg_Debt_Tr(R_in)
 	        DO e2=1,ne
 				DBN_aux(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) =  &
 	          		& DBN_aux(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) + &
-	          		& DBN_tr(age1, a1, z1, lambda1, e1,x1,ti-1) &
+	          		& DBN_2(age1, a1, z1, lambda1, e1,x1) &
 	                & * survP(age1) * pr_e(e1,e2) * pr_x(x1,x2,z1,age1) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
 	            DBN_aux(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) =  &
 	          		& DBN_aux(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) + &
-	          		& DBN_tr(age1, a1, z1, lambda1, e1,x1,ti-1) &
+	          		& DBN_2(age1, a1, z1, lambda1, e1,x1) &
 	                & * survP(age1) * pr_e(e1,e2) * pr_x(x1,x2,z1,age1) * PrAprimehi(age1,a1,z1,lambda1,e1,x1) 
 	        ENDDO
 	        ENDDO
@@ -9381,7 +9385,7 @@ Function Agg_Debt_Tr(R_in)
 		! In first period there is no updating with R 
 		! Change is a shock and not anticipated
 		DBN_aux = DBN_bench
-		
+
 	endif 
 
 
