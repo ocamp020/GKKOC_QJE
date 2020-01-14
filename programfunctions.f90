@@ -5831,6 +5831,10 @@ SUBROUTINE FIND_DBN_Transition()
 			        Wealth_Top_1_Tr(ti)  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
 			        Wealth_Top_10_Tr(ti) = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
 
+	        print*, '	Prices and Dampening'
+	        print*, '		Q_full=',QBAR2_tr(ti),'Q_tr=',QBAR_tr(ti)
+	        print*, '		N_full=',NBAR2_tr(ti),'N_tr=',NBAR_tr(ti)
+	        print*, '		R_full=',R2_tr(ti),'R_tr=',R_tr(ti)
 
 	        print*, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr(ti),'Wealth=',K_tr(ti),'R=',R_tr(ti),'Q=',QBAR2_tr(ti)
     	ENDDO ! Transition Time
