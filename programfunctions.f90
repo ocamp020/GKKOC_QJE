@@ -5547,13 +5547,13 @@ SUBROUTINE FIND_DBN_Transition()
 	    	print*, ' '
 
 	    ! First Period Starts at DBN_bench
-	    print*, ' Set DBN_tr for first period to benchmark distribution'
+	    ! print*, ' Set DBN_tr for first period to benchmark distribution'
 	    DBN_tr(:,:,:,:,:,:,1) = DBN_bench
 
 
 
 		! Initialize DBN_tr to zero for other periods
-		print*, ' Initializing remaining periods of DBN_tr to zero'
+		! print*, ' Initializing remaining periods of DBN_tr to zero'
 		! DO ti=2,T+1
 		! 	! print*,' 	Transition Period',ti
 	 	! 		DBN_tr(:,:,:,:,:,:,ti)=0.0_DP
@@ -5770,7 +5770,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 
 	    	! Solve for new R (that clears market under new guess for prices)
-	    	print*, '		Solving for equilibrium interest rate (R)'
+	    	print*, '	Solving for equilibrium interest rate (R)'
 	    		! Save old R for updating 
 	    		R_old = R_tr(ti)
 	    	if (sum(theta)/nz .gt. 1.0_DP) then
@@ -5780,6 +5780,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    		DBN1  = DBN_tr(:,:,:,:,:,:,ti)
 	            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(ti))
 	            	! Usually brent_tol=0.00000001_DP
+	            	print*, ' 		Error=',brent_value,'R_out=',R2_tr(ti)
             else
                 R2_tr(ti) = 0.0_DP
 	        endif
@@ -5841,8 +5842,10 @@ SUBROUTINE FIND_DBN_Transition()
 	        print*, '		Q_full=',QBAR2_tr(ti),'Q_tr=',QBAR_tr(ti)
 	        print*, '		N_full=',NBAR2_tr(ti),'N_tr=',NBAR_tr(ti)
 	        print*, '		R_full=',R2_tr(ti),'R_tr=',R_tr(ti)
+	        print*, ' '
 
 	        print*, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr(ti),'Wealth=',K_tr(ti),'R=',R_tr(ti),'Q=',QBAR2_tr(ti)
+	        print*, ' '
     	ENDDO ! Transition Time
 
 		print*,' 	--------------------------------------'
@@ -5898,7 +5901,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        Ebar_tr(T+1)  = wage_tr(T+1)  * NBAR_tr(T+1) * sum(pop)/sum(pop(1:RetAge-1))
 
 	    	! Solve for new R (that clears market under new guess for prices)
-	    	print*, '		Solving for equilibrium interest rate (R)'
+	    	print*, '	Solving for equilibrium interest rate (R)'
 	    		! Save old R for updating 
 	    		R_old = R_tr(ti)
 	    	if (sum(theta)/nz .gt. 1.0_DP) then
@@ -5906,8 +5909,9 @@ SUBROUTINE FIND_DBN_Transition()
 	    		P = min(P_tr(T+1),1.0_dp)
 	    		! Set DBN1 as the distribution for the current period (Time: T+1)
 	    		DBN1  = DBN_tr(:,:,:,:,:,:,T+1)
-	            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R_tr(T+1))
+	            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(T+1))
 	            	! Usually brent_tol=0.00000001_DP
+	            	print*, ' 		Error=',brent_value,'R_out=',R2_tr(T+1)
             else
                 R_tr(T+1) = 0.0_DP
 	        endif
@@ -5933,6 +5937,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        K_tr(T+1) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 	        C_tr(T+1) = sum( DBN1*Cons )
 
+	        print*,' '
 	        print*, 't=',T+1,'Deficit=',(GBAR_bench-GBAR_tr(T+1)),'Debt=',Debt_tr(T+1),'Wealth=',K_tr(T+1),'R=',R_tr(T+1),'Q=',QBAR2_tr(T+1)
 	        print*,' '
 
@@ -9437,7 +9442,8 @@ Function Agg_Debt_Tr(R_in)
 	
 	! Function outputs aggregate demand relative to total wealth (squared to have a min at 0)
 	Agg_Debt_Tr = ((Agg_Demand-Wealth)/Wealth)**2.0_dp
-	print*, ' 	Agg_Debt_Error=',Agg_Debt_Tr,'	R_in=',R_in
+	
+	! print*, ' 	Agg_Debt_Error=',Agg_Debt_Tr,'	R_in=',R_in
 
 end Function Agg_Debt_Tr
 
