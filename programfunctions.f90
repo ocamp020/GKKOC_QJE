@@ -9218,7 +9218,7 @@ Function Agg_Debt_Tr(R_in)
 	DBN_aux = 0.0_dp
 
 	! Compute auxiliary distribution of assets 
-	if (ti.ge.2)
+	if (ti.ge.2) then
 		! Solve auxiliary DP problem 
 		call EGM_Transition_aux(Ap_aux,ti)
 
@@ -9381,6 +9381,7 @@ Function Agg_Debt_Tr(R_in)
 		! In first period there is no updating with R 
 		! Change is a shock and not anticipated
 		DBN_aux = DBN_bench
+		
 	endif 
 
 
