@@ -5410,7 +5410,7 @@ SUBROUTINE FIND_DBN_Transition()
 	REAL(DP)   :: BBAR, MeanWealth, brent_value, K_bench, C_bench, K_exp, C_exp
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
-	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr, Wealth_Top_1_Tr, Wealth_Top_10_Tr
+	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr, Wealth_Top_1_Tr, Wealth_Top_10_Tr, R2_tr
 	INTEGER    :: prctile
 
 
@@ -5773,16 +5773,16 @@ SUBROUTINE FIND_DBN_Transition()
 	    		P = min(P_tr(ti),1.0_dp)
 	    		! Set DBN1 as the distribution for the current period (Time: ti)
 	    		DBN1  = DBN_tr(:,:,:,:,:,:,ti)
-	            brent_value = brent(-0.1_DP,0.01_DP,0.1_DP,Agg_Debt_Tr, brent_tol,R_tr(ti))
+	            brent_value = brent(-0.1_DP,0.01_DP,0.1_DP,Agg_Debt_Tr, brent_tol,R2_tr(ti))
             else
-                R_tr(ti) = 0.0_DP
+                R2_tr(ti) = 0.0_DP
 	        endif
 
+	        	! Dampened Update of QBAR and NBAR
+	        	R_tr(ti)  = 0.8*R_tr(ti) + 0.2*R2_tr(ti)
 
-	        Add here dampening for R
-
-	    ! Compute government budget for the current preiod (Time: sti)
-	    ! print*,' Calculating tax revenue'
+		    ! Compute government budget for the current preiod (Time: sti)
+		    ! print*,' Calculating tax revenue'
 	    	CALL GOVNT_BUDGET(.false.)
 			    GBAR_tr(ti) 		= GBAR 
 			    GBAR_K_tr(ti) 		= GBAR_K 
@@ -5792,10 +5792,11 @@ SUBROUTINE FIND_DBN_Transition()
 			    SSC_Payments_tr(ti) = SSC_Payments
 			    Tot_Lab_Inc_tr(ti) 	= Tot_Lab_Inc
 			    if (ti.eq.1) then 
-			    	Debt_tr         = (GBAR_bench-GBAR_tr(ti)) ! First period debt is equal to  the deficit
+			    	Debt_tr(ti)     = (GBAR_bench-GBAR_tr(ti)) ! First period debt is equal to  the deficit
 			    else
-			    	Debt_tr         = Debt_tr*(1+R_tr(ti)) + (GBAR_bench-GBAR_tr(ti)) ! Debt is equal to  the deficit plus (compunded) previous debt
+			    	Debt_tr(ti)     = Debt_tr(ti-1)*(1+R_tr(ti)) + (GBAR_bench-GBAR_tr(ti)) ! Debt is equal to  the deficit plus (compunded) previous debt
 			    endif 
+
 
 	        ! Compute total assets and consumption
 	        K_tr(ti) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
@@ -5830,13 +5831,15 @@ SUBROUTINE FIND_DBN_Transition()
 			        Wealth_Top_1_Tr(ti)  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
 			        Wealth_Top_10_Tr(ti) = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
 
-	        print*, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr,'Wealth=',K_tr(ti),'R=',R_tr(ti),'Q=',QBAR2_tr(ti)
+
+	        print*, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr(ti),'Wealth=',K_tr(ti),'R=',R_tr(ti),'Q=',QBAR2_tr(ti)
     	ENDDO ! Transition Time
 
 		print*,' 	--------------------------------------'
 		print*,' 	DBN Forward Iteration Completed'
 		print*,' 	--------------------------------------'
 		print*,' '
+
 
 	    ! Set global variables to current period  (Time: ti)
 	    	R = R_tr(T+1) ; P = P_tr(T+1) ; wage = wage_tr(T+1) ;
@@ -5847,19 +5850,6 @@ SUBROUTINE FIND_DBN_Transition()
 			DBN1  = DBN_tr(:,:,:,:,:,:,T+1)
 			Cons  = Cons_tr(:,:,:,:,:,:,T+1)
 			Hours = Hours_tr(:,:,:,:,:,:,T+1)
-
-	    ! Compute government budget for the current preiod (Time: T+1)
-	    ! print*,' Calculating tax revenue'
-	    	CALL GOVNT_BUDGET(.false.)
-			    GBAR_tr(T+1) 		 = GBAR 
-			    GBAR_K_tr(T+1) 		 = GBAR_K 
-			    GBAR_W_tr(T+1) 		 = GBAR_W
-			    GBAR_L_tr(T+1) 		 = GBAR_L 
-			    GBAR_C_tr(T+1) 		 = GBAR_C 
-			    SSC_Payments_tr(T+1) = SSC_Payments
-			    Tot_Lab_Inc_tr(T+1)  = Tot_Lab_Inc
-			    ! Note that Debt_tr is not computed for T+1 since that would increase interest payments
-
 
 	    ! Compute prices and aggregates for the current period (Time: T+1)
 	    ! print*,' Updating Prices and Quantities fot T+1'
@@ -5908,11 +5898,28 @@ SUBROUTINE FIND_DBN_Transition()
                 R_tr(T+1) = 0.0_DP
 	        endif
 
+	        	! Dampened Update of QBAR and NBAR
+	        	R_tr(ti)  = 0.8*R_tr(ti) + 0.2*R2_tr(ti)
+
+	        ! Compute government budget for the current preiod (Time: T+1)
+	    	! print*,' Calculating tax revenue'
+	    	CALL GOVNT_BUDGET(.false.)
+			    GBAR_tr(T+1) 		 = GBAR 
+			    GBAR_K_tr(T+1) 		 = GBAR_K 
+			    GBAR_W_tr(T+1) 		 = GBAR_W
+			    GBAR_L_tr(T+1) 		 = GBAR_L 
+			    GBAR_C_tr(T+1) 		 = GBAR_C 
+			    SSC_Payments_tr(T+1) = SSC_Payments
+			    Tot_Lab_Inc_tr(T+1)  = Tot_Lab_Inc
+			    Debt_tr(T+1) 		 = Debt_tr(T)           
+			    ! Note that Debt_tr is not computed for T+1 since that would increase interest payments
+
+
 	        ! Compute total assets and consumption
 	        K_tr(T+1) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 	        C_tr(T+1) = sum( DBN1*Cons )
 
-	        print*, 't=',T+1,'Deficit=',(GBAR_bench-GBAR_tr(T+1)),'Debt=',Debt_tr,'Wealth=',K_tr(T+1),'R=',R_tr(T+1),'Q=',QBAR2_tr(T+1)
+	        print*, 't=',T+1,'Deficit=',(GBAR_bench-GBAR_tr(T+1)),'Debt=',Debt_tr(T+1),'Wealth=',K_tr(T+1),'R=',R_tr(T+1),'Q=',QBAR2_tr(T+1)
 	        print*,' '
 
 	        ! Compute top wealth concentration
@@ -6033,7 +6040,7 @@ SUBROUTINE FIND_DBN_Transition()
 		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,' Q_dist=',Q_dist,' N_dist=',N_dist,&
 		    	&' Q(T)/Q(SS)=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N(T)/N(SS)=',100*(NBAR2_tr(T+1)/NBAR_exp-1),&
 		    	&' Chg_dist=',Chg_dist
-	    	print*,'	GBAR_exp=',GBAR_tr(T+1),'Debt/GDP=',Debt_tr/YBAR_tr(T+1),'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr
+	    	print*,'	GBAR_exp=',GBAR_tr(T+1),'Debt/GDP=',Debt_tr(T+1)/YBAR_tr(T+1),'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr(T+1)
 
 	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
 	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,N_dist,100*(QBAR2_tr(T+1)/QBAR_exp-1),100*(NBAR2_tr(T+1)/NBAR_exp-1)
@@ -6058,10 +6065,10 @@ SUBROUTINE FIND_DBN_Transition()
 	WRITE (UNIT=78,  FMT=*) ti,',',QBAR_tr(ti),',',NBAR_tr(ti),',',R_tr(ti),',',Wage_tr(ti),',' & 
 							& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),',',GBAR_tr(ti),',' &
 							& ,GBAR_K_tr(ti),',',GBAR_W_tr(ti),',',GBAR_L_tr(ti),',',GBAR_C_tr(ti),',',SSC_Payments_tr(ti),',' &
-							& ,Wealth_Top_1_tr(ti),',',Wealth_Top_10_tr(ti)
+							& ,Debt_tr(ti),Wealth_Top_1_tr(ti),',',Wealth_Top_10_tr(ti)
 	enddo 
 	WRITE (UNIT=78,  FMT=*) 'SS_2,',QBAR_exp,',',NBAR_exp,',',R_exp,',',wage_exp,',' & 
-						&  ,Y_exp,',',K_exp,',',C_exp,',',GBAR_exp,',99,99,99,99,99,',Wealth_Top_1_tr(T+1),',',Wealth_Top_1_tr(T+1)
+						&  ,Y_exp,',',K_exp,',',C_exp,',',GBAR_exp,',99,99,99,99,99,99,',Wealth_Top_1_tr(T+1),',',Wealth_Top_1_tr(T+1)
 	CLOSE (UNIT=78);
 
 
@@ -9386,7 +9393,7 @@ Function Agg_Debt_Tr(R_in)
 	do xi=1,nx
 	do zi=1,nz 
 	do ai=1,na
-		Private_Demand = Private_Demand + sum(DBN1(:,ai,zi,:,:,xi)*K_mat(ai,zi,xi))
+		Private_Demand = Private_Demand + sum(DBN_aux(:,ai,zi,:,:,xi)*K_mat(ai,zi,xi))
 	enddo 
 	enddo 
 	enddo 
@@ -9394,10 +9401,15 @@ Function Agg_Debt_Tr(R_in)
 	! Public demand is computed as current debt plus governemnt deficit
 		! Debt_tr(t) = (1+R)*Debt_tr(t-1) + Deficit(t)
 		! Deficit(t) = GBAR_bench - GBAR_Tr(t) 
-	Public_Demand = Debt_tr
+	if (ti.eq.1) then 
+		Public_Demand = 0.0_dp
+	else
+		Public_Demand = Debt_tr(ti-1)
+	endif 
+
 
 	! Aggregate debt is the sum of private and public demand for funds 
-	Agg_Demand    = Private_Demand + Public_Demand
+	Agg_Demand  = Private_Demand + Public_Demand
 	
 	! Function outputs aggregate demand relative to total wealth (squared to have a min at 0)
 	Agg_Debt_Tr = ((Agg_Demand-Wealth)/Wealth)**2.0_dp
