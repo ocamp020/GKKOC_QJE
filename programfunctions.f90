@@ -5407,7 +5407,7 @@ SUBROUTINE FIND_DBN_Transition()
 	IMPLICIT NONE
 	INTEGER    :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL       :: DBN_dist, DBN_criteria, Q_dist, N_dist, Price_criteria, Chg_criteria, Old_DBN_dist, Chg_dist
-	REAL(DP)   :: BBAR, MeanWealth, brent_value, K_bench, C_bench, K_exp, C_exp
+	REAL(DP)   :: BBAR, MeanWealth, brent_value, K_bench, C_bench, K_exp, C_exp, R_old
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
 	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr, Wealth_Top_1_Tr, Wealth_Top_10_Tr, R2_tr
@@ -5768,7 +5768,11 @@ SUBROUTINE FIND_DBN_Transition()
 	        wage_tr(ti)  = (1.0_DP-alpha)*QBAR_tr(ti)**alpha * NBAR_tr(ti)**(-alpha)
 	        Ebar_tr(ti)  = wage_tr(ti)  * NBAR_tr(ti) * sum(pop)/sum(pop(1:RetAge-1))
 
+
 	    	! Solve for new R (that clears market under new guess for prices)
+	    	print*, '		Solving for equilibrium interest rate (R)'
+	    		! Save old R for updating 
+	    		R_old = R_tr(ti)
 	    	if (sum(theta)/nz .gt. 1.0_DP) then
 	    		! Set price 
 	    		P = min(P_tr(ti),1.0_dp)
@@ -5780,7 +5784,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        endif
 
 	        	! Dampened Update of QBAR and NBAR
-	        	R_tr(ti)  = 0.8*R_tr(ti) + 0.2*R2_tr(ti)
+	        	R_tr(ti)  = 0.8*R_old(ti) + 0.2*R2_tr(ti)
 
 		    ! Compute government budget for the current preiod (Time: sti)
 		    ! print*,' Calculating tax revenue'
@@ -5893,6 +5897,9 @@ SUBROUTINE FIND_DBN_Transition()
 	        Ebar_tr(T+1)  = wage_tr(T+1)  * NBAR_tr(T+1) * sum(pop)/sum(pop(1:RetAge-1))
 
 	    	! Solve for new R (that clears market under new guess for prices)
+	    	print*, '		Solving for equilibrium interest rate (R)'
+	    		! Save old R for updating 
+	    		R_old = R_tr(ti)
 	    	if (sum(theta)/nz .gt. 1.0_DP) then
 	    		! Set price 
 	    		P = min(P_tr(T+1),1.0_dp)
@@ -5904,7 +5911,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        endif
 
 	        	! Dampened Update of QBAR and NBAR
-	        	R_tr(ti)  = 0.8*R_tr(ti) + 0.2*R2_tr(ti)
+	        	R_tr(ti)  = 0.8*R_old(ti) + 0.2*R2_tr(ti)
 
 	        ! Compute government budget for the current preiod (Time: T+1)
 	    	! print*,' Calculating tax revenue'
@@ -6731,10 +6738,10 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
 	allocate( Cons_aux(MaxAge,na_t,nz,nlambda,ne,nx) )
 	allocate( Hours_aux(MaxAge,na_t,nz,nlambda,ne,nx) )
 
-	print*,' '
-	print*,' 	----------------------------------------'
-	print*,' 	Starting EGM Transition inside Agg_Debt'
-	print*,' 	----------------------------------------'
+	! print*,' '
+	! print*,' 	----------------------------------------'
+	! print*,' 	Starting EGM Transition inside Agg_Debt'
+	! print*,' 	----------------------------------------'
 
 	!$ call omp_set_num_threads(nz)
 
@@ -7286,10 +7293,10 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
 	end if 
 
 	
-	print*,' 	----------------------------------------'
-	print*,' 	End of EGM Transition inside Agg_Debt'
-	print*,' 	----------------------------------------'
-	print*,' '
+	! print*,' 	----------------------------------------'
+	! print*,' 	End of EGM Transition inside Agg_Debt'
+	! print*,' 	----------------------------------------'
+	! print*,' '
 
 END SUBROUTINE EGM_Transition_Aux
 
@@ -9225,6 +9232,9 @@ Function Agg_Debt_Tr(R_in)
 	allocate( Aplo(       MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Aphi(       MaxAge,na,nz,nlambda,ne,nx) )
 
+	! Assign new interest rate to R_tr
+	R_tr(ti) = R_in 
+
 	! Initialize new distribution
 	DBN_aux = 0.0_dp
 
@@ -9425,7 +9435,7 @@ Function Agg_Debt_Tr(R_in)
 	
 	! Function outputs aggregate demand relative to total wealth (squared to have a min at 0)
 	Agg_Debt_Tr = ((Agg_Demand-Wealth)/Wealth)**2.0_dp
-
+	print*, ' 	Agg_Debt_Error='Agg_Debt_Tr,'	R_in=',R_in
 
 end Function Agg_Debt_Tr
 
