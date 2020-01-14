@@ -9435,7 +9435,7 @@ Function Agg_Debt_Tr(R_in)
 	
 	! Function outputs aggregate demand relative to total wealth (squared to have a min at 0)
 	Agg_Debt_Tr = ((Agg_Demand-Wealth)/Wealth)**2.0_dp
-	print*, ' 	Agg_Debt_Error='Agg_Debt_Tr,'	R_in=',R_in
+	print*, ' 	Agg_Debt_Error=',Agg_Debt_Tr,'	R_in=',R_in
 
 end Function Agg_Debt_Tr
 
