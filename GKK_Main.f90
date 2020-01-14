@@ -3823,8 +3823,8 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 		print*,'---------------------------------------------------'
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
 			tauWindx = 4.0_DP
-			Debt_tr  = 1.0_DP
-			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
+			Debt_tr(T+1)  = 1.0_DP
+			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr(T+1)))
 				! Set old G and new value of tauW
 				GBAR_exp_old = GBAR_exp
 				tauW_bt = tauw_bt_0 + tauWindx * tauWinc_bt
@@ -3861,16 +3861,16 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 				print*,' ' 
 				write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
 				print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
-				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
+				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr(T+1),'Debt',Debt_tr(T+1)
 			ENDDO
 
 			! Set tauW as weighted average of point in  the grid to balance budget more precisely
 				tauW_up_bt  = tauW_bt
 				tauW_low_bt = tauW_bt  -  tauWinc_bt
-				tauW_bt     = tauW_low_bt + tauWinc_bt * 0.5_dp ! GBAR_bench+R_exp*Debt_tr - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				tauW_bt     = tauW_low_bt + tauWinc_bt * 0.5_dp ! GBAR_bench+R_exp*Debt_tr(T+1) - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
 				tauW_up_at  = tauW_at
 				tauW_low_at = tauW_at  -  tauWinc_at  
-				tauW_at     = tauW_low_at + tauWinc_at * 0.5_dp ! (GBAR_bench+R_exp*Debt_tr - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				tauW_at     = tauW_low_at + tauWinc_at * 0.5_dp ! (GBAR_bench+R_exp*Debt_tr(T+1) - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
 				print*,''
 				print*,'GBAR bracketed by taxes:'
 				print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_bt=', tauW_bt*100, "%", '% tauW_up_bt=', tauW_up_bt*100
@@ -3906,11 +3906,11 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 
 			! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
 				print*,"Gbar at midpoint of bracket"
-				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr
+				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr(T+1)
 				print*,''
 				print*,'Bisection for TauW:'
-				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr))) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
-				    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
+				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr(T+1)))) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
+				    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr(T+1) ) then
 				        tauW_up_bt  = tauW_bt 
 				        tauW_up_at  = tauW_at 
 				    else
@@ -3948,7 +3948,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 				    print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
 					print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
 					print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
-					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
+					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr(T+1),'Debt',Debt_tr(T+1)
 				ENDDO
 
 	else 
@@ -4159,7 +4159,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 			BB_tax_ind = 1.0_DP ! Originally 1.0_DP
 			BB_tax_chg = 0.001_DP ! Originally 0.005_DP
 			Debt_tr  = 1.0_DP
-			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
+			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr(T+1)))
 				! Set old G and new value of tauW
 				GBAR_exp_old = GBAR_exp
 				print*,' '
@@ -4204,7 +4204,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 				BB_tax_ind = BB_tax_ind + 1.0_DP  
 				print*,' ' 
 				print*,'Bracketing GBAR: tau_L=', (1.0_dp-psi)*100,'tauK=',100*tauK,'tauW=',100*tauW_at
-				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
+				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr(T+1),'Debt',Debt_tr(T+1)
 				print*,' ' 
 			ENDDO
 
@@ -4233,10 +4233,10 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 
 			! Find psi that exactly balances the budget (up to precisioin 0.1%) using bisection
 				print*,'Bisection for Taxes:'
-				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr))) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
+				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr(T+1)))) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
 			    	
 					if (balance_tau_L) then 
-					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
+					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr(T+1) ) then
 					        BB_tax_low  = psi ! If there is a surplus don't decrease psi (increase tau_L). Set a floor.
 					    else
 					        BB_tax_up   = psi ! If there is a deficit don't increase psi (decrease tau_L). Set a ceiling.
@@ -4244,7 +4244,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
     				    ! Set new tax
 						    psi = (BB_tax_low + BB_tax_up)/2.0_DP
 					elseif (Opt_Tax_KW) then 
-					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
+					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr(T+1) ) then
 					        BB_tax_up   = tauK ! If there is a surplus don't increase tau_K. Set a ceiling.
 					    else
 					        BB_tax_low  = tauK ! If there is a deficit don't decrease tau_K. Set a floor.
@@ -4252,7 +4252,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
     				    ! Set new tax
 						    tauK = (BB_tax_low + BB_tax_up)/2.0_DP
 					else
-					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
+					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr(T+1) ) then
 					        BB_tax_up   = tauW_at ! If there is a surplus don't increase tau_W. Set a ceiling.
 					    else
 					        BB_tax_low  = tauW_at ! If there is a deficit don't decrease tau_W. Set a floor.
@@ -4296,7 +4296,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 					else
 					print*,'tax_W_low =', BB_tax_low*100, 'tau_W_up=', BB_tax_up*100, 'tau_W=', tauW_at*100
 					endif 
-					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
+					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr(T+1),'Debt',Debt_tr(T+1)
 				ENDDO
 
 
