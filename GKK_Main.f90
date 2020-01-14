@@ -89,11 +89,11 @@ PROGRAM main
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
 
-		Transition_Tax_Reform = .true.
-		Transition_OT = .false.
+		Transition_Tax_Reform = .false.
+		Transition_OT = .true.
 			budget_balance = .true.
 			balance_tau_L  = .false. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
-			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
+			Opt_Tax_KW_TR  = .false. ! true=tau_K, false=tau_W
 
 		Simul_Switch  = .false.
 
@@ -4126,14 +4126,14 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		! Set Results Folder
 			if (balance_tau_L) then 
 				if (Opt_Tax_KW) then 
-				Result_Folder = trim(folder_aux)//'Transition_OTK_BB_tau_L/'
+				Result_Folder = trim(folder_aux)//'Transition_OTK_BB_tau_L_cfm/'
 				else 
-				Result_Folder = trim(folder_aux)//'Transition_OTW_BB_tau_L/'
+				Result_Folder = trim(folder_aux)//'Transition_OTW_BB_tau_L_cfm/'
 				endif 
 			elseif (Opt_Tax_KW) then 
-				Result_Folder = trim(folder_aux)//'Transition_OTK_BB_tau_K/'
+				Result_Folder = trim(folder_aux)//'Transition_OTK_BB_tau_K_cfm/'
 			else
-				Result_Folder = trim(folder_aux)//'Transition_OTW_BB_tau_W/'
+				Result_Folder = trim(folder_aux)//'Transition_OTW_BB_tau_W_cfm/'
 			endif 
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
@@ -4156,8 +4156,8 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		print*,'---------------------------------------------------'
 		endif 
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-			BB_tax_ind = 8.0_DP ! Originally 1.0_DP
-			BB_tax_chg = 0.01_DP ! Originally 0.005_DP
+			BB_tax_ind = 1.0_DP ! Originally 1.0_DP
+			BB_tax_chg = 0.001_DP ! Originally 0.005_DP
 			Debt_tr  = 1.0_DP
 			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
 				! Set old G and new value of tauW
