@@ -5784,7 +5784,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        endif
 
 	        	! Dampened Update of QBAR and NBAR
-	        	R_tr(ti)  = 0.8*R_old(ti) + 0.2*R2_tr(ti)
+	        	R_tr(ti)  = 0.8*R_old + 0.2*R2_tr(ti)
 
 		    ! Compute government budget for the current preiod (Time: sti)
 		    ! print*,' Calculating tax revenue'
@@ -5911,7 +5911,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        endif
 
 	        	! Dampened Update of QBAR and NBAR
-	        	R_tr(ti)  = 0.8*R_old(ti) + 0.2*R2_tr(ti)
+	        	R_tr(ti)  = 0.8*R_old + 0.2*R2_tr(ti)
 
 	        ! Compute government budget for the current preiod (Time: T+1)
 	    	! print*,' Calculating tax revenue'
