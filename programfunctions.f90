@@ -5566,7 +5566,7 @@ SUBROUTINE FIND_DBN_Transition()
 		print*,' 	--------------------------------------'
 	    ! Fill in other periods starting at DBN bench following policy functions
 	    DO ti=1,T
-	    	print*,' 	Transition Period ',ti
+	    	! print*,' 	Transition Period ',ti
 
 
 		! Discretize policy function for assets (a') for current period
@@ -5778,7 +5778,8 @@ SUBROUTINE FIND_DBN_Transition()
 	    		P = min(P_tr(ti),1.0_dp)
 	    		! Set DBN1 as the distribution for the current period (Time: ti)
 	    		DBN1  = DBN_tr(:,:,:,:,:,:,ti)
-	            brent_value = brent(-0.1_DP,0.01_DP,0.1_DP,Agg_Debt_Tr, brent_tol,R2_tr(ti))
+	            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(ti))
+	            	! Usually brent_tol=0.00000001_DP
             else
                 R2_tr(ti) = 0.0_DP
 	        endif
@@ -5905,7 +5906,8 @@ SUBROUTINE FIND_DBN_Transition()
 	    		P = min(P_tr(T+1),1.0_dp)
 	    		! Set DBN1 as the distribution for the current period (Time: T+1)
 	    		DBN1  = DBN_tr(:,:,:,:,:,:,T+1)
-	            brent_value = brent(-0.1_DP,0.01_DP,0.1_DP,Agg_Debt_Tr, brent_tol,R_tr(T+1))
+	            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R_tr(T+1))
+	            	! Usually brent_tol=0.00000001_DP
             else
                 R_tr(T+1) = 0.0_DP
 	        endif
