@@ -5531,7 +5531,7 @@ SUBROUTINE FIND_DBN_Transition()
 	iter_indx    = 1
 	!print*, 'Computing Equilibrium Distribution'
 	DO WHILE ((DBN_dist.ge.DBN_criteria).and.(max(Q_dist,N_dist).ge.Price_criteria)&
-			& .and.(simutime.le.25).and.(Chg_dist.ge.Chg_criteria) )
+			& .and.(simutime.le.10).and.(Chg_dist.ge.Chg_criteria) )
 		! print*, 'DBN_dist=', DBN_dist
 
 		! Start Q_dist and N_dist
@@ -5844,7 +5844,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        print*, '		R_full=',R2_tr(ti),'R_tr=',R_tr(ti)
 	        print*, ' '
 
-	        print*, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr(ti),'Wealth=',K_tr(ti),'R=',R_tr(ti),'Q=',QBAR2_tr(ti)
+	        print*, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr(ti),'Wealth=',K_tr(ti),'R=',R_tr(ti),'Q=',QBAR_tr(ti)
 	        print*, ' '
     	ENDDO ! Transition Time
 
@@ -5938,7 +5938,8 @@ SUBROUTINE FIND_DBN_Transition()
 	        C_tr(T+1) = sum( DBN1*Cons )
 
 	        print*,' '
-	        print*, 't=',T+1,'Deficit=',(GBAR_bench-GBAR_tr(T+1)),'Debt=',Debt_tr(T+1),'Wealth=',K_tr(T+1),'R=',R_tr(T+1),'Q=',QBAR2_tr(T+1)
+	        print*, 't=',T+1,'Deficit=',(GBAR_bench-GBAR_tr(T+1)),'Debt=',Debt_tr(T+1),&
+	        		& 'Wealth=',K_tr(T+1),'R=',R_tr(T+1),'Q=',QBAR_tr(T+1)
 	        print*,' '
 
 	        ! Compute top wealth concentration
@@ -9442,7 +9443,7 @@ Function Agg_Debt_Tr(R_in)
 	
 	! Function outputs aggregate demand relative to total wealth (squared to have a min at 0)
 	Agg_Debt_Tr = ((Agg_Demand-Wealth)/Wealth)**2.0_dp
-	
+
 	! print*, ' 	Agg_Debt_Error=',Agg_Debt_Tr,'	R_in=',R_in
 
 end Function Agg_Debt_Tr
