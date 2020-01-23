@@ -5547,6 +5547,7 @@ SUBROUTINE FIND_DBN_Transition()
 			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 		! Solve for New Steady State
 			CALL FIND_DBN_EQ
+				CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 				GBAR_exp  = GBAR
 				QBAR_exp  = QBAR 
 				NBAR_exp  = NBAR  
@@ -5573,6 +5574,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 	    ! Solve for policy functions by backwards induction and EGM
 	    	! Output is policy functions for all times and all ages
+	    	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 	    	CALL EGM_Transition
 	    	print*, ' '
 
