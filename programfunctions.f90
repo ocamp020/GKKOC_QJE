@@ -5543,10 +5543,8 @@ SUBROUTINE FIND_DBN_Transition()
 
 		! Set initial value for aggregate variables 
 			R = R_exp ; P = P_exp ; wage = wage_exp ; DBN1 = DBN_exp ; 
-		! Set grids that depend on wealth tax threshold
-			! Adjust agrid to include breaking points
+		! Deallocate grids that include thresholds, they are reset in Find_DBN_EQ
 			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		! Solve for New Steady State
 			CALL FIND_DBN_EQ
 				GBAR_exp  = GBAR
