@@ -5406,12 +5406,12 @@ SUBROUTINE FIND_DBN_Transition()
 	use omp_lib
 	IMPLICIT NONE
 	INTEGER    :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
-	REAL       :: DBN_dist, DBN_criteria, Q_dist, N_dist, Price_criteria, Chg_criteria, Old_DBN_dist, Chg_dist
-	REAL(DP)   :: BBAR, MeanWealth, brent_value, K_bench, C_bench, K_exp, C_exp, R_old
+	REAL       :: DBN_dist, DBN_criteria, Q_dist, N_dist, Price_criteria, Chg_criteria, Old_DBN_dist, Chg_dist, R_dist, Db_dist
+	REAL(DP)   :: BBAR, MeanWealth, brent_value, K_bench, C_bench, K_exp, C_exp, R_old, Db_old 
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
 	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr, Wealth_Top_1_Tr, Wealth_Top_10_Tr, R2_tr
-	INTEGER    :: prctile
+	INTEGER    :: prctile, ind_R 
 
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -5427,6 +5427,7 @@ SUBROUTINE FIND_DBN_Transition()
 	DBN_criteria    = 1.0E-06_DP
 	Price_criteria  = 1.5E-05_DP
 	Chg_criteria    = 1.5E-07_DP
+	ind_R   		= 3
 
 	! Set grids that depend on wealth tax threshold
 		! Adjust agrid to include breaking points
@@ -5434,9 +5435,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 	! Wealth and consumption in benchmark and experiment
 		K_bench = sum( sum(sum(sum(sum(sum(DBN_bench,6),5),4),3),1)*agrid )
-		K_exp   = sum( sum(sum(sum(sum(sum(DBN_exp  ,6),5),4),3),1)*agrid )
 		C_bench = sum( DBN_bench*Cons_bench )
-		C_exp   = sum( DBN_exp  *Cons_exp   )
 
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -5456,10 +5455,12 @@ SUBROUTINE FIND_DBN_Transition()
 			OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'   , STATUS='old', ACTION='read')
 			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
 			OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		 , STATUS='old', ACTION='read')
+			OPEN (UNIT=4,  FILE=trim(Result_Folder)//'Debt_SS' 	 , STATUS='old', ACTION='read')
 			READ (UNIT=1,  FMT=*), QBAR_tr
 			READ (UNIT=2,  FMT=*), NBAR_tr
 			READ (UNIT=3,  FMT=*), R_tr
-			CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3);
+			READ (UNIT=4,  FMT=*), Debt_SS
+			CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4);
 			print*, 'Reading completed'
 
 		! Choose YBAR, EBAR, P and Wage to be consistent
@@ -5489,7 +5490,8 @@ SUBROUTINE FIND_DBN_Transition()
         OPEN (UNIT=88, FILE=trim(Result_Folder)//'Transition_Top1.txt', STATUS='replace')
         OPEN (UNIT=89, FILE=trim(Result_Folder)//'Transition_Top10.txt', STATUS='replace')
      		
-     		WRITE(UNIT=76, FMT=*) 'Iteration, DBN_dist, Q_dist, N_dist, Q(T)/Q(SS), N(T)/N(SS)'
+     		WRITE(UNIT=76, FMT=*) 'Iteration, DBN_dist, Q_dist, N_dist, R_dist, Db_dist',&
+     								&' Q(T)/Q(SS), N(T)/N(SS), R(T)/R(SS), Db(T)/Db(SS)'
      		WRITE(UNIT=77, FMT=*) 'NBAR'
         	WRITE(UNIT=78, FMT=*) 'QBAR'
         	WRITE(UNIT=79, FMT=*) 'R'
@@ -5525,20 +5527,50 @@ SUBROUTINE FIND_DBN_Transition()
 	DBN_dist     = 1.0_DP
 	Q_dist       = 1.0_DP
 	N_dist       = 1.0_DP
+	R_dist       = 1.0_DP
+	Db_dist      = 1.0_DP
 	Chg_dist     = 1.0_DP 
 	Old_DBN_dist = 0.0_DP 
 	simutime     = 1
 	iter_indx    = 1
 	!print*, 'Computing Equilibrium Distribution'
-	DO WHILE ((DBN_dist.ge.DBN_criteria).and.(max(Q_dist,N_dist).ge.Price_criteria)&
+	DO WHILE ((DBN_dist.ge.DBN_criteria).and.(max(Q_dist,N_dist,R_dist,Db_dist).ge.Price_criteria)&
 			& .and.(simutime.le.10).and.(Chg_dist.ge.Chg_criteria) )
 		! print*, 'DBN_dist=', DBN_dist
 
-		! Start Q_dist and N_dist
-		Q_dist = 0.0 ; N_dist = 0.0 ;
+		! Start Q_dist, N_dist, R_dsit, Db_dist
+		Q_dist = 0.0 ; N_dist = 0.0 ; R_dist = 0.0 ; Db_dist = 0.0 ;
 
 		! Start Debt to zero
 		Debt_tr = 0.0_dp
+
+		! Set initial value for aggregate variables 
+			R = R_exp ; P = P_exp ; wage = wage_exp ; DBN1 = DBN_exp ; 
+		! Solve for New Steady State
+			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+			CALL FIND_DBN_EQ
+				GBAR_exp  = GBAR
+				QBAR_exp  = QBAR 
+				NBAR_exp  = NBAR  
+				Y_exp 	  = YBAR
+				Ebar_exp  = EBAR
+				P_exp     = P
+				R_exp	  = R
+				wage_exp  = wage
+				tauK_exp  = tauK
+				tauPL_exp = tauPL
+				psi_exp   = psi
+				DBN_exp   = DBN1
+				tauw_bt_exp = tauW_bt
+				tauw_at_exp = tauW_at
+				Y_a_threshold_exp = Y_a_threshold
+				Cons_exp          = Cons           
+				Hours_exp         = Hours
+				Aprime_exp        = Aprime
+		! Wealth and consumption in benchmark and experiment
+			K_exp   = sum( sum(sum(sum(sum(sum(DBN_exp  ,6),5),4),3),1)*agrid )
+			C_exp   = sum( DBN_exp  *Cons_exp   )
+
 
 
 	    ! Solve for policy functions by backwards induction and EGM
@@ -5759,8 +5791,8 @@ SUBROUTINE FIND_DBN_Transition()
 	        	N_dist = max(N_dist,abs(NBAR2_tr(ti)/NBAR_tr(ti)-1))
 
             	! Dampened Update of QBAR and NBAR
-	        	QBAR_tr(ti)  = 0.8*QBAR_tr(ti) + 0.2*QBAR2_tr(ti)
-	        	NBAR_tr(ti)  = 0.8*NBAR_tr(ti) + 0.2*NBAR2_tr(ti)
+	        	QBAR_tr(ti)  = 0.5*QBAR_tr(ti) + 0.5*QBAR2_tr(ti)
+	        	NBAR_tr(ti)  = 0.5*NBAR_tr(ti) + 0.5*NBAR2_tr(ti)
 
         	! Update other prices and quantities             
 	        P_tr(ti)     = alpha* QBAR_tr(ti)**(alpha-mu) * NBAR_tr(ti)**(1.0_DP-alpha)
@@ -5770,23 +5802,38 @@ SUBROUTINE FIND_DBN_Transition()
 
 
 	    	! Solve for new R (that clears market under new guess for prices)
-	    	print*, '	Solving for equilibrium interest rate (R)'
-	    		! Save old R for updating 
-	    		R_old = R_tr(ti)
-	    	if (sum(theta)/nz .gt. 1.0_DP) then
-	    		! Set price 
-	    		P = min(P_tr(ti),1.0_dp)
-	    		! Set DBN1 as the distribution for the current period (Time: ti)
-	    		DBN1  = DBN_tr(:,:,:,:,:,:,ti)
-	            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(ti))
-	            	! Usually brent_tol=0.00000001_DP
-	            	print*, ' 		Error=',brent_value,'R_out=',R2_tr(ti)
-            else
-                R2_tr(ti) = 0.0_DP
-	        endif
+	    	! Update only every third period or in the first and last periods 
+	    	if ((ind_R.eq.3).or.(ti.eq.T)) then 
+		    		! Save old R for updating 
+		    		R_old = R_tr(ti)
+		    	if (sum(theta)/nz .gt. 1.0_DP) then
+		    		! Set price 
+		    		P = min(P_tr(ti),1.0_dp)
+		    		! Solve for R using brent
+		            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(ti))
+		            	! Usually brent_tol=0.00000001_DP
+		            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
+		            		& 'R_out=',R2_tr(ti)
+	            else
+	                R2_tr(ti) = 0.0_DP
+		        endif
 
-	        	! Dampened Update of QBAR and NBAR
-	        	R_tr(ti)  = 0.8*R_old + 0.2*R2_tr(ti)
+		        ! Get R_dist before dampening 
+	        	R_dist = max(R_dist,abs(R2_tr(ti)/R_tr(ti)-1))
+
+	        	! Dampened Update of R
+	        	R_tr(ti)  = 0.5*R_old + 0.5*R2_tr(ti)
+
+	        	! Update index
+        		ind_R = 1 
+	        else 
+	        	! Update by interpolating between last update and next update
+	        	R_tr(ti) = real(ind_R,8)/3.0_dp*R_tr(ti-ind_R)+real(3-ind_R,8)/3.0_dp*R_tr(ti+3-ind_R)
+
+	        	! Update index
+	        	ind_R = ind_R+1
+	        endif 
+
 
 		    ! Compute government budget for the current preiod (Time: sti)
 		    ! print*,' Calculating tax revenue'
@@ -5838,11 +5885,11 @@ SUBROUTINE FIND_DBN_Transition()
 			        Wealth_Top_1_Tr(ti)  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
 			        Wealth_Top_10_Tr(ti) = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
 
-	        print*, '	Prices and Dampening'
-	        print*, '		Q_full=',QBAR2_tr(ti),'Q_tr=',QBAR_tr(ti)
-	        print*, '		N_full=',NBAR2_tr(ti),'N_tr=',NBAR_tr(ti)
-	        print*, '		R_full=',R2_tr(ti),'R_tr=',R_tr(ti)
-	        print*, ' '
+	        ! print*, '	Prices and Dampening'
+	        ! print*, '		Q_full=',QBAR2_tr(ti),'Q_tr=',QBAR_tr(ti)
+	        ! print*, '		N_full=',NBAR2_tr(ti),'N_tr=',NBAR_tr(ti)
+	        ! print*, '		R_full=',R2_tr(ti),'R_tr=',R_tr(ti)
+	        ! print*, ' '
 
 	        print*, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr(ti),'Wealth=',K_tr(ti),'R=',R_tr(ti),'Q=',QBAR_tr(ti)
 	        print*, ' '
@@ -5891,8 +5938,8 @@ SUBROUTINE FIND_DBN_Transition()
 	        	N_dist = max(N_dist,abs(NBAR2_tr(T+1)/NBAR_tr(T+1)-1))
 
             	! Dampened Update of QBAR and NBAR
-	        	QBAR_tr(T+1)  = 0.8*QBAR_tr(T+1) + 0.2*QBAR2_tr(T+1)
-	        	NBAR_tr(T+1)  = 0.8*NBAR_tr(T+1) + 0.2*NBAR2_tr(T+1)
+	        	QBAR_tr(T+1)  = 0.5*QBAR_tr(T+1) + 0.5*QBAR2_tr(T+1)
+	        	NBAR_tr(T+1)  = 0.5*NBAR_tr(T+1) + 0.5*NBAR2_tr(T+1)
 
         	! Update other prices and quantities             
 	        P_tr(T+1)     = alpha* QBAR_tr(T+1)**(alpha-mu) * NBAR_tr(T+1)**(1.0_DP-alpha)
@@ -5911,13 +5958,17 @@ SUBROUTINE FIND_DBN_Transition()
 	    		DBN1  = DBN_tr(:,:,:,:,:,:,T+1)
 	            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(T+1))
 	            	! Usually brent_tol=0.00000001_DP
-	            	print*, ' 		Error=',brent_value,'R_out=',R2_tr(T+1)
+	            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
+	            		& 'R_out=',R2_tr(T+1)
             else
                 R_tr(T+1) = 0.0_DP
 	        endif
 
-	        	! Dampened Update of QBAR and NBAR
-	        	R_tr(ti)  = 0.8*R_old + 0.2*R2_tr(ti)
+	        	! Get R_dist before dampening 
+	        	R_dist = max(R_dist,abs(R2_tr(T+1)/R_tr(T+1)-1))
+
+	        	! Dampened Update of R
+	        	R_tr(ti)  = 0.5*R_old + 0.5*R2_tr(ti)
 
 	        ! Compute government budget for the current preiod (Time: T+1)
 	    	! print*,' Calculating tax revenue'
@@ -5931,6 +5982,12 @@ SUBROUTINE FIND_DBN_Transition()
 			    Tot_Lab_Inc_tr(T+1)  = Tot_Lab_Inc
 			    Debt_tr(T+1) 		 = Debt_tr(T)           
 			    ! Note that Debt_tr is not computed for T+1 since that would increase interest payments
+
+		    ! Get Db_dist before dampening 
+	        	Db_dist = max(Db_dist,abs(Debt_SS/Debt_tr(T+1)-1))
+
+	        ! Dampened Update of Db_ss
+	        	Debt_SS  = 0.5*Debt_SS + 0.5*Debt_tr(T+1)	
 
 
 	        ! Compute total assets and consumption
@@ -5986,6 +6043,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    	OPEN (UNIT=87, FILE=trim(Result_Folder)//'Transition_C.txt', STATUS='old', POSITION='append')
 	    	OPEN (UNIT=88, FILE=trim(Result_Folder)//'Transition_Top1.txt', STATUS='old', POSITION='append')
 	    	OPEN (UNIT=89, FILE=trim(Result_Folder)//'Transition_Top10.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=90, FILE=trim(Result_Folder)//'Transition_Debt.txt', STATUS='old', POSITION='append')
 	        	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR2_tr, NBAR_exp
 	        	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR2_tr, QBAR_exp
 	        	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
@@ -5995,13 +6053,14 @@ SUBROUTINE FIND_DBN_Transition()
 	        	WRITE(UNIT=83, FMT=*) GBAR_L_tr
 	        	WRITE(UNIT=84, FMT=*) GBAR_C_tr
 	        	WRITE(UNIT=85, FMT=*) SSC_Payments_tr
-	        	WRITE(UNIT=86, FMT=*) K_tr
-	        	WRITE(UNIT=87, FMT=*) C_tr
+	        	WRITE(UNIT=86, FMT=*) K_bench, K_tr, K_exp
+	        	WRITE(UNIT=87, FMT=*) C_bench, C_tr, C_exp
 	        	WRITE(UNIT=88, FMT=*) Wealth_Top_1_Tr
 	        	WRITE(UNIT=89, FMT=*) Wealth_Top_10_Tr
+	        	WRITE(UNIT=90, FMT=*) 0, Debt_tr, Debt_SS
 	    	CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
 	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
-	    	CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89);
+	    	CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89); CLOSE (unit=90);
 
 
 	    	! Write Variable Paths
@@ -6026,6 +6085,7 @@ SUBROUTINE FIND_DBN_Transition()
 			OPEN  (UNIT=88,  FILE=trim(Result_Folder)//'tauL_tr'   , STATUS='replace')
 			OPEN  (UNIT=89,  FILE=trim(Result_Folder)//'tauK_tr'   , STATUS='replace')
 			OPEN  (UNIT=90,  FILE=trim(Result_Folder)//'tauC_tr'   , STATUS='replace')
+			OPEN  (UNIT=91,  FILE=trim(Result_Folder)//'Debt_SS'   , STATUS='replace')
 				! WRITE (UNIT=1,  FMT=*) Cons_tr
 				! WRITE (UNIT=2,  FMT=*) Hours_tr
 				! WRITE (UNIT=3,  FMT=*) Aprime_tr
@@ -6043,10 +6103,12 @@ SUBROUTINE FIND_DBN_Transition()
 				WRITE (UNIT=88,  FMT=*) 1.0_dp-psi
 				WRITE (UNIT=89,  FMT=*) tauK
 				WRITE (UNIT=90,  FMT=*) tauC
+				WRITE (UNIT=91,  FMT=*) Debt_SS
 			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
 			CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
 	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); 
 	    	CLOSE (unit=85); CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89); CLOSE (unit=90); 
+	    	CLOSE (unit=91); 
 			print*,' 	--------------------------------------'
 			print*,' 	Variable Printing Completed'
 			print*,' 	--------------------------------------'
@@ -6057,14 +6119,17 @@ SUBROUTINE FIND_DBN_Transition()
 		    Chg_dist = abs(DBN_dist-Old_DBN_dist)
 		    Old_DBN_dist = DBN_dist
 
-		    print*, 'Iteration=',simutime,' DBN_diff=', DBN_dist,' Q_dist=',Q_dist,' N_dist=',N_dist,&
-		    	&' Q(T)/Q(SS)=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N(T)/N(SS)=',100*(NBAR2_tr(T+1)/NBAR_exp-1),&
-		    	&' Chg_dist=',Chg_dist
+		    print*, 'Iteration=',simutime,
+		    print*, '	Distance: DBN=', DBN_dist,' Q=',Q_dist,' N=',N_dist,' R=',R_dist,' Db=',Db_dist,'Chg_dist=',Chg_dist
+		    print*, '	X(T)/X(SS): Q=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N=',100*(NBAR2_tr(T+1)/NBAR_exp-1),
+		    		' R=',100*(R2_tr(T+1)/R_exp-1),' Db=',100*(Debt_tr(T+1)/Debt_exp-1)
 	    	print*,'	GBAR_exp=',GBAR_tr(T+1),'Debt/GDP=',Debt_tr(T+1)/YBAR_tr(T+1),&
 	    		&'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr(T+1)
 
 	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
-	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,N_dist,100*(QBAR2_tr(T+1)/QBAR_exp-1),100*(NBAR2_tr(T+1)/NBAR_exp-1)
+	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,N_dist,R_dist,Db_dist,&
+	    						&	100*(QBAR2_tr(T+1)/QBAR_exp-1),100*(NBAR2_tr(T+1)/NBAR_exp-1),&
+	    						&	100*(R2_tr(T+1)/R_exp-1),100*(Debt_tr(T+1)/Debt_exp-1)
 	    	CLOSE(UNIT=76)
 
 
@@ -6079,9 +6144,9 @@ SUBROUTINE FIND_DBN_Transition()
 
 	! Print Summary File
 	OPEN  (UNIT=78,  FILE=trim(Result_Folder)//'Transition_Summary.txt'   , STATUS='replace')
-	WRITE (UNIT=78,  FMT=*) 'Period, Q, N, R, Wage, Y, K, C, GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC, Wealth_Top_1, Wealth_Top_10'
+	WRITE (UNIT=78,  FMT=*) 'Period, Q, N, R, Wage, Y, K, C, Debt, GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC, Wealth_Top_1, Wealth_Top_10'
 	WRITE (UNIT=78,  FMT=*) 'SS_1,',QBAR_bench,',',NBAR_bench,',',R_bench,',',wage_bench,',' & 
-								&  ,Y_bench,',',K_bench,',',C_bench,',',GBAR_bench
+								&  ,Y_bench,',',K_bench,',',C_bench,',',0,',',GBAR_bench
 	do ti=1,T+1
 	WRITE (UNIT=78,  FMT=*) ti,',',QBAR_tr(ti),',',NBAR_tr(ti),',',R_tr(ti),',',Wage_tr(ti),',' & 
 							& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),',',GBAR_tr(ti),',' &
@@ -6089,7 +6154,7 @@ SUBROUTINE FIND_DBN_Transition()
 							& ,Debt_tr(ti),Wealth_Top_1_tr(ti),',',Wealth_Top_10_tr(ti)
 	enddo 
 	WRITE (UNIT=78,  FMT=*) 'SS_2,',QBAR_exp,',',NBAR_exp,',',R_exp,',',wage_exp,',' & 
-						&  ,Y_exp,',',K_exp,',',C_exp,',',GBAR_exp,',99,99,99,99,99,99,',Wealth_Top_1_tr(T+1),',',Wealth_Top_1_tr(T+1)
+						&  ,Y_exp,',',K_exp,',',C_exp,',',Debt_exp,',',GBAR_exp,',99,99,99,99,99,99,',Wealth_Top_1_tr(T+1),',',Wealth_Top_1_tr(T+1)
 	CLOSE (UNIT=78);
 
 
@@ -9207,6 +9272,10 @@ Function Agg_Debt(R_in)
 	enddo 
 	enddo 
 	enddo 
+
+	! Adjust with Government Debt
+		Agg_Debt = Agg_Debt + Debt_SS 
+
 	! print*, mu, P, R_in, DepRate
 	! print*, xz_grid(1,5:)
 	! print*, (mu*P*xz_grid(1,5:)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu))

@@ -165,6 +165,10 @@ PROGRAM main
 	 		psi   = 0.776_DP  	
 	 	endif 
 
+ 	! Debt
+ 		! Start government debt at zero
+ 		Debt_SS = 0.0_DP
+
 	! Resutls Folder
 		write(Result_Folder,'(f4.2)') Threshold_Factor
 		write(string_theta,'(f4.2)')  theta_folder
@@ -4175,27 +4179,6 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 				endif 
 				print*,' '
 				
-				! Solve for New Steady State
-				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-				CALL FIND_DBN_EQ
-					GBAR_exp  = GBAR
-					QBAR_exp  = QBAR 
-					NBAR_exp  = NBAR  
-					Y_exp 	  = YBAR
-					Ebar_exp  = EBAR
-					P_exp     = P
-					R_exp	  = R
-					wage_exp  = wage
-					tauK_exp  = tauK
-					tauPL_exp = tauPL
-					psi_exp   = psi
-					DBN_exp   = DBN1
-					tauw_bt_exp = tauW_bt
-					tauw_at_exp = tauW_at
-					Y_a_threshold_exp = Y_a_threshold
-					Cons_exp          = Cons           
-					Hours_exp         = Hours
-					Aprime_exp        = Aprime
 				! Find the Distribution and Policy Functions Along Transition Path
 				call Find_DBN_Transition 
 				! Get new G
@@ -4262,27 +4245,6 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 					endif 
 
 
-					! Solve for New Steady State
-					deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-					CALL FIND_DBN_EQ
-						GBAR_exp  = GBAR
-						QBAR_exp  = QBAR 
-						NBAR_exp  = NBAR  
-						Y_exp 	  = YBAR
-						Ebar_exp  = EBAR
-						P_exp     = P
-						R_exp	  = R
-						wage_exp  = wage
-						tauK_exp  = tauK
-						tauPL_exp = tauPL
-						psi_exp   = psi
-						DBN_exp   = DBN1
-						tauw_bt_exp = tauW_bt
-						tauw_at_exp = tauW_at
-						Y_a_threshold_exp = Y_a_threshold
-						Cons_exp          = Cons           
-						Hours_exp         = Hours
-						Aprime_exp        = Aprime
 					! Find the Distribution and Policy Functions Along Transition Path
 					call Find_DBN_Transition 
 					! Get new G
