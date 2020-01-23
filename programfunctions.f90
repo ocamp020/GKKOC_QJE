@@ -6144,7 +6144,8 @@ SUBROUTINE FIND_DBN_Transition()
 
 	! Print Summary File
 	OPEN  (UNIT=78,FILE=trim(Result_Folder)//'Transition_Summary.txt'   , STATUS='replace')
-	WRITE (UNIT=78,FMT=*) 'Period, Q, N, R, Wage, Y, K, C, Debt,',' GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC,',' Wealth_Top_1, Wealth_Top_10'
+	WRITE (UNIT=78,FMT=*) 'Period, Q, N, R, Wage, Y, K, C, Debt,',&
+			&' GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC,',' Wealth_Top_1, Wealth_Top_10'
 	WRITE (UNIT=78,FMT=*) 'SS_1,',QBAR_bench,',',NBAR_bench,',',R_bench,',',wage_bench,',' & 
 								&  ,Y_bench,',',K_bench,',',C_bench,',',0,',',GBAR_bench
 	do ti=1,T+1
