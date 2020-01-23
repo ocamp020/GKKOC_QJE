@@ -5429,9 +5429,6 @@ SUBROUTINE FIND_DBN_Transition()
 	Chg_criteria    = 1.5E-07_DP
 	ind_R   		= 3
 
-	! Set grids that depend on wealth tax threshold
-		! Adjust agrid to include breaking points
-		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 
 	! Wealth and consumption in benchmark and experiment
 		K_bench = sum( sum(sum(sum(sum(sum(DBN_bench,6),5),4),3),1)*agrid )
@@ -5546,8 +5543,11 @@ SUBROUTINE FIND_DBN_Transition()
 
 		! Set initial value for aggregate variables 
 			R = R_exp ; P = P_exp ; wage = wage_exp ; DBN1 = DBN_exp ; 
-		! Solve for New Steady State
+		! Set grids that depend on wealth tax threshold
+			! Adjust agrid to include breaking points
 			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		! Solve for New Steady State
 			CALL FIND_DBN_EQ
 				GBAR_exp  = GBAR
 				QBAR_exp  = QBAR 
