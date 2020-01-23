@@ -6119,9 +6119,9 @@ SUBROUTINE FIND_DBN_Transition()
 		    Chg_dist = abs(DBN_dist-Old_DBN_dist)
 		    Old_DBN_dist = DBN_dist
 
-		    print*, 'Iteration=',simutime,
+		    print*, 'Iteration=',simutime
 		    print*, '	Distance: DBN=', DBN_dist,' Q=',Q_dist,' N=',N_dist,' R=',R_dist,' Db=',Db_dist,'Chg_dist=',Chg_dist
-		    print*, '	X(T)/X(SS): Q=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N=',100*(NBAR2_tr(T+1)/NBAR_exp-1),
+		    print*, '	X(T)/X(SS): Q=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N=',100*(NBAR2_tr(T+1)/NBAR_exp-1),&
 		    		' R=',100*(R2_tr(T+1)/R_exp-1),' Db=',100*(Debt_tr(T+1)/Debt_exp-1)
 	    	print*,'	GBAR_exp=',GBAR_tr(T+1),'Debt/GDP=',Debt_tr(T+1)/YBAR_tr(T+1),&
 	    		&'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr(T+1)
@@ -6143,17 +6143,17 @@ SUBROUTINE FIND_DBN_Transition()
 	print*,' '
 
 	! Print Summary File
-	OPEN  (UNIT=78,  FILE=trim(Result_Folder)//'Transition_Summary.txt'   , STATUS='replace')
-	WRITE (UNIT=78,  FMT=*) 'Period, Q, N, R, Wage, Y, K, C, Debt, GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC, Wealth_Top_1, Wealth_Top_10'
-	WRITE (UNIT=78,  FMT=*) 'SS_1,',QBAR_bench,',',NBAR_bench,',',R_bench,',',wage_bench,',' & 
+	OPEN  (UNIT=78,FILE=trim(Result_Folder)//'Transition_Summary.txt'   , STATUS='replace')
+	WRITE (UNIT=78,FMT=*) 'Period, Q, N, R, Wage, Y, K, C, Debt,',' GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC,',' Wealth_Top_1, Wealth_Top_10'
+	WRITE (UNIT=78,FMT=*) 'SS_1,',QBAR_bench,',',NBAR_bench,',',R_bench,',',wage_bench,',' & 
 								&  ,Y_bench,',',K_bench,',',C_bench,',',0,',',GBAR_bench
 	do ti=1,T+1
-	WRITE (UNIT=78,  FMT=*) ti,',',QBAR_tr(ti),',',NBAR_tr(ti),',',R_tr(ti),',',Wage_tr(ti),',' & 
+	WRITE (UNIT=78,FMT=*) ti,',',QBAR_tr(ti),',',NBAR_tr(ti),',',R_tr(ti),',',Wage_tr(ti),',' & 
 							& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),',',GBAR_tr(ti),',' &
 							& ,GBAR_K_tr(ti),',',GBAR_W_tr(ti),',',GBAR_L_tr(ti),',',GBAR_C_tr(ti),',',SSC_Payments_tr(ti),',' &
 							& ,Debt_tr(ti),Wealth_Top_1_tr(ti),',',Wealth_Top_10_tr(ti)
 	enddo 
-	WRITE (UNIT=78,  FMT=*) 'SS_2,',QBAR_exp,',',NBAR_exp,',',R_exp,',',wage_exp,',' & 
+	WRITE (UNIT=78,FMT=*) 'SS_2,',QBAR_exp,',',NBAR_exp,',',R_exp,',',wage_exp,',' & 
 						&  ,Y_exp,',',K_exp,',',C_exp,',',Debt_exp,',',GBAR_exp,',99,99,99,99,99,99,',Wealth_Top_1_tr(T+1),',',Wealth_Top_1_tr(T+1)
 	CLOSE (UNIT=78);
 
