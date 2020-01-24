@@ -5567,6 +5567,7 @@ SUBROUTINE FIND_DBN_Transition()
 				Cons_exp          = Cons           
 				Hours_exp         = Hours
 				Aprime_exp        = Aprime
+				Debt_exp  		  = Debt_SS
 		! Wealth and consumption in benchmark and experiment
 			K_exp   = sum( sum(sum(sum(sum(sum(DBN_exp  ,6),5),4),3),1)*agrid )
 			C_exp   = sum( DBN_exp  *Cons_exp   )
@@ -5831,6 +5832,9 @@ SUBROUTINE FIND_DBN_Transition()
 	        else 
 	        	! Update by interpolating between last update and next update
 	        	R_tr(ti) = real(ind_R,8)/3.0_dp*R_tr(ti-ind_R)+real(3-ind_R,8)/3.0_dp*R_tr(ti+3-ind_R)
+	        		print*, '	R Interpolation'
+	        		print*, '		p1=',real(ind_R,8)/3.0_dp,'p2=',real(3-ind_R,8)/3.0_dp,'R1=',R_tr(ti-ind_R),'R2=',R_tr(ti+3-ind_R)
+	        		print*, ' '
 
 	        	! Update index
 	        	ind_R = ind_R+1
@@ -6124,7 +6128,7 @@ SUBROUTINE FIND_DBN_Transition()
 		    print*, 'Iteration=',simutime
 		    print*, '	Distance: DBN=', DBN_dist,' Q=',Q_dist,' N=',N_dist,' R=',R_dist,' Db=',Db_dist,'Chg_dist=',Chg_dist
 		    print*, '	X(T)/X(SS): Q=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N=',100*(NBAR2_tr(T+1)/NBAR_exp-1),&
-		    		' R=',100*(R2_tr(T+1)/R_exp-1),' Db=',100*(Debt_tr(T+1)/Debt_exp-1)
+		    		' R=',100*(R2_tr(T+1)-R_exp),' Db=',100*(Debt_tr(T+1)/Debt_exp-1)
 	    	print*,'	GBAR_exp=',GBAR_tr(T+1),'Debt/GDP=',Debt_tr(T+1)/YBAR_tr(T+1),&
 	    		&'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr(T+1)
 
