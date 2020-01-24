@@ -5486,6 +5486,7 @@ SUBROUTINE FIND_DBN_Transition()
         OPEN (UNIT=87, FILE=trim(Result_Folder)//'Transition_C.txt', STATUS='replace')
         OPEN (UNIT=88, FILE=trim(Result_Folder)//'Transition_Top1.txt', STATUS='replace')
         OPEN (UNIT=89, FILE=trim(Result_Folder)//'Transition_Top10.txt', STATUS='replace')
+        OPEN (UNIT=90, FILE=trim(Result_Folder)//'Transition_Debt.txt', STATUS='replace')
      		
      		WRITE(UNIT=76, FMT=*) 'Iteration, DBN_dist, Q_dist, N_dist, R_dist, Db_dist',&
      								&' Q(T)/Q(SS), N(T)/N(SS), R(T)/R(SS), Db(T)/Db(SS)'
@@ -5502,6 +5503,7 @@ SUBROUTINE FIND_DBN_Transition()
         	WRITE(UNIT=87, FMT=*) 'C'
         	WRITE(UNIT=88, FMT=*) 'Wealth_Top_1'
         	WRITE(UNIT=89, FMT=*) 'Wealth_Top_10'
+        	WRITE(UNIT=90, FMT=*) 'Debt'
 
         	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR_tr, NBAR_exp
         	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR_tr, QBAR_exp
@@ -5510,7 +5512,7 @@ SUBROUTINE FIND_DBN_Transition()
 
     	CLOSE (unit=76); CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
     	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
-    	CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89);
+    	CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89); CLOSE (unit=90);
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	!! DBN Iteration 
@@ -5813,6 +5815,7 @@ SUBROUTINE FIND_DBN_Transition()
 		            	! Usually brent_tol=0.00000001_DP
 		            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
 		            		& 'R_out=',R2_tr(ti)
+	            		print*, ' '
 	            else
 	                R2_tr(ti) = 0.0_DP
 		        endif
@@ -5947,7 +5950,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        Ebar_tr(T+1)  = wage_tr(T+1)  * NBAR_tr(T+1) * sum(pop)/sum(pop(1:RetAge-1))
 
 	    	! Solve for new R (that clears market under new guess for prices)
-	    	print*, '	Solving for equilibrium interest rate (R)'
+	    	! print*, '	Solving for equilibrium interest rate (R)'
 	    		! Save old R for updating 
 	    		R_old = R_tr(ti)
 	    	if (sum(theta)/nz .gt. 1.0_DP) then
@@ -6132,6 +6135,25 @@ SUBROUTINE FIND_DBN_Transition()
 	    	CLOSE(UNIT=76)
 
 
+	    	! Print Summary File
+			OPEN  (UNIT=78,FILE=trim(Result_Folder)//'Transition_Summary.txt'   , STATUS='replace')
+			WRITE (UNIT=78,FMT=*) 'Period, Q, N, R, Wage, Y, K, C, Debt,',&
+					&' GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC,',' Wealth_Top_1, Wealth_Top_10'
+			WRITE (UNIT=78,FMT=*) 'SS_1,',QBAR_bench,',',NBAR_bench,',',R_bench,',',wage_bench,',' & 
+										&  ,Y_bench,',',K_bench,',',C_bench,',',0,',',GBAR_bench
+			do ti=1,T+1
+			WRITE (UNIT=78,FMT=*) ti,',',QBAR_tr(ti),',',NBAR_tr(ti),',',R_tr(ti),',',Wage_tr(ti),',' & 
+								& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),',',GBAR_tr(ti),',' &
+								& ,GBAR_K_tr(ti),',',GBAR_W_tr(ti),',',GBAR_L_tr(ti),',',GBAR_C_tr(ti),',',SSC_Payments_tr(ti),','&
+								& ,Debt_tr(ti),Wealth_Top_1_tr(ti),',',Wealth_Top_10_tr(ti)
+			enddo 
+			WRITE (UNIT=78,FMT=*) 'SS_2,',QBAR_exp,',',NBAR_exp,',',R_exp,',',wage_exp,',' & 
+								&  ,Y_exp,',',K_exp,',',C_exp,','&
+								&  ,Debt_exp,',',GBAR_exp,',99,99,99,99,99,99,'&
+								&  ,Wealth_Top_1_tr(T+1),',',Wealth_Top_1_tr(T+1)
+			CLOSE (UNIT=78);
+
+
 	    simutime  = simutime +1 
 	 
 	ENDDO ! WHILE
@@ -6141,21 +6163,7 @@ SUBROUTINE FIND_DBN_Transition()
 	print*,'---------------------------------------------------'
 	print*,' '
 
-	! Print Summary File
-	OPEN  (UNIT=78,FILE=trim(Result_Folder)//'Transition_Summary.txt'   , STATUS='replace')
-	WRITE (UNIT=78,FMT=*) 'Period, Q, N, R, Wage, Y, K, C, Debt,',&
-			&' GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC,',' Wealth_Top_1, Wealth_Top_10'
-	WRITE (UNIT=78,FMT=*) 'SS_1,',QBAR_bench,',',NBAR_bench,',',R_bench,',',wage_bench,',' & 
-								&  ,Y_bench,',',K_bench,',',C_bench,',',0,',',GBAR_bench
-	do ti=1,T+1
-	WRITE (UNIT=78,FMT=*) ti,',',QBAR_tr(ti),',',NBAR_tr(ti),',',R_tr(ti),',',Wage_tr(ti),',' & 
-							& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),',',GBAR_tr(ti),',' &
-							& ,GBAR_K_tr(ti),',',GBAR_W_tr(ti),',',GBAR_L_tr(ti),',',GBAR_C_tr(ti),',',SSC_Payments_tr(ti),',' &
-							& ,Debt_tr(ti),Wealth_Top_1_tr(ti),',',Wealth_Top_10_tr(ti)
-	enddo 
-	WRITE (UNIT=78,FMT=*) 'SS_2,',QBAR_exp,',',NBAR_exp,',',R_exp,',',wage_exp,',' & 
-						&  ,Y_exp,',',K_exp,',',C_exp,',',Debt_exp,',',GBAR_exp,',99,99,99,99,99,99,',Wealth_Top_1_tr(T+1),',',Wealth_Top_1_tr(T+1)
-	CLOSE (UNIT=78);
+	
 
 
 
