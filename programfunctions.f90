@@ -5831,10 +5831,10 @@ SUBROUTINE FIND_DBN_Transition()
         		ind_R = 1 
 	        else 
 	        	! Update by interpolating between last update and next update
-	        	R_tr(ti) = real(ind_R,8)/3.0_dp*R_tr(ti-ind_R)+real(3-ind_R,8)/3.0_dp*R_tr(ti+3-ind_R)
-	        		print*, '	R Interpolation'
-	        		print*, '		p1=',real(ind_R,8)/3.0_dp,'p2=',real(3-ind_R,8)/3.0_dp,'R1=',R_tr(ti-ind_R),'R2=',R_tr(ti+3-ind_R)
-	        		print*, ' '
+	        	R_tr(ti) = real(3-ind_R,8)/3.0_dp*R_tr(ti-ind_R)+real(ind_R,8)/3.0_dp*R_tr(ti+3-ind_R)
+	        		! print*, '	R Interpolation'
+	        		! print*, '		p1=',real(3-ind_R,8)/3.0_dp,'p2=',real(ind_R,8)/3.0_dp,'R1=',R_tr(ti-ind_R),'R2=',R_tr(ti+3-ind_R)
+	        		! print*, ' '
 
 	        	! Update index
 	        	ind_R = ind_R+1
