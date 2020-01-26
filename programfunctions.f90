@@ -5453,11 +5453,13 @@ SUBROUTINE FIND_DBN_Transition()
 			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
 			OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		 , STATUS='old', ACTION='read')
 			OPEN (UNIT=4,  FILE=trim(Result_Folder)//'Debt_SS' 	 , STATUS='old', ACTION='read')
+			OPEN (UNIT=5,  FILE=trim(Result_Folder)//'DBN_SS' 	 , STATUS='old', ACTION='read')
 			READ (UNIT=1,  FMT=*), QBAR_tr
 			READ (UNIT=2,  FMT=*), NBAR_tr
 			READ (UNIT=3,  FMT=*), R_tr
 			READ (UNIT=4,  FMT=*), Debt_SS
-			CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4);
+			READ (UNIT=5,  FMT=*), DBN1
+			CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=4);
 			print*, 'Reading completed'
 
 		! Choose YBAR, EBAR, P and Wage to be consistent
@@ -6092,6 +6094,7 @@ SUBROUTINE FIND_DBN_Transition()
 			OPEN  (UNIT=89,  FILE=trim(Result_Folder)//'tauK_tr'   , STATUS='replace')
 			OPEN  (UNIT=90,  FILE=trim(Result_Folder)//'tauC_tr'   , STATUS='replace')
 			OPEN  (UNIT=91,  FILE=trim(Result_Folder)//'Debt_SS'   , STATUS='replace')
+			OPEN  (UNIT=92,  FILE=trim(Result_Folder)//'DBN_SS'   , STATUS='replace')
 				! WRITE (UNIT=1,  FMT=*) Cons_tr
 				! WRITE (UNIT=2,  FMT=*) Hours_tr
 				! WRITE (UNIT=3,  FMT=*) Aprime_tr
@@ -6110,11 +6113,12 @@ SUBROUTINE FIND_DBN_Transition()
 				WRITE (UNIT=89,  FMT=*) tauK
 				WRITE (UNIT=90,  FMT=*) tauC
 				WRITE (UNIT=91,  FMT=*) Debt_SS
+				WRITE (UNIT=92,  FMT=*) DBN_exp
 			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
 			CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
 	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); 
 	    	CLOSE (unit=85); CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89); CLOSE (unit=90); 
-	    	CLOSE (unit=91); 
+	    	CLOSE (unit=91); CLOSE (unit=92); 
 			print*,' 	--------------------------------------'
 			print*,' 	Variable Printing Completed'
 			print*,' 	--------------------------------------'
