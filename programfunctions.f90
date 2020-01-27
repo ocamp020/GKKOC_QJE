@@ -5459,7 +5459,7 @@ SUBROUTINE FIND_DBN_Transition()
 			READ (UNIT=3,  FMT=*), R_tr
 			READ (UNIT=4,  FMT=*), Debt_SS
 			READ (UNIT=5,  FMT=*), DBN1
-			CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=4);
+			CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=5);
 			print*, 'Reading completed'
 
 		! Choose YBAR, EBAR, P and Wage to be consistent
