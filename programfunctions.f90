@@ -5467,7 +5467,7 @@ SUBROUTINE FIND_DBN_Transition()
         YBAR_tr = QBAR_tr ** alpha * NBAR_tr **(1.0_DP-alpha)
         wage_tr = (1.0_DP-alpha)*QBAR_tr**alpha * NBAR_tr**(-alpha)
         Ebar_tr = wage_tr  * NBAR_tr  * sum(pop)/sum(pop(1:RetAge-1))
-        DBN_exp = DBN1 ; DBN2 = DBN1 ; 
+        DBN_exp = DBN1 ; DBN_tr(:,:,:,:,:,:,T+1) = DBN1 ; 
         	print*, "Test Prices"
 	        print*, "P   ", P_bench, P_tr(1), P_tr(T), P_tr(T+1)
 	        print*, "wage", wage_bench, wage_tr(1), wage_tr(T), wage_tr(T+1)
@@ -5547,7 +5547,7 @@ SUBROUTINE FIND_DBN_Transition()
 		Debt_tr = 0.0_dp
 
 		! Set initial value for aggregate variables 
-			R = R_tr(T+1) ; P = P_tr(T+1) ; wage = wage_tr(T+1) ; DBN1 = DBN2 ; 
+			R = R_tr(T+1) ; P = P_tr(T+1) ; wage = wage_tr(T+1) ; DBN1 = DBN_tr(:,:,:,:,:,:,T+1) ; 
 		! Deallocate grids that include thresholds, they are reset in Find_DBN_EQ
 			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 		! Solve for New Steady State
@@ -5911,9 +5911,6 @@ SUBROUTINE FIND_DBN_Transition()
 		print*,' 	DBN Forward Iteration Completed'
 		print*,' 	--------------------------------------'
 		print*,' '
-
-		! Save Last period's distribution for initial guess in FIND_DBN_EQ
-			DBN2  = DBN_tr(:,:,:,:,:,:,T+1)
 
 
 	    ! Set global variables to current period  (Time: ti)
