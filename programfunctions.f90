@@ -5467,6 +5467,7 @@ SUBROUTINE FIND_DBN_Transition()
         YBAR_tr = QBAR_tr ** alpha * NBAR_tr **(1.0_DP-alpha)
         wage_tr = (1.0_DP-alpha)*QBAR_tr**alpha * NBAR_tr**(-alpha)
         Ebar_tr = wage_tr  * NBAR_tr  * sum(pop)/sum(pop(1:RetAge-1))
+        DBN_exp = DBN1 ; DBN2 = DBN1 ; 
         	print*, "Test Prices"
 	        print*, "P   ", P_bench, P_tr(1), P_tr(T), P_tr(T+1)
 	        print*, "wage", wage_bench, wage_tr(1), wage_tr(T), wage_tr(T+1)
@@ -5546,10 +5547,12 @@ SUBROUTINE FIND_DBN_Transition()
 		Debt_tr = 0.0_dp
 
 		! Set initial value for aggregate variables 
-			R = R_exp ; P = P_exp ; wage = wage_exp ; DBN1 = DBN_exp ; 
+			R = R_tr(T+1) ; P = P_tr(T+1) ; wage = wage_tr(T+1) ; DBN1 = DBN2 ; 
 		! Deallocate grids that include thresholds, they are reset in Find_DBN_EQ
 			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 		! Solve for New Steady State
+			print*,' '
+			print*,' 	Finding SS: Debt_SS=',Debt_SS,'R_0=',R,'Q_0=',QBAR_exp
 			CALL FIND_DBN_EQ
 				GBAR_exp  = GBAR
 				QBAR_exp  = QBAR 
@@ -5573,6 +5576,7 @@ SUBROUTINE FIND_DBN_Transition()
 		! Wealth and consumption in benchmark and experiment
 			K_exp   = sum( sum(sum(sum(sum(sum(DBN_exp  ,6),5),4),3),1)*agrid )
 			C_exp   = sum( DBN_exp  *Cons_exp   )
+			print*,' 	New SS: Debt_SS=',Debt_SS,'R_SS=',R,'Q_SS=',QBAR
 
 
 
@@ -5590,10 +5594,10 @@ SUBROUTINE FIND_DBN_Transition()
 
 		! Initialize DBN_tr to zero for other periods
 		! print*, ' Initializing remaining periods of DBN_tr to zero'
-		! DO ti=2,T+1
-		! 	! print*,' 	Transition Period',ti
-	 	! 		DBN_tr(:,:,:,:,:,:,ti)=0.0_DP
-	 	! ENDDO
+			! DO ti=2,T+1
+			! 	! print*,' 	Transition Period',ti
+		 	! 		DBN_tr(:,:,:,:,:,:,ti)=0.0_DP
+		 	! ENDDO
 	 	DBN_tr(:,:,:,:,:,:,2:) = 0.0_DP
 
     	print*,' '
@@ -5795,8 +5799,8 @@ SUBROUTINE FIND_DBN_Transition()
 	        	N_dist = max(N_dist,abs(NBAR2_tr(ti)/NBAR_tr(ti)-1))
 
             	! Dampened Update of QBAR and NBAR
-	        	QBAR_tr(ti)  = 0.5*QBAR_tr(ti) + 0.5*QBAR2_tr(ti)
-	        	NBAR_tr(ti)  = 0.5*NBAR_tr(ti) + 0.5*NBAR2_tr(ti)
+	        	QBAR_tr(ti)  = 0.2*QBAR_tr(ti) + 0.8*QBAR2_tr(ti)
+	        	NBAR_tr(ti)  = 0.2*NBAR_tr(ti) + 0.8*NBAR2_tr(ti)
 
         	! Update other prices and quantities             
 	        P_tr(ti)     = alpha* QBAR_tr(ti)**(alpha-mu) * NBAR_tr(ti)**(1.0_DP-alpha)
@@ -5827,7 +5831,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        	R_dist = max(R_dist,abs(R2_tr(ti)/R_tr(ti)-1))
 
 	        	! Dampened Update of R
-	        	R_tr(ti)  = 0.5*R_old + 0.5*R2_tr(ti)
+	        	R_tr(ti)  = 0.2*R_old + 0.8*R2_tr(ti)
 
 	        	! Update index
         		ind_R = 1 
@@ -5908,6 +5912,9 @@ SUBROUTINE FIND_DBN_Transition()
 		print*,' 	--------------------------------------'
 		print*,' '
 
+		! Save Last period's distribution for initial guess in FIND_DBN_EQ
+			DBN2  = DBN_tr(:,:,:,:,:,:,T+1)
+
 
 	    ! Set global variables to current period  (Time: ti)
 	    	R = R_tr(T+1) ; P = P_tr(T+1) ; wage = wage_tr(T+1) ;
@@ -5946,8 +5953,8 @@ SUBROUTINE FIND_DBN_Transition()
 	        	N_dist = max(N_dist,abs(NBAR2_tr(T+1)/NBAR_tr(T+1)-1))
 
             	! Dampened Update of QBAR and NBAR
-	        	QBAR_tr(T+1)  = 0.5*QBAR_tr(T+1) + 0.5*QBAR2_tr(T+1)
-	        	NBAR_tr(T+1)  = 0.5*NBAR_tr(T+1) + 0.5*NBAR2_tr(T+1)
+	        	QBAR_tr(T+1)  = 0.2*QBAR_tr(T+1) + 0.8*QBAR2_tr(T+1)
+	        	NBAR_tr(T+1)  = 0.2*NBAR_tr(T+1) + 0.8*NBAR2_tr(T+1)
 
         	! Update other prices and quantities             
 	        P_tr(T+1)     = alpha* QBAR_tr(T+1)**(alpha-mu) * NBAR_tr(T+1)**(1.0_DP-alpha)
@@ -5958,12 +5965,10 @@ SUBROUTINE FIND_DBN_Transition()
 	    	! Solve for new R (that clears market under new guess for prices)
 	    	! print*, '	Solving for equilibrium interest rate (R)'
 	    		! Save old R for updating 
-	    		R_old = R_tr(ti)
+	    		R_old = R_tr(T+1)
 	    	if (sum(theta)/nz .gt. 1.0_DP) then
 	    		! Set price 
 	    		P = min(P_tr(T+1),1.0_dp)
-	    		! Set DBN1 as the distribution for the current period (Time: T+1)
-	    		DBN1  = DBN_tr(:,:,:,:,:,:,T+1)
 	            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(T+1))
 	            	! Usually brent_tol=0.00000001_DP
 	            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
@@ -5976,7 +5981,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        	R_dist = max(R_dist,abs(R2_tr(T+1)/R_tr(T+1)-1))
 
 	        	! Dampened Update of R
-	        	R_tr(ti)  = 0.5*R_old + 0.5*R2_tr(ti)
+	        	R_tr(T+1)  = 0.2*R_old + 0.8*R2_tr(T+1)
 
 	        ! Compute government budget for the current preiod (Time: T+1)
 	    	! print*,' Calculating tax revenue'
@@ -5995,7 +6000,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        	Db_dist = max(Db_dist,abs(Debt_SS/Debt_tr(T+1)-1))
 
 	        ! Dampened Update of Db_ss
-	        	Debt_SS  = 0.5*Debt_SS + 0.5*Debt_tr(T+1)	
+	        	Debt_SS  = 0.2*Debt_SS + 0.8*Debt_tr(T+1)	
 
 
 	        ! Compute total assets and consumption
@@ -6033,8 +6038,8 @@ SUBROUTINE FIND_DBN_Transition()
 				    ENDIF
 				ENDDO
 				! Store top wealth shares 
-			        Wealth_Top_1_Tr(ti)  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
-			        Wealth_Top_10_Tr(ti) = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
+			        Wealth_Top_1_Tr(T+1)  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
+			        Wealth_Top_10_Tr(T+1) = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
 	    
 
 	    	! Save Prices
