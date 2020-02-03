@@ -5537,7 +5537,7 @@ SUBROUTINE FIND_DBN_Transition()
 	iter_indx    = 1
 	!print*, 'Computing Equilibrium Distribution'
 	DO WHILE ((DBN_dist.ge.DBN_criteria).and.(max(Q_dist,N_dist,R_dist,Db_dist).ge.Price_criteria)&
-			& .and.(simutime.le.10).and.(Chg_dist.ge.Chg_criteria) )
+			& .and.(simutime.le.15).and.(Chg_dist.ge.Chg_criteria) )
 		! print*, 'DBN_dist=', DBN_dist
 
 		! Start Q_dist, N_dist, R_dsit, Db_dist
@@ -5799,8 +5799,8 @@ SUBROUTINE FIND_DBN_Transition()
 	        	N_dist = max(N_dist,abs(NBAR2_tr(ti)/NBAR_tr(ti)-1))
 
             	! Dampened Update of QBAR and NBAR
-	        	QBAR_tr(ti)  = 0.2*QBAR_tr(ti) + 0.8*QBAR2_tr(ti)
-	        	NBAR_tr(ti)  = 0.2*NBAR_tr(ti) + 0.8*NBAR2_tr(ti)
+	        	QBAR_tr(ti)  = 0.5*QBAR_tr(ti) + 0.5*QBAR2_tr(ti)
+	        	NBAR_tr(ti)  = 0.5*NBAR_tr(ti) + 0.5*NBAR2_tr(ti)
 
         	! Update other prices and quantities             
 	        P_tr(ti)     = alpha* QBAR_tr(ti)**(alpha-mu) * NBAR_tr(ti)**(1.0_DP-alpha)
@@ -5831,7 +5831,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        	R_dist = max(R_dist,abs(R2_tr(ti)/R_tr(ti)-1))
 
 	        	! Dampened Update of R
-	        	R_tr(ti)  = 0.2*R_old + 0.8*R2_tr(ti)
+	        	R_tr(ti)  = 0.5*R_old + 0.5*R2_tr(ti)
 
 	        	! Update index
         		ind_R = 1 
@@ -5950,8 +5950,8 @@ SUBROUTINE FIND_DBN_Transition()
 	        	N_dist = max(N_dist,abs(NBAR2_tr(T+1)/NBAR_tr(T+1)-1))
 
             	! Dampened Update of QBAR and NBAR
-	        	QBAR_tr(T+1)  = 0.2*QBAR_tr(T+1) + 0.8*QBAR2_tr(T+1)
-	        	NBAR_tr(T+1)  = 0.2*NBAR_tr(T+1) + 0.8*NBAR2_tr(T+1)
+	        	QBAR_tr(T+1)  = 0.5*QBAR_tr(T+1) + 0.5*QBAR2_tr(T+1)
+	        	NBAR_tr(T+1)  = 0.5*NBAR_tr(T+1) + 0.5*NBAR2_tr(T+1)
 
         	! Update other prices and quantities             
 	        P_tr(T+1)     = alpha* QBAR_tr(T+1)**(alpha-mu) * NBAR_tr(T+1)**(1.0_DP-alpha)
@@ -5978,7 +5978,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        	R_dist = max(R_dist,abs(R2_tr(T+1)/R_tr(T+1)-1))
 
 	        	! Dampened Update of R
-	        	R_tr(T+1)  = 0.2*R_old + 0.8*R2_tr(T+1)
+	        	R_tr(T+1)  = 0.5*R_old + 0.5*R2_tr(T+1)
 
 	        ! Compute government budget for the current preiod (Time: T+1)
 	    	! print*,' Calculating tax revenue'
@@ -5997,7 +5997,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        	Db_dist = max(Db_dist,abs(Debt_SS/Debt_tr(T+1)-1))
 
 	        ! Dampened Update of Db_ss
-	        	Debt_SS  = 0.2*Debt_SS + 0.8*Debt_tr(T+1)	
+	        	Debt_SS  = 0.5*Debt_SS + 0.5*Debt_tr(T+1)	
 
 
 	        ! Compute total assets and consumption
