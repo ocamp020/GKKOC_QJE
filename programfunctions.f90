@@ -5811,7 +5811,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 	    	! Solve for new R (that clears market under new guess for prices)
 	    	! Update only every third period or in the first and last periods 
-	    	if ((ind_R.eq.3).or.(ti.eq.T)) then 
+	    	! if ((ind_R.eq.3).or.(ti.eq.T)) then 
 		    		! Save old R for updating 
 		    		R_old = R_tr(ti)
 		    	if (sum(theta)/nz .gt. 1.0_DP) then
@@ -5835,16 +5835,16 @@ SUBROUTINE FIND_DBN_Transition()
 
 	        	! Update index
         		ind_R = 1 
-	        else 
-	        	! Update by interpolating between last update and next update
-	        	R_tr(ti) = real(3-ind_R,8)/3.0_dp*R_tr(ti-ind_R)+real(ind_R,8)/3.0_dp*R_tr(ti+3-ind_R)
-	        		! print*, '	R Interpolation'
-	        		! print*, '		p1=',real(3-ind_R,8)/3.0_dp,'p2=',real(ind_R,8)/3.0_dp,'R1=',R_tr(ti-ind_R),'R2=',R_tr(ti+3-ind_R)
-	        		! print*, ' '
+	        ! else 
+	        ! 	! Update by interpolating between last update and next update
+	        ! 	R_tr(ti) = real(3-ind_R,8)/3.0_dp*R_tr(ti-ind_R)+real(ind_R,8)/3.0_dp*R_tr(ti+3-ind_R)
+	        ! 		! print*, '	R Interpolation'
+	        ! 		! print*, '		p1=',real(3-ind_R,8)/3.0_dp,'p2=',real(ind_R,8)/3.0_dp,'R1=',R_tr(ti-ind_R),'R2=',R_tr(ti+3-ind_R)
+	        ! 		! print*, ' '
 
-	        	! Update index
-	        	ind_R = ind_R+1
-	        endif 
+	        ! 	! Update index
+	        ! 	ind_R = ind_R+1
+	        ! endif 
 
 
 		    ! Compute government budget for the current preiod (Time: sti)
