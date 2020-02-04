@@ -5407,7 +5407,7 @@ SUBROUTINE FIND_DBN_Transition()
 	IMPLICIT NONE
 	INTEGER    :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL       :: DBN_dist, DBN_criteria, Q_dist, N_dist, Price_criteria, Chg_criteria, Old_DBN_dist, Chg_dist, R_dist, Db_dist
-	REAL(DP)   :: BBAR, MeanWealth, brent_value, K_bench, C_bench, K_exp, C_exp, R_old, Db_old 
+	REAL(DP)   :: BBAR, MeanWealth, brent_value, K_bench, C_bench, K_exp, C_exp, R_old, Db_old, R_slope 
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
 	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr, Wealth_Top_1_Tr, Wealth_Top_10_Tr, R2_tr
@@ -5811,7 +5811,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 	    	! Solve for new R (that clears market under new guess for prices)
 	    	! Update only every third period or in the first and last periods 
-	    	! if ((ind_R.eq.3).or.(ti.eq.T)) then 
+	    	if ((ind_R.eq.3)) then ! .or.(ti.eq.T)
 		    		! Save old R for updating 
 		    		R_old = R_tr(ti)
 		    	if (sum(theta)/nz .gt. 1.0_DP) then
@@ -5833,21 +5833,42 @@ SUBROUTINE FIND_DBN_Transition()
 	        	! Dampened Update of R
 	        	R_tr(ti)  = 0.5*R_old + 0.5*R2_tr(ti)
 
+	        	if ((ti.gt.1).and.(ti.lt.T)) then 
+	        		! Update extrapolation by interpolating between last update and this update
+    				R_tr(ti-2) = real(2,8)/3.0_dp*R_tr(ti-3)+real(1,8)/3.0_dp*R_tr(ti)
+    				R_tr(ti-1) = real(1,8)/3.0_dp*R_tr(ti-3)+real(2,8)/3.0_dp*R_tr(ti)
+	        		! print*, '	R Interpolation'
+	        		! print*, ' 	R1=',R_tr(ti-3),'R2=',R_tr(ti-2),'R3=',R_tr(ti-1),'R4=',R_tr(ti)
+	        		! print*, ' '
+ 
+
+	        		! Update Slope for extrapolation 
+	        		R_slope = (R_tr(ti)-R_tr(ti-3))/3.0_dp 
+
+        		!elseif (ti.eq.T) then 
+
+        		elseif (ti.eq.1) then 
+
+        			R_slope = 0.0_dp
+
+	        	endif 
+
 	        	! Update index
         		ind_R = 1 
-	        ! else 
-	        ! 	! Update by interpolating between last update and next update
-	        ! 	R_tr(ti) = real(3-ind_R,8)/3.0_dp*R_tr(ti-ind_R)+real(ind_R,8)/3.0_dp*R_tr(ti+3-ind_R)
-	        ! 		! print*, '	R Interpolation'
-	        ! 		! print*, '		p1=',real(3-ind_R,8)/3.0_dp,'p2=',real(ind_R,8)/3.0_dp,'R1=',R_tr(ti-ind_R),'R2=',R_tr(ti+3-ind_R)
-	        ! 		! print*, ' '
 
-	        ! 	! Update index
-	        ! 	ind_R = ind_R+1
-	        ! endif 
+	        else 
+	        	! Update by extrapolating from last update 
+	    		R_tr(ti) = R_slope*ind_R+R_tr(ti-ind_R)
+	        		! print*, '	R Interpolation'
+	        		! print*, '		p1=',real(3-ind_R,8)/3.0_dp,'p2=',real(ind_R,8)/3.0_dp,'R1=',R_tr(ti-ind_R),'R2=',R_tr(ti+3-ind_R)
+	        		! print*, ' '
+
+	        	! Update index
+	        	ind_R = ind_R+1
+	        endif 
 
 
-		    ! Compute government budget for the current preiod (Time: sti)
+		    ! Compute government budget for the current preiod (Time: ti)
 		    ! print*,' Calculating tax revenue'
 	    	CALL GOVNT_BUDGET(.false.)
 			    GBAR_tr(ti) 		= GBAR 
