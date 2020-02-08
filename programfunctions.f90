@@ -4044,7 +4044,7 @@ SUBROUTINE FIND_DBN_EQ()
 
 		! Everyone in MaxAge dies. Those who die, switch to z2, lambda2 and start at ne/2+1 and x=1
 	    age1=MaxAge
-	    !$omp parallel do reduction(+:DBN_aux) private(x1,a1,lambda1,e1,z2,lambda2)
+	    !$omp parallel do reduction(+:DBN2) private(x1,a1,lambda1,e1,z2,lambda2)
 	    DO z1=1,nz
 	    DO x1=1,nx
 	    DO a1=1,na
@@ -5414,8 +5414,7 @@ SUBROUTINE FIND_DBN_Transition()
 	INTEGER    :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL       :: DBN_dist, DBN_criteria, Q_dist, N_dist, Price_criteria, Chg_criteria, Old_DBN_dist, Chg_dist, R_dist, Db_dist
 	REAL(DP)   :: BBAR, MeanWealth, brent_value, K_bench, C_bench, K_exp, C_exp, R_old, Db_old, R_slope 
-	REAL(DP), DIMENSION(MaxAge,na,nz,nlambda,ne,nx) :: DBN_aux
-	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi, DBN_aux
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
 	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr, Wealth_Top_1_Tr, Wealth_Top_10_Tr, R2_tr
 	INTEGER    :: prctile, ind_R 
@@ -5430,7 +5429,7 @@ SUBROUTINE FIND_DBN_Transition()
 	allocate( PrAprimelo( MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Aplo(       MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Aphi(       MaxAge,na,nz,nlambda,ne,nx) )
-	! allocate( DBN_aux(    MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( DBN_aux(    MaxAge,na,nz,nlambda,ne,nx) )
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria    = 1.0E-06_DP
