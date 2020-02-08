@@ -5419,6 +5419,9 @@ SUBROUTINE FIND_DBN_Transition()
 	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr, Wealth_Top_1_Tr, Wealth_Top_10_Tr, R2_tr
 	INTEGER    :: prctile, ind_R 
 	REAL(DP)   :: Dampen
+	! Timing
+	real(kind=8)    :: t1, t2, elapsed_time, t1_R, t2_R, elapsed_time_R
+    integer(kind=8) :: tclock1, tclock2, clock_rate, tclock1_R, tclock2_R, clock_rate_R
 
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -5618,7 +5621,8 @@ SUBROUTINE FIND_DBN_Transition()
 
     	! Initialize DBN1 
     		DBN1 = 0.0_DP
-
+    		call system_clock(tclock1)  ! start wall timer
+    		call cpu_time(t1)   		! start cpu timer
 
 		! Discretize policy function for assets (a') for current period
 			! For each age and state vector bracket optimal a' between two grid points
@@ -5771,6 +5775,9 @@ SUBROUTINE FIND_DBN_Transition()
 	    ENDDO
 	    !$omp barrier
 
+	    call cpu_time(t2)   ! end cpu timer
+    	call system_clock(tclock2, clock_rate); elapsed_time = float(tclock2 - tclock1) / float(clock_rate)
+
 	    ! Update distribution
 	    	DBN_tr(:,:,:,:,:,:,ti+1) = DBN1
 
@@ -5832,10 +5839,15 @@ SUBROUTINE FIND_DBN_Transition()
 		    		! Set price 
 		    		P = min(P_tr(ti),1.0_dp)
 		    		! Solve for R using brent
+		    			call system_clock(tclock1_R)  ! start wall timer
+    					call cpu_time(t1_R)   		! start cpu timer
 		            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(ti))
 		            	! Usually brent_tol=0.00000001_DP
+		            	call cpu_time(t2)   ! end cpu timer
+    					call system_clock(tclock2, clock_rate); elapsed_time = float(tclock2 - tclock1) / float(clock_rate)
 		            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
 		            		& 'R_out=',R2_tr(ti)
+		            	print*, '	Brent Time:		CPU time:',t2-t1,'sec		Elapsed time:',elapsed_time,'sec'
 	            		print*, ' '
 	            else
 	                R2_tr(ti) = 0.0_DP
@@ -5939,6 +5951,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        ! print*, ' '
 
 	        print*, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr(ti),'Wealth=',K_tr(ti),'R=',R_tr(ti),'Q=',QBAR_tr(ti)
+	        print*, '		CPU time:',t2-t1,'sec		Elapsed time:',elapsed_time,'sec'
 	        print*, ' '
     	ENDDO ! Transition Time
 
@@ -9427,7 +9440,7 @@ Function Agg_Debt_Tr(R_in)
 
 		! Everyone in MaxAge dies. Those who die, switch to z2, lambda2 and start at ne/2+1 and x=1
 	    age1=MaxAge
-	    !$omp parallel do reduction(+:DBN_aux) private(x1,a1,lambda1,e1,z2,lambda2)
+	    ! $omp parallel do reduction(+:DBN_aux) private(x1,a1,lambda1,e1,z2,lambda2)
 	    DO z1=1,nz
 	    DO x1=1,nx
 	    DO a1=1,na
@@ -9453,7 +9466,7 @@ Function Agg_Debt_Tr(R_in)
 	    !$omp barrier   
 
 		! retirees "e" stays the same for benefit retirement calculation purposes
-		!$omp parallel do reduction(+:DBN_aux) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2)
+		! $omp parallel do reduction(+:DBN_aux) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2)
 	    DO z1=1,nz
 	    DO x1=1,nx
 	    DO age1=RetAge-1, MaxAge-1
@@ -9495,7 +9508,7 @@ Function Agg_Debt_Tr(R_in)
 	    !$omp barrier
 	    
 	    ! Working age agents
-	    !$omp parallel do reduction(+:DBN_aux) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2,e2)
+	    ! $omp parallel do reduction(+:DBN_aux) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2,e2)
 	    DO z1=1,nz
 	    DO x1=1,nx
 	    DO age1=1,RetAge-2
