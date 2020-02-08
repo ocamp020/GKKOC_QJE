@@ -4044,8 +4044,9 @@ SUBROUTINE FIND_DBN_EQ()
 
 		! Everyone in MaxAge dies. Those who die, switch to z2, lambda2 and start at ne/2+1 and x=1
 	    age1=MaxAge
-	    DO x1=1,nx
+	    !$omp parallel do reduction(+:DBN_aux) private(x1,a1,lambda1,e1,z2,lambda2)
 	    DO z1=1,nz
+	    DO x1=1,nx
 	    DO a1=1,na
 	    DO lambda1=1,nlambda
 	    DO e1=1, ne
@@ -4063,13 +4064,15 @@ SUBROUTINE FIND_DBN_EQ()
 	    ENDDO
 	    ENDDO    
 	    ENDDO
-	    ENDDO    
+	    ENDDO  
+	    !$omp barrier  
 
 		! retirees "e" stays the same for benefit retirement calculation purposes
+		!$omp parallel do reduction(+:DBN2) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2)
+		DO z1=1,nz
 	    DO x1=1,nx
 	    DO age1=RetAge-1, MaxAge-1
 	    DO a1=1,na
-	    DO z1=1,nz
 	    DO lambda1=1,nlambda
 	    DO e1=1, ne
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
@@ -4100,12 +4103,14 @@ SUBROUTINE FIND_DBN_EQ()
 	    ENDDO
 	    ENDDO
 	    ENDDO
+	    !$omp barrier
 	    
 	    ! Working age agents
+	    !$omp parallel do reduction(+:DBN2) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2,e2)
+	    DO z1=1,nz
 	    DO x1=1,nx
 	    DO age1=1,RetAge-2
 	    DO a1=1,na
-	    DO z1=1,nz
 	    DO lambda1=1,nlambda
 	    DO e1=1, ne
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
@@ -4137,6 +4142,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    ENDDO
 	    ENDDO
 	    ENDDO
+	    !$omp barrier
 	    
 	    DBN2 = 0.9*DBN1 + 0.1*DBN2
 	    DBN_dist = maxval(abs(DBN2-DBN1))
@@ -5408,7 +5414,7 @@ SUBROUTINE FIND_DBN_Transition()
 	INTEGER    :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL       :: DBN_dist, DBN_criteria, Q_dist, N_dist, Price_criteria, Chg_criteria, Old_DBN_dist, Chg_dist, R_dist, Db_dist
 	REAL(DP)   :: BBAR, MeanWealth, brent_value, K_bench, C_bench, K_exp, C_exp, R_old, Db_old, R_slope 
-	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi, DBN_aux
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
 	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr, Wealth_Top_1_Tr, Wealth_Top_10_Tr, R2_tr
 	INTEGER    :: prctile, ind_R 
@@ -5423,6 +5429,7 @@ SUBROUTINE FIND_DBN_Transition()
 	allocate( PrAprimelo( MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Aplo(       MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Aphi(       MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( DBN_aux(    MaxAge,na,nz,nlambda,ne,nx) )
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria    = 1.0E-06_DP
@@ -5610,6 +5617,9 @@ SUBROUTINE FIND_DBN_Transition()
 	    DO ti=1,T
 	    	! print*,' 	Transition Period ',ti
 
+    	! Initialize DBN_aux 
+    		DBN_aux = 0.0_DP
+
 
 		! Discretize policy function for assets (a') for current period
 			! For each age and state vector bracket optimal a' between two grid points
@@ -5617,18 +5627,12 @@ SUBROUTINE FIND_DBN_Transition()
 			! The grid points are selected with probability proportional to their distance to the optimal a'
 		! print*,' Discretizing Policy Functions'
 		DO age=1,MaxAge
-			! print*,' 		Age ',age
 		!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
 		DO zi=1,nz
-			! print*,' 			z ',zi 
 		DO xi=1,nx
-			! print*,' 				x ',xi 
 		DO ai=1,na
-			! print*,' 					a ',ai 
 		DO lambdai=1,nlambda
-			! print*,' 						lambda ',lambdai 
 		DO ei=1, ne
-			! print*, '  							e', ei
 	        if ( Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .ge. amax) then
 	            tklo =na-1
 	        elseif (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .lt. amin) then
@@ -5658,18 +5662,19 @@ SUBROUTINE FIND_DBN_Transition()
 
 		! Everyone in MaxAge dies. Those who die, switch to z2, lambda2 and start at ne/2+1 and x=1
 	    age1=MaxAge
-	    DO x1=1,nx
+	    !$omp parallel do reduction(+:DBN_aux) private(x1,a1,lambda1,e1,z2,lambda2)
 	    DO z1=1,nz
+	    DO x1=1,nx
 	    DO a1=1,na
 	    DO lambda1=1,nlambda
 	    DO e1=1, ne
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN_tr(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 , ti+1)   =  &
+	        	DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
 	           		& DBN_tr(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1 , ti+1) + &
 	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) &
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
-	            DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 , ti+1)   =  &
+	            DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
 	           		& DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1 , ti+1) + &
 	           		&  DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
@@ -5679,23 +5684,25 @@ SUBROUTINE FIND_DBN_Transition()
 	    ENDDO
 	    ENDDO    
 	    ENDDO
-	    ENDDO    
+	    ENDDO  
+	    !$omp barrier  
 
 		! retirees "e" stays the same for benefit retirement calculation purposes
+		!$omp parallel do reduction(+:DBN_aux) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2)
+	    DO z1=1,nz
 	    DO x1=1,nx
 	    DO age1=RetAge-1, MaxAge-1
 	    DO a1=1,na
-	    DO z1=1,nz
 	    DO lambda1=1,nlambda
 	    DO e1=1, ne
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN_tr(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1,ti+1)   =  &
+	        	DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
 	           		& DBN_tr(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1,ti+1) + &
 	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) &
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
-	            DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1,ti+1)   =  &
+	            DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
 	           		& DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1,ti+1) + &
 	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
@@ -5705,11 +5712,11 @@ SUBROUTINE FIND_DBN_Transition()
 	        ! Those who live stay at z1, lambda1, and also e1 since they are retired
 	        !e2=e1
 	        DO x2=1,nx
-		        DBN_tr(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2,ti+1) =  &
+		        DBN_aux(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2 ) =  &
 		        	& DBN_tr(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2,ti+1) + &
 		        	& DBN_tr(age1, a1, z1, lambda1, e1,x1,ti) &
 		            & * survP(age1) * PrAprimelo(age1,a1,z1,lambda1,e1,x1) * pr_x(x1,x2,z1,age1)     
-		        DBN_tr(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2,ti+1) =  &
+		        DBN_aux(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2 ) =  &
 		          	& DBN_tr(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2,ti+1) + &
 		          	& DBN_tr(age1, a1, z1, lambda1, e1,x1,ti) &
 		            & * survP(age1) * PrAprimehi(age1,a1,z1,lambda1,e1,x1) * pr_x(x1,x2,z1,age1)  
@@ -5720,22 +5727,24 @@ SUBROUTINE FIND_DBN_Transition()
 	    ENDDO
 	    ENDDO
 	    ENDDO
+	    !$omp barrier
 	    
 	    ! Working age agents
+	    !$omp parallel do reduction(+:DBN_aux) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2,e2)
+	    DO z1=1,nz
 	    DO x1=1,nx
 	    DO age1=1,RetAge-2
 	    DO a1=1,na
-	    DO z1=1,nz
 	    DO lambda1=1,nlambda
 	    DO e1=1, ne
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN_tr(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1,ti+1)   =  &
+	        	DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
 	           		& DBN_tr(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1,ti+1) + & 
 	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) &
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
-	            DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1,ti+1)   =  &
+	            DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
 	           		& DBN_tr(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1,ti+1) + & 
 	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
@@ -5745,11 +5754,11 @@ SUBROUTINE FIND_DBN_Transition()
 	        ! Those who live stay at z1, lambda1, but switch to e2 and x2
 	        DO x2=1,nx
 	        DO e2=1,ne
-				DBN_tr(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2,ti+1) =  &
+				DBN_aux(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2 ) =  &
 	          		& DBN_tr(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2,ti+1) + &
 	          		& DBN_tr(age1, a1, z1, lambda1, e1,x1,ti) &
 	                & * survP(age1) * pr_e(e1,e2) * pr_x(x1,x2,z1,age1) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
-	            DBN_tr(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2,ti+1) =  &
+	            DBN_aux(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2 ) =  &
 	          		& DBN_tr(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2,ti+1) + &
 	          		& DBN_tr(age1, a1, z1, lambda1, e1,x1,ti) &
 	                & * survP(age1) * pr_e(e1,e2) * pr_x(x1,x2,z1,age1) * PrAprimehi(age1,a1,z1,lambda1,e1,x1) 
@@ -5761,6 +5770,10 @@ SUBROUTINE FIND_DBN_Transition()
 	    ENDDO
 	    ENDDO
 	    ENDDO
+	    !$omp barrier
+
+	    ! Update distribution
+	    	DBN_tr(:,:,:,:,:,:,ti+1) = DBN_aux
 
 	    ! Set global variables to current period  (Time: ti)
 	    	R = R_tr(ti) ; P = P_tr(ti) ; wage = wage_tr(ti) ;
@@ -9376,15 +9389,10 @@ Function Agg_Debt_Tr(R_in)
 			! print*,' 		Age ',age
 		!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
 		DO zi=1,nz
-			! print*,' 			z ',zi 
 		DO xi=1,nx
-			! print*,' 				x ',xi 
 		DO ai=1,na
-			! print*,' 					a ',ai 
 		DO lambdai=1,nlambda
-			! print*,' 						lambda ',lambdai 
 		DO ei=1, ne
-			! print*, '  							e', ei
 	        if ( Ap_aux(age,ai,zi,lambdai,ei,xi) .ge. amax) then
 	            tklo =na-1
 	        elseif (Ap_aux(age,ai,zi,lambdai,ei,xi) .lt. amin) then
@@ -9414,8 +9422,9 @@ Function Agg_Debt_Tr(R_in)
 
 		! Everyone in MaxAge dies. Those who die, switch to z2, lambda2 and start at ne/2+1 and x=1
 	    age1=MaxAge
-	    DO x1=1,nx
+	    !$omp parallel do reduction(+:DBN_aux) private(x1,a1,lambda1,e1,z2,lambda2)
 	    DO z1=1,nz
+	    DO x1=1,nx
 	    DO a1=1,na
 	    DO lambda1=1,nlambda
 	    DO e1=1, ne
@@ -9435,13 +9444,15 @@ Function Agg_Debt_Tr(R_in)
 	    ENDDO
 	    ENDDO    
 	    ENDDO
-	    ENDDO    
+	    ENDDO 
+	    !$omp barrier   
 
 		! retirees "e" stays the same for benefit retirement calculation purposes
+		!$omp parallel do reduction(+:DBN_aux) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2)
+	    DO z1=1,nz
 	    DO x1=1,nx
 	    DO age1=RetAge-1, MaxAge-1
 	    DO a1=1,na
-	    DO z1=1,nz
 	    DO lambda1=1,nlambda
 	    DO e1=1, ne
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
@@ -9476,12 +9487,14 @@ Function Agg_Debt_Tr(R_in)
 	    ENDDO
 	    ENDDO
 	    ENDDO
+	    !$omp barrier
 	    
 	    ! Working age agents
+	    !$omp parallel do reduction(+:DBN_aux) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2,e2)
+	    DO z1=1,nz
 	    DO x1=1,nx
 	    DO age1=1,RetAge-2
 	    DO a1=1,na
-	    DO z1=1,nz
 	    DO lambda1=1,nlambda
 	    DO e1=1, ne
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
@@ -9517,6 +9530,7 @@ Function Agg_Debt_Tr(R_in)
 	    ENDDO
 	    ENDDO
 	    ENDDO
+	    !$omp barrier
 
 	else 
 		! Distribution is obtained from benchmark
