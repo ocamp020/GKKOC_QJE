@@ -6171,8 +6171,14 @@ SUBROUTINE FIND_DBN_Transition()
 		    print*, '	Distance: DBN=', DBN_dist,' Q=',Q_dist,' N=',N_dist,' R=',R_dist,' Db=',Db_dist,'Chg_dist=',Chg_dist
 		    print*, '	X(T)/X(SS): Q=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N=',100*(NBAR2_tr(T+1)/NBAR_exp-1),&
 		    		' R=',100*(R2_tr(T+1)-R_exp),' Db=',100*(Debt_tr(T+1)/Debt_exp-1)
-	    	print*,'	GBAR_exp=',GBAR_tr(T+1),'Debt/GDP=',Debt_tr(T+1)/YBAR_tr(T+1),&
-	    		&'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr(T+1)
+	    	print*, ' '
+	    	print*, ' Government Budget:'
+	    	print*, '	Debt=',Debt_tr(T+1),'Debt/GDP=',Debt_tr(T+1)/YBAR_tr(T+1)
+	    	print*, '	GBAR_T+1=',GBAR_tr(T+1),'Expenditure',GBAR_bench+R_tr(T+1)*Debt_tr(T+1),&
+	    					& 'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr(T+1)
+			print*, '	GBAR_exp=',GBAR_exp,'Expenditure',GBAR_bench+R_exp*Debt_tr(T+1),&
+	    					& 'Deficit=',GBAR_exp-GBAR_bench-R_exp*Debt_tr(T+1)
+			print*, ' '
 
 	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
 	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,N_dist,R_dist,Db_dist,&
