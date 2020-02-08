@@ -5441,7 +5441,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 	! Wealth and consumption in benchmark and experiment
 		K_bench = sum( sum(sum(sum(sum(sum(DBN_bench,6),5),4),3),1)*agrid )
-		C_bench = sum( DBN_bench*Cons_benchs )
+		C_bench = sum( DBN_bench*Cons_bench )
 
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
