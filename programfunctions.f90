@@ -5426,8 +5426,8 @@ SUBROUTINE FIND_DBN_Transition()
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria    = 1.0E-06_DP
-	Price_criteria  = 1.5E-05_DP
-	Chg_criteria    = 1.5E-05_DP
+	Price_criteria  = 1.0E-04_DP
+	Chg_criteria    = 1.5E-06_DP
 	ind_R   		= 3
 	Dampen   	    = 0.70_dp
 
