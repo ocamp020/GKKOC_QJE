@@ -5434,7 +5434,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 	! Wealth and consumption in benchmark and experiment
 		K_bench = sum( sum(sum(sum(sum(sum(DBN_bench,6),5),4),3),1)*agrid )
-		C_bench = sum( DBN_bench*Cons_bench )
+		C_bench = sum( DBN_bench*Cons_benchs )
 
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -9333,6 +9333,7 @@ end Function Agg_Debt
 ! Government debt is included
 ! The function uses the interest rate R and implicitely the price of intermediate good P and distribution DBN1
 Function Agg_Debt_Tr(R_in)
+	use omp_lib
 	Implicit None 
 	real(dp), intent(in) :: R_in
 	real(dp)             :: Agg_Debt_Tr, Private_Demand, Public_Demand, Agg_Demand
@@ -9342,6 +9343,8 @@ Function Agg_Debt_Tr(R_in)
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Ap_aux, DBN_aux
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
+
+	!$ call omp_set_num_threads(nz)
 
 	allocate( Ap_aux(MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( DBN_aux(MaxAge,na,nz,nlambda,ne,nx) )
