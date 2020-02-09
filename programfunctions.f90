@@ -5843,11 +5843,11 @@ SUBROUTINE FIND_DBN_Transition()
     					call cpu_time(t1_R)   		! start cpu timer
 		            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(ti))
 		            	! Usually brent_tol=0.00000001_DP
-		            	call cpu_time(t2)   ! end cpu timer
-    					call system_clock(tclock2, clock_rate); elapsed_time = float(tclock2 - tclock1) / float(clock_rate)
+		            	call cpu_time(t2_R)   ! end cpu timer
+    					call system_clock(tclock2_R, clock_rate_R); elapsed_time_R = float(tclock2_R - tclock1_R) / float(clock_rate_R)
 		            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
 		            		& 'R_out=',R2_tr(ti)
-		            	print*, '	Brent Time:		CPU time:',t2-t1,'sec		Elapsed time:',elapsed_time,'sec'
+		            	print*, '	Brent Time:		CPU time:',t2_R-t1_R,'sec		Elapsed time:',elapsed_time_R,'sec'
 	            		print*, ' '
 	            else
 	                R2_tr(ti) = 0.0_DP
