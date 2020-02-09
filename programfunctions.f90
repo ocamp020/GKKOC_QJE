@@ -5665,7 +5665,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 		! Everyone in MaxAge dies. Those who die, switch to z2, lambda2 and start at ne/2+1 and x=1
 	    age1=MaxAge
-	    !$omp parallel do reduction(+:DBN1) private(x1,a1,lambda1,e1,z2,lambda2)
+	    ! $omp parallel do reduction(+:DBN1) private(x1,a1,lambda1,e1,z2,lambda2)
 	    DO z1=1,nz
 	    DO x1=1,nx
 	    DO a1=1,na
@@ -5691,7 +5691,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    !$omp barrier  
 
 		! retirees "e" stays the same for benefit retirement calculation purposes
-		!$omp parallel do reduction(+:DBN1) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2)
+		! $omp parallel do reduction(+:DBN1) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2)
 	    DO z1=1,nz
 	    DO x1=1,nx
 	    DO age1=RetAge-1, MaxAge-1
@@ -5733,7 +5733,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    !$omp barrier
 	    
 	    ! Working age agents
-	    !$omp parallel do reduction(+:DBN1) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2,e2)
+	    ! $omp parallel do reduction(+:DBN1) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2,e2)
 	    DO z1=1,nz
 	    DO x1=1,nx
 	    DO age1=1,RetAge-2
