@@ -5839,16 +5839,16 @@ SUBROUTINE FIND_DBN_Transition()
 		    		! Set price 
 		    		P = min(P_tr(ti),1.0_dp)
 		    		! Solve for R using brent
-		    			call system_clock(tclock1_R)  ! start wall timer
-    					call cpu_time(t1_R)   		! start cpu timer
+		    			! call system_clock(tclock1_R)  ! start wall timer
+    					! call cpu_time(t1_R)   		! start cpu timer
 		            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(ti))
 		            	! Usually brent_tol=0.00000001_DP
-		            	call cpu_time(t2_R)   ! end cpu timer
-    					call system_clock(tclock2_R, clock_rate_R); elapsed_time_R = float(tclock2_R - tclock1_R) / float(clock_rate_R)
-		            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
-		            		& 'R_out=',R2_tr(ti)
-		            	print*, '	Brent Time:		CPU time:',t2_R-t1_R,'sec		Elapsed time:',elapsed_time_R,'sec'
-	            		print*, ' '
+		       !      	call cpu_time(t2_R)   ! end cpu timer
+    					! call system_clock(tclock2_R, clock_rate_R); elapsed_time_R = float(tclock2_R - tclock1_R) / float(clock_rate_R)
+		            	! print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
+		            		! & 'R_out=',R2_tr(ti)
+		            	! print*, '	Brent Time:		CPU time:',t2_R-t1_R,'sec		Elapsed time:',elapsed_time_R,'sec'
+	            		! print*, ' '
 	            else
 	                R2_tr(ti) = 0.0_DP
 		        endif
@@ -5951,7 +5951,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        ! print*, ' '
 
 	        print*, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr(ti),'Wealth=',K_tr(ti),'R=',R_tr(ti),'Q=',QBAR_tr(ti)
-	        print*, '		CPU time:',t2-t1,'sec		Elapsed time:',elapsed_time,'sec'
+	        ! print*, '		CPU time:',t2-t1,'sec		Elapsed time:',elapsed_time,'sec'
 	        print*, ' '
     	ENDDO ! Transition Time
 
