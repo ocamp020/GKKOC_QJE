@@ -93,7 +93,7 @@ PROGRAM main
 		Transition_OT = .true.
 			budget_balance = .true.
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
-			Opt_Tax_KW_TR  = .false. ! true=tau_K, false=tau_W
+			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 
 		Simul_Switch  = .false.
 
@@ -4069,7 +4069,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 	logical  :: read_results
 
 	! Set flag for reading results or computing optimal taxes
-		read_results = .true.
+		read_results = .false.
 
 	! Save base folder
 		folder_aux = Result_Folder
@@ -4124,7 +4124,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		Aprime_exp        = Aprime 
 
 	! Set reference value for psi, tau_K and tau_W
-		psi_0  = 1.0_dp-0.15540_dp 
+		psi_0  = 1.0_dp-0.3740_dp
 			! OTW with tauL set to 1.0_dp-0.15540_dp 
 			! OTK with tauL set to 1.0_dp-0.3740_dp
 			! If not using tauL set to psi
@@ -4228,7 +4228,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 
 			! Find psi that exactly balances the budget (up to precisioin 0.1%) using bisection
 				print*,'Bisection for Taxes:'
-				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr(T+1)))) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
+				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr(T+1)))) .gt. 0.05 ) ! as long as the difference is greater than 0.1% continue
 			    	
 					if (balance_tau_L) then 
 					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr(T+1) ) then

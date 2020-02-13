@@ -5553,7 +5553,7 @@ SUBROUTINE FIND_DBN_Transition()
 	iter_indx    = 1
 	!print*, 'Computing Equilibrium Distribution'
 	DO WHILE ((DBN_dist.ge.DBN_criteria).and.(max(Q_dist,N_dist,R_dist,Db_dist).ge.Price_criteria)&
-			& .and.(simutime.le.1).and.(Chg_dist.ge.Chg_criteria) )
+			& .and.(simutime.le.9).and.(Chg_dist.ge.Chg_criteria) )
 		! print*, 'DBN_dist=', DBN_dist
 
 		! Start Q_dist, N_dist, R_dsit, Db_dist
@@ -6212,14 +6212,14 @@ SUBROUTINE FIND_DBN_Transition()
 										&  ,Y_bench,',',K_bench,',',C_bench,',',0,',',GBAR_bench
 			do ti=1,T+1
 			WRITE (UNIT=78,FMT=*) ti,',',QBAR_tr(ti),',',NBAR_tr(ti),',',R_tr(ti),',',Wage_tr(ti),',' & 
-								& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),',',GBAR_tr(ti),',' &
+								& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),',',Debt_tr(ti),GBAR_tr(ti),',' &
 								& ,GBAR_K_tr(ti),',',GBAR_W_tr(ti),',',GBAR_L_tr(ti),',',GBAR_C_tr(ti),',',SSC_Payments_tr(ti),','&
-								& ,Debt_tr(ti),Wealth_Top_1_tr(ti),',',Wealth_Top_10_tr(ti)
+								& ,Wealth_Top_1_tr(ti),',',Wealth_Top_10_tr(ti)
 			enddo 
 			WRITE (UNIT=78,FMT=*) 'SS_2,',QBAR_exp,',',NBAR_exp,',',R_exp,',',wage_exp,',' & 
 								&  ,Y_exp,',',K_exp,',',C_exp,','&
-								&  ,Debt_exp,',',GBAR_exp,',99,99,99,99,99,99,'&
-								&  ,Wealth_Top_1_tr(T+1),',',Wealth_Top_1_tr(T+1)
+								&  ,Debt_exp,',',GBAR_exp,',99, 99, 99, 99, 99, 99,'&
+								&  ,Wealth_Top_1_tr(T+1),',',Wealth_Top_10_tr(T+1)
 			CLOSE (UNIT=78);
 
 
