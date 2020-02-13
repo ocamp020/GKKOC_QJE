@@ -3151,7 +3151,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_Tax_K_exp.txt', STATUS='replace') 
 	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_Tax_L_exp.txt', STATUS='replace') 
 	    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_Tax_C_exp.txt', STATUS='replace') 
-	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_Inc_exp.txt', STATUS='replace') 
+	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_Inc_exp.txt'  , STATUS='replace') 
 	    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_Tax_K_Inc_exp.txt', STATUS='replace') 
 	    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_Tax_L_Inc_exp.txt', STATUS='replace') 
 	    OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_Tax_C_Inc_exp.txt', STATUS='replace') 
@@ -3394,10 +3394,12 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 
 	allocate( Value_mat(  MaxAge,na,nz,nlambda,ne,nx) )
 
+	print*,' '
+	print*,'Computing Welfare Gain for Transition'
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	!! Routine Set Up
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+	print*,'	 Set up'
 	! Age Brackets
 		draft_age_limit = [0, 1, 15, 30, 45, MaxAge ] 
 
@@ -3415,8 +3417,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	!! Measuring Consumption Equivalent Welfare
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+	
 	! Consumption Equivalent Welfare: CE 1
+	print*,'	 Consumption Equivalent: CE 1'
 		DO age=1,MaxAge
 			if (Log_Switch.eqv..true.) then 
 		    	CE1_tr(age,:,:,:,:,:)= & 
@@ -3432,6 +3435,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 		CE1_pop_tr = 100.0_DP*sum(CE1_tr*DBN_bench)/sum(DBN_bench)
 
 	! Consumption Equivalent Welfare: CE 2
+	print*,'	 Consumption Equivalent: CE 1'
 		CE2_nb_tr  = 100.0_dp * (( sum(Value_mat(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) / &
 				&               sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) ) &
 				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
@@ -3842,6 +3846,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_TRANSITION
 		! Save value function
 			ValueFunction_tr(:,:,:,:,:,:,age) = Value_mat
 	enddo 
+	print*,'Computing Value Function Completed'
 
 END SUBROUTINE COMPUTE_VALUE_FUNCTION_TRANSITION
 
