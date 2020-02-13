@@ -5434,9 +5434,9 @@ SUBROUTINE FIND_DBN_Transition()
 	allocate( Aphi(       MaxAge,na,nz,nlambda,ne,nx) )
 
 	!$ call omp_set_num_threads(nz)
-	DBN_criteria    = 1.0E-06_DP
+	DBN_criteria    = 1.0E-05_DP
 	Price_criteria  = 1.0E-04_DP
-	Chg_criteria    = 1.5E-06_DP
+	Chg_criteria    = 1.8E-06_DP
 	ind_R   		= 3
 	Dampen   	    = 0.70_dp
 
@@ -5843,12 +5843,12 @@ SUBROUTINE FIND_DBN_Transition()
     					! call cpu_time(t1_R)   		! start cpu timer
 		            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(ti))
 		            	! Usually brent_tol=0.00000001_DP
-		       !      	call cpu_time(t2_R)   ! end cpu timer
+		             	! call cpu_time(t2_R)   ! end cpu timer
     					! call system_clock(tclock2_R, clock_rate_R); elapsed_time_R = float(tclock2_R - tclock1_R) / float(clock_rate_R)
-		            	! print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
-		            		! & 'R_out=',R2_tr(ti)
+		            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
+		            		& 'R_out=',R2_tr(ti)
 		            	! print*, '	Brent Time:		CPU time:',t2_R-t1_R,'sec		Elapsed time:',elapsed_time_R,'sec'
-	            		! print*, ' '
+	            		print*, ' '
 	            else
 	                R2_tr(ti) = 0.0_DP
 		        endif

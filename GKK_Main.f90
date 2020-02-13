@@ -4066,6 +4066,10 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 	logical, intent(in) :: budget_balance, Opt_Tax_KW, balance_tau_L
 	real(dp) :: psi_0, tauK_0, tauW_0
 	character(100) :: folder_aux
+	logical  :: read_results
+
+	! Set flag for reading results or computing optimal taxes
+		read_results = .true.
 
 	! Save base folder
 		folder_aux = Result_Folder
@@ -4125,7 +4129,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		tauW_0 = tauW_at
 			! Better start for opt tauW= 0.0340_dp
 
-
+		
 	if (budget_balance) then 
 
 		! Set Results Folder
@@ -4160,6 +4164,10 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		print*,' 	Balancing the Budget with Capital/Wealth Taxes'
 		print*,'---------------------------------------------------'
 		endif 
+
+		if (read_results.eq..false.) then 
+		! Solve for the optimal tax
+
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
 			BB_tax_ind = 0.0_DP ! Originally 1.0_DP
 			BB_tax_chg = 0.0002_DP ! Originally 0.005_DP
@@ -4262,6 +4270,31 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr(T+1),'Debt',Debt_tr(T+1)
 				ENDDO
 
+		else 
+		! Read results from main folder 
+
+			! Read taxes 
+				print*, ' ' ; print*, 'Loading taxes from file'
+				OPEN (UNIT=1,  FILE=trim(Result_Folder)//'tauC_tr'   , STATUS='old', ACTION='read')
+				OPEN (UNIT=2,  FILE=trim(Result_Folder)//'tauK_tr'	 , STATUS='old', ACTION='read')
+				OPEN (UNIT=3,  FILE=trim(Result_Folder)//'tauL_tr'	 , STATUS='old', ACTION='read')
+				OPEN (UNIT=4,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='old', ACTION='read')
+				READ (UNIT=1,  FMT=*), tauC
+				READ (UNIT=2,  FMT=*), tauK
+				READ (UNIT=3,  FMT=*), psi
+				READ (UNIT=4,  FMT=*), tauW_at
+				CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4);
+				print*, '	Reading completed'; print*, ' '
+
+			! Adjust psi (file saves tauL = 1 - psi)
+				psi = 1-psi
+
+			! Find the Distribution and Policy Functions Along Transition Path
+				call Find_DBN_Transition 
+
+
+		endif
+
 
 	else
 
@@ -4277,6 +4310,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 			call Find_DBN_Transition 
 
 	endif
+
 
 	! Compute Value Functions for Cohorts Alive at Time of Policy Change
 		call COMPUTE_VALUE_FUNCTION_TRANSITION
