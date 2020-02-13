@@ -4165,7 +4165,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		print*,'---------------------------------------------------'
 		endif 
 
-		if (read_results.eq..false.) then 
+		if (read_results.eqv..false.) then 
 		! Solve for the optimal tax
 
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
