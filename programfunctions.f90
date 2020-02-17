@@ -5846,7 +5846,7 @@ SUBROUTINE FIND_DBN_Transition()
 		    		! Solve for R using brent
 		    			! call system_clock(tclock1_R)  ! start wall timer
     					! call cpu_time(t1_R)   		! start cpu timer
-		            brent_value = brent(-0.02_DP,R_old,0.15_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(ti))
+		            brent_value = brent(-0.05_DP,R_old,0.15_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(ti))
 		            	! Usually brent_tol=0.00000001_DP
 		             	! call cpu_time(t2_R)   ! end cpu timer
     					! call system_clock(tclock2_R, clock_rate_R); elapsed_time_R = float(tclock2_R - tclock1_R) / float(clock_rate_R)
@@ -6019,7 +6019,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    	if (sum(theta)/nz .gt. 1.0_DP) then
 	    		! Set price 
 	    		P = min(P_tr(T+1),1.0_dp)
-	            brent_value = brent(-0.02_DP,R_old,0.15_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(T+1))
+	            brent_value = brent(-0.05_DP,R_old,0.15_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(T+1))
 	            	! Usually brent_tol=0.00000001_DP
 	            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
 	            		& 'R_out=',R2_tr(T+1)
