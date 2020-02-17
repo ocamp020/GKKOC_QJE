@@ -4124,7 +4124,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		Aprime_exp        = Aprime 
 
 	! Set reference value for psi, tau_K and tau_W
-		psi_0  = 1.0_dp-0.48_dp
+		psi_0  = 1.0_dp-0.45_dp
 			! OTW with tauL set to 1.0_dp-0.15540_dp 
 			! OTK with tauL set to 1.0_dp-0.3740_dp
 			! If not using tauL set to psi
@@ -4173,7 +4173,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
 			BB_tax_ind = 0.0_DP ! Originally 1.0_DP
-			BB_tax_chg = 0.0002_DP ! Originally 0.005_DP
+			BB_tax_chg = 0.001_DP ! Originally 0.0002_DP
 			Debt_tr  = 1.0_DP
 			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr(T+1)))
 				! Set old G and new value of tauW
