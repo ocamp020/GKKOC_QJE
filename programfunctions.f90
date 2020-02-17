@@ -4194,7 +4194,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        endif
 
 	    	!!
-	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P
+	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P,'Error=',brent_value
 	    	!!
 
 	    	! Solve the model at current aggregate values
@@ -5553,7 +5553,7 @@ SUBROUTINE FIND_DBN_Transition()
 	iter_indx    = 1
 	!print*, 'Computing Equilibrium Distribution'
 	DO WHILE ((DBN_dist.ge.DBN_criteria).and.(max(Q_dist,N_dist,R_dist,Db_dist).ge.Price_criteria)&
-			& .and.(simutime.le.9).and.(Chg_dist.ge.Chg_criteria) )
+			& .and.(simutime.le.5).and.(Chg_dist.ge.Chg_criteria) )
 		! print*, 'DBN_dist=', DBN_dist
 
 		! Start Q_dist, N_dist, R_dsit, Db_dist
@@ -5846,7 +5846,7 @@ SUBROUTINE FIND_DBN_Transition()
 		    		! Solve for R using brent
 		    			! call system_clock(tclock1_R)  ! start wall timer
     					! call cpu_time(t1_R)   		! start cpu timer
-		            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(ti))
+		            brent_value = brent(-0.02_DP,R_old,0.15_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(ti))
 		            	! Usually brent_tol=0.00000001_DP
 		             	! call cpu_time(t2_R)   ! end cpu timer
     					! call system_clock(tclock2_R, clock_rate_R); elapsed_time_R = float(tclock2_R - tclock1_R) / float(clock_rate_R)
@@ -6019,7 +6019,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    	if (sum(theta)/nz .gt. 1.0_DP) then
 	    		! Set price 
 	    		P = min(P_tr(T+1),1.0_dp)
-	            brent_value = brent(-0.1_DP,R_old,0.1_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(T+1))
+	            brent_value = brent(-0.02_DP,R_old,0.15_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(T+1))
 	            	! Usually brent_tol=0.00000001_DP
 	            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
 	            		& 'R_out=',R2_tr(T+1)
@@ -6190,6 +6190,7 @@ SUBROUTINE FIND_DBN_Transition()
 		    		' R=',100*(R2_tr(T+1)-R_exp),' Db=',100*(Debt_tr(T+1)/Debt_exp-1)
 	    	print*, ' '
 	    	print*, ' Government Budget:'
+	    	print*, '	tau_K=',tauK,'tau_W',tauW_at,'tau_L',1.0_dp-psi
 	    	print*, '	Debt=',Debt_tr(T+1),'Debt/GDP=',Debt_tr(T+1)/YBAR_tr(T+1)
 	    	print*, '	GBAR_T+1=',GBAR_tr(T+1),'Expenditure',GBAR_bench+R_tr(T+1)*Debt_tr(T+1),&
 	    					& 'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr(T+1)
