@@ -207,8 +207,8 @@ PROGRAM main
 
 	! Set initia lvalues of R, Wage, Ebar to find equilibrium
 		! ------- DO NOT REMOVE THE LINES BELOW
-		R     =  0.05_dp
-		P     =  4.906133597851297E-002 
+		R     =  0.0535_dp
+		P     =  0.1718
 		wage  =  1.97429920063330 
 		Ebar  =  1.82928004963637  
 		Ebar_bench = Ebar
