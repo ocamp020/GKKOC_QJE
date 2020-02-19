@@ -4049,7 +4049,7 @@ SUBROUTINE FIND_DBN_EQ()
 
 		! Everyone in MaxAge dies. Those who die, switch to z2, lambda2 and start at ne/2+1 and x=1
 	    age1=MaxAge
-	    ! $omp parallel do reduction(+:DBN2) private(x1,a1,lambda1,e1,z2,lambda2)
+	    !$omp parallel do reduction(+:DBN2) private(x1,a1,lambda1,e1,z2,lambda2)
 	    DO z1=1,nz
 	    DO x1=1,nx
 	    DO a1=1,na
@@ -4073,7 +4073,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    !$omp barrier  
 
 		! retirees "e" stays the same for benefit retirement calculation purposes
-		! $omp parallel do reduction(+:DBN2) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2)
+		!$omp parallel do reduction(+:DBN2) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2)
 		DO z1=1,nz
 	    DO x1=1,nx
 	    DO age1=RetAge-1, MaxAge-1
@@ -4111,7 +4111,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    !$omp barrier
 	    
 	    ! Working age agents
-	    ! $omp parallel do reduction(+:DBN2) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2,e2)
+	    !$omp parallel do reduction(+:DBN2) private(x1,age1,a1,lambda1,e1,z2,lambda2,x2,e2)
 	    DO z1=1,nz
 	    DO x1=1,nx
 	    DO age1=1,RetAge-2
@@ -4194,7 +4194,8 @@ SUBROUTINE FIND_DBN_EQ()
 	        endif
 
 	    	!!
-	    	print*, 'DBN_diff=', DBN_dist, 'R=',R,'P=',P,'Error=',brent_value
+	    	print*, 'DBN_diff=', DBN_dist,'K',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
+	    				&'W=',wage,'R=',R,'P=',P,'Error=',brent_value
 	    	!!
 
 	    	! Solve the model at current aggregate values
