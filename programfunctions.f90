@@ -4195,8 +4195,7 @@ SUBROUTINE FIND_DBN_EQ()
 
 	    	!!
 	    	print*, 'DBN_diff=', DBN_dist,'K',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
-	    				&'W=',wage
-			print*, '		R=',R,'P=',P,'Error=',brent_value
+	    				&'W=',wage,'R=',R,'P=',P!,'Error=',brent_value
 	    	!!
 
 	    	! Solve the model at current aggregate values
