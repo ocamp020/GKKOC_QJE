@@ -7645,6 +7645,8 @@ SUBROUTINE COMPUTE_STATS()
 
 	!$ call omp_set_num_threads(20)
 	!$ print *, "OMP Test Message"
+
+	print*, ' '; print*,' Entering Compute_Stats'
 	
 	! Age Brackets
 		age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
@@ -8203,8 +8205,10 @@ SUBROUTINE COMPUTE_STATS()
 	enddo 
 	print*, 'Total Constrained', 100.0_dp*sum(constrained_firm_ind*DBN1)
 	print*,'Moments',SSE_Moments 
-	!print*,''
+	print*,''
 
+	print*,' '
+	print*,' Printing results into files'
 	! Write in files some stats
 	if (solving_bench.eq.1) then
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'Asset_Stats_bench.txt', STATUS='replace')
@@ -8309,6 +8313,7 @@ SUBROUTINE COMPUTE_STATS()
 		enddo 
 	CLOSE(UNIT=20)
 
+	print*, 'test 1'
 	! Save files of constrained index, output and profits
 	if (solving_bench.eq.1) then
 		OPEN(UNIT=1,  FILE=trim(Result_Folder)//'constrained_ind_bench'  , STATUS='replace')
@@ -8325,6 +8330,9 @@ SUBROUTINE COMPUTE_STATS()
 		CLOSE(UNIT=1)
 		CLOSE(UNIT=2)
 		CLOSE(UNIT=3)
+
+
+	print*, ' '; print*,' End of Compute_Stats'; print*, ' '
 
 
 END SUBROUTINE COMPUTE_STATS
