@@ -208,7 +208,7 @@ PROGRAM main
 	! Set initia lvalues of R, Wage, Ebar to find equilibrium
 		! ------- DO NOT REMOVE THE LINES BELOW
 		R     =  0.0535_dp
-		P     =  0.1718
+		P     =  0.1718_dp
 		wage  =  1.97429920063330 
 		Ebar  =  1.82928004963637  
 		Ebar_bench = Ebar
@@ -507,7 +507,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		print*,"	Computing satitics"
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
-		!CALL WRITE_VARIABLES(1)
+		CALL WRITE_VARIABLES(1)
 		if (Simul_Switch) then 
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)

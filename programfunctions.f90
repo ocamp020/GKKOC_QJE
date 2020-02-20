@@ -8207,129 +8207,128 @@ SUBROUTINE COMPUTE_STATS()
 	print*,'Moments',SSE_Moments 
 	print*,''
 
-	print*,' '
-	print*,' Printing results into files'
-	! Write in files some stats
-	if (solving_bench.eq.1) then
-		OPEN (UNIT=19, FILE=trim(Result_Folder)//'Asset_Stats_bench.txt', STATUS='replace')
-		OPEN (UNIT=20, FILE=trim(Result_Folder)//'leverage_bench.txt', STATUS='replace')
-	else
-		OPEN (UNIT=19, FILE=trim(Result_Folder)//'Asset_Stats_exp.txt', STATUS='replace')
-		OPEN (UNIT=20, FILE=trim(Result_Folder)//'leverage_exp.txt', STATUS='replace')
-	end if 
+	! print*,' '
+	! print*,' Printing results into files'
+	! ! Write in files some stats
+	! if (solving_bench.eq.1) then
+	! 	OPEN (UNIT=19, FILE=trim(Result_Folder)//'Asset_Stats_bench.txt', STATUS='replace')
+	! 	OPEN (UNIT=20, FILE=trim(Result_Folder)//'leverage_bench.txt', STATUS='replace')
+	! else
+	! 	OPEN (UNIT=19, FILE=trim(Result_Folder)//'Asset_Stats_exp.txt', STATUS='replace')
+	! 	OPEN (UNIT=20, FILE=trim(Result_Folder)//'leverage_exp.txt', STATUS='replace')
+	! end if 
 
-		WRITE(UNIT=19, FMT=*) 'Stats on assets, return and savings'
-		WRITE(UNIT=19, FMT=*) ' '
-	! Aggregate Assets and Capital
-		WRITE(UNIT=21, FMT=*) 'Assets and Capital'
-		WRITE(UNIT=21, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
-		WRITE(UNIT=19, FMT=*) 'A', Wealth_by_z  , MeanWealth
-		WRITE(UNIT=19, FMT=*) 'K', Capital_by_z , Mean_Capital 
-		WRITE(UNIT=19, FMT=*) ' '
-	! Return
-		WRITE(UNIT=19, FMT=*) 'Return Stats'
-		WRITE(UNIT=19, FMT=*) ' ', 'Assets', 'Capital'
-		WRITE(UNIT=19, FMT=*) 'Mean_Return', MeanReturn, MeanReturn
-		WRITE(UNIT=19, FMT=*) 'Std_Return', StdReturn, Std_K_Return
-		do zi=1,nz
-			write(rowname,*) zi 
-			rowname = 'Mean_Return_z'//trim(rowname)
-			WRITE(UNIT=19, FMT=*) trim(rowname), MeanReturn_by_z(zi), Mean_K_Return_by_z(zi)
-		enddo 
-		WRITE(UNIT=19, FMT=*) ' '
-		WRITE(UNIT=19, FMT=*) 'Mean_Return_AT', MeanATReturn, MeanATReturn
-		WRITE(UNIT=19, FMT=*) 'Std_Return_AT', StdATReturn, Std_AT_K_Return
-		do zi=1,nz
-			write(rowname,*) zi 
-			rowname = 'Mean_Return_z'//trim(rowname)//'_AT'
-			WRITE(UNIT=19, FMT=*) trim(rowname), MeanATReturn_by_z(zi), Mean_AT_K_Return_by_z(zi)
-		enddo 
-		WRITE(UNIT=19, FMT=*) ' '
-	! Savings
-		WRITE(UNIT=19, FMT=*) 'Saving Rates'
-		WRITE(UNIT=19, FMT=*) '(Ap-A)/A'
-		WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
-		do group=1,max_age_category
-			write(rowname,*) group  
-			rowname = 'Age_Group_'//trim(rowname)
-			WRITE(UNIT=19, FMT=*) rowname, S_Rate_A_AZ(group,:), S_Rate_A_Age(group)
-		enddo 
-		WRITE(UNIT=19, FMT=*) ' '
-		WRITE(UNIT=19, FMT=*) '(Ap-A)/Y'
-		WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
-		do group=1,max_age_category
-			write(rowname,*) group  
-			rowname = 'Age_Group_'//trim(rowname)
-			WRITE(UNIT=19, FMT=*) rowname, S_Rate_Y_AZ(group,:), S_Rate_Y_Age(group)
-		enddo
-		WRITE(UNIT=19, FMT=*) ' '
-		WRITE(UNIT=19, FMT=*) ' ', '<90% ','90%<99% ','99%<'
-		WRITE(UNIT=19, FMT=*) '(Ap-A)/A', S_Rate_A_W
-		WRITE(UNIT=19, FMT=*) '(Ap-A)/Y', S_Rate_Y_W
-		WRITE(UNIT=19, FMT=*) 'A', A_W
-		WRITE(UNIT=19, FMT=*) 'Ap', Ap_W
-		WRITE(UNIT=19, FMT=*) 'Y', Y_W
-		WRITE(UNIT=19, FMT=*) ' '
-		WRITE(UNIT=19, FMT=*) 'A'
-		WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
-		do group=1,max_age_category
-			write(rowname,*) group  
-			rowname = 'Age_Group_'//trim(rowname)
-			WRITE(UNIT=19, FMT=*) rowname, A_AZ(group,:), A_Age(group)
-		enddo 
-		WRITE(UNIT=19, FMT=*) ' '
-		WRITE(UNIT=19, FMT=*) 'Ap'
-		WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
-		do group=1,max_age_category
-			write(rowname,*) group  
-			rowname = 'Age_Group_'//trim(rowname)
-			WRITE(UNIT=19, FMT=*) rowname, Ap_AZ(group,:), Ap_Age(group)
-		enddo 
-		WRITE(UNIT=19, FMT=*) ' '
-		WRITE(UNIT=19, FMT=*) 'Y'
-		WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
-		do group=1,max_age_category
-			write(rowname,*) group  
-			rowname = 'Age_Group_'//trim(rowname)
-			WRITE(UNIT=19, FMT=*) rowname, Y_AZ(group,:), Y_Age(group)
-		enddo 
-		WRITE(UNIT=19, FMT=*) ' '
-	! Wealth percentiles
-		WRITE(UNIT=19, FMT=*) ' '
-		WRITE(UNIT=19, FMT=*) 'Percentiles of Asset Distribution'
-		WRITE(UNIT=19, FMT=*) prctile_ai
+	! 	WRITE(UNIT=19, FMT=*) 'Stats on assets, return and savings'
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! ! Aggregate Assets and Capital
+	! 	WRITE(UNIT=21, FMT=*) 'Assets and Capital'
+	! 	WRITE(UNIT=21, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
+	! 	WRITE(UNIT=19, FMT=*) 'A', Wealth_by_z  , MeanWealth
+	! 	WRITE(UNIT=19, FMT=*) 'K', Capital_by_z , Mean_Capital 
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! ! Return
+	! 	WRITE(UNIT=19, FMT=*) 'Return Stats'
+	! 	WRITE(UNIT=19, FMT=*) ' ', 'Assets', 'Capital'
+	! 	WRITE(UNIT=19, FMT=*) 'Mean_Return', MeanReturn, MeanReturn
+	! 	WRITE(UNIT=19, FMT=*) 'Std_Return', StdReturn, Std_K_Return
+	! 	do zi=1,nz
+	! 		write(rowname,*) zi 
+	! 		rowname = 'Mean_Return_z'//trim(rowname)
+	! 		WRITE(UNIT=19, FMT=*) trim(rowname), MeanReturn_by_z(zi), Mean_K_Return_by_z(zi)
+	! 	enddo 
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! 	WRITE(UNIT=19, FMT=*) 'Mean_Return_AT', MeanATReturn, MeanATReturn
+	! 	WRITE(UNIT=19, FMT=*) 'Std_Return_AT', StdATReturn, Std_AT_K_Return
+	! 	do zi=1,nz
+	! 		write(rowname,*) zi 
+	! 		rowname = 'Mean_Return_z'//trim(rowname)//'_AT'
+	! 		WRITE(UNIT=19, FMT=*) trim(rowname), MeanATReturn_by_z(zi), Mean_AT_K_Return_by_z(zi)
+	! 	enddo 
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! ! Savings
+	! 	WRITE(UNIT=19, FMT=*) 'Saving Rates'
+	! 	WRITE(UNIT=19, FMT=*) '(Ap-A)/A'
+	! 	WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
+	! 	do group=1,max_age_category
+	! 		write(rowname,*) group  
+	! 		rowname = 'Age_Group_'//trim(rowname)
+	! 		WRITE(UNIT=19, FMT=*) rowname, S_Rate_A_AZ(group,:), S_Rate_A_Age(group)
+	! 	enddo 
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! 	WRITE(UNIT=19, FMT=*) '(Ap-A)/Y'
+	! 	WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
+	! 	do group=1,max_age_category
+	! 		write(rowname,*) group  
+	! 		rowname = 'Age_Group_'//trim(rowname)
+	! 		WRITE(UNIT=19, FMT=*) rowname, S_Rate_Y_AZ(group,:), S_Rate_Y_Age(group)
+	! 	enddo
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! 	WRITE(UNIT=19, FMT=*) ' ', '<90% ','90%<99% ','99%<'
+	! 	WRITE(UNIT=19, FMT=*) '(Ap-A)/A', S_Rate_A_W
+	! 	WRITE(UNIT=19, FMT=*) '(Ap-A)/Y', S_Rate_Y_W
+	! 	WRITE(UNIT=19, FMT=*) 'A', A_W
+	! 	WRITE(UNIT=19, FMT=*) 'Ap', Ap_W
+	! 	WRITE(UNIT=19, FMT=*) 'Y', Y_W
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! 	WRITE(UNIT=19, FMT=*) 'A'
+	! 	WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
+	! 	do group=1,max_age_category
+	! 		write(rowname,*) group  
+	! 		rowname = 'Age_Group_'//trim(rowname)
+	! 		WRITE(UNIT=19, FMT=*) rowname, A_AZ(group,:), A_Age(group)
+	! 	enddo 
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! 	WRITE(UNIT=19, FMT=*) 'Ap'
+	! 	WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
+	! 	do group=1,max_age_category
+	! 		write(rowname,*) group  
+	! 		rowname = 'Age_Group_'//trim(rowname)
+	! 		WRITE(UNIT=19, FMT=*) rowname, Ap_AZ(group,:), Ap_Age(group)
+	! 	enddo 
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! 	WRITE(UNIT=19, FMT=*) 'Y'
+	! 	WRITE(UNIT=19, FMT=*) ' ', 'z1 ', 'z2 ', 'z3 ', 'z4 ', 'z5 ', 'z6 ', 'z7 ', 'Total'
+	! 	do group=1,max_age_category
+	! 		write(rowname,*) group  
+	! 		rowname = 'Age_Group_'//trim(rowname)
+	! 		WRITE(UNIT=19, FMT=*) rowname, Y_AZ(group,:), Y_Age(group)
+	! 	enddo 
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! ! Wealth percentiles
+	! 	WRITE(UNIT=19, FMT=*) ' '
+	! 	WRITE(UNIT=19, FMT=*) 'Percentiles of Asset Distribution'
+	! 	WRITE(UNIT=19, FMT=*) prctile_ai
 
-	CLOSE(Unit=19)
+	! CLOSE(Unit=19)
 
-	! Leverage and constrained firms 
-		WRITE(UNIT=20, FMT=*) 'Leverage ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', 	&
-							& 'Cons_Firm',' ',' ',											&	 
-							& 'Cons_Firms ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', & 
-							& 'Size_AZ ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 '
-		do age=1,MaxAge 
-			WRITE(UNIT=20, FMT=*) age, leverage_age_z(age,:), ' ',&
-								& age, constrained_firms_age(age), ' ', age, constrained_firms_age_z(age,:), ' ', &
-								& age, size_by_age_z(age,:)
-		enddo 
-	CLOSE(UNIT=20)
+	! ! Leverage and constrained firms 
+	! 	WRITE(UNIT=20, FMT=*) 'Leverage ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', 	&
+	! 						& 'Cons_Firm',' ',' ',											&	 
+	! 						& 'Cons_Firms ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 ', ' ', & 
+	! 						& 'Size_AZ ','z1 ','z2 ','z3 ','z4 ','z5 ','z6 ','z7 '
+	! 	do age=1,MaxAge 
+	! 		WRITE(UNIT=20, FMT=*) age, leverage_age_z(age,:), ' ',&
+	! 							& age, constrained_firms_age(age), ' ', age, constrained_firms_age_z(age,:), ' ', &
+	! 							& age, size_by_age_z(age,:)
+	! 	enddo 
+	! CLOSE(UNIT=20)
 
-	print*, 'test 1'
-	! Save files of constrained index, output and profits
-	if (solving_bench.eq.1) then
-		OPEN(UNIT=1,  FILE=trim(Result_Folder)//'constrained_ind_bench'  , STATUS='replace')
-		OPEN(UNIT=2,  FILE=trim(Result_Folder)//'firm_output_bench'      , STATUS='replace')
-		OPEN(UNIT=3,  FILE=trim(Result_Folder)//'firm_profit_bench' 	    , STATUS='replace')
-	else 
-		OPEN(UNIT=1,  FILE=trim(Result_Folder)//'constrained_ind_exp'    , STATUS='replace')
-		OPEN(UNIT=2,  FILE=trim(Result_Folder)//'firm_output_exp'        , STATUS='replace')
-		OPEN(UNIT=3,  FILE=trim(Result_Folder)//'firm_profit_exp'  	    , STATUS='replace')
-	endif
-		WRITE(UNIT=1,FMT=*) constrained_firm_ind
-		WRITE(UNIT=2,FMT=*) Firm_Output
-		WRITE(UNIT=3,FMT=*) Firm_Profit
-		CLOSE(UNIT=1)
-		CLOSE(UNIT=2)
-		CLOSE(UNIT=3)
+	! ! Save files of constrained index, output and profits
+	! if (solving_bench.eq.1) then
+	! 	OPEN(UNIT=1,  FILE=trim(Result_Folder)//'constrained_ind_bench'  , STATUS='replace')
+	! 	OPEN(UNIT=2,  FILE=trim(Result_Folder)//'firm_output_bench'      , STATUS='replace')
+	! 	OPEN(UNIT=3,  FILE=trim(Result_Folder)//'firm_profit_bench' 	    , STATUS='replace')
+	! else 
+	! 	OPEN(UNIT=1,  FILE=trim(Result_Folder)//'constrained_ind_exp'    , STATUS='replace')
+	! 	OPEN(UNIT=2,  FILE=trim(Result_Folder)//'firm_output_exp'        , STATUS='replace')
+	! 	OPEN(UNIT=3,  FILE=trim(Result_Folder)//'firm_profit_exp'  	    , STATUS='replace')
+	! endif
+	! 	WRITE(UNIT=1,FMT=*) constrained_firm_ind
+	! 	WRITE(UNIT=2,FMT=*) Firm_Output
+	! 	WRITE(UNIT=3,FMT=*) Firm_Profit
+	! 	CLOSE(UNIT=1)
+	! 	CLOSE(UNIT=2)
+	! 	CLOSE(UNIT=3)
 
 
 	print*, ' '; print*,' End of Compute_Stats'; print*, ' '
