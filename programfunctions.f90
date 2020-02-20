@@ -7648,58 +7648,58 @@ SUBROUTINE COMPUTE_STATS()
 
 	print*, ' '; print*,' Entering Compute_Stats'
 	
-	! ! Age Brackets
-	! 	age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
+	! Age Brackets
+		age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
 
 
-	! ! Percentage of the population above wealth tax threshold
-	! 	! Compute distribution of agents by (a,z,x)
-	! 	DBN_azx = sum(sum(sum(DBN1,5),4),1)
-	! 	! Compute mean before tax wealth
-	! 	Wealth_mat = Wealth_Matrix(R,P)
-	! 	! Compute share of agents above threshold
-	! 	Threshold_Share = 0.0_dp
-	! 	do xi=1,nx
-	! 	do ai=1,na
-	! 	do zi=1,nz 
-	! 		if (Wealth_mat(ai,zi,xi).gt.Y_a_threshold) then 
-	! 			Threshold_Share = Threshold_Share + DBN_azx(ai,zi,xi)
-	! 		end if 
-	! 	end do 
-	! 	end do 
-	! 	end do 
+	! Percentage of the population above wealth tax threshold
+		! Compute distribution of agents by (a,z,x)
+		DBN_azx = sum(sum(sum(DBN1,5),4),1)
+		! Compute mean before tax wealth
+		Wealth_mat = Wealth_Matrix(R,P)
+		! Compute share of agents above threshold
+		Threshold_Share = 0.0_dp
+		do xi=1,nx
+		do ai=1,na
+		do zi=1,nz 
+			if (Wealth_mat(ai,zi,xi).gt.Y_a_threshold) then 
+				Threshold_Share = Threshold_Share + DBN_azx(ai,zi,xi)
+			end if 
+		end do 
+		end do 
+		end do 
 
-	! ! Distribution of Assets
-	! 	DO ai=1,na
-	! 	     pr_a_dbn(ai)          = sum(DBN1(:,ai,:,:,:,:)) 
-	! 	     cdf_a_dbn(ai)         = sum( pr_a_dbn(1:ai) )      
-	! 	     tot_a_by_grid(ai)     = sum(DBN1(:,ai,:,:,:,:) * agrid(ai) )
-	! 	     cdf_tot_a_by_grid(ai) = sum(tot_a_by_grid(1:ai))   
-	! 	!     print*, pr_a_dbn(ai), cdf_a_dbn(ai)
-	! 	ENDDO
-	! 	cdf_a_dbn = cdf_a_dbn + 1.0_DP - cdf_a_dbn(na)
+	! Distribution of Assets
+		DO ai=1,na
+		     pr_a_dbn(ai)          = sum(DBN1(:,ai,:,:,:,:)) 
+		     cdf_a_dbn(ai)         = sum( pr_a_dbn(1:ai) )      
+		     tot_a_by_grid(ai)     = sum(DBN1(:,ai,:,:,:,:) * agrid(ai) )
+		     cdf_tot_a_by_grid(ai) = sum(tot_a_by_grid(1:ai))   
+		!     print*, pr_a_dbn(ai), cdf_a_dbn(ai)
+		ENDDO
+		cdf_a_dbn = cdf_a_dbn + 1.0_DP - cdf_a_dbn(na)
 
 		
-	! 	! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
-	! 	DO prctile=1,100
-	! 	    ai=1
-	! 	    DO while (cdf_a_dbn(ai) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
-	! 	        ai=ai+1
-	! 	    ENDDO
-	! 	    prctile_ai_ind(prctile) = ai
-	! 	    prctile_ai(prctile)     = agrid(ai)
-	! 	    ! print*,prctile, REAL(prctile,8)/100.0_DP,  ai
-	! 	    IF (ai .gt. 1) THEN
-	! 	        cdf_tot_a_by_prctile(prctile)  = cdf_tot_a_by_grid(ai-1) + (REAL(prctile,8)/100.0_DP - cdf_a_dbn(ai-1))*agrid(ai) 
-	! 	    else
-	! 	        cdf_tot_a_by_prctile(prctile)  = (REAL(prctile,8)/100.0_DP )*agrid(ai)     
-	! 	    ENDIF
-	! 	ENDDO
-	! 	print*,''
-	! 	prct1_wealth  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
-	! 	prct10_wealth = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
-	! 	prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
-	! 	prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
+		! FIND THE ai THAT CORRESPONDS TO EACH PRCTILE OF WEALTH DBN & WEALTH HELD BY PEOPLE LOWER THAN THAT PRCTILE
+		DO prctile=1,100
+		    ai=1
+		    DO while (cdf_a_dbn(ai) .lt. (REAL(prctile,8)/100.0_DP-0.000000000000001))
+		        ai=ai+1
+		    ENDDO
+		    prctile_ai_ind(prctile) = ai
+		    prctile_ai(prctile)     = agrid(ai)
+		    ! print*,prctile, REAL(prctile,8)/100.0_DP,  ai
+		    IF (ai .gt. 1) THEN
+		        cdf_tot_a_by_prctile(prctile)  = cdf_tot_a_by_grid(ai-1) + (REAL(prctile,8)/100.0_DP - cdf_a_dbn(ai-1))*agrid(ai) 
+		    else
+		        cdf_tot_a_by_prctile(prctile)  = (REAL(prctile,8)/100.0_DP )*agrid(ai)     
+		    ENDIF
+		ENDDO
+		print*,''
+		prct1_wealth  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
+		prct10_wealth = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
+		prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
+		prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
 	
 
 	! ! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
