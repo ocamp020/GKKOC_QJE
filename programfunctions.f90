@@ -8079,26 +8079,26 @@ SUBROUTINE COMPUTE_STATS()
 
 			CLOSE(UNIT=11)
 
-	! ! Distribution of bequest
-	! 	Bequest_Wealth=0.0_DP
-	! 	DO xi=1,nx
-	! 	DO zi=1,nz
-	! 	DO ai=1,na
-	! 	DO lambdai=1,nlambda
-	! 	DO ei=1, ne
-	! 	   Bequest_Wealth = Bequest_Wealth  +   DBN1(1, ai, zi, lambdai, ei, xi) * agrid(ai)
-	! 	ENDDO
-	! 	ENDDO
-	! 	ENDDO    
-	! 	ENDDO 
-	! 	ENDDO  
+	! Distribution of bequest
+		Bequest_Wealth=0.0_DP
+		DO xi=1,nx
+		DO zi=1,nz
+		DO ai=1,na
+		DO lambdai=1,nlambda
+		DO ei=1, ne
+		   Bequest_Wealth = Bequest_Wealth  +   DBN1(1, ai, zi, lambdai, ei, xi) * agrid(ai)
+		ENDDO
+		ENDDO
+		ENDDO    
+		ENDDO 
+		ENDDO  
 
 
-	! 	! Distribution of bequest (matrix)	
-	! 	do ai=1,MaxAge
-	! 		DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
-	! 	enddo 
-	! 	DBN_bq = DBN_bq/sum(DBN_bq)
+		! Distribution of bequest (matrix)	
+		do ai=1,MaxAge
+			DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
+		enddo 
+		DBN_bq = DBN_bq/sum(DBN_bq)
 		
 	! 	! Vectorization
 	! 	DBN_bq_vec        = reshape(DBN_bq,(/size(DBN1)/))
