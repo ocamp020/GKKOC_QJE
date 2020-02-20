@@ -7970,61 +7970,61 @@ SUBROUTINE COMPUTE_STATS()
 	S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
 	S_Rate_Y_W   = (Ap_W-A_W)/Y_W
 
-	! ! Leverage Ratio and fraction of contrainted firms 
-	! leverage_age_z = 0.0_dp 
-	! size_by_age_z  = 0.0_dp 
-	! constrained_firms_age_z = 0.0_dp
-	! constrained_firm_ind = 0
-	! do xi=1,nx
-	! do age = 1,MaxAge 
-	! do zi  = 1,nz 
- !        DO lambdai=1,nlambda
- !        DO ei=1,ne
- !        DO ai=1,na
- !        	size_by_age(age)       = size_by_age(age)       + DBN1(age,ai,zi,lambdai,ei,xi)
-	! 		size_by_age_z(age,zi)  = size_by_age_z(age,zi)  + DBN1(age,ai,zi,lambdai,ei,xi)
-	! 		leverage_age_z(age,zi) = leverage_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*K_mat(ai,zi,xi)/agrid(ai)
-	! 		if (K_mat(ai,zi,xi).ge.(theta(zi)*agrid(ai))) then 
-	! 			constrained_firms_age(age)      = constrained_firms_age(age)      + DBN1(age,ai,zi,lambdai,ei,xi)
-	! 			constrained_firms_age_z(age,zi) = constrained_firms_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
-	! 			constrained_firm_ind(age,ai,zi,lambdai,ei,xi) = 1
-	! 		endif 
-	! 		Firm_Output(age,ai,zi,lambdai,ei,xi) = xz_grid(xi,zi)*K_mat(ai,zi,xi)
-	! 		Firm_Profit(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi)
-	! 	enddo
-	! 	enddo 
-	! 	enddo 
-	! enddo 
-	! enddo 
-	! enddo 
-	! leverage_age_z = leverage_age_z/size_by_age_z
-	! constrained_firms_age_z = constrained_firms_age_z/size_by_age_z 
-	! constrained_firms_age   = constrained_firms_age/size_by_age 
+	! Leverage Ratio and fraction of contrainted firms 
+	leverage_age_z = 0.0_dp 
+	size_by_age_z  = 0.0_dp 
+	constrained_firms_age_z = 0.0_dp
+	constrained_firm_ind = 0
+	do xi=1,nx
+	do age = 1,MaxAge 
+	do zi  = 1,nz 
+        DO lambdai=1,nlambda
+        DO ei=1,ne
+        DO ai=1,na
+        	size_by_age(age)       = size_by_age(age)       + DBN1(age,ai,zi,lambdai,ei,xi)
+			size_by_age_z(age,zi)  = size_by_age_z(age,zi)  + DBN1(age,ai,zi,lambdai,ei,xi)
+			leverage_age_z(age,zi) = leverage_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*K_mat(ai,zi,xi)/agrid(ai)
+			if (K_mat(ai,zi,xi).ge.(theta(zi)*agrid(ai))) then 
+				constrained_firms_age(age)      = constrained_firms_age(age)      + DBN1(age,ai,zi,lambdai,ei,xi)
+				constrained_firms_age_z(age,zi) = constrained_firms_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
+				constrained_firm_ind(age,ai,zi,lambdai,ei,xi) = 1
+			endif 
+			Firm_Output(age,ai,zi,lambdai,ei,xi) = xz_grid(xi,zi)*K_mat(ai,zi,xi)
+			Firm_Profit(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi)
+		enddo
+		enddo 
+		enddo 
+	enddo 
+	enddo 
+	enddo 
+	leverage_age_z = leverage_age_z/size_by_age_z
+	constrained_firms_age_z = constrained_firms_age_z/size_by_age_z 
+	constrained_firms_age   = constrained_firms_age/size_by_age 
 
 
-	! if (solving_bench.eq.1) then
-	! 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats.txt', STATUS='replace')
-	! 	WRITE(UNIT=11, FMT=*) ' '
-	! 	WRITE(UNIT=11, FMT=*) 'Z ','Const_firms_by_z: ','Const_firms_z_x1 ','Const_firms_z_x1 ','Opt_K_x_1 ','Opt_K_x2 '
-	! 	WRITE(UNIT=11, FMT=*) 'Benchmark'
-	! else
-	! 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats_exp.txt', STATUS='replace') 
-	! 	WRITE(UNIT=11, FMT=*) ' '
-	! 	WRITE(UNIT=11, FMT=*) 'Z ','Const_firms_by_z: ','Const_firms_z_x1 ','Const_firms_z_x1 ','Opt_K_x_1 ','Opt_K_x2 '
-	! 	WRITE(UNIT=11, FMT=*) 'Tax_Reform'
-	! end if 
-	! 	WRITE(UNIT=11, FMT=*) ' '
-	! 	do zi=1,nz
-	! 	WRITE(UNIT=11, FMT=*) zi, & 
-	! 		100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
-	! 		100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &
-	! 		100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
-	! 		(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) , & 
-	! 		(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
-	! 	enddo 	
-	! 	WRITE(UNIT=11, FMT=*) 'Total', 100.0_dp*sum(constrained_firm_ind*DBN1)
+	if (solving_bench.eq.1) then
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats.txt', STATUS='replace')
+		WRITE(UNIT=11, FMT=*) ' '
+		WRITE(UNIT=11, FMT=*) 'Z ','Const_firms_by_z: ','Const_firms_z_x1 ','Const_firms_z_x1 ','Opt_K_x_1 ','Opt_K_x2 '
+		WRITE(UNIT=11, FMT=*) 'Benchmark'
+	else
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats_exp.txt', STATUS='replace') 
+		WRITE(UNIT=11, FMT=*) ' '
+		WRITE(UNIT=11, FMT=*) 'Z ','Const_firms_by_z: ','Const_firms_z_x1 ','Const_firms_z_x1 ','Opt_K_x_1 ','Opt_K_x2 '
+		WRITE(UNIT=11, FMT=*) 'Tax_Reform'
+	end if 
+		WRITE(UNIT=11, FMT=*) ' '
+		do zi=1,nz
+		WRITE(UNIT=11, FMT=*) zi, & 
+			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
+			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &
+			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
+			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) , & 
+			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
+		enddo 	
+		WRITE(UNIT=11, FMT=*) 'Total', 100.0_dp*sum(constrained_firm_ind*DBN1)
 
-	! 	CLOSE(UNIT=11)
+		CLOSE(UNIT=11)
 		
 
 
