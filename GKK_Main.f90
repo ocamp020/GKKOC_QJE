@@ -93,7 +93,7 @@ PROGRAM main
 		Transition_OT = .true.
 			budget_balance = .true.
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
-			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
+			Opt_Tax_KW_TR  = .false. ! true=tau_K, false=tau_W
 
 		Simul_Switch  = .false.
 
@@ -4126,7 +4126,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		Aprime_exp        = Aprime 
 
 	! Set reference value for psi, tau_K and tau_W
-		psi_0  = psi+0.20_dp
+		psi_0  = psi+0.00_dp
 			! OTW with tauL set to 1.0_dp-0.15540_dp 
 			! OTK with tauL set to 1.0_dp-0.3740_dp
 			! If not using tauL set to psi
