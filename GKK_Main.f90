@@ -81,7 +81,7 @@ PROGRAM main
 		Tax_Reform_Decomposition = .false.
 		compute_exp_fixed_prices_and_taxes = .false.
 
-		Opt_Tax       = .true.
+		Opt_Tax       = .false.
 			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
@@ -90,7 +90,7 @@ PROGRAM main
 		Opt_Tau_CX = .false.
 
 		Transition_Tax_Reform = .false.
-		Transition_OT = .false.
+		Transition_OT = .true.
 			budget_balance = .true.
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
@@ -4126,7 +4126,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		Aprime_exp        = Aprime 
 
 	! Set reference value for psi, tau_K and tau_W
-		psi_0  = 1.0_dp-0.42_dp
+		psi_0  = psi
 			! OTW with tauL set to 1.0_dp-0.15540_dp 
 			! OTK with tauL set to 1.0_dp-0.3740_dp
 			! If not using tauL set to psi
