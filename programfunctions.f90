@@ -9632,26 +9632,14 @@ SUBROUTINE FORM_Y_MB_GRID(TYGRID,TMBGRID,TYGRID_t,TMBGRID_t)
 
 	DO x_ind=1,nx 
 	DO z_ind=1,nz
-		print*, ' Starting loop: x=',x_ind,'z=',z_ind
 		DO a_ind=1,na
 			TYGRID(a_ind,z_ind,x_ind)  = Y_a(agrid(a_ind),z_ind,x_ind)
 			TMBGRID(a_ind,z_ind,x_ind) = MB_a(agrid(a_ind),z_ind,x_ind)
 		ENDDO 
-		print*, ' End of a loop'
 		if (Y_a_threshold.eq.0.0_dp) then
-			print*,'No Trheshold'
-			print*,'TYGRID(:,z,x)=',TYGRID(:,z_ind,x_ind)
-			print*,'TMBGRID(:,z,x)=',TMBGRID(:,z_ind,x_ind)
-			print*,'TYGRID_t(:,z,x)=',TYGRID_t(:,z_ind,x_ind)
-			print*,'TMBGRID_t(:,z,x)=',TMBGRID_t(:,z_ind,x_ind)
-			print*,' '
-			print*,'na_t=',na_t
-			print*,size(TYGRID),size(TYGRID_t),size(TMBGRID),size(TMBGRID_t)
 			TYGRID_t(:,z_ind,x_ind)  = TYGRID(:,z_ind,x_ind)
 			TMBGRID_t(:,z_ind,x_ind) = TMBGRID(:,z_ind,x_ind) 
-			print*,'Test done'
 		else 
-			print*,'Yes Trheshold'
 			DO a_ind=1,na_t
 				TYGRID_t(a_ind,z_ind,x_ind)  = Y_a(agrid_t(a_ind),z_ind,x_ind)
 				TMBGRID_t(a_ind,z_ind,x_ind) = MB_a(agrid_t(a_ind),z_ind,x_ind)
@@ -9659,7 +9647,7 @@ SUBROUTINE FORM_Y_MB_GRID(TYGRID,TMBGRID,TYGRID_t,TMBGRID_t)
 		endif 
 	ENDDO
 	ENDDO
-	print*,'End of FORM_Y_MB_GRID'
+
 	!print *, "Grid for asset income"
 	!do ai=1,na
 	!	write(*,*) TMBGRID_t(ai,:)
