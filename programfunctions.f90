@@ -9639,8 +9639,8 @@ SUBROUTINE FORM_Y_MB_GRID(TYGRID,TMBGRID,TYGRID_t,TMBGRID_t)
 			print*,' '
 			print*,'na_t=',na_t
 			print*,size(TYGRID),size(TYGRID_t),size(TMBGRID),size(TMBGRID_t)
-			TYGRID_t  = TYGRID
-			TMBGRID_t = TMBGRID 
+			TYGRID_t(:,z_ind,x_ind)  = TYGRID(:,z_ind,x_ind)
+			TMBGRID_t(:,z_ind,x_ind) = TMBGRID(:,z_ind,x_ind) 
 			print*,'Test done'
 		else 
 			print*,'Yes Trheshold'
