@@ -5473,7 +5473,7 @@ SUBROUTINE FIND_DBN_Transition()
 				QBAR_tr(ti) = QBAR_tr(ti-1) + (QBAR_tr(T+1)-QBAR_tr(1))/T
 				R_tr(ti)    = R_tr(ti-1) + (R_tr(T+1)-R_tr(1))/T
 			enddo 
-			Debt_SS = 0.0_dp
+			Debt_SS = 1.0_dp
 		! Load Guess From Files
 			! print*, 'Loading initial variables from file'
 			! OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'   , STATUS='old', ACTION='read')
