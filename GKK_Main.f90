@@ -2307,6 +2307,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
       	  	CLOSE (unit=77)
 		    Call Write_Experimental_Results(.true.)
+		    print*,'end of iteration 1 - stoping program'
+		    STOP
 	    ENDDO 
 
 

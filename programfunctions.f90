@@ -2839,6 +2839,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		
 		!! Experiment 
 		P = P_exp ; R = R_exp ; wage = wage_exp ; EBAR = EBAR_exp ;
+		! Adjust grid to include breaking points
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		Pr_mat = Profit_Matrix(R_exp,P_exp)
 		K_mat  = K_Matrix(R_exp,P_exp)
 		CALL ComputeLaborUnits(EBAR_exp,wage_exp)
@@ -3372,6 +3374,12 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		ENDDO
 		close(unit=80); close(unit=81); close(unit=82); close(unit=83); close(unit=84); close(unit=85)
 
+	! Deallocate policy functions on adjusted grid (so that they can be allocated later)
+	deallocate( YGRID_t  )
+	deallocate( MBGRID_t ) 
+	deallocate( Cons_t   )
+	deallocate( Hours_t  )
+	deallocate( Aprime_t )
 
 
 END SUBROUTINE  COMPUTE_WELFARE_GAIN
