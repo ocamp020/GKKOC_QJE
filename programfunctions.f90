@@ -2838,6 +2838,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 
 		
 		!! Experiment 
+		P = P_exp ; R = R_exp ; wage = wage_exp ; EBAR = EBAR_exp ;
 		Pr_mat = Profit_Matrix(R_exp,P_exp)
 		K_mat  = K_Matrix(R_exp,P_exp)
 		CALL ComputeLaborUnits(EBAR_exp,wage_exp)
@@ -9619,21 +9620,21 @@ SUBROUTINE FORM_Y_MB_GRID(TYGRID,TMBGRID,TYGRID_t,TMBGRID_t)
 	REAL(DP), DIMENSION(na,nz,nx),   INTENT(OUT) :: TYGRID, TMBGRID
 	REAL(DP), DIMENSION(na_t,nz,nx), INTENT(OUT) :: TYGRID_t, TMBGRID_t
 	!REAL(DP), INTENT(IN) :: P
-	!integer :: ai, zi
+	integer :: a_ind, z_ind, x_ind
 
-	DO xi=1,nx 
-	DO zi=1,nz
-		DO ai=1,na
-			TYGRID(ai,zi,xi)  = Y_a(agrid(ai),zi,xi)
-			TMBGRID(ai,zi,xi) = MB_a(agrid(ai),zi,xi)
+	DO x_ind=1,nx 
+	DO z_ind=1,nz
+		DO a_ind=1,na
+			TYGRID(a_ind,z_ind,x_ind)  = Y_a(agrid(a_ind),z_ind,x_ind)
+			TMBGRID(a_ind,z_ind,x_ind) = MB_a(agrid(a_ind),z_ind,x_ind)
 		ENDDO 
 		if (Y_a_threshold.eq.0.0_dp) then
 			TYGRID_t  = TYGRID
 			TMBGRID_t = TMBGRID 
 		else 
-			DO ai=1,na_t
-				TYGRID_t(ai,zi,xi)  = Y_a(agrid_t(ai),zi,xi)
-				TMBGRID_t(ai,zi,xi) = MB_a(agrid_t(ai),zi,xi)
+			DO a_ind=1,na_t
+				TYGRID_t(a_ind,z_ind,x_ind)  = Y_a(agrid_t(a_ind),z_ind,x_ind)
+				TMBGRID_t(a_ind,z_ind,x_ind) = MB_a(agrid_t(a_ind),z_ind,x_ind)
 			ENDDO
 		endif 
 	ENDDO

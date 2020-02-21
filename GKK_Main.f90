@@ -2243,7 +2243,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	CLOSE (unit=77) 
 
     	! CALL Write_Experimental_Results(.false.)
-
+    	psi = 1.0_dp-0.1465
 	    DO tauindx=20,50,2
 	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='old', POSITION='append')
 
