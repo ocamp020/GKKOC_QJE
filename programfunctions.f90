@@ -7634,13 +7634,13 @@ SUBROUTINE COMPUTE_STATS()
 	allocate(BQ_vec(size(DBN1)))
 	allocate(DBN_bq_vec(size(DBN1)))
 	allocate(CDF_bq(size(DBN1)))
-	allocate(Firm_Output(MaxAge,na,nz,nlambda,ne,nx))
-	allocate(Firm_Profit(MaxAge,na,nz,nlambda,ne,nx))
-	allocate(DBN_bq(MaxAge,na,nz,nlambda,ne,nx))
+	allocate(Firm_Output( MaxAge,na,nz,nlambda,ne,nx))
+	allocate(Firm_Profit( MaxAge,na,nz,nlambda,ne,nx))
+	allocate(DBN_bq(      MaxAge,na,nz,nlambda,ne,nx))
 	allocate(Labor_Income(MaxAge,na,nz,nlambda,ne,nx))
 	allocate(Total_Income(MaxAge,na,nz,nlambda,ne,nx))
-	allocate(K_L_Income(MaxAge,na,nz,nlambda,ne,nx))
-	allocate(K_T_Income(MaxAge,na,nz,nlambda,ne,nx))
+	allocate(K_L_Income(  MaxAge,na,nz,nlambda,ne,nx))
+	allocate(K_T_Income(  MaxAge,na,nz,nlambda,ne,nx))
 	allocate(constrained_firm_ind(MaxAge,na,nz,nlambda,ne,nx))
 
 	!$ call omp_set_num_threads(20)
@@ -8094,13 +8094,13 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO  
 
 
-		! ! Distribution of bequest (matrix)	
-		! do ai=1,MaxAge
-		! 	DBN_bq(age,:,:,:,:,:) = DBN1(age,:,:,:,:,:)*(1.0_DP-survP(age))
-		! enddo 
-		! DBN_bq = DBN_bq/sum(DBN_bq)
+		! Distribution of bequest (matrix)	
+		do ai=1,MaxAge
+			DBN_bq(ai,:,:,:,:,:) = DBN1(ai,:,:,:,:,:)*(1.0_DP-survP(ai))
+		enddo 
+		DBN_bq = DBN_bq/sum(DBN_bq)
 		
-	! 	! Vectorization
+	! 	! Vectorizations
 	! 	DBN_bq_vec        = reshape(DBN_bq,(/size(DBN1)/))
 	! 	BQ_vec            = reshape(Aprime,(/size(DBN1)/))
 
