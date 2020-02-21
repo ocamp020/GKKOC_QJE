@@ -9643,7 +9643,7 @@ SUBROUTINE FORM_Y_MB_GRID(TYGRID,TMBGRID,TYGRID_t,TMBGRID_t)
 		endif 
 	ENDDO
 	ENDDO
-
+	print*,'End of FORM_Y_MB_GRID'
 	!print *, "Grid for asset income"
 	!do ai=1,na
 	!	write(*,*) TMBGRID_t(ai,:)
