@@ -9632,8 +9632,16 @@ SUBROUTINE FORM_Y_MB_GRID(TYGRID,TMBGRID,TYGRID_t,TMBGRID_t)
 		print*, ' End of a loop'
 		if (Y_a_threshold.eq.0.0_dp) then
 			print*,'No Trheshold'
+			print*,'TYGRID(100,:,:)='TYGRID(100,:,:)
+			print*,'TMBGRID(100,:,:)='TMBGRID(100,:,:)
+			print*,'TYGRID_t(100,:,:)='TYGRID_t(100,:,:)
+			print*,'TMBGRID_t(100,:,:)='TMBGRID_t(100,:,:)
+			print*,' '
+			print*,'na_t=',na_t
+			print*,size(TYGRID),size(TYGRID_t),size(TMBGRID),size(TMBGRID_t)
 			TYGRID_t  = TYGRID
 			TMBGRID_t = TMBGRID 
+			print*,'Test done'
 		else 
 			print*,'Yes Trheshold'
 			DO a_ind=1,na_t
