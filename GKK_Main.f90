@@ -82,7 +82,7 @@ PROGRAM main
 		compute_exp_fixed_prices_and_taxes = .false.
 
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .false. ! true=tau_K false=tau_W
+			Opt_Tax_KW    = .true. ! true=tau_K false=tau_W
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
 		Opt_Threshold = .false.
@@ -2133,7 +2133,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
-	    DO tauindx=0,25,1
+	    DO tauindx=-20,-40,-1
 	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
             
             tauK        = real(tauindx,8)/100_DP
@@ -2204,7 +2204,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 		tauK = OPT_tauK
 		psi  = OPT_psi
-		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.02_dp,Opt_TauK+0.02_dp) 
+		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.01_dp,Opt_TauK+0.01_dp) 
 
 		tauK     = OPT_tauK
 		OPT_psi  = psi
@@ -2243,7 +2243,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	CLOSE (unit=77) 
 
     	! CALL Write_Experimental_Results(.false.)
-    	psi = 1.0_dp-0.1465
+    	! psi = 1.0_dp-0.1465
+
 	    DO tauindx=20,50,2
 	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='old', POSITION='append')
 
@@ -2307,7 +2308,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
       	  	CLOSE (unit=77)
 		    Call Write_Experimental_Results(.true.)
-		    
+
 	    ENDDO 
 
 
