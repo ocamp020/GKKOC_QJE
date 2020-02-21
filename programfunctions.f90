@@ -9624,14 +9624,18 @@ SUBROUTINE FORM_Y_MB_GRID(TYGRID,TMBGRID,TYGRID_t,TMBGRID_t)
 
 	DO x_ind=1,nx 
 	DO z_ind=1,nz
+		print*, ' Starting loop: x=',x_ind,'z=',z_ind
 		DO a_ind=1,na
 			TYGRID(a_ind,z_ind,x_ind)  = Y_a(agrid(a_ind),z_ind,x_ind)
 			TMBGRID(a_ind,z_ind,x_ind) = MB_a(agrid(a_ind),z_ind,x_ind)
 		ENDDO 
+		print*, ' End of a loop'
 		if (Y_a_threshold.eq.0.0_dp) then
+			print*,'No Trheshold'
 			TYGRID_t  = TYGRID
 			TMBGRID_t = TMBGRID 
 		else 
+			print*,'Yes Trheshold'
 			DO a_ind=1,na_t
 				TYGRID_t(a_ind,z_ind,x_ind)  = Y_a(agrid_t(a_ind),z_ind,x_ind)
 				TMBGRID_t(a_ind,z_ind,x_ind) = MB_a(agrid_t(a_ind),z_ind,x_ind)
