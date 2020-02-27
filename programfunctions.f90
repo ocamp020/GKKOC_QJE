@@ -9609,6 +9609,7 @@ Function Agg_Debt_Tr(R_in)
 
 	! Aggregate debt is the sum of private and public demand for funds 
 	! Agg_Demand  = Private_Demand + Public_Demand
+	Agg_Demand = Private_Demand
 	
 	! Function outputs aggregate demand relative to total wealth (squared to have a min at 0)
 	Agg_Debt_Tr = ((Agg_Demand-Wealth)/Wealth)**2.0_dp
