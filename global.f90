@@ -163,7 +163,8 @@ MODULE global
     ! Extra tax information
     REAL(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, Tot_Lab_Inc
 
-    ! Transition Yo
+    ! Transition 
+    LOGICAL :: Use_Transition_Seed
     INTEGER :: ti 
     ! Prices and Quantities
     REAL(DP), DIMENSION(T+1) :: R_tr, P_tr, QBAR_tr, NBAR_tr, YBAR_tr, Wage_tr, EBAR_tr, K_tr, C_tr

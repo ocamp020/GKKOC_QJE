@@ -5464,6 +5464,7 @@ SUBROUTINE FIND_DBN_Transition()
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	!! Initial guess for transition path variables
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		if (Use_Transition_Seed.eqv..false.) then 
 		! Guess NBAR, QBAR and R as a linear combination of starting and end values
 			NBAR_tr(1)   = NBAR_bench ; NBAR_tr(T+1) = NBAR_exp   ;
 			QBAR_tr(1)   = QBAR_bench ; QBAR_tr(T+1) = QBAR_exp   ;
@@ -5474,20 +5475,23 @@ SUBROUTINE FIND_DBN_Transition()
 				R_tr(ti)    = R_tr(ti-1) + (R_tr(T+1)-R_tr(1))/T
 			enddo 
 			Debt_SS = 0.0_dp
+			Use_Transition_Seed = .true.
+		else
 		! Load Guess From Files
-			! print*, 'Loading initial variables from file'
-			! OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'   , STATUS='old', ACTION='read')
-			! OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
-			! OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		 , STATUS='old', ACTION='read')
-			! OPEN (UNIT=4,  FILE=trim(Result_Folder)//'Debt_SS' 	 , STATUS='old', ACTION='read')
-			! OPEN (UNIT=5,  FILE=trim(Result_Folder)//'DBN_SS' 	 , STATUS='old', ACTION='read')
-			! READ (UNIT=1,  FMT=*), QBAR_tr
-			! READ (UNIT=2,  FMT=*), NBAR_tr
-			! READ (UNIT=3,  FMT=*), R_tr
-			! READ (UNIT=4,  FMT=*), Debt_SS
-			! READ (UNIT=5,  FMT=*), DBN1
-			! CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=5);
-			! print*, 'Reading completed'
+			print*, 'Loading initial variables from file'
+			OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'   , STATUS='old', ACTION='read')
+			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
+			OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		 , STATUS='old', ACTION='read')
+			OPEN (UNIT=4,  FILE=trim(Result_Folder)//'Debt_SS' 	 , STATUS='old', ACTION='read')
+			OPEN (UNIT=5,  FILE=trim(Result_Folder)//'DBN_SS' 	 , STATUS='old', ACTION='read')
+			READ (UNIT=1,  FMT=*), QBAR_tr
+			READ (UNIT=2,  FMT=*), NBAR_tr
+			READ (UNIT=3,  FMT=*), R_tr
+			READ (UNIT=4,  FMT=*), Debt_SS
+			READ (UNIT=5,  FMT=*), DBN1
+			CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=5);
+			print*, 'Reading completed'
+		endif 
 
 		! Choose YBAR, EBAR, P and Wage to be consistent
 		P_tr    = alpha* QBAR_tr**(alpha-mu) * NBAR_tr**(1.0_DP-alpha)
@@ -5564,7 +5568,7 @@ SUBROUTINE FIND_DBN_Transition()
 	iter_indx    = 1
 	!print*, 'Computing Equilibrium Distribution'
 	DO WHILE ((DBN_dist.ge.DBN_criteria).and.(max(Q_dist,N_dist,R_dist,Db_dist).ge.Price_criteria)&
-			& .and.(simutime.le.5).and.(Chg_dist.ge.Chg_criteria) )
+			& .and.(simutime.le.7).and.(Chg_dist.ge.Chg_criteria) )
 		! print*, 'DBN_dist=', DBN_dist
 
 		! Start Q_dist, N_dist, R_dsit, Db_dist
@@ -5969,6 +5973,20 @@ SUBROUTINE FIND_DBN_Transition()
 	        print*, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr(ti),'Wealth=',K_tr(ti),'R=',R_tr(ti),'Q=',QBAR_tr(ti)
 	        ! print*, '		CPU time:',t2-t1,'sec		Elapsed time:',elapsed_time,'sec'
 	        print*, ' '
+
+	        if (Debt_tr(ti).gt.K_tr(ti)) then 
+	        	print*,' '
+	        	print*,' 	--------------------------------------'
+				print*,' 	Error in transition - Taxes are too low to sustain debt'
+				print*,' 	Exiting Transition Loop'
+				print*,' 	--------------------------------------'
+
+				! Set GBAR and Debt to increase tax  
+				GBAR_exp = 0; Debt_tr(T+1) = Debt_tr(ti)
+				! Set flag to avoid using current solution as seed
+				Use_Transition_Seed = .false.
+				return 
+			endif 
     	ENDDO ! Transition Time
 
 		print*,' 	--------------------------------------'
