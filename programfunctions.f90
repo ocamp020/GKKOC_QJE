@@ -9370,7 +9370,7 @@ Function Agg_Debt(R_in)
 	enddo 
 
 	! Adjust with Government Debt
-		! Agg_Debt = Agg_Debt + Debt_SS 
+		Agg_Debt = Agg_Debt + Debt_SS 
 
 	! print*, mu, P, R_in, DepRate
 	! print*, xz_grid(1,5:)
@@ -9608,8 +9608,8 @@ Function Agg_Debt_Tr(R_in)
 
 
 	! Aggregate debt is the sum of private and public demand for funds 
-	! Agg_Demand  = Private_Demand + Public_Demand
-	Agg_Demand = Private_Demand
+	Agg_Demand  = Private_Demand + Public_Demand
+		! Agg_Demand = Private_Demand
 	
 	! Function outputs aggregate demand relative to total wealth (squared to have a min at 0)
 	Agg_Debt_Tr = ((Agg_Demand-Wealth)/Wealth)**2.0_dp
