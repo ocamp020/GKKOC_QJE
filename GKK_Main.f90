@@ -4205,6 +4205,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 				print*,'Bracketing GBAR: tau_L=', (1.0_dp-psi)*100,'tauK=',100*tauK,'tauW=',100*tauW_at
 				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr(T+1),'Debt',Debt_tr(T+1)
 				print*,' ' 
+				STOP
 			ENDDO
 
 				print*,''
