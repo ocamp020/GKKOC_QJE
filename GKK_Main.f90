@@ -4232,7 +4232,8 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 
 			! Find psi that exactly balances the budget (up to precisioin 0.1%) using bisection
 				print*,'Bisection for Taxes:'
-				DO WHILE ((  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr(T+1)))) .gt. 0.05 ).or.(abs(BB_tax_low-BB_tax_low).gt.1.5E-05_DP)) ! as long as the difference is greater than 0.1% continue
+				DO WHILE ((  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr(T+1)))) .gt. 0.05 )&
+						&.or.(abs(BB_tax_low-BB_tax_low).gt.1.5E-05_DP)) ! as long as the difference is greater than 0.1% continue
 			    	
 					if (balance_tau_L) then 
 					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr(T+1) ) then
