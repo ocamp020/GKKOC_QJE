@@ -4126,7 +4126,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		Aprime_exp        = Aprime 
 
 	! Set reference value for psi, tau_K and tau_W
-		psi_0  = psi-0.025_dp
+		psi_0  = 1.0_dp - 0.2010_dp
 			! OTW with tauL set to 1.0_dp-0.15540_dp 
 			! OTK with tauL set to 1.0_dp-0.3740_dp
 			! If not using tauL set to psi
@@ -4177,7 +4177,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
 			BB_tax_ind = 0.0_DP ! Originally 1.0_DP
-			BB_tax_chg = 0.001_DP ! Originally 0.0002_DP
+			BB_tax_chg = 0.002_DP ! Originally 0.0002_DP
 			Debt_tr  = 1.0_DP
 			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr(T+1)))
 				! Set old G and new value of tauW
@@ -4232,7 +4232,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 
 			! Find psi that exactly balances the budget (up to precisioin 0.1%) using bisection
 				print*,'Bisection for Taxes:'
-				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr(T+1)))) .gt. 0.05 ) ! as long as the difference is greater than 0.1% continue
+				DO WHILE ((  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr(T+1)))) .gt. 0.05 ).or.(abs(BB_tax_low-BB_tax_low).gt.1.5E-05_DP)) ! as long as the difference is greater than 0.1% continue
 			    	
 					if (balance_tau_L) then 
 					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr(T+1) ) then
