@@ -5974,7 +5974,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        ! print*, '		CPU time:',t2-t1,'sec		Elapsed time:',elapsed_time,'sec'
 	        print*, ' '
 
-	        if (Debt_tr(ti).gt.K_tr(ti)) then 
+	        if (Debt_Absorption*Debt_tr(ti).gt.K_tr(ti)) then 
 	        	print*,' '
 	        	print*,' 	--------------------------------------'
 				print*,' 	Error in transition - Taxes are too low to sustain debt'
