@@ -9388,7 +9388,7 @@ Function Agg_Debt(R_in)
 	enddo 
 
 	! Adjust with Government Debt
-		Agg_Debt = Agg_Debt + Debt_SS 
+		Agg_Debt = Agg_Debt + Debt_Absorption*Debt_SS 
 
 	! print*, mu, P, R_in, DepRate
 	! print*, xz_grid(1,5:)
@@ -9621,7 +9621,7 @@ Function Agg_Debt_Tr(R_in)
 	if (ti.eq.1) then 
 		Public_Demand = 0.0_dp
 	else
-		Public_Demand = Debt_tr(ti-1)
+		Public_Demand = Debt_Absorption*Debt_tr(ti-1)
 	endif 
 
 

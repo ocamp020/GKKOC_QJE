@@ -165,6 +165,7 @@ MODULE global
 
     ! Transition 
     LOGICAL :: Use_Transition_Seed
+    REAL    :: Debt_Absorption
     INTEGER :: ti 
     ! Prices and Quantities
     REAL(DP), DIMENSION(T+1) :: R_tr, P_tr, QBAR_tr, NBAR_tr, YBAR_tr, Wage_tr, EBAR_tr, K_tr, C_tr
