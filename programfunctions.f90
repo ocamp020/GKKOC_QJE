@@ -5866,7 +5866,7 @@ SUBROUTINE FIND_DBN_Transition()
 		             	! call cpu_time(t2_R)   ! end cpu timer
     					! call system_clock(tclock2_R, clock_rate_R); elapsed_time_R = float(tclock2_R - tclock1_R) / float(clock_rate_R)
 		            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
-		            		& 'R_out=',R2_tr(ti)
+		            		& 'R_out=',R2_tr(ti),'Debt_Absorption=',Debt_Absorption
 		            	! print*, '	Brent Time:		CPU time:',t2_R-t1_R,'sec		Elapsed time:',elapsed_time_R,'sec'
 	            		print*, ' '
 	            else
@@ -6225,6 +6225,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    					& 'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr(T+1)
 			print*, '	GBAR_exp=',GBAR_exp,'Expenditure',GBAR_bench+R_exp*Debt_tr(T+1),&
 	    					& 'Deficit=',GBAR_exp-GBAR_bench-R_exp*Debt_tr(T+1)
+			print*, '	Debt Absortion',Debt_Absorption_iter,Debt_Absorption
 			print*, ' '
 
 	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')

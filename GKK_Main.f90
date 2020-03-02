@@ -4067,6 +4067,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 	implicit none 
 	logical, intent(in) :: budget_balance, Opt_Tax_KW, balance_tau_L
 	real(dp) :: psi_0, tauK_0, tauW_0
+	integer  :: Debt_Absorption_iter 
 	character(100) :: folder_aux
 	logical  :: read_results
 
@@ -4135,7 +4136,6 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 			! Better start for opt tauW= 0.0340_dp
 
 	Use_Transition_Seed = .false.
-	Debt_Absorption     = 0.0_dp
 
 		
 	if (budget_balance) then 
@@ -4174,7 +4174,12 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		endif 
 
 		if (read_results.eqv..false.) then 
-		! Solve for the optimal tax
+		! Solve for the optimal tax for iterative loops of Debt_Absorption
+
+		DO Debt_Absorption_iter=0,10
+
+			! Set Debt_Absorption
+			Debt_Absorption = real(Debt_Absorption_iter,8)/10.0_dp
 
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
 			BB_tax_ind = 0.0_DP ! Originally 1.0_DP
@@ -4205,6 +4210,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 				print*,' ' 
 				print*,'Bracketing GBAR: tau_L=', (1.0_dp-psi)*100,'tauK=',100*tauK,'tauW=',100*tauW_at
 				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr(T+1),'Debt',Debt_tr(T+1)
+				print*,'	Debt Absortion',Debt_Absorption_iter,Debt_Absorption
 				print*,' ' 
 				
 			ENDDO
@@ -4278,7 +4284,10 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 					print*,'tax_W_low =', BB_tax_low*100, 'tau_W_up=', BB_tax_up*100, 'tau_W=', tauW_at*100
 					endif 
 					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr(T+1),'Debt',Debt_tr(T+1)
+					print*,'	Debt Absortion',Debt_Absorption_iter,Debt_Absorption
 				ENDDO
+
+		ENDDO
 
 		else 
 		! Read results from main folder 
