@@ -6225,7 +6225,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    					& 'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr(T+1)
 			print*, '	GBAR_exp=',GBAR_exp,'Expenditure',GBAR_bench+R_exp*Debt_tr(T+1),&
 	    					& 'Deficit=',GBAR_exp-GBAR_bench-R_exp*Debt_tr(T+1)
-			print*, '	Debt Absortion',Debt_Absorption_iter,Debt_Absorption
+			print*, '	Debt Absortion=',Debt_Absorption
 			print*, ' '
 
 	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
