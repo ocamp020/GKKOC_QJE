@@ -4287,6 +4287,12 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 					print*,'	Debt Absortion',Debt_Absorption_iter,Debt_Absorption
 				ENDDO
 
+			! Set reference value of taxes to current solution
+				psi_0  = psi
+				tauK_0 = tauK 
+				tauW_0 = tauW_at
+
+
 		ENDDO
 
 		else 
