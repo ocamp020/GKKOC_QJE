@@ -4072,7 +4072,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 	logical  :: read_results
 
 	! Set flag for reading results or computing optimal taxes
-		read_results = .false.
+		read_results = .true.
 
 	! Save base folder
 		folder_aux = Result_Folder
@@ -4297,6 +4297,9 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 
 		else 
 		! Read results from main folder 
+
+			Use_Transition_Seed = .true.
+			Debt_Absorption     = 1.0_dp
 
 			! Read taxes 
 				print*, ' ' ; print*, 'Loading taxes from file'
