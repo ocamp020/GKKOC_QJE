@@ -93,7 +93,7 @@ PROGRAM main
 		Transition_OT = .true.
 			budget_balance = .true.
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
-			Opt_Tax_KW_TR  = .false. ! true=tau_K, false=tau_W
+			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 
 		Simul_Switch  = .false.
 
@@ -183,7 +183,7 @@ PROGRAM main
 			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Model_1.2_bv_sss/' 
+		Result_Folder = trim(Result_Folder)//'Model_1.2_bv/' 
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
@@ -207,8 +207,8 @@ PROGRAM main
 
 	! Set initia lvalues of R, Wage, Ebar to find equilibrium
 		! ------- DO NOT REMOVE THE LINES BELOW
-		R     =  0.0535_dp
-		P     =  0.1718_dp
+		R     =  0.05_dp
+		P     =  4.906133597851297E-002_dp
 		wage  =  1.97429920063330 
 		Ebar  =  1.82928004963637  
 		Ebar_bench = Ebar
@@ -507,7 +507,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		print*,"	Computing satitics"
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
-		CALL WRITE_VARIABLES(1)
+		! CALL WRITE_VARIABLES(1)
 		if (Simul_Switch) then 
 			print*,"	Simulation"
 			CALL SIMULATION(solving_bench)
