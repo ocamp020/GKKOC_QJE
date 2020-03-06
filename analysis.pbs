@@ -17,7 +17,7 @@
 	#PBS -m abe
 	#PBS -M ocamp020@umn.edu
 	#PBS -j oe
-	#PBS -N batch_OTW_Transition_BB_tw
+	#PBS -N batch_OTK_Transition_BB_tl
 	#PBS -S /bin/tcsh
 	#PBS -e analysis.err
 
@@ -25,5 +25,5 @@
 	module load gcc/4.8.5
 	cd RA_Guvenen/GKKC_Code/
 	make clean
-	rm -f log_Transition_OTW_BB_tw.txt
-	make GKK_Main > log_Transition_OTW_BB_tw.txt
+	rm -f log_Transition_OTK_BB_tl.txt
+	make GKK_Main > log_Transition_OTK_BB_tl.txt
