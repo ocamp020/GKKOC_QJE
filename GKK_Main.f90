@@ -4072,7 +4072,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 	logical  :: read_results
 
 	! Set flag for reading results or computing optimal taxes
-		read_results = .true.
+		read_results = .false.
 
 	! Save base folder
 		folder_aux = Result_Folder
