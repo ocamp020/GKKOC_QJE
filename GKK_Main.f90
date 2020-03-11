@@ -4199,7 +4199,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		tauW_0 = tauW_at
 			! Better start for opt tauW= 0.0340_dp
 
-	Use_Transition_Seed = .true.
+	Use_Transition_Seed = .false.
 
 		
 	if (budget_balance) then 
