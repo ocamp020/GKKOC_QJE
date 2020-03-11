@@ -40,9 +40,10 @@ PROGRAM main
 	! Compute benchmark or load results
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
 		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, Opt_Tax_K_and_W, Tax_Reform_KW
-		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices
-		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R 
+		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices, compute_exp_fixed_prices_and_taxes
+		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R , Tax_Reform_Decomposition
 		logical  :: Transition_Tax_Reform, Transition_OT, budget_balance, balance_tau_L
+		logical  :: Tax_Reform_tau_C, compute_exp_tau_c, Opt_Tax_KW_TR
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -73,6 +74,13 @@ PROGRAM main
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
+
+		Tax_Reform_tau_C = .false.
+			compute_exp_tau_c = .true.
+
+		Tax_Reform_Decomposition = .false.
+		compute_exp_fixed_prices_and_taxes = .false.
+
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
 		Opt_Tax_K_and_W = .false.
@@ -80,11 +88,12 @@ PROGRAM main
 		Opt_Threshold = .false.
 		Opt_Tau_C = .false.
 		Opt_Tau_CX = .false.
+
 		Transition_Tax_Reform = .false.
 		Transition_OT = .true.
 			budget_balance = .true.
 			balance_tau_L  = .false. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
-			Opt_Tax_KW     = .true. ! true=tau_K, false=tau_W
+			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 		Simul_Switch  = .false.
 
 
@@ -155,6 +164,10 @@ PROGRAM main
 	 		psi   = 0.776_DP  	
 	 	endif 
 
+ 	! Debt
+ 		! Start government debt at zero
+ 		Debt_SS = 0.0_DP
+
 	! Resutls Folder
 		write(Result_Folder,'(f4.2)') Threshold_Factor
 		write(string_theta,'(f4.2)')  theta_folder
@@ -194,7 +207,7 @@ PROGRAM main
 	! Set initia lvalues of R, Wage, Ebar to find equilibrium
 		! ------- DO NOT REMOVE THE LINES BELOW
 		R     =  0.05_dp
-		P     =  4.906133597851297E-002 
+		P     =  4.906133597851297E-002_dp
 		wage  =  1.97429920063330 
 		Ebar  =  1.82928004963637  
 		Ebar_bench = Ebar
@@ -222,7 +235,7 @@ PROGRAM main
 					call Solve_Experiment_Fixed_Policy_Functions(Fixed_PF,Simul_Switch)
 				elseif ((Fixed_PF.eqv..false.).and.(Fixed_PF_interp).and.(Fixed_PF_prices.eqv..false.)) then
 					! If using benchmark prices
-						Result_Folder = trim(Result_Folder)//'Tax_Reform_Timing_PF2_BP/'
+						Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp/'
 						call system( 'mkdir -p ' // trim(Result_Folder) )
 					! If using tax reform prices
 						! call Solve_Experiment(.false.,.false.)
@@ -234,7 +247,7 @@ PROGRAM main
 						! 	Cons   = Cons_bench        
 						! 	Hours  = Hours_bench
 						! 	Aprime = Aprime_bench
-						! Result_Folder = trim(Result_Folder)//'Tax_Reform_Timing_PF2_EP/'
+						! Result_Folder = trim(Result_Folder)//'Exp_Policy_Functions_Interp_Prices_Exp/'
 						! call system( 'mkdir -p ' // trim(Result_Folder) )
 					call Solve_Experiment_Fixed_PF_Interp(Fixed_PF_interp,Simul_Switch)
 				elseif ((Fixed_PF.eqv..false.).and.(Fixed_PF_interp.eqv..false.).and.(Fixed_PF_prices)) then
@@ -265,12 +278,29 @@ PROGRAM main
 				call Solve_Experiment(compute_exp,Simul_Switch)
 			endif 
 
-			! Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
-			! call system( 'mkdir -p ' // trim(Result_Folder) )
-			! call Solve_Experiment_tauC(compute_exp,Simul_Switch)
-
 			compute_bench = .false.
 		endif 
+
+		if (compute_exp_fixed_prices_and_taxes) then
+			call Solve_Experiment_Fixed_Prices_and_Taxes
+		endif 
+
+		if (Tax_Reform_Decomposition) then 
+			call Solve_Tax_Reform_Decomposition
+		endif 
+
+		! Tax Reform Tau_C
+		if (Tax_Reform_tau_C) then
+			! Solve Benchmark 
+			call Solve_Benchmark(compute_bench,Simul_Switch)
+			Bench_Simul_Folder = trim(Result_Folder)//'Simul/'
+			compute_bench = .false.
+			! Result folder for tau_C reform 
+			Result_Folder = trim(Result_Folder)//'Tau_C_Experiment/'
+			call system( 'mkdir -p ' // trim(Result_Folder) )
+			! Solve tax reform
+			call Solve_Experiment_tauC(compute_exp_tau_c,Simul_Switch)
+		endif	 
 
 		! Optimal Tax
 		if (Opt_Tax) then 
@@ -319,7 +349,7 @@ PROGRAM main
 			! 	V_Pr_exp          = V_Pr 
 			! 	V_Pr_nb_exp  	  = V_Pr_nb
 
-			! ! Compute moments
+			! ! Compute momentsr
 			! CALL COMPUTE_STATS
 			
 			! ! Compute welfare gain between economies
@@ -349,7 +379,6 @@ PROGRAM main
 				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Tau_C/'
 			endif
 			call system( 'mkdir -p ' // trim(Result_Folder) )
-
 			
 			call Solve_Opt_Tau_C(Opt_Tax_KW)
 			
@@ -406,7 +435,7 @@ PROGRAM main
 		endif
 
 		if (Transition_OT) then
-			call Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
+			call Solve_Transition_Opt_Taxes(Opt_Tax_KW_TR,budget_balance,balance_tau_L)
 		endif
 
 
@@ -485,11 +514,11 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		print*,"	Computing satitics"
 		CALL COMPUTE_STATS
 		print*,"	Writing variables"
-		CALL WRITE_VARIABLES(1)
-		! if (Simul_Switch) then 
-		! 	print*,"	Simulation"
-		! 	CALL SIMULATION(solving_bench)
-		! endif
+		! CALL WRITE_VARIABLES(1)
+		if (Simul_Switch) then 
+			print*,"	Simulation"
+			CALL SIMULATION(solving_bench)
+		endif
 		
 
 	! Aggregate variables in benchmark economy
@@ -724,7 +753,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 
 	! print*,"	Efficiency Computation"
 	! 	CALL Hsieh_Klenow_Efficiency(solving_bench)
-
+	print*, ' End of Solve_Experiment'
 
 end Subroutine Solve_Experiment
 
@@ -824,7 +853,7 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 	use omp_lib
 	implicit none 
 	logical, intent(in) :: compute_exp, Simul_Switch
-	real(dp)            :: tauCmin=0.075_dp, tauCindx=0.0_dp, tauCinc=0.05_dp, tauC_up, tauC_low
+	real(dp)            :: tauCmin=0.075_dp, tauCindx=0.0_dp, tauCinc=0.01_dp, tauC_up, tauC_low
 
 	!====================================================================================================
 	PRINT*,''
@@ -835,7 +864,9 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 	! Experiment economy
 		solving_bench=0
 	! Set capital taxes to zero
-		tauK = 0.0_DP
+		tauK    = 0.0_DP
+		tauW_bt = 0.0_DP
+		tauW_at = 0.0_DP
 	! Set Y_a_threshold
 		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
 		!Y_a_threshold = 0.0_dp ! big_p   !8.1812138704441200
@@ -968,8 +999,10 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 	! Deallocate variables
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
-	print*,"	Efficiency Computation"
-		CALL Hsieh_Klenow_Efficiency(solving_bench)
+	! print*,"	Efficiency Computation"
+	! 	CALL Hsieh_Klenow_Efficiency(solving_bench)
+
+	print*, ' End of Solve_Experiment_tauC'
 
 
 end Subroutine Solve_Experiment_tauC
@@ -1185,7 +1218,7 @@ end Subroutine Solve_Experiment_Fixed_Policy_Functions
 !========================================================================================
 !========================================================================================
 
-Subroutine Solve_Experiment_Fixed_PF_Interp(compute_exp_pf_interp,Simul_Switch)
+Subroutine Solve_Experiment_Fixed_PF_Interp (compute_exp_pf_interp,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
@@ -1328,13 +1361,13 @@ Subroutine Solve_Experiment_Fixed_PF_Interp(compute_exp_pf_interp,Simul_Switch)
 
 	endif 
 
-	
+
 	CALL Write_Experimental_Results(compute_exp_pf_interp)
-	CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+	K_mat  = K_Matrix(R,P)
+	Pr_mat = Profit_Matrix(R,P)
 	CALL ComputeLaborUnits(EBAR,wage)
 	CALL GOVNT_BUDGET(.true.)
-
-
+	
 	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
 		QBAR_exp  = QBAR 
@@ -1360,7 +1393,7 @@ Subroutine Solve_Experiment_Fixed_PF_Interp(compute_exp_pf_interp,Simul_Switch)
 		V_Pr_nb_exp  	  = V_Pr_nb
 
 	! Compute moments
-	CALL COMPUTE_STATS
+	! CALL COMPUTE_STATS
 	
 	! Compute welfare gain between economies
 	CALL COMPUTE_WELFARE_GAIN
@@ -1756,6 +1789,332 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 end Subroutine Solve_Experiment_Fixed_Prices
 
 
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
+	use parameters
+	use global 
+	use programfunctions
+	use Simulation_Module
+	use Toolbox
+	use omp_lib
+	implicit none 
+	REAL(DP), DIMENSION(na,nz,nx) :: YGRID_exp
+	integer :: aa, age1, a1, z1, lambda1, e1, x1
+
+	!====================================================================================================
+	! Get Benchmark Values
+		call Solve_Benchmark(.false.,.false.)
+
+	!====================================================================================================
+	! Get Experiment Values
+		call Solve_Experiment(.false.,.false.)
+		! Set YGRID for interpolation
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			CALL FORM_Y_MB_GRID(YGRID_exp,MBGRID,YGRID_t,MBGRID_t)
+			CALL ComputeLaborUnits(EBAR,wage)
+			! deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+	!====================================================================================================
+	! Change folder		
+		Result_Folder = trim(Result_Folder)//'Exp_PF_Interp_fixed_price_and_tax/'
+		call system( 'mkdir -p ' // trim(Result_Folder) )			
+
+
+	!====================================================================================================
+	! Choose values for prices and policy functions
+		P_exp        = P_bench
+		R_exp	     = R_bench
+		wage_exp     = wage_bench
+		tauK_exp     = tauK_bench
+		tauPL_exp    = tauPL_bench
+		psi_exp      = psi_bench
+		tauw_bt_exp  = tauW_bt_bench
+		tauw_at_exp  = tauW_at_bench 
+		Y_a_threshold_exp = Y_a_threshold_bench 
+
+		P 			 = P_bench 
+		R 			 = R_bench 
+		wage 		 = wage_bench 
+		tauK 		 = tauK_bench 
+		tauPL 		 = tauPL_bench 
+		tauw_bt      = tauw_bt_bench 
+		tauw_at      = tauw_at_bench 
+
+		Cons_bench   = Cons_exp 
+		Hours_bench  = Hours_exp
+		Aprime_bench = Aprime_exp
+
+
+	!====================================================================================================
+	! Solve Equilibrium with policy function interpolation
+		CALL FIND_DBN_EQ_PF_Interp(YGRID_exp)
+		CALL GOVNT_BUDGET(.true.)
+
+
+    	! Compute aggregates with current distribution
+	        QBAR =0.0
+	        NBAR =0.0
+	        DO x1=1,nx
+	        DO age1=1,MaxAge
+	        DO z1=1,nz
+	        DO a1=1,na
+	        DO lambda1=1,nlambda
+	        DO e1=1, ne
+	             QBAR= QBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
+	             NBAR= NBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * eff_un(age1, lambda1, e1) * Hours(age1, a1, z1, lambda1,e1,x1)
+	        ENDDO
+	        ENDDO
+	        ENDDO
+	        ENDDO    
+	        ENDDO    
+	        ENDDO    
+	    
+	        QBAR = ( QBAR)**(1.0_DP/mu)                
+	        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
+	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+
+		! Compute value function and store policy functions, value function and distribution in file
+			! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+			CALL Firm_Value
+
+
+	!====================================================================================================
+	! Compute stats and tables
+		CALL Write_Experimental_Results(.true.)
+		! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		K_mat  = K_Matrix(R,P)
+		Pr_mat = Profit_Matrix(R,P)
+		! CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		! CALL ComputeLaborUnits(EBAR,wage)
+
+
+		! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+		ValueFunction_exp = ValueFunction
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime
+		V_Pr_exp          = V_Pr 
+		V_Pr_nb_exp  	  = V_Pr_nb
+
+		! Compute moments
+		CALL COMPUTE_STATS
+		! Compute welfare gain between economies
+		CALL COMPUTE_WELFARE_GAIN
+
+
+	! Deallocate variables
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+end Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
+
+
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Subroutine Solve_Tax_Reform_Decomposition
+	use parameters
+	use global 
+	use programfunctions
+	use Simulation_Module
+	use Toolbox
+	use omp_lib
+	implicit none 
+	REAL(DP), DIMENSION(na,nz,nx) :: YGRID_exp
+	REAL(DP) :: P_aux, R_aux, wage_aux
+	character(100) :: aux_folder
+
+	aux_folder = Result_Folder
+
+	!====================================================================================================
+	! Get Benchmark Values
+		call Solve_Benchmark(.false.,.false.)
+		! Set YGRID for interpolation
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			CALL FORM_Y_MB_GRID(YGRID_exp,MBGRID,YGRID_t,MBGRID_t)
+			CALL ComputeLaborUnits(EBAR,wage)
+			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+	!====================================================================================================
+	! Get Experiment Values
+		call Solve_Experiment(.false.,.false.)
+			P_aux = P_exp
+			R_aux = R_exp 
+			wage_aux = wage_exp
+
+	!====================================================================================================
+	! Change only taxes
+	!====================================================================================================
+
+
+	!====================================================================================================
+	! Change folder		
+		Result_Folder = trim(Result_Folder)//'Tax_Reform_Decomposition/Only_Taxes/'
+		call system( 'mkdir -p ' // trim(Result_Folder) )			
+
+	!====================================================================================================
+	! Choose values for prices and policy functions
+		P_exp        = P_bench
+		R_exp	     = R_bench
+		wage_exp     = wage_bench
+		
+		P 			 = P_bench
+		R 			 = R_bench 
+		wage 		 = wage_bench 
+		tauK 		 = tauK_exp
+		tauPL 		 = tauPL_exp
+		tauw_bt      = tauw_bt_exp
+		tauw_at      = tauw_at_exp
+
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+
+	! Solve Interpolated Economy
+	call Solve_Interpolated_Economy(YGRID_exp)
+
+	!====================================================================================================
+	! Change taxes and prices
+	!====================================================================================================
+
+
+	!====================================================================================================
+	! Change folder		
+		Result_Folder = trim(aux_folder)//'Tax_Reform_Decomposition/Taxes_and_Prices/'
+		call system( 'mkdir -p ' // trim(Result_Folder) )			
+
+	!====================================================================================================
+	! Choose values for prices and policy functions
+		P_exp        = P_aux
+		R_exp	     = R_aux
+		wage_exp     = wage_aux
+		
+		P 			 = P_exp
+		R 			 = R_exp 
+		wage 		 = wage_exp
+
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+
+	! Solve Interpolated Economy
+	call Solve_Interpolated_Economy(YGRID_exp)
+
+end Subroutine Solve_Tax_Reform_Decomposition
+
+
+Subroutine Solve_Interpolated_Economy(YGRID_exp)
+	use parameters
+	use global 
+	use programfunctions
+	use Simulation_Module
+	use Toolbox
+	use omp_lib
+	implicit none 
+	REAL(DP), DIMENSION(na,nz,nx) :: YGRID_exp
+	INTEGER  :: aa, age1, a1, z1, lambda1, e1, x1
+
+	!====================================================================================================
+	! Solve Equilibrium with policy function interpolation
+	
+		CALL FIND_DBN_EQ_PF_Interp(YGRID_exp)
+		CALL GOVNT_BUDGET(.true.)
+
+    	! Compute aggregates with current distribution
+	        QBAR =0.0
+	        NBAR =0.0
+	        DO x1=1,nx
+	        DO age1=1,MaxAge
+	        DO z1=1,nz
+	        DO a1=1,na
+	        DO lambda1=1,nlambda
+	        DO e1=1, ne
+	             QBAR= QBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
+	             NBAR= NBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * eff_un(age1, lambda1, e1) * Hours(age1, a1, z1, lambda1,e1,x1)
+	        ENDDO
+	        ENDDO
+	        ENDDO
+	        ENDDO    
+	        ENDDO    
+	        ENDDO    
+	    
+	        QBAR = ( QBAR)**(1.0_DP/mu)                
+	        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
+	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+
+		! Compute value function and store policy functions, value function and distribution in file
+			! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
+			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+			CALL Firm_Value
+
+
+
+	!====================================================================================================
+	! Compute stats and tables
+		CALL Write_Experimental_Results(.true.)
+		! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		K_mat  = K_Matrix(R,P)
+		Pr_mat = Profit_Matrix(R,P)
+		! CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		! CALL ComputeLaborUnits(EBAR,wage)
+
+
+		! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+		ValueFunction_exp = ValueFunction
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime
+		V_Pr_exp          = V_Pr 
+		V_Pr_nb_exp  	  = V_Pr_nb
+
+		! Compute moments
+		CALL COMPUTE_STATS
+	
+		! Compute welfare gain between economies
+		CALL COMPUTE_WELFARE_GAIN
+
+	! Deallocate variables
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+
+
+end Subroutine Solve_Interpolated_Economy
+
+
 !========================================================================================
 !========================================================================================
 !========================================================================================
@@ -1788,257 +2147,247 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		Opt_TauW = 0.0_DP
 		maxbrentvaluet=-10000.0_DP
 	
-	! print*,'Optimal Tax Loop'
-	! If (Opt_Tax_KW) then
-	! 	PRINT*,''
-	! 	Print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
-	! 	PRINT*,''
- !    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_no_tax_3.txt', STATUS='replace')
- !    	CLOSE (unit=77) 
+	print*,'Optimal Tax Loop'
+	If (Opt_Tax_KW) then
+		PRINT*,''
+		Print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
+		PRINT*,''
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
+    	CLOSE (unit=77) 
 
-	!     DO tauindx=0,25,1
+	    DO tauindx=-20,-40,-1
+	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
             
- !            tauK        = real(tauindx,8)/100_DP
- !            brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
+            tauK        = real(tauindx,8)/100_DP
+            brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 
- !             ! Aggregate variable in experimental economy
-	! 			GBAR_exp  = GBAR
-	! 			QBAR_exp  = QBAR 
-	! 			NBAR_exp  = NBAR  
-	! 			Y_exp 	  = YBAR
-	! 			Ebar_exp  = EBAR
-	! 			P_exp     = P
-	! 			R_exp	  = R
-	! 			wage_exp  = wage
-	! 			tauK_exp  = tauK
-	! 			tauPL_exp = tauPL
-	! 			psi_exp   = psi
-	! 			DBN_exp   = DBN1
-	! 			tauw_bt_exp = tauW_bt
-	! 			tauw_at_exp = tauW_at
-	! 			Y_a_threshold_exp = Y_a_threshold
+             ! Aggregate variable in experimental economy
+				GBAR_exp  = GBAR
+				QBAR_exp  = QBAR 
+				NBAR_exp  = NBAR  
+				Y_exp 	  = YBAR
+				Ebar_exp  = EBAR
+				P_exp     = P
+				R_exp	  = R
+				wage_exp  = wage
+				tauK_exp  = tauK
+				tauPL_exp = tauPL
+				psi_exp   = psi
+				DBN_exp   = DBN1
+				tauw_bt_exp = tauW_bt
+				tauw_at_exp = tauW_at
+				Y_a_threshold_exp = Y_a_threshold
 
-	! 			ValueFunction_exp = ValueFunction
-	! 			Cons_exp          = Cons           
-	! 			Hours_exp         = Hours
-	! 			Aprime_exp        = Aprime 
+				ValueFunction_exp = ValueFunction
+				Cons_exp          = Cons           
+				Hours_exp         = Hours
+				Aprime_exp        = Aprime 
 
-	! 			! Compute moments
-	! 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-	! 			CALL COMPUTE_STATS
-	! 			CALL GOVNT_BUDGET(.false.)
-	! 			CALL Compute_After_Tax_Income
+				! Compute moments
+				CALL COMPUTE_STATS
+				CALL GOVNT_BUDGET(.true.)
 				
-	! 			! Compute welfare gain between economies
-	! 			CALL COMPUTE_WELFARE_GAIN
+				! Compute welfare gain between economies
+				CALL COMPUTE_WELFARE_GAIN
 
-	! 			! Write experimental results in output.txt
-	! 			CALL WRITE_VARIABLES(0)
+				! Write experimental results in output.txt
+				CALL WRITE_VARIABLES(0)
 
-	! 	    if (brentvaluet .gt. maxbrentvaluet) then
-	! 	        maxbrentvaluet = brentvaluet
-	! 			OPT_tauK = tauK
-	! 			OPT_psi  = psi
-	! 		endif
+		    if (brentvaluet .gt. maxbrentvaluet) then
+		        maxbrentvaluet = brentvaluet
+				OPT_tauK = tauK
+				OPT_psi  = psi
+			endif
 
-	! 		! Print Results 
-	! 	    print*, 'tauK=', tauK, 'YBAR=', YBAR, & 
-	! 	    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
-	! 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_no_tax_3.txt', STATUS='old', POSITION='append')
-	! 	    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
-	! 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-	! 		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
-	! 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-	! 		      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
-	! 		      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
-	! 		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	! 		      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
-	! 		      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
-	! 		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	! 		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-	! 	      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet, Tot_Cap_Inc
-	!       	CLOSE (unit=77) 
-	!     	Call Write_Experimental_Results(.true.)
-	!     	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-	!     ENDDO 
+			! Print Results 
+		    print*, 'tauK=', tauK, 'YBAR=', YBAR, & 
+		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+		      
+		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+			      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+				!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+			      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
+			      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
+			      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+			      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
+			      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
+			      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+			      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet
+	      	CLOSE (unit=77) 
+	    	Call Write_Experimental_Results(.true.)
+	    ENDDO 
 
-	!     tauK = OPT_tauK
-	! 	psi  = OPT_psi
+	    tauK = OPT_tauK
+		psi  = OPT_psi
+
+	 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
+
+		tauK = OPT_tauK
+		psi  = OPT_psi
+		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.01_dp,Opt_TauK+0.01_dp) 
+
+		tauK     = OPT_tauK
+		OPT_psi  = psi
+
+		! Compute moments
+		CALL COMPUTE_STATS
+
+		print*, "Optimal tau_K=", tauK, "Optimal psi=", psi
+
+		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+		    &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+		    &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+		!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+	 	    &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
+	 	    &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
+	 	    &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+	 	    &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
+	 	    &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
+	 	    &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+	 	    & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+  		    & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
 
 
-	! 	tauK = OPT_tauK
-	! 	psi  = OPT_psi
-	! 	call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.02_dp,Opt_TauK+0.02_dp) 
+		CLOSE (UNIT=77)
+		Call Write_Experimental_Results(.true.)
 
-	! 	tauK     = OPT_tauK
-	! 	OPT_psi  = psi
+	else
+		PRINT*,''
+		Print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
+		PRINT*,''
+    	! Set Y_a_threshold
+			call Find_TauW_Threshold(DBN_bench,W_bench)  
+			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
+			Wealth_factor = Y_a_threshold/W_bench
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
+    	CLOSE (unit=77) 
 
-	! 	! Compute moments
-	! 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-	! 	CALL COMPUTE_STATS
+    	! CALL Write_Experimental_Results(.false.)
+    	! psi = 1.0_dp-0.1465
 
-	! 	print*, "Optimal tau_K=", tauK, "Optimal psi=", psi
-	! 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_k.txt', STATUS='replace')
-	! 	WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
-	! 	    &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-	! 	    &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
-	! 	!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-	!  	    &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
-	!  	    &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
-	!  	    &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	!  	    &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
-	!  	    &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
-	!  	    &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	!  	    & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
- !  		    & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
-	! 	CLOSE (UNIT=77)
-	! 	Call Write_Experimental_Results(.true.)
-	! 	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-	! else
-	! 	PRINT*,''
-	! 	Print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
-	! 	PRINT*,''
- !    	! Set Y_a_threshold
-	! 		call Find_TauW_Threshold(DBN_bench,W_bench)  
-	! 		Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
-	! 		Wealth_factor = Y_a_threshold/W_bench
- !    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_timing_2.txt', STATUS='replace')
- !    	WRITE(UNIT=77, FMT=*) 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
-	! 	      & 'MeanWealth ','QBAR ','NBAR ','YBAR ','Y_Growth ', 'wage ', &
-	! 	      & 'Av_Util_NB ', 'CE2_NB ', 'CE2_Pop ', &
-	! 	      & 'Wealth_Output ', 'prct1_wealth ' , 'prct10_wealth ', 'Std_Log_Earnings ', 'mean_hours ', &
-	!       	  & 'GBAR ', 'GBAR_K ', 'GBAR_W ', 'GBAR_L ', 'GBAR_C ', 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet ','Cap_Inc '
- !    	CLOSE (unit=77) 
+	    DO tauindx=20,50,2
+	    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='old', POSITION='append')
 
- !    	! CALL Write_Experimental_Results(.false.)
- !    	psi=  0.4078
+            tauw_at     = real(tauindx,8)/1000_DP
+            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 
-	!     DO tauindx=-40,40,1
+            ! Aggregate variable in experimental economy
+				GBAR_exp  = GBAR
+				QBAR_exp  = QBAR 
+				NBAR_exp  = NBAR  
+				Y_exp 	  = YBAR
+				Ebar_exp  = EBAR
+				P_exp     = P
+				R_exp	  = R
+				wage_exp  = wage
+				tauK_exp  = tauK
+				tauPL_exp = tauPL
+				psi_exp   = psi
+				DBN_exp   = DBN1
+				tauw_bt_exp = tauW_bt
+				tauw_at_exp = tauW_at
+				Y_a_threshold_exp = Y_a_threshold
 
- !            tauw_at     = real(tauindx,8)/1000_DP
- !            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
- 
- !            ! Aggregate variable in experimental economy
-	! 			GBAR_exp  = GBAR
-	! 			QBAR_exp  = QBAR 
-	! 			NBAR_exp  = NBAR  
-	! 			Y_exp 	  = YBAR
-	! 			Ebar_exp  = EBAR
-	! 			P_exp     = P
-	! 			R_exp	  = R
-	! 			wage_exp  = wage
-	! 			tauK_exp  = tauK
-	! 			tauPL_exp = tauPL
-	! 			psi_exp   = psi
-	! 			DBN_exp   = DBN1
-	! 			tauw_bt_exp = tauW_bt
-	! 			tauw_at_exp = tauW_at
-	! 			Y_a_threshold_exp = Y_a_threshold
+				ValueFunction_exp = ValueFunction
+				Cons_exp          = Cons           
+				Hours_exp         = Hours
+				Aprime_exp        = Aprime 
 
-	! 			ValueFunction_exp = ValueFunction
-	! 			Cons_exp          = Cons           
-	! 			Hours_exp         = Hours
-	! 			Aprime_exp        = Aprime 
-
-	! 			! Compute moments
-	! 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-	! 			CALL COMPUTE_STATS
-	! 			CALL GOVNT_BUDGET(.false.)
-	! 			CALL Compute_After_Tax_Income
+				! Compute moments
+				CALL COMPUTE_STATS
+				CALL GOVNT_BUDGET(.true.)
 				
-	! 			! Compute welfare gain between economies
-	! 			CALL COMPUTE_WELFARE_GAIN
+				! Compute welfare gain between economies
+				CALL COMPUTE_WELFARE_GAIN
 
-	! 			! Write experimental results in output.txt
-	! 			CALL WRITE_VARIABLES(0)
+				! Write experimental results in output.txt
+				CALL WRITE_VARIABLES(0)
 
-	! 	    if (brentvaluet .gt. maxbrentvaluet) then
-	! 	        maxbrentvaluet = brentvaluet
-	! 			OPT_tauW = tauW_at
-	! 			OPT_psi  = psi
-	! 		endif
+		    if (brentvaluet .gt. maxbrentvaluet) then
+		        maxbrentvaluet = brentvaluet
+				OPT_tauW = tauW_at
+				OPT_psi  = psi
+			endif
 
-	! 		! Print Results 
-	! 	    print*, 'tauW=', tauW_at, 'YBAR=', YBAR, & 
-	! 	    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+			! Print Results 
+		    print*, 'tauW=', tauW_at, 'YBAR=', YBAR, & 
+		    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+		      
+		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+			      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+				!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+			      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
+			      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
+			      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+			      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
+			      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
+			      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+			      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet
 
-	! 	    OPEN  (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_timing_2.txt', STATUS='old', POSITION='append')
-	! 	    WRITE (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
-	! 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-	! 		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
-	! 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-	! 		      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
-	! 		      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
-	! 		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	! 		      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
-	! 		      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
-	! 		      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	! 		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-	! 	      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet,Tot_Cap_Inc
- !      	  	CLOSE (unit=77)
+      	  	CLOSE (unit=77)
+		    Call Write_Experimental_Results(.true.)
 
-	! 	    Call Write_Experimental_Results(.true.)
-	! 	    deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-	!     ENDDO 
+	    ENDDO 
 
-	!     ! opt_psi = 0.860830826876844_dp 
-	!     ! Opt_TauW = 0.031_dp 
-	! 	tauW_at = OPT_tauW
-	! 	psi     = OPT_psi
-	! 	call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.002_dp,Opt_TauW+0.002_dp)
-	! 	tauW_at = OPT_tauW
-	! 	OPT_psi = psi
 
-	! 	! Compute moments
-	! 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-	! 	CALL COMPUTE_STATS
-	! 	CALL GOVNT_BUDGET(.false.)
-	! 	CALL Compute_After_Tax_Income
+	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w.txt', STATUS='replace')
+
+	    ! opt_psi = 0.860830826876844_dp 
+	    ! Opt_TauW = 0.031_dp 
+		tauW_at = OPT_tauW
+		psi     = OPT_psi
+		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.002_dp,Opt_TauW+0.002_dp)
+
+		! tauW_at = 0.025_dp
+		! call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,0.023_dp,0.028_dp)
+
+		tauW_at = OPT_tauW
+		OPT_psi = psi
+
+		! Compute moments
+		CALL COMPUTE_STATS
+
+		print*, "Optimal tau_W=", tauW_at, "Optimal psi=", psi
 		
-	! 	! Compute welfare gain between economies
-	! 	CALL COMPUTE_WELFARE_GAIN
+		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+	      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+	      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+		!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
+	      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
+	      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
+	      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+	      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
+	      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
+	      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+	      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
 
-	! 	print*, "Optimal tau_W=", tauW_at, "Optimal psi=", psi
-		
-	! 	OPEN  (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_timing_2.txt', STATUS='replace')
-	! 	WRITE (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
-	!       &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-	!       &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
-	! 	!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-	!       &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
-	!       &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
-	!       &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	!       &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
-	!       &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
-	!       &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	!       & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
- !      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet, Tot_Cap_Inc
-	! 	CLOSE (UNIT=77)
-	! 	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-	! endif 
 
-	! CALL FIND_DBN_EQ
+		CLOSE (UNIT=77)
+	endif 
+
+	CALL FIND_DBN_EQ
+	CALL GOVNT_BUDGET(.true.)
+
+	! Compute value function and store policy functions, value function and distribution in file
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL Firm_Value
+	CALL Write_Experimental_Results(.true.)
+
+	! CALL Write_Experimental_Results(.false.)
+	! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+	! K_mat  = K_Matrix(R,P)
+	! Pr_mat = Profit_Matrix(R,P)
+	! CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+	! CALL ComputeLaborUnits(EBAR,wage)
 	! CALL GOVNT_BUDGET(.true.)
+	! print*, " 	Computing After Tax Income"
 	! CALL Compute_After_Tax_Income
-
-	! ! Compute value function and store policy functions, value function and distribution in file
-	! CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
-	! CALL Firm_Value
 	! CALL Write_Experimental_Results(.true.)
-
-	! Load results 
-	! Use this block if commenting everything above
-		CALL Write_Experimental_Results(.false.)
-		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-		K_mat  = K_Matrix(R,P)
-		Pr_mat = Profit_Matrix(R,P)
-		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
-		CALL ComputeLaborUnits(EBAR,wage)
-		CALL GOVNT_BUDGET(.true.)
-		! print*, " 	Computing After Tax Income"
-		! CALL Compute_After_Tax_Income
-		! CALL Write_Experimental_Results(.true.)
-		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	
 	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
@@ -2062,7 +2411,6 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime 
 
-	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 	! Compute moments
 	CALL COMPUTE_STATS
 	
@@ -2072,16 +2420,14 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
 
-	! Simulation
-	if (Simul_Switch) then 
-	CALL SIMULATION(solving_bench)
-	endif 
-
-	! Deallocate variables
-		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+	! ! if (((theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp).and.(Simul_Switch)) then 
+	! !  	print*,"	Optimal Tax Simulation"
+	! ! 	CALL SIMULATION(solving_bench)
+	! ! endif
+	
+	! CALL SIMULATION(0)
 
 end Subroutine Solve_Opt_Tax
-
 
 
 !========================================================================================
@@ -2623,7 +2969,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 	implicit none 
 	logical, intent(in) :: Opt_Tax_KW
 	real(DP) :: OPT_tauC
-	INTEGER  :: tauC_ind
+	INTEGER  :: tauC_ind, tauL_ind
 
 
 	!====================================================================================================
@@ -2642,7 +2988,6 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		maxbrentvaluet=-10000.0_DP
 	
 	print*,'Optimal Tax Loop'
-	
 		
 
 	If (Opt_Tax_KW) then
@@ -2741,8 +3086,44 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		tauK     = OPT_tauK
 		OPT_psi  = psi
 
+		CALL FIND_DBN_EQ
+		CALL GOVNT_BUDGET(.true.)
+
+		! Compute value function and store policy functions, value function and distribution in file
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL Firm_Value
+		CALL Write_Experimental_Results(.true.)
+		
+		! Aggregate variable in experimental economy
+			GBAR_exp  = GBAR
+			QBAR_exp  = QBAR 
+			NBAR_exp  = NBAR  
+			Y_exp 	  = YBAR
+			Ebar_exp  = EBAR
+			P_exp     = P
+			R_exp	  = R
+			wage_exp  = wage
+			tauK_exp  = tauK
+			tauPL_exp = tauPL
+			psi_exp   = psi
+			DBN_exp   = DBN1
+			tauw_bt_exp = tauW_bt
+			tauw_at_exp = tauW_at
+			Y_a_threshold_exp = Y_a_threshold
+
+			ValueFunction_exp = ValueFunction
+			Cons_exp          = Cons           
+			Hours_exp         = Hours
+			Aprime_exp        = Aprime 
+
 		! Compute moments
 		CALL COMPUTE_STATS
+		
+		! Compute welfare gain between economies
+		CALL COMPUTE_WELFARE_GAIN
+
+		! Write experimental results in output.txt
+		CALL WRITE_VARIABLES(0)
 
 		print*, "Optimal tau_K=", tauK, "Optimal psi=", psi, 'Optimal tauC=',tauC
 
@@ -2761,34 +3142,44 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
 
 		CLOSE (UNIT=77)
-		Call Write_Experimental_Results(.true.)
 
 
 	else 
 		PRINT*,''
 		Print*,'--------------- OPTIMAL WEALTH TAXES - Consumption Taxes -----------------'
 		PRINT*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_8.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_0.txt', STATUS='replace')
     	CLOSE (unit=77) 
 
-    	CALL Write_Experimental_Results(.false.)
+    	! CALL Write_Experimental_Results(.false.)
     	! psi = 1.8
 
-    	DO tauC_ind = 10,15,1
-
-    		OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_8.txt', STATUS='old', POSITION='append')
-
-			tauC = real(tauC_ind,8)/10.0_dp
-			print*, ' '
-			print*, ' Consumption Taxes=',tauC
+    	DO tauindx=-4,4,1
+    		tauw_at     = real(tauindx,8)/1000_DP
+            print*, ' '
+			print*, ' Wealth Taxes=',tauw_at
 			print*, ' '
 
-			! psi = 0.776_dp
+			tauC = 0.295359_dp
 			! psi = 1.50_dp 
 
-		    DO tauindx=-03,03,1
-	            tauw_at     = real(tauindx,8)/1000_DP
-	            brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+		    ! DO tauC_ind = 10,15,1
+		    DO tauL_ind = -4,4,1
+	    		! tauC = 1.0_dp - real(tauC_ind,8)/100.0_dp
+		    	psi  = 1.0_dp - real(tauL_ind,8)/100.0_dp
+		    
+				print*, ' '
+				print*, '-----------------------------------------------------------'
+				print*, ' Labor Income Taxes=',1.0_dp-psi
+				print*, ' '
+
+				! Solve model with current taxes (tauC is taken as a global)
+				! brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
+				brentvaluet = - EQ_WELFARE_GIVEN_PSI(tauK,tauW_at,psi)
+				print*, ' '
+				print*, ' Consumption Taxes=',tauC
+				print*, ' '
+
 
 	            ! Aggregate variable in experimental economy
 				GBAR_exp  = GBAR
@@ -2812,9 +3203,17 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 				Hours_exp         = Hours
 				Aprime_exp        = Aprime 
 
+
+				CALL Write_Experimental_Results(.true.)
+				CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+				K_mat  = K_Matrix(R,P)
+				Pr_mat = Profit_Matrix(R,P)
+				CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+				CALL ComputeLaborUnits(EBAR,wage)
+				CALL GOVNT_BUDGET(.true.)
+
 				! Compute moments
 				CALL COMPUTE_STATS
-				CALL GOVNT_BUDGET(.true.)
 				
 				! Compute welfare gain between economies
 				CALL COMPUTE_WELFARE_GAIN
@@ -2833,7 +3232,8 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			    print*, 'tauW=', tauW_at, 'YBAR=', YBAR, & 
 			    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
 			    	  & 'tauC=', tauC,'psi=',psi
-			      
+			     
+		     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_0.txt', STATUS='old', POSITION='append') 
 			    WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
 			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 			      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
@@ -2845,15 +3245,15 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
 			      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
 			      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-		      & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_NB
+		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_NB
+		      	CLOSE (unit=77)
+		      	deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 		    ENDDO 
-		    CLOSE (unit=77)
-		    Call Write_Experimental_Results(.true.)
 
 	    ENDDO
 
 
-	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_cons_tax_8.txt', STATUS='replace')
+	    
 
 		tauW_at = OPT_tauW
 		psi 	= OPT_psi
@@ -2863,11 +3263,57 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		tauW_at = OPT_tauW
 		OPT_psi  = psi
 
-		! Compute moments
-		CALL COMPUTE_STATS
+		CALL FIND_DBN_EQ
+		CALL GOVNT_BUDGET(.true.)
+
+		! Compute value function and store policy functions, value function and distribution in file
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL Firm_Value
+		
+		! Aggregate variable in experimental economy
+			GBAR_exp  = GBAR
+			QBAR_exp  = QBAR 
+			NBAR_exp  = NBAR  
+			Y_exp 	  = YBAR
+			Ebar_exp  = EBAR
+			P_exp     = P
+			R_exp	  = R
+			wage_exp  = wage
+			tauK_exp  = tauK
+			tauPL_exp = tauPL
+			psi_exp   = psi
+			DBN_exp   = DBN1
+			tauw_bt_exp = tauW_bt
+			tauw_at_exp = tauW_at
+			Y_a_threshold_exp = Y_a_threshold
+
+			ValueFunction_exp = ValueFunction
+			Cons_exp          = Cons           
+			Hours_exp         = Hours
+			Aprime_exp        = Aprime 
+
+			CALL Write_Experimental_Results(.true.)
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			K_mat  = K_Matrix(R,P)
+			Pr_mat = Profit_Matrix(R,P)
+			CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+			CALL ComputeLaborUnits(EBAR,wage)
+
+			! Compute moments
+			CALL COMPUTE_STATS
+			
+			! Compute welfare gain between economies
+			CALL COMPUTE_WELFARE_GAIN
+
+			! Write experimental results in output.txt
+			CALL WRITE_VARIABLES(0)
+
+
+
 
 		print*, "Optimal tau_W=", tauW_at, "Optimal psi=", psi
-		
+
+		OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_cons_tax.txt', STATUS='replace')
 		WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
@@ -2883,53 +3329,15 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
 
 		CLOSE (UNIT=77)
-		Call Write_Experimental_Results(.true.)
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 	endif 
 
 
-	CALL FIND_DBN_EQ
-	CALL GOVNT_BUDGET(.true.)
 
-	! Compute value function and store policy functions, value function and distribution in file
-	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
-	CALL Firm_Value
-	! CALL Write_Experimental_Results(.true.)
-	
-	! Aggregate variable in experimental economy
-		GBAR_exp  = GBAR
-		QBAR_exp  = QBAR 
-		NBAR_exp  = NBAR  
-		Y_exp 	  = YBAR
-		Ebar_exp  = EBAR
-		P_exp     = P
-		R_exp	  = R
-		wage_exp  = wage
-		tauK_exp  = tauK
-		tauPL_exp = tauPL
-		psi_exp   = psi
-		DBN_exp   = DBN1
-		tauw_bt_exp = tauW_bt
-		tauw_at_exp = tauW_at
-		Y_a_threshold_exp = Y_a_threshold
+	! print*,"	Efficiency Computation"
+	! 	CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		ValueFunction_exp = ValueFunction
-		Cons_exp          = Cons           
-		Hours_exp         = Hours
-		Aprime_exp        = Aprime 
-
-	! Compute moments
-	CALL COMPUTE_STATS
-	
-	! Compute welfare gain between economies
-	CALL COMPUTE_WELFARE_GAIN
-
-	! Write experimental results in output.txt
-	CALL WRITE_VARIABLES(0)
-
-	print*,"	Efficiency Computation"
-		CALL Hsieh_Klenow_Efficiency(solving_bench)
-
-	CALL SIMULATION(0)
+	! CALL SIMULATION(0)
 
     
 
@@ -3441,8 +3849,9 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	use omp_lib
 	implicit none 
 	logical, intent(in) :: budget_balance
-	character(100) :: folder_aux
-	real(dp) :: tauW_at_0, tauW_bt_0
+	real(dp)            :: tauW_at_0, tauW_bt_0
+	character(100)      :: folder_aux
+	
 
 	! Set step for increments
 	tauWinc_bt=0.000_DP
@@ -3456,21 +3865,26 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	Result_Folder = trim(folder_aux)//'Tax_Reform_Timing/'
 	call Solve_Experiment(.false.,.false.)
 
-	! Set reference value for wealth taxes
-		tauW_at_0 = tauW_at
-		tauW_bt_0 = tauW_bt
+	! Base level for taxes (current experimental value)
+	tauw_bt_0 = tauW_bt_exp 
+	tauw_at_0 = tauW_at_exp 
+
+	Debt_Absorption = 1.0_dp
+	Use_Transition_Seed = .false.
 
 	if (budget_balance) then 
 
 		! Set Results Folder
-		Result_Folder = trim(folder_aux)//'Transition_Tax_Reform_Timing_BB/'
+		Result_Folder = trim(Result_Folder)//'Transition_Tax_Reform_BB_cfm/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	if (.true.) then 
 
 		! Find the Distribution and Policy Functions Along Transition Path
 		! This is done for the tax reform steady state
-		call Find_DBN_Transition 
+		! call Find_DBN_Transition 
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			GBAR_exp = GBAR_bench - 1 ; Debt_tr = 0 ; 
 
 		! Find Taxes that balance the budget 
 		print*,' '
@@ -3479,8 +3893,8 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 		print*,'---------------------------------------------------'
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
 			tauWindx = 4.0_DP
-			Debt_tr  = 1.0_DP
-			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
+			Debt_tr(T+1)  = 1.0_DP
+			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr(T+1)))
 				! Set old G and new value of tauW
 				GBAR_exp_old = GBAR_exp
 				tauW_bt = tauw_bt_0 + tauWindx * tauWinc_bt
@@ -3517,16 +3931,16 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 				print*,' ' 
 				write(*,*) "Bracketing GBAR: tauW_bt=", tauW_bt*100, "And tauW_at=", tauW_at*100
 				print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
-				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
+				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr(T+1),'Debt',Debt_tr(T+1)
 			ENDDO
 
 			! Set tauW as weighted average of point in  the grid to balance budget more precisely
 				tauW_up_bt  = tauW_bt
 				tauW_low_bt = tauW_bt  -  tauWinc_bt
-				tauW_bt     = tauW_low_bt + tauWinc_bt * 0.5_dp ! GBAR_bench+R_exp*Debt_tr - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				tauW_bt     = tauW_low_bt + tauWinc_bt * 0.5_dp ! GBAR_bench+R_exp*Debt_tr(T+1) - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
 				tauW_up_at  = tauW_at
 				tauW_low_at = tauW_at  -  tauWinc_at  
-				tauW_at     = tauW_low_at + tauWinc_at * 0.5_dp ! (GBAR_bench+R_exp*Debt_tr - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
+				tauW_at     = tauW_low_at + tauWinc_at * 0.5_dp ! (GBAR_bench+R_exp*Debt_tr(T+1) - GBAR_exp_old )/(GBAR_exp - GBAR_exp_old)
 				print*,''
 				print*,'GBAR bracketed by taxes:'
 				print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_bt=', tauW_bt*100, "%", '% tauW_up_bt=', tauW_up_bt*100
@@ -3562,11 +3976,11 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 
 			! Find tauW that exactly balances the budget (up to precisioin 0.1) using bisection
 				print*,"Gbar at midpoint of bracket"
-				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr
+				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr(T+1)
 				print*,''
 				print*,'Bisection for TauW:'
-				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr))) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
-				    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
+				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr(T+1)))) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
+				    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr(T+1) ) then
 				        tauW_up_bt  = tauW_bt 
 				        tauW_up_at  = tauW_at 
 				    else
@@ -3604,7 +4018,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 				    print*,'tauW_low_bt =', tauW_low_bt*100, '% tauW_up_bt=', tauW_up_bt*100, '% tauW_bt=', tauW_bt*100, "%"
 					print*,'tauW_low_at =', tauW_low_at*100, '% tauW_up_at=', tauW_up_at*100, '% tauW_at=', tauW_at*100, "%"
 					print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
-					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
+					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr(T+1),'Debt',Debt_tr(T+1)
 				ENDDO
 
 	else 
@@ -3717,13 +4131,20 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 	implicit none 
 	logical, intent(in) :: budget_balance, Opt_Tax_KW, balance_tau_L
 	real(dp) :: psi_0, tauK_0, tauW_0
+	integer  :: Debt_Absorption_iter 
 	character(100) :: folder_aux
+	logical  :: read_results
+
+	! Set flag for reading results or computing optimal taxes
+		read_results = .false.
 
 	! Save base folder
 		folder_aux = Result_Folder
 
 	! Load Benchmark Variables
 		call Solve_Benchmark(.false.,.false.)
+		! Change flag 
+		solving_bench=0
 
 	! Load Optimal Tax Variables
 		! Change to optimal tax folder 
@@ -3770,32 +4191,38 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		Aprime_exp        = Aprime 
 
 	! Set reference value for psi, tau_K and tau_W
-		psi_0  = psi 
+		psi_0  = 1.0_dp-0.3740_dp
+			! OTW with tauL set to 1.0_dp-0.15540_dp 
+			! OTK with tauL set to 1.0_dp-0.3740_dp
+			! If not using tauL set to psi
 		tauK_0 = tauK 
 		tauW_0 = tauW_at
+			! Better start for opt tauW= 0.0340_dp
 
+	Use_Transition_Seed = .true.
 
+		
 	if (budget_balance) then 
 
 		! Set Results Folder
 			if (balance_tau_L) then 
 				if (Opt_Tax_KW) then 
-				Result_Folder = trim(folder_aux)//'Transition_OTK_BB_tau_L/'
+				Result_Folder = trim(folder_aux)//'Transition_OTK_BB_tau_L_cfm/'
 				else 
-				Result_Folder = trim(folder_aux)//'Transition_OTW_Timing_BB_tau_L/'
+				Result_Folder = trim(folder_aux)//'Transition_OTW_Timing_BB_tau_L_cfm/'
 				endif 
 			elseif (Opt_Tax_KW) then 
-				Result_Folder = trim(folder_aux)//'Transition_OTK_BB_tau_K/'
+				Result_Folder = trim(folder_aux)//'Transition_OTK_BB_tau_K_cfm/'
 			else
-				Result_Folder = trim(folder_aux)//'Transition_OTW_Timing_BB_tau_W/'
+				Result_Folder = trim(folder_aux)//'Transition_OTW_Timing_BB_tau_W_cfm/'
 			endif 
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
 		! Find the Distribution and Policy Functions Along Transition Path
 		! This is done for the tax reform steady state
-		call Find_DBN_Transition 
+		! call Find_DBN_Transition 
 			! If previous line is commented you need this:
-			! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 
 		! Find Taxes that balance the budget 
 		if (balance_tau_L) then
@@ -3806,14 +4233,23 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		else 
 		print*,' '
 		print*,'---------------------------------------------------'
-		print*,' 	Balancing the Budget with Capital/True Taxes'
+		print*,' 	Balancing the Budget with Capital/Wealth Taxes'
 		print*,'---------------------------------------------------'
 		endif 
+
+		if (read_results.eqv..false.) then 
+		! Solve for the optimal tax for iterative loops of Debt_Absorption
+
+		DO Debt_Absorption_iter=0,10
+
+			! Set Debt_Absorption
+			Debt_Absorption = real(Debt_Absorption_iter,8)/10.0_dp
+
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
-			BB_tax_ind = 1.0_DP
-			BB_tax_chg = 0.005_DP
+			BB_tax_ind = 0.0_DP ! Originally 1.0_DP
+			BB_tax_chg = 0.002_DP ! Originally 0.0002_DP
 			Debt_tr  = 1.0_DP
-			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr))
+			DO WHILE (GBAR_exp .lt. (GBAR_bench+R_exp*Debt_tr(T+1)))
 				! Set old G and new value of tauW
 				GBAR_exp_old = GBAR_exp
 				print*,' '
@@ -3829,27 +4265,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 				endif 
 				print*,' '
 				
-				! Solve for New Steady State
-				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-				CALL FIND_DBN_EQ
-					GBAR_exp  = GBAR
-					QBAR_exp  = QBAR 
-					NBAR_exp  = NBAR  
-					Y_exp 	  = YBAR
-					Ebar_exp  = EBAR
-					P_exp     = P
-					R_exp	  = R
-					wage_exp  = wage
-					tauK_exp  = tauK
-					tauPL_exp = tauPL
-					psi_exp   = psi
-					DBN_exp   = DBN1
-					tauw_bt_exp = tauW_bt
-					tauw_at_exp = tauW_at
-					Y_a_threshold_exp = Y_a_threshold
-					Cons_exp          = Cons           
-					Hours_exp         = Hours
-					Aprime_exp        = Aprime
+
 				! Find the Distribution and Policy Functions Along Transition Path
 				call Find_DBN_Transition 
 				! Get new G
@@ -3858,7 +4274,9 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 				BB_tax_ind = BB_tax_ind + 1.0_DP  
 				print*,' ' 
 				print*,'Bracketing GBAR: tau_L=', (1.0_dp-psi)*100,'tauK=',100*tauK,'tauW=',100*tauW_at
-				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
+				print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr(T+1),'Debt',Debt_tr(T+1)
+				print*,'	Debt Absortion',Debt_Absorption_iter,Debt_Absorption
+				print*,' ' 
 			ENDDO
 
 				print*,''
@@ -3886,10 +4304,11 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 
 			! Find psi that exactly balances the budget (up to precisioin 0.1%) using bisection
 				print*,'Bisection for Taxes:'
-				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr))) .gt. 0.01 ) ! as long as the difference is greater than 0.1% continue
+				DO WHILE ((  abs(100.0_DP*(1.0_DP-GBAR_exp/(GBAR_bench+R_exp*Debt_tr(T+1)))) .gt. 0.05 )&
+						&.and.(abs(BB_tax_up-BB_tax_low).gt.1.5E-05_DP)) ! as long as the difference is greater than 0.1% continue
 			    	
 					if (balance_tau_L) then 
-					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
+					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr(T+1) ) then
 					        BB_tax_low  = psi ! If there is a surplus don't decrease psi (increase tau_L). Set a floor.
 					    else
 					        BB_tax_up   = psi ! If there is a deficit don't increase psi (decrease tau_L). Set a ceiling.
@@ -3897,7 +4316,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
     				    ! Set new tax
 						    psi = (BB_tax_low + BB_tax_up)/2.0_DP
 					elseif (Opt_Tax_KW) then 
-					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
+					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr(T+1) ) then
 					        BB_tax_up   = tauK ! If there is a surplus don't increase tau_K. Set a ceiling.
 					    else
 					        BB_tax_low  = tauK ! If there is a deficit don't decrease tau_K. Set a floor.
@@ -3905,7 +4324,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
     				    ! Set new tax
 						    tauK = (BB_tax_low + BB_tax_up)/2.0_DP
 					else
-					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr ) then
+					    if (GBAR_exp .gt. GBAR_bench+R_exp*Debt_tr(T+1) ) then
 					        BB_tax_up   = tauW_at ! If there is a surplus don't increase tau_W. Set a ceiling.
 					    else
 					        BB_tax_low  = tauW_at ! If there is a deficit don't decrease tau_W. Set a floor.
@@ -3915,27 +4334,6 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 					endif 
 
 
-					! Solve for New Steady State
-					deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
-					CALL FIND_DBN_EQ
-						GBAR_exp  = GBAR
-						QBAR_exp  = QBAR 
-						NBAR_exp  = NBAR  
-						Y_exp 	  = YBAR
-						Ebar_exp  = EBAR
-						P_exp     = P
-						R_exp	  = R
-						wage_exp  = wage
-						tauK_exp  = tauK
-						tauPL_exp = tauPL
-						psi_exp   = psi
-						DBN_exp   = DBN1
-						tauw_bt_exp = tauW_bt
-						tauw_at_exp = tauW_at
-						Y_a_threshold_exp = Y_a_threshold
-						Cons_exp          = Cons           
-						Hours_exp         = Hours
-						Aprime_exp        = Aprime
 					! Find the Distribution and Policy Functions Along Transition Path
 					call Find_DBN_Transition 
 					! Get new G
@@ -3949,9 +4347,45 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 					else
 					print*,'tax_W_low =', BB_tax_low*100, 'tau_W_up=', BB_tax_up*100, 'tau_W=', tauW_at*100
 					endif 
-					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr,'Debt',Debt_tr
+					print*,'GBAR_exp =', GBAR_exp,'GBAR_bench+R*Debt=',GBAR_bench+R_exp*Debt_tr(T+1),'Debt',Debt_tr(T+1)
+					print*,'	Debt Absortion',Debt_Absorption_iter,Debt_Absorption
 				ENDDO
 
+			! Set reference value of taxes to current solution
+				psi_0  = psi
+				tauK_0 = tauK 
+				tauW_0 = tauW_at
+
+
+		ENDDO
+
+		else 
+		! Read results from main folder 
+
+			Use_Transition_Seed = .true.
+			Debt_Absorption     = 1.0_dp
+
+			! Read taxes 
+				print*, ' ' ; print*, 'Loading taxes from file'
+				OPEN (UNIT=1,  FILE=trim(Result_Folder)//'tauC_tr'   , STATUS='old', ACTION='read')
+				OPEN (UNIT=2,  FILE=trim(Result_Folder)//'tauK_tr'	 , STATUS='old', ACTION='read')
+				OPEN (UNIT=3,  FILE=trim(Result_Folder)//'tauL_tr'	 , STATUS='old', ACTION='read')
+				OPEN (UNIT=4,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='old', ACTION='read')
+				READ (UNIT=1,  FMT=*), tauC
+				READ (UNIT=2,  FMT=*), tauK
+				READ (UNIT=3,  FMT=*), psi
+				READ (UNIT=4,  FMT=*), tauW_at
+				CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4);
+				print*, '	Reading completed'; print*, ' '
+
+			! Adjust psi (file saves tauL = 1 - psi)
+				psi = 1-psi
+
+			! Find the Distribution and Policy Functions Along Transition Path
+				call Find_DBN_Transition 
+
+
+		endif
 
 	else
 
@@ -3967,6 +4401,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 			call Find_DBN_Transition 
 
 	endif
+
 
 	! Compute Value Functions for Cohorts Alive at Time of Policy Change
 		call COMPUTE_VALUE_FUNCTION_TRANSITION

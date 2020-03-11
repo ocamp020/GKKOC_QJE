@@ -69,7 +69,7 @@ MODULE global
 	 	! Benchmark values of Q, N, E, Wage, R, G, Y
 	    REAL(DP) :: QBAR_bench, NBAR_bench, Ebar_bench, wage_bench, P_bench, GBAR_bench, Y_bench, W_bench, R_bench, SSC_Payments_bench
 	    ! Experiment values of Q, N, E, Wage, R, G, Y
-	    REAL(DP) :: QBAR_exp,   NBAR_exp,   Ebar_exp,   wage_exp,   P_exp,   GBAR_exp, GBAR_exp_old, Y_exp, R_exp
+	    REAL(DP) :: QBAR_exp,   NBAR_exp,   Ebar_exp,   wage_exp,   P_exp,   GBAR_exp, GBAR_exp_old, Y_exp, R_exp,Debt_exp
 	    ! Values for aggregate variables (used when solving a given economy)
 	    REAL(DP) :: P, Ebar , wage, NBAR, QBAR, YBAR, GBAR, R, SSC_Payments
 	    ! Wealth tax threshold as proportion of mean benchmark wealth
@@ -163,13 +163,16 @@ MODULE global
     ! Extra tax information
     REAL(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, Tot_Lab_Inc, Tot_Cap_Inc
 
-    ! Transition Yo
+    ! Transition 
+    LOGICAL :: Use_Transition_Seed
+    REAL    :: Debt_Absorption
     INTEGER :: ti 
     ! Prices and Quantities
     REAL(DP), DIMENSION(T+1) :: R_tr, P_tr, QBAR_tr, NBAR_tr, YBAR_tr, Wage_tr, EBAR_tr, K_tr, C_tr
     ! Government Budget
-    REAL(DP), DIMENSION(T+1) :: GBAR_tr, GBAR_K_tr, GBAR_W_tr, GBAR_L_tr, GBAR_C_tr, SSC_Payments_tr, Tot_Lab_Inc_tr
-    REAL(DP)                 :: Debt_tr
+    REAL(DP), DIMENSION(T+1) :: GBAR_tr, GBAR_K_tr, GBAR_W_tr, GBAR_L_tr, GBAR_C_tr
+    REAL(DP), DIMENSION(T+1) :: SSC_Payments_tr, Tot_Lab_Inc_tr, Debt_tr
+    REAL(DP)                 :: Debt_SS
     ! Policy function and value function (defined on the exogenous grid)
     REAL(DP), DIMENSION(:,:,:,:,:,:,:), allocatable :: Cons_tr, Hours_tr, Aprime_tr, DBN_tr, ValueFunction_tr
     ! Welfare Gain
