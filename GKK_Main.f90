@@ -169,20 +169,17 @@ PROGRAM main
  		Debt_SS = 0.0_DP
 
 	! Resutls Folder
-		write(Result_Folder,'(f4.2)') Threshold_Factor
-		write(string_theta,'(f4.2)')  theta_folder
-
 		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './NSU_ZS_LT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
+			Result_Folder = './Revision/Model_2.0/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './NSU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
+			Result_Folder = './Revision/Model_2.0_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './SU_ZS_LT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
+			Result_Folder = './Revision/Model_2.0_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Factor_'//trim(Result_Folder)//'/'
+			Result_Folder = './Revision/Model_2.0_PT_SU/' 
 		end if
 
-		Result_Folder = trim(Result_Folder)//'Model_1.2_bv/' 
+		
 
 		! call execute_command_line( 'mkdir -p ' // trim(Result_Folder) )
 		call system( 'mkdir -p ' // trim(Result_Folder) )
@@ -267,12 +264,12 @@ PROGRAM main
 					call Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W,Fixed_P,Fixed_R)
 			else
 				if (KeepSSatBench .eq. 1) then 
-				Result_Folder = trim(Result_Folder)//'Tax_Reform_Timing/'
+				Result_Folder = trim(Result_Folder)//'Tax_Reform/'
 				else 
 				folder_aux = Result_Folder
-				Result_Folder = trim(folder_aux)//'Tax_Reform_Timing/'
+				Result_Folder = trim(folder_aux)//'Tax_Reform/'
 				CALL Write_Experimental_Results(.false.)
-				Result_Folder = trim(folder_aux)//'Tax_Reform_Timing_SS/'
+				Result_Folder = trim(folder_aux)//'Tax_Reform_SS/'
 				endif
 				call system( 'mkdir -p ' // trim(Result_Folder) )
 				call Solve_Experiment(compute_exp,Simul_Switch)
@@ -310,50 +307,12 @@ PROGRAM main
 			if (Opt_Tax_KW) then 
 				Result_Folder = trim(folder_aux)//'Opt_Tax_K/'
 			else 
-				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Timing/'
+				Result_Folder = trim(folder_aux)//'Opt_Tax_W/'
 			endif
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
 			
 			call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
-			
-			! CALL Write_Experimental_Results(.false.)
-			! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
-			! K_mat  = K_Matrix(R,P)
-			! Pr_mat = Profit_Matrix(R,P)
-			! CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
-			! CALL ComputeLaborUnits(EBAR,wage)
-			! CALL GOVNT_BUDGET(.true.)
-
-			! ! Aggregate variable in experimental economy
-			! 	GBAR_exp  = GBAR
-			! 	QBAR_exp  = QBAR 
-			! 	NBAR_exp  = NBAR  
-			! 	Y_exp 	  = YBAR
-			! 	Ebar_exp  = EBAR
-			! 	P_exp     = P
-			! 	R_exp	  = R
-			! 	wage_exp  = wage
-			! 	tauK_exp  = tauK
-			! 	tauPL_exp = tauPL
-			! 	psi_exp   = psi
-			! 	DBN_exp   = DBN1
-			! 	tauw_bt_exp = tauW_bt
-			! 	tauw_at_exp = tauW_at
-			! 	Y_a_threshold_exp = Y_a_threshold
-
-			! 	ValueFunction_exp = ValueFunction
-			! 	Cons_exp          = Cons           
-			! 	Hours_exp         = Hours
-			! 	Aprime_exp        = Aprime
-			! 	V_Pr_exp          = V_Pr 
-			! 	V_Pr_nb_exp  	  = V_Pr_nb
-
-			! ! Compute momentsr
-			! CALL COMPUTE_STATS
-			
-			! ! Compute welfare gain between economies
-			! CALL COMPUTE_WELFARE_GAIN
 
 
 		endif 
@@ -362,7 +321,7 @@ PROGRAM main
 			call Solve_Benchmark(compute_bench,Simul_Switch)
 
 			folder_aux = Result_Folder
-			Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold_tax_timing/'
+			Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold/'
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
 			
@@ -394,9 +353,9 @@ PROGRAM main
 
 			folder_aux = Result_Folder
 			if (Opt_Tax_KW) then 
-				Result_Folder = trim(folder_aux)//'Opt_Tax_K_Tau_C_No_Labor_Tax/'
+				Result_Folder = trim(folder_aux)//'Opt_Tax_K_Tau_C/'
 			else 
-				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Tau_C_No_Labor_Tax/'
+				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Tau_C/'
 			endif
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
@@ -3862,7 +3821,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 
 	! Load Tax Reform Variables
 	folder_aux = Result_Folder
-	Result_Folder = trim(folder_aux)//'Tax_Reform_Timing/'
+	Result_Folder = trim(folder_aux)//'Tax_Reform/'
 	call Solve_Experiment(.false.,.false.)
 
 	! Base level for taxes (current experimental value)
@@ -4094,7 +4053,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	else ! If budget isn't balanced: Transition between steady states
 
 		! Set Results Folder
-		Result_Folder = trim(folder_aux)//'Transition_Tax_Reform_Timing/'
+		Result_Folder = trim(folder_aux)//'Transition_Tax_Reform/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
 		! Find the Distribution and Policy Functions Along Transition Path
@@ -4152,7 +4111,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		Result_Folder = trim(folder_aux)//'Opt_Tax_K/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 		else 
-		Result_Folder = trim(folder_aux)//'Opt_Tax_W_Timing/'
+		Result_Folder = trim(folder_aux)//'Opt_Tax_W/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 		endif 
 		
@@ -4207,14 +4166,14 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		! Set Results Folder
 			if (balance_tau_L) then 
 				if (Opt_Tax_KW) then 
-				Result_Folder = trim(folder_aux)//'Transition_OTK_BB_tau_L_cfm/'
+				Result_Folder = trim(folder_aux)//'Transition_OTK_tL/'
 				else 
-				Result_Folder = trim(folder_aux)//'Transition_OTW_Timing_BB_tau_L_cfm/'
+				Result_Folder = trim(folder_aux)//'Transition_OTW_tL/'
 				endif 
 			elseif (Opt_Tax_KW) then 
-				Result_Folder = trim(folder_aux)//'Transition_OTK_BB_tau_K_cfm/'
+				Result_Folder = trim(folder_aux)//'Transition_OTK_tK/'
 			else
-				Result_Folder = trim(folder_aux)//'Transition_OTW_Timing_BB_tau_W_cfm/'
+				Result_Folder = trim(folder_aux)//'Transition_OTW_tW/'
 			endif 
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
@@ -4389,13 +4348,16 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 
 	else
 
-		! Set Results Folder
+		! Set Results Folder for no Budget Balance
 			if (Opt_Tax_KW) then 
-				Result_Folder = trim(folder_aux)//'Transition_OTK/'
+				Result_Folder = trim(folder_aux)//'Transition_OTK_no_BB/'
 			else 
-				Result_Folder = trim(folder_aux)//'Transition_OTW_Timing/'
+				Result_Folder = trim(folder_aux)//'Transition_OTW_no_BB/'
 			endif 
 			call system( 'mkdir -p ' // trim(Result_Folder) )
+
+		! Set absorption to zero
+			Debt_Absorption = 0.0_dp 
 
 		! Find the Distribution and Policy Functions Along Transition Path
 			call Find_DBN_Transition 
