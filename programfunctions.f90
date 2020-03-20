@@ -268,7 +268,8 @@ end Subroutine Asset_Grid_Threshold
 
 		! Evaluate square residual of Euler equation at current state (given by (ai,zi,lambdai,ei)) and savings given by a'
 		FOC_R	= ( (YGRID_t(a_in,z_in,x_in)+RetY_lambda_e(l_in,e_in)-aprimet)    &
-		           & - ( beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * cprime**(1.0_dp/euler_power) ) ) &
+		           & - ( beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * cprime**(1.0_dp/euler_power) ) &
+		           &     + beta*(1-0_dp-survP(age_in))*chi_bq*(aprimet+bq_0)**(1.0_dp/euler_power) ) &
 		           & **euler_power) ** 2.0_DP
 
 	END  FUNCTION FOC_R
@@ -317,7 +318,8 @@ end Subroutine Asset_Grid_Threshold
 
 		! Evaluate square residual of Euler equation at current state (given by (ai,zi,lambdai,ei)) and savings given by a'
 		FOC_R_Transition	= ( (YGRID_t(a_in,z_in,x_in)+RetY_lambda_e(l_in,e_in)-aprimet)    &
-		           & - ( beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * cprime**(1.0_dp/euler_power) ) ) &
+		           & - ( beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * cprime**(1.0_dp/euler_power) ) & 
+		           &      + beta*(1-0_dp-survP(age_in))*chi_bq*(aprimet+bq_0)**(1.0_dp/euler_power) ) &
 		           & **euler_power) ** 2.0_DP
 
 	END  FUNCTION FOC_R_Transition
@@ -409,7 +411,8 @@ FUNCTION FOC_WH(aprimet,state)
 				
 
 				! Evaluate the squared residual of the Euler equation for working period
-				FOC_WH   = ( (1.0_dp/ctemp)- (beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * E_MU_cp) ) ) **2.0_DP 
+				FOC_WH   = ( (1.0_dp/ctemp)- ( beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * E_MU_cp) &
+					         &     +beta*(1-0_dp-survP(age_in))*chi_bq/(aprimet+bq_0) ) ) **2.0_DP 
 			else
 				! I have to evaluate the FOC in expectation over eindx prime given eindx
 				! Compute consumption and labor for eachvalue of eindx prime
@@ -432,7 +435,8 @@ FUNCTION FOC_WH(aprimet,state)
 
 				! Evaluate the squared residual of the Euler equation for working period
 				FOC_WH = ( ctemp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-ntemp)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
-					         & - beta*survP(age_in)* sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp)  )**2.0_DP
+					         & - (beta*survP(age_in)* sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp) & 
+					         & + beta*(1-0_dp-survP(age_in))*chi_bq*(aprimet+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ))**2.0_DP
 			end if 
 		else ! Linear Taxes 
 			ntemp = max(0.0_DP , gamma - (1.0_DP-gamma)*(YGRID_t(a_in,z_in,x_in) - aprimet)/(psi*yh(age_in,l_in,e_in)) )
@@ -449,7 +453,8 @@ FUNCTION FOC_WH(aprimet,state)
 			enddo 
 
 			FOC_WH = ((ctemp**(gamma*(1.0_DP-sigma)-1))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
-					& - beta*survP(age_in)* sum( pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp ) )**2.0_DP
+					& - (beta*survP(age_in)* sum( pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp ) & 
+					&  + beta*(1-0_dp-survP(age_in))*chi_bq*(aprimet+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) )**2.0_DP
 		end if 
 	else 
 		! Separable Utility
@@ -464,7 +469,8 @@ FUNCTION FOC_WH(aprimet,state)
 			enddo 
 
 			! Evaluate the squared residual of the Euler equation for working period
-			FOC_WH   = (ctemp - 1.0_dp/(beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp))**(1.0_dp/sigma)) **2.0_DP 
+			FOC_WH   = (ctemp - 1.0_dp/(beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp) &
+						&  + beta*(1-0_dp-survP(age_in))*chi_bq/(aprimet+bq_0)**sigma )**(1.0_dp/sigma) )**2.0_DP 
 	end if 
 
 END  FUNCTION FOC_WH
@@ -542,7 +548,8 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 
 				! Evaluate the squared residual of the Euler equation for working period
 				FOC_WH_Transition   = &
-					& ( (1.0_dp/ctemp)- (beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * E_MU_cp) ) ) **2.0_DP 
+					& ( (1.0_dp/ctemp)- (beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * E_MU_cp) & 
+						& + beta*(1-0_dp-survP(age_in))*chi_bq/(aprimet+bq_0) ) ) **2.0_DP 
 			else
 				! I have to evaluate the FOC in expectation over eindx prime given eindx
 				! Compute consumption and labor for eachvalue of eindx prime
@@ -565,8 +572,9 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 
 				! Evaluate the squared residual of the Euler equation for working period
 				FOC_WH_Transition = &
-							& ( ctemp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-ntemp)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
-					         & - beta*survP(age_in)* sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp)  )**2.0_DP
+					& ( ctemp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-ntemp)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
+					& - (beta*survP(age_in)* sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp) &
+					& + beta*(1-0_dp-survP(age_in))*chi_bq*(aprimet+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ))**2.0_DP
 			end if 
 		else ! Linear Taxes 
 			ntemp = max(0.0_DP , gamma - (1.0_DP-gamma)*(YGRID_t(a_in,z_in,x_in) - aprimet)/(psi*yh(age_in,l_in,e_in)) )
@@ -584,7 +592,8 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 			enddo 
 
 			FOC_WH_Transition = ((ctemp**(gamma*(1.0_DP-sigma)-1))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
-					& - beta*survP(age_in)* sum( pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp ) )**2.0_DP
+					& - (beta*survP(age_in)* sum( pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp ) &
+				    &  + beta*(1-0_dp-survP(age_in))*chi_bq*(aprimet+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) )**2.0_DP
 		end if 
 	else 
 		! Separable Utility
@@ -600,7 +609,8 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 
 			! Evaluate the squared residual of the Euler equation for working period
 			FOC_WH_Transition  = &
-				& (ctemp - 1.0_dp/(beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp))**(1.0_dp/sigma)) **2.0_DP
+				& (ctemp - 1.0_dp/(beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp) & 
+				&  + beta*(1-0_dp-survP(age_in))*chi_bq/(aprimet+bq_0)**sigma )**(1.0_dp/sigma) )**2.0_DP
 	end if 
 
 END  FUNCTION FOC_WH_Transition
@@ -683,7 +693,8 @@ END  FUNCTION FOC_WH_Transition
 	    enddo 
 		! Compute square residual of Euler FOC
 			FOC_H_NSU = ( cons**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hoursin)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
-			         	& - beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp)  )**2.0_DP
+			    & - (beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp)
+			    &  + beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(a_in)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ))**2.0_DP
 
 	END  FUNCTION FOC_H_NSU
 
@@ -718,8 +729,9 @@ END  FUNCTION FOC_WH_Transition
 	    enddo 
 		! Compute square residual of Euler FOC
 			FOC_H_NSU_Transition = &
-						& ( cons**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hoursin)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
-			         	& - beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp)  )**2.0_DP
+				& ( cons**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hoursin)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
+			    & - (beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp) &
+			    &  + beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(a_in)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ))**2.0_DP
 
 	END  FUNCTION FOC_H_NSU_Transition
 
@@ -820,7 +832,9 @@ END  FUNCTION FOC_WH_Transition
 				        & (1.0_dp-Hours_t(age+1,ai,zi,lambdai,:,xp_ind))**((1.0_dp-sigma)*(1.0_dp-gamma))  )
 				enddo
 
-				C_euler = ( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp))) **(1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
+				C_euler = ( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) & 
+						  &  beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp)   )) &
+						  & **(1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
 				C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
 
 				if (C_euler.ge.C_foc) then
@@ -848,7 +862,8 @@ END  FUNCTION FOC_WH_Transition
 				do xp_ind=1,nx
 					E_MU_cp(xp_ind) = SUM(pr_e(ei,:) * Cons_t(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma) )
 				enddo
-				C_endo = 1.0_dp/( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_mu_cp)  ) **(1.0_dp/sigma) )
+				C_endo = 1.0_dp/( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_mu_cp) &
+						&   + beta*(1-0_dp-survP(age_in))*chi_bq/(aprimet+bq_0)**sigma ) ) **(1.0_dp/sigma) 
 				C_foc  = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
 
 				if (C_endo.ge.C_foc) then
@@ -870,13 +885,15 @@ END  FUNCTION FOC_WH_Transition
 				    & *  ( (1.0_DP-Hours_t(age+1, ai, zi, lambdai,:,xp_ind))**((1.0_DP-gamma)*(1.0_DP-sigma))))
 				enddo
 				  C_endo = ((gamma*psi*yh(age, lambdai,ei)/(1.0_DP-gamma))**((1.0_DP-gamma)*(1.0_DP-sigma)) &
-				    & *  beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp)  )**(-1.0_DP/sigma)
+				    & *  (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) &
+				    & + beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) )**(-1.0_DP/sigma)
 
 				  H_endo = 1.0_DP - (1.0_DP-gamma)*C_endo/(gamma*psi*yh(age,lambdai,ei))   
 
 				If (H_endo .lt. 0.0_DP) then
 				    H_endo = 0.0_DP 
-				    C_endo  = ( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) )**(1.0_DP/(gamma*(1.0_DP-sigma)-1.0_DP))
+				    C_endo  = ( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) &
+				    		& + beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp))**(1.0_DP/(gamma*(1.0_DP-sigma)-1.0_DP))
 				endif 
 
 				! print*,' '
@@ -887,7 +904,8 @@ END  FUNCTION FOC_WH_Transition
 				do xp_ind=1,nx
 					E_MU_cp(xp_ind) = sum( pr_e(ei,:) * (Cons_t(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma)) )
 				enddo
-				C_endo  = 1.0_DP/( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) )**(1.0_DP/sigma)
+				C_endo  = 1.0_DP/( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) &
+					&   + beta*(1-0_dp-survP(age_in))*chi_bq/(aprimet+bq_0)**sigma ) **(1.0_dp/sigma) 
 
 				H_endo = max(0.0_DP , 1.0_DP - (phi*C_endo**sigma/(psi*yh(age, lambdai,ei)))**(1.0_dp/gamma) )  
 
@@ -962,6 +980,15 @@ END  FUNCTION FOC_WH_Transition
 		end if 
 
 	END FUNCTION U_H
+
+	FUNCTION v_bq(a) 
+		IMPLICIT NONE
+		real(DP), intent(in) :: a
+		real(DP)             :: v_bq
+
+		v_bq = chi_bq*(a+bq_0)**(gamma*(1.0_dp-sigma))/(1.0_dp-sigma) 
+
+	END FUNCTION v_bq(a)
 
 !========================================================================================
 !========================================================================================

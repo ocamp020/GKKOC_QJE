@@ -134,6 +134,10 @@ PROGRAM main
 		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
 
+		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
+			chi_bq = 0.0_dp ! Scaling 
+			bq_0   = 0.0_dp ! Level shift 
+
 		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
 		x_0     = 0.00_dp
