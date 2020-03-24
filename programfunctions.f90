@@ -833,7 +833,7 @@ END  FUNCTION FOC_WH_Transition
 				enddo
 
 				C_euler = ( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) & 
-						  & + beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp))) &
+						  & + beta*(1-0_dp-survP(age))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp))) &
 						  & **(1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
 				C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
 
@@ -863,7 +863,7 @@ END  FUNCTION FOC_WH_Transition
 					E_MU_cp(xp_ind) = SUM(pr_e(ei,:) * Cons_t(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma) )
 				enddo
 				C_endo = 1.0_dp/( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_mu_cp) &
-						&   + beta*(1-0_dp-survP(age_in))*chi_bq/(aprimet+bq_0)**sigma ) ) **(1.0_dp/sigma) 
+						&   + beta*(1-0_dp-survP(age))*chi_bq/(agrid_t(ai)+bq_0)**sigma ) ) **(1.0_dp/sigma) 
 				C_foc  = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
 
 				if (C_endo.ge.C_foc) then
@@ -886,14 +886,14 @@ END  FUNCTION FOC_WH_Transition
 				enddo
 				  C_endo = ((gamma*psi*yh(age, lambdai,ei)/(1.0_DP-gamma))**((1.0_DP-gamma)*(1.0_DP-sigma)) &
 				    & *  (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) &
-				    & + beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) )**(-1.0_DP/sigma)
+				    & + beta*(1-0_dp-survP(ageio))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) )**(-1.0_DP/sigma)
 
 				  H_endo = 1.0_DP - (1.0_DP-gamma)*C_endo/(gamma*psi*yh(age,lambdai,ei))   
 
 				If (H_endo .lt. 0.0_DP) then
 				    H_endo = 0.0_DP 
 				    C_endo  = ( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) &
-				    		& + beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp))&
+				    		& + beta*(1-0_dp-survP(age))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp))&
 				    		& **(1.0_DP/(gamma*(1.0_DP-sigma)-1.0_DP))
 				endif 
 
@@ -906,7 +906,7 @@ END  FUNCTION FOC_WH_Transition
 					E_MU_cp(xp_ind) = sum( pr_e(ei,:) * (Cons_t(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma)) )
 				enddo
 				C_endo  = 1.0_DP/( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) &
-					&   + beta*(1-0_dp-survP(age_in))*chi_bq/(aprimet+bq_0)**sigma ) **(1.0_dp/sigma) 
+					&   + beta*(1-0_dp-survP(age))*chi_bq/(agrid_t(ai)+bq_0)**sigma ) **(1.0_dp/sigma) 
 
 				H_endo = max(0.0_DP , 1.0_DP - (phi*C_endo**sigma/(psi*yh(age, lambdai,ei)))**(1.0_dp/gamma) )  
 
