@@ -2503,7 +2503,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		close(unit=80); close(unit=81); close(unit=82); close(unit=83); close(unit=84); close(unit=85)
 		close(unit=86); close(unit=87); close(unit=88); close(unit=89); close(unit=90); close(unit=91); 
 
-		
+		print*, 'test 1'
 		!! Experiment 
 		P = P_exp ; R = R_exp ; wage = wage_exp ; EBAR = EBAR_exp ;
 		! Adjust grid to include breaking points
@@ -2512,6 +2512,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		K_mat  = K_Matrix(R_exp,P_exp)
 		CALL ComputeLaborUnits(EBAR_exp,wage_exp)
 		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		print*, ' test 2'
 
 		K_Tax_draft_group_z			= 0.0_dp
 		L_Tax_draft_group_z			= 0.0_dp
