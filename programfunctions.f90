@@ -1356,11 +1356,17 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    WRITE  (UNIT=50, FMT=*) 'Av Utility NB (exp  ) =',sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))    
 		    WRITE  (UNIT=50, FMT=*) 'Av Utility  (bench)   =',sum(ValueFunction_Bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))  
 		    WRITE  (UNIT=50, FMT=*) 'Av Utility  (exp)     =',sum(ValueFunction_exp(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))
+		    close (unit=50)	
 		    print*,' '
+		    print*, ' CE 2 Computation'
 		    print*, 'Av Utility NB (bench) =',sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  
 		    print*, 'Av Utility NB (exp  ) =',sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))    
-		    print*, sum(ValueFunction_exp(1,:,:,:,:,:)), sum(DBN1(1,:,:,:,:,:))    
-		close (unit=50)		
+		    print*, 'CE2_NB =',100*(( sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:)) / &
+		                                &  sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  ) &
+		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP) 
+		    print*, 'CE2_Pop =', 100*(( sum(ValueFunction_exp*DBN1) / sum(ValueFunction_Bench*DBN_bench)  ) &
+		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+		    print*,' '
 
 
 		OPEN (UNIT=50, FILE=trim(Result_Folder)//'CE_NEWBORN', STATUS='replace')  
@@ -1678,6 +1684,12 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	size_draft_group(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*size_draft_group_z(:,7) + &
 							& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*size_draft_group_z(:,8)
 	size_draft_group(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*size_draft_group_z(:,8) + size_draft_group_z(:,9)
+
+	CE_draft_group = Draft_Table(size_draft_group_z,DBN_z,.true.)
+
+	print*,' test '
+	print*, size_draft_group-CE_draft_group
+	STOP
 
 	! CE of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
 	CE_draft_group(:,1)   = ( DBN_Z(1)*CE_draft_group_z(:,1) + DBN_Z(2)*CE_draft_group_z(:,2) + & 
@@ -3559,6 +3571,60 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 
 
 END SUBROUTINE  COMPUTE_WELFARE_GAIN_TRANSITION
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+
+Function Draft_Table(Table_az,DBN_z,Cum_flag)
+	implicit none
+	real(dp), dimension(draft_age_category,nz), intent(in)   :: Table_az
+	real(dp), dimension(nz), intent(in) :: DBN_z
+	real(dp), dimension(nz) 			:: CDF_z
+	logical, intent(in)					:: Cum_flag
+	integer  						    :: zi
+	real(dp), dimension(draft_age_category,draft_z_category) :: Draft_Table
+
+
+	! CDF
+	do zi=1,nz 
+		CDF_Z(zi) = sum(DBN_Z(1:zi))
+	enddo 
+
+	if (Cum_flag) then
+	! Cumulative value of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Draft_Table(:,1) = Table_az(:,1) + Table_az(:,2) + Table_az(:,3) & 
+								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*Table_az(:,4)
+		Draft_Table(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*Table_az(:,4)+((0.80_dp-CDF_Z(4))/DBN_Z(5))*Table_az(:,5)
+		Draft_Table(:,3) = (0.10_dp/DBN_Z(5))*Table_az(:,5)
+		Draft_Table(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*Table_az(:,5) + &
+							& ((0.99_dp-CDF_Z(5))/DBN_Z(6))*Table_az(:,6) 
+		Draft_Table(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*Table_az(:,6) + & 
+							& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*Table_az(:,7) 
+		Draft_Table(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Table_az(:,7) + Table_az(:,8) + Table_az(:,9) 
+		Draft_Table(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Table_az(:,7) + &
+								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*Table_az(:,8)
+		Draft_Table(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Table_az(:,8) + Table_az(:,9)
+
+	else
+	! Average value of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Draft_Table(:,1) = ( DBN_Z(1)*Table_az(:,1) + DBN_Z(2)*Table_az(:,2) + & 
+								& DBN_Z(3)*Table_az(:,3) + (0.40_dp-CDF_Z(3))*Table_az(:,4) )/0.40_dp
+		Draft_Table(:,2) = ( (CDF_Z(4)-0.40_dp)*Table_az(:,4) + (0.80_dp-CDF_Z(4))*Table_az(:,5) )/0.40_dp
+		Draft_Table(:,3) = Table_az(:,5)
+		Draft_Table(:,4) = ( (CDF_Z(5)-0.90_dp)*Table_az(:,5) + (0.99_dp-CDF_Z(5))*Table_az(:,6) )/0.09_dp
+		Draft_Table(:,5) = ( (CDF_Z(6)-0.99_dp)*Table_az(:,6) + (0.999_dp-CDF_Z(6))*Table_az(:,7) )/0.009_dp
+		Draft_Table(:,6) = ( (CDF_Z(7)-0.999_dp)*Table_az(:,7) + &
+								&  DBN_Z(8)*Table_az(:,8) + DBN_Z(9)*Table_az(:,9) )/0.001_dp
+		Draft_Table(:,7) = ( (CDF_Z(7)-0.999_dp)*Table_az(:,7) + (0.9999_dp-CDF_Z(7))*Table_az(:,8) )/0.0009_dp
+		Draft_Table(:,8) = ( (CDF_Z(8)-0.9999_dp)*Table_az(:,8) + DBN_Z(9)*Table_az(:,9) )/0.0001_dp
+
+	endif 
+
+END Function Draft_Table
+
 
 
 
