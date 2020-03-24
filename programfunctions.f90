@@ -693,7 +693,7 @@ END  FUNCTION FOC_WH_Transition
 	    enddo 
 		! Compute square residual of Euler FOC
 			FOC_H_NSU = ( cons**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hoursin)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
-			    & - (beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp)
+			    & - (beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp) &
 			    &  + beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(a_in)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ))**2.0_DP
 
 	END  FUNCTION FOC_H_NSU
@@ -833,7 +833,7 @@ END  FUNCTION FOC_WH_Transition
 				enddo
 
 				C_euler = ( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) & 
-						  &  beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp)   )) &
+						  & + beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp))) &
 						  & **(1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
 				C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
 
@@ -886,14 +886,15 @@ END  FUNCTION FOC_WH_Transition
 				enddo
 				  C_endo = ((gamma*psi*yh(age, lambdai,ei)/(1.0_DP-gamma))**((1.0_DP-gamma)*(1.0_DP-sigma)) &
 				    & *  (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) &
-				    & + beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) )**(-1.0_DP/sigma)
+				    & + beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) )**(-1.0_DP/sigma)
 
 				  H_endo = 1.0_DP - (1.0_DP-gamma)*C_endo/(gamma*psi*yh(age,lambdai,ei))   
 
 				If (H_endo .lt. 0.0_DP) then
 				    H_endo = 0.0_DP 
 				    C_endo  = ( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) &
-				    		& + beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp))**(1.0_DP/(gamma*(1.0_DP-sigma)-1.0_DP))
+				    		& + beta*(1-0_dp-survP(age_in))*chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp))&
+				    		& **(1.0_DP/(gamma*(1.0_DP-sigma)-1.0_DP))
 				endif 
 
 				! print*,' '
@@ -988,7 +989,7 @@ END  FUNCTION FOC_WH_Transition
 
 		v_bq = chi_bq*(a+bq_0)**(gamma*(1.0_dp-sigma))/(1.0_dp-sigma) 
 
-	END FUNCTION v_bq(a)
+	END FUNCTION v_bq
 
 !========================================================================================
 !========================================================================================
