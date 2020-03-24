@@ -63,9 +63,9 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
-			compute_bench = .false.
-			compute_exp   = .false.
+		Tax_Reform    = .true.
+			compute_bench = .true.
+			compute_exp   = .true.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .true.
@@ -90,7 +90,7 @@ PROGRAM main
 		Opt_Tau_CX = .false.
 
 		Transition_Tax_Reform = .false.
-		Transition_OT = .true.
+		Transition_OT = .false.
 			budget_balance = .true.
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .false. ! true=tau_K, false=tau_W
