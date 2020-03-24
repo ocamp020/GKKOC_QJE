@@ -2506,8 +2506,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		!! Experiment 
 		P = P_exp ; R = R_exp ; wage = wage_exp ; EBAR = EBAR_exp ;
 		! Adjust grid to include breaking points
-				deallocate( YGRID_t  ); deallocate( MBGRID_t ) 
-				deallocate( Cons_t   ); deallocate( Hours_t  ); deallocate( Aprime_t )
+				if (allocated(YGRID_t)) then 
+				deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+				endif
 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		Pr_mat = Profit_Matrix(R_exp,P_exp)
 		K_mat  = K_Matrix(R_exp,P_exp)

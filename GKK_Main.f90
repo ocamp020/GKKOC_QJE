@@ -689,16 +689,17 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	
 	! Compute welfare gain between economies
 	CALL COMPUTE_WELFARE_GAIN
-print*, 'test'
+
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
+
+	! Simulation
 	if ((Simul_Switch)) then 
 	 	print*,"	Experiment Simulation"
 		CALL SIMULATION(solving_bench)
 	endif
 	! Call Simulation_Life_Cycle_Patterns(solving_bench)
 	! Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
-print*, 'test 2'
 
 	print*,'---------------------------'
 	print*,''
@@ -712,7 +713,9 @@ print*, 'test 2'
 
 
 	! Deallocate variables
-		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+		if (allocated(YGRID_t)) then 
+			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+		endif
 
 	! print*,"	Efficiency Computation"
 	! 	CALL Hsieh_Klenow_Efficiency(solving_bench)
