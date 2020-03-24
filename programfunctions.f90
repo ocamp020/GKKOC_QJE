@@ -3036,9 +3036,9 @@ END Function Draft_Table
 Function Draft_Table_X(Table_axz,DBN_xz,Cum_flag)
 	implicit none
 	real(dp), dimension(draft_age_category,nz,nx), intent(in)   :: Table_axz
-	real(dp), dimension(nz,nx), intent(in) :: DBN_xz
-	real(dp), dimension(nz,nx) 			:: CDF_xz
-	logical, intent(in)					:: Cum_flag
+	real(dp), dimension(nz,nx), intent(in) 	:: DBN_xz
+	real(dp)				   				:: CDF_xz, cdf_xz_low
+	logical, intent(in)						:: Cum_flag
 	real(dp), dimension(draft_age_category,draft_z_category) :: Draft_Table_X
 
 	! Groups based on cross sectional productivity, not age dependent 
