@@ -1679,7 +1679,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	CE_draft_group = Draft_Table(CE_draft_group_z,DBN_z,.false.)
 
 	! Frac. pos. welfare by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-	frac_pos_welfare_size_draft_group = Draft_Table(frac_pos_welfare_draft_group_z,DBN_z,.true.)
+	frac_pos_welfare_draft_group = Draft_Table(frac_pos_welfare_draft_group_z,DBN_z,.true.)
 
 	! Wealth of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
 	wealth_draft_group = Draft_Table(wealth_draft_group_z,DBN_z,.true.)
@@ -1769,13 +1769,13 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 
 
 	! CE of groups adjusting by x-z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-	CE_draft_group = Table_X(CE_draft_group_xz,DBN_xz,.false.)
+	CE_draft_group = Draft_Table_X(CE_draft_group_xz,DBN_xz,.false.)
 
 	! Size of groups adjusting by x-z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-	size_draft_group = Table_X(size_draft_group_xz,DBN_xz,.true.)
+	size_draft_group = Draft_Table_X(size_draft_group_xz,DBN_xz,.true.)
 
 	! Frac. pos. welfare by groups adjusting by x-z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-	frac_pos_welfare_draft_group = Table_X(frac_pos_welfare_draft_group_xz,DBN_xz,.true.)
+	frac_pos_welfare_draft_group = Draft_Table_X(frac_pos_welfare_draft_group_xz,DBN_xz,.true.)
 
 	! Fix fractions
 	frac_pos_welfare_draft_group = 100*frac_pos_welfare_draft_group/size_draft_group
