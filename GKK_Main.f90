@@ -689,7 +689,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	
 	! Compute welfare gain between economies
 	CALL COMPUTE_WELFARE_GAIN
-
+print*, 'test'
 	! Write experimental results in output.txt
 	CALL WRITE_VARIABLES(0)
 	if ((Simul_Switch)) then 
@@ -698,7 +698,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	endif
 	! Call Simulation_Life_Cycle_Patterns(solving_bench)
 	! Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
-
+print*, 'test 2'
 
 	print*,'---------------------------'
 	print*,''
