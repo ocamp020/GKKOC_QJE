@@ -460,8 +460,6 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	else
 		print*,"	Reading benchmark results from files"
 		CALL Write_Benchmark_Results(compute_bench)
-			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
-			CALL Write_Benchmark_Results(.true.)
 		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		K_mat  = K_Matrix(R,P)
 		Pr_mat = Profit_Matrix(R,P)
@@ -656,8 +654,6 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	endif 
 	
 	CALL Write_Experimental_Results(compute_exp)
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
-		CALL Write_Experimental_Results(.true.)
 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 	K_mat  = K_Matrix(R,P)
 	Pr_mat = Profit_Matrix(R,P)
