@@ -1283,7 +1283,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		!CALL EGM_RETIREMENT_WORKING_PERIOD 
 
 	! Compute the value function using interpolation and save it
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction_Exp,Bq_Value_Exp)
+		! CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction_Exp,Bq_Value_Exp)
 		!CALL COMPUTE_VALUE_FUNCTION_SPLINE 
 		! ValueFunction_Exp = ValueFunction
 
@@ -3348,13 +3348,14 @@ END SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR
 
 SUBROUTINE COMPUTE_VALUE_FUNCTION_TRANSITION
 	IMPLICIT NONE
-	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_mat, Hours_mat, Aprime_mat, Value_mat
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_mat, Hours_mat, Aprime_mat, Value_mat, Bq_Value_mat
 	INTEGER :: aux_T
 
-	allocate( Cons_mat(   MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( Hours_mat(  MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( Aprime_mat( MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( Value_mat(  MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Cons_mat(    MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Hours_mat(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Aprime_mat(  MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Value_mat(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Bq_Value_mat(MaxAge,na,nz,nlambda,ne,nx) )
 
 	print*,'Computing Value Function'
 	print*,'	Value functions computed only for agents alive at the time of policy change'
@@ -10019,7 +10020,7 @@ Function Tax_Reform_Welfare(tk)
 
 		! Compute value function and store policy functions, value function and distribution in file
 		! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		CALL Firm_Value
 
 	
