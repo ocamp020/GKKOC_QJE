@@ -64,8 +64,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
-			compute_exp   = .false.
+			compute_bench = .true.
+			compute_exp   = .true.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .true.
@@ -442,7 +442,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	! Solve for the model and compute stats
 	print*,"	Initializing program"
 		CALL INITIALIZE
-		! CALL Write_Benchmark_Results(.false.)
+		CALL Write_Benchmark_Results(.false.)
 	if (compute_bench) then
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
@@ -450,7 +450,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL GOVNT_BUDGET(.true.)
 		print*,"	Computing Value Function"
 		! CALL COMPUTE_VALUE_FUNCTION_SPLINE
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		print*,"	Computing Firm Value Function"
 		CALL Firm_Value
 		print*, " 	Computing After Tax Income"
@@ -503,6 +503,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 
 		DBN_bench           = DBN1
 		ValueFunction_bench = ValueFunction
+		Bq_Value_bench 		= Bq_Value
 		Cons_bench          = Cons           
 		Hours_bench         = Hours
 		Aprime_bench        = Aprime 
@@ -645,7 +646,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 
 		! Compute value function and store policy functions, value function and distribution in file
 		! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		CALL Firm_Value
 		print*, " 	Computing After Tax Income"
 		CALL Compute_After_Tax_Income
@@ -678,6 +679,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		Y_a_threshold_exp = Y_a_threshold
 
 		ValueFunction_exp = ValueFunction
+		Bq_Value_exp      = Bq_Value
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime

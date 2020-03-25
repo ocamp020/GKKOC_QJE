@@ -60,6 +60,7 @@ MODULE global
     REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons, Hours, Aprime, Income_AT
     REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_bench, Hours_bench, Aprime_bench, Cons_exp, Hours_exp, Aprime_exp 
     REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: ValueFunction, ValueFunction_bench, ValueFunction_exp
+    REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Bq_ValueFunction, Bq_ValueFunction_bench, Bq_ValueFunction_exp
     REAL(DP), dimension(:,:,:,:,:,:), allocatable :: Cons_Eq_Welfare
 	! Policy function and value function (defined on the adjusted grid for breakpoints)
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_t, Hours_t, Aprime_t
@@ -174,7 +175,8 @@ MODULE global
     REAL(DP), DIMENSION(T+1) :: SSC_Payments_tr, Tot_Lab_Inc_tr, Debt_tr
     REAL(DP)                 :: Debt_SS
     ! Policy function and value function (defined on the exogenous grid)
-    REAL(DP), DIMENSION(:,:,:,:,:,:,:), allocatable :: Cons_tr, Hours_tr, Aprime_tr, DBN_tr, ValueFunction_tr
+    REAL(DP), DIMENSION(:,:,:,:,:,:,:), allocatable :: Cons_tr, Hours_tr, Aprime_tr, DBN_tr, &
+        & ValueFunction_tr, Bq_ValueFunction_tr
     ! Welfare Gain
     REAL(DP), DIMENSION(:,:,:,:,:,:)  , allocatable :: CE1_tr
     REAL(DP) :: CE1_nb_tr,  CE1_pop_tr, CE2_nb_tr,  CE2_pop_tr
@@ -199,6 +201,9 @@ Subroutine Allocate_Variables
     allocate( ValueFunction(      MaxAge,na,nz,nlambda,ne,nx) )
     allocate( ValueFunction_bench(MaxAge,na,nz,nlambda,ne,nx) )
     allocate( ValueFunction_exp(  MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( Bq_Value(           MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( Bq_Value_bench(     MaxAge,na,nz,nlambda,ne,nx) )
+    allocate( Bq_Value_exp(       MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Cons_Eq_Welfare(    MaxAge,na,nz,nlambda,ne,nx) )
     allocate( V_Pr(               MaxAge,na,nz,nlambda,ne,nx) )
     allocate( V_Pr_bench(         MaxAge,na,nz,nlambda,ne,nx) )
@@ -211,6 +216,7 @@ Subroutine Allocate_Variables
     allocate( Aprime_tr(          MaxAge,na,nz,nlambda,ne,nx,T+1) )
     allocate( DBN_tr( 			  MaxAge,na,nz,nlambda,ne,nx,T+1) )
     allocate( ValueFunction_tr(   MaxAge,na,nz,nlambda,ne,nx,MaxAge) )
+    allocate( Bq_ValueFunction_tr(MaxAge,na,nz,nlambda,ne,nx,MaxAge) )
 	allocate( Cons_t_pr(          MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Hours_t_pr(         MaxAge,na,nz,nlambda,ne,nx) )
     allocate( CE1_tr( 			  MaxAge,na,nz,nlambda,ne,nx) )

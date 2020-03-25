@@ -1088,8 +1088,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		! CALL EGM_RETIREMENT_WORKING_PERIOD 
 
 	! Compute the value function using interpolation and save it
-		
-		! CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction_Bench)
+		! CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction_Bench,Bq_Value_Bench)
 		! CALL COMPUTE_VALUE_FUNCTION_SPLINE  
 		! ValueFunction_Bench = ValueFunction
 
@@ -1284,7 +1283,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		!CALL EGM_RETIREMENT_WORKING_PERIOD 
 
 	! Compute the value function using interpolation and save it
-		! CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction_Exp)
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction_Exp,Bq_Value_Exp)
 		!CALL COMPUTE_VALUE_FUNCTION_SPLINE 
 		! ValueFunction_Exp = ValueFunction
 
@@ -3217,12 +3216,12 @@ END Function Draft_Table_X
 !========================================================================================
 
 
-SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat)
+SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat,Bq_Value_mat)
 	IMPLICIT NONE
 	REAL(DP), DIMENSION(MaxAge,na,nz,nlambda,ne,nx), INTENT(in)  :: Cons_mat, Hours_mat, Aprime_mat
-	REAL(DP), DIMENSION(MaxAge,na,nz,nlambda,ne,nx), INTENT(out) :: Value_mat
+	REAL(DP), DIMENSION(MaxAge,na,nz,nlambda,ne,nx), INTENT(out) :: Value_mat, Bq_Value_mat
 	INTEGER  :: tklo, tkhi, xp_ind, age, xi, ai, zi, lambdai, ei
-	REAL(DP) :: PrAprimelo, PrAprimehi, E_MU_cp(nx), aux
+	REAL(DP) :: PrAprimelo, PrAprimehi, E_MU_cp(nx), Bq_E_MU_cp(nx), aux
 
 	! print*,'VALUE FUNCTION LINEAR'
 
@@ -3232,8 +3231,9 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
     DO zi=1,nz
     DO lambdai=1,nlambda          
 	DO ei=1,ne
-      	Value_mat(age, ai, zi, lambdai, ei, xi) = &
+      	   Value_mat(age, ai, zi, lambdai, ei, xi) = &
       				& Utility(Cons_mat(age, ai, zi, lambdai, ei, xi),Hours_mat(age, ai, zi, lambdai, ei, xi))
+		Bq_Value_mat(age, ai, zi, lambdai, ei, xi) = beta*v_bq(Aprime_mat(age, ai, zi, lambdai, ei, xi))
       	! Value_mat(age, ai, zi, lambdai, ei, xi) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
        !             & * (1.0_DP-Hours_mat(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma)  
 		! print*,Cons_mat(age, ai, zi, lambdai, ei),  Value_mat(age, ai, zi, lambdai, ei) 
@@ -3267,9 +3267,13 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 		PrAprimehi = min(PrAprimehi, 1.0_DP)
 		PrAprimehi = max(PrAprimehi, 0.0_DP)    
 
-		Value_mat(age, ai, zi, lambdai, ei, xi) = Utility(Cons_mat(age,ai,zi,lambdai,ei,xi),Hours_mat(age,ai,zi,lambdai,ei,xi)) &
+		   Value_mat(age, ai, zi, lambdai, ei, xi) = Utility(Cons_mat(age,ai,zi,lambdai,ei,xi),Hours_mat(age,ai,zi,lambdai,ei,xi)) &
 			  & + beta*survP(age)* sum( pr_x(xi,:,zi,age)* (PrAprimelo*Value_mat(age+1, tklo, zi, lambdai, ei, :) &
-			  & 				                     +  PrAprimehi*Value_mat(age+1, tkhi, zi, lambdai, ei, :)) ) 
+			  & 				                     	 +  PrAprimehi*Value_mat(age+1, tkhi, zi, lambdai, ei, :)) ) 
+
+		Bq_Value_mat(age, ai, zi, lambdai, ei, xi) = beta*(1.0_dp-survP(age))*v_bq(Aprime_mat(age,ai,zi,lambdai,ei,xi)) &
+			  & + beta*survP(age)* sum( pr_x(xi,:,zi,age)* (PrAprimelo*Bq_Value_mat(age+1, tklo, zi, lambdai, ei, :) &
+			  & 				                     	 +  PrAprimehi*Bq_Value_mat(age+1, tkhi, zi, lambdai, ei, :)) ) 
         ! Value_mat(age, ai, zi, lambdai, ei, xi) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
         !               & * (1.0_DP-Hours_mat(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
         !               & + beta*survP(age)* sum(pr_x(xi,:,zi) * (PrAprimelo*Value_mat(age+1, tklo, zi, lambdai, ei, :)&
@@ -3308,12 +3312,16 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 
 
 		do xp_ind=1,nx
-			E_MU_cp(xp_ind) = sum( ( PrAprimelo * Value_mat(age+1, tklo, zi, lambdai,:,xp_ind)  &
-		   & 					+    PrAprimehi * Value_mat(age+1, tkhi, zi, lambdai,:,xp_ind)) * pr_e(ei,:))
+			E_MU_cp(xp_ind)    = sum( ( PrAprimelo *    Value_mat(age+1, tklo, zi, lambdai,:,xp_ind)  &
+		   & 					   +    PrAprimehi *    Value_mat(age+1, tkhi, zi, lambdai,:,xp_ind)) * pr_e(ei,:))
+			Bq_E_MU_cp(xp_ind) = sum( ( PrAprimelo * Bq_Value_mat(age+1, tklo, zi, lambdai,:,xp_ind)  &
+		   & 					   +    PrAprimehi * Bq_Value_mat(age+1, tkhi, zi, lambdai,:,xp_ind)) * pr_e(ei,:))
 		enddo    
 
-		Value_mat(age, ai, zi, lambdai, ei, xi) = Utility(Cons_mat(age,ai,zi,lambdai,ei,xi),Hours_mat(age,ai,zi,lambdai,ei,xi))  &
-		   & + beta*survP(age)* sum( pr_x(xi,:,zi,age)*E_mu_cp )
+		   Value_mat(age, ai, zi, lambdai, ei, xi) = Utility(Cons_mat(age,ai,zi,lambdai,ei,xi),Hours_mat(age,ai,zi,lambdai,ei,xi))  &
+		   											& + beta*survP(age)* sum( pr_x(xi,:,zi,age)*E_mu_cp )
+	   	Bq_Value_mat(age, ai, zi, lambdai, ei, xi) = beta*(1.0_dp-survP(age))*v_bq(Aprime_mat(age,ai,zi,lambdai,ei,xi)) &
+		   											& + beta*survP(age)* sum( pr_x(xi,:,zi,age)*Bq_E_mu_cp )
 		! Value_mat(age, ai, zi, lambdai, ei) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
   !                      & * (1.0_DP-Hours_mat(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
   !                      & + beta*survP(age)* sum( pr_x(xi,:,zi)*E_mu_cp )
@@ -3326,6 +3334,9 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	ENDDO ! ai
 	ENDDO ! age
 	ENDDO ! xi
+
+	! Add bequest value to consumption/leisure value t get total value
+	Value_mat = Value_mat + Bq_Value_mat
 
 END SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR 
 
@@ -3372,10 +3383,12 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_TRANSITION
 			Aprime_mat(T+2:,:,:,:,:,:) = Aprime_exp(T+2:,:,:,:,:,:)
 			endif 
 		! Obtain value function 
-			call COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat)
+			call COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat,Bq_Value_mat)
 
 		! Save value function
 			ValueFunction_tr(:,:,:,:,:,:,age) = Value_mat
+		! Save bequest value function
+			Bq_ValueFunction_tr(:,:,:,:,:,:,age) = Bq_Value_mat
 	enddo 
 	print*,'Computing Value Function Completed'
 
@@ -10225,6 +10238,9 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN  (UNIT=4,  FILE=trim(bench_folder)//'value' , STATUS='replace')
 		WRITE (UNIT=4,  FMT=*) ValueFunction
 		CLOSE (unit=4)
+		OPEN  (UNIT=4,  FILE=trim(bench_folder)//'bq_value', STATUS='replace')
+		WRITE (UNIT=4,  FMT=*) Bq_Value
+		CLOSE (unit=4)
 		OPEN  (UNIT=4,  FILE=trim(bench_folder)//'v_pr'  , STATUS='replace')
 		WRITE (UNIT=4,  FMT=*) V_Pr
 		CLOSE (unit=4)
@@ -10289,6 +10305,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN (UNIT=2,  FILE=trim(bench_folder)//'aprime', STATUS='old', ACTION='read')
 		OPEN (UNIT=3,  FILE=trim(bench_folder)//'hours' , STATUS='old', ACTION='read')
 		OPEN (UNIT=4,  FILE=trim(bench_folder)//'value' , STATUS='old', ACTION='read')
+		OPEN (UNIT=80, FILE=trim(bench_folder)//'bq_value', STATUS='old', ACTION='read')
 		OPEN (UNIT=5,  FILE=trim(bench_folder)//'DBN'   , STATUS='old', ACTION='read')
 		OPEN (UNIT=60, FILE=trim(bench_folder)//'GBAR'  , STATUS='old', ACTION='read')
 		OPEN (UNIT=7,  FILE=trim(bench_folder)//'EBAR'  , STATUS='old', ACTION='read')
@@ -10315,6 +10332,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		READ (UNIT=2,  FMT=*), aprime
 		READ (UNIT=3,  FMT=*), hours
 		READ (UNIT=4,  FMT=*), ValueFunction
+		READ (UNIT=70, FMT=*), Bq_Value
 		READ (UNIT=5,  FMT=*), DBN1 
 		READ (UNIT=60, FMT=*), GBAR 
 		READ (UNIT=7,  FMT=*), EBAR
@@ -10336,7 +10354,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		READ (UNIT=21, FMT=*), SSC_Payments
 		READ (UNIT=22, FMT=*), Income_AT
 
-		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=5)
+		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=70); CLOSE (unit=5)
 		CLOSE (unit=60); CLOSE (unit=7); CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10)
 		CLOSE (unit=11); CLOSE (unit=12); CLOSE (unit=13); CLOSE (unit=14); CLOSE (unit=15)
 		CLOSE (unit=16); CLOSE (unit=17); CLOSE (unit=18); CLOSE (unit=19); !CLOSE (unit=20)
@@ -10355,25 +10373,27 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 
 	if (compute_exp) then 
 		print*, "Writing experimental results in folder", trim(Result_Folder) // 'Exp_Files/'
-		OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_cons'  , STATUS='replace')
-		WRITE (UNIT=1,  FMT=*) cons
-		OPEN  (UNIT=2,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_aprime', STATUS='replace')
-		WRITE (UNIT=2,  FMT=*) aprime
-		OPEN  (UNIT=3,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_hours' , STATUS='replace')
-		WRITE (UNIT=3,  FMT=*) hours
-		OPEN  (UNIT=4,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_value' , STATUS='replace')
-		WRITE (UNIT=4,  FMT=*) ValueFunction
+		OPEN  (UNIT=1 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_cons'  , STATUS='replace')
+		WRITE (UNIT=1 , FMT=*) cons
+		OPEN  (UNIT=2 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_aprime', STATUS='replace')
+		WRITE (UNIT=2 , FMT=*) aprime
+		OPEN  (UNIT=3 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_hours' , STATUS='replace')
+		WRITE (UNIT=3 , FMT=*) hours
+		OPEN  (UNIT=4 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_value' , STATUS='replace')
+		WRITE (UNIT=4 , FMT=*) ValueFunction
+		OPEN  (UNIT=70, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_bq_value' , STATUS='replace')
+		WRITE (UNIT=70, FMT=*) Bq_Value
 
-		OPEN  (UNIT=5,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_DBN'   , STATUS='replace')
-		WRITE (UNIT=5,  FMT=*) DBN1 
-		OPEN  (UNIT=60,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_GBAR' , STATUS='replace')
-		WRITE (UNIT=60,  FMT=*) GBAR
-		OPEN  (UNIT=7,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_EBAR'  , STATUS='replace')
-		WRITE (UNIT=7,  FMT=*) EBAR
-		OPEN  (UNIT=8,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_NBAR'  , STATUS='replace')
-		WRITE (UNIT=8,  FMT=*) NBAR
-		OPEN  (UNIT=9,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_QBAR'  , STATUS='replace')
-		WRITE (UNIT=9,  FMT=*) QBAR
+		OPEN  (UNIT=5 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_DBN'   , STATUS='replace')
+		WRITE (UNIT=5 , FMT=*) DBN1 
+		OPEN  (UNIT=60, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_GBAR' , STATUS='replace')
+		WRITE (UNIT=60, FMT=*) GBAR
+		OPEN  (UNIT=7 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_EBAR'  , STATUS='replace')
+		WRITE (UNIT=7 , FMT=*) EBAR
+		OPEN  (UNIT=8 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_NBAR'  , STATUS='replace')
+		WRITE (UNIT=8 , FMT=*) NBAR
+		OPEN  (UNIT=9 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_QBAR'  , STATUS='replace')
+		WRITE (UNIT=9 , FMT=*) QBAR
 		OPEN  (UNIT=10, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_P'     , STATUS='replace')
 		WRITE (UNIT=10, FMT=*) P
 		OPEN  (UNIT=11, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_R'     , STATUS='replace')
@@ -10410,6 +10430,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN (UNIT=2 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_aprime'	, STATUS='old', ACTION='read')
 		OPEN (UNIT=3 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_hours' 	, STATUS='old', ACTION='read')
 		OPEN (UNIT=4 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_value' 	, STATUS='old', ACTION='read')
+		OPEN (UNIT=70, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_bq_value', STATUS='old', ACTION='read')
 		OPEN (UNIT=5 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_DBN'   	, STATUS='old', ACTION='read')
 		OPEN (UNIT=60, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_GBAR'  	, STATUS='old', ACTION='read')
 		OPEN (UNIT=7 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_EBAR'  	, STATUS='old', ACTION='read')
@@ -10432,6 +10453,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		READ (UNIT=2,  FMT=*), aprime
 		READ (UNIT=3,  FMT=*), hours
 		READ (UNIT=4,  FMT=*), ValueFunction
+		READ (UNIT=70, FMT=*), Bq_Value
 		READ (UNIT=5,  FMT=*), DBN1 
 		READ (UNIT=60, FMT=*), GBAR 
 		READ (UNIT=7,  FMT=*), EBAR
@@ -10456,6 +10478,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 	CLOSE (unit=2)
 	CLOSE (unit=3)
 	CLOSE (unit=4)
+	CLOSE (unit=70)
 	CLOSE (unit=5)
 	CLOSE (unit=60)
 	CLOSE (unit=7)
