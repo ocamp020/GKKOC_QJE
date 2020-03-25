@@ -1333,42 +1333,69 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		ENDDO
 		close (unit=50)  
 
-	! Consumption Equivalent Welfare
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	!! Consumption Equivalent Welfare
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	! Compute Average Utility - CE2
+		Av_Util_NB  =  100.0_dp*(( (sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:)) - &
+	    					&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
+	                        &  sum((ValueFunction_Bench(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
+	                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+
+		Av_Util_Pop = 100.0_dp*(( (sum(ValueFunction_exp*DBN1)-sum(Bq_Value_Bench*DBN_bench)) / &
+	    					& sum((ValueFunction_Bench-Bq_Value_Bench)*DBN_bench)  ) &
+	                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+	    print*,' '
+	    print*,'---------------------------'
+	    print*,''
+	    print*, ' CE 2 Computation'
+	    print*, 'Av Utility NB (bench) =',sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  
+	    print*, 'Av Utility NB (exp  ) =',sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))    
+	    print*, 'CE2_NB =',Av_Util_NB
+	    print*, 'CE2_Pop =', Av_Util_Pop
+	    print*,''
+	    print*,'---------------------------'
+	    print*,' '
+
+	    ! Decomposition using distribution
 		OPEN (UNIT=50, FILE=trim(Result_Folder)//'CE_alternative.txt', STATUS='replace') 
-		    WRITE  (UNIT=50, FMT=*) 'CE2_NB =', 100*(( sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:)) / &
-		                                &  sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  ) &
-		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
-		    WRITE  (UNIT=50, FMT=*) 'CE2_Pop =', 100*(( sum(ValueFunction_exp*DBN1) / sum(ValueFunction_Bench*DBN_bench)  ) &
-		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
-		    WRITE  (UNIT=50, FMT=*) 'CE2_NB_bench =', 100*(( sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) / &
-		                                &  sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  ) &
-		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
-		    WRITE  (UNIT=50, FMT=*) 'CE2_Pop_bench =', 100*(( sum(ValueFunction_exp*DBN_bench)/sum(ValueFunction_Bench*DBN_bench)) &
-		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
-            WRITE  (UNIT=50, FMT=*) 'CE2_NB_exp =', 100*(( sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:)) / &
-		                                &  sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))  ) &
-		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
-		    WRITE  (UNIT=50, FMT=*) 'CE2_Pop_exp =', 100*(( sum(ValueFunction_exp*DBN1) / sum(ValueFunction_Bench*DBN1)  ) &
-		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
-            WRITE  (UNIT=50, FMT=*) ' '
+	    WRITE  (UNIT=50, FMT=*) 'CE2_NB =', 100.0_dp*(( (sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:)) - &
+	    					&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
+	                        &  sum((ValueFunction_Bench(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
+	                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+	    WRITE  (UNIT=50, FMT=*) 'CE2_Pop =', 100.0_dp*(( (sum(ValueFunction_exp*DBN1)-sum(Bq_Value_Bench*DBN_bench)) / &
+	    					& sum((ValueFunction_Bench-Bq_Value_Bench)*DBN_bench)  ) &
+	                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+	    WRITE  (UNIT=50, FMT=*) 'CE2_NB_bench =', &
+	    					& 100.0_dp*(( sum((ValueFunction_exp(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:)) / &
+	                        &  sum((ValueFunction_Bench(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
+	                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+	    WRITE  (UNIT=50, FMT=*) 'CE2_Pop_bench =', 100.0_dp*(( sum((ValueFunction_exp-Bq_Value_Bench)*DBN_bench)/ &
+	    					&  sum((ValueFunction_Bench-Bq_Value_Bench)*DBN_bench)) &
+	                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+        WRITE  (UNIT=50, FMT=*) 'CE2_NB_exp =', &
+        					& 100.0_dp*(( sum((ValueFunction_exp(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN1(1,:,:,:,:,:)) / &
+	                        &  sum((ValueFunction_Bench(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN1(1,:,:,:,:,:))  ) &
+	                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+	    WRITE  (UNIT=50, FMT=*) 'CE2_Pop_exp =', 100.0_dp*(( sum((ValueFunction_exp-Bq_Value_Bench)*DBN1) / &
+	    					&  sum((ValueFunction_Bench-Bq_Value_Bench)*DBN1)  ) &
+	                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+        WRITE  (UNIT=50, FMT=*) ' '
 
-		    WRITE  (UNIT=50, FMT=*) 'Av Utility NB (bench) =',sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  
-		    WRITE  (UNIT=50, FMT=*) 'Av Utility NB (exp  ) =',sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))    
-		    WRITE  (UNIT=50, FMT=*) 'Av Utility  (bench)   =',sum(ValueFunction_Bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))  
-		    WRITE  (UNIT=50, FMT=*) 'Av Utility  (exp)     =',sum(ValueFunction_exp(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))
-		    close (unit=50)	
-		    print*,' '
-		    print*, ' CE 2 Computation'
-		    print*, 'Av Utility NB (bench) =',sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  
-		    print*, 'Av Utility NB (exp  ) =',sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))    
-		    print*, 'CE2_NB =',100*(( sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:)) / &
-		                                &  sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  ) &
-		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP) 
-		    print*, 'CE2_Pop =', 100*(( sum(ValueFunction_exp*DBN1) / sum(ValueFunction_Bench*DBN_bench)  ) &
-		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
-		    print*,' '
+	    WRITE  (UNIT=50, FMT=*) 'Av Utility NB (bench) =',sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  
+	    WRITE  (UNIT=50, FMT=*) 'Av Utility NB (exp  ) =',sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))    
+	    WRITE  (UNIT=50, FMT=*) 'Av Utility  (bench)   =',sum(ValueFunction_Bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))  
+	    WRITE  (UNIT=50, FMT=*) 'Av Utility  (exp)     =',sum(ValueFunction_exp(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))
+	    WRITE  (UNIT=50, FMT=*) 'Av BQ Utility NB (bench) =',sum(BQ_Value_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  
+	    WRITE  (UNIT=50, FMT=*) 'Av BQ Utility  (bench)   =',sum(BQ_Value_Bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))  
+	    close (unit=50)	
 
 
+
+
+    ! Compute Individual Utility - CE1
 		OPEN (UNIT=50, FILE=trim(Result_Folder)//'CE_NEWBORN', STATUS='replace')  
 		OPEN (UNIT=60, FILE=trim(Result_Folder)//'CE', STATUS='replace')  
 		OPEN (UNIT=70, FILE=trim(Result_Folder)//'CE_by_age', STATUS='replace')  
@@ -1379,7 +1406,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    	Cons_Eq_Welfare(age,:,:,:,:,:)= & 
 		    		& exp((ValueFunction_exp(age,:,:,:,:,:)-ValueFunction_Bench(age,:,:,:,:,:))/CumDiscountF(age))-1.0_DP
 		    else 
-		    	Cons_Eq_Welfare(age,:,:,:,:,:)=(ValueFunction_exp(age,:,:,:,:,:)/ValueFunction_Bench(age,:,:,:,:,:)) &
+		    	Cons_Eq_Welfare(age,:,:,:,:,:)=((ValueFunction_exp(age,:,:,:,:,:)-Bq_Value_bench(age,:,:,:,:,:))/&
+		    									& (ValueFunction_Bench(age,:,:,:,:,:)-Bq_Value_bench(age,:,:,:,:,:)) ) &
                                 				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
 		    end if 
 
@@ -1606,26 +1634,19 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		Welfare_Gain_NB_bench  = 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
 		Welfare_Gain_NB_exp    = 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
 
+	print*,''
 	print*,'---------------------------'
 	print*,''
+	print*, ' CE 1 Computation'
 	print*,'Average Welfare Gain Whole Population (bench dbn) (prct)=',100.0_DP*sum(Cons_Eq_Welfare*DBN_bench)
 	print*,'Average Welfare Gain Whole Population (exp dbn)     (prct)=',100.0_DP*sum(Cons_Eq_Welfare*DBN1)
-	print*,'Average Welfare Gain NEW BORN (bench dbn) (prct)          =',&
+	print*,'Average Welfare Gain New Born (bench dbn) (prct)          =',&
 	    & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-	print*,'Average Welfare Gain NEW BORN (exp dbn)     (prct)          =',&
+	print*,'Average Welfare Gain New Born (exp dbn)     (prct)          =',&
 	    & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
 	print*,''
 	print*,'---------------------------'
-
-	! Compute Average Utility - CE2
-
-	Av_Util_NB  =  100.0_dp * (( sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:)) / &
-				&               sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) ) &
-				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
-
-	Av_Util_Pop =  100.0_dp * (( sum(ValueFunction_exp(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:)) / &
-				& 	            sum(ValueFunction_Bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:)) ) &
-				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+	print*,''
 
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -3337,8 +3358,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 
 	! Add bequest value to consumption/leisure value t get total value
 	if (chi_bq.eq.0.0_dp) then 
-		Bq_Value_mat = 0.0_dp 
-		print*,'Test v_bq=',v_bq(100.0_dp) 
+		Bq_Value_mat = 0.0_dp  
 	endif 
 	Value_mat = Value_mat + Bq_Value_mat
 
