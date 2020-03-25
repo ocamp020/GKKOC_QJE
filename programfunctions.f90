@@ -987,7 +987,12 @@ END  FUNCTION FOC_WH_Transition
 		real(DP), intent(in) :: a
 		real(DP)             :: v_bq
 
+		if (chi_bq.gt.0.0_dp) then 
 		v_bq = chi_bq*(a+bq_0)**(gamma*(1.0_dp-sigma))/(1.0_dp-sigma) 
+		else 
+		v_bq = 0.0_dp 
+		endif 
+
 
 	END FUNCTION v_bq
 
