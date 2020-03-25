@@ -442,7 +442,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	! Solve for the model and compute stats
 	print*,"	Initializing program"
 		CALL INITIALIZE
-		CALL Write_Benchmark_Results(.false.)
+		! CALL Write_Benchmark_Results(.false.)
 	if (compute_bench) then
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
@@ -460,6 +460,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	else
 		print*,"	Reading benchmark results from files"
 		CALL Write_Benchmark_Results(compute_bench)
+			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		K_mat  = K_Matrix(R,P)
 		Pr_mat = Profit_Matrix(R,P)
