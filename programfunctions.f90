@@ -1358,6 +1358,12 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	    print*,''
 	    print*,'---------------------------'
 	    print*,' '
+	    print*,' Test'
+	    do ai=1,na 
+	    print*, v_bq(agrid(ai)),Bq_Value_bench(1,ai,5,3,3,1)
+	    enddo 
+	    print*,'av. BQ NB',sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))
+	    print*,' End Test'
 
 	    ! Decomposition using distribution
 		OPEN (UNIT=50, FILE=trim(Result_Folder)//'CE_alternative.txt', STATUS='replace') 
