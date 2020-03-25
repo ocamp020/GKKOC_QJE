@@ -2829,9 +2829,10 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 	REAL(DP), dimension(nz,nx) :: DBN_XZ
 	INTEGER , dimension(draft_age_category+1) :: draft_age_limit
 	INTEGER :: age2, z2
-	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Value_mat
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Value_mat, Bq_Value_mat
 
-	allocate( Value_mat(  MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Value_mat(  	MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Bq_Value_mat( MaxAge,na,nz,nlambda,ne,nx) )
 
 	print*,' '
 	print*,'Computing Welfare Gain for Transition'
@@ -2850,7 +2851,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 
 	! Select relevant values of value function
 		DO age=1,MaxAge
-			Value_mat(age,:,:,:,:,:) = ValueFunction_tr(age,:,:,:,:,:,age)
+			Value_mat(age,:,:,:,:,:)    = ValueFunction_tr(age,:,:,:,:,:,age)
+			Bq_Value_mat(age,:,:,:,:,:) = BQ_Value_tr(age,:,:,:,:,:,age)
 		ENDDO
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -2864,8 +2866,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 		    	CE1_tr(age,:,:,:,:,:)= & 
 		    		& exp((Value_mat(age,:,:,:,:,:)-ValueFunction_Bench(age,:,:,:,:,:))/CumDiscountF(age))-1.0_DP
 		    else 
-		    	CE1_tr(age,:,:,:,:,:)=(Value_mat(age,:,:,:,:,:)/ValueFunction_Bench(age,:,:,:,:,:)) &
-                                				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+		    	CE1_tr(age,:,:,:,:,:)=((Value_mat(age,:,:,:,:,:)-BQ_Value_mat(age,:,:,:,:,:))/&
+    									& (ValueFunction_Bench(age,:,:,:,:,:)-BQ_Value_mat(age,:,:,:,:,:)) ) &
+                        				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
 		    end if 
 		ENDDO
 
@@ -2874,11 +2877,11 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 		CE1_pop_tr = 100.0_DP*sum(CE1_tr*DBN_bench)/sum(DBN_bench)
 
 	! Consumption Equivalent Welfare: CE 2
-	print*,'	 Consumption Equivalent: CE 1'
-		CE2_nb_tr  = 100.0_dp * (( sum(Value_mat(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) / &
-				&               sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) ) &
+	print*,'	 Consumption Equivalent: CE 2'
+		CE2_nb_tr  = 100.0_dp * (( sum((Value_mat(1,:,:,:,:,:)-BQ_Value_mat(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:)) / &
+				&               sum((ValueFunction_Bench(1,:,:,:,:,:)-BQ_Value_mat(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:)) ) &
 				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
-		CE2_pop_tr = 100*(( sum(Value_mat*DBN_bench) / sum(ValueFunction_Bench*DBN_bench)  ) &
+		CE2_pop_tr = 100*(( sum((Value_mat-BQ_Value_mat)*DBN_bench) / sum((ValueFunction_Bench-BQ_Value_mat)*DBN_bench)  ) &
 		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 
 	! Write Aggregate Results
@@ -3413,7 +3416,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_TRANSITION
 		! Save value function
 			ValueFunction_tr(:,:,:,:,:,:,age) = Value_mat
 		! Save bequest value function
-			Bq_ValueFunction_tr(:,:,:,:,:,:,age) = Bq_Value_mat
+			Bq_Value_tr(:,:,:,:,:,:,age) = Bq_Value_mat
 	enddo 
 	print*,'Computing Value Function Completed'
 

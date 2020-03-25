@@ -176,7 +176,7 @@ MODULE global
     REAL(DP)                 :: Debt_SS
     ! Policy function and value function (defined on the exogenous grid)
     REAL(DP), DIMENSION(:,:,:,:,:,:,:), allocatable :: Cons_tr, Hours_tr, Aprime_tr, DBN_tr, &
-        & ValueFunction_tr, Bq_ValueFunction_tr
+        & ValueFunction_tr, Bq_Value_tr
     ! Welfare Gain
     REAL(DP), DIMENSION(:,:,:,:,:,:)  , allocatable :: CE1_tr
     REAL(DP) :: CE1_nb_tr,  CE1_pop_tr, CE2_nb_tr,  CE2_pop_tr
@@ -216,7 +216,7 @@ Subroutine Allocate_Variables
     allocate( Aprime_tr(          MaxAge,na,nz,nlambda,ne,nx,T+1) )
     allocate( DBN_tr( 			  MaxAge,na,nz,nlambda,ne,nx,T+1) )
     allocate( ValueFunction_tr(   MaxAge,na,nz,nlambda,ne,nx,MaxAge) )
-    allocate( Bq_ValueFunction_tr(MaxAge,na,nz,nlambda,ne,nx,MaxAge) )
+    allocate( Bq_Value_tr(        MaxAge,na,nz,nlambda,ne,nx,MaxAge) )
 	allocate( Cons_t_pr(          MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Hours_t_pr(         MaxAge,na,nz,nlambda,ne,nx) )
     allocate( CE1_tr( 			  MaxAge,na,nz,nlambda,ne,nx) )
