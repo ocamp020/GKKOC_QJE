@@ -61,7 +61,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauK(tauk_in)
 		Y_a_threshold_exp = Y_a_threshold
 
 	! CALL COMPUTE_WELFARE_GAIN
-	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 	CALL Firm_Value
     	EQ_WELFARE_GIVEN_TAUK = - sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
 
@@ -113,7 +113,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauW(tauW_in)
 		Y_a_threshold_exp = Y_a_threshold
 
 	!CALL COMPUTE_WELFARE_GAIN
-	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 	CALL Firm_Value
     	EQ_WELFARE_GIVEN_TauW = - sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
     !CALL COMPUTE_STATS
@@ -229,7 +229,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauC(tauC_in,Opt_Tax_KW)
 		Y_a_threshold_exp = Y_a_threshold
 
 	!CALL COMPUTE_WELFARE_GAIN
-	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 	CALL Firm_Value
     	EQ_WELFARE_GIVEN_TauC = - sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
     !CALL COMPUTE_STATS
@@ -283,7 +283,7 @@ FUNCTION EQ_WELFARE_GIVEN_PSI(tauK_in,tauW_in,psi_in)
 		Y_a_threshold_exp = Y_a_threshold
 
 	!CALL COMPUTE_WELFARE_GAIN
-	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 	CALL Firm_Value
     	EQ_WELFARE_GIVEN_PSI = - sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
     !CALL COMPUTE_STATS
