@@ -901,7 +901,7 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 
 		! Compute value function and store policy functions, value function and distribution in file
 		! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		CALL Firm_Value
 
 	endif 
@@ -933,6 +933,7 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 		Y_a_threshold_exp = Y_a_threshold
 
 		ValueFunction_exp = ValueFunction
+		Bq_Value_exp 	  = Bq_Value
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime
@@ -1108,7 +1109,7 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 
 		! Compute value function and store policy functions, value function and distribution in file
 		! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		CALL Firm_Value
 
 	endif 
@@ -1141,6 +1142,7 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 		Y_a_threshold_exp = Y_a_threshold
 
 		ValueFunction_exp = ValueFunction
+		Bq_Value_exp 	  = Bq_Value
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime
@@ -1324,7 +1326,7 @@ Subroutine Solve_Experiment_Fixed_PF_Interp (compute_exp_pf_interp,Simul_Switch)
 
 		! Compute value function and store policy functions, value function and distribution in file
 		! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		CALL Firm_Value
 
 	endif 
@@ -1354,6 +1356,7 @@ Subroutine Solve_Experiment_Fixed_PF_Interp (compute_exp_pf_interp,Simul_Switch)
 		Y_a_threshold_exp = Y_a_threshold
 
 		ValueFunction_exp = ValueFunction
+		Bq_Value_exp 	  = Bq_Value
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime
@@ -1497,7 +1500,7 @@ Subroutine Solve_Experiment_Fixed_PF_Prices(compute_exp_prices,Simul_Switch)
 
 	! 	! Compute value function and store policy functions, value function and distribution in file
 	! 	! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-	! 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	! 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 	! 	CALL Firm_Value
 
 	! endif 
@@ -1530,6 +1533,7 @@ Subroutine Solve_Experiment_Fixed_PF_Prices(compute_exp_prices,Simul_Switch)
 		Y_a_threshold_exp = Y_a_threshold
 
 		ValueFunction_exp = ValueFunction
+		Bq_Value_exp	  = Bq_Value
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime
@@ -1682,7 +1686,7 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 
 	! 	! Compute value function and store policy functions, value function and distribution in file
 	! 	! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-	! 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	! 	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 	! 	CALL Firm_Value
 
 	! endif 
@@ -1715,6 +1719,7 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 		Y_a_threshold_exp = Y_a_threshold
 
 		ValueFunction_exp = ValueFunction
+		Bq_Value_exp	  = Bq_Value
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime
@@ -1847,7 +1852,7 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 
 		! Compute value function and store policy functions, value function and distribution in file
 			! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 			CALL Firm_Value
 
 
@@ -1879,6 +1884,7 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 		Y_a_threshold_exp = Y_a_threshold
 
 		ValueFunction_exp = ValueFunction
+		Bq_Value_exp	  = Bq_Value
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime
@@ -2031,7 +2037,7 @@ Subroutine Solve_Interpolated_Economy(YGRID_exp)
 
 		! Compute value function and store policy functions, value function and distribution in file
 			! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 			CALL Firm_Value
 
 
@@ -2064,6 +2070,7 @@ Subroutine Solve_Interpolated_Economy(YGRID_exp)
 		Y_a_threshold_exp = Y_a_threshold
 
 		ValueFunction_exp = ValueFunction
+		Bq_Value_exp	  = Bq_Value
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime
@@ -2147,6 +2154,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 				Y_a_threshold_exp = Y_a_threshold
 
 				ValueFunction_exp = ValueFunction
+				Bq_Value_exp	  = Bq_Value
 				Cons_exp          = Cons           
 				Hours_exp         = Hours
 				Aprime_exp        = Aprime 
@@ -2259,6 +2267,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 				Y_a_threshold_exp = Y_a_threshold
 
 				ValueFunction_exp = ValueFunction
+				Bq_Value_exp	  = Bq_Value
 				Cons_exp          = Cons           
 				Hours_exp         = Hours
 				Aprime_exp        = Aprime 
@@ -2342,7 +2351,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	CALL GOVNT_BUDGET(.true.)
 
 	! Compute value function and store policy functions, value function and distribution in file
-	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 	CALL Firm_Value
 	CALL Write_Experimental_Results(.true.)
 
@@ -2375,6 +2384,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		Y_a_threshold_exp = Y_a_threshold
 
 		ValueFunction_exp = ValueFunction
+		Bq_Value_exp	  = Bq_Value
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime 
@@ -2475,6 +2485,7 @@ Subroutine Solve_Opt_Tax_K_and_W(Simul_Switch)
 				Y_a_threshold_exp = Y_a_threshold
 
 				ValueFunction_exp = ValueFunction
+				Bq_Value_exp	  = Bq_Value
 				Cons_exp          = Cons           
 				Hours_exp         = Hours
 				Aprime_exp        = Aprime 
@@ -2557,7 +2568,7 @@ Subroutine Solve_Opt_Tax_K_and_W(Simul_Switch)
 	CALL GOVNT_BUDGET(.true.)
 
 	! Compute value function and store policy functions, value function and distribution in file
-	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 	CALL Firm_Value
 	CALL Write_Experimental_Results(.true.)
 	
@@ -2579,6 +2590,7 @@ Subroutine Solve_Opt_Tax_K_and_W(Simul_Switch)
 		Y_a_threshold_exp = Y_a_threshold
 
 		ValueFunction_exp = ValueFunction
+		Bq_Value_exp	  = Bq_Value
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime 
@@ -2643,6 +2655,7 @@ Subroutine Solve_Opt_Threshold
 	! 	Y_a_threshold_exp = Y_a_threshold
 
 	! 	ValueFunction_exp = ValueFunction
+	! 	Bq_Value_exp	  = Bq_Value
 	! 	Cons_exp          = Cons           
 	! 	Hours_exp         = Hours
 	! 	Aprime_exp        = Aprime 
@@ -2719,6 +2732,7 @@ Subroutine Solve_Opt_Threshold
 	! 			Y_a_threshold_exp = Y_a_threshold
 
 	! 			ValueFunction_exp = ValueFunction
+	! 			Bq_Value_exp	  = Bq_Value
 	! 			Cons_exp          = Cons           
 	! 			Hours_exp         = Hours
 	! 			Aprime_exp        = Aprime 
@@ -2861,7 +2875,7 @@ Subroutine Solve_Opt_Threshold
 	CALL Compute_After_Tax_Income
 
 	! Compute value function and store policy functions, value function and distribution in file
-	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 	CALL Firm_Value
 	CALL Write_Experimental_Results(.true.)
 	
@@ -2883,6 +2897,7 @@ Subroutine Solve_Opt_Threshold
 		Y_a_threshold_exp = Y_a_threshold
 
 		ValueFunction_exp = ValueFunction
+		Bq_Value_exp	  = Bq_Value
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime 
@@ -3000,6 +3015,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 				Y_a_threshold_exp = Y_a_threshold
 
 				ValueFunction_exp = ValueFunction
+				Bq_Value_exp	  = Bq_Value
 				Cons_exp          = Cons           
 				Hours_exp         = Hours
 				Aprime_exp        = Aprime 
@@ -3058,7 +3074,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		CALL GOVNT_BUDGET(.true.)
 
 		! Compute value function and store policy functions, value function and distribution in file
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		CALL Firm_Value
 		CALL Write_Experimental_Results(.true.)
 		
@@ -3080,6 +3096,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			Y_a_threshold_exp = Y_a_threshold
 
 			ValueFunction_exp = ValueFunction
+			Bq_Value_exp	  = Bq_Value
 			Cons_exp          = Cons           
 			Hours_exp         = Hours
 			Aprime_exp        = Aprime 
@@ -3167,6 +3184,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 				Y_a_threshold_exp = Y_a_threshold
 
 				ValueFunction_exp = ValueFunction
+				Bq_Value_exp	  = Bq_Value
 				Cons_exp          = Cons           
 				Hours_exp         = Hours
 				Aprime_exp        = Aprime 
@@ -3235,7 +3253,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		CALL GOVNT_BUDGET(.true.)
 
 		! Compute value function and store policy functions, value function and distribution in file
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		CALL Firm_Value
 		
 		! Aggregate variable in experimental economy
@@ -3256,6 +3274,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			Y_a_threshold_exp = Y_a_threshold
 
 			ValueFunction_exp = ValueFunction
+			Bq_Value_exp	  = Bq_Value
 			Cons_exp          = Cons           
 			Hours_exp         = Hours
 			Aprime_exp        = Aprime 
@@ -3393,6 +3412,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 			Y_a_threshold_exp = Y_a_threshold
 
 			ValueFunction_exp = ValueFunction
+			Bq_Value_exp	  = Bq_Value
 			Cons_exp          = Cons           
 			Hours_exp         = Hours
 			Aprime_exp        = Aprime 
@@ -3465,6 +3485,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 			Y_a_threshold_exp = Y_a_threshold
 
 			ValueFunction_exp = ValueFunction
+			Bq_Value_exp	  = Bq_Value
 			Cons_exp          = Cons           
 			Hours_exp         = Hours
 			Aprime_exp        = Aprime 
@@ -3578,6 +3599,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 			Y_a_threshold_exp = Y_a_threshold
 
 			ValueFunction_exp = ValueFunction
+			Bq_Value_exp	  = Bq_Value
 			Cons_exp          = Cons           
 			Hours_exp         = Hours
 			Aprime_exp        = Aprime 
@@ -3656,7 +3678,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 	CALL GOVNT_BUDGET(.true.)
 
 	! Compute value function and store policy functions, value function and distribution in file
-	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction)
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 	CALL Firm_Value
 	! CALL Write_Experimental_Results(.true.)
 	
@@ -3678,6 +3700,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		Y_a_threshold_exp = Y_a_threshold
 
 		ValueFunction_exp = ValueFunction
+		Bq_Value_exp	  = Bq_Value
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime 
@@ -4006,6 +4029,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 
 		! Solve for New Steady State
 			CALL FIND_DBN_EQ
+			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 			CALL Write_Experimental_Results(.true.)
 			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 			K_mat  = K_Matrix(R,P)
@@ -4032,6 +4056,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 				Y_a_threshold_exp = Y_a_threshold
 
 				ValueFunction_exp = ValueFunction
+				Bq_Value_exp	  = Bq_Value
 				Cons_exp          = Cons           
 				Hours_exp         = Hours
 				Aprime_exp        = Aprime
@@ -4039,7 +4064,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 				V_Pr_nb_exp  	  = V_Pr_nb
 
 			! Compute moments
-			! CALL COMPUTE_STATS
+			CALL COMPUTE_STATS
 			
 			! Compute welfare and output gain between economies
 				CALL COMPUTE_WELFARE_GAIN
@@ -4154,6 +4179,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		Y_a_threshold_exp = Y_a_threshold
 
 		ValueFunction_exp = ValueFunction
+		Bq_Value_exp	  = Bq_Value
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime 
