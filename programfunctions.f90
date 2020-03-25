@@ -3338,7 +3338,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	! Add bequest value to consumption/leisure value t get total value
 	if (chi_bq.eq.0.0_dp) then 
 		Bq_Value_mat = 0.0_dp 
-		print*,'Test v_bq=',v_bq(100) 
+		print*,'Test v_bq=',v_bq(100.0_dp) 
 	endif 
 	Value_mat = Value_mat + Bq_Value_mat
 
