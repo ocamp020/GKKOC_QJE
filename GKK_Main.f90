@@ -64,8 +64,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
-			compute_exp   = .true.
+			compute_bench = .false.
+			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .true.
@@ -442,7 +442,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	! Solve for the model and compute stats
 	print*,"	Initializing program"
 		CALL INITIALIZE
-		! CALL Write_Benchmark_Results(.false.)
+		CALL Write_Benchmark_Results(.false.)
 	if (compute_bench) then
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
@@ -654,6 +654,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	endif 
 	
 	CALL Write_Experimental_Results(compute_exp)
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 	CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 	K_mat  = K_Matrix(R,P)
 	Pr_mat = Profit_Matrix(R,P)
