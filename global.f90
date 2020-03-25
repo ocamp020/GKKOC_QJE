@@ -60,7 +60,7 @@ MODULE global
     REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons, Hours, Aprime, Income_AT
     REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_bench, Hours_bench, Aprime_bench, Cons_exp, Hours_exp, Aprime_exp 
     REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: ValueFunction, ValueFunction_bench, ValueFunction_exp
-    REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Bq_ValueFunction, Bq_ValueFunction_bench, Bq_ValueFunction_exp
+    REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Bq_Value, Bq_Value_bench, Bq_Value_exp
     REAL(DP), dimension(:,:,:,:,:,:), allocatable :: Cons_Eq_Welfare
 	! Policy function and value function (defined on the adjusted grid for breakpoints)
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_t, Hours_t, Aprime_t
