@@ -1413,8 +1413,6 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	            if (panela(paneli)  .lt. amin) then
 	                panela(paneli) = max(panela(paneli), amin) 
 	            endif      
-
-	       	endif !age .lt. MaxAge
 			!  NEXT PERIOD'S ASSET HAS BEEN COMPUTED
 
 	             
