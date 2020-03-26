@@ -878,7 +878,9 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 				MB_aprime_t(xp_ind) = MB_a_bt(agrid_t(ai),zi,xp_ind)
     		enddo 
     		EndoCons(ai)  =  (beta*survP(age)* 	&
-    					& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) ) **euler_power
+				& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power))&
+				& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        
 	        ! Consumption on endogenous grid and implied asset income under tauW_at
@@ -886,9 +888,9 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 				MB_aprime_t(xp_ind) = MB_a_at(agrid_t(ai),zi,xp_ind)
     		enddo 
 	        EndoCons(na_t+sw)  = (beta*survP(age)*	&
-	        			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) &
-	        			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
-				    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
+    			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) &
+    			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	    	EndoYgrid(na_t+sw) = agrid_t(ai) +  EndoCons(na_t+sw) - RetY_lambda_e(lambdai,ei)
 
 	  !   	print*, ' '
@@ -1384,9 +1386,9 @@ END SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD
 				        & (1.0_dp-Hours_t(age+1,ai,zi,lambdai,:,xp_ind))**((1.0_dp-sigma)*(1.0_dp-gamma))  )
 				enddo
 
-				C_euler = ( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) & 
+				C_euler = (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) & 
 						  & + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma) &
-						  &         *chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp))) &
+						  &         *chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) &
 						  & **(1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
 				C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
 
@@ -6403,7 +6405,7 @@ END SUBROUTINE FIND_DBN_Transition
 SUBROUTINE EGM_Transition()
 	use omp_lib
 	IMPLICIT NONE
-	REAL(DP) :: brentvalue, C_foc, H_min, euler_power
+	REAL(DP) :: brentvalue, C_foc, H_min, euler_power, chi_aux
 	INTEGER  :: tempai, sw 
 	REAL(DP), DIMENSION(na_t+nz*nx+1)  	:: EndoCons, EndoYgrid, EndoHours
 	INTEGER , DIMENSION(na_t+nz*nx+1)   :: sort_ind 
@@ -6432,6 +6434,9 @@ SUBROUTINE EGM_Transition()
 			! Separable Utility
 				euler_power = (-1.0_dp/sigma)
 		end if 
+
+	! Set value of auxiliary chi parameter for last period's saving
+		chi_aux = ((1.0_dp+tauC)*beta*chi_bq)**(1.0_dp/(1-gamma*(1.0_dp-sigma)))/(1.0_dp+tauC)
 
 	! Policy functions set to tax reform in final period
 		Cons_tr(:,:,:,:,:,:,T+1)   = Cons_exp*(1.0_DP+tauC) ; Cons_t_pr   = Cons_exp*(1.0_DP+tauC) ;
@@ -6480,13 +6485,17 @@ SUBROUTINE EGM_Transition()
     DO lambdai=1,nlambda
     DO ei=1,ne
     DO ai=1,na_t
-        Cons_t(age,ai,zi,lambdai,ei,xi) =  YGRID_t(ai,zi,xi) + RetY_lambda_e(lambdai,ei) 
+    	if ((YGRID_t(ai,zi,xi) + RetY_lambda_e(lambdai,ei)).le.(bq_0/chi_aux) ) then 
+        Cons_t(age,ai,zi,lambdai,ei,xi)   =  YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei) 
+        else
+        Cons_t(age,ai,zi,lambdai,ei,xi)   = (YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)+bq_0)/(1.0_dp+chi_aux)
+        endif
+        Aprime_t(age,ai,zi,lambdai,ei,xi) = YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)-Cons_t(age,ai,zi,lambdai,ei,xi)
 	ENDDO ! ai
     ENDDO ! ei
 	ENDDO ! lambdai
 	ENDDO ! xi
 	ENDDO ! zi
-	Aprime_t(age, :, :, :, :,:) = 0.0_DP
 	! print*,"Period",ti,"|Const_t-Const_bench|=",maxval(abs(Cons_t(MaxAge,:,:,:,:,:)-Cons_t_pr(MaxAge,:,:,:,:,:)))
 	! print*,"Period",ti,"Test-Const_bench=",(YGRID_aux(50,5,2) + RetY_lambda_e_aux(3,3))/(1.0_DP+tauC)-Cons_bench(MaxAge,50,5,3,3,2)
 	
@@ -6514,7 +6523,9 @@ SUBROUTINE EGM_Transition()
 				MB_aprime_t(xp_ind) = MB_a_bt(agrid_t(ai),zi,xp_ind)
     		enddo 
     		EndoCons(ai)  =  (beta*survP(age)* 	&
-    			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) )**euler_power
+    			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) &
+				& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! Consumption on endogenous grid and implied asset income under tauW_at
 	        do xp_ind = 1,nx 	
@@ -6522,7 +6533,9 @@ SUBROUTINE EGM_Transition()
 				MB_aprime_t(xp_ind) = MB_a_at(agrid_t(ai),zi,xp_ind)
     		enddo 
 	        EndoCons(na_t+sw)  = (beta*survP(age)*	&
-	        	& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) )**euler_power
+	        	& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) &
+				& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	    	EndoYgrid(na_t+sw) = agrid_t(ai) +  EndoCons(na_t+sw) - RetY_lambda_e(lambdai,ei)
 
 	  !   	print*, ' '
@@ -6539,7 +6552,9 @@ SUBROUTINE EGM_Transition()
 	    else 
 	    	! Consumption on endogenous grid and implied asset income
 	    	EndoCons(ai)  = (beta*survP(age)* 	&
-	    		& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)))**euler_power
+	    		& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power))&
+				& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) )**euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! !$omp critical
 	        ! print*,' Standard EGM - State:',age,ai,zi,lambdai,ei,xi,ti
@@ -7022,7 +7037,7 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
  	INTEGER , intent(in) :: time
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable, intent(out) :: Ap_aux
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Ap_t_aux, Cons_aux, Hours_aux
-	REAL(DP) :: brentvalue, C_foc, H_min, euler_power
+	REAL(DP) :: brentvalue, C_foc, H_min, euler_power, chi_aux
 	INTEGER  :: tempai, sw 
 	REAL(DP), DIMENSION(na_t+nz*nx+1)  	:: EndoCons, EndoYgrid, EndoHours
 	INTEGER , DIMENSION(na_t+nz*nx+1)   :: sort_ind 
@@ -7056,6 +7071,9 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
 			! Separable Utility
 				euler_power = (-1.0_dp/sigma)
 		end if 
+
+	! Set value of auxiliary chi parameter for last period's saving
+		chi_aux = ((1.0_dp+tauC)*beta*chi_bq)**(1.0_dp/(1-gamma*(1.0_dp-sigma)))/(1.0_dp+tauC)
 
 	! Policy Functions for period t (time)
 		! Note: these arrays should be adjusted to agrid_t 
@@ -7101,13 +7119,17 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
     DO lambdai=1,nlambda
     DO ei=1,ne
     DO ai=1,na_t
-        Cons_aux(age,ai,zi,lambdai,ei,xi) =  YGRID_t(ai,zi,xi) + RetY_lambda_e(lambdai,ei) 
+        if ((YGRID_t(ai,zi,xi) + RetY_lambda_e(lambdai,ei)).le.(bq_0/chi_aux) ) then 
+        Cons_aux(age,ai,zi,lambdai,ei,xi)   =  YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei) 
+        else
+        Cons_aux(age,ai,zi,lambdai,ei,xi)   = (YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)+bq_0)/(1.0_dp+chi_aux)
+        endif
+        Ap_t_aux(age,ai,zi,lambdai,ei,xi) = YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)-Cons_t(age,ai,zi,lambdai,ei,xi)
 	ENDDO ! ai
     ENDDO ! ei
 	ENDDO ! lambdai
 	ENDDO ! xi
 	ENDDO ! zi
-	Ap_t_aux(age, :, :, :, :,:) = 0.0_DP
 	! print*,"Period",ti,"|Const_t-Const_bench|=",maxval(abs(Cons_t(MaxAge,:,:,:,:,:)-Cons_t_pr(MaxAge,:,:,:,:,:)))
 	! print*,"Period",ti,"Test-Const_bench=",(YGRID_aux(50,5,2) + RetY_lambda_e_aux(3,3))/(1.0_DP+tauC)-Cons_bench(MaxAge,50,5,3,3,2)
 	
@@ -7137,7 +7159,9 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
     			endif
     		enddo 
     		EndoCons(ai)  =  (beta*survP(age)* 	&
-    			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) )**euler_power
+    			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) &
+    			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! Consumption on endogenous grid and implied asset income under tauW_at
 	        do xp_ind = 1,nx 	
@@ -7147,7 +7171,9 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
     			endif
     		enddo 
 	        EndoCons(na_t+sw)  = (beta*survP(age)*	&
-	        	& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) )**euler_power
+	        	& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) &
+    			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	    	EndoYgrid(na_t+sw) = agrid_t(ai) +  EndoCons(na_t+sw) - RetY_lambda_e(lambdai,ei)
 
 	  !   	print*, ' '
@@ -7164,7 +7190,9 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
 	    else 
 	    	! Consumption on endogenous grid and implied asset income
 	    	EndoCons(ai)  = (beta*survP(age)* 	&
-	    		& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)))**euler_power
+	    		& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power))&
+    			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! !$omp critical
 	        ! print*,' Standard EGM - State:',age,ai,zi,lambdai,ei,xi,ti
@@ -7332,8 +7360,7 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
     				MB_aprime_t(xp_ind) = MB_a_bt(agrid_t(ai),zi,xp_ind)
     			endif
     		enddo 
-			call EGM_Working_Period_Transition( MB_aprime_t , H_min , state_FOC , & 
-			      & EndoCons(ai), EndoHours(ai) , EndoYgrid(ai)  )
+			call EGM_Working_Period_Transition( MB_aprime_t, H_min, state_FOC, EndoCons(ai), EndoHours(ai), EndoYgrid(ai) )
 			
 			! Above threshold
 			do xp_ind = 1,nx 	
@@ -7342,8 +7369,7 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
     				MB_aprime_t(xp_ind) = MB_a_at(agrid_t(ai),zi,xp_ind)
     			endif
     		enddo 
-			call EGM_Working_Period_Transition( MB_aprime_t , H_min , state_FOC , & 
-			      & EndoCons(na_t+sw), EndoHours(na_t+sw) , EndoYgrid(na_t+sw)  )
+			call EGM_Working_Period_Transition( MB_aprime_t, H_min, state_FOC, EndoCons(na_t+sw), EndoHours(na_t+sw), EndoYgrid(na_t+sw) )
 
 	    	!print*, ' '
 	    	!print*, State_FOC 
@@ -7649,7 +7675,9 @@ Subroutine EGM_Working_Period_Transition(MB_in,H_min,state_FOC,C_endo,H_endo,Y_e
 			        & (1.0_dp-Hours_t_pr(age+1,ai,zi,lambdai,:,xp_ind))**((1.0_dp-sigma)*(1.0_dp-gamma))  )
 			enddo
 
-			C_euler = ( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp))) **(1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
+			C_euler = ( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp)) &
+	        			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+				    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **(1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
 			C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
 
 			if (C_euler.ge.C_foc) then
@@ -7679,7 +7707,9 @@ Subroutine EGM_Working_Period_Transition(MB_in,H_min,state_FOC,C_endo,H_endo,Y_e
 			do xp_ind=1,nx
 				E_MU_cp(xp_ind) = SUM(pr_e(ei,:) * Cons_t_pr(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma) )
 			enddo
-			C_endo = 1.0_dp/( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_mu_cp)  ) **(1.0_dp/sigma) )
+			C_endo = 1.0_dp/( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_mu_cp)  &
+	        			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**(1.0_dp-sigma)&
+				    	& *   chi_bq*(agrid_t(ai)+bq_0)**(-sigma) ) **(1.0_dp/sigma) )
 			C_foc  = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
 
 			if (C_endo.ge.C_foc) then
@@ -7703,13 +7733,17 @@ Subroutine EGM_Working_Period_Transition(MB_in,H_min,state_FOC,C_endo,H_endo,Y_e
 			    & *  ( (1.0_DP-Hours_t_pr(age+1, ai, zi, lambdai,:,xp_ind))**((1.0_DP-gamma)*(1.0_DP-sigma))))
 			enddo
 			  C_endo = ((gamma*psi*yh(age, lambdai,ei)/(1.0_DP-gamma))**((1.0_DP-gamma)*(1.0_DP-sigma)) &
-			    & *  beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp)  )**(-1.0_DP/sigma)
+			    & *  (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp)  &
+	        		& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+					& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) )**(-1.0_DP/sigma)
 
 			  H_endo = 1.0_DP - (1.0_DP-gamma)*C_endo/(gamma*psi*yh(age, lambdai,ei))   
 
 			If (H_endo .lt. 0.0_DP) then
 			    H_endo = 0.0_DP 
-			    C_endo = ( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) )**(1.0_DP/(gamma*(1.0_DP-sigma)-1.0_DP))
+			    C_endo = ( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp)  &
+	        		& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+					& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) )**(1.0_DP/(gamma*(1.0_DP-sigma)-1.0_DP))
 			endif 
 
 			! print*,' '
@@ -7720,7 +7754,9 @@ Subroutine EGM_Working_Period_Transition(MB_in,H_min,state_FOC,C_endo,H_endo,Y_e
 			do xp_ind=1,nx
 				E_MU_cp(xp_ind) = sum( pr_e(ei,:) * (Cons_t_pr(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma)) )
 			enddo
-			C_endo  = 1.0_DP/( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) )**(1.0_DP/sigma)
+			C_endo  = 1.0_DP/( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp)  &
+	        			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**(1.0_dp-sigma)&
+				    	& *   chi_bq*(agrid_t(ai)+bq_0)**(-sigma) )**(1.0_DP/sigma)
 
 			H_endo = max(0.0_DP , 1.0_DP - (phi*C_endo**sigma/(psi*yh(age, lambdai,ei)))**(1.0_dp/gamma) )  
 
