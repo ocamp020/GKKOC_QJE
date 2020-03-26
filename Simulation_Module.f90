@@ -233,8 +233,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		       	currentxi 		= panelx(paneli)
 		        
 				!  COMPUTE NEXT PERIOD'S ASSET
-		       	if (age .lt. MaxAge) then
-		            ! do linear interpolation here to find aprime. calling the function takes much more time
+	            ! do linear interpolation here to find aprime. calling the function takes much more time
 		            if (currenta .ge. amax) then
 	                	tklo = na-1
 	                elseif (currenta .lt. amin) then
@@ -254,9 +253,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		            if (panela(paneli)  .lt. amin) then
 		                panela(paneli) = max(panela(paneli), amin) 
 		            endif      
-
-		       	endif !age .lt. MaxAge
-				!  NEXT PERIOD'S ASSET IS COMPUTED
+				!  NEXT PERIOD'S ASSET HAS BEEN COMPUTED
 
 		             
 				! DRAW NEXT PERIOD'S AGE DBN
@@ -1396,7 +1393,6 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	       	currentxi 		= panelx(paneli)
 	        
 			!  COMPUTE NEXT PERIOD'S ASSET
-	       	if (age .lt. MaxAge) then
 	            ! do linear interpolation here to find aprime. calling the function takes much more time
 	            if (currenta .ge. amax) then
                 	tklo = na-1
@@ -1419,7 +1415,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	            endif      
 
 	       	endif !age .lt. MaxAge
-			!  NEXT PERIOD'S ASSET IS COMPUTED
+			!  NEXT PERIOD'S ASSET HAS BEEN COMPUTED
 
 	             
 			! DRAW NEXT PERIOD'S AGE DBN
@@ -1770,7 +1766,6 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	   	DO i=1,sample_size
 	        
 			!  Compute Assets from previous period savings
-	       	if (age .lt. MaxAge) then
 	            ! do linear interpolation here to find aprime. calling the function takes much more time
 	            if (Panel_a(i,age-1,i_z) .ge. amax) then
 			        tklo = na-1
@@ -1786,9 +1781,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	                           	&  +  (Panel_a(i,age-1,i_z) - agrid(tklo))* &
                            		& 	Aprime(age-1,tkhi,i_z,Panel_l(i,i_z),Panel_e(i,age-1,i_z),Panel_x(i,age-1,i_z))) &
 	                            &  / ( agrid(tkhi) - agrid(tklo) )  ) )
-
-	       	endif !age .lt. MaxAge
-			!  NEXT PERIOD'S ASSET IS COMPUTED
+			!  NEXT PERIOD'S ASSET HAS BEEN COMPUTED
 
 	             
 			! DRAW NEXT PERIOD'S AGE DBN
@@ -2240,7 +2233,6 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	   	DO i=1,sample_size
 	        i_z = Panel_z(i)
 			!  Compute Assets from previous period savings
-	       	! if (age .lt. MaxAge) then
 	            ! do linear interpolation here to find aprime. calling the function takes much more time
 	            if (Panel_a(i,age-1) .ge. amax) then
 			        tklo = na-1
@@ -2257,8 +2249,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
                            		& 	Aprime(age-1,tkhi,i_z,Panel_l(i),Panel_e(i,age-1),Panel_x(i,age-1))) &
 	                            &  / ( agrid(tkhi) - agrid(tklo) )  ) )
 
-	       	! endif !age .lt. MaxAge
-			!  NEXT PERIOD'S ASSET IS COMPUTED
+			!  NEXT PERIOD'S ASSET HAS BEEN COMPUTED
 
 	             
 			! DRAW NEXT PERIOD'S AGE DBN
