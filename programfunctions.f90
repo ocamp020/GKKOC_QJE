@@ -8435,7 +8435,8 @@ SUBROUTINE COMPUTE_STATS()
 						& sum(DBN_bq_vec,(BQ_vec>=c_low).and.(BQ_vec<=c_high))
 				print*, ' Test BQ',sum(BQ_vec/Inc_vec,(BQ_vec>=c_low)),sum(BQ_vec/Inc_vec,(BQ_vec<=c_high)),&
 						& sum(BQ_vec/Inc_vec,(BQ_vec>=c_low).and.(BQ_vec<=c_high))
-				print*, ' Test Sum', sum( (BQ_vec/Inc_vec*DBN_bq_vec) , ((BQ_vec>=c_low).and.(BQ_vec<=c_high)) )/sum(DBN_bq_vec,((BQ_vec>=c_low).and.(BQ_vec<=c_high)))
+				print*, ' Test Sum', sum( (BQ_vec/Inc_vec*DBN_bq_vec) , ((BQ_vec>=c_low).and.(BQ_vec<=c_high)) )/&
+						& sum(DBN_bq_vec,((BQ_vec>=c_low).and.(BQ_vec<=c_high)))
 			enddo 
 			! Write down results 
 			WRITE(UNIT=11, FMT=*) 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(:,j)
