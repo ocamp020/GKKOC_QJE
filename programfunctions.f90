@@ -8378,7 +8378,7 @@ SUBROUTINE COMPUTE_STATS()
 					c = (a+b)/2.0_dp
 					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
 				endif
-				print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
 			enddo 
 			BQ_top_x(i) = c 
 			do j=1,3
@@ -8398,8 +8398,8 @@ SUBROUTINE COMPUTE_STATS()
 						c_low = (a+b)/2.0_dp
 						CCDF_c = sum(DBN_bq_vec,BQ_vec>=c_low)
 					enddo 
-					print*,'		Bisection results'
-					print*, '		a',a,'c',c_low,'b',b,'CCDF',CCDF_c,'Obj',low_pct,'Error', abs(CCDF_c-low_pct)
+					! print*,'		Bisection results'
+					! print*, '		a',a,'c',c_low,'b',b,'CCDF',CCDF_c,'Obj',low_pct,'Error', abs(CCDF_c-low_pct)
 				else
 					c_low = minval(BQ_vec)
 				endif 
@@ -8419,8 +8419,8 @@ SUBROUTINE COMPUTE_STATS()
 						c_high = (a+b)/2.0_dp
 						CCDF_c = sum(DBN_bq_vec,BQ_vec>=c_high)
 					enddo 
-					print*,'		Bisection results'
-					print*, '		a',a,'c',c_high,'b',b,'CCDF',CCDF_c,'Obj',high_pct,'Error', abs(CCDF_c-high_pct)
+					! print*,'		Bisection results'
+					! print*, '		a',a,'c',c_high,'b',b,'CCDF',CCDF_c,'Obj',high_pct,'Error', abs(CCDF_c-high_pct)
 				else
 					c_high = maxval(BQ_vec)
 				endif 
