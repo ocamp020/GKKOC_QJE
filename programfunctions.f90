@@ -7787,7 +7787,7 @@ SUBROUTINE COMPUTE_STATS()
 	use omp_lib
 
 	IMPLICIT NONE
-	INTEGER  :: prctile, group, i
+	INTEGER  :: prctile, group, i, j
 	REAL(DP), DIMENSION(nz)    :: cdf_Gz_DBN, Capital_by_z 
 	REAL(dp), DIMENSION(na,nz,nx) :: DBN_azx, Wealth_mat
 	REAL(DP) :: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz), Mean_Capital
@@ -7802,7 +7802,7 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP) :: size_Age(max_age_category), size_AZ(max_age_category,nz), size_W(3)
 	real(DP) :: leverage_age_z(MaxAge,nz), size_by_age_z(MaxAge,nz), constrained_firms_age_z(MaxAge,nz)
 	real(DP) :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
-	real(DP) :: FW_top_x(6), prctile_FW(6), prctile_bq(6), Bq_Inc(6,3), a, b, c, CCDF_c, a_low, b_low, c_low, a_high, b_high, c_high
+	real(DP) :: FW_top_x(6), prctile_FW(6), prctile_bq(6), low_pct, high_pct, a, b, c, CCDF_c, a_low, b_low, c_low, a_high, b_high, c_high
 	REAL(DP), DIMENSION(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Labor_Income, Total_Income, K_L_Income, K_T_Income
