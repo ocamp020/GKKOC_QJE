@@ -8368,7 +8368,7 @@ SUBROUTINE COMPUTE_STATS()
 			CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
 			!print*, ' '
 			!print*, 'Percentile', prctile_bq(i)
-			do while ((abs(CCDF_c-prctile_bq(i))>0.0001_dp).and.(b-a>1e-8))
+			do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-8))
 				if (CCDF_c<prctile_bq(i)) then 
 					b = c 
 					c = (a+b)/2.0_dp
@@ -8387,9 +8387,9 @@ SUBROUTINE COMPUTE_STATS()
 				if (low_pct<1.0_dp) then
 					a = minval(BQ_vec)
 					b = c
-					c_low = (a+b)/2.0_dp
+					c_low = c
 					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-					do while ((abs(CCDF_c-low_pct)>0.0001_dp).and.(b-a>1e-8))
+					do while ((abs(CCDF_c-low_pct)>0.00001_dp).and.(b-a>1e-8))
 						if (CCDF_c<low_pct) then 
 							b = c_low
 						else 
@@ -8408,9 +8408,9 @@ SUBROUTINE COMPUTE_STATS()
 				if (high_pct>0.0_dp) then
 					a = c
 					b = maxval(BQ_vec)
-					c_high = (a+b)/2.0_dp
+					c_high = c
 					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-					do while ((abs(CCDF_c-high_pct)>0.0001_dp).and.(b-a>1e-8))
+					do while ((abs(CCDF_c-high_pct)>0.00001_dp).and.(b-a>1e-8))
 						if (CCDF_c<high_pct) then 
 							b = c_high
 						else 
