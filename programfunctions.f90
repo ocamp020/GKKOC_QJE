@@ -8398,6 +8398,8 @@ SUBROUTINE COMPUTE_STATS()
 						c_low = (a+b)/2.0_dp
 						CCDF_c = sum(DBN_bq_vec,BQ_vec>=c_low)
 					enddo 
+					print*,'		Bisection results'
+					print*, '		a',a,'c',c_low,'b',b,'CCDF',CCDF_c,'Obj',low_pct,'Error', abs(CCDF_c-low_pct)
 				else
 					c_low = minval(BQ_vec)
 				endif 
@@ -8417,6 +8419,8 @@ SUBROUTINE COMPUTE_STATS()
 						c_high = (a+b)/2.0_dp
 						CCDF_c = sum(DBN_bq_vec,BQ_vec>=c_high)
 					enddo 
+					print*,'		Bisection results'
+					print*, '		a',a,'c',c_high,'b',b,'CCDF',CCDF_c,'Obj',high_pct,'Error', abs(CCDF_c-high_pct)
 				else
 					c_high = maxval(BQ_vec)
 				endif 
@@ -8424,7 +8428,7 @@ SUBROUTINE COMPUTE_STATS()
 				print*, ' Test:','pct=',prctile_bq(i),'c_low=',c_low,'c=',c,'c_high=',c_high
 
 				! Get Average Bequest/Income
-				Bq_Inc(i,j) = sum( BQ_vec/Inc_vec*DBN_bq_vec , (BQ_vec>=c_low).and.(BQ_vec<=c_high) )
+				Bq_Inc(i,j) = sum( BQ_vec/Inc_vec*DBN_bq_vec , (BQ_vec>=c_low).and.(BQ_vec<=c_high) )/(0.005_dp*(2**j))
 			enddo 
 			! Write down results 
 			WRITE(UNIT=11, FMT=*) 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(:,j)
