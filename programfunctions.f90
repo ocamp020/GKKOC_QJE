@@ -8378,7 +8378,7 @@ SUBROUTINE COMPUTE_STATS()
 					c = (a+b)/2.0_dp
 					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
 				endif
-				!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', abs(CCDF_c-prctile_bq(i))
+				print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
 			enddo 
 			BQ_top_x(i) = c 
 			do j=1,3
