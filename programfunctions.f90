@@ -8421,6 +8421,8 @@ SUBROUTINE COMPUTE_STATS()
 					c_high = maxval(BQ_vec)
 				endif 
 
+				print*, ' Test:','pct=',prctile_bq(i),'c_low=',c_low,'c=',c,'c_high=',c_high
+
 				! Get Average Bequest/Income
 				Bq_Inc(i,j) = sum( BQ_vec/Inc_vec*DBN_bq_vec , (BQ_vec>=c_low).and.(BQ_vec<=c_high) )
 			enddo 
@@ -8430,9 +8432,6 @@ SUBROUTINE COMPUTE_STATS()
 		enddo 
 			CLOSE(UNIT=11)
 			print*, ' '; print*,'-----------------------------------------------------'; print*, ' '
-
-		print*,' Test for inequality'
-		print*, (BQ_vec>=c_low).and.(BQ_vec<=c_high)
 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
