@@ -8430,13 +8430,13 @@ SUBROUTINE COMPUTE_STATS()
 				! Get Average Bequest/Income
 				Bq_Inc(i,j) = sum( (BQ_vec/Inc_vec*DBN_bq_vec) , ((BQ_vec>=c_low).and.(BQ_vec<=c_high)) )&
 							&  				/sum( (DBN_bq_vec) , ((BQ_vec>=c_low).and.(BQ_vec<=c_high)) )
-				print*, ' Test logical',count((BQ_vec>=c_low)),count((BQ_vec<=c_high)),count((BQ_vec>=c_low).and.(BQ_vec<=c_high))
-				print*, ' Test DBN',sum(DBN_bq_vec,(BQ_vec>=c_low)),sum(DBN_bq_vec,(BQ_vec<=c_high)),&
-						& sum(DBN_bq_vec,(BQ_vec>=c_low).and.(BQ_vec<=c_high))
-				print*, ' Test BQ',sum(BQ_vec/Inc_vec,(BQ_vec>=c_low)),sum(BQ_vec/Inc_vec,(BQ_vec<=c_high)),&
-						& sum(BQ_vec/Inc_vec,(BQ_vec>=c_low).and.(BQ_vec<=c_high))
-				print*, ' Test Sum', sum( (BQ_vec/Inc_vec*DBN_bq_vec) , ((BQ_vec>=c_low).and.(BQ_vec<=c_high)) )/&
-						& sum(DBN_bq_vec,((BQ_vec>=c_low).and.(BQ_vec<=c_high))), Bq_Inc(i,j)
+				! print*, ' Test logical',count((BQ_vec>=c_low)),count((BQ_vec<=c_high)),count((BQ_vec>=c_low).and.(BQ_vec<=c_high))
+				! print*, ' Test DBN',sum(DBN_bq_vec,(BQ_vec>=c_low)),sum(DBN_bq_vec,(BQ_vec<=c_high)),&
+				! 		& sum(DBN_bq_vec,(BQ_vec>=c_low).and.(BQ_vec<=c_high))
+				! print*, ' Test BQ',sum(BQ_vec/Inc_vec,(BQ_vec>=c_low)),sum(BQ_vec/Inc_vec,(BQ_vec<=c_high)),&
+				! 		& sum(BQ_vec/Inc_vec,(BQ_vec>=c_low).and.(BQ_vec<=c_high))
+				! print*, ' Test Sum', sum( (BQ_vec/Inc_vec*DBN_bq_vec) , ((BQ_vec>=c_low).and.(BQ_vec<=c_high)) )/&
+				! 		& sum(DBN_bq_vec,((BQ_vec>=c_low).and.(BQ_vec<=c_high))), Bq_Inc(i,j)
 			enddo 
 			! Write down results 
 			WRITE(UNIT=11, FMT=*) 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(i,:)
