@@ -2949,7 +2949,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    do ai=1,na
 		    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
 
-		    	if (age.lt.draft_age_category) then
+		    	if (age.lt.RetAge) then
 		    	L_Inc_aux   = yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi)
 		    	else
 		    	L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
@@ -3120,7 +3120,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    do ai=1,na
 		    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
 
-		    	if (age.lt.draft_age_category) then
+		    	if (age.lt.RetAge) then
 		    	L_Inc_aux   = yh(age2,lambdai,ei)*Hours_exp(age2,ai,zi,lambdai,ei,xi)
 		    	else
 		    	L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
@@ -7802,8 +7802,8 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP) :: size_Age(max_age_category), size_AZ(max_age_category,nz), size_W(3)
 	real(DP) :: leverage_age_z(MaxAge,nz), size_by_age_z(MaxAge,nz), constrained_firms_age_z(MaxAge,nz)
 	real(DP) :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
-	real(DP) :: FW_top_x(6),  prctile_FW(6), prctile_bq(7), a, b, c, CCDF_c
-	REAL(DP), DIMENSION(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq
+	real(DP) :: FW_top_x(6), prctile_FW(6), prctile_bq(6), Bq_Inc(6,3), a, b, c, CCDF_c, a_low, b_low, c_low, a_high, b_high, c_high
+	REAL(DP), DIMENSION(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Labor_Income, Total_Income, K_L_Income, K_T_Income
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
@@ -7817,6 +7817,7 @@ SUBROUTINE COMPUTE_STATS()
 	allocate(BQ_vec(size(DBN1)))
 	allocate(DBN_bq_vec(size(DBN1)))
 	allocate(CDF_bq(size(DBN1)))
+	allocate(Inc_vec(size(DBN1)))
 	allocate(Firm_Output( MaxAge,na,nz,nlambda,ne,nx))
 	allocate(Firm_Profit( MaxAge,na,nz,nlambda,ne,nx))
 	allocate(DBN_bq(      MaxAge,na,nz,nlambda,ne,nx))
@@ -7837,8 +7838,11 @@ SUBROUTINE COMPUTE_STATS()
 
 
 
-
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
 	! Distribution of Assets
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
 		DO ai=1,na
 		     pr_a_dbn(ai)          = sum(DBN1(:,ai,:,:,:,:)) 
 		     cdf_a_dbn(ai)         = sum( pr_a_dbn(1:ai) )      
@@ -7883,6 +7887,12 @@ SUBROUTINE COMPUTE_STATS()
 		prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
 		prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
 	
+
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+	! Labor Earnings and Hours of working age population
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
 
 	! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
 	! COMPUTE VARIANCE OF LOG EARNINGS FOR 25-60 FOR THOSE WHO WORK MORE THAN 260 HOURS
@@ -7934,6 +7944,13 @@ SUBROUTINE COMPUTE_STATS()
 	Var_Log_Earnings_25_60 = Var_Log_Earnings_25_60 / pop_pos_earn_25_60
 	Std_Log_Earnings_25_60 = Var_Log_Earnings_25_60 ** 0.5_DP
 
+
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+	! Income, Wealth, Returns to Capital
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+
 	! Sources of income
 		Pr_mat = Profit_Matrix(R,P)
 		K_mat  = K_Matrix(R,P)
@@ -7965,6 +7982,13 @@ SUBROUTINE COMPUTE_STATS()
 	DO ai=1,na
 	DO lambdai=1,nlambda
 	DO ei=1, ne
+
+		if (age.lt.RetAge) then
+    	Total_Income(age,ai,zi,lambdai,ei,xi) = R*agrid(ai)+Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)
+    	else
+    	Total_Income(age,ai,zi,lambdai,ei,xi) = R*agrid(ai)+Pr_mat(ai,zi,xi) + RetY_lambda_e(lambdai,ei) 
+    	endif 
+
 	    MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei, xi)*agrid(ai)
 	    Mean_Capital = Mean_Capital + DBN1(age, ai, zi, lambdai, ei, xi)*K_mat(ai,zi,xi)
 	    MeanCons     = MeanCons     + DBN1(age, ai, zi, lambdai, ei, xi)*cons(age, ai, zi, lambdai, ei, xi)
@@ -8051,8 +8075,11 @@ SUBROUTINE COMPUTE_STATS()
 	Std_AT_K_Return = Var_AT_K_Return**0.5_DP
 	Std_K_Return    = Var_K_Return**0.5_DP
 
-
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
     ! Debt to GDP Ratio
+    !------------------------------------------------------------------------------------
+    !------------------------------------------------------------------------------------
     External_Debt_GDP = 0.0_DP
 	DO xi=1,nx
 	DO zi=1,nz
@@ -8063,7 +8090,12 @@ SUBROUTINE COMPUTE_STATS()
 	ENDDO
 	External_Debt_GDP = 0.5_dp*External_Debt_GDP / YBAR
 
+
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
 	! Savings Rate
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
 	group 	 = 1
 	A_Age 	 = 0.0_dp
 	A_AZ  	 = 0.0_dp 
@@ -8152,7 +8184,11 @@ SUBROUTINE COMPUTE_STATS()
 	S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
 	S_Rate_Y_W   = (Ap_W-A_W)/Y_W
 
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
 	! Leverage Ratio and fraction of constrainted firms 
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
 	leverage_age_z = 0.0_dp 
 	size_by_age_z  = 0.0_dp 
 	constrained_firms_age_z = 0.0_dp
@@ -8211,8 +8247,11 @@ SUBROUTINE COMPUTE_STATS()
 
 
 
-
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
 	! Distribution of firm wealth
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
 		do ai=1,na
 			Firm_Wealth(:,ai,:,:,:,:) = V_Pr(:,ai,:,:,:,:) + (1.0_dp+R)*agrid(ai)
 		enddo
@@ -8261,7 +8300,13 @@ SUBROUTINE COMPUTE_STATS()
 
 			CLOSE(UNIT=11)
 
+
+
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
 	! Distribution of bequest
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
 		Bequest_Wealth=0.0_DP
 		DO xi=1,nx
 		DO zi=1,nz
@@ -8283,8 +8328,9 @@ SUBROUTINE COMPUTE_STATS()
 		DBN_bq = DBN_bq/sum(DBN_bq)
 		
 		! Vectorizations
-		DBN_bq_vec        = reshape(DBN_bq,(/size(DBN1)/))
-		BQ_vec            = reshape(Aprime,(/size(DBN1)/))
+		DBN_bq_vec        = reshape(DBN_bq      ,(/size(DBN1)/))
+		BQ_vec            = reshape(Aprime      ,(/size(DBN1)/))
+		Inc_vec 		  = reshape(Total_Income,(/size(DBN1)/))
 
 		! Mean Bequest
 		Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
@@ -8294,15 +8340,24 @@ SUBROUTINE COMPUTE_STATS()
 		else
 			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Exp.txt', STATUS='replace')
 		end if 
+		print*,' '
+		print*,'-----------------------------------------------------'
+		print*,' Bequest Stats'
+		print*,' '
 			WRITE(UNIT=11, FMT=*) ' '
 			WRITE(UNIT=11, FMT=*) 'Bequest_Stats'
-			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/Wealth= '		, Bequest_Wealth/MeanWealth 
+			WRITE(UNIT=11, FMT=*) 'Total_Bequest/Wealth= '		, Bequest_Wealth/MeanWealth 
+			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/Wealth= '		, Mean_Bequest/MeanWealth 
 			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/PV_Wealth= '	, Bequest_Wealth/Mean_Firm_Wealth 
 			WRITE(UNIT=11, FMT=*) 'Bequests_Above_Threshold= '	, Threshold_Share_bq
 			WRITE(UNIT=11, FMT=*) 'Bequest_Revenue/YBAR= '		, 0
-			WRITE(UNIT=11, FMT=*) 'Top_x% ','x_percentile ','x_percentile/YBAR'
+			WRITE(UNIT=11, FMT=*) 'Prctile ','Bequest ','Bq/EBAR ','Bq/Inc 0.5%','Bq_Inc 1% ','Bq_Inc 2% '
+		print*, ' 	Total_Bequest/Wealth= '		, Bequest_Wealth/MeanWealth 
+		print*, ' 	Mean_Bequest/Wealth= '		, Mean_Bequest/MeanWealth 
+		print*, ' 	Prctile ','Bequest ','Bq/EBAR ','Bq/Inc 0.5%','Bq_Inc 1% ','Bq_Inc 2% '
 
-		prctile_bq = (/0.90_dp, 0.70_dp, 0.5_dp, 0.30_dp, 0.10_dp, 0.02_dp, 0.01_dp/)
+		! Compute bequest by percentile (percentiles for counter CDF)
+		prctile_bq = (/0.90_dp, 0.5_dp, 0.25_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
 		a = minval(BQ_vec)
 		b = maxval(BQ_vec) 
 		c = a
@@ -8326,13 +8381,65 @@ SUBROUTINE COMPUTE_STATS()
 				!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', abs(CCDF_c-prctile_bq(i))
 			enddo 
 			BQ_top_x(i) = c 
-			WRITE(UNIT=11, FMT=*) 100_dp*prctile_bq(i),BQ_top_x(i),BQ_top_x(i)/YBAR, CCDF_C
+			do j=1,3
+				! Get low end of range 	
+				low_pct  = prctile_bq-0.005_dp*(2**(j-1))
+				if (low_pct<0.0_dp) then
+					a_low = minval(BQ_vec)
+					b_low = c
+					c_low = (a_low+b_low)/2.0_dp
+					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+					do while ((abs(CCDF_c-low_pct)>0.0001_dp).and.(b_low-a_low>1e-8))
+						if (CCDF_c<low_pct) then 
+							b_low = c_low
+						else 
+							a_low = c_low 
+						endif
+						c_low = (a_low+b_low)/2.0_dp
+						CCDF_c = sum(DBN_bq_vec,BQ_vec>=c_low)
+					enddo 
+				else
+					c_low = minval(BQ_vec)
+				endif 
+				! Get low end of range 	
+				high_pct = prctile_bq+0.005_dp*(2**(j-1))
+				if (high_pct<1.0_dp) then
+					a_high = c
+					b_high = maxval(BQ_vec)
+					c_high = (a_high+b_high)/2.0_dp
+					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+					do while ((abs(CCDF_c-high_pct)>0.0001_dp).and.(b_high-a_high>1e-8))
+						if (CCDF_c<high_pct) then 
+							b_high = c_high
+						else 
+							a_high = c_high 
+						endif
+						c_high = (a_high+b_high)/2.0_dp
+						CCDF_c = sum(DBN_bq_vec,BQ_vec>=c_high)
+					enddo 
+				else
+					c_high = maxval(BQ_vec)
+				endif 
+
+				! Get Average Bequest/Income
+				Bq_Inc(i,j) = sum( BQ_vec/Inc_vec*DBN_bq_vec , (BQ_vec>=c_low).and.(BQ_vec<=c_high) )
+			enddo 
+			! Write down results 
+			WRITE(UNIT=11, FMT=*) 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(:,j)
+			print*, ' 	', 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(:,j)
 		enddo 
-
 			CLOSE(UNIT=11)
+			print*, ' '; print*,'-----------------------------------------------------'; print*, ' '
 
+		print*,' Test for inequality'
+		print*, (BQ_vec>=c_low).and.(BQ_vec<=c_high)
 
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
 	! Frisch Elasticity 
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+
 	! This is only for agents with positive hours worked
 		Frisch_Elasticity = 0.0_dp
 		Size_Frisch       = 0.0_dp 
@@ -8363,9 +8470,11 @@ SUBROUTINE COMPUTE_STATS()
 
 
 
-	!print*, 'MeanReturn=',MeanReturn, 'StdReturn=', StdReturn
-	!print*,'MeanReturn_by_z=',MeanReturn_by_z
-
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+	! Moments and Print Results
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
 	SSE_Moments = (1.0-Wealth_Output/3.0_DP)**2.0_DP  + (1.0_DP-prct1_wealth/0.34_DP)**2.0_DP  + (prct10_wealth-0.69_DP)**2.0_DP &
                    & + (1.0_DP-Std_Log_Earnings_25_60 / 0.8_DP)**2.0_DP + (1.0_DP-meanhours_25_60/0.4_DP)**2.0_DP &
                    & + (1.0_DP-MeanReturn/0.069_DP)**2.0_DP
@@ -10232,7 +10341,6 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) "Debt_Output"		  		, External_Debt_GDP
 			WRITE(UNIT=19, FMT=*) "Wealth_Output"		  	, Wealth_Output
 			WRITE(UNIT=19, FMT=*) "Mean_Assets"				, MeanWealth
-			WRITE(UNIT=19, FMT=*) "Bequest_Wealth"	        , Bequest_Wealth/MeanWealth 
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_1%' 	, prct1_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_10%'	, prct10_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_20%'	, prct20_wealth
@@ -10257,7 +10365,8 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_40%'		, FW_top_x_share(1)
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Bequest'
-			WRITE(UNIT=19, FMT=*) 'Mean_Bequest/Wealth'		, Bequest_Wealth/MeanWealth 
+			WRITE(UNIT=19, FMT=*) 'Total_Bequest_Wealth'	, Bequest_Wealth/MeanWealth 
+			WRITE(UNIT=19, FMT=*) 'Mean_Bequest_Wealth'	    , Mean_Bequest/MeanWealth 
 			WRITE(UNIT=19, FMT=*) 'Mean_Bequest/PV_Wealth'	, Bequest_Wealth/Mean_Firm_Wealth 
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Labor'
@@ -10282,13 +10391,13 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Welfare and output gain'
 			WRITE(UNIT=19, FMT=*) ' '
-			WRITE(UNIT=19, FMT=*) "CE_Pop(bench)" , Welfare_Gain_Pop_bench
-			WRITE(UNIT=19, FMT=*) "CE_Pop(exp)"   , Welfare_Gain_Pop_exp
-			WRITE(UNIT=19, FMT=*) "CE_NB(bench)"  , Welfare_Gain_NB_bench
-			WRITE(UNIT=19, FMT=*) "CE_NB(exp)"    , Welfare_Gain_NB_exp
+			WRITE(UNIT=19, FMT=*) "CE1_Pop(bench)" , Welfare_Gain_Pop_bench
+			WRITE(UNIT=19, FMT=*) "CE1_Pop(exp)"   , Welfare_Gain_Pop_exp
+			WRITE(UNIT=19, FMT=*) "CE1_NB(bench)"  , Welfare_Gain_NB_bench
+			WRITE(UNIT=19, FMT=*) "CE1_NB(exp)"    , Welfare_Gain_NB_exp
 			WRITE(UNIT=19, FMT=*) "Output_Gain(prct)"	  	, 100.0_DP*(Y_exp/Y_bench-1.0) 
-			WRITE(UNIT=19, FMT=*) "Av_Util_Pop(exp)"		, Av_Util_Pop
-			WRITE(UNIT=19, FMT=*) "Av_Util_NB(exp)"			, Av_Util_NB
+			WRITE(UNIT=19, FMT=*) "CE2_Pop(exp)"   , Av_Util_Pop
+			WRITE(UNIT=19, FMT=*) "CE2_NB(exp)"	   , Av_Util_NB
 		CLOSE(Unit=19)
 	end if 
 
