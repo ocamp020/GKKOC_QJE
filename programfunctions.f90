@@ -8444,7 +8444,6 @@ SUBROUTINE COMPUTE_STATS()
 		enddo 
 			CLOSE(UNIT=11)
 			print*, ' '; print*,'-----------------------------------------------------'; print*, ' '
-			STOP
 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
@@ -10380,6 +10379,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Total_Bequest_Wealth'	, Bequest_Wealth/MeanWealth 
 			WRITE(UNIT=19, FMT=*) 'Mean_Bequest_Wealth'	    , Mean_Bequest/MeanWealth 
 			WRITE(UNIT=19, FMT=*) 'Mean_Bequest/PV_Wealth'	, Bequest_Wealth/Mean_Firm_Wealth 
+			WRITE(UNIT=19, FMT=*) 'BQ/Inc_for_90th_pct' 	, Bq_Inc(3,:)
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Labor'
 			WRITE(UNIT=19, FMT=*) 'Fraction_of_workers'		, Size_Frisch/sum(DBN1(1:RetAge-1,:,:,:,:,:))
