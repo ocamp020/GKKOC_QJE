@@ -7802,7 +7802,7 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP) :: size_Age(max_age_category), size_AZ(max_age_category,nz), size_W(3)
 	real(DP) :: leverage_age_z(MaxAge,nz), size_by_age_z(MaxAge,nz), constrained_firms_age_z(MaxAge,nz)
 	real(DP) :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
-	real(DP) :: FW_top_x(6), prctile_FW(6), prctile_bq(6), low_pct, high_pct, a, b, c, CCDF_c, a_low, b_low, c_low, a_high, b_high, c_high
+	real(DP) :: FW_top_x(6), prctile_FW(6), prctile_bq(6), low_pct, high_pct, a, b, c, CCDF_c, c_low, c_high
 	REAL(DP), DIMENSION(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Labor_Income, Total_Income, K_L_Income, K_T_Income
@@ -8385,17 +8385,17 @@ SUBROUTINE COMPUTE_STATS()
 				! Get low end of range 	
 				low_pct  = prctile_bq-0.005_dp*(2**(j-1))
 				if (low_pct<0.0_dp) then
-					a_low = minval(BQ_vec)
-					b_low = c
-					c_low = (a_low+b_low)/2.0_dp
+					a = minval(BQ_vec)
+					b = c
+					c_low = (a+b)/2.0_dp
 					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-					do while ((abs(CCDF_c-low_pct)>0.0001_dp).and.(b_low-a_low>1e-8))
+					do while ((abs(CCDF_c-low_pct)>0.0001_dp).and.(b-a_low>1e-8))
 						if (CCDF_c<low_pct) then 
-							b_low = c_low
+							b = c_low
 						else 
-							a_low = c_low 
+							a = c_low 
 						endif
-						c_low = (a_low+b_low)/2.0_dp
+						c_low = (a+b)/2.0_dp
 						CCDF_c = sum(DBN_bq_vec,BQ_vec>=c_low)
 					enddo 
 				else
@@ -8404,17 +8404,17 @@ SUBROUTINE COMPUTE_STATS()
 				! Get low end of range 	
 				high_pct = prctile_bq+0.005_dp*(2**(j-1))
 				if (high_pct<1.0_dp) then
-					a_high = c
-					b_high = maxval(BQ_vec)
-					c_high = (a_high+b_high)/2.0_dp
+					a = c
+					b = maxval(BQ_vec)
+					c_high = (a+b)/2.0_dp
 					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-					do while ((abs(CCDF_c-high_pct)>0.0001_dp).and.(b_high-a_high>1e-8))
+					do while ((abs(CCDF_c-high_pct)>0.0001_dp).and.(b-a>1e-8))
 						if (CCDF_c<high_pct) then 
-							b_high = c_high
+							b = c_high
 						else 
-							a_high = c_high 
+							a = c_high 
 						endif
-						c_high = (a_high+b_high)/2.0_dp
+						c_high = (a+b)/2.0_dp
 						CCDF_c = sum(DBN_bq_vec,BQ_vec>=c_high)
 					enddo 
 				else
