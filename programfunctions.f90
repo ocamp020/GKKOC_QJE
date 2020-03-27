@@ -8357,7 +8357,7 @@ SUBROUTINE COMPUTE_STATS()
 		print*, ' 	Prctile  ','Bequest  ','Bq/EBAR  ','Bq/Inc 0.5%  ','Bq_Inc 1%  ','Bq_Inc 2%  '
 
 		! Compute bequest by percentile (percentiles for counter CDF)
-		prctile_bq = (/0.6_dp, 0.25_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+		prctile_bq = (/0.4_dp, 0.25_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
 		a = minval(BQ_vec)
 		b = maxval(BQ_vec) 
 		c = a
