@@ -8429,6 +8429,7 @@ SUBROUTINE COMPUTE_STATS()
 
 				! Get Average Bequest/Income
 				Bq_Inc(i,j) = sum( BQ_vec/Inc_vec*DBN_bq_vec , (BQ_vec>=c_low).and.(BQ_vec<=c_high) )/(0.005_dp*(2**j))
+				print*,sum(BQ_vec/Inc_vec*DBN_bq_vec )
 			enddo 
 			! Write down results 
 			WRITE(UNIT=11, FMT=*) 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(:,j)
