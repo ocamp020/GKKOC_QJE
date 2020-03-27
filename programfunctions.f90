@@ -8383,13 +8383,13 @@ SUBROUTINE COMPUTE_STATS()
 			BQ_top_x(i) = c 
 			do j=1,3
 				! Get low end of range 	
-				low_pct  = prctile_bq-0.005_dp*(2**(j-1))
+				low_pct  = prctile_bq(i)-0.005_dp*(2**(j-1))
 				if (low_pct<0.0_dp) then
 					a = minval(BQ_vec)
 					b = c
 					c_low = (a+b)/2.0_dp
 					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-					do while ((abs(CCDF_c-low_pct)>0.0001_dp).and.(b-a_low>1e-8))
+					do while ((abs(CCDF_c-low_pct)>0.0001_dp).and.(b-a>1e-8))
 						if (CCDF_c<low_pct) then 
 							b = c_low
 						else 
@@ -8402,7 +8402,7 @@ SUBROUTINE COMPUTE_STATS()
 					c_low = minval(BQ_vec)
 				endif 
 				! Get low end of range 	
-				high_pct = prctile_bq+0.005_dp*(2**(j-1))
+				high_pct = prctile_bq(i)+0.005_dp*(2**(j-1))
 				if (high_pct<1.0_dp) then
 					a = c
 					b = maxval(BQ_vec)
