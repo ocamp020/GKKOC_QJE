@@ -8357,7 +8357,7 @@ SUBROUTINE COMPUTE_STATS()
 		print*, ' 	Prctile  ','Bequest  ','Bq/EBAR  ','Bq/Inc 0.5%  ','Bq_Inc 1%  ','Bq_Inc 2%  '
 
 		! Compute bequest by percentile (percentiles for counter CDF)
-		prctile_bq = (/0.90_dp, 0.5_dp, 0.25_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+		prctile_bq = (/0.6_dp, 0.25_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
 		a = minval(BQ_vec)
 		b = maxval(BQ_vec) 
 		c = a
@@ -8368,7 +8368,7 @@ SUBROUTINE COMPUTE_STATS()
 			CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
 			!print*, ' '
 			!print*, 'Percentile', prctile_bq(i)
-			do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-8))
+			do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
 				if (CCDF_c<prctile_bq(i)) then 
 					b = c 
 					c = (a+b)/2.0_dp
@@ -8389,7 +8389,7 @@ SUBROUTINE COMPUTE_STATS()
 					b = c
 					c_low = c
 					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-					do while ((abs(CCDF_c-low_pct)>0.00001_dp).and.(b-a>1e-8))
+					do while ((abs(CCDF_c-low_pct)>0.00001_dp).and.(b-a>1e-9))
 						if (CCDF_c<low_pct) then 
 							b = c_low
 						else 
@@ -8410,7 +8410,7 @@ SUBROUTINE COMPUTE_STATS()
 					b = maxval(BQ_vec)
 					c_high = c
 					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-					do while ((abs(CCDF_c-high_pct)>0.00001_dp).and.(b-a>1e-8))
+					do while ((abs(CCDF_c-high_pct)>0.00001_dp).and.(b-a>1e-9))
 						if (CCDF_c<high_pct) then 
 							b = c_high
 						else 
