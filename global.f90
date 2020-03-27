@@ -153,7 +153,7 @@ MODULE global
     INTEGER :: newiseed
 
     ! Bequest Stats
-	REAL(DP) :: Threshold_Share_bq, Bequest_Wealth, BQ_top_x(7), Mean_Bequest
+	REAL(DP) :: Threshold_Share_bq, Bequest_Wealth, BQ_top_x(7), Bq_Inc(6,3), Mean_Bequest
 
 	! top certain percentiles of the PV_a distribution
     REAL(DP) :: FW_top_x_share(6) 
