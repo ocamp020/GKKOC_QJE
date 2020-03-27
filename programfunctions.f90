@@ -8383,8 +8383,8 @@ SUBROUTINE COMPUTE_STATS()
 			BQ_top_x(i) = c 
 			do j=1,3
 				! Get low end of range 	
-				low_pct  = prctile_bq(i)-0.005_dp*(2**(j-1))
-				if (low_pct<0.0_dp) then
+				low_pct  = prctile_bq(i)+0.005_dp*(2**(j-1))
+				if (low_pct>1.0_dp) then
 					a = minval(BQ_vec)
 					b = c
 					c_low = (a+b)/2.0_dp
@@ -8402,8 +8402,8 @@ SUBROUTINE COMPUTE_STATS()
 					c_low = minval(BQ_vec)
 				endif 
 				! Get low end of range 	
-				high_pct = prctile_bq(i)+0.005_dp*(2**(j-1))
-				if (high_pct<1.0_dp) then
+				high_pct = prctile_bq(i)-0.005_dp*(2**(j-1))
+				if (high_pct<0.0_dp) then
 					a = c
 					b = maxval(BQ_vec)
 					c_high = (a+b)/2.0_dp
@@ -8420,7 +8420,7 @@ SUBROUTINE COMPUTE_STATS()
 				else
 					c_high = maxval(BQ_vec)
 				endif 
-
+				print*, ' low_pct=',low_pct,'pct=',prctile_bq(i),'high_pct=',high_pct
 				print*, ' Test:','pct=',prctile_bq(i),'c_low=',c_low,'c=',c,'c_high=',c_high
 
 				! Get Average Bequest/Income
