@@ -8424,8 +8424,8 @@ SUBROUTINE COMPUTE_STATS()
 				else
 					c_high = maxval(BQ_vec)
 				endif 
-				print*, ' low_pct=',low_pct,'pct=',prctile_bq(i),'high_pct=',high_pct
-				print*, ' Test:','pct=',prctile_bq(i),'c_low=',c_low,'c=',c,'c_high=',c_high
+				! print*, ' low_pct=',low_pct,'pct=',prctile_bq(i),'high_pct=',high_pct
+				! print*, ' Test:','pct=',prctile_bq(i),'c_low=',c_low,'c=',c,'c_high=',c_high
 
 				! Get Average Bequest/Income
 				Bq_Inc(i,j) = sum( (BQ_vec/Inc_vec*DBN_bq_vec) , ((BQ_vec>=c_low).and.(BQ_vec<=c_high)) )&
@@ -8436,11 +8436,11 @@ SUBROUTINE COMPUTE_STATS()
 				print*, ' Test BQ',sum(BQ_vec/Inc_vec,(BQ_vec>=c_low)),sum(BQ_vec/Inc_vec,(BQ_vec<=c_high)),&
 						& sum(BQ_vec/Inc_vec,(BQ_vec>=c_low).and.(BQ_vec<=c_high))
 				print*, ' Test Sum', sum( (BQ_vec/Inc_vec*DBN_bq_vec) , ((BQ_vec>=c_low).and.(BQ_vec<=c_high)) )/&
-						& sum(DBN_bq_vec,((BQ_vec>=c_low).and.(BQ_vec<=c_high)))
+						& sum(DBN_bq_vec,((BQ_vec>=c_low).and.(BQ_vec<=c_high))), Bq_Inc(i,j)
 			enddo 
 			! Write down results 
-			WRITE(UNIT=11, FMT=*) 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(:,j)
-			print*, ' 	', 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(:,j)
+			WRITE(UNIT=11, FMT=*) 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(i,:)
+			print*, ' 	', 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(i,:)
 		enddo 
 			CLOSE(UNIT=11)
 			print*, ' '; print*,'-----------------------------------------------------'; print*, ' '
