@@ -4123,6 +4123,13 @@ SUBROUTINE FIND_DBN_EQ()
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-07_DP
 
+
+	! Current aggregate values given QBAR and Wage
+	if (A_C.gt.0.0_dp) then 
+		
+	endif 
+
+
 	! Solve the model at current aggregate values
 		! Find the threshold for wealth taxes (a_bar)
 			!call Find_TauW_Threshold(DBN1,Y_a_threshold)
