@@ -136,7 +136,7 @@ PROGRAM main
 
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 			chi_bq = 25.00_dp ! Scaling 
-			bq_0   = 0.2_dp ! Level shift 
+			bq_0   = 0.5_dp ! Level shift 
 
 		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
