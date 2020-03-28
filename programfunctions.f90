@@ -269,7 +269,7 @@ end Subroutine Asset_Grid_Threshold
 		! Evaluate square residual of Euler equation at current state (given by (ai,zi,lambdai,ei)) and savings given by a'
 		FOC_R	= ( (YGRID_t(a_in,z_in,x_in)+RetY_lambda_e(l_in,e_in)-aprimet)    &
 		    & - ( beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * cprime**(1.0_dp/euler_power) ) &
-		    &   + beta*(1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)*chi_bq*(aprimet+bq_0)**(1.0_dp/euler_power) ) &
+		    &   + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)*chi_bq*(aprimet+bq_0)**(1.0_dp/euler_power) ) &
 		    & **euler_power) ** 2.0_DP
 
 	END  FUNCTION FOC_R
@@ -319,7 +319,7 @@ end Subroutine Asset_Grid_Threshold
 		! Evaluate square residual of Euler equation at current state (given by (ai,zi,lambdai,ei)) and savings given by a'
 		FOC_R_Transition	= ( (YGRID_t(a_in,z_in,x_in)+RetY_lambda_e(l_in,e_in)-aprimet)    &
 		        & - ( beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * cprime**(1.0_dp/euler_power) ) & 
-		        & + beta*(1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)*chi_bq*(aprimet+bq_0)**(1.0_dp/euler_power) ) &
+		        & + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)*chi_bq*(aprimet+bq_0)**(1.0_dp/euler_power) ) &
 		        & **euler_power) ** 2.0_DP
 
 	END  FUNCTION FOC_R_Transition
@@ -412,7 +412,7 @@ FUNCTION FOC_WH(aprimet,state)
 
 				! Evaluate the squared residual of the Euler equation for working period
 				FOC_WH   = ( (1.0_dp/ctemp)- ( beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * E_MU_cp) &
-					         &     +beta*(1.0_dp-survP(age_in))*chi_bq/(aprimet+bq_0) ) ) **2.0_DP 
+					         &     +(1.0_dp-survP(age_in))*chi_bq/(aprimet+bq_0) ) ) **2.0_DP 
 			else
 				! I have to evaluate the FOC in expectation over eindx prime given eindx
 				! Compute consumption and labor for eachvalue of eindx prime
@@ -436,7 +436,7 @@ FUNCTION FOC_WH(aprimet,state)
 				! Evaluate the squared residual of the Euler equation for working period
 				FOC_WH = ( ctemp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-ntemp)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
 					         & - (beta*survP(age_in)* sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp) & 
-					         & + beta*(1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+					         & + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 					         & *chi_bq*(aprimet+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ))**2.0_DP
 			end if 
 		else ! Linear Taxes 
@@ -455,7 +455,7 @@ FUNCTION FOC_WH(aprimet,state)
 
 			FOC_WH = ((ctemp**(gamma*(1.0_DP-sigma)-1))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
 					& - (beta*survP(age_in)* sum( pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp ) & 
-					&  + beta*(1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+					&  + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 					&  *chi_bq*(aprimet+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) )**2.0_DP
 		end if 
 	else 
@@ -472,7 +472,7 @@ FUNCTION FOC_WH(aprimet,state)
 
 			! Evaluate the squared residual of the Euler equation for working period
 			FOC_WH   = (ctemp - 1.0_dp/(beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp) &
-			&  + beta*(1.0_dp-survP(age_in))*(1.0_dp+tauC)**(1.0_dp-sigma)*chi_bq/(aprimet+bq_0)**sigma)**(1.0_dp/sigma) )**2.0_DP 
+			&  + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**(1.0_dp-sigma)*chi_bq/(aprimet+bq_0)**sigma)**(1.0_dp/sigma) )**2.0_DP 
 	end if 
 
 END  FUNCTION FOC_WH
@@ -551,7 +551,7 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 				! Evaluate the squared residual of the Euler equation for working period
 				FOC_WH_Transition   = &
 					& ( (1.0_dp/ctemp)- (beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * E_MU_cp) & 
-						& + beta*(1.0_dp-survP(age_in))*chi_bq/(aprimet+bq_0) ) ) **2.0_DP 
+						& + (1.0_dp-survP(age_in))*chi_bq/(aprimet+bq_0) ) ) **2.0_DP 
 			else
 				! I have to evaluate the FOC in expectation over eindx prime given eindx
 				! Compute consumption and labor for eachvalue of eindx prime
@@ -576,7 +576,7 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 				FOC_WH_Transition = &
 					& ( ctemp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-ntemp)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
 					& - (beta*survP(age_in)* sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp) &
-					& + beta*(1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+					& + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 					&  *chi_bq*(aprimet+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ))**2.0_DP
 			end if 
 		else ! Linear Taxes 
@@ -596,7 +596,7 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 
 			FOC_WH_Transition = ((ctemp**(gamma*(1.0_DP-sigma)-1))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
 					& - (beta*survP(age_in)* sum( pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp ) &
-				    &  + beta*(1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+				    &  + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 				    & *chi_bq*(aprimet+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) )**2.0_DP
 		end if 
 	else 
@@ -614,7 +614,7 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 			! Evaluate the squared residual of the Euler equation for working period
 			FOC_WH_Transition  = &
 			& (ctemp - 1.0_dp/(beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp) & 
-			&  + beta*(1.0_dp-survP(age_in))*(1.0_dp+tauC)**(1.0_dp-sigma)*chi_bq/(aprimet+bq_0)**sigma )**(1.0_dp/sigma) )**2.0_DP
+			&  + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**(1.0_dp-sigma)*chi_bq/(aprimet+bq_0)**sigma )**(1.0_dp/sigma) )**2.0_DP
 	end if 
 
 END  FUNCTION FOC_WH_Transition
@@ -698,7 +698,7 @@ END  FUNCTION FOC_WH_Transition
 		! Compute square residual of Euler FOC
 			FOC_H_NSU = ( cons**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hoursin)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
 			    & - (beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp) &
-			    &  + beta*(1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+			    &  + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 			    & *chi_bq*(agrid_t(a_in)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ))**2.0_DP
 
 	END  FUNCTION FOC_H_NSU
@@ -736,7 +736,7 @@ END  FUNCTION FOC_WH_Transition
 			FOC_H_NSU_Transition = &
 				& ( cons**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hoursin)**((1.0_dp-sigma)*(1.0_dp-gamma)) & 
 			    & - (beta*survP(age_in)*sum(pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp) &
-			    &  + beta*(1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+			    &  + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 			    & *chi_bq*(agrid_t(a_in)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ))**2.0_DP
 
 	END  FUNCTION FOC_H_NSU_Transition
@@ -824,7 +824,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 		end if 
 
 	! Set value of auxiliary chi parameter for last period's saving
-		chi_aux = ((1.0_dp+tauC)*beta*chi_bq)**(1.0_dp/(1-gamma*(1.0_dp-sigma)))/(1.0_dp+tauC)
+		chi_aux = ((1.0_dp+tauC)*chi_bq)**(1.0_dp/(1-gamma*(1.0_dp-sigma)))/(1.0_dp+tauC)
 
 	! Compute wealth given current R and P
 		Wealth_mat = Wealth_Matrix_t(R,P)
@@ -879,7 +879,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
     		enddo 
     		EndoCons(ai)  =  (beta*survP(age)* 	&
 				& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power))&
-				& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+				& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        
@@ -889,7 +889,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
     		enddo 
 	        EndoCons(na_t+sw)  = (beta*survP(age)*	&
     			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) &
-    			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+    			& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	    	EndoYgrid(na_t+sw) = agrid_t(ai) +  EndoCons(na_t+sw) - RetY_lambda_e(lambdai,ei)
 
@@ -908,7 +908,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    	! Consumption on endogenous grid and implied asset income
 	    	EndoCons(ai)  = (beta*survP(age)* 	&
 	    				& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) &
-	    				& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+	    				& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 				    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	    end if 
@@ -1387,7 +1387,7 @@ END SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD
 				enddo
 
 				C_euler = (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) & 
-						  & + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma) &
+						  & + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma) &
 						  &         *chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) &
 						  & **(1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
 				C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
@@ -1418,7 +1418,7 @@ END SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD
 					E_MU_cp(xp_ind) = SUM(pr_e(ei,:) * Cons_t(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma) )
 				enddo
 				C_endo = 1.0_dp/( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_mu_cp) &
-						&   + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**(1.0_dp-sigma)&
+						&   + (1.0_dp-survP(age))*(1.0_dp+tauC)**(1.0_dp-sigma)&
 						&   *chi_bq/(agrid_t(ai)+bq_0)**sigma ) ) **(1.0_dp/sigma) 
 				C_foc  = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
 
@@ -1442,7 +1442,7 @@ END SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD
 				enddo
 				  C_endo = ((gamma*psi*yh(age, lambdai,ei)/(1.0_DP-gamma))**((1.0_DP-gamma)*(1.0_DP-sigma)) &
 				    & *  (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) &
-				    & + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+				    & + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 				    & *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) )**(-1.0_DP/sigma)
 
 				  H_endo = 1.0_DP - (1.0_DP-gamma)*C_endo/(gamma*psi*yh(age,lambdai,ei))   
@@ -1450,7 +1450,7 @@ END SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD
 				If (H_endo .lt. 0.0_DP) then
 				    H_endo = 0.0_DP 
 				    C_endo  = ( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) &
-				    		& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+				    		& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 				    		& *chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp))&
 				    		& **(1.0_DP/(gamma*(1.0_DP-sigma)-1.0_DP))
 				endif 
@@ -1464,7 +1464,7 @@ END SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD
 					E_MU_cp(xp_ind) = sum( pr_e(ei,:) * (Cons_t(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma)) )
 				enddo
 				C_endo  = 1.0_DP/( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp) &
-					&   + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**(1.0_dp-sigma)&
+					&   + (1.0_dp-survP(age))*(1.0_dp+tauC)**(1.0_dp-sigma)&
 					&   * chi_bq/(agrid_t(ai)+bq_0)**sigma ) **(1.0_dp/sigma) 
 
 				H_endo = max(0.0_DP , 1.0_DP - (phi*C_endo**sigma/(psi*yh(age, lambdai,ei)))**(1.0_dp/gamma) )  
@@ -3821,7 +3821,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 	DO ei=1,ne
       	   Value_mat(age, ai, zi, lambdai, ei, xi) = &
       				& Utility(Cons_mat(age, ai, zi, lambdai, ei, xi),Hours_mat(age, ai, zi, lambdai, ei, xi))
-		Bq_Value_mat(age, ai, zi, lambdai, ei, xi) = beta*v_bq(Aprime_mat(age, ai, zi, lambdai, ei, xi))
+		Bq_Value_mat(age, ai, zi, lambdai, ei, xi) = v_bq(Aprime_mat(age, ai, zi, lambdai, ei, xi))
       	! Value_mat(age, ai, zi, lambdai, ei, xi) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
        !             & * (1.0_DP-Hours_mat(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma)  
 		! print*,Cons_mat(age, ai, zi, lambdai, ei),  Value_mat(age, ai, zi, lambdai, ei) 
@@ -3859,7 +3859,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 			  & + beta*survP(age)* sum( pr_x(xi,:,zi,age)* (PrAprimelo*Value_mat(age+1, tklo, zi, lambdai, ei, :) &
 			  & 				                     	 +  PrAprimehi*Value_mat(age+1, tkhi, zi, lambdai, ei, :)) ) 
 
-		Bq_Value_mat(age, ai, zi, lambdai, ei, xi) = beta*(1.0_dp-survP(age))*v_bq(Aprime_mat(age,ai,zi,lambdai,ei,xi)) &
+		Bq_Value_mat(age, ai, zi, lambdai, ei, xi) = (1.0_dp-survP(age))*v_bq(Aprime_mat(age,ai,zi,lambdai,ei,xi)) &
 			  & + beta*survP(age)* sum( pr_x(xi,:,zi,age)* (PrAprimelo*Bq_Value_mat(age+1, tklo, zi, lambdai, ei, :) &
 			  & 				                     	 +  PrAprimehi*Bq_Value_mat(age+1, tkhi, zi, lambdai, ei, :)) ) 
         ! Value_mat(age, ai, zi, lambdai, ei, xi) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
@@ -3908,7 +3908,7 @@ SUBROUTINE COMPUTE_VALUE_FUNCTION_LINEAR(Cons_mat,Hours_mat,Aprime_mat,Value_mat
 
 		   Value_mat(age, ai, zi, lambdai, ei, xi) = Utility(Cons_mat(age,ai,zi,lambdai,ei,xi),Hours_mat(age,ai,zi,lambdai,ei,xi))  &
 		   											& + beta*survP(age)* sum( pr_x(xi,:,zi,age)*E_mu_cp )
-	   	Bq_Value_mat(age, ai, zi, lambdai, ei, xi) = beta*(1.0_dp-survP(age))*v_bq(Aprime_mat(age,ai,zi,lambdai,ei,xi)) &
+	   	Bq_Value_mat(age, ai, zi, lambdai, ei, xi) = (1.0_dp-survP(age))*v_bq(Aprime_mat(age,ai,zi,lambdai,ei,xi)) &
 		   											& + beta*survP(age)* sum( pr_x(xi,:,zi,age)*Bq_E_mu_cp )
 		! Value_mat(age, ai, zi, lambdai, ei) = ((Cons_mat(age,ai,zi,lambdai,ei,xi)**gamma) &
   !                      & * (1.0_DP-Hours_mat(age,ai,zi,lambdai,ei,xi))**(1.0_DP-gamma))**(1.0_DP-sigma)/(1.0_DP-sigma) &
@@ -6436,7 +6436,7 @@ SUBROUTINE EGM_Transition()
 		end if 
 
 	! Set value of auxiliary chi parameter for last period's saving
-		chi_aux = ((1.0_dp+tauC)*beta*chi_bq)**(1.0_dp/(1-gamma*(1.0_dp-sigma)))/(1.0_dp+tauC)
+		chi_aux = ((1.0_dp+tauC)*chi_bq)**(1.0_dp/(1-gamma*(1.0_dp-sigma)))/(1.0_dp+tauC)
 
 	! Policy functions set to tax reform in final period
 		Cons_tr(:,:,:,:,:,:,T+1)   = Cons_exp*(1.0_DP+tauC) ; Cons_t_pr   = Cons_exp*(1.0_DP+tauC) ;
@@ -6524,7 +6524,7 @@ SUBROUTINE EGM_Transition()
     		enddo 
     		EndoCons(ai)  =  (beta*survP(age)* 	&
     			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) &
-				& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+				& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! Consumption on endogenous grid and implied asset income under tauW_at
@@ -6534,7 +6534,7 @@ SUBROUTINE EGM_Transition()
     		enddo 
 	        EndoCons(na_t+sw)  = (beta*survP(age)*	&
 	        	& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) &
-				& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+				& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	    	EndoYgrid(na_t+sw) = agrid_t(ai) +  EndoCons(na_t+sw) - RetY_lambda_e(lambdai,ei)
 
@@ -6553,7 +6553,7 @@ SUBROUTINE EGM_Transition()
 	    	! Consumption on endogenous grid and implied asset income
 	    	EndoCons(ai)  = (beta*survP(age)* 	&
 	    		& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power))&
-				& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+				& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) )**euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! !$omp critical
@@ -7073,7 +7073,7 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
 		end if 
 
 	! Set value of auxiliary chi parameter for last period's saving
-		chi_aux = ((1.0_dp+tauC)*beta*chi_bq)**(1.0_dp/(1-gamma*(1.0_dp-sigma)))/(1.0_dp+tauC)
+		chi_aux = ((1.0_dp+tauC)*chi_bq)**(1.0_dp/(1-gamma*(1.0_dp-sigma)))/(1.0_dp+tauC)
 
 	! Policy Functions for period t (time)
 		! Note: these arrays should be adjusted to agrid_t 
@@ -7160,7 +7160,7 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
     		enddo 
     		EndoCons(ai)  =  (beta*survP(age)* 	&
     			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) &
-    			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+    			& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! Consumption on endogenous grid and implied asset income under tauW_at
@@ -7172,7 +7172,7 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
     		enddo 
 	        EndoCons(na_t+sw)  = (beta*survP(age)*	&
 	        	& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) &
-    			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+    			& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	    	EndoYgrid(na_t+sw) = agrid_t(ai) +  EndoCons(na_t+sw) - RetY_lambda_e(lambdai,ei)
 
@@ -7191,7 +7191,7 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
 	    	! Consumption on endogenous grid and implied asset income
 	    	EndoCons(ai)  = (beta*survP(age)* 	&
 	    		& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t_pr(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power))&
-    			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+    			& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 		    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
 	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
 	        ! !$omp critical
@@ -7676,7 +7676,7 @@ Subroutine EGM_Working_Period_Transition(MB_in,H_min,state_FOC,C_endo,H_endo,Y_e
 			enddo
 
 			C_euler = ( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp)) &
-	        			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+	        			& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 				    	& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **(1.0_dp/((1.0_dp-sigma)*gamma-1.0_dp))
 			C_foc   = (gamma/(1.0_dp-gamma))*(1.0_dp-H_min)*MB_h(H_min,age,lambdai,ei,wage)
 
@@ -7708,7 +7708,7 @@ Subroutine EGM_Working_Period_Transition(MB_in,H_min,state_FOC,C_endo,H_endo,Y_e
 				E_MU_cp(xp_ind) = SUM(pr_e(ei,:) * Cons_t_pr(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma) )
 			enddo
 			C_endo = 1.0_dp/( (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_mu_cp)  &
-	        			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**(1.0_dp-sigma)&
+	        			& + (1.0_dp-survP(age))*(1.0_dp+tauC)**(1.0_dp-sigma)&
 				    	& *   chi_bq*(agrid_t(ai)+bq_0)**(-sigma) ) **(1.0_dp/sigma) )
 			C_foc  = (MB_h(H_min,age,lambdai,ei,wage)*(1.0_dp-H_min)**(gamma)/phi)**(1.0_dp/sigma)
 
@@ -7734,7 +7734,7 @@ Subroutine EGM_Working_Period_Transition(MB_in,H_min,state_FOC,C_endo,H_endo,Y_e
 			enddo
 			  C_endo = ((gamma*psi*yh(age, lambdai,ei)/(1.0_DP-gamma))**((1.0_DP-gamma)*(1.0_DP-sigma)) &
 			    & *  (beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp)  &
-	        		& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+	        		& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 					& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) )**(-1.0_DP/sigma)
 
 			  H_endo = 1.0_DP - (1.0_DP-gamma)*C_endo/(gamma*psi*yh(age, lambdai,ei))   
@@ -7742,7 +7742,7 @@ Subroutine EGM_Working_Period_Transition(MB_in,H_min,state_FOC,C_endo,H_endo,Y_e
 			If (H_endo .lt. 0.0_DP) then
 			    H_endo = 0.0_DP 
 			    C_endo = ( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp)  &
-	        		& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
+	        		& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 					& *   chi_bq*(agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) )**(1.0_DP/(gamma*(1.0_DP-sigma)-1.0_DP))
 			endif 
 
@@ -7755,7 +7755,7 @@ Subroutine EGM_Working_Period_Transition(MB_in,H_min,state_FOC,C_endo,H_endo,Y_e
 				E_MU_cp(xp_ind) = sum( pr_e(ei,:) * (Cons_t_pr(age+1,ai,zi,lambdai,:,xp_ind)**(-sigma)) )
 			enddo
 			C_endo  = 1.0_DP/( beta*survP(age)*sum(pr_x(xi,:,zi,age)*MB_in*E_MU_cp)  &
-	        			& + beta*(1.0_dp-survP(age))*(1.0_dp+tauC)**(1.0_dp-sigma)&
+	        			& + (1.0_dp-survP(age))*(1.0_dp+tauC)**(1.0_dp-sigma)&
 				    	& *   chi_bq*(agrid_t(ai)+bq_0)**(-sigma) )**(1.0_DP/sigma)
 
 			H_endo = max(0.0_DP , 1.0_DP - (phi*C_endo**sigma/(psi*yh(age, lambdai,ei)))**(1.0_dp/gamma) )  
