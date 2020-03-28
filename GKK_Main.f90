@@ -64,7 +64,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
+			compute_bench = .true.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
@@ -135,7 +135,7 @@ PROGRAM main
 		phi    	= (1.0_dp-gamma)/gamma
 
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
-			chi_bq = 0.0_dp ! Scaling 
+			chi_bq = 0.05_dp ! Scaling 
 			bq_0   = 0.0_dp ! Level shift 
 
 		x_hi	= 5.00_dp
@@ -442,8 +442,10 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	! Solve for the model and compute stats
 	print*,"	Initializing program"
 		CALL INITIALIZE
-		! CALL Write_Benchmark_Results(.false.)
+		
 	if (compute_bench) then
+		print*,"	Reading initial conditions from file"
+		CALL Write_Benchmark_Results(.false.)
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
 		print*,"	Computing government spending"
@@ -527,6 +529,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
+		STOP
 		
 
 end Subroutine Solve_Benchmark
