@@ -123,7 +123,7 @@ PROGRAM main
 		! Calibration to book value and rho_z=0.1 and x_hi=10
 		Params =[ 0.9473_dp, 0.00_dp, 0.1_dp, 0.0352_dp , 0.307_dp, 0.46_dp ] 
 		
-		beta   	= 0.9220_dp! 0.9475_dp ! params(1) !
+		beta   	= 0.9240_dp! 0.9475_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
 		sigma_z_eps      =  0.0775_dp! 0.072_dp !0.115_dp ! params(4) ! 0.01_dp ! ! 
@@ -135,7 +135,7 @@ PROGRAM main
 		phi    	= (1.0_dp-gamma)/gamma
 
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
-			chi_bq = 31.00_dp ! Scaling 
+			chi_bq = 30.00_dp ! Scaling 
 			bq_0   = 0.2_dp ! Level shift 
 
 		x_hi	= 5.00_dp
