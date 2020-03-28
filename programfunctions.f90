@@ -4126,7 +4126,9 @@ SUBROUTINE FIND_DBN_EQ()
 
 	! Current aggregate values given QBAR and Wage
 	if (A_C.gt.0.0_dp) then 
-		
+		L_P = ( (1.0_dp-alpha)/Wage )**(1.0_dp/alpha) * QBAR 
+		P   = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
+		R   = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
 	endif 
 
 
@@ -4294,7 +4296,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    ENDDO
 	    !$omp barrier
 	    
-	    DBN2 = 0.8_dp*DBN1 + 0.2_dp*DBN2
+	    DBN2 = 0.7_dp*DBN1 + 0.3_dp*DBN2
 	    DBN_dist = maxval(abs(DBN2-DBN1))
 	    ! print*, DBN_dist
 	    DBN1 = DBN2
