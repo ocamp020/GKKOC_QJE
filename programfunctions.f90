@@ -9038,7 +9038,7 @@ Function Labor_Market_Clearing(W_in)
 	Ld_P  = ( (1.0_dp-alpha  )*Aprod/W_in )**(1.0_dp/alpha  ) * QBAR 
 	Ld_C  = ( (1.0_dp-alpha_C)*A_C  /W_in )**(1.0_dp/alpha_C) * K_C
 
-	Labor_Market_Clearing = ( ( Ld_P+LdC )/NBAR - 1.0_dp )**2.0_dp 
+	Labor_Market_Clearing = ( ( Ld_P+Ld_C )/NBAR - 1.0_dp )**2.0_dp 
 
 
 end Function Labor_Market_Clearing
