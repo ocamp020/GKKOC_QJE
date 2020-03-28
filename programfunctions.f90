@@ -4108,9 +4108,9 @@ END  SUBROUTINE GOVNT_BUDGET
 SUBROUTINE FIND_DBN_EQ()
 	use omp_lib
 	IMPLICIT NONE
-	INTEGER:: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
-	REAL   :: DBN_dist, DBN_criteria
-	REAL(DP)   ::BBAR, MeanWealth, brent_value
+	INTEGER  :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
+	REAL   	 :: DBN_dist, DBN_criteria
+	REAL(DP) :: BBAR, Wealth, brent_value
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable ::  PrAprimelo, PrAprimehi, DBN2
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable ::  Aplo, Aphi
 
@@ -4126,10 +4126,10 @@ SUBROUTINE FIND_DBN_EQ()
 
 	! Current aggregate values given QBAR and Wage
 	if (A_C.gt.0.0_dp) then 
-		L_P = ( (1.0_dp-alpha)/Wage )**(1.0_dp/alpha) * QBAR 
+		L_P = ( (1.0_dp-alpha)*Aprod/Wage )**(1.0_dp/alpha) * QBAR 
 		P   = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
 		R   = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
-	endif 
+	endif ! If A_C=0 then all aggregates must be provided
 
 
 	! Solve the model at current aggregate values
@@ -4307,7 +4307,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    ! Update of policy function with current aggregates
 	    IF (iter_indx .ge. update_period) THEN
 
-	    	! Compute aggregates with current distribution
+	    	! Compute aggregates with current distribution: New QBAR and Agg. Labor Supply (NBAR)
 	        QBAR =0.0
 	        NBAR =0.0
 	        DO x1=1,nx
@@ -4323,22 +4323,65 @@ SUBROUTINE FIND_DBN_EQ()
 	        ENDDO
 	        ENDDO    
 	        ENDDO    
-	        ENDDO    
-	    
-	        QBAR = ( QBAR)**(1.0_DP/mu)                
-	        P    = alpha* QBAR **(alpha-mu) * NBAR **(1.0_DP-alpha)
-	        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
-	        wage = (1.0_DP-alpha)*QBAR **alpha * NBAR  **(-alpha)
-	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+	        ENDDO    	    
+	        QBAR = ( QBAR)**(1.0_DP/mu)
 
-	    	! Solve for new R 
-	    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
-	    	if (sum(theta)/nz .gt. 1.0_DP) then
-	    		P = min(P,1.0_dp)
-	            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R)
-            else
-                R = 0.0_DP
-	        endif
+
+	        if (A_C.gt.0.0_dp) then 
+	        	! Capital Market: Supply of capital and private demand 
+	        	Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+	        	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_mat)) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
+	        	
+	        	if (Wealth.gt.K_P) then 
+		        	! Corporate demand for capital
+		        	K_C    = Wealth - K_P 
+
+		        	! Update Wage 
+		        	if (alpha_C.eq.alpha) then 
+		        		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
+		        	else 
+		        		print*, ' Solving labor market numerically'
+		        		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage)
+		        		print*, ' New Wage=',Wage,'Error=',brent_value
+		        	endif 
+
+	        	else ! Capital Market did not clear
+
+		        	! Modify prices and quantities 
+		        	QBAR = 0.50_dp*QBAR 
+		        	Wage = Wage 
+
+	        	endif 
+
+	        	! Update other prices and quantities
+        		L_P  = ( (1.0_dp-alpha)*Aprod/Wage )**(1.0_dp/alpha  ) * QBAR 
+        		L_C  = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
+				
+				P    = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
+				R    = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
+				
+				Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+				YBAR_P = AProd * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
+				YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
+				YBAR   = YBAR_P + YBAR_P
+
+	        else 
+	        	! Solve for aggregates and clear capital market with R
+		        P    = alpha* QBAR **(alpha-mu) * NBAR **(1.0_DP-alpha)
+		        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
+		        wage = (1.0_DP-alpha)*QBAR **alpha * NBAR  **(-alpha)
+		        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+
+		    	! Solve for new R 
+		    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
+		    	if (sum(theta)/nz .gt. 1.0_DP) then
+		    		P = min(P,1.0_dp)
+		            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R)
+		        else
+		            R = 0.0_DP
+		        endif
+
+	        endif 
 
 	    	!!
 	    	print*, 'DBN_diff=', DBN_dist,'K',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
@@ -8980,6 +9023,28 @@ Subroutine Find_TauW_Threshold(DBN_in,Y_a_threshold_out)
 
 end Subroutine Find_TauW_Threshold
 
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Function Labor_Market_Clearing(W_in)
+	Implicit None 
+	real(dp), intent(in) :: W_in
+	real(dp)             :: Labor_Market_Clearing
+	real(dp) 			 :: Ld_P, Ld_C 
+
+	Ld_P  = ( (1.0_dp-alpha  )*Aprod/W_in )**(1.0_dp/alpha  ) * QBAR 
+	Ld_C  = ( (1.0_dp-alpha_C)*A_C  /W_in )**(1.0_dp/alpha_C) * K_C
+
+	Labor_Market_Clearing = ( ( Ld_P+LdC )/NBAR - 1.0_dp )**2.0_dp 
+
+
+end Function Labor_Market_Clearing
+
+
+
 !========================================================================================
 !========================================================================================
 !========================================================================================
@@ -9100,6 +9165,7 @@ Function Wealth_Matrix_t(R_in,P_in)
 	Wealth_Matrix_t = ( (1.0_dp+R_in*(1.0_DP-tauK))*spread(spread(agrid_t,2,nz),3,nx) +  Pr *(1.0_DP-tauK) )
 
 end Function Wealth_Matrix_t
+
 
 !========================================================================================
 !========================================================================================
@@ -10356,11 +10422,11 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'wage'	, wage
 			WRITE(UNIT=19, FMT=*) 'R'		, 100.0_dp*R
 			WRITE(UNIT=19, FMT=*) ' '
-			WRITE(UNIT=19, FMT=*) "Moments:"
-			WRITE(UNIT=19, FMT=*) " "
-			WRITE(UNIT=19, FMT=*) "Debt_Output"		  		, External_Debt_GDP
-			WRITE(UNIT=19, FMT=*) "Wealth_Output"		  	, Wealth_Output
-			WRITE(UNIT=19, FMT=*) "Mean_Assets"				, MeanWealth
+			WRITE(UNIT=19, FMT=*) 'Moments:'
+			WRITE(UNIT=19, FMT=*) ' '
+			WRITE(UNIT=19, FMT=*) 'Debt_Output'		  		, External_Debt_GDP
+			WRITE(UNIT=19, FMT=*) 'Wealth_Output'		  	, Wealth_Output
+			WRITE(UNIT=19, FMT=*) 'Mean_Assets'				, MeanWealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_1%' 	, prct1_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_10%'	, prct10_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_20%'	, prct20_wealth
