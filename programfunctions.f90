@@ -7883,7 +7883,7 @@ SUBROUTINE COMPUTE_STATS()
 	!$ call omp_set_num_threads(20)
 	!$ print *, "OMP Test Message"
 
-	print*, ' '; print*,' Entering Compute_Stats'
+	print*, ' '; print*,' Entering Compute_Stats'; print*, ' '; 
 	
 	! Age Brackets
 		age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
@@ -7933,7 +7933,7 @@ SUBROUTINE COMPUTE_STATS()
 		        cdf_tot_a_by_prctile(prctile)  = (REAL(prctile,8)/100.0_DP )*agrid(ai)     
 		    ENDIF
 		ENDDO
-		print*,''
+		
 		prct1_wealth  = 1.0_DP-cdf_tot_a_by_prctile(99)/cdf_tot_a_by_prctile(100)
 		prct10_wealth = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
 		prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
@@ -8495,7 +8495,7 @@ SUBROUTINE COMPUTE_STATS()
 			print*, ' 	', 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(i,:)
 		enddo 
 			CLOSE(UNIT=11)
-			print*, ' '; print*,'-----------------------------------------------------'; print*, ' '
+			print*,'-----------------------------------------------------'; print*, ' '
 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
