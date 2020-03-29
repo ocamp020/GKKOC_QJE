@@ -138,6 +138,9 @@ PROGRAM main
 			chi_bq = 30.00_dp ! Scaling 
 			bq_0   = 0.2_dp ! Level shift 
 
+		! Corporate Sector
+			A_C    = 1.0_dp
+
 		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
 		x_0     = 0.00_dp
@@ -529,7 +532,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark

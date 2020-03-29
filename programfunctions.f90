@@ -4364,6 +4364,7 @@ SUBROUTINE FIND_DBN_EQ()
 				YBAR_P = AProd * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
 				YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
 				YBAR   = YBAR_P + YBAR_P
+				print*,'	Corp.Sector Levels:',YBAR_C,K_C,L_C,'Ratios',100.0_dp*YBAR_C/YBAR,100.0_dp*K_C/Wealth,100.0_dp*L_C/NBAR
 
 	        else 
 	        	! Solve for aggregates and clear capital market with R
@@ -10471,6 +10472,11 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Average_Labor_Tax'		, GBAR_L/Tot_Lab_Inc
 			WRITE(UNIT=19, FMT=*) 'Cons_Tax/Total_Tax'		, GBAR_C/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
 			WRITE(UNIT=19, FMT=*) 'Cons_Tax/GDP'			, GBAR_C/YBAR
+			WRITE(UNIT=19, FMT=*) ' '
+			WRITE(UNIT=19, FMT=*) 'Public_Corporate_Sector'
+			WRITE(UNIT=19, FMT=*) 'Y_C/YBAR'				, 100.0_dp*Y_C/YBAR
+			WRITE(UNIT=19, FMT=*) 'K_C/KBAR'				, 100.0_dp*K_C/MeanWealth
+			WRITE(UNIT=19, FMT=*) 'L_C/NBAR'   				, 100.0_dp*L_C/NBAR
 			WRITE(UNIT=19, FMT=*) ' '
 		CLOSE(Unit=19)
 	if (bench_indx.ne.1) then
