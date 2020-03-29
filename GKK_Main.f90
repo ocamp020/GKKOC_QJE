@@ -128,7 +128,7 @@ PROGRAM main
 		rho_z  	= 0.1_dp ! params(3) 
 		sigma_z_eps      =  0.085_dp! 0.072_dp ! params(4) !
 		sigma_lambda_eps = 0.289_dp ! 0.305_dp ! params(5)
-		gamma  	=  0.469_dp ! 0.46_dp !  params(6) ! 
+		gamma  	=  0.472_dp ! 0.46_dp !  params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
 		
 		sigma  	= 4.0_dp
@@ -139,7 +139,7 @@ PROGRAM main
 			bq_0   = 01.10_dp ! Level shift 
 
 		! Corporate Sector
-			A_C    = 0.913_dp
+			A_C    = 0.915_dp
 
 		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
