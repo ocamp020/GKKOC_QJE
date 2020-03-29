@@ -4364,11 +4364,16 @@ SUBROUTINE FIND_DBN_EQ()
 				YBAR_P = AProd * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
 				YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
 				YBAR   = YBAR_P + YBAR_C
-				print '(A,F9.3,F9.3,F9.3,X,X,A,F9.3,F9.3,F9.3)',&
-						& ' 	Corp. Sector Levels:', YBAR_C, K_C, L_C , &
-						& ' Ratios ', 100.0_dp*YBAR_C/YBAR, 100.0_dp*K_C/Wealth, 100.0_dp*L_C/NBAR
+				! print '(A,F9.3,F9.3,F9.3,X,X,A,F9.3,F9.3,F9.3)',&
+				! 		& ' 				Corp. Sector Levels:', YBAR_C, K_C, L_C , &
+				! 		& ' Ratios ', 100.0_dp*YBAR_C/YBAR, 100.0_dp*K_C/Wealth, 100.0_dp*L_C/NBAR
 
 	        else 
+	        	! Set Corporate values to zero
+        		K_C    = 0.0_dp 
+        		L_C    = 0.0_dp
+        		YBAR_C = 0.0_dp
+
 	        	! Solve for aggregates and clear capital market with R
 		        P    = alpha* QBAR **(alpha-mu) * NBAR **(1.0_DP-alpha)
 		        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
@@ -4387,9 +4392,10 @@ SUBROUTINE FIND_DBN_EQ()
 	        endif 
 
 	    	!!
-	    	print '(A,E11.5,X,A,F9.3,X,A,F9.3,X,A,F9.3,X,A,F9.3,X)', &
-	    		& 'DBN_diff=', DBN_dist,'A',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
-	    		& 'W=',wage,'R=',R,'P=',P!,'Error=',brent_value
+	    	print '(A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)', &
+	    		& ' 	DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
+	    		& 'W=',wage,'R=',R,'P=',P!,'Error=',brent_value &
+	    		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/NBAR=',100.0_dp*L_C/NBAR
 	    	!!
 
 	    	! Solve the model at current aggregate values
