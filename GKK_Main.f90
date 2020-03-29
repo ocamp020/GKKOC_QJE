@@ -127,8 +127,8 @@ PROGRAM main
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
 		sigma_z_eps      =  0.0765_dp! 0.072_dp ! params(4) !
-		sigma_lambda_eps = 0.300_dp ! 0.305_dp ! params(5)
-		gamma  	=  0.47_dp ! 0.46_dp !  params(6) ! 
+		sigma_lambda_eps = 0.290_dp ! 0.305_dp ! params(5)
+		gamma  	=  0.475_dp ! 0.46_dp !  params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
 		
 		sigma  	= 4.0_dp
@@ -136,7 +136,7 @@ PROGRAM main
 
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 			chi_bq = 30.00_dp ! Scaling 
-			bq_0   = 0.2_dp ! Level shift 
+			bq_0   = 0.5_dp ! Level shift 
 
 		! Corporate Sector
 			A_C    = 0.912_dp
@@ -524,7 +524,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		print*,' '
 		print*,' Targets:'
 		print 12345, &
-			& " 	A/Y=",MeanWealth/YBAR,'BQ/A=',100.0_dp*Bequest_Wealth/MeanWealth ,'BQ/Y=',Bq_Inc(3,1),&
+			& " 	A/Y=",MeanWealth/YBAR,'BQ/A=',100.0_dp*Bequest_Wealth/MeanWealth ,'BQ/Inc=',Bq_Inc(3,1),&
 			& 'Top_1%=',100.0_dp*prct1_wealth,'L_C/N=',100.0_dp*L_C/NBAR,&
 			& 'stdEarn=',Std_Log_Earnings_25_60,'N',meanhours_25_60
 		12345 format (A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)

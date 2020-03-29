@@ -4071,12 +4071,12 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	print*,'GBAR=',GBAR,'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=', GBAR_L/Ebar 
 	print*, 'GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C
 	print*, 'Tau_K=', tauK, 'Tau_W_bt=', tauW_bt, 'Tau_W_at=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
-	print '(A,F7.3)', ' Tax Revenue/GDP=      ', (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
+	print '(A,F7.3)', ' Tax Revenue/GDP=      ', 100.0_dp*(GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
 	print '(A,F7.3)', ' Capital_Tax/Total_Tax=', 100.0_dp*GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
 	print '(A,F7.3)', ' Labor_Tax/Total_Tax=  ', 100.0_dp*GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
 	print '(A,F7.3)', ' Labor_Tax/GDP=        ', 100.0_dp*GBAR_L/YBAR
 	print '(A,F7.3)', ' Average Labor Tax=    ', 100.0_dp*GBAR_L/Tot_Lab_Inc
-	print '(A,F7.3,X,X,A,F7.3)', 'Total Labor Income=', Tot_Lab_Inc , 'EBAR=', EBAR
+	print '(A,F7.3,X,X,A,F7.3)', ' 	Total Labor Income=', Tot_Lab_Inc , 'EBAR=', EBAR
 	print*, ' '
 
 	if (solving_bench.eq.1) then 
@@ -4198,7 +4198,8 @@ SUBROUTINE FIND_DBN_EQ()
 	DBN_dist=1.0_DP
 	simutime = 1
 	iter_indx = 1
-	!print*, 'Computing Equilibrium Distribution'
+	print*,' '; print*,'-----------------------------------------------------------------------------'
+	print*, 'Computing Equilibrium Distribution'; print*,' '
 	DO WHILE ( ( DBN_dist .ge. DBN_criteria ) .and. ( simutime .le. 700 ) )
 		! print*, 'DBN_dist=', DBN_dist
 
@@ -4477,6 +4478,7 @@ SUBROUTINE FIND_DBN_EQ()
 		& 'W=',wage,'R=',R,'P=',P,'Q=',QBAR, &
 		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'K_C=',K_C,'L_C=',L_C,'Iter=',simutime
 	12346 format (A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,I5)
+	print*,' '; print*,'-----------------------------------------------------------------------------'
 	print*,' '
 
 
@@ -8557,7 +8559,7 @@ SUBROUTINE COMPUTE_STATS()
 		Hours_Frisch 	  = Hours_Frisch/Size_Frisch
 		Frisch_Elasticity_2 = (1.0_dp-tauPL)/( sigma/(1.0_dp-(1.0_dp-sigma)*gamma) * Hours_Frisch/(1-Hours_Frisch) - tauPL )
 		print*, 'Frisch_Elasticity',Frisch_Elasticity,Frisch_Elasticity_2,Hours_Frisch, Size_Frisch
-		
+		print*, ' '
 
 
 
@@ -8572,11 +8574,13 @@ SUBROUTINE COMPUTE_STATS()
 	!print*,''
 	!print*,"Current parameters"
 	!print*,'beta',beta,'rho_z',rho_z,'sigma_z',sigma_z_eps,'sigma_lam',sigma_lambda_eps,'phi',phi
+	print*,' '
+	print*,'-----------------------------------------------------'
 	print*,"Statistics"
 	print*,'Debt/GDP',External_Debt_GDP,'W/GDP',Wealth_Output,'Top 1% A',prct1_wealth,'Top 10% A',prct10_wealth
 	print*,'STD Labor Earnings',Std_Log_Earnings_25_60,'Mean Labor (hours 25-60)',meanhours_25_60,'MeanReturn',MeanReturn
 	print*,'PV_Wealth_Top_1%', FW_top_x_share(4), 'PV_Top_10%', FW_top_x_share(3)
-	print*,'Z','Constrained_firms_by_z: ','Capital_high_shock','Capital_low_shock'
+	print*,' Z ','  Constrained_firms_by_z:     ',' Capital_high_shock ',' Capital_low_shock '
 	do zi=1,nz
 		print 12345, zi, & 
 			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
@@ -8588,6 +8592,7 @@ SUBROUTINE COMPUTE_STATS()
 	12345 format (I3,X,X,F7.2,X,X,F7.2,X,X,F7.2,X,X,E12.4,X,X,E12.4)
 	print*, 'Total Constrained', 100.0_dp*sum(constrained_firm_ind*DBN1)
 	print*,'Moments',SSE_Moments 
+	print*,'-----------------------------------------------------'
 	print*,''
 
 	print*,' '
