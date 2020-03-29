@@ -4363,8 +4363,8 @@ SUBROUTINE FIND_DBN_EQ()
 				Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 				YBAR_P = AProd * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
 				YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
-				YBAR   = YBAR_P + YBAR_P
-				print*,'	Corp.Sector Levels:',YBAR_C,K_C,L_C,'Ratios',100.0_dp*YBAR_C/YBAR,100.0_dp*K_C/Wealth,100.0_dp*L_C/NBAR
+				YBAR   = YBAR_P + YBAR_C
+				print '(F12.4)','	Corp.Sector Levels:',YBAR_C,K_C,L_C,'Ratios',100.0_dp*YBAR_C/YBAR,100.0_dp*K_C/Wealth,100.0_dp*L_C/NBAR
 
 	        else 
 	        	! Solve for aggregates and clear capital market with R
