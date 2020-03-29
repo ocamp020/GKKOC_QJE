@@ -4394,7 +4394,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    	!!
 	    	print '(A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)', &
 	    		& ' 	DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
-	    		& 'W=',wage,'R=',R,'P=',P!,'Error=',brent_value &
+	    		& 'W=',wage,'R=',R,'P=',P,'Q=',QBAR, &!'Error=',brent_value, &
 	    		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/NBAR=',100.0_dp*L_C/NBAR
 	    	!!
 
