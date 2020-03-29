@@ -8431,8 +8431,8 @@ SUBROUTINE COMPUTE_STATS()
 			WRITE(UNIT=11, FMT=*) 'Bequests_Above_Threshold= '	, Threshold_Share_bq
 			WRITE(UNIT=11, FMT=*) 'Bequest_Revenue/YBAR= '		, 0
 			WRITE(UNIT=11, FMT=*) 'Prctile ','Bequest ','Bq/EBAR ','Bq/Inc 0.5%','Bq_Inc 1% ','Bq_Inc 2% '
-		print '(A,F7,3)', ' 	Total_Bequest/Wealth= '		, 100.0_dp*Bequest_Wealth/MeanWealth 
-		print '(A,F7,3)', ' 	Mean_Bequest/Wealth= '		, 100.0_dp*Mean_Bequest/MeanWealth 
+		print '(A,F7.3)', ' 	Total_Bequest/Wealth= '		, 100.0_dp*Bequest_Wealth/MeanWealth 
+		print '(A,F7.3)', ' 	Mean_Bequest/Wealth= '		, 100.0_dp*Mean_Bequest/MeanWealth 
 		print*, ' 	Prctile  ','Bequest  ','Bq/EBAR  ','Bq/Inc 0.5%  ','Bq_Inc 1%  ','Bq_Inc 2%  '
 
 		! Compute bequest by percentile (percentiles for counter CDF)
