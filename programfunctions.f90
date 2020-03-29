@@ -4072,11 +4072,11 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	print*, 'GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C
 	print*, 'Tau_K=', tauK, 'Tau_W_bt=', tauW_bt, 'Tau_W_at=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
 	print '(A,F7.3)', 'Tax Revenue over GDP', (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
-	print '(A,F7.3)', 'Capital Tax / Total Tax', 100.0_dp*GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
-	print '(A,F7.3)', 'Labor Tax / Total Tax', 100.0_dp*GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
-	print '(A,F7.3)', 'Labor Tax / GDP', 100.0_dp*GBAR_L/YBAR
-	print '(A,F7.3)', 'Average Labor Tax', 100.0_dp*GBAR_L/Tot_Lab_Inc
-	print '(A,F7.3,X,X,A,F7.3)', 'Total Labor Income', Tot_Lab_Inc , 'EBAR', EBAR
+	print '(A,F7.3)', 'Capital_Tax/Total_Tax=', 100.0_dp*GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+	print '(A,F7.3)', 'Labor_Tax/Total_Tax=', 100.0_dp*GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+	print '(A,F7.3)', 'Labor_Tax/GDP=', 100.0_dp*GBAR_L/YBAR
+	print '(A,F7.3)', 'Average Labor Tax=', 100.0_dp*GBAR_L/Tot_Lab_Inc
+	print '(A,F7.3,X,X,A,F7.3)', 'Total Labor Income=', Tot_Lab_Inc , 'EBAR=', EBAR
 	print*, ' '
 
 	if (solving_bench.eq.1) then 
@@ -4086,16 +4086,16 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	endif 
 	WRITE(UNIT=11, FMT=*) ' '
 	WRITE(UNIT=11, FMT=*) "Government Budget - Revenues and taxes"
-	WRITE(UNIT=11, FMT=*) 'GBAR=',GBAR,'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=', GBAR_L/Ebar 
+	WRITE(UNIT=11, FMT=*) 'GBAR=',GBAR,'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av.Labor_Tax=', GBAR_L/Ebar 
 	WRITE(UNIT=11, FMT=*) 'GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C
 	WRITE(UNIT=11, FMT=*) 'Tau_K=', tauK, 'Tau_W=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
-	WRITE(UNIT=11, FMT=*) 'Tax Revenue over GDP', (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
-	WRITE(UNIT=11, FMT=*) 'Capital Tax / Total Tax', GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
-	WRITE(UNIT=11, FMT=*) 'Capital Tax / GDP', GBAR_K/YBAR
-	WRITE(UNIT=11, FMT=*) 'Labor Tax / Total Tax', GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
-	WRITE(UNIT=11, FMT=*) 'Labor Tax / GDP', GBAR_L/YBAR
-	WRITE(UNIT=11, FMT=*) 'Average Labor Tax', GBAR_L/Tot_Lab_Inc
-	WRITE(UNIT=11, FMT=*) 'Total Labor Income', Tot_Lab_Inc , 'EBAR', EBAR, 'Total Capital Income', Tot_Cap_Inc
+	WRITE(UNIT=11, FMT=*) 'Tax_Revenue/GDP', (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
+	WRITE(UNIT=11, FMT=*) 'Capital_Tax/Total_Tax', GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+	WRITE(UNIT=11, FMT=*) 'Capital_Tax/GDP', GBAR_K/YBAR
+	WRITE(UNIT=11, FMT=*) 'Labor_Tax/Total_Tax', GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+	WRITE(UNIT=11, FMT=*) 'Labor_Tax/GDP', GBAR_L/YBAR
+	WRITE(UNIT=11, FMT=*) 'Average_Labor_Tax', GBAR_L/Tot_Lab_Inc
+	WRITE(UNIT=11, FMT=*) 'Total_Labor_Income', Tot_Lab_Inc , 'EBAR', EBAR, 'Total_Capital_Income', Tot_Cap_Inc
 	Close(UNIT=11)
 	ENDIF  
 END  SUBROUTINE GOVNT_BUDGET
@@ -8519,7 +8519,8 @@ SUBROUTINE COMPUTE_STATS()
 			enddo 
 			! Write down results 
 			WRITE(UNIT=11, FMT=*) 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(i,:)
-			print*, ' 	', 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(i,:)
+			print '(A,X,X,F7.3,X,X,F7.3,X,X,F7.3,X,X,F7.3,X,X,F7.3,X,X,F7.3)',&
+				& ' 	', 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(i,:)
 		enddo 
 			CLOSE(UNIT=11)
 			print*,'-----------------------------------------------------'; print*, ' '
@@ -8577,13 +8578,14 @@ SUBROUTINE COMPUTE_STATS()
 	print*,'PV_Wealth_Top_1%', FW_top_x_share(4), 'PV_Top_10%', FW_top_x_share(3)
 	print*,'Z','Constrained_firms_by_z: ','Capital_high_shock','Capital_low_shock'
 	do zi=1,nz
-		print '(F7.3,X,X)', zi, & 
+		print 12345, zi, & 
 			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
 			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &
 			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
 			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) , & 
 			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
 	enddo 
+	12345 format (I3,X,X,F7.3,X,X,F7.3,X,X,F7.3,X,X,F7.3,X,X,F7.3)
 	print*, 'Total Constrained', 100.0_dp*sum(constrained_firm_ind*DBN1)
 	print*,'Moments',SSE_Moments 
 	print*,''
