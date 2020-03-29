@@ -4071,11 +4071,11 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	print*,'GBAR=',GBAR,'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=', GBAR_L/Ebar 
 	print*, 'GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C
 	print*, 'Tau_K=', tauK, 'Tau_W_bt=', tauW_bt, 'Tau_W_at=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
-	print '(A,F7.3)', 'Tax Revenue over GDP', (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
-	print '(A,F7.3)', 'Capital_Tax/Total_Tax=', 100.0_dp*GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
-	print '(A,F7.3)', 'Labor_Tax/Total_Tax=', 100.0_dp*GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
-	print '(A,F7.3)', 'Labor_Tax/GDP=', 100.0_dp*GBAR_L/YBAR
-	print '(A,F7.3)', 'Average Labor Tax=', 100.0_dp*GBAR_L/Tot_Lab_Inc
+	print '(A,F7.3)', ' Tax Revenue/GDP=      ', (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
+	print '(A,F7.3)', ' Capital_Tax/Total_Tax=', 100.0_dp*GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+	print '(A,F7.3)', ' Labor_Tax/Total_Tax=  ', 100.0_dp*GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+	print '(A,F7.3)', ' Labor_Tax/GDP=        ', 100.0_dp*GBAR_L/YBAR
+	print '(A,F7.3)', ' Average Labor Tax=    ', 100.0_dp*GBAR_L/Tot_Lab_Inc
 	print '(A,F7.3,X,X,A,F7.3)', 'Total Labor Income=', Tot_Lab_Inc , 'EBAR=', EBAR
 	print*, ' '
 
@@ -8431,8 +8431,8 @@ SUBROUTINE COMPUTE_STATS()
 			WRITE(UNIT=11, FMT=*) 'Bequests_Above_Threshold= '	, Threshold_Share_bq
 			WRITE(UNIT=11, FMT=*) 'Bequest_Revenue/YBAR= '		, 0
 			WRITE(UNIT=11, FMT=*) 'Prctile ','Bequest ','Bq/EBAR ','Bq/Inc 0.5%','Bq_Inc 1% ','Bq_Inc 2% '
-		print*, ' 	Total_Bequest/Wealth= '		, Bequest_Wealth/MeanWealth 
-		print*, ' 	Mean_Bequest/Wealth= '		, Mean_Bequest/MeanWealth 
+		print '(A,F7,3)', ' 	Total_Bequest/Wealth= '		, 100.0_dp*Bequest_Wealth/MeanWealth 
+		print '(A,F7,3)', ' 	Mean_Bequest/Wealth= '		, 100.0_dp*Mean_Bequest/MeanWealth 
 		print*, ' 	Prctile  ','Bequest  ','Bq/EBAR  ','Bq/Inc 0.5%  ','Bq_Inc 1%  ','Bq_Inc 2%  '
 
 		! Compute bequest by percentile (percentiles for counter CDF)
@@ -8585,7 +8585,7 @@ SUBROUTINE COMPUTE_STATS()
 			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) , & 
 			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
 	enddo 
-	12345 format (I3,X,X,F7.3,X,X,F7.3,X,X,F7.3,X,X,F7.3,X,X,F7.3)
+	12345 format (I3,X,X,F7.2,X,X,F7.2,X,X,F7.2,X,X,E12.4,X,X,E12.4)
 	print*, 'Total Constrained', 100.0_dp*sum(constrained_firm_ind*DBN1)
 	print*,'Moments',SSE_Moments 
 	print*,''
