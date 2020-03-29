@@ -4121,7 +4121,7 @@ SUBROUTINE FIND_DBN_EQ()
 	allocate( Aphi(         MaxAge,na,nz,nlambda,ne,nx) )
 
 	!$ call omp_set_num_threads(nz)
-	DBN_criteria = 1.0E-07_DP
+	DBN_criteria = 1.00E-07_DP
 
 
 	! Current aggregate values given QBAR and Wage
