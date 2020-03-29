@@ -4138,7 +4138,7 @@ SUBROUTINE FIND_DBN_EQ()
 		YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
 		YBAR   = YBAR_P + YBAR_C
 
-		print*,'initial values:',Wealth,K_P,K_C,L_C,L_P,YBAR,YBAR_P,YBAR_C
+		! print*,'initial values:',Wealth,K_P,K_C,L_C,L_P,YBAR,YBAR_P,YBAR_C,P,R
 	endif ! If A_C=0 then all aggregates must be provided
 
 
@@ -7971,7 +7971,6 @@ SUBROUTINE COMPUTE_STATS()
 		prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
 		prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
 	
-print*,'test 1'
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Labor Earnings and Hours of working age population
@@ -8028,7 +8027,7 @@ print*,'test 1'
 	Var_Log_Earnings_25_60 = Var_Log_Earnings_25_60 / pop_pos_earn_25_60
 	Std_Log_Earnings_25_60 = Var_Log_Earnings_25_60 ** 0.5_DP
 
-print*,'test 2'
+
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Income, Wealth, Returns to Capital
@@ -8158,7 +8157,7 @@ print*,'test 2'
 	StdReturn       = VarReturn**0.5_DP
 	Std_AT_K_Return = Var_AT_K_Return**0.5_DP
 	Std_K_Return    = Var_K_Return**0.5_DP
-print*,'test 3'
+
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
     ! Debt to GDP Ratio
@@ -8174,7 +8173,7 @@ print*,'test 3'
 	ENDDO
 	External_Debt_GDP = 0.5_dp*External_Debt_GDP / YBAR
 
-print*,'test 5'
+
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Savings Rate
@@ -8267,7 +8266,7 @@ print*,'test 5'
 	S_Rate_Y_Age = (Ap_Age-A_Age)/Y_Age
 	S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
 	S_Rate_Y_W   = (Ap_W-A_W)/Y_W
-print*,'test 6'
+
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Leverage Ratio and fraction of constrainted firms 
@@ -8327,9 +8326,6 @@ print*,'test 6'
 		WRITE(UNIT=11, FMT=*) 'Total', 100.0_dp*sum(constrained_firm_ind*DBN1)
 
 		CLOSE(UNIT=11)
-		
-print*,'test 7'
-
 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
@@ -8363,7 +8359,7 @@ print*,'test 7'
 			b = maxval(Firm_Wealth_vec)
 			c = (a+b)/2.0_dp
 			CCDF_c = sum(DBN_vec,Firm_Wealth_vec>=c)
-			print*, ' '
+			! print*, ' '
 			!print*, 'Percentile', prctile_FW(i)
 			do while ((abs(CCDF_c-prctile_FW(i))>0.0001_dp).and.(b-a>1e-8))
 				if (CCDF_c<prctile_FW(i)) then 
@@ -8384,7 +8380,6 @@ print*,'test 7'
 
 			CLOSE(UNIT=11)
 
-print*,'test 8'
 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
