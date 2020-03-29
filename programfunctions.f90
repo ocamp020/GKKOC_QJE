@@ -10474,7 +10474,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Cons_Tax/GDP'			, GBAR_C/YBAR
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Public_Corporate_Sector'
-			WRITE(UNIT=19, FMT=*) 'Y_C/YBAR'				, 100.0_dp*Y_C/YBAR
+			WRITE(UNIT=19, FMT=*) 'Y_C/YBAR'				, 100.0_dp*YBAR_C/YBAR
 			WRITE(UNIT=19, FMT=*) 'K_C/KBAR'				, 100.0_dp*K_C/MeanWealth
 			WRITE(UNIT=19, FMT=*) 'L_C/NBAR'   				, 100.0_dp*L_C/NBAR
 			WRITE(UNIT=19, FMT=*) ' '
