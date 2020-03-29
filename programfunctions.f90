@@ -4371,8 +4371,8 @@ SUBROUTINE FIND_DBN_EQ()
 				! write (*,'(A,F4.4)') '	Corp.Sector Levels:',YBAR,K_C
 				! 12345 format (A,F4.4,F4.4,F4.4)
 				print *, YBAR_C 
-				print '(F5.2)', YBAR_C
-				
+				print '(A,F5.2)','A', YBAR_C
+
 
 
 	        else 
