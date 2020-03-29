@@ -4137,6 +4137,8 @@ SUBROUTINE FIND_DBN_EQ()
 		YBAR_P = AProd * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
 		YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
 		YBAR   = YBAR_P + YBAR_C
+
+		print*,'initial values:',Wealth,K_P,K_C,L_C,L_P,YBAR,YBAR_P,YBAR_C
 	endif ! If A_C=0 then all aggregates must be provided
 
 
@@ -7969,7 +7971,7 @@ SUBROUTINE COMPUTE_STATS()
 		prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
 		prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
 	
-
+print*,'test 1'
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Labor Earnings and Hours of working age population
@@ -8026,7 +8028,7 @@ SUBROUTINE COMPUTE_STATS()
 	Var_Log_Earnings_25_60 = Var_Log_Earnings_25_60 / pop_pos_earn_25_60
 	Std_Log_Earnings_25_60 = Var_Log_Earnings_25_60 ** 0.5_DP
 
-
+print*,'test 2'
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Income, Wealth, Returns to Capital
@@ -8156,7 +8158,7 @@ SUBROUTINE COMPUTE_STATS()
 	StdReturn       = VarReturn**0.5_DP
 	Std_AT_K_Return = Var_AT_K_Return**0.5_DP
 	Std_K_Return    = Var_K_Return**0.5_DP
-
+print*,'test 3'
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
     ! Debt to GDP Ratio
@@ -8172,7 +8174,7 @@ SUBROUTINE COMPUTE_STATS()
 	ENDDO
 	External_Debt_GDP = 0.5_dp*External_Debt_GDP / YBAR
 
-
+print*,'test 5'
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Savings Rate
@@ -8265,7 +8267,7 @@ SUBROUTINE COMPUTE_STATS()
 	S_Rate_Y_Age = (Ap_Age-A_Age)/Y_Age
 	S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
 	S_Rate_Y_W   = (Ap_W-A_W)/Y_W
-
+print*,'test 6'
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Leverage Ratio and fraction of constrainted firms 
@@ -8326,7 +8328,7 @@ SUBROUTINE COMPUTE_STATS()
 
 		CLOSE(UNIT=11)
 		
-
+print*,'test 7'
 
 
 	!------------------------------------------------------------------------------------
@@ -8382,7 +8384,7 @@ SUBROUTINE COMPUTE_STATS()
 
 			CLOSE(UNIT=11)
 
-
+print*,'test 8'
 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
