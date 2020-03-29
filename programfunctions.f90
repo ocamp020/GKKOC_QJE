@@ -4392,10 +4392,12 @@ SUBROUTINE FIND_DBN_EQ()
 	        endif 
 
 	    	!!
-	    	print '(A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,I5)', &
+	    	print 12345, &
 	    		& ' DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
 	    		& 'W=',wage,'R=',R,'P=',P,'Q=',QBAR, &
 	    		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'K_C=',K_C,'L_C=',L_C,'Iter=',simutime
+    		12345 format &
+    		&(A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,I5)
 	    	!!
 
 	    	! Solve the model at current aggregate values
