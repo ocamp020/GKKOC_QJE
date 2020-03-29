@@ -88,7 +88,9 @@ type mytype
 end type mytype
 
 type(mytype), dimension(2,2,2) :: kk 
-real(8), dimension(2,2,2,2,3,4,5,6,7) :: kkk
+! real(8), dimension(2,2,2,2,3,4,5,6,7) :: kkk
+
+real(8) :: x
 
 ! !answer = select (array)
 ! call select(array,answer)
@@ -249,5 +251,16 @@ print*,'test kk'
 print*, kk
 
 
+print*,' '
+print*,' Test of formatting'
+      x = 0.025
+      write(*,100) 'x=', x
+  100 format (A,F)
+      write(*,110) 'x=', x
+  110 format (A,F5.3)
+      write(*,120) 'x=', x
+  120 format (A,E)
+      write(*,130) 'x=', x
+  130 format (A,E8.1)
 
 end program test
