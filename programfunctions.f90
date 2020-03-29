@@ -4347,6 +4347,7 @@ SUBROUTINE FIND_DBN_EQ()
 
 	        	else ! Capital Market did not clear
 
+	        		print*, ' ';print*, ' 	Warning! Capital Market Did not Clear!';print*, ' ';
 		        	! Modify prices and quantities 
 		        	QBAR = 0.50_dp*QBAR 
 		        	Wage = Wage 

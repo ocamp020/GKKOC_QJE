@@ -517,8 +517,19 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 
 		SSC_Payments_bench  = SSC_Payments
 
-		write(*,*) "Benchmark variables"
-		write(*,*) "GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"P=",P,"wage=",wage,'R=',R
+		print*,' '
+		print*,'-------------------------------------------------------------------------'
+		write(*,*) " Benchmark variables"
+		print 12345," GBAR=",GBAR,"EBAR=",EBAR,"NBAR=",NBAR,"QBAR=",QBAR,"P=",P,"wage=",wage,'R(%)=',100.0_dp*R
+		print*,' '
+		print*,' Targets:'
+		print 12345, &
+			& 'A/Y=',MeanWealth/YBAR,'BQ/A=',100.0_dp*Bequest_Wealth/MeanWealth ,'BQ/Y=',Bq_Inc(3,1),&
+			& 'Top_1%=',100.0_dp*prct1_wealth,'L_C/N=',100.0_dp*L_C/NBAR,&
+			& 'stdEarn=',Std_Log_Earnings_25_60,'N',meanhours_25_60
+		12345 format (A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)
+		print*,'-------------------------------------------------------------------------'
+		print*,' ';print*,' ';print*,' '
 
 		! Deallocate variables
 		if (compute_bench.eqv..false.) then 
