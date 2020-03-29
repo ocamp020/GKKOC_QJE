@@ -4365,7 +4365,12 @@ SUBROUTINE FIND_DBN_EQ()
 				YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
 				YBAR   = YBAR_P + YBAR_C
 				print 12345,'	Corp.Sector Levels:',YBAR_C,K_C,L_C,'Ratios',100.0_dp*YBAR_C/YBAR,100.0_dp*K_C/Wealth,100.0_dp*L_C/NBAR
+				print 12345,'	Corp.Sector Levels:',YBAR
+				print '(A,F4.4)','	Corp.Sector Levels:',YBAR
+				write (*,'(A,F4.4)') '	Corp.Sector Levels:',YBAR
+				write (*,'(A,F4.4)') '	Corp.Sector Levels:',YBAR,K_C
 				12345 format (A,F4.4)
+
 
 	        else 
 	        	! Solve for aggregates and clear capital market with R
