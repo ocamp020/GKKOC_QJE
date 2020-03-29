@@ -4131,7 +4131,7 @@ SUBROUTINE FIND_DBN_EQ()
 		R   = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
 
 		Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
-    	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_mat)) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
+    	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_Matrix(R,P))) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
     	K_C    = Wealth - K_P 
     	L_C    = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
 		YBAR_P = AProd * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
