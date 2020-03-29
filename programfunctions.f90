@@ -4387,7 +4387,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        endif 
 
 	    	!!
-	    	print '(A,E11.5,X,(A,F9.3,X))', &
+	    	print '(A,E11.5,X,A,F9.3,X,A,F9.3,X,A,F9.3,X,A,F9.3,X)', &
 	    		& 'DBN_diff=', DBN_dist,'A',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
 	    		& 'W=',wage,'R=',R,'P=',P!,'Error=',brent_value
 	    	!!
