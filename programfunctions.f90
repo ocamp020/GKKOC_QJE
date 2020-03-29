@@ -4071,12 +4071,12 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	print*,'GBAR=',GBAR,'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=', GBAR_L/Ebar 
 	print*, 'GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C
 	print*, 'Tau_K=', tauK, 'Tau_W_bt=', tauW_bt, 'Tau_W_at=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
-	print*, 'Tax Revenue over GDP', (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
-	print*, 'Capital Tax / Total Tax', GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
-	print*, 'Labor Tax / Total Tax', GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
-	print*, 'Labor Tax / GDP', GBAR_L/YBAR
-	print*, 'Average Labor Tax', GBAR_L/Tot_Lab_Inc
-	print*, 'Total Labor Income', Tot_Lab_Inc , 'EBAR', EBAR
+	print '(A,F7.3)', 'Tax Revenue over GDP', (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
+	print '(A,F7.3)', 'Capital Tax / Total Tax', 100.0_dp*GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+	print '(A,F7.3)', 'Labor Tax / Total Tax', 100.0_dp*GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+	print '(A,F7.3)', 'Labor Tax / GDP', 100.0_dp*GBAR_L/YBAR
+	print '(A,F7.3)', 'Average Labor Tax', 100.0_dp*GBAR_L/Tot_Lab_Inc
+	print '(A,F7.3,X,X,A,F7.3)', 'Total Labor Income', Tot_Lab_Inc , 'EBAR', EBAR
 	print*, ' '
 
 	if (solving_bench.eq.1) then 
@@ -8577,7 +8577,7 @@ SUBROUTINE COMPUTE_STATS()
 	print*,'PV_Wealth_Top_1%', FW_top_x_share(4), 'PV_Top_10%', FW_top_x_share(3)
 	print*,'Z','Constrained_firms_by_z: ','Capital_high_shock','Capital_low_shock'
 	do zi=1,nz
-		print*, zi, & 
+		print '(F7.3,X,X)', zi, & 
 			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
 			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &
 			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
