@@ -10633,6 +10633,20 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		WRITE (UNIT=12, FMT=*) SSC_Payments
 		CLOSE (UNIT=12)
 
+		OPEN  (UNIT=12, FILE=trim(bench_folder)//'YBAR_C'  	, STATUS='replace')
+		OPEN  (UNIT=13, FILE=trim(bench_folder)//'L_C'  	, STATUS='replace')
+		OPEN  (UNIT=14, FILE=trim(bench_folder)//'K_C'  	, STATUS='replace')
+		OPEN  (UNIT=15, FILE=trim(bench_folder)//'YBAR_P'  	, STATUS='replace')
+		OPEN  (UNIT=16, FILE=trim(bench_folder)//'L_P'  	, STATUS='replace')
+		OPEN  (UNIT=17, FILE=trim(bench_folder)//'K_P'  	, STATUS='replace')
+		WRITE (UNIT=12, FMT=*) YBAR_C
+		WRITE (UNIT=13, FMT=*) L_C
+		WRITE (UNIT=14, FMT=*) K_C
+		WRITE (UNIT=15, FMT=*) YBAR_P
+		WRITE (UNIT=16, FMT=*) L_P
+		WRITE (UNIT=17, FMT=*) K_P
+		CLOSE (UNIT=12); CLOSE (UNIT=13); CLOSE (UNIT=14); CLOSE (UNIT=15); CLOSE (UNIT=16); CLOSE (UNIT=17); 
+
 		print*, "Writing of benchmark results completed"
 	ELSE 
 		OPEN (UNIT=1,  FILE=trim(bench_folder)//'cons'  , STATUS='old', ACTION='read')
@@ -10662,6 +10676,13 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN (UNIT=21, FILE=trim(bench_folder)//'SSC_Payments' , STATUS='old', ACTION='read')
 		OPEN (UNIT=22, FILE=trim(bench_folder)//'Income_AT' , STATUS='old', ACTION='read')
 
+		! OPEN (UNIT=23, FILE=trim(bench_folder)//'YBAR_C' , STATUS='old', ACTION='read')
+		! OPEN (UNIT=24, FILE=trim(bench_folder)//'L_C'    , STATUS='old', ACTION='read')
+		! OPEN (UNIT=25, FILE=trim(bench_folder)//'K_C'    , STATUS='old', ACTION='read')
+		! OPEN (UNIT=26, FILE=trim(bench_folder)//'YBAR_P' , STATUS='old', ACTION='read')		
+		! OPEN (UNIT=27, FILE=trim(bench_folder)//'L_P'    , STATUS='old', ACTION='read')		
+		! OPEN (UNIT=28, FILE=trim(bench_folder)//'K_P'    , STATUS='old', ACTION='read')		
+
 		READ (UNIT=1,  FMT=*), cons
 		READ (UNIT=2,  FMT=*), aprime
 		READ (UNIT=3,  FMT=*), hours
@@ -10688,11 +10709,19 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		READ (UNIT=21, FMT=*), SSC_Payments
 		READ (UNIT=22, FMT=*), Income_AT
 
+		! READ (UNIT=23, FMT=*), YBAR_C
+		! READ (UNIT=24, FMT=*), L_C
+		! READ (UNIT=25, FMT=*), K_C
+		! READ (UNIT=26, FMT=*), YBAR_P
+		! READ (UNIT=27, FMT=*), L_P
+		! READ (UNIT=28, FMT=*), K_P
+
 		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=70); CLOSE (unit=5)
 		CLOSE (unit=60); CLOSE (unit=7); CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10)
 		CLOSE (unit=11); CLOSE (unit=12); CLOSE (unit=13); CLOSE (unit=14); CLOSE (unit=15)
 		CLOSE (unit=16); CLOSE (unit=17); CLOSE (unit=18); CLOSE (unit=19); !CLOSE (unit=20)
-		CLOSE (unit=21); CLOSE (unit=22);
+		CLOSE (unit=21); CLOSE (unit=22); 
+		! CLOSE (unit=23); CLOSE (unit=24); CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); CLOSE (unit=28);
 
 		print*, "Reading of benchmark results completed"
 	END IF 
@@ -10756,6 +10785,24 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN  (UNIT=21,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_Income_AT', STATUS='replace')
 		WRITE (UNIT=21,  FMT=*) Income_AT
 
+		OPEN  (UNIT=22,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_YBAR_C', STATUS='replace')
+		WRITE (UNIT=22,  FMT=*) YBAR_C
+
+		OPEN  (UNIT=23,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_L_C', STATUS='replace')
+		WRITE (UNIT=23,  FMT=*) L_C
+
+		OPEN  (UNIT=24,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_K_C', STATUS='replace')
+		WRITE (UNIT=24,  FMT=*) K_C
+
+		OPEN  (UNIT=25,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_YBAR_P', STATUS='replace')
+		WRITE (UNIT=25,  FMT=*) YBAR_P
+
+		OPEN  (UNIT=26,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_L_P', STATUS='replace')
+		WRITE (UNIT=26,  FMT=*) L_P
+
+		OPEN  (UNIT=27,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_K_P', STATUS='replace')
+		WRITE (UNIT=27,  FMT=*) K_P
+
 		print*, "Writing of experimental results completed"
 
 	else 
@@ -10782,6 +10829,12 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN (UNIT=19, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr'   , STATUS='old', ACTION='read')
 		OPEN (UNIT=20, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_v_pr_nb', STATUS='old', ACTION='read')
 		OPEN (UNIT=21, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_Income_AT', STATUS='old', ACTION='read')
+		OPEN (UNIT=22, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_YBAR_C' , STATUS='old', ACTION='read')
+		OPEN (UNIT=23, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_L_C' 	, STATUS='old', ACTION='read')
+		OPEN (UNIT=24, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_K_C' 	, STATUS='old', ACTION='read')
+		OPEN (UNIT=25, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_YBAR_P' , STATUS='old', ACTION='read')
+		OPEN (UNIT=26, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_L_P' 	, STATUS='old', ACTION='read')
+		OPEN (UNIT=27, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_K_P' 	, STATUS='old', ACTION='read')
 
 		READ (UNIT=1,  FMT=*), cons
 		READ (UNIT=2,  FMT=*), aprime
@@ -10805,30 +10858,21 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		READ (UNIT=19, FMT=*), V_Pr
 		READ (UNIT=20, FMT=*), V_Pr_nb
 		READ (UNIT=21, FMT=*), Income_AT
+		READ (UNIT=22, FMT=*), YBAR_C 
+		READ (UNIT=23, FMT=*), L_C 
+		READ (UNIT=24, FMT=*), K_C 
+		READ (UNIT=25, FMT=*), YBAR_P
+		READ (UNIT=26, FMT=*), L_P 
+		READ (UNIT=27, FMT=*), K_P 
 		print*, "Reading of experimental results completed"
 	endif 
 
-	CLOSE (unit=1)
-	CLOSE (unit=2)
-	CLOSE (unit=3)
-	CLOSE (unit=4)
-	CLOSE (unit=70)
-	CLOSE (unit=5)
-	CLOSE (unit=60)
-	CLOSE (unit=7)
-	CLOSE (unit=8)
-	CLOSE (unit=9)
-	CLOSE (unit=10)
-	CLOSE (unit=11)
-	CLOSE (unit=12)
-	CLOSE (unit=13)
-	CLOSE (unit=14)
-	CLOSE (unit=15)
-	CLOSE (unit=16)
-	CLOSE (unit=17)
-	CLOSE (unit=18)
-	CLOSE (unit=19)
-	CLOSE (unit=20); CLOSE (unit=21)
+	CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=70);
+	CLOSE (unit=5); CLOSE (unit=60); CLOSE (unit=7); CLOSE (unit=8); CLOSE (unit=9);
+	CLOSE (unit=10); CLOSE (unit=11); CLOSE (unit=12); CLOSE (unit=13); CLOSE (unit=14);
+	CLOSE (unit=15); CLOSE (unit=16); CLOSE (unit=17); CLOSE (unit=18); CLOSE (unit=19)
+	CLOSE (unit=20); CLOSE (unit=21); CLOSE (unit=22); CLOSE (unit=23); CLOSE (unit=24); 
+	CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); 
 
 END SUBROUTINE Write_Experimental_Results
 
