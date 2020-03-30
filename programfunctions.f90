@@ -5006,7 +5006,7 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	IMPLICIT NONE
 	INTEGER    :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL       :: DBN_dist, DBN_criteria, tauW_aux
-	real(dp)   :: BBAR, MeanWealth, brent_value
+	real(dp)   :: BBAR, Wealth, brent_value
 	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, DBN2
 	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi
 	real(dp), dimension(na,nz,nx) :: YGRID_bench
@@ -5404,7 +5404,7 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 	logical, intent(in) :: Fixed_W, Fixed_P, Fixed_R
 	INTEGER:: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL   :: DBN_dist, DBN_criteria
-	real(dp)   ::BBAR, MeanWealth, brent_value
+	real(dp)   ::BBAR, Wealth, brent_value
 	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, DBN2
 	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi
 
