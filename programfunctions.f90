@@ -4476,9 +4476,9 @@ SUBROUTINE FIND_DBN_EQ()
 	print 12346, &
 		& ' 	DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
 		& 'W=',wage,'R=',R,'P=',P,'Q=',QBAR, &
-		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'Y_C/Y=',100.0_dp*YBAR_C/YBAR,'K_C=',K_C,'L_C=',L_C,'Iter=',simutime
+		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'Y_C/Y=',100.0_dp*YBAR_C/YBAR,'Iter=',simutime
 	12346 format &
-	& (A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,I5)
+	& (A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,I5)
 	print*,' '; print*,'-----------------------------------------------------------------------------'
 	print*,' '
 
@@ -10676,12 +10676,12 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN (UNIT=21, FILE=trim(bench_folder)//'SSC_Payments' , STATUS='old', ACTION='read')
 		OPEN (UNIT=22, FILE=trim(bench_folder)//'Income_AT' , STATUS='old', ACTION='read')
 
-		! OPEN (UNIT=23, FILE=trim(bench_folder)//'YBAR_C' , STATUS='old', ACTION='read')
-		! OPEN (UNIT=24, FILE=trim(bench_folder)//'L_C'    , STATUS='old', ACTION='read')
-		! OPEN (UNIT=25, FILE=trim(bench_folder)//'K_C'    , STATUS='old', ACTION='read')
-		! OPEN (UNIT=26, FILE=trim(bench_folder)//'YBAR_P' , STATUS='old', ACTION='read')		
-		! OPEN (UNIT=27, FILE=trim(bench_folder)//'L_P'    , STATUS='old', ACTION='read')		
-		! OPEN (UNIT=28, FILE=trim(bench_folder)//'K_P'    , STATUS='old', ACTION='read')		
+		OPEN (UNIT=23, FILE=trim(bench_folder)//'YBAR_C' , STATUS='old', ACTION='read')
+		OPEN (UNIT=24, FILE=trim(bench_folder)//'L_C'    , STATUS='old', ACTION='read')
+		OPEN (UNIT=25, FILE=trim(bench_folder)//'K_C'    , STATUS='old', ACTION='read')
+		OPEN (UNIT=26, FILE=trim(bench_folder)//'YBAR_P' , STATUS='old', ACTION='read')		
+		OPEN (UNIT=27, FILE=trim(bench_folder)//'L_P'    , STATUS='old', ACTION='read')		
+		OPEN (UNIT=28, FILE=trim(bench_folder)//'K_P'    , STATUS='old', ACTION='read')		
 
 		READ (UNIT=1,  FMT=*), cons
 		READ (UNIT=2,  FMT=*), aprime
@@ -10709,19 +10709,19 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		READ (UNIT=21, FMT=*), SSC_Payments
 		READ (UNIT=22, FMT=*), Income_AT
 
-		! READ (UNIT=23, FMT=*), YBAR_C
-		! READ (UNIT=24, FMT=*), L_C
-		! READ (UNIT=25, FMT=*), K_C
-		! READ (UNIT=26, FMT=*), YBAR_P
-		! READ (UNIT=27, FMT=*), L_P
-		! READ (UNIT=28, FMT=*), K_P
+		READ (UNIT=23, FMT=*), YBAR_C
+		READ (UNIT=24, FMT=*), L_C
+		READ (UNIT=25, FMT=*), K_C
+		READ (UNIT=26, FMT=*), YBAR_P
+		READ (UNIT=27, FMT=*), L_P
+		READ (UNIT=28, FMT=*), K_P
 
 		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=70); CLOSE (unit=5)
 		CLOSE (unit=60); CLOSE (unit=7); CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10)
 		CLOSE (unit=11); CLOSE (unit=12); CLOSE (unit=13); CLOSE (unit=14); CLOSE (unit=15)
 		CLOSE (unit=16); CLOSE (unit=17); CLOSE (unit=18); CLOSE (unit=19); !CLOSE (unit=20)
 		CLOSE (unit=21); CLOSE (unit=22); 
-		! CLOSE (unit=23); CLOSE (unit=24); CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); CLOSE (unit=28);
+		CLOSE (unit=23); CLOSE (unit=24); CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); CLOSE (unit=28);
 
 		print*, "Reading of benchmark results completed"
 	END IF 
