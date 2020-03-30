@@ -4071,7 +4071,8 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	print*,' '
 	print*,'	GBAR=',GBAR,'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=', GBAR_L/Ebar 
 	print*,'	GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C
-	print*,'	Tau_K=', tauK, 'Tau_W_bt=', tauW_bt, 'Tau_W_at=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
+	print '(A,F7.4,X,X,A,F7.4,X,X,A,F7.4,X,X,A,F7.4,X,X,A,F7.4)',&
+			&'	Tau_K=', tauK, 'Tau_W_bt=', tauW_bt, 'Tau_W_at=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
 	print*, ' '
 	print '(A,F7.3)', ' 	Tax Revenue/GDP=      ', 100.0_dp*(GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
 	print '(A,F7.3)', ' 	Capital_Tax/Total_Tax=', 100.0_dp*GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
