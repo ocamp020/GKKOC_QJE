@@ -64,8 +64,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
-			compute_exp   = .true.
+			compute_bench = .false.
+			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .true.
@@ -660,7 +660,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 					&'tauW_low_bt =', tauW_low_bt*100.0_dp, '%  tauW_up_bt=', tauW_up_bt*100.0_dp, '%  tauW_bt=', tauW_bt*100.0_dp, "%"
 				print '(A,F7.3,A,F7.3,A,F7.3,A)',&
 					&'tauW_low_at =', tauW_low_at*100.0_dp, '%  tauW_up_at=', tauW_up_at*100.0_dp, '%  tauW_at=', tauW_at*100.0_dp, "%"
-					print*, "Current Threshold for wealth taxes", Y_a_threshold, "Share above threshold=", Threshold_Share
+					print '(A,F7.3,X,X,A,F7.3)', "Current tauW Threshold=", Y_a_threshold, "Share above threshold=", Threshold_Share
 					print '(A,F10.6,X,X,A,F10.6)','GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
 					print*, ' '
 				ENDDO

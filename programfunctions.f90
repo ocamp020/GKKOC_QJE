@@ -1913,13 +1913,11 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 	    print*,' '
 	    print*,'---------------------------'
-	    print*,''
 	    print*, ' CE 2 Computation'
 	    print*, 'Av Utility NB (bench) =',sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  
 	    print*, 'Av Utility NB (exp  ) =',sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))    
 	    print*, 'CE2_NB =',Av_Util_NB
 	    print*, 'CE2_Pop =', Av_Util_Pop
-	    print*,''
 	    print*,'---------------------------'
 	    print*,' '
 
@@ -2200,15 +2198,13 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 
 	print*,''
 	print*,'---------------------------'
-	print*,''
 	print*, ' CE 1 Computation'
-	print*,' Pop_bench_DBN=',100.0_DP*sum(Cons_Eq_Welfare*DBN_bench)
-	print*,' Pop_exp_DBN  =',100.0_DP*sum(Cons_Eq_Welfare*DBN1)
-	print*,' NB_bench_DBN =',&
+	print*,' Pop_bench_DBN =',100.0_DP*sum(Cons_Eq_Welfare*DBN_bench)
+	print*,' Pop_exp_DBN   =',100.0_DP*sum(Cons_Eq_Welfare*DBN1)
+	print*,' NB_bench_DBN  =',&
 	    & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-	print*,' NB_exp_dbn  =',&
+	print*,' NB_exp_dbn    =',&
 	    & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
-	print*,''
 	print*,'---------------------------'
 	print*,''
 
@@ -4480,8 +4476,8 @@ SUBROUTINE FIND_DBN_EQ()
 	print 12346, &
 		& ' 	DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
 		& 'W=',wage,'R=',R,'P=',P,'Q=',QBAR, &
-		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'K_C=',K_C,'L_C=',L_C,'Iter=',simutime
-	12346 format (A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,I5)
+		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'Y_C/Y=',100.0_dp*YBAR_C/YBAR,'K_C=',K_C,'L_C=',L_C,'Iter=',simutime
+	12346 format (A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,I5)
 	print*,' '; print*,'-----------------------------------------------------------------------------'
 	print*,' '
 
