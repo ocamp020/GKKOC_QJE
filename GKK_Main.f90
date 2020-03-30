@@ -592,7 +592,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 			GBAR_exp = 0.0_DP
 			tauW_bt  = tauWmin_bt
 			tauW_at  = tauWmin_at
-			tauWindx = 1.0_DP
+			tauWindx = 0.0_DP
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
 			DO WHILE (GBAR_exp .lt. GBAR_bench)
 				! Set old G and new value of tauW
