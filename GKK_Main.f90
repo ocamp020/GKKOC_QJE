@@ -159,7 +159,7 @@ PROGRAM main
 		tauWmin_bt=0.00_DP
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
 		tauWmin_at=0.010_DP
-		tauWinc_at=0.005_DP ! Minimum tax above threshold and increments
+		tauWinc_at=0.002_DP ! Minimum tax above threshold and increments
 	! Consumption tax
 		tauC=0.075_DP
 	! Set Labor Tax Regime
@@ -592,7 +592,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 			GBAR_exp = 0.0_DP
 			tauW_bt  = tauWmin_bt
 			tauW_at  = tauWmin_at
-			tauWindx = 0.0_DP
+			tauWindx = 1.0_DP
 			! Solve for the model increasing wealth taxes until revenue is enough to finance G_benchamark
 			DO WHILE (GBAR_exp .lt. GBAR_bench)
 				! Set old G and new value of tauW
