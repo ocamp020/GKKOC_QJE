@@ -126,7 +126,7 @@ PROGRAM main
 		beta   	= 0.9349_dp! 0.9475_dp ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
-		sigma_z_eps      =  0.0847_dp! 0.072_dp ! params(4) !
+		sigma_z_eps      =  0.0849_dp! 0.072_dp ! params(4) !
 		sigma_lambda_eps = 0.297_dp ! 0.305_dp ! params(5)
 		gamma  	=  0.4679_dp ! 0.46_dp !  params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
@@ -136,10 +136,10 @@ PROGRAM main
 
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 			chi_bq = 32.50_dp ! Scaling 
-			bq_0   = 01.20_dp ! Level shift 
+			bq_0   = 01.30_dp ! Level shift 
 
 		! Corporate Sector
-			A_C    = 0.920_dp
+			A_C    = 0.923_dp
 
 		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
