@@ -2202,11 +2202,11 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	print*,'---------------------------'
 	print*,''
 	print*, ' CE 1 Computation'
-	print*,'Average Welfare Gain Whole Population (bench dbn) (prct)=',100.0_DP*sum(Cons_Eq_Welfare*DBN_bench)
-	print*,'Average Welfare Gain Whole Population (exp dbn)     (prct)=',100.0_DP*sum(Cons_Eq_Welfare*DBN1)
-	print*,'Average Welfare Gain New Born (bench dbn) (prct)          =',&
+	print*,' Pop_bench_DBN=',100.0_DP*sum(Cons_Eq_Welfare*DBN_bench)
+	print*,' Pop_exp_DBN  =',100.0_DP*sum(Cons_Eq_Welfare*DBN1)
+	print*,' NB_bench_DBN =',&
 	    & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
-	print*,'Average Welfare Gain New Born (exp dbn)     (prct)          =',&
+	print*,' NB_exp_dbn  =',&
 	    & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
 	print*,''
 	print*,'---------------------------'
