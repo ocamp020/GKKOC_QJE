@@ -3362,7 +3362,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		ENDDO
 		close(unit=80); close(unit=81); close(unit=82); close(unit=83); close(unit=84); close(unit=85)
 
-	print*, ' End of compute welfare gain'
+	print*, ' End of compute welfare gain'; print*, ' '
 
 	! Deallocate policy functions on adjusted grid (so that they can be allocated later)
 	deallocate( YGRID_t  )
@@ -4382,9 +4382,8 @@ SUBROUTINE FIND_DBN_EQ()
 
 	        else 
 	        	! Set Corporate values to zero
-        		K_C    = 0.0_dp 
-        		L_C    = 0.0_dp
-        		YBAR_C = 0.0_dp
+        		K_C    = 0.0_dp; L_C    = 0.0_dp; YBAR_C = 0.0_dp
+        		K_P    = 0.0_dp; L_P    = 0.0_dp; YBAR_P = 0.0_dp
 
 	        	! Solve for aggregates and clear capital market with R
 		        P    = alpha* QBAR **(alpha-mu) * NBAR **(1.0_DP-alpha)
@@ -5237,24 +5236,79 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	        ENDDO    
 	        ENDDO    
 	        ENDDO    
-	    
-	        QBAR = ( QBAR)**(1.0_DP/mu)                
-	        P    = alpha* QBAR **(alpha-mu) * NBAR **(1.0_DP-alpha)
-	        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
-	        wage = (1.0_DP-alpha)*QBAR **alpha * NBAR  **(-alpha)
-	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+	        QBAR = ( QBAR)**(1.0_DP/mu) 
 
-	    	! Solve for new R 
-	    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
-	    	if (sum(theta)/nz .gt. 1.0_DP) then
-	    		P = min(P,1.0_dp)
-	           brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R)
-            else
-                R = 0.0_DP
-	        endif
+	        if (A_C.gt.0.0_dp) then 
+	        	! Capital Market: Supply of capital and private demand 
+	        	Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+	        	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_mat)) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
+	        	
+	        	if (Wealth.gt.K_P) then 
+		        	! Corporate demand for capital
+		        	K_C    = Wealth - K_P 
+
+		        	! Update Wage 
+		        	if (alpha_C.eq.alpha) then 
+		        		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
+		        	else 
+		        		print*, ' Solving labor market numerically'
+		        		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage)
+		        		print*, ' New Wage=',Wage,'Error=',brent_value
+		        	endif 
+
+	        	else ! Capital Market did not clear
+
+	        		print*, ' ';print*, ' 	Warning! Capital Market Did not Clear!';print*, ' ';
+		        	! Modify prices and quantities 
+		        	QBAR = 0.50_dp*QBAR 
+		        	Wage = Wage 
+
+	        	endif 
+
+	        	! Update other prices and quantities
+        		L_P  = ( (1.0_dp-alpha)*Aprod/Wage )**(1.0_dp/alpha  ) * QBAR 
+        		L_C  = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
+				
+				P    = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
+				R    = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
+				
+				Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+				YBAR_P = AProd * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
+				YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
+				YBAR   = YBAR_P + YBAR_C
+				! print '(A,F9.3,F9.3,F9.3,X,X,A,F9.3,F9.3,F9.3)',&
+				! 		& ' 				Corp. Sector Levels:', YBAR_C, K_C, L_C , &
+				! 		& ' Ratios ', 100.0_dp*YBAR_C/YBAR, 100.0_dp*K_C/Wealth, 100.0_dp*L_C/NBAR
+
+	        else 
+	        	! Set Corporate values to zero
+        		K_C    = 0.0_dp; L_C    = 0.0_dp; YBAR_C = 0.0_dp
+        		K_P    = 0.0_dp; L_P    = 0.0_dp; YBAR_P = 0.0_dp
+
+	        	! Solve for aggregates and clear capital market with R
+		        P    = alpha* QBAR **(alpha-mu) * NBAR **(1.0_DP-alpha)
+		        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
+		        wage = (1.0_DP-alpha)*QBAR **alpha * NBAR  **(-alpha)
+		        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+
+		    	! Solve for new R 
+		    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
+		    	if (sum(theta)/nz .gt. 1.0_DP) then
+		    		P = min(P,1.0_dp)
+		            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R)
+		        else
+		            R = 0.0_DP
+		        endif
+
+	        endif 
 
 	    	!!
-	    	print*,'Iter',simutime,'DBN_diff=',DBN_dist,'R=',R,'P=',P,'Assets',sum(sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid)
+	    	print 12345, &
+	    		& ' DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
+	    		& 'W=',wage,'R=',R,'P=',P,'Q=',QBAR, &
+	    		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'K_C=',K_C,'L_C=',L_C
+    		12345 format &
+    		&(A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X)
 	    	!!
 
 	    	! Solve the model at current aggregate values
@@ -5544,16 +5598,65 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 	        ENDDO    
 	        ENDDO    
 	        ENDDO    
-	    
 	        QBAR = ( QBAR)**(1.0_DP/mu)                
-	        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
 
-	        if (Fixed_W.eqv..false.) wage = (1.0_DP-alpha)*QBAR **alpha * NBAR  **(-alpha)
-	        if (Fixed_P.eqv..false.) P    = alpha* QBAR **(alpha-mu) * NBAR **(1.0_DP-alpha)
+	        if (A_C.gt.0.0_dp) then 
+	        	! Capital Market: Supply of capital and private demand 
+	        	Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+	        	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_mat)) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
+	        	
+	        	if (Wealth.gt.K_P) then 
+		        	! Corporate demand for capital
+		        	K_C    = Wealth - K_P 
 
-	        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+		        	! Update Wage 
+		        	if (Fixed_W.eqv..false.) then
+		        	if (alpha_C.eq.alpha) then 
+		        		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
+		        	else 
+		        		print*, ' Solving labor market numerically'
+		        		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage)
+		        		print*, ' New Wage=',Wage,'Error=',brent_value
+		        	endif 
+		        	endif 
 
-	        if (Fixed_R.eqv..false.) then 
+	        	else ! Capital Market did not clear
+
+	        		print*, ' ';print*, ' 	Warning! Capital Market Did not Clear!';print*, ' ';
+		        	! Modify prices and quantities 
+		        	QBAR = 0.50_dp*QBAR 
+		        	if (Fixed_W.eqv..false.) Wage = Wage 
+
+	        	endif 
+
+	        	! Update other prices and quantities
+        		L_P  = ( (1.0_dp-alpha)*Aprod/Wage )**(1.0_dp/alpha  ) * QBAR 
+        		L_C  = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
+				
+				if (Fixed_P.eqv..false.) P    = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
+				if (Fixed_R.eqv..false.) R    = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
+				
+				Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+				YBAR_P = AProd * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
+				YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
+				YBAR   = YBAR_P + YBAR_C
+				! print '(A,F9.3,F9.3,F9.3,X,X,A,F9.3,F9.3,F9.3)',&
+				! 		& ' 				Corp. Sector Levels:', YBAR_C, K_C, L_C , &
+				! 		& ' Ratios ', 100.0_dp*YBAR_C/YBAR, 100.0_dp*K_C/Wealth, 100.0_dp*L_C/NBAR
+
+	        else 
+	        	! Set Corporate values to zero
+        		K_C    = 0.0_dp; L_C    = 0.0_dp; YBAR_C = 0.0_dp
+        		K_P    = 0.0_dp; L_P    = 0.0_dp; YBAR_P = 0.0_dp
+
+		        YBAR = QBAR ** alpha * NBAR **(1.0_DP-alpha)
+
+		        if (Fixed_W.eqv..false.) wage = (1.0_DP-alpha)*QBAR **alpha * NBAR  **(-alpha)
+		        if (Fixed_P.eqv..false.) P    = alpha* QBAR **(alpha-mu) * NBAR **(1.0_DP-alpha)
+
+		        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+
+		        if (Fixed_R.eqv..false.) then 
 		    	! Solve for new R 
 		    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
 		    	if (sum(theta)/nz .gt. 1.0_DP) then
@@ -5564,8 +5667,16 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 		        endif
 	        endif 
 
+
+	        endif 
+
 	    	!!
-	    	print*, 'DBN_diff=',DBN_dist,'R=',R,'P=',P,'W=',wage,'Assets',sum(sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid)
+	    	print 12345, &
+	    		& ' DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
+	    		& 'W=',wage,'R=',R,'P=',P,'Q=',QBAR, &
+	    		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'K_C=',K_C,'L_C=',L_C
+    		12345 format &
+    		&(A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X)
 	    	!!
 
 	    	! Solve the model at current aggregate values
@@ -5627,6 +5738,17 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 	    simutime  = simutime +1 
 	 
 	ENDDO ! WHILE
+
+	print*,' '
+	print*,' 	Stationary Equilibrium Found: '
+	print 12346, &
+		& ' 	DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
+		& 'W=',wage,'R=',R,'P=',P,'Q=',QBAR, &
+		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'Y_C/Y=',100.0_dp*YBAR_C/YBAR,'Iter=',simutime
+	12346 format &
+	& (A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,I5)
+	print*,' '; print*,'-----------------------------------------------------------------------------'
+	print*,' '
 
 
 
