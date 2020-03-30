@@ -7916,9 +7916,9 @@ SUBROUTINE COMPUTE_STATS()
 
 
 	!$ call omp_set_num_threads(20)
-	!$ print *, "OMP Test Message"
+	! $ print *, "OMP Test Message"
 
-	print*, ' '; print*,' Entering Compute_Stats'; print*, ' '; 
+	! print*, ' '; print*,' Entering Compute_Stats'; print*, ' '; 
 	
 	! Age Brackets
 		age_limit = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
