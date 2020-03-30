@@ -139,7 +139,7 @@ PROGRAM main
 			bq_0   = 01.20_dp ! Level shift 
 
 		! Corporate Sector
-			A_C    = 0.9225_dp
+			A_C    = 0.9227_dp
 
 		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
