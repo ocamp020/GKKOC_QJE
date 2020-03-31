@@ -6240,7 +6240,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        QBAR2_tr(ti) = ( QBAR2_tr(ti))**(1.0_DP/mu) 
 
 	        	! Get Q_dist and N_dist before dampening 
-	        	Q_dist = max(Q_dist,abs(QBAR2_tr(ti)/QBAR_tr(ti)-1))
+	        	Q_dist  = max( Q_dist,abs(QBAR2_tr(ti)/QBAR_tr(ti)-1))
 	        	if (A_C.gt.0.0_dp) then 
 	        	NW_dist = max(NW_dist,abs(wage2_tr(ti)/wage_tr(ti)-1))
 	        	else 
@@ -6436,8 +6436,12 @@ SUBROUTINE FIND_DBN_Transition()
 	        QBAR2_tr(T+1) = ( QBAR2_tr(T+1))**(1.0_DP/mu) 
 
 	        	! Get Q_dist and N_dist before dampening 
-	        	Q_dist = max(Q_dist,abs(QBAR2_tr(T+1)/QBAR_tr(T+1)-1))
-	        	N_dist = max(N_dist,abs(NBAR2_tr(T+1)/NBAR_tr(T+1)-1))
+	        	Q_dist  = max( Q_dist,abs(QBAR2_tr(T+1)/QBAR_tr(T+1)-1))
+	        	if (A_C.gt.0.0_dp) then 
+	        	NW_dist = max(NW_dist,abs(wage2_tr(T+1)/wage_tr(T+1)-1))
+	        	else 
+	        	NW_dist = max(NW_dist,abs(NBAR2_tr(T+1)/NBAR_tr(T+1)-1))
+	        	endif  
 
             	! Dampened Update of QBAR and NBAR
 	        	QBAR_tr(T+1)  = Dampen*QBAR_tr(T+1) + (1.0_dp-Dampen)*QBAR2_tr(T+1)
@@ -6622,7 +6626,7 @@ SUBROUTINE FIND_DBN_Transition()
 		    Old_DBN_dist = DBN_dist
 
 		    print*, 'Iteration=',simutime
-		    print*, '	Distance: DBN=', DBN_dist,' Q=',Q_dist,' N=',N_dist,' R=',R_dist,' Db=',Db_dist,'Chg_dist=',Chg_dist
+		    print*, '	Distance: DBN=', DBN_dist,' Q=',Q_dist,' NW=',NW_dist,' R=',R_dist,' Db=',Db_dist,'Chg_dist=',Chg_dist
 		    print*, '	X(T)/X(SS): Q=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N=',100*(NBAR2_tr(T+1)/NBAR_exp-1),&
 		    		' R=',100*(R2_tr(T+1)-R_exp),' Db=',100*(Debt_tr(T+1)/Debt_exp-1)
 	    	print*, ' '
@@ -6637,7 +6641,7 @@ SUBROUTINE FIND_DBN_Transition()
 			print*, ' '
 
 	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
-	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,N_dist,R_dist,Db_dist,&
+	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,NW_dist,R_dist,Db_dist,&
 	    						&	100*(QBAR2_tr(T+1)/QBAR_exp-1),100*(NBAR2_tr(T+1)/NBAR_exp-1),&
 	    						&	100*(R2_tr(T+1)/R_exp-1),100*(Debt_tr(T+1)/Debt_exp-1)
 	    	CLOSE(UNIT=76)
