@@ -73,6 +73,8 @@ MODULE global
 	    REAL(DP) :: QBAR_exp,   NBAR_exp,   Ebar_exp,   wage_exp,   P_exp,   GBAR_exp, GBAR_exp_old, Y_exp, R_exp,Debt_exp
 	    ! Values for aggregate variables (used when solving a given economy)
 	    REAL(DP) :: P, Ebar , wage, NBAR, QBAR, YBAR, GBAR, R, SSC_Payments, L_P, L_C, K_P, K_C, YBAR_P, YBAR_C
+        REAL(DP) :: L_P_bench, L_C_bench, K_P_bench, K_C_bench, YBAR_P_bench, YBAR_C_bench
+        REAL(DP) :: L_P_exp, L_C_exp, K_P_exp, K_C_exp, YBAR_P_exp, YBAR_C_exp
 	    ! Wealth tax threshold as proportion of mean benchmark wealth
 	    REAL(DP) :: Wealth_factor, Threshold_Share
 
@@ -170,6 +172,7 @@ MODULE global
     INTEGER :: ti 
     ! Prices and Quantities
     REAL(DP), DIMENSION(T+1) :: R_tr, P_tr, QBAR_tr, NBAR_tr, YBAR_tr, Wage_tr, EBAR_tr, K_tr, C_tr
+    REAL(DP), DIMENSION(T+1) :: YBAR_C_tr, K_C_tr, L_C_tr, YBAR_P_tr, K_P_tr, L_P_tr
     ! Government Budget
     REAL(DP), DIMENSION(T+1) :: GBAR_tr, GBAR_K_tr, GBAR_W_tr, GBAR_L_tr, GBAR_C_tr
     REAL(DP), DIMENSION(T+1) :: SSC_Payments_tr, Tot_Lab_Inc_tr, Debt_tr

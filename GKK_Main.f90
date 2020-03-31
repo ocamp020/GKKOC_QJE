@@ -517,6 +517,13 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 
 		SSC_Payments_bench  = SSC_Payments
 
+		YBAR_C_bench = YBAR_C
+		L_C_bench 	 = L_C
+		K_C_bench    = K_C
+		YBAR_P_bench = YBAR_P
+		L_P_bench 	 = L_P
+		K_P_bench    = K_P
+
 		print*,' '
 		print*,'-------------------------------------------------------------------------'
 		write(*,*) " Benchmark variables"
@@ -706,6 +713,13 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		Aprime_exp        = Aprime
 		V_Pr_exp          = V_Pr 
 		V_Pr_nb_exp  	  = V_Pr_nb
+
+		YBAR_C_exp = YBAR_C
+		L_C_exp    = L_C
+		K_C_exp    = K_C
+		YBAR_P_exp = YBAR_P
+		L_P_exp    = L_P
+		K_P_exp    = K_P
 
 	! Compute moments
 	CALL COMPUTE_STATS

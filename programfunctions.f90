@@ -840,6 +840,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	age=MaxAge
 	!$omp parallel do private(lambdai,ei,ai,xi)
 	DO zi=1,nz
+	!$omp parallel do private(lambdai,ei,ai)
 	DO xi=1,nx
     DO lambdai=1,nlambda
     DO ei=1,ne
@@ -862,6 +863,8 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
 	!$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
     DO zi=1,nz
+    !$omp parallel do private(lambdai,ei,ai,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
+	!$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
     DO xi=1,nx
     DO lambdai=1,nlambda
     DO ei=1,ne
@@ -1036,6 +1039,8 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai, &
 	!$omp& C_foc,state_FOC,par_FOC,MB_aprime_t)
     DO zi=1,nz
+    !$omp parallel do private(lambdai,ei,ai,xp_ind,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai, &
+	!$omp& C_foc,state_FOC,par_FOC,MB_aprime_t)
     DO xi=1,nx
     DO lambdai=1,nlambda
     DO ei=1,ne	
@@ -3462,6 +3467,18 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 			WRITE  (UNIT=50, FMT=*) 'All unites in percentage points (already multiplied by 100)'
 		close (unit=50)	
 
+	print*,''
+	print*,'---------------------------'
+	print*, 'CE_1: Average of welfare gain across agents'
+	print '(A,F7.3)', 'CE1_nb  =',CE1_nb_tr
+	print '(A,F7.3)', 'CE1_pop =',CE1_pop_tr
+	print*, ' '
+	print*, 'CE_2: Welfare gain average agent'
+	print '(A,F7.3)', 'CE2_nb  =',CE2_nb_tr
+	print '(A,F7.3)', 'CE2_pop =',CE2_pop_tr
+	print*,'---------------------------'
+	print*,''
+
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	!! Draft Tables
@@ -4164,6 +4181,7 @@ SUBROUTINE FIND_DBN_EQ()
 	DO age=1,MaxAge
 	!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
 	DO zi=1,nz
+	!$omp parallel do private(lambdai,ei,ai,tklo,tkhi)
 	DO xi=1,nx
 	DO ai=1,na
 	DO lambdai=1,nlambda
@@ -4433,6 +4451,7 @@ SUBROUTINE FIND_DBN_EQ()
 				DO age=1,MaxAge
 				!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
 				DO zi=1,nz
+				!$omp parallel do private(lambdai,ei,ai,tklo,tkhi)
 				DO xi=1,nx
 				DO ai=1,na
 				DO lambdai=1,nlambda
@@ -5765,8 +5784,8 @@ SUBROUTINE FIND_DBN_Transition()
 	use omp_lib
 	IMPLICIT NONE
 	INTEGER    :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
-	REAL       :: DBN_dist, DBN_criteria, Q_dist, N_dist, Price_criteria, Chg_criteria, Old_DBN_dist, Chg_dist, R_dist, Db_dist
-	REAL(DP)   :: BBAR, MeanWealth, brent_value, K_bench, C_bench, K_exp, C_exp, R_old, Db_old, R_slope 
+	REAL       :: DBN_dist, DBN_criteria, Q_dist, NW_dist, Price_criteria, Chg_criteria, Old_DBN_dist, Chg_dist, R_dist, Db_dist
+	REAL(DP)   :: BBAR, Wealth, brent_value, K_bench, C_bench, K_exp, C_exp, R_old, Db_old, R_slope 
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
 	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr, Wealth_Top_1_Tr, Wealth_Top_10_Tr, R2_tr
@@ -5804,11 +5823,19 @@ SUBROUTINE FIND_DBN_Transition()
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		if (Use_Transition_Seed.eqv..false.) then 
 		! Guess NBAR, QBAR and R as a linear combination of starting and end values
+			if (A_C.gt.0.0_dp) then 
 			NBAR_tr(1)   = NBAR_bench ; NBAR_tr(T+1) = NBAR_exp   ;
+			else
+			wage_tr(1)   = wage_bench ; wage_tr(T+1) = wage_exp   ;
+			endif 
 			QBAR_tr(1)   = QBAR_bench ; QBAR_tr(T+1) = QBAR_exp   ;
 			R_tr(1)      = R_bench    ; R_tr(T+1)    = R_exp      ;
 			do ti=2,T
+				if (A_C.gt.0.0_dp) then 
 				NBAR_tr(ti) = NBAR_tr(ti-1) + (NBAR_tr(T+1)-NBAR_tr(1))/T
+				else
+				wage_tr(ti) = wage_tr(ti-1) + (wage_tr(T+1)-wage_tr(1))/T
+				endif 
 				QBAR_tr(ti) = QBAR_tr(ti-1) + (QBAR_tr(T+1)-QBAR_tr(1))/T
 				R_tr(ti)    = R_tr(ti-1) + (R_tr(T+1)-R_tr(1))/T
 			enddo 
@@ -5818,25 +5845,52 @@ SUBROUTINE FIND_DBN_Transition()
 		! Load Guess From Files
 			print*, 'Loading initial variables from file'
 			OPEN (UNIT=1,  FILE=trim(Result_Folder)//'QBAR_tr'   , STATUS='old', ACTION='read')
-			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
 			OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		 , STATUS='old', ACTION='read')
 			OPEN (UNIT=4,  FILE=trim(Result_Folder)//'Debt_SS' 	 , STATUS='old', ACTION='read')
 			OPEN (UNIT=5,  FILE=trim(Result_Folder)//'DBN_SS' 	 , STATUS='old', ACTION='read')
 			READ (UNIT=1,  FMT=*), QBAR_tr
-			READ (UNIT=2,  FMT=*), NBAR_tr
 			READ (UNIT=3,  FMT=*), R_tr
 			READ (UNIT=4,  FMT=*), Debt_SS
 			READ (UNIT=5,  FMT=*), DBN1
-			CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=5);
+			CLOSE (unit=1); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=5);
+
+			if (A_C.gt.0.0_dp) then 
+			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
+			READ (UNIT=2,  FMT=*), NBAR_tr
+			else
+			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'wage_tr'	 , STATUS='old', ACTION='read')
+			READ (UNIT=2,  FMT=*), wage_tr
+			endif 
+			CLOSE (unit=2); 
 			print*, 'Reading completed'
 		endif 
 
-		! Choose YBAR, EBAR, P and Wage to be consistent
-		P_tr    = alpha* QBAR_tr**(alpha-mu) * NBAR_tr**(1.0_DP-alpha)
-        YBAR_tr = QBAR_tr ** alpha * NBAR_tr **(1.0_DP-alpha)
-        wage_tr = (1.0_DP-alpha)*QBAR_tr**alpha * NBAR_tr**(-alpha)
+
+		! Current aggregate values given QBAR and Wage
+		if (A_C.gt.0.0_dp) then 
+			L_P_tr    = ( (1.0_dp-alpha)*Aprod/Wage_tr )**(1.0_dp/alpha) * QBAR_tr 
+			P_tr      = alpha * QBAR_tr**(alpha-mu) * L_P_tr**(1.0_DP-alpha)
+
+			K_tr 	  = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+	    	K_P_tr    = K_P
+	    	K_C_tr    = K_tr - K_P_tr 
+	    	L_C_tr    = ( (1.0_dp-alpha_C)*A_C/Wage_tr )**(1.0_dp/alpha_C) * K_C_tr
+			YBAR_P_tr = AProd * QBAR_tr**alpha   * L_P_tr**(1.0_DP-alpha  ) 
+			YBAR_C_tr = A_C   * K_C_tr **alpha_C * L_C_tr**(1.0_DP-alpha_C) 
+			YBAR_tr   = YBAR_P_tr + YBAR_C_tr
+			NBAR_tr   =    L_P_tr +    L_C_tr
+
+			! print*,'initial values:',Wealth,K_P,K_C,L_C,L_P,YBAR,YBAR_P,YBAR_C,P,R
+		else 
+			! Choose YBAR, EBAR, P and Wage to be consistent
+			P_tr    = alpha* QBAR_tr**(alpha-mu) * NBAR_tr**(1.0_DP-alpha)
+	        YBAR_tr = QBAR_tr ** alpha * NBAR_tr **(1.0_DP-alpha)
+	        wage_tr = (1.0_DP-alpha)*QBAR_tr**alpha * NBAR_tr**(-alpha)
+        endif 
+
         Ebar_tr = wage_tr  * NBAR_tr  * sum(pop)/sum(pop(1:RetAge-1))
         DBN_exp = DBN1 ; DBN_tr(:,:,:,:,:,:,T+1) = DBN1 ; 
+
         	print*, "Test Prices"
 	        print*, "P   ", P_bench, P_tr(1), P_tr(T), P_tr(T+1)
 	        print*, "wage", wage_bench, wage_tr(1), wage_tr(T), wage_tr(T+1)
@@ -5859,6 +5913,7 @@ SUBROUTINE FIND_DBN_Transition()
         OPEN (UNIT=88, FILE=trim(Result_Folder)//'Transition_Top1.txt', STATUS='replace')
         OPEN (UNIT=89, FILE=trim(Result_Folder)//'Transition_Top10.txt', STATUS='replace')
         OPEN (UNIT=90, FILE=trim(Result_Folder)//'Transition_Debt.txt', STATUS='replace')
+        OPEN (UNIT=91, FILE=trim(Result_Folder)//'Transition_Wage.txt', STATUS='replace')
      		
      		WRITE(UNIT=76, FMT=*) 'Iteration, DBN_dist, Q_dist, N_dist, R_dist, Db_dist',&
      								&' Q(T)/Q(SS), N(T)/N(SS), R(T)/R(SS), Db(T)/Db(SS)'
@@ -5876,15 +5931,17 @@ SUBROUTINE FIND_DBN_Transition()
         	WRITE(UNIT=88, FMT=*) 'Wealth_Top_1'
         	WRITE(UNIT=89, FMT=*) 'Wealth_Top_10'
         	WRITE(UNIT=90, FMT=*) 'Debt'
+        	WRITE(UNIT=91, FMT=*) 'Wage'
 
         	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR_tr, NBAR_exp
         	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR_tr, QBAR_exp
         	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
+        	WRITE(UNIT=91, FMT=*) wage_bench, wage_tr, wage_exp
 
 
     	CLOSE (unit=76); CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
     	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
-    	CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89); CLOSE (unit=90);
+    	CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89); CLOSE (unit=90); CLOSE (unit=91);
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	!! DBN Iteration 
@@ -5897,7 +5954,7 @@ SUBROUTINE FIND_DBN_Transition()
 		! Distribution is obtained by iterating over an initial distribution using policy functions
 	DBN_dist     = 1.0_DP
 	Q_dist       = 1.0_DP
-	N_dist       = 1.0_DP
+	NW_dist      = 1.0_DP
 	R_dist       = 1.0_DP
 	Db_dist      = 1.0_DP
 	Chg_dist     = 1.0_DP 
@@ -5905,12 +5962,12 @@ SUBROUTINE FIND_DBN_Transition()
 	simutime     = 1
 	iter_indx    = 1
 	!print*, 'Computing Equilibrium Distribution'
-	DO WHILE ((DBN_dist.ge.DBN_criteria).and.(max(Q_dist,N_dist,R_dist,Db_dist).ge.Price_criteria)&
+	DO WHILE ((DBN_dist.ge.DBN_criteria).and.(max(Q_dist,NW_dist,R_dist,Db_dist).ge.Price_criteria)&
 			& .and.(simutime.le.7).and.(Chg_dist.ge.Chg_criteria) )
 		! print*, 'DBN_dist=', DBN_dist
 
-		! Start Q_dist, N_dist, R_dsit, Db_dist
-		Q_dist = 0.0 ; N_dist = 0.0 ; R_dist = 0.0 ; Db_dist = 0.0 ;
+		! Start Q_dist, N_dist, R_dist, Db_dist
+		Q_dist = 0.0 ; NW_dist = 0.0 ; R_dist = 0.0 ; Db_dist = 0.0 ;
 
 		! Start Debt to zero
 		Debt_tr = 0.0_dp
@@ -5920,7 +5977,7 @@ SUBROUTINE FIND_DBN_Transition()
 		! Deallocate grids that include thresholds, they are reset in Find_DBN_EQ
 			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 		! Solve for New Steady State
-			print*,' '
+			print*,' '; print*,'-----------------------------------------------------------------------------'
 			print*,' 	Finding SS: Debt_SS=',Debt_SS,'R_0=',R,'Q_0=',QBAR_exp
 			CALL FIND_DBN_EQ
 				GBAR_exp  = GBAR
@@ -5942,10 +5999,18 @@ SUBROUTINE FIND_DBN_Transition()
 				Hours_exp         = Hours
 				Aprime_exp        = Aprime
 				Debt_exp  		  = Debt_SS
+
+				YBAR_C_exp = YBAR_C
+				L_C_exp    = L_C
+				K_C_exp    = K_C
+				YBAR_P_exp = YBAR_P
+				L_P_exp    = L_P
+				K_P_exp    = K_P
 		! Wealth and consumption in benchmark and experiment
 			K_exp   = sum( sum(sum(sum(sum(sum(DBN_exp  ,6),5),4),3),1)*agrid )
 			C_exp   = sum( DBN_exp  *Cons_exp   )
 			print*,' 	New SS: Debt_SS=',Debt_SS,'R_SS=',R,'Q_SS=',QBAR
+			print*,'-----------------------------------------------------------------------------';print*,' '
 
 
 
@@ -5990,6 +6055,7 @@ SUBROUTINE FIND_DBN_Transition()
 		DO age=1,MaxAge
 		!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
 		DO zi=1,nz
+		!$omp parallel do private(lambdai,ei,ai,tklo,tkhi)
 		DO xi=1,nx
 		DO ai=1,na
 		DO lambdai=1,nlambda
@@ -6690,6 +6756,7 @@ SUBROUTINE EGM_Transition()
 		! print*,' 	Age=',age
 	!$omp parallel do private(lambdai,ei,ai,xi)
 	DO zi=1,nz
+	!$omp parallel do private(lambdai,ei,ai)
 	DO xi=1,nx
     DO lambdai=1,nlambda
     DO ei=1,ne
@@ -6714,6 +6781,8 @@ SUBROUTINE EGM_Transition()
 	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
 	!$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
     DO zi=1,nz
+    !$omp parallel do private(lambdai,ei,ai,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
+	!$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
     DO xi=1,nx
     DO lambdai=1,nlambda
     DO ei=1,ne
@@ -6914,6 +6983,8 @@ SUBROUTINE EGM_Transition()
 	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai, &
 	!$omp& C_foc,state_FOC,par_FOC,MB_aprime_t)
     DO zi=1,nz
+    !$omp parallel do private(lambdai,ei,ai,xp_ind,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai, &
+	!$omp& C_foc,state_FOC,par_FOC,MB_aprime_t)
     DO xi=1,nx
     DO lambdai=1,nlambda
     DO ei=1,ne	
@@ -7324,6 +7395,7 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
 		! print*,' 	Age=',age
 	!$omp parallel do private(lambdai,ei,ai,xi)
 	DO zi=1,nz
+	!$omp parallel do private(lambdai,ei,ai)
 	DO xi=1,nx
     DO lambdai=1,nlambda
     DO ei=1,ne
@@ -7348,6 +7420,8 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
 	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
 	!$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
     DO zi=1,nz
+    !$omp parallel do private(lambdai,ei,ai,xp_ind,EndoCons,EndoYgrid,sw,sort_ind,tempai, &
+	!$omp& state_FOC,par_FOC,MB_aprime_t,EndoYgrid_sort)
     DO xi=1,nx
     DO lambdai=1,nlambda
     DO ei=1,ne
@@ -7549,6 +7623,8 @@ SUBROUTINE EGM_Transition_aux(Ap_aux,time)
 	!$omp parallel do private(lambdai,ei,ai,xi,xp_ind,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai, &
 	!$omp& C_foc,state_FOC,par_FOC,MB_aprime_t)
     DO zi=1,nz
+    !$omp parallel do private(lambdai,ei,ai,xp_ind,EndoCons,EndoHours,EndoYgrid,sw,sort_ind,tempai, &
+	!$omp& C_foc,state_FOC,par_FOC,MB_aprime_t)
     DO xi=1,nx
     DO lambdai=1,nlambda
     DO ei=1,ne	
