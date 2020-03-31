@@ -5788,7 +5788,7 @@ SUBROUTINE FIND_DBN_Transition()
 	REAL(DP)   :: BBAR, Wealth, brent_value, K_bench, C_bench, K_exp, C_exp, R_old, Db_old, R_slope 
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
-	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr, Wealth_Top_1_Tr, Wealth_Top_10_Tr, R2_tr
+	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr, wage2_tr, Wealth_Top_1_Tr, Wealth_Top_10_Tr, R2_tr
 	INTEGER    :: prctile, ind_R 
 	REAL(DP)   :: Dampen
 	! Timing
@@ -6241,7 +6241,11 @@ SUBROUTINE FIND_DBN_Transition()
 
 	        	! Get Q_dist and N_dist before dampening 
 	        	Q_dist = max(Q_dist,abs(QBAR2_tr(ti)/QBAR_tr(ti)-1))
-	        	N_dist = max(N_dist,abs(NBAR2_tr(ti)/NBAR_tr(ti)-1))
+	        	if (A_C.gt.0.0_dp) then 
+	        	NW_dist = max(NW_dist,abs(wage2_tr(ti)/wage_tr(ti)-1))
+	        	else 
+	        	NW_dist = max(NW_dist,abs(NBAR2_tr(ti)/NBAR_tr(ti)-1))
+	        	endif 
 
             	! Dampened Update of QBAR and NBAR
 	        	QBAR_tr(ti)  = Dampen*QBAR_tr(ti) + (1.0_dp-Dampen)*QBAR2_tr(ti)
