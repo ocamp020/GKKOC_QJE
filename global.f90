@@ -168,7 +168,7 @@ MODULE global
 
     ! Transition 
     LOGICAL :: Use_Transition_Seed
-    REAL    :: Debt_Absorption
+    REAL(DP):: Debt_Absorption=0.0_dp
     INTEGER :: ti 
     ! Prices and Quantities
     REAL(DP), DIMENSION(T+1) :: R_tr, P_tr, QBAR_tr, NBAR_tr, YBAR_tr, Wage_tr, EBAR_tr, K_tr, C_tr
@@ -176,7 +176,7 @@ MODULE global
     ! Government Budget
     REAL(DP), DIMENSION(T+1) :: GBAR_tr, GBAR_K_tr, GBAR_W_tr, GBAR_L_tr, GBAR_C_tr
     REAL(DP), DIMENSION(T+1) :: SSC_Payments_tr, Tot_Lab_Inc_tr, Debt_tr
-    REAL(DP)                 :: Debt_SS
+    REAL(DP)                 :: Debt_SS=0.0_dp
     ! Policy function and value function (defined on the exogenous grid)
     REAL(DP), DIMENSION(:,:,:,:,:,:,:), allocatable :: Cons_tr, Hours_tr, Aprime_tr, DBN_tr, &
         & ValueFunction_tr, Bq_Value_tr

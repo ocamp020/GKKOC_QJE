@@ -4149,7 +4149,7 @@ SUBROUTINE FIND_DBN_EQ()
 
 		Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
     	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_Matrix(R,P))) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
-    	K_C    = Wealth - K_P 
+    	K_C    = Wealth - K_P - Debt_Absorption*Debt_SS
     	L_C    = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
 		YBAR_P = AProd * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
 		YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
@@ -4361,9 +4361,9 @@ SUBROUTINE FIND_DBN_EQ()
 	        	Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 	        	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_mat)) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
 	        	
-	        	if (Wealth.gt.K_P) then 
+	        	if (Wealth.gt.(K_P+Debt_Absorption*Debt_SS) then 
 		        	! Corporate demand for capital
-		        	K_C    = Wealth - K_P 
+		        	K_C    = Wealth - K_P - Debt_Absorption*Debt_SS
 
 		        	! Update Wage 
 		        	if (alpha_C.eq.alpha) then 
@@ -5858,7 +5858,7 @@ SUBROUTINE FIND_DBN_Transition()
 			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
 			READ (UNIT=2,  FMT=*), NBAR_tr
 			else
-			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'wage_tr'	 , STATUS='old', ACTION='read')
+			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'Wage_tr'	 , STATUS='old', ACTION='read')
 			READ (UNIT=2,  FMT=*), wage_tr
 			endif 
 			CLOSE (unit=2); 
@@ -5915,8 +5915,8 @@ SUBROUTINE FIND_DBN_Transition()
         OPEN (UNIT=90, FILE=trim(Result_Folder)//'Transition_Debt.txt', STATUS='replace')
         OPEN (UNIT=91, FILE=trim(Result_Folder)//'Transition_Wage.txt', STATUS='replace')
      		
-     		WRITE(UNIT=76, FMT=*) 'Iteration, DBN_dist, Q_dist, N_dist, R_dist, Db_dist',&
-     								&' Q(T)/Q(SS), N(T)/N(SS), R(T)/R(SS), Db(T)/Db(SS)'
+     		WRITE(UNIT=76, FMT=*) 'Iteration, DBN_dist, Q_dist, NW_dist, R_dist, Db_dist',&
+     								&' Q(T)/Q(SS), N(T)/N(SS), W(T)/W(SS), R(T)/R(SS), Db(T)/Db(SS)'
      		WRITE(UNIT=77, FMT=*) 'NBAR'
         	WRITE(UNIT=78, FMT=*) 'QBAR'
         	WRITE(UNIT=79, FMT=*) 'R'
@@ -6239,86 +6239,145 @@ SUBROUTINE FIND_DBN_Transition()
 	        ENDDO    
 	        QBAR2_tr(ti) = ( QBAR2_tr(ti))**(1.0_DP/mu) 
 
-	        	! Get Q_dist and N_dist before dampening 
-	        	Q_dist  = max( Q_dist,abs(QBAR2_tr(ti)/QBAR_tr(ti)-1))
-	        	if (A_C.gt.0.0_dp) then 
-	        	NW_dist = max(NW_dist,abs(wage2_tr(ti)/wage_tr(ti)-1))
-	        	else 
-	        	NW_dist = max(NW_dist,abs(NBAR2_tr(ti)/NBAR_tr(ti)-1))
-	        	endif 
-
-            	! Dampened Update of QBAR and NBAR
+	        ! Get Q_dist and NW_dist before dampening 
+	        	Q_dist  	 = max( Q_dist,abs(QBAR2_tr(ti)/QBAR_tr(ti)-1))
 	        	QBAR_tr(ti)  = Dampen*QBAR_tr(ti) + (1.0_dp-Dampen)*QBAR2_tr(ti)
+	        	if (A_C.gt.0.0_dp) then
+	        	NBAR_tr(ti)  = NBAR2_tr(ti)
+	        	else
+	        	NW_dist 	 = max(NW_dist,abs(NBAR2_tr(ti)/NBAR_tr(ti)-1))
 	        	NBAR_tr(ti)  = Dampen*NBAR_tr(ti) + (1.0_dp-Dampen)*NBAR2_tr(ti)
+	        	endif 
 
-        	! Update other prices and quantities             
-	        P_tr(ti)     = alpha* QBAR_tr(ti)**(alpha-mu) * NBAR_tr(ti)**(1.0_DP-alpha)
-	        YBAR_tr(ti)  = QBAR_tr(ti)**alpha * NBAR_tr(ti)**(1.0_DP-alpha)
-	        wage_tr(ti)  = (1.0_DP-alpha)*QBAR_tr(ti)**alpha * NBAR_tr(ti)**(-alpha)
-	        Ebar_tr(ti)  = wage_tr(ti)  * NBAR_tr(ti) * sum(pop)/sum(pop(1:RetAge-1))
+        	! Compute total assets and consumption
+		        K_tr(ti) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+		        C_tr(ti) = sum( DBN1*Cons )
 
+			! Update prices 		        
+	        if (A_C.gt.0.0_dp) then 
+	        	! Capital Market: Private demand 
+	        	K_P_tr(ti)    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_mat)) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
+	        	
+	        	if (K_tr(ti).gt.(K_P_tr(ti)+Debt_Absorption*Debt_tr(ti-1))) then 
+		        	! Corporate demand for capital
+		        	K_C_tr(ti)   = K_tr(ti)- K_P_tr(ti)-Debt_Absorption*Debt_tr(ti-1)
 
-	    	! Solve for new R (that clears market under new guess for prices)
-	    	! Update only every third period or in the first and last periods 
-	    	if ((ind_R.eq.3)) then ! .or.(ti.eq.T)
-		    		! Save old R for updating 
-		    		R_old = R_tr(ti)
-		    	if (sum(theta)/nz .gt. 1.0_DP) then
-		    		! Set price 
-		    		P = min(P_tr(ti),1.0_dp)
-		    		! Solve for R using brent
-		    			! call system_clock(tclock1_R)  ! start wall timer
-    					! call cpu_time(t1_R)   		! start cpu timer
-		            brent_value = brent(-0.05_DP,R_old,0.15_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(ti))
-		            	! Usually brent_tol=0.00000001_DP
-		             	! call cpu_time(t2_R)   ! end cpu timer
-    					! call system_clock(tclock2_R, clock_rate_R); elapsed_time_R = float(tclock2_R - tclock1_R) / float(clock_rate_R)
-		            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
-		            		& 'R_out=',R2_tr(ti),'Debt_Absorption=',Debt_Absorption
-		            	! print*, '	Brent Time:		CPU time:',t2_R-t1_R,'sec		Elapsed time:',elapsed_time_R,'sec'
-	            		print*, ' '
-	            else
-	                R2_tr(ti) = 0.0_DP
-		        endif
+		        	! Update Wage 
+		        	if (alpha_C.eq.alpha) then 
+		        		Wage2_tr(ti) = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR_tr(ti) + &
+		        				& ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C_tr(ti))/NBAR_tr(ti))**(alpha)
+		        	else 
+		        		print*, ' Solving labor market numerically - Transition Period:', ti
+		        		QBAR = QBAR_tr(ti); NBAR = NBAR_tr(ti); K_C = K_C_tr(ti); 
+		        		brent_value = brent(0.001_DP,Wage_tr(ti),10.0_DP,Labor_Market_Clearing, brent_tol,Wage2_tr(ti))
+		        		print*, ' New Wage=',Wage,'Error=',brent_value
+		        	endif 
+		        	NW_dist = max(NW_dist,abs(wage2_tr(ti)/wage_tr(ti)-1))
+		        	wage_tr(ti)  = Dampen*wage_tr(ti) + (1.0_dp-Dampen)*wage2_tr(ti)
 
-		        ! Get R_dist before dampening 
-	        	R_dist = max(R_dist,abs(R2_tr(ti)/R_tr(ti)-1))
+	        	else ! Capital Market did not clear
 
-	        	! Dampened Update of R
-	        	R_tr(ti)  = Dampen*R_old + (1.0_dp-Dampen)*R2_tr(ti)
-
-	        	if ((ti.gt.1).and.(ti.lt.T)) then 
-	        		! Update extrapolation by interpolating between last update and this update
-    				R_tr(ti-2) = real(2,8)/3.0_dp*R_tr(ti-3)+real(1,8)/3.0_dp*R_tr(ti)
-    				R_tr(ti-1) = real(1,8)/3.0_dp*R_tr(ti-3)+real(2,8)/3.0_dp*R_tr(ti)
-	        		! print*, '	R Interpolation'
-	        		! print*, ' 	R1=',R_tr(ti-3),'R2=',R_tr(ti-2),'R3=',R_tr(ti-1),'R4=',R_tr(ti)
-	        		! print*, ' '
- 
-
-	        		! Update Slope for extrapolation 
-	        		R_slope = (R_tr(ti)-R_tr(ti-3))/3.0_dp 
-
-        		!elseif (ti.eq.T) then 
-
-        		elseif (ti.eq.1) then 
-
-        			R_slope = 0.0_dp
+	        		print*, ' ';
+	        		print*, ' 	Warning! Capital Market Did not Clear! Transition Period:',ti;
+	        		print*, ' ';
+		        	! Modify prices and quantities 
+		        	QBAR_tr(ti) = 0.50_dp*QBAR_tr(ti) 
+		        	Wage_tr(ti) = Wage_tr(ti) 
 
 	        	endif 
 
-	        	! Update index
-        		ind_R = 1 
+	        	! Update other prices and quantities
+        		L_P_tr(ti)  = ( (1.0_dp-alpha)*Aprod/Wage_tr(ti) )**(1.0_dp/alpha  ) * QBAR_tr(ti) 
+        		L_C_tr(ti)  = ( (1.0_dp-alpha_C)*A_C/Wage_tr(ti) )**(1.0_dp/alpha_C) * K_C_tr(ti)
+				
+				P_tr(ti)    = alpha * QBAR_tr(ti)**(alpha-mu) * L_P_tr(ti)**(1.0_DP-alpha)
+				R2_tr(ti)   = alpha_C * A_C * ( Wage_tr(ti)/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
+					R_dist  = max(R_dist,abs(R2_tr(ti)/R_tr(ti)-1))
+					R_tr(ti)= R2_tr(ti) ! Dampen*R_old + (1.0_dp-Dampen)*R2_tr(ti)
+				
+				Ebar_tr(ti)   = wage_tr(ti)  * NBAR_tr(ti)  * sum(pop)/sum(pop(1:RetAge-1))
+				YBAR_P_tr(ti) = AProd * QBAR_tr(ti)**alpha   * L_P_tr(ti)**(1.0_DP-alpha  ) 
+				YBAR_C_tr(ti) = A_C   * K_C_tr(ti) **alpha_C * L_C_tr(ti)**(1.0_DP-alpha_C) 
+				YBAR_tr(ti)   = YBAR_P_tr(ti) + YBAR_C_tr(ti)
+				! print '(A,F9.3,F9.3,F9.3,X,X,A,F9.3,F9.3,F9.3)',&
+				! 		& ' 				Corp. Sector Levels:', YBAR_C_tr(ti), K_C_tr(ti), L_C_tr(ti) , &
+				! 		& ' Ratios ', 100.0_dp*YBAR_C_tr(ti)/YBAR_tr(ti), 100.0_dp*K_C_tr(ti)/K_tr(ti), 100.0_dp*L_C_tr(ti)/NBAR_tr(ti)
 
 	        else 
-	        	! Update by extrapolating from last update 
-	    		R_tr(ti) = R_slope*ind_R+R_tr(ti-ind_R)
+	        	! Set Corporate values to zero
+        		K_C_tr(ti) = 0.0_dp; L_C_tr(ti) = 0.0_dp; YBAR_C_tr(ti) = 0.0_dp
+        		K_P_tr(ti) = 0.0_dp; L_P_tr(ti) = 0.0_dp; YBAR_P_tr(ti) = 0.0_dp
+
+	        	! Update other prices and quantities             
+		        P_tr(ti)     = alpha* QBAR_tr(ti)**(alpha-mu) * NBAR_tr(ti)**(1.0_DP-alpha)
+		        YBAR_tr(ti)  = QBAR_tr(ti)**alpha * NBAR_tr(ti)**(1.0_DP-alpha)
+		        wage_tr(ti)  = (1.0_DP-alpha)*QBAR_tr(ti)**alpha * NBAR_tr(ti)**(-alpha)
+		        Ebar_tr(ti)  = wage_tr(ti)  * NBAR_tr(ti) * sum(pop)/sum(pop(1:RetAge-1))
+
+		    	! Solve for new R (that clears market under new guess for prices)
+		    	! Update only every third period or in the first and last periods 
+		    	if ((ind_R.eq.3)) then ! .or.(ti.eq.T)
+			    		! Save old R for updating 
+			    		R_old = R_tr(ti)
+			    	if (sum(theta)/nz .gt. 1.0_DP) then
+			    		! Set price 
+			    		P = min(P_tr(ti),1.0_dp)
+			    		! Solve for R using brent
+			    			! call system_clock(tclock1_R)  ! start wall timer
+	    					! call cpu_time(t1_R)   		! start cpu timer
+			            brent_value = brent(-0.05_DP,R_old,0.15_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(ti))
+			            	! Usually brent_tol=0.00000001_DP
+			             	! call cpu_time(t2_R)   ! end cpu timer
+	    					! call system_clock(tclock2_R, clock_rate_R); elapsed_time_R = float(tclock2_R - tclock1_R) / float(clock_rate_R)
+			            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
+			            		& 'R_out=',R2_tr(ti),'Debt_Absorption=',Debt_Absorption
+			            	! print*, '	Brent Time:		CPU time:',t2_R-t1_R,'sec		Elapsed time:',elapsed_time_R,'sec'
+		            		print*, ' '
+		            else
+		                R2_tr(ti) = 0.0_DP
+			        endif
+
+			        ! Get R_dist before dampening 
+		        	R_dist = max(R_dist,abs(R2_tr(ti)/R_tr(ti)-1))
+
+		        	! Dampened Update of R
+		        	R_tr(ti)  = Dampen*R_old + (1.0_dp-Dampen)*R2_tr(ti)
+
+		        	if ((ti.gt.1).and.(ti.lt.T)) then 
+		        		! Update extrapolation by interpolating between last update and this update
+	    				R_tr(ti-2) = real(2,8)/3.0_dp*R_tr(ti-3)+real(1,8)/3.0_dp*R_tr(ti)
+	    				R_tr(ti-1) = real(1,8)/3.0_dp*R_tr(ti-3)+real(2,8)/3.0_dp*R_tr(ti)
+		        		! print*, '	R Interpolation'
+		        		! print*, ' 	R1=',R_tr(ti-3),'R2=',R_tr(ti-2),'R3=',R_tr(ti-1),'R4=',R_tr(ti)
+		        		! print*, ' '
+	 
+
+		        		! Update Slope for extrapolation 
+		        		R_slope = (R_tr(ti)-R_tr(ti-3))/3.0_dp 
+
+	        		!elseif (ti.eq.T) then 
+
+	        		elseif (ti.eq.1) then 
+
+	        			R_slope = 0.0_dp
+
+		        	endif 
+
+		        	! Update index
+	        		ind_R = 1 
+
+		        else 
+		        	! Update by extrapolating from last update 
+		    		R_tr(ti) = R_slope*ind_R+R_tr(ti-ind_R)
 	        		! print*, '	R Interpolation'
 	        		! print*, '		p1=',real(3-ind_R,8)/3.0_dp,'p2=',real(ind_R,8)/3.0_dp,'R1=',R_tr(ti-ind_R),'R2=',R_tr(ti+3-ind_R)
 	        		! print*, ' '
 
-	        	! Update index
-	        	ind_R = ind_R+1
+		        	! Update index
+		        	ind_R = ind_R+1
+		        endif 
+
+
 	        endif 
 
 
@@ -6339,9 +6398,6 @@ SUBROUTINE FIND_DBN_Transition()
 			    endif 
 
 
-	        ! Compute total assets and consumption
-	        K_tr(ti) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
-	        C_tr(ti) = sum( DBN1*Cons )
 
 	        ! Compute top wealth concentration
 	    		DO ai=1,na
@@ -6378,7 +6434,13 @@ SUBROUTINE FIND_DBN_Transition()
 	        ! print*, '		R_full=',R2_tr(ti),'R_tr=',R_tr(ti)
 	        ! print*, ' '
 
-	        print*, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr(ti),'Wealth=',K_tr(ti),'R=',R_tr(ti),'Q=',QBAR_tr(ti)
+	        !!
+	        print 12345, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr(ti),&
+	        	& 'Wealth=',K_tr(ti),'R=',100_dp*R_tr(ti),'Q=',QBAR_tr(ti),'W=',Wage_tr(ti).&
+	        	& 'K_C/A=',100.0_dp*K_C_tr(ti)/K_tr(ti),'L_C/N=',100.0_dp*L_C_tr(ti)/NBAR_tr(ti)	    		
+    		12345 format &
+    		&(A,I3,X,X,A,F8.5,X,X,A,F8.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)
+	    	!!
 	        ! print*, '		CPU time:',t2-t1,'sec		Elapsed time:',elapsed_time,'sec'
 	        print*, ' '
 
@@ -6413,8 +6475,9 @@ SUBROUTINE FIND_DBN_Transition()
 			Cons  = Cons_tr(:,:,:,:,:,:,T+1)
 			Hours = Hours_tr(:,:,:,:,:,:,T+1)
 
+	    
 	    ! Compute prices and aggregates for the current period (Time: T+1)
-	    ! print*,' Updating Prices and Quantities fot T+1'
+	    ! print*,' Updating Prices and Quantities'
     		! Compute aggregates with current distribution (Time: T+1)
 	        QBAR2_tr(T+1) =0.0
 	        NBAR2_tr(T+1) =0.0
@@ -6426,7 +6489,7 @@ SUBROUTINE FIND_DBN_Transition()
 	        DO e1=1, ne
 	             QBAR2_tr(T+1)= QBAR2_tr(T+1)+ DBN_tr(age1,a1,z1,lambda1,e1,x1,T+1) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
 	             NBAR2_tr(T+1)= NBAR2_tr(T+1)+ &
-	             		& DBN_tr(age1,a1,z1,lambda1,e1,x1,T+1) * eff_un(age1,lambda1,e1) * Hours_tr(age1,a1,z1,lambda1,e1,x1,T+1)
+	             			& DBN_tr(age1,a1,z1,lambda1,e1,x1,T+1) * eff_un(age1,lambda1,e1) * Hours_tr(age1,a1,z1,lambda1,e1,x1,T+1)
 	        ENDDO
 	        ENDDO
 	        ENDDO
@@ -6435,44 +6498,102 @@ SUBROUTINE FIND_DBN_Transition()
 	        ENDDO    
 	        QBAR2_tr(T+1) = ( QBAR2_tr(T+1))**(1.0_DP/mu) 
 
-	        	! Get Q_dist and N_dist before dampening 
-	        	Q_dist  = max( Q_dist,abs(QBAR2_tr(T+1)/QBAR_tr(T+1)-1))
-	        	if (A_C.gt.0.0_dp) then 
-	        	NW_dist = max(NW_dist,abs(wage2_tr(T+1)/wage_tr(T+1)-1))
-	        	else 
-	        	NW_dist = max(NW_dist,abs(NBAR2_tr(T+1)/NBAR_tr(T+1)-1))
-	        	endif  
-
-            	! Dampened Update of QBAR and NBAR
+	        ! Get Q_dist and NW_dist before dampening 
+	        	Q_dist  	 = max( Q_dist,abs(QBAR2_tr(T+1)/QBAR_tr(T+1)-1))
 	        	QBAR_tr(T+1)  = Dampen*QBAR_tr(T+1) + (1.0_dp-Dampen)*QBAR2_tr(T+1)
+	        	if (A_C.gt.0.0_dp) then
+	        	NBAR_tr(T+1)  = NBAR2_tr(T+1)
+	        	else
+	        	NW_dist 	 = max(NW_dist,abs(NBAR2_tr(T+1)/NBAR_tr(T+1)-1))
 	        	NBAR_tr(T+1)  = Dampen*NBAR_tr(T+1) + (1.0_dp-Dampen)*NBAR2_tr(T+1)
+	        	endif 
 
-        	! Update other prices and quantities             
-	        P_tr(T+1)     = alpha* QBAR_tr(T+1)**(alpha-mu) * NBAR_tr(T+1)**(1.0_DP-alpha)
-	        YBAR_tr(T+1)  = QBAR_tr(T+1)**alpha * NBAR_tr(T+1)**(1.0_DP-alpha)
-	        wage_tr(T+1)  = (1.0_DP-alpha)*QBAR_tr(T+1)**alpha * NBAR_tr(T+1)**(-alpha)
-	        Ebar_tr(T+1)  = wage_tr(T+1)  * NBAR_tr(T+1) * sum(pop)/sum(pop(1:RetAge-1))
+        	! Compute total assets and consumption
+		        K_tr(T+1) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+		        C_tr(T+1) = sum( DBN1*Cons )
 
-	    	! Solve for new R (that clears market under new guess for prices)
-	    	! print*, '	Solving for equilibrium interest rate (R)'
-	    		! Save old R for updating 
-	    		R_old = R_tr(T+1)
-	    	if (sum(theta)/nz .gt. 1.0_DP) then
-	    		! Set price 
-	    		P = min(P_tr(T+1),1.0_dp)
-	            brent_value = brent(-0.05_DP,R_old,0.15_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(T+1))
-	            	! Usually brent_tol=0.00000001_DP
-	            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
-	            		& 'R_out=',R2_tr(T+1)
-            else
-                R_tr(T+1) = 0.0_DP
-	        endif
+			! Update prices 		        
+	        if (A_C.gt.0.0_dp) then 
+	        	! Capital Market: Private demand 
+	        	K_P_tr(T+1)    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_mat)) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
+	        	
+	        	if (K_tr(T+1).gt.(K_P_tr(T+1)+Debt_Absorption*Debt_tr(T))) then 
+		        	! Corporate demand for capital
+		        	K_C_tr(T+1)   = K_tr(T+1)- K_P_tr(T+1)-Debt_Absorption*Debt_tr(T)
 
-	        	! Get R_dist before dampening 
+		        	! Update Wage 
+		        	if (alpha_C.eq.alpha) then 
+		        		Wage2_tr(T+1) = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR_tr(T+1) + &
+		        				& ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C_tr(T+1))/NBAR_tr(T+1))**(alpha)
+		        	else 
+		        		print*, ' Solving labor market numerically - Transition Period:', ti
+		        		QBAR = QBAR_tr(T+1); NBAR = NBAR_tr(T+1); K_C = K_C_tr(T+1); 
+		        		brent_value = brent(0.001_DP,Wage_tr(T+1),10.0_DP,Labor_Market_Clearing, brent_tol,Wage2_tr(T+1))
+		        		print*, ' New Wage=',Wage,'Error=',brent_value
+		        	endif 
+		        	NW_dist = max(NW_dist,abs(wage2_tr(T+1)/wage_tr(T+1)-1))
+		        	wage_tr(T+1)  = Dampen*wage_tr(T+1) + (1.0_dp-Dampen)*wage2_tr(T+1)
+
+	        	else ! Capital Market did not clear
+
+	        		print*, ' ';
+	        		print*, ' 	Warning! Capital Market Did not Clear! Transition Period:',ti;
+	        		print*, ' ';
+		        	! Modify prices and quantities 
+		        	QBAR_tr(T+1) = 0.50_dp*QBAR_tr(T+1) 
+		        	Wage_tr(T+1) = Wage_tr(T+1) 
+
+	        	endif 
+
+	        	! Update other prices and quantities
+        		L_P_tr(T+1)  = ( (1.0_dp-alpha)*Aprod/Wage_tr(T+1) )**(1.0_dp/alpha  ) * QBAR_tr(T+1) 
+        		L_C_tr(T+1)  = ( (1.0_dp-alpha_C)*A_C/Wage_tr(T+1) )**(1.0_dp/alpha_C) * K_C_tr(T+1)
+				
+				P_tr(T+1)    = alpha * QBAR_tr(T+1)**(alpha-mu) * L_P_tr(T+1)**(1.0_DP-alpha)
+				R2_tr(T+1)   = alpha_C * A_C * ( Wage_tr(T+1)/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
+					R_dist  = max(R_dist,abs(R2_tr(T+1)/R_tr(T+1)-1))
+					R_tr(T+1)= R2_tr(T+1) ! Dampen*R_old + (1.0_dp-Dampen)*R2_tr(T+1)
+				
+				Ebar_tr(T+1)   = wage_tr(T+1)  * NBAR_tr(T+1)  * sum(pop)/sum(pop(1:RetAge-1))
+				YBAR_P_tr(T+1) = AProd * QBAR_tr(T+1)**alpha   * L_P_tr(T+1)**(1.0_DP-alpha  ) 
+				YBAR_C_tr(T+1) = A_C   * K_C_tr(T+1) **alpha_C * L_C_tr(T+1)**(1.0_DP-alpha_C) 
+				YBAR_tr(T+1)   = YBAR_P_tr(T+1) + YBAR_C_tr(T+1)
+				! print '(A,F9.3,F9.3,F9.3,X,X,A,F9.3,F9.3,F9.3)',&
+				! 		& ' 				Corp. Sector Levels:', YBAR_C_tr(T+1), K_C_tr(T+1), L_C_tr(T+1) , &
+				! 		& ' Ratios ', 100.0_dp*YBAR_C_tr(T+1)/YBAR_tr(T+1), 100.0_dp*K_C_tr(T+1)/K_tr(T+1), 100.0_dp*L_C_tr(T+1)/NBAR_tr(T+1)
+
+	        else 
+	        	! Set Corporate values to zero
+        		K_C_tr(T+1) = 0.0_dp; L_C_tr(T+1) = 0.0_dp; YBAR_C_tr(T+1) = 0.0_dp
+        		K_P_tr(T+1) = 0.0_dp; L_P_tr(T+1) = 0.0_dp; YBAR_P_tr(T+1) = 0.0_dp
+
+	        	! Update other prices and quantities             
+		        P_tr(T+1)     = alpha* QBAR_tr(T+1)**(alpha-mu) * NBAR_tr(T+1)**(1.0_DP-alpha)
+		        YBAR_tr(T+1)  = QBAR_tr(T+1)**alpha * NBAR_tr(T+1)**(1.0_DP-alpha)
+		        wage_tr(T+1)  = (1.0_DP-alpha)*QBAR_tr(T+1)**alpha * NBAR_tr(T+1)**(-alpha)
+		        Ebar_tr(T+1)  = wage_tr(T+1)  * NBAR_tr(T+1) * sum(pop)/sum(pop(1:RetAge-1))
+
+		    	! Solve for new R (that clears market under new guess for prices)
+    				! Save old R for updating 
+		    		R_old = R_tr(T+1)
+		    	if (sum(theta)/nz .gt. 1.0_DP) then
+		    		P = min(P_tr(T+1),1.0_dp)
+		            brent_value = brent(-0.05_DP,R_old,0.15_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(T+1))
+		            	! Usually brent_tol=0.00000001_DP
+		            	print*, ' 	Solving for equilibrium interest rate (R)  -  Error=',brent_value,&
+		            		& 'R_out=',R2_tr(T+1),'Debt_Absorption=',Debt_Absorption
+	            		print*, ' '
+	            else
+	                R2_tr(T+1) = 0.0_DP
+		        endif
+
+		        ! Get R_dist before dampening 
 	        	R_dist = max(R_dist,abs(R2_tr(T+1)/R_tr(T+1)-1))
 
 	        	! Dampened Update of R
 	        	R_tr(T+1)  = Dampen*R_old + (1.0_dp-Dampen)*R2_tr(T+1)
+
+	        endif 
 
 	        ! Compute government budget for the current preiod (Time: T+1)
 	    	! print*,' Calculating tax revenue'
@@ -6494,13 +6615,10 @@ SUBROUTINE FIND_DBN_Transition()
 	        	Debt_SS  = 0.8*Debt_SS + 0.2*Debt_tr(T+1)	
 
 
-	        ! Compute total assets and consumption
-	        K_tr(T+1) = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
-	        C_tr(T+1) = sum( DBN1*Cons )
-
 	        print*,' '
-	        print*, 't=',T+1,'Deficit=',(GBAR_bench-GBAR_tr(T+1)),'Debt=',Debt_tr(T+1),&
-	        		& 'Wealth=',K_tr(T+1),'R=',R_tr(T+1),'Q=',QBAR_tr(T+1)
+	        print 12345, 't=',T+1,'Deficit=',(GBAR_bench-GBAR_tr(T+1)),'Debt=',Debt_tr(T+1),&
+	        	& 'Wealth=',K_tr(T+1),'R=',100_dp*R_tr(T+1),'Q=',QBAR_tr(T+1),'W=',Wage_tr(T+1).&
+	        	& 'K_C/A=',100.0_dp*K_C_tr(T+1)/K_tr(T+1),'L_C/N=',100.0_dp*L_C_tr(T+1)/NBAR_tr(T+1)	    		
 	        print*,' '
 
 	        ! Compute top wealth concentration
@@ -6548,6 +6666,7 @@ SUBROUTINE FIND_DBN_Transition()
 	    	OPEN (UNIT=88, FILE=trim(Result_Folder)//'Transition_Top1.txt', STATUS='old', POSITION='append')
 	    	OPEN (UNIT=89, FILE=trim(Result_Folder)//'Transition_Top10.txt', STATUS='old', POSITION='append')
 	    	OPEN (UNIT=90, FILE=trim(Result_Folder)//'Transition_Debt.txt', STATUS='old', POSITION='append')
+	    	OPEN (UNIT=91, FILE=trim(Result_Folder)//'Transition_Wage.txt', STATUS='old', POSITION='append')
 	        	WRITE(UNIT=77, FMT=*) NBAR_bench, NBAR2_tr, NBAR_exp
 	        	WRITE(UNIT=78, FMT=*) QBAR_bench, QBAR2_tr, QBAR_exp
 	        	WRITE(UNIT=79, FMT=*) R_bench, R_tr, R_exp
@@ -6562,9 +6681,10 @@ SUBROUTINE FIND_DBN_Transition()
 	        	WRITE(UNIT=88, FMT=*) Wealth_Top_1_Tr
 	        	WRITE(UNIT=89, FMT=*) Wealth_Top_10_Tr
 	        	WRITE(UNIT=90, FMT=*) 0, Debt_tr, Debt_SS
+	        	WRITE(UNIT=90, FMT=*) wage_bench, wage_tr, wage_exp
 	    	CLOSE (unit=77); CLOSE (unit=78); CLOSE (unit=79);
 	    	CLOSE (unit=80); CLOSE (unit=81); CLOSE (unit=82); CLOSE (unit=83); CLOSE (unit=84); CLOSE (unit=85);
-	    	CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89); CLOSE (unit=90);
+	    	CLOSE (unit=86); CLOSE (unit=87); CLOSE (unit=88); CLOSE (unit=89); CLOSE (unit=90); CLOSE (unit=91);
 
 
 	    	! Write Variable Paths
@@ -6625,42 +6745,53 @@ SUBROUTINE FIND_DBN_Transition()
 		    Chg_dist = abs(DBN_dist-Old_DBN_dist)
 		    Old_DBN_dist = DBN_dist
 
+		    print*, ' '; print*,'-------------------------------------------------------------------'
 		    print*, 'Iteration=',simutime
-		    print*, '	Distance: DBN=', DBN_dist,' Q=',Q_dist,' NW=',NW_dist,' R=',R_dist,' Db=',Db_dist,'Chg_dist=',Chg_dist
-		    print*, '	X(T)/X(SS): Q=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N=',100*(NBAR2_tr(T+1)/NBAR_exp-1),&
-		    		' R=',100*(R2_tr(T+1)-R_exp),' Db=',100*(Debt_tr(T+1)/Debt_exp-1)
+		    print '(A,E12.5,X,X,A,E12.5,X,X,A,E12.5,X,X,A,E12.5,X,X,A,E12.5,X,X,A,E12.5,X,X)', &
+		    	&'	Distance: DBN=', DBN_dist,' Q=',Q_dist,' NW=',NW_dist,' R=',R_dist,' Db=',Db_dist,'Chg_dist=',Chg_dist
+		    print '(A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X)', &
+	    		&'	X(T)/X(SS): Q=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N=',100*(NBAR2_tr(T+1)/NBAR_exp-1),&
+		    		' W=',100*(Wage_tr(T+1)-wage_exp),' R=',100*(R2_tr(T+1)-R_exp),' Db=',100*(Debt_tr(T+1)/Debt_exp-1)
 	    	print*, ' '
 	    	print*, ' Government Budget:'
-	    	print*, '	tau_K=',tauK,'tau_W',tauW_at,'tau_L',1.0_dp-psi
-	    	print*, '	Debt=',Debt_tr(T+1),'Debt/GDP=',Debt_tr(T+1)/YBAR_tr(T+1)
-	    	print*, '	GBAR_T+1=',GBAR_tr(T+1),'Expenditure',GBAR_bench+R_tr(T+1)*Debt_tr(T+1),&
+	    	print '(A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X)', &
+	    		&'	tau_K=',100.0_dp*tauK,'tau_W',100.0_dp*tauW_at,'tau_L',100.0_dp*(1.0_dp-psi)
+	    	print '(A,F7.3,X,X,A,F7.3)', '	Debt=',Debt_tr(T+1),'Debt/GDP=',Debt_tr(T+1)/YBAR_tr(T+1)
+	    	print '(A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X)', &
+	    		&'	GBAR_T+1=',GBAR_tr(T+1),'Expenditure',GBAR_bench+R_tr(T+1)*Debt_tr(T+1),&
 	    					& 'Deficit=',GBAR_tr(T+1)-GBAR_bench-R_tr(T+1)*Debt_tr(T+1)
-			print*, '	GBAR_exp=',GBAR_exp,'Expenditure',GBAR_bench+R_exp*Debt_tr(T+1),&
+			print '(A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X)', &
+				&'	GBAR_exp=',GBAR_exp,'Expenditure',GBAR_bench+R_exp*Debt_tr(T+1),&
 	    					& 'Deficit=',GBAR_exp-GBAR_bench-R_exp*Debt_tr(T+1)
-			print*, '	Debt Absortion=',Debt_Absorption
-			print*, ' '
+			print '(A,F7.4)', '	Debt Absortion=',Debt_Absorption
+			print*,'-------------------------------------------------------------------';print*, ' '
 
 	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
 	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,NW_dist,R_dist,Db_dist,&
 	    						&	100*(QBAR2_tr(T+1)/QBAR_exp-1),100*(NBAR2_tr(T+1)/NBAR_exp-1),&
-	    						&	100*(R2_tr(T+1)/R_exp-1),100*(Debt_tr(T+1)/Debt_exp-1)
+	    						&	100*(Wage_tr(T+1)/wage_exp-1),100*(R2_tr(T+1)/R_exp-1),100*(Debt_tr(T+1)/Debt_exp-1)
 	    	CLOSE(UNIT=76)
 
 
 	    	! Print Summary File
 			OPEN  (UNIT=78,FILE=trim(Result_Folder)//'Transition_Summary.txt'   , STATUS='replace')
-			WRITE (UNIT=78,FMT=*) 'Period, Q, N, R, Wage, Y, K, C, Debt,',&
+			WRITE (UNIT=78,FMT=*) 'Period, Q, N, R, Wage, Y, K, C, Y_C, L_C, K_C, Y_P, L_P, K_P, Debt,',&
 					&' GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, SSC,',' Wealth_Top_1, Wealth_Top_10'
 			WRITE (UNIT=78,FMT=*) 'SS_1,',QBAR_bench,',',NBAR_bench,',',R_bench,',',wage_bench,',' & 
-										&  ,Y_bench,',',K_bench,',',C_bench,',',0,',',GBAR_bench
+										& ,Y_bench,',',K_bench,',',C_bench,','&
+										& ,YBAR_C_bench,',',L_C_bench,',',K_C_bench,',',YBAR_P_bench,',',L_P_bench,',',K_P_bench,','&
+										& ,0,',',GBAR_bench
 			do ti=1,T+1
 			WRITE (UNIT=78,FMT=*) ti,',',QBAR_tr(ti),',',NBAR_tr(ti),',',R_tr(ti),',',Wage_tr(ti),',' & 
-								& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),',',Debt_tr(ti),GBAR_tr(ti),',' &
+								& ,YBAR_tr(ti),',',K_tr(ti),',',C_tr(ti),','&
+								& ,YBAR_C_tr(ti),',',L_C_tr(ti),',',K_C_tr(ti),',',YBAR_P_tr(ti),',',L_P_tr(ti),',',K_P_tr(ti),','&
+								& ,Debt_tr(ti),GBAR_tr(ti),',' &
 								& ,GBAR_K_tr(ti),',',GBAR_W_tr(ti),',',GBAR_L_tr(ti),',',GBAR_C_tr(ti),',',SSC_Payments_tr(ti),','&
 								& ,Wealth_Top_1_tr(ti),',',Wealth_Top_10_tr(ti)
 			enddo 
 			WRITE (UNIT=78,FMT=*) 'SS_2,',QBAR_exp,',',NBAR_exp,',',R_exp,',',wage_exp,',' & 
 								&  ,Y_exp,',',K_exp,',',C_exp,','&
+								& ,YBAR_C_exp,',',L_C_exp,',',K_C_exp,',',YBAR_P_exp,',',L_P_exp,',',K_P_exp,','&
 								&  ,Debt_exp,',',GBAR_exp,',99, 99, 99, 99, 99, 99,'&
 								&  ,Wealth_Top_1_tr(T+1),',',Wealth_Top_10_tr(T+1)
 			CLOSE (UNIT=78);
