@@ -4360,8 +4360,8 @@ SUBROUTINE FIND_DBN_EQ()
 	        ENDDO   
 	        call cpu_time(t2)   ! end cpu timer
     		call system_clock(tclock2, clock_rate); elapsed_time = float(tclock2 - tclock1) / float(clock_rate)
-	        print*,'Test - QBAR=',QBAR,'NBAR=',NBAR 
-	        print*, '		CPU time:',t2-t1,'sec		Elapsed time:',elapsed_time,'sec'
+	        print '(A,F9.6,X,X,A,F9.6)','Test - QBAR=',QBAR,'NBAR=',NBAR 
+	        print '(A,F9.6,X,X,A,F9.6)', '		CPU time:',t2-t1,'sec		Elapsed time:',elapsed_time,'sec'
 
 	        call system_clock(tclock1)  ! start wall timer
     		call cpu_time(t1)   		! start cpu timer
@@ -4385,8 +4385,8 @@ SUBROUTINE FIND_DBN_EQ()
 	        !$omp barrier
 	        call cpu_time(t2)   ! end cpu timer
     		call system_clock(tclock2, clock_rate); elapsed_time = float(tclock2 - tclock1) / float(clock_rate)
-	        print*,'Test - QBAR=',QBAR,'NBAR=',NBAR 
-	        print*, '		CPU time:',t2-t1,'sec		Elapsed time:',elapsed_time,'sec'    
+	        print '(A,F9.6,X,X,A,F9.6)','Test - QBAR=',QBAR,'NBAR=',NBAR 
+	        print '(A,F9.6,X,X,A,F9.6)', '		CPU time:',t2-t1,'sec		Elapsed time:',elapsed_time,'sec'    
 	        QBAR = ( QBAR)**(1.0_DP/mu)
 
 
