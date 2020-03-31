@@ -4130,6 +4130,9 @@ SUBROUTINE FIND_DBN_EQ()
 	REAL(DP) :: BBAR, Wealth, brent_value
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable ::  PrAprimelo, PrAprimehi, DBN2
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable ::  Aplo, Aphi
+	! Timing
+	real(kind=8)    :: t1, t2, elapsed_time
+    integer(kind=8) :: tclock1, tclock2, clock_rate
 
 	allocate( PrAprimelo(   MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( PrAprimehi(   MaxAge,na,nz,nlambda,ne,nx) )
@@ -4337,6 +4340,8 @@ SUBROUTINE FIND_DBN_EQ()
 	    IF (iter_indx .ge. update_period) THEN
 
 	    	! Compute aggregates with current distribution: New QBAR and Agg. Labor Supply (NBAR)
+	    	call system_clock(tclock1)  ! start wall timer
+    		call cpu_time(t1)   		! start cpu timer
 	        QBAR =0.0
 	        NBAR =0.0
 	        DO x1=1,nx
@@ -4352,7 +4357,36 @@ SUBROUTINE FIND_DBN_EQ()
 	        ENDDO
 	        ENDDO    
 	        ENDDO    
-	        ENDDO    	    
+	        ENDDO   
+	        call cpu_time(t2)   ! end cpu timer
+    		call system_clock(tclock2, clock_rate); elapsed_time = float(tclock2 - tclock1) / float(clock_rate)
+	        print*,'Test - QBAR=',QBAR,'NBAR=',NBAR 
+	        print*, '		CPU time:',t2-t1,'sec		Elapsed time:',elapsed_time,'sec'
+
+	        call system_clock(tclock1)  ! start wall timer
+    		call cpu_time(t1)   		! start cpu timer
+	        QBAR =0.0
+	        NBAR =0.0
+	        !$omp parallel do reduction(+:QBAR,NBAR) private(x1,age1,a1,lambda1,e1)
+	        DO z1=1,nz
+	        DO x1=1,nx
+	        DO age1=1,MaxAge
+	        DO a1=1,na
+	        DO lambda1=1,nlambda
+	        DO e1=1, ne
+	             QBAR= QBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
+	             NBAR= NBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * eff_un(age1, lambda1, e1) * Hours(age1, a1, z1, lambda1,e1,x1)
+	        ENDDO
+	        ENDDO
+	        ENDDO
+	        ENDDO    
+	        ENDDO    
+	        ENDDO 
+	        !$omp barrier
+	        call cpu_time(t2)   ! end cpu timer
+    		call system_clock(tclock2, clock_rate); elapsed_time = float(tclock2 - tclock1) / float(clock_rate)
+	        print*,'Test - QBAR=',QBAR,'NBAR=',NBAR 
+	        print*, '		CPU time:',t2-t1,'sec		Elapsed time:',elapsed_time,'sec'    
 	        QBAR = ( QBAR)**(1.0_DP/mu)
 
 
