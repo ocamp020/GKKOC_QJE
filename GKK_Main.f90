@@ -135,11 +135,11 @@ PROGRAM main
 		phi    	= (1.0_dp-gamma)/gamma
 
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
-			chi_bq = 10.00_dp ! Scaling 
+			chi_bq = 08.00_dp ! Scaling 
 			bq_0   = 00.30_dp ! Level shift 
 
 		! Corporate Sector
-			A_C    = 0.9500_dp
+			A_C    = 0.9600_dp
 
 		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
