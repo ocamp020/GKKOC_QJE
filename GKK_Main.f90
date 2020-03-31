@@ -64,7 +64,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
+			compute_bench = .true.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
@@ -135,11 +135,11 @@ PROGRAM main
 		phi    	= (1.0_dp-gamma)/gamma
 
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
-			chi_bq = 33.00_dp ! Scaling 
-			bq_0   = 01.20_dp ! Level shift 
+			chi_bq = 30.00_dp ! Scaling 
+			bq_0   = 00.30_dp ! Level shift 
 
 		! Corporate Sector
-			A_C    = 0.9227_dp
+			A_C    = 0.9300_dp
 
 		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
@@ -550,7 +550,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark
