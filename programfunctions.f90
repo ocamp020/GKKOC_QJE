@@ -10788,6 +10788,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Aggregate Variables'
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'GBAR'	, GBAR
+			WRITE(UNIT=19, FMT=*) 'KBAR'	, MeanWealth
 			WRITE(UNIT=19, FMT=*) 'QBAR'	, QBAR
 			WRITE(UNIT=19, FMT=*) 'NBAR'	, NBAR
 			WRITE(UNIT=19, FMT=*) 'EBAR'	, EBAR
@@ -10799,22 +10800,21 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Moments:'
 			WRITE(UNIT=19, FMT=*) ' '
-			WRITE(UNIT=19, FMT=*) 'Debt_Output'		  		, External_Debt_GDP
-			WRITE(UNIT=19, FMT=*) 'Wealth_Output'		  	, Wealth_Output
-			WRITE(UNIT=19, FMT=*) 'Mean_Assets'				, MeanWealth
-			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_1%' 	, prct1_wealth
-			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_10%'	, prct10_wealth
-			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_20%'	, prct20_wealth
-			WRITE(UNIT=19, FMT=*) 'Wealth_held_by_Top_40%'	, prct40_wealth
-			WRITE(UNIT=19, FMT=*) 'Mean_Labor_Earnings'	  	, mean_log_earnings_25_60
-			WRITE(UNIT=19, FMT=*) 'STD_Labor_Earnings'	  	, Std_Log_Earnings_25_60
-			WRITE(UNIT=19, FMT=*) 'Mean_Labor_25_60'	   	, meanhours_25_60
-			WRITE(UNIT=19, FMT=*) 'Mean_Return'				, 100.0_dp*MeanReturn
-			WRITE(UNIT=19, FMT=*) 'Std_Return'				, StdReturn
+			WRITE(UNIT=19, FMT=*) 'Debt_Output'		  	, External_Debt_GDP
+			WRITE(UNIT=19, FMT=*) 'Wealth_Output'	  	, Wealth_Output
+			WRITE(UNIT=19, FMT=*) 'Wealth_Top_1%' 		, prct1_wealth
+			WRITE(UNIT=19, FMT=*) 'Wealth_Top_10%'		, prct10_wealth
+			WRITE(UNIT=19, FMT=*) 'Wealth_Top_20%'		, prct20_wealth
+			WRITE(UNIT=19, FMT=*) 'Wealth_Top_40%'		, prct40_wealth
+			WRITE(UNIT=19, FMT=*) 'Mean_Labor_Earnings'	, mean_log_earnings_25_60
+			WRITE(UNIT=19, FMT=*) 'STD_Labor_Earnings'	, Std_Log_Earnings_25_60
+			WRITE(UNIT=19, FMT=*) 'Mean_Labor_25_60'	, meanhours_25_60
+			WRITE(UNIT=19, FMT=*) 'Mean_Return'			, 100.0_dp*MeanReturn
+			WRITE(UNIT=19, FMT=*) 'Std_Return'			, StdReturn
 			do zi=1,nz
-			WRITE(UNIT=19, FMT=*) 'Mean_Return_by_z'		, 100.0_dp*MeanReturn_by_z(zi)
+			WRITE(UNIT=19, FMT=*) 'Mean_Return_by_z'	, 100.0_dp*MeanReturn_by_z(zi)
 			enddo 
-			WRITE(UNIT=19, FMT=*) 'Moments'				  	, SSE_Moments 
+			WRITE(UNIT=19, FMT=*) 'Moments'				, SSE_Moments 
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Present_Value_Wealth'
 			WRITE(UNIT=19, FMT=*) "Mean_PV_Wealth"		    , Mean_Firm_Wealth
@@ -10851,6 +10851,9 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Y_C/YBAR'				, 100.0_dp*YBAR_C/YBAR
 			WRITE(UNIT=19, FMT=*) 'K_C/KBAR'				, 100.0_dp*K_C/MeanWealth
 			WRITE(UNIT=19, FMT=*) 'L_C/NBAR'   				, 100.0_dp*L_C/NBAR
+			WRITE(UNIT=19, FMT=*) 'Y_C'		   				, YBAR_C 
+			WRITE(UNIT=19, FMT=*) 'L_C'		   				, L_C 
+			WRITE(UNIT=19, FMT=*) 'K_C'		   				, K_C 
 			WRITE(UNIT=19, FMT=*) ' '
 		CLOSE(Unit=19)
 	if (bench_indx.ne.1) then
@@ -10894,7 +10897,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 
 	bench_folder = trim(Result_Folder)//'Bench_Files/'
 		call system( 'mkdir -p ' // trim(bench_folder) )
-		print*, "Bench Files Folder:", bench_folder
+		print*,' '; print*, "Bench Files Folder:", bench_folder
 	
 	IF (Compute_bench) then 
 		OPEN  (UNIT=1,  FILE=trim(bench_folder)//'cons'  , STATUS='replace')
@@ -10984,7 +10987,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		WRITE (UNIT=17, FMT=*) K_P
 		CLOSE (UNIT=12); CLOSE (UNIT=13); CLOSE (UNIT=14); CLOSE (UNIT=15); CLOSE (UNIT=16); CLOSE (UNIT=17); 
 
-		print*, "Writing of benchmark results completed"
+		print*, "Writing of benchmark results completed"; print*, ' '
 	ELSE 
 		OPEN (UNIT=1,  FILE=trim(bench_folder)//'cons'  , STATUS='old', ACTION='read')
 		OPEN (UNIT=2,  FILE=trim(bench_folder)//'aprime', STATUS='old', ACTION='read')
@@ -11060,7 +11063,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		CLOSE (unit=21); CLOSE (unit=22); 
 		CLOSE (unit=23); CLOSE (unit=24); CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); CLOSE (unit=28);
 
-		print*, "Reading of benchmark results completed"
+		print*, "Reading of benchmark results completed"; print*, ' ';
 	END IF 
 END SUBROUTINE Write_Benchmark_Results
 
@@ -11072,7 +11075,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Exp_Files/' )
 
 	if (compute_exp) then 
-		print*, "Writing experimental results in folder", trim(Result_Folder) // 'Exp_Files/'
+		print*,' '; print*, "Writing experimental results in folder", trim(Result_Folder) // 'Exp_Files/'
 		OPEN  (UNIT=1 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_cons'  , STATUS='replace')
 		WRITE (UNIT=1 , FMT=*) cons
 		OPEN  (UNIT=2 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_aprime', STATUS='replace')
@@ -11140,10 +11143,10 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN  (UNIT=27,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_K_P', STATUS='replace')
 		WRITE (UNIT=27,  FMT=*) K_P
 
-		print*, "Writing of experimental results completed"
+		print*, "Writing of experimental results completed"; print*, ' '
 
 	else 
-		print*, "Reading experimental results from folder", trim(Result_Folder) // 'Exp_Files/'
+		print*,' '; print*, "Reading experimental results from folder", trim(Result_Folder) // 'Exp_Files/'
 		OPEN (UNIT=1 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_cons'  	, STATUS='old', ACTION='read')
 		OPEN (UNIT=2 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_aprime'	, STATUS='old', ACTION='read')
 		OPEN (UNIT=3 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_hours' 	, STATUS='old', ACTION='read')
@@ -11201,7 +11204,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		READ (UNIT=25, FMT=*), YBAR_P
 		READ (UNIT=26, FMT=*), L_P 
 		READ (UNIT=27, FMT=*), K_P 
-		print*, "Reading of experimental results completed"
+		print*, "Reading of experimental results completed"; print*, ' '
 	endif 
 
 	CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=70);
