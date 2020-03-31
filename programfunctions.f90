@@ -4369,7 +4369,6 @@ SUBROUTINE FIND_DBN_EQ()
 	        NBAR =0.0
 	        !$omp parallel do reduction(+:QBAR,NBAR) private(x1,age1,a1,lambda1,e1)
 	        DO z1=1,nz
-	        !$omp parallel do reduction(+:QBAR,NBAR) private(age1,a1,lambda1,e1)
 	        DO x1=1,nx
 	        DO age1=1,MaxAge
 	        DO a1=1,na
