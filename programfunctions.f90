@@ -4361,7 +4361,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        	Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 	        	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_mat)) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
 	        	
-	        	if (Wealth.gt.(K_P+Debt_Absorption*Debt_SS) then 
+	        	if (Wealth.gt.(K_P+Debt_Absorption*Debt_SS)) then 
 		        	! Corporate demand for capital
 		        	K_C    = Wealth - K_P - Debt_Absorption*Debt_SS
 
@@ -6436,7 +6436,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 	        !!
 	        print 12345, 't=',ti,'Deficit=',(GBAR_bench-GBAR_tr(ti)),'Debt=',Debt_tr(ti),&
-	        	& 'Wealth=',K_tr(ti),'R=',100_dp*R_tr(ti),'Q=',QBAR_tr(ti),'W=',Wage_tr(ti).&
+	        	& 'Wealth=',K_tr(ti),'R=',100_dp*R_tr(ti),'Q=',QBAR_tr(ti),'W=',Wage_tr(ti),&
 	        	& 'K_C/A=',100.0_dp*K_C_tr(ti)/K_tr(ti),'L_C/N=',100.0_dp*L_C_tr(ti)/NBAR_tr(ti)	    		
     		12345 format &
     		&(A,I3,X,X,A,F8.5,X,X,A,F8.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)
@@ -6617,7 +6617,7 @@ SUBROUTINE FIND_DBN_Transition()
 
 	        print*,' '
 	        print 12345, 't=',T+1,'Deficit=',(GBAR_bench-GBAR_tr(T+1)),'Debt=',Debt_tr(T+1),&
-	        	& 'Wealth=',K_tr(T+1),'R=',100_dp*R_tr(T+1),'Q=',QBAR_tr(T+1),'W=',Wage_tr(T+1).&
+	        	& 'Wealth=',K_tr(T+1),'R=',100_dp*R_tr(T+1),'Q=',QBAR_tr(T+1),'W=',Wage_tr(T+1),&
 	        	& 'K_C/A=',100.0_dp*K_C_tr(T+1)/K_tr(T+1),'L_C/N=',100.0_dp*L_C_tr(T+1)/NBAR_tr(T+1)	    		
 	        print*,' '
 
