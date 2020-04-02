@@ -7427,7 +7427,7 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: Tot_Income_draft_group, K_Inc_draft_group, L_Inc_draft_group
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: K_Inc_frac_draft_group, L_Inc_frac_draft_group
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: K_Tax_Inc_draft_group, L_Tax_Inc_draft_group, C_Tax_Inc_draft_group
-	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income, K_Tax_bench, L_Tax_bench ! , Firm_Output, Firm_Profit
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income, K_Tax, L_Tax ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 
