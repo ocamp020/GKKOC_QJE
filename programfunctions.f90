@@ -8156,7 +8156,7 @@ SUBROUTINE COMPUTE_STATS()
 		! Cons, Hours, Ap of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
 		 Cons_draft_group = Draft_Table(  Cons_draft_group_z,DBN_z,.false.)
 		Hours_draft_group = Draft_Table( Hours_draft_group_z,DBN_z,.false.)
-		   Ap_draft_group = Draft_Table(Aprime_draft_group_z,DBN_z,.true. )
+		   Ap_draft_group = Draft_Table(    Ap_draft_group_z,DBN_z,.true. )
 
 		! Fix fractions
 	    av_wealth_draft_group        = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*wealth_draft_group/size_draft_group
