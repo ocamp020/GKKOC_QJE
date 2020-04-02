@@ -7701,6 +7701,163 @@ SUBROUTINE COMPUTE_STATS()
 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
+	! Distribution of bequest
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+		print*, 'Test Bequests'
+		Bequest_Wealth=0.0_DP
+		DO xi=1,nx
+		DO zi=1,nz
+		DO ai=1,na
+		DO lambdai=1,nlambda
+		DO ei=1, ne
+		   Bequest_Wealth = Bequest_Wealth + DBN1(1, ai, zi, lambdai, ei, xi)*agrid(ai)
+		ENDDO
+		ENDDO
+		ENDDO    
+		ENDDO 
+		ENDDO  
+		print*, ' Test 1 '
+		print*, 'test Total_Income 7'
+		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
+		! Distribution of bequest (matrix)	
+		do ai=1,MaxAge
+			DBN_bq(ai,:,:,:,:,:) = DBN1(ai,:,:,:,:,:)*(1.0_DP-survP(ai))
+		enddo 
+		DBN_bq = DBN_bq/sum(DBN_bq)
+		print*, ' Test 2 '
+		print*, 'test Total_Income 8'
+		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
+		! Vectorizations
+		DBN_bq_vec        = reshape(DBN_bq      ,(/size(DBN1)/)); print*, ' Test 2.1 '
+		print*, 'test Total_Income 9'
+		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
+		BQ_vec            = reshape(Aprime      ,(/size(DBN1)/)); print*, ' Test 2.2 '
+			print*, sum(DBN1), sum(Total_Income), size(DBN1)
+			Inc_vec= 0.0_dp 
+			print*, sum(Inc_vec), sum(Total_Income), maxval(Total_Income), minval(Total_Income)
+		Inc_vec 		  = reshape(Total_Income,(/size(DBN1)/)); print*, ' Test 2.3 '
+		print*, ' Test 2.5 '
+
+		! Mean Bequest
+		Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
+
+		print*, ' Test 3 '
+		if (solving_bench.eq.1) then
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Bench.txt', STATUS='replace')
+		else
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Exp.txt', STATUS='replace')
+		end if 
+		print*,' '
+		print*,'-----------------------------------------------------'
+		print*,' Bequest Stats'
+		print*,' '
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'Bequest_Stats'
+			WRITE(UNIT=11, FMT=*) 'Total_Bequest/Wealth= '		, Bequest_Wealth/MeanWealth 
+			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/Wealth= '		, Mean_Bequest/MeanWealth 
+			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/PV_Wealth= '	, Bequest_Wealth/Mean_Firm_Wealth 
+			WRITE(UNIT=11, FMT=*) 'Bequests_Above_Threshold= '	, Threshold_Share_bq
+			WRITE(UNIT=11, FMT=*) 'Bequest_Revenue/YBAR= '		, 0
+			WRITE(UNIT=11, FMT=*) 'Prctile ','Bequest ','Bq/EBAR ','Bq/Inc 0.5%','Bq_Inc 1% ','Bq_Inc 2% '
+		print '(A,F7.3)', ' 	Total_Bequest/Wealth= '		, 100.0_dp*Bequest_Wealth/MeanWealth 
+		print '(A,F7.3)', ' 	Mean_Bequest/Wealth= '		, 100.0_dp*Mean_Bequest/MeanWealth 
+		print*, ' 	Prctile  ','Bequest  ','Bq/EBAR  ','Bq/Inc 0.5%  ','Bq_Inc 1%  ','Bq_Inc 2%  '
+
+		! Compute bequest by percentile (percentiles for counter CDF)
+		prctile_bq = (/0.4_dp, 0.25_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+		a = minval(BQ_vec)
+		b = maxval(BQ_vec) 
+		c = a
+		do i=1,size(prctile_bq)
+			a = c
+			b = maxval(BQ_vec)
+			c = (a+b)/2.0_dp
+			CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+			!print*, ' '
+			!print*, 'Percentile', prctile_bq(i)
+			do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+				if (CCDF_c<prctile_bq(i)) then 
+					b = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+				else 
+					a = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+				endif
+				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+			enddo 
+			BQ_top_x(i) = c 
+			do j=1,3
+				! Get low end of range 	
+				low_pct  = prctile_bq(i)+0.005_dp*(2**(j-1))
+				if (low_pct<1.0_dp) then
+					a = minval(BQ_vec)
+					b = c
+					c_low = c
+					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+					do while ((abs(CCDF_c-low_pct)>0.00001_dp).and.(b-a>1e-9))
+						if (CCDF_c<low_pct) then 
+							b = c_low
+						else 
+							a = c_low 
+						endif
+						c_low = (a+b)/2.0_dp
+						CCDF_c = sum(DBN_bq_vec,BQ_vec>=c_low)
+					enddo 
+					! print*,'		Bisection results'
+					! print*, '		a',a,'c',c_low,'b',b,'CCDF',CCDF_c,'Obj',low_pct,'Error', abs(CCDF_c-low_pct)
+				else
+					c_low = minval(BQ_vec)
+				endif 
+				! Get low end of range 	
+				high_pct = prctile_bq(i)-0.005_dp*(2**(j-1))
+				if (high_pct>0.0_dp) then
+					a = c
+					b = maxval(BQ_vec)
+					c_high = c
+					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
+					do while ((abs(CCDF_c-high_pct)>0.00001_dp).and.(b-a>1e-9))
+						if (CCDF_c<high_pct) then 
+							b = c_high
+						else 
+							a = c_high 
+						endif
+						c_high = (a+b)/2.0_dp
+						CCDF_c = sum(DBN_bq_vec,BQ_vec>=c_high)
+					enddo 
+					! print*,'		Bisection results'
+					! print*, '		a',a,'c',c_high,'b',b,'CCDF',CCDF_c,'Obj',high_pct,'Error', abs(CCDF_c-high_pct)
+				else
+					c_high = maxval(BQ_vec)
+				endif 
+				! print*, ' low_pct=',low_pct,'pct=',prctile_bq(i),'high_pct=',high_pct
+				! print*, ' Test:','pct=',prctile_bq(i),'c_low=',c_low,'c=',c,'c_high=',c_high
+
+				! Get Average Bequest/Income
+				Bq_Inc(i,j) = sum( (BQ_vec/Inc_vec*DBN_bq_vec) , ((BQ_vec>=c_low).and.(BQ_vec<=c_high)) )&
+							&  				/sum( (DBN_bq_vec) , ((BQ_vec>=c_low).and.(BQ_vec<=c_high)) )
+				! print*, ' Test logical',count((BQ_vec>=c_low)),count((BQ_vec<=c_high)),count((BQ_vec>=c_low).and.(BQ_vec<=c_high))
+				! print*, ' Test DBN',sum(DBN_bq_vec,(BQ_vec>=c_low)),sum(DBN_bq_vec,(BQ_vec<=c_high)),&
+				! 		& sum(DBN_bq_vec,(BQ_vec>=c_low).and.(BQ_vec<=c_high))
+				! print*, ' Test BQ',sum(BQ_vec/Inc_vec,(BQ_vec>=c_low)),sum(BQ_vec/Inc_vec,(BQ_vec<=c_high)),&
+				! 		& sum(BQ_vec/Inc_vec,(BQ_vec>=c_low).and.(BQ_vec<=c_high))
+				! print*, ' Test Sum', sum( (BQ_vec/Inc_vec*DBN_bq_vec) , ((BQ_vec>=c_low).and.(BQ_vec<=c_high)) )/&
+				! 		& sum(DBN_bq_vec,((BQ_vec>=c_low).and.(BQ_vec<=c_high))), Bq_Inc(i,j)
+			enddo 
+			! Write down results 
+			WRITE(UNIT=11, FMT=*) 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(i,:)
+			print '(A,X,X,F7.3,X,X,F7.3,X,X,F7.3,X,X,F7.3,X,X,F7.3,X,X,F7.3)',&
+				& ' 	', 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(i,:)
+		enddo 
+			CLOSE(UNIT=11)
+			print*,'-----------------------------------------------------'; print*, ' '
+
+
+
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
     ! Debt to GDP Ratio
     !------------------------------------------------------------------------------------
     !------------------------------------------------------------------------------------
@@ -7930,160 +8087,6 @@ print*, 'test Total_Income 5'
 
 print*, 'test Total_Income 6'
 		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
-	!------------------------------------------------------------------------------------
-	!------------------------------------------------------------------------------------
-	! Distribution of bequest
-	!------------------------------------------------------------------------------------
-	!------------------------------------------------------------------------------------
-		print*, 'Test Bequests'
-		Bequest_Wealth=0.0_DP
-		DO xi=1,nx
-		DO zi=1,nz
-		DO ai=1,na
-		DO lambdai=1,nlambda
-		DO ei=1, ne
-		   Bequest_Wealth = Bequest_Wealth + DBN1(1, ai, zi, lambdai, ei, xi)*agrid(ai)
-		ENDDO
-		ENDDO
-		ENDDO    
-		ENDDO 
-		ENDDO  
-		print*, ' Test 1 '
-print*, 'test Total_Income 7'
-		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
-		! Distribution of bequest (matrix)	
-		do ai=1,MaxAge
-			DBN_bq(ai,:,:,:,:,:) = DBN1(ai,:,:,:,:,:)*(1.0_DP-survP(ai))
-		enddo 
-		DBN_bq = DBN_bq/sum(DBN_bq)
-		print*, ' Test 2 '
-		print*, 'test Total_Income 8'
-		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
-		! Vectorizations
-		DBN_bq_vec        = reshape(DBN_bq      ,(/size(DBN1)/)); print*, ' Test 2.1 '
-		print*, 'test Total_Income 9'
-		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
-		BQ_vec            = reshape(Aprime      ,(/size(DBN1)/)); print*, ' Test 2.2 '
-			print*, sum(DBN1), sum(Total_Income), size(DBN1)
-			Inc_vec= 0.0_dp 
-			print*, sum(Inc_vec), sum(Total_Income), maxval(Total_Income), minval(Total_Income)
-		Inc_vec 		  = reshape(Total_Income,(/size(DBN1)/)); print*, ' Test 2.3 '
-		print*, ' Test 2.5 '
-
-		! Mean Bequest
-		Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
-
-		print*, ' Test 3 '
-		if (solving_bench.eq.1) then
-			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Bench.txt', STATUS='replace')
-		else
-			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Exp.txt', STATUS='replace')
-		end if 
-		print*,' '
-		print*,'-----------------------------------------------------'
-		print*,' Bequest Stats'
-		print*,' '
-			WRITE(UNIT=11, FMT=*) ' '
-			WRITE(UNIT=11, FMT=*) 'Bequest_Stats'
-			WRITE(UNIT=11, FMT=*) 'Total_Bequest/Wealth= '		, Bequest_Wealth/MeanWealth 
-			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/Wealth= '		, Mean_Bequest/MeanWealth 
-			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/PV_Wealth= '	, Bequest_Wealth/Mean_Firm_Wealth 
-			WRITE(UNIT=11, FMT=*) 'Bequests_Above_Threshold= '	, Threshold_Share_bq
-			WRITE(UNIT=11, FMT=*) 'Bequest_Revenue/YBAR= '		, 0
-			WRITE(UNIT=11, FMT=*) 'Prctile ','Bequest ','Bq/EBAR ','Bq/Inc 0.5%','Bq_Inc 1% ','Bq_Inc 2% '
-		print '(A,F7.3)', ' 	Total_Bequest/Wealth= '		, 100.0_dp*Bequest_Wealth/MeanWealth 
-		print '(A,F7.3)', ' 	Mean_Bequest/Wealth= '		, 100.0_dp*Mean_Bequest/MeanWealth 
-		print*, ' 	Prctile  ','Bequest  ','Bq/EBAR  ','Bq/Inc 0.5%  ','Bq_Inc 1%  ','Bq_Inc 2%  '
-
-		! Compute bequest by percentile (percentiles for counter CDF)
-		prctile_bq = (/0.4_dp, 0.25_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
-		a = minval(BQ_vec)
-		b = maxval(BQ_vec) 
-		c = a
-		do i=1,size(prctile_bq)
-			a = c
-			b = maxval(BQ_vec)
-			c = (a+b)/2.0_dp
-			CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-			!print*, ' '
-			!print*, 'Percentile', prctile_bq(i)
-			do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
-				if (CCDF_c<prctile_bq(i)) then 
-					b = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-				else 
-					a = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-				endif
-				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
-			enddo 
-			BQ_top_x(i) = c 
-			do j=1,3
-				! Get low end of range 	
-				low_pct  = prctile_bq(i)+0.005_dp*(2**(j-1))
-				if (low_pct<1.0_dp) then
-					a = minval(BQ_vec)
-					b = c
-					c_low = c
-					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-					do while ((abs(CCDF_c-low_pct)>0.00001_dp).and.(b-a>1e-9))
-						if (CCDF_c<low_pct) then 
-							b = c_low
-						else 
-							a = c_low 
-						endif
-						c_low = (a+b)/2.0_dp
-						CCDF_c = sum(DBN_bq_vec,BQ_vec>=c_low)
-					enddo 
-					! print*,'		Bisection results'
-					! print*, '		a',a,'c',c_low,'b',b,'CCDF',CCDF_c,'Obj',low_pct,'Error', abs(CCDF_c-low_pct)
-				else
-					c_low = minval(BQ_vec)
-				endif 
-				! Get low end of range 	
-				high_pct = prctile_bq(i)-0.005_dp*(2**(j-1))
-				if (high_pct>0.0_dp) then
-					a = c
-					b = maxval(BQ_vec)
-					c_high = c
-					CCDF_c = sum(DBN_bq_vec,BQ_vec>=c)
-					do while ((abs(CCDF_c-high_pct)>0.00001_dp).and.(b-a>1e-9))
-						if (CCDF_c<high_pct) then 
-							b = c_high
-						else 
-							a = c_high 
-						endif
-						c_high = (a+b)/2.0_dp
-						CCDF_c = sum(DBN_bq_vec,BQ_vec>=c_high)
-					enddo 
-					! print*,'		Bisection results'
-					! print*, '		a',a,'c',c_high,'b',b,'CCDF',CCDF_c,'Obj',high_pct,'Error', abs(CCDF_c-high_pct)
-				else
-					c_high = maxval(BQ_vec)
-				endif 
-				! print*, ' low_pct=',low_pct,'pct=',prctile_bq(i),'high_pct=',high_pct
-				! print*, ' Test:','pct=',prctile_bq(i),'c_low=',c_low,'c=',c,'c_high=',c_high
-
-				! Get Average Bequest/Income
-				Bq_Inc(i,j) = sum( (BQ_vec/Inc_vec*DBN_bq_vec) , ((BQ_vec>=c_low).and.(BQ_vec<=c_high)) )&
-							&  				/sum( (DBN_bq_vec) , ((BQ_vec>=c_low).and.(BQ_vec<=c_high)) )
-				! print*, ' Test logical',count((BQ_vec>=c_low)),count((BQ_vec<=c_high)),count((BQ_vec>=c_low).and.(BQ_vec<=c_high))
-				! print*, ' Test DBN',sum(DBN_bq_vec,(BQ_vec>=c_low)),sum(DBN_bq_vec,(BQ_vec<=c_high)),&
-				! 		& sum(DBN_bq_vec,(BQ_vec>=c_low).and.(BQ_vec<=c_high))
-				! print*, ' Test BQ',sum(BQ_vec/Inc_vec,(BQ_vec>=c_low)),sum(BQ_vec/Inc_vec,(BQ_vec<=c_high)),&
-				! 		& sum(BQ_vec/Inc_vec,(BQ_vec>=c_low).and.(BQ_vec<=c_high))
-				! print*, ' Test Sum', sum( (BQ_vec/Inc_vec*DBN_bq_vec) , ((BQ_vec>=c_low).and.(BQ_vec<=c_high)) )/&
-				! 		& sum(DBN_bq_vec,((BQ_vec>=c_low).and.(BQ_vec<=c_high))), Bq_Inc(i,j)
-			enddo 
-			! Write down results 
-			WRITE(UNIT=11, FMT=*) 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(i,:)
-			print '(A,X,X,F7.3,X,X,F7.3,X,X,F7.3,X,X,F7.3,X,X,F7.3,X,X,F7.3)',&
-				& ' 	', 100_dp*(1.0_dp-prctile_bq(i)),BQ_top_x(i),BQ_top_x(i)/EBAR_bench,Bq_Inc(i,:)
-		enddo 
-			CLOSE(UNIT=11)
-			print*,'-----------------------------------------------------'; print*, ' '
 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
