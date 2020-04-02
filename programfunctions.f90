@@ -7428,13 +7428,13 @@ SUBROUTINE COMPUTE_STATS()
 		& capital_draft_group,  av_capital_draft_group, frac_capital_draft_group 
 	
 
-	allocate(DBN_vec(size(DBN1)))
-	allocate(Firm_Wealth_vec(size(DBN1)))
-	allocate(CDF_Firm_Wealth(size(DBN1)))
-	allocate(BQ_vec(size(DBN1)))
-	allocate(DBN_bq_vec(size(DBN1)))
-	allocate(CDF_bq(size(DBN1)))
-	allocate(Inc_vec(size(DBN1)))
+	allocate(DBN_vec(			size(DBN1)))
+	allocate(Firm_Wealth_vec(	size(DBN1)))
+	allocate(CDF_Firm_Wealth(	size(DBN1)))
+	allocate(BQ_vec(			size(DBN1)))
+	allocate(DBN_bq_vec(		size(DBN1)))
+	allocate(CDF_bq(			size(DBN1)))
+	allocate(Inc_vec(			size(DBN1)))
 	allocate(Firm_Output( MaxAge,na,nz,nlambda,ne,nx))
 	allocate(Firm_Profit( MaxAge,na,nz,nlambda,ne,nx))
 	allocate(DBN_bq(      MaxAge,na,nz,nlambda,ne,nx))
@@ -7963,6 +7963,7 @@ SUBROUTINE COMPUTE_STATS()
 		DBN_bq_vec        = reshape(DBN_bq      ,(/size(DBN1)/))
 		BQ_vec            = reshape(Aprime      ,(/size(DBN1)/))
 		Inc_vec 		  = reshape(Total_Income,(/size(DBN1)/))
+		print*, ' Test 2.5 '
 
 		! Mean Bequest
 		Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
