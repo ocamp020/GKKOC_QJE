@@ -7417,7 +7417,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(draft_age_category,draft_z_category) :: size_draft_group, &
 		& wealth_draft_group,  av_wealth_draft_group, frac_wealth_draft_group, & 
 		& capital_draft_group,  av_capital_draft_group, frac_capital_draft_group 
-	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq, Total_Income
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	
@@ -7429,8 +7429,8 @@ SUBROUTINE COMPUTE_STATS()
 	allocate(DBN_bq_vec(		size(DBN1)))
 	allocate(CDF_bq(			size(DBN1)))
 	allocate(Inc_vec(			size(DBN1)))
-	allocate(Firm_Output( MaxAge,na,nz,nlambda,ne,nx))
-	allocate(Firm_Profit( MaxAge,na,nz,nlambda,ne,nx))
+	! allocate(Firm_Output( MaxAge,na,nz,nlambda,ne,nx))
+	! allocate(Firm_Profit( MaxAge,na,nz,nlambda,ne,nx))
 	allocate(DBN_bq(      MaxAge,na,nz,nlambda,ne,nx))
 	allocate(Total_Income(MaxAge,na,nz,nlambda,ne,nx))
 	allocate(constrained_firm_ind(MaxAge,na,nz,nlambda,ne,nx))
@@ -7834,8 +7834,8 @@ print*, 'test Total_Income 3'
 					constrained_firms_age_z(age,zi) = constrained_firms_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
 					constrained_firm_ind(age,ai,zi,lambdai,ei,xi) = 1
 				endif 
-				Firm_Output(age,ai,zi,lambdai,ei,xi) = xz_grid(xi,zi)*K_mat(ai,zi,xi)
-				Firm_Profit(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi)
+				! Firm_Output(age,ai,zi,lambdai,ei,xi) = xz_grid(xi,zi)*K_mat(ai,zi,xi)
+				! Firm_Profit(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi)
 			enddo
 			enddo 
 			enddo 
@@ -7871,7 +7871,7 @@ print*, 'test Total_Income 3'
 
 			CLOSE(UNIT=11)
 
-			deallocate(Firm_Output,Firm_Profit)
+			! deallocate(Firm_Output,Firm_Profit)
 print*, 'test Total_Income 5'
 		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	!------------------------------------------------------------------------------------
