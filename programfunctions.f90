@@ -7398,21 +7398,17 @@ end Subroutine EGM_Working_Period_Transition
 
 SUBROUTINE COMPUTE_STATS()
 	use omp_lib
-
 	IMPLICIT NONE
-	INTEGER  :: prctile, group, i, j, age_group_counter, age2
-	REAL(DP), DIMENSION(nz)    :: cdf_Gz_DBN, Capital_by_z, DBN_Z, CDF_Z
-	REAL(DP) :: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz), Mean_Capital
-	REAL(DP) :: Std_k_Return,    Var_K_Return,    Mean_K_Return_by_z(nz)
-	REAL(DP) :: Std_AT_K_Return, Var_AT_K_Return, Mean_AT_K_Return_by_z(nz)
-	REAL(DP), dimension(max_age_category)    :: A_Age, Ap_Age, Y_Age, S_Age, S_Rate_A_Age, S_Rate_Y_Age 
+	real  :: prctile, group, i, j, age_group_counter, age2
+	real(DP), dimension(nz)    :: Capital_by_z, DBN_Z, CDF_Z
+	real(DP) :: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz), Mean_Capital
+	real(DP) :: Std_k_Return,    Var_K_Return,    Mean_K_Return_by_z(nz)
+	real(DP) :: Std_AT_K_Return, Var_AT_K_Return, Mean_AT_K_Return_by_z(nz)
+	real(DP), dimension(max_age_category)    :: A_Age, Ap_Age, Y_Age, S_Age, S_Rate_A_Age, S_Rate_Y_Age 
 	real(DP), dimension(max_age_category,nz) :: A_AZ , Ap_AZ , Y_AZ , S_AZ , S_Rate_A_AZ , S_Rate_Y_AZ  
 	real(DP), dimension(3) 					 :: A_W  , Ap_W  , Y_W  , S_W  , S_Rate_A_W  , S_Rate_Y_W  
-	real(DP), dimension(MaxAge) 			 :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
+	real(DP), dimension(MaxAge) 			 :: constrained_firms_age, size_by_age
 	real(DP) :: FW_top_x(6), prctile_FW(6), prctile_bq(5), low_pct, high_pct, a, b, c, CCDF_c, c_low, c_high
-	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq, Total_Income
-	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
-	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP)       :: Frisch_Aux, Frisch_Aux_2
 	character(100) :: rowname
 	integer        :: age_limit(max_age_category+1), draft_age_limit(draft_age_category+1)
@@ -7421,6 +7417,9 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(draft_age_category,draft_z_category) :: size_draft_group, &
 		& wealth_draft_group,  av_wealth_draft_group, frac_wealth_draft_group, & 
 		& capital_draft_group,  av_capital_draft_group, frac_capital_draft_group 
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq, Total_Income
+	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
+	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	
 
 	allocate(DBN_vec(			size(DBN1)))
@@ -7871,6 +7870,8 @@ print*, 'test Total_Income 3'
 			WRITE(UNIT=11, FMT=*) 'Total', 100.0_dp*sum(constrained_firm_ind*DBN1)
 
 			CLOSE(UNIT=11)
+
+			deallocate(Firm_Output,Firm_Profit)
 print*, 'test Total_Income 5'
 		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	!------------------------------------------------------------------------------------
