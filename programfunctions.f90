@@ -1573,7 +1573,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	REAL(DP), dimension(MaxAge, nz) :: frac_pos_welfare_by_age_z, size_pos_welfare_by_age_z, size_by_age_z
 	INTEGER, dimension(max_age_category+1) :: age_limit
 	INTEGER :: age_group_counter
-	REAL(DP), dimension(max_age_category,nz) :: CE_by_agegroup_z 
+	REAL(DP), dimension(max_age_category,nz) :: CE_by_agegroup_z, size_by_agegroup_z 
 	REAL(DP), dimension(max_age_category,nz) :: size_pos_welfare_by_agegroup_z, frac_pos_welfare_by_agegroup_z  
 	REAL(DP), dimension(draft_age_category,nz) :: CE_draft_group_z,  size_draft_group_z, frac_pos_welfare_draft_group_z
 	REAL(DP), dimension(draft_age_category,draft_z_category) :: CE_draft_group,  size_draft_group, frac_pos_welfare_draft_group
@@ -7400,7 +7400,7 @@ SUBROUTINE COMPUTE_STATS()
 	use omp_lib
 
 	IMPLICIT NONE
-	INTEGER  :: prctile, group, i, j, age_group_counter
+	INTEGER  :: prctile, group, i, j, age_group_counter, age2
 	REAL(DP), DIMENSION(nz)    :: cdf_Gz_DBN, Capital_by_z, DBN_Z, CDF_Z
 	REAL(DP) :: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz), Mean_Capital
 	REAL(DP) :: Std_k_Return,    Var_K_Return,    Mean_K_Return_by_z(nz)
@@ -7465,7 +7465,7 @@ SUBROUTINE COMPUTE_STATS()
 		        size_by_age_z(age, zi) = sum(DBN1(age,:,zi,:,:,:))
 		    ENDDO ! zi
 
-		    WRITE  (UNIT=90, FMT=*)  size_by_age_z_bench(age, :) 
+		    WRITE  (UNIT=90, FMT=*)  size_by_age_z(age, :) 
 		ENDDO
 		CLOSE(unit=90)
 		
