@@ -1747,13 +1747,13 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
                                 				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
 		    end if 
 
-		    WRITE  (UNIT=70, FMT=*) 100*sum(Cons_Eq_Welfare(age,:,:,:,:,:)*DBN_bench(age,:,:,:,:,:))/sum(DBN_bench(age,:,:,:,:,:))
+		    WRITE  (UNIT=70, FMT=*) 100.0_dp*sum(Cons_Eq_Welfare(age,:,:,:,:,:)*DBN_bench(age,:,:,:,:,:))/sum(DBN_bench(age,:,:,:,:,:))
 		    DO zi=1,nz
-		         temp_ce_by_z(zi) = 100*sum(Cons_Eq_Welfare(age,:,zi,:,:,:)*DBN_bench(age,:,zi,:,:,:))/sum(DBN_bench(age,:,zi,:,:,:))
+		         temp_ce_by_z(zi) = 100.0_dp*sum(Cons_Eq_Welfare(age,:,zi,:,:,:)*DBN_bench(age,:,zi,:,:,:))/sum(DBN_bench(age,:,zi,:,:,:))
 		    ENDDO
 		    WRITE  (UNIT=80, FMT=*) temp_ce_by_z
 		    !print*,'age=',age, temp_ce_by_z, ', mean:  ', &
-		    !    & 100*sum(Cons_Eq_Welfare(age,:,:,:,:)*DBN_bench(age,:,:,:,:))/sum(DBN_bench(age,:,:,:,:))
+		    !    & 100.0_dp*sum(Cons_Eq_Welfare(age,:,:,:,:)*DBN_bench(age,:,:,:,:))/sum(DBN_bench(age,:,:,:,:))
 		ENDDO
 
 		CE_NEWBORN = 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
@@ -1774,7 +1774,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		DO zi=1,nz
 		    DO age_group_counter=1,max_age_category
 		         CE_by_agegroup_z(age_group_counter,zi)= &
-		            & 100*sum(Cons_Eq_Welfare(age_limit(age_group_counter)+1:age_limit(age_group_counter+1),:,zi,:,:,:)* &
+		            & 100.0_dp*sum(Cons_Eq_Welfare(age_limit(age_group_counter)+1:age_limit(age_group_counter+1),:,zi,:,:,:)* &
 		            &                         DBN_bench(age_limit(age_group_counter)+1:age_limit(age_group_counter+1),:,zi,:,:,:))/&
 		            &                sum( DBN_bench(age_limit(age_group_counter)+1:age_limit(age_group_counter+1),:,zi,:,:,:))
 		    ENDDO
@@ -1871,7 +1871,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		size_draft_group_z(age,zi) = &
 			& sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:))
 
-		CE_draft_group_z(age,zi) =  100* &
+		CE_draft_group_z(age,zi) =  100.0_dp* &
 			& sum(Cons_Eq_Welfare(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:)* &
             &     DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:))/&
             & sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:))
@@ -1911,7 +1911,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	frac_pos_welfare_draft_group = Draft_Table(frac_pos_welfare_draft_group_z,DBN_z,.true.)
 
 	! Fix fractions
-	frac_pos_welfare_draft_group = 100*frac_pos_welfare_draft_group/size_draft_group
+	frac_pos_welfare_draft_group = 100.0_dp*frac_pos_welfare_draft_group/size_draft_group
     
     OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE.txt', STATUS='replace') 
     OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_fpos_welfare.txt', STATUS='replace') 
@@ -1958,7 +1958,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		size_draft_group_xz(age,zi,xi) = &
 			& sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,xi))
 
-		CE_draft_group_xz(age,zi,xi) =  100* &
+		CE_draft_group_xz(age,zi,xi) =  100.0_dp* &
 			& sum(Cons_Eq_Welfare(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,xi)* &
             &     DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,xi))/&
             & sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,xi))
@@ -1990,7 +1990,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	frac_pos_welfare_draft_group = Draft_Table_X(frac_pos_welfare_draft_group_xz,DBN_xz,.true.)
 
 	! Fix fractions
-	frac_pos_welfare_draft_group = 100*frac_pos_welfare_draft_group/size_draft_group
+	frac_pos_welfare_draft_group = 100.0_dp*frac_pos_welfare_draft_group/size_draft_group
 
     OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE_xz.txt', STATUS='replace') 
     OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size_xz.txt', STATUS='replace') 
@@ -2532,7 +2532,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 
 
 	! Fix fractions
-	frac_pos_welfare_draft_group = 100*frac_pos_welfare_draft_group/size_draft_group
+	frac_pos_welfare_draft_group = 100.0_dp*frac_pos_welfare_draft_group/size_draft_group
 
     OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE_axz.txt', STATUS='replace') 
     OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size_axz.txt', STATUS='replace') 
@@ -2630,7 +2630,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 		CE2_nb_tr  = 100.0_dp * (( sum((Value_mat(1,:,:,:,:,:)-BQ_Value_mat(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:)) / &
 				&               sum((ValueFunction_Bench(1,:,:,:,:,:)-BQ_Value_mat(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:)) ) &
 				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
-		CE2_pop_tr = 100*(( sum((Value_mat-BQ_Value_mat)*DBN_bench) / sum((ValueFunction_Bench-BQ_Value_mat)*DBN_bench)  ) &
+		CE2_pop_tr = 100.0_dp*(( sum((Value_mat-BQ_Value_mat)*DBN_bench) / sum((ValueFunction_Bench-BQ_Value_mat)*DBN_bench)  ) &
 		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 
 	! Write Aggregate Results
@@ -2675,7 +2675,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 		size_draft_group_z(age,zi) = &
 			& sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:))
 
-		CE_draft_group_z(age,zi) =  100* &
+		CE_draft_group_z(age,zi) =  100.0_dp* &
 			& sum(CE1_tr(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:)* &
             &     DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:))/&
             & sum(DBN_bench(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:))
@@ -2707,7 +2707,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 	! Frac. pos. welfare by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
 	frac_pos_welfare_draft_group = Draft_Table(frac_pos_welfare_draft_group_z,DBN_z,.true.)
 		! Fix fractions
-		frac_pos_welfare_draft_group = 100*frac_pos_welfare_draft_group/size_draft_group
+		frac_pos_welfare_draft_group = 100.0_dp*frac_pos_welfare_draft_group/size_draft_group
 
     OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE_tr.txt', STATUS='replace') 
     OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size_tr.txt', STATUS='replace') 
@@ -5939,8 +5939,8 @@ SUBROUTINE FIND_DBN_Transition()
 		    print '(A,E12.5,X,X,A,E12.5,X,X,A,E12.5,X,X,A,E12.5,X,X,A,E12.5,X,X,A,E12.5,X,X)', &
 		    	&'	Distance: DBN=', DBN_dist,' Q=',Q_dist,' NW=',NW_dist,' R=',R_dist,' Db=',Db_dist,'Chg_dist=',Chg_dist
 		    print '(A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X)', &
-	    		&'	X(T)/X(SS): Q=',100*(QBAR2_tr(T+1)/QBAR_exp-1),' N=',100*(NBAR2_tr(T+1)/NBAR_exp-1),&
-		    		' W=',100*(Wage_tr(T+1)-wage_exp),' R=',100*(R2_tr(T+1)-R_exp),' Db=',100*(Debt_tr(T+1)/Debt_exp-1)
+	    		&'	X(T)/X(SS): Q=',100.0_dp*(QBAR2_tr(T+1)/QBAR_exp-1),' N=',100.0_dp*(NBAR2_tr(T+1)/NBAR_exp-1),&
+		    		' W=',100.0_dp*(Wage_tr(T+1)-wage_exp),' R=',100.0_dp*(R2_tr(T+1)-R_exp),' Db=',100.0_dp*(Debt_tr(T+1)/Debt_exp-1)
 	    	print*, ' '
 	    	print*, ' Government Budget:'
 	    	print '(A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X)', &
@@ -5957,8 +5957,8 @@ SUBROUTINE FIND_DBN_Transition()
 
 	    	OPEN (UNIT=76, FILE=trim(Result_Folder)//'Transition_Distance.txt', STATUS='old', POSITION='append')
 	    	WRITE(UNIT=76, FMT=*) simutime,DBN_dist,Q_dist,NW_dist,R_dist,Db_dist,&
-	    						&	100*(QBAR2_tr(T+1)/QBAR_exp-1),100*(NBAR2_tr(T+1)/NBAR_exp-1),&
-	    						&	100*(Wage_tr(T+1)/wage_exp-1),100*(R2_tr(T+1)/R_exp-1),100*(Debt_tr(T+1)/Debt_exp-1)
+	    						&	100.0_dp*(QBAR2_tr(T+1)/QBAR_exp-1),100.0_dp*(NBAR2_tr(T+1)/NBAR_exp-1),&
+	    						&	100.0_dp*(Wage_tr(T+1)/wage_exp-1),100.0_dp*(R2_tr(T+1)/R_exp-1),100.0_dp*(Debt_tr(T+1)/Debt_exp-1)
 	    	CLOSE(UNIT=76)
 
 
@@ -7408,7 +7408,8 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(max_age_category,nz) :: A_AZ , Ap_AZ , Y_AZ , S_AZ , S_Rate_A_AZ , S_Rate_Y_AZ  
 	real(DP), dimension(3) 					 :: A_W  , Ap_W  , Y_W  , S_W  , S_Rate_A_W  , S_Rate_Y_W  
 	real(DP), dimension(MaxAge) 			 :: constrained_firms_age, size_by_age
-	real(DP) 	   :: FW_top_x(6), prctile_FW(6), prctile_bq(5), low_pct, high_pct, a, b, c, CCDF_c, c_low, c_high
+	real(DP) 	   :: Pr_mat_bench(na,nz,nx), FW_top_x(6), prctile_FW(6), prctile_bq(5)
+	real(DP)  	   :: low_pct, high_pct, a, b, c, CCDF_c, c_low, c_high
 	real(DP)       :: Frisch_Aux, Frisch_Aux_2, K_Inc_aux, L_Inc_aux
 	character(100) :: rowname
 	integer        :: age_limit(max_age_category+1), draft_age_limit(draft_age_category+1)
@@ -7416,16 +7417,22 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(draft_age_category,nz) :: size_draft_group_z, wealth_draft_group_z, capital_draft_group_z, &
 		& Cons_draft_group_z, Hours_draft_group_z, Ap_draft_group_z, & 
 		& K_Tax_draft_group_z, L_Tax_draft_group_z, K_Tax_Inc_draft_group_z, L_Tax_Inc_draft_group_z, &
-		& T_Inc_draft_group_z, K_Inc_draft_group_z, L_Inc_draft_group_z, K_Inc_frac_draft_group_z, L_Inc_frac_draft_group_z
+		& T_Inc_draft_group_z, K_Inc_draft_group_z, L_Inc_draft_group_z, K_Inc_frac_draft_group_z, L_Inc_frac_draft_group_z, &
+		&      Tax_Increase_tk_draft_group_z,      Tax_Increase_tl_draft_group_z,      Tax_Increase_draft_group_z, &
+		& Tax_Rate_Increase_tk_draft_group_z, Tax_Rate_Increase_tl_draft_group_z, Tax_Rate_Increase_draft_group_z
 	real(DP), dimension(draft_age_category,draft_z_category) :: size_draft_group, &
 		& wealth_draft_group,  av_wealth_draft_group, frac_wealth_draft_group, & 
 		& capital_draft_group,  av_capital_draft_group, frac_capital_draft_group, &
 		& cons_draft_group, hours_draft_group, Ap_draft_group,  av_Ap_draft_group, frac_Ap_draft_group, &
 		& K_Tax_draft_group, L_Tax_draft_group, K_Tax_Inc_draft_group, L_Tax_Inc_draft_group, &
-		& T_Inc_draft_group, K_Inc_draft_group, L_Inc_draft_group, K_Inc_frac_draft_group, L_Inc_frac_draft_group
-	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income, K_Tax, L_Tax ! , Firm_Output, Firm_Profit
+		& T_Inc_draft_group, K_Inc_draft_group, L_Inc_draft_group, K_Inc_frac_draft_group, L_Inc_frac_draft_group, &
+		& Tax_Increase_tk_draft_group, Tax_Increase_tl_draft_group, Tax_Increase_draft_group, &
+		& Tax_Rate_Increase_tk_draft_group, Tax_Rate_Increase_tl_draft_group, Tax_Rate_Increase_draft_group
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income, K_Income, L_Income, K_Tax, L_Tax ! , Firm_Output, Firm_Profit
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: Total_Income_bench, K_Income_bench, L_Income_bench, K_Tax_bench, L_Tax_bench
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
+
 
 	allocate(DBN_vec(			size(DBN1)))
 	allocate(Firm_Wealth_vec(	size(DBN1)))
@@ -7436,11 +7443,21 @@ SUBROUTINE COMPUTE_STATS()
 	allocate(Inc_vec(			size(DBN1)))
 	! allocate(Firm_Output( MaxAge,na,nz,nlambda,ne,nx))
 	! allocate(Firm_Profit( MaxAge,na,nz,nlambda,ne,nx))
-	allocate(DBN_bq(      		  MaxAge,na,nz,nlambda,ne,nx))
-	allocate(Total_Income(		  MaxAge,na,nz,nlambda,ne,nx))
+	allocate(DBN_bq(       MaxAge,na,nz,nlambda,ne,nx))
+	allocate(Total_Income( MaxAge,na,nz,nlambda,ne,nx))
+	allocate(K_Income(	   MaxAge,na,nz,nlambda,ne,nx))
+	allocate(L_Income(	   MaxAge,na,nz,nlambda,ne,nx))
+	allocate(K_Tax(  	   MaxAge,na,nz,nlambda,ne,nx))
+	allocate(L_Tax( 	   MaxAge,na,nz,nlambda,ne,nx))
 	allocate(constrained_firm_ind(MaxAge,na,nz,nlambda,ne,nx))
-	allocate( K_Tax(  			  MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( L_Tax( 		      MaxAge,na,nz,nlambda,ne,nx) )
+	
+	if (solving_bench.ne.1) then
+		allocate(Total_Income_bench( MaxAge,na,nz,nlambda,ne,nx))
+		allocate(K_Income_bench(	 MaxAge,na,nz,nlambda,ne,nx))
+		allocate(L_Income_bench(	 MaxAge,na,nz,nlambda,ne,nx))
+		allocate(K_Tax_bench(  	     MaxAge,na,nz,nlambda,ne,nx))
+		allocate(L_Tax_bench( 	     MaxAge,na,nz,nlambda,ne,nx))
+	endif 
 
 
 	!$ call omp_set_num_threads(20)
@@ -7846,7 +7863,6 @@ SUBROUTINE COMPUTE_STATS()
 			print*,'-----------------------------------------------------'; print*, ' '
 
 
-
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
     ! Debt to GDP Ratio
@@ -8062,7 +8078,7 @@ SUBROUTINE COMPUTE_STATS()
 				!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', CCDF_c-prctile_FW(i)
 			enddo 
 			FW_top_x(i)       = c 
-			FW_top_x_share(i) = 100*sum(Firm_Wealth_vec*DBN_vec,Firm_Wealth_vec>=c)/Mean_Firm_Wealth
+			FW_top_x_share(i) = 100.0_dp*sum(Firm_Wealth_vec*DBN_vec,Firm_Wealth_vec>=c)/Mean_Firm_Wealth
 			WRITE(UNIT=11, FMT=*) 100_dp*prctile_FW(i),FW_top_x(i),FW_top_x_share(i), CCDF_c
 		enddo 
 
@@ -8237,13 +8253,15 @@ SUBROUTINE COMPUTE_STATS()
 
 		    	! Income for each agent 
 		    	if (age.lt.RetAge) then
-		    	L_Inc_aux   = yh(age2,lambdai,ei)*Hours(age2,ai,zi,lambdai,ei,xi)
+		    	L_Inc_aux   = yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi)
 		    	else
 		    	L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
 		    	endif 
 		    	K_Inc_aux   = R*agrid(ai) + Pr_mat(ai,zi,xi)
 
 		    	Total_Income(age2,ai,zi,lambdai,ei,xi) = L_Inc_aux + K_Inc_aux
+		    	K_Income(age2,ai,zi,lambdai,ei,xi) 	   = K_Inc_aux
+		    	L_Income(age2,ai,zi,lambdai,ei,xi) 	   = L_Inc_aux
 
 		    	! Income by group (total, capital, labor)
 	    		T_Inc_draft_group_z(age,zi) = T_Inc_draft_group_z(age,zi) + (K_Inc_aux +L_Inc_aux)*DBN_bench(age2,ai,zi,lambdai,ei,xi)
@@ -8350,6 +8368,141 @@ SUBROUTINE COMPUTE_STATS()
 		close(unit=87); close(unit=88); close(unit=89); close(unit=90); 
 
 
+
+
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+	! Draft Tables 3: Income and Tax Changes
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+	if (solving_bench.ne.1) then 
+
+		! Set variables to benchmark values
+		Pr_mat_bench = Profit_Matrix(R_bench,P_bench)
+
+		Tax_Increase_tk_draft_group_z = 0.0_dp ; Tax_Increase_tl_draft_group_z = 0.0_dp ;
+		Tax_Increase_draft_group_z = 0.0_dp ; Tax_Rate_Increase_draft_group_z = 0.0_dp ;
+		Tax_Rate_Increase_tk_draft_group_z = 0.0_dp ; Tax_Rate_Increase_tl_draft_group_z = 0.0_dp ;
+		do zi  = 1,nz
+		do age = 1,draft_age_category
+	        do xi=1,nx
+		    do ei=1,ne
+		    do lambdai=1,nlambda
+		    do ai=1,na
+		    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
+
+		    	! Income for each agent in benchmark
+		    	if (age.lt.RetAge) then
+		    	L_Inc_aux   = Wage_bench*eff_un(age2,lambdai,ei)*Hours(age2,ai,zi,lambdai,ei,xi)
+		    	else
+		    		if (KeepSSatBench .eq. 1) then 
+		    		L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
+		    		else 
+		    		L_Inc_aux   = RetY_lambda_e(lambdai,ei)*EBAR_bench/Ebar_exps
+		    	endif 
+		    	K_Inc_aux   = R_bench*agrid(ai) + Pr_mat_bench(ai,zi,xi)
+
+		    	Total_Income(age2,ai,zi,lambdai,ei,xi) = L_Inc_aux + K_Inc_aux
+		    	K_Income(age2,ai,zi,lambdai,ei,xi) 	   = K_Inc_aux
+		    	L_Income(age2,ai,zi,lambdai,ei,xi) 	   = L_Inc_aux
+
+		    	! Tax by agent (capital and labor) in benchmark
+		    	K_Tax(age2,ai,zi,lambdai,ei,xi)  = tauK_bench*K_Inc_aux
+		    	if (age.lt.draft_age_category) then
+		    	L_Tax(age2,ai,zi,lambdai,ei,xi)  = L_Inc_aux - psi_bench*(L_Inc_aux)**(1.0_DP-tauPL_bench)
+		    	endif 
+
+
+		    	! Compare Capital taxes
+		    	If ( K_Tax(age2,ai,zi,lambdai,ei,xi) .gt. K_Tax_bench(age2,ai,zi,lambdai,ei,xi)) then
+		    	Tax_Increase_tk_draft_group_z(age,zi) = Tax_Increase_tk_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
+
+		    	! Compare Labor taxes
+		    	If ( L_Tax(age2,ai,zi,lambdai,ei,xi) .gt. L_Tax_bench(age2,ai,zi,lambdai,ei,xi)) then
+		    	Tax_Increase_tl_draft_group_z(age,zi) = Tax_Increase_tl_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
+
+		    	! Compare Total taxes
+		    	If ( (K_Tax(age2,ai,zi,lambdai,ei,xi)+L_Tax(age2,ai,zi,lambdai,ei,xi)) .gt. &
+		    	  &  (K_Tax_bench(age2,ai,zi,lambdai,ei,xi)+L_Tax_bench(age2,ai,zi,lambdai,ei,xi)) ) then
+		    	Tax_Increase_draft_group_z(age,zi) = Tax_Increase_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
+
+				! Compare Capital tax rate
+		    	If ( K_Tax(age2,ai,zi,lambdai,ei,xi)/K_Income(age2,ai,zi,lambdai,ei,xi) .gt. & 
+		    	  &  K_Tax_bench(age2,ai,zi,lambdai,ei,xi)/K_Income_bench(age2,ai,zi,lambdai,ei,xi)) then
+		    	Tax_Rate_Increase_tk_draft_group_z(age,zi) = Tax_Rate_Increase_tk_draft_group_z(age,zi) + & 
+		    		&  DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
+
+		    	! Compare Labor tax rate
+		    	If ( L_Tax(age2,ai,zi,lambdai,ei,xi)/L_Income(age2,ai,zi,lambdai,ei,xi) .gt. & 
+		    	  &  L_Tax_bench(age2,ai,zi,lambdai,ei,xi)/L_Income_bench(age2,ai,zi,lambdai,ei,xi)) then
+		    	Tax_Rate_Increase_tl_draft_group_z(age,zi) = Tax_Rate_Increase_tl_draft_group_z(age,zi) + & 
+		    		& DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
+
+		    	! Compare Total tax rate
+		    	If ( (K_Tax(age2,ai,zi,lambdai,ei,xi)+L_Tax(age2,ai,zi,lambdai,ei,xi))/Total_Income(age2,ai,zi,lambdai,ei,xi) &
+		    		& .gt. (K_Tax_bench(age2,ai,zi,lambdai,ei,xi)+L_Tax_bench(age2,ai,zi,lambdai,ei,xi))/&
+		    		& Total_Income_bench(age2,ai,zi,lambdai,ei,xi) ) then
+		    	Tax_Rate_Increase_draft_group_z(age,zi) = Tax_Rate_Increase_draft_group_z(age,zi)+DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
+	    	enddo 
+	    	enddo 
+	    	enddo 
+	    	enddo 
+	    	enddo  
+		enddo
+		enddo
+
+		! Frac. capital tax increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Tax_Increase_tk_draft_group = Draft_Table(Tax_Increase_tk_draft_group_z,DBN_z,.true.)
+			! Fix fractions
+			Tax_Increase_tk_draft_group = 100.0_dp*Tax_Increase_tk_draft_group/size_draft_group
+
+		! Frac. labor tax increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Tax_Increase_tl_draft_group = Draft_Table(Tax_Increase_tl_draft_group_z,DBN_z,.true.)
+			! Fix fractions
+			Tax_Increase_tl_draft_group = 100.0_dp*Tax_Increase_tl_draft_group/size_draft_group
+
+		! Frac. total tax increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Tax_Increase_draft_group = Draft_Table(Tax_Increase_draft_group_z,DBN_z,.true.)
+			! Fix fractions
+			Tax_Increase_draft_group = 100.0_dp*Tax_Increase_draft_group/size_draft_group
+
+		! Frac. capital tax rate increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Tax_Rate_Increase_tk_draft_group = Draft_Table(Tax_Rate_Increase_tk_draft_group_z,DBN_z,.true.)
+			! Fix fractions
+			Tax_Rate_Increase_tk_draft_group = 100.0_dp*Tax_Rate_Increase_tk_draft_group/size_draft_group
+
+		! Frac. labor tax rate increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Tax_Rate_Increase_tl_draft_group = Draft_Table(Tax_Rate_Increase_tl_draft_group_z,DBN_z,.true.)
+			! Fix fractions
+			Tax_Rate_Increase_tl_draft_group = 100.0_dp*Tax_Rate_Increase_tl_draft_group/size_draft_group
+
+		! Frac. total tax rate increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Tax_Rate_Increase_draft_group = Draft_Table(Tax_Rate_Increase_draft_group_z,DBN_z,.true.)
+			! Fix fractions
+			Tax_Rate_Increase_draft_group = 100.0_dp*Tax_Rate_Increase_draft_group/size_draft_group
+
+		OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_frac_Tax_K.txt', STATUS='replace') 
+	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_frac_Tax_L.txt', STATUS='replace') 
+	    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_frac_Tax.txt', STATUS='replace') 
+	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate_K.txt', STATUS='replace') 
+	    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate_L.txt', STATUS='replace') 
+	    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate.txt', STATUS='replace') 
+		do age = 1,draft_age_category
+		    WRITE  (UNIT=80, FMT=*)  Tax_Increase_tk_draft_group(age,:)
+		    WRITE  (UNIT=81, FMT=*)  Tax_Increase_tl_draft_group(age,:)
+		    WRITE  (UNIT=82, FMT=*)  Tax_Increase_draft_group(age,:)
+		    WRITE  (UNIT=83, FMT=*)  Tax_Rate_Increase_tk_draft_group(age,:)
+		    WRITE  (UNIT=84, FMT=*)  Tax_Rate_Increase_tl_draft_group(age,:)
+		    WRITE  (UNIT=85, FMT=*)  Tax_Rate_Increase_draft_group(age,:)
+		ENDDO
+		close(unit=80); close(unit=81); close(unit=82); close(unit=83); close(unit=84); close(unit=85)
+	endif 
 
 
 	!------------------------------------------------------------------------------------
@@ -8674,7 +8827,7 @@ SUBROUTINE COMPUTE_MOMENTS
 				!print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'Error', CCDF_c-prctile_FW(i)
 			enddo 
 			FW_top_x(i)       = c 
-			FW_top_x_share(i) = 100*sum(Firm_Wealth_vec*DBN_vec,Firm_Wealth_vec>=c)/Mean_Firm_Wealth
+			FW_top_x_share(i) = 100.0_dp*sum(Firm_Wealth_vec*DBN_vec,Firm_Wealth_vec>=c)/Mean_Firm_Wealth
 		enddo 
 
 			CLOSE(UNIT=11)
