@@ -7643,7 +7643,7 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO    
 		ENDDO    
 		ENDDO
-		print*, 'test Total_Income'
+		print*, 'test Total_Income 1'
 		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 			! Allocate MeanReturn to K
 			Mean_K_Return_by_z    = MeanReturn_by_z
@@ -7701,6 +7701,9 @@ SUBROUTINE COMPUTE_STATS()
 		Std_AT_K_Return = Var_AT_K_Return**0.5_DP
 		Std_K_Return    = Var_K_Return**0.5_DP
 
+		print*, 'test Total_Income 2'
+		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
+
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
     ! Debt to GDP Ratio
@@ -7719,7 +7722,8 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO
 		External_Debt_GDP = External_Debt_GDP / YBAR
 
-
+print*, 'test Total_Income 3'
+		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Savings Rate
@@ -7813,7 +7817,8 @@ SUBROUTINE COMPUTE_STATS()
 	S_Rate_Y_Age = (Ap_Age-A_Age)/Y_Age
 	S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
 	S_Rate_Y_W   = (Ap_W-A_W)/Y_W
-
+print*, 'test Total_Income 4'
+		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Leverage Ratio and fraction of constrainted firms 
@@ -7874,7 +7879,8 @@ SUBROUTINE COMPUTE_STATS()
 			WRITE(UNIT=11, FMT=*) 'Total', 100.0_dp*sum(constrained_firm_ind*DBN1)
 
 			CLOSE(UNIT=11)
-
+print*, 'test Total_Income 5'
+		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Distribution of firm wealth
@@ -7929,7 +7935,8 @@ SUBROUTINE COMPUTE_STATS()
 
 			CLOSE(UNIT=11)
 
-
+print*, 'test Total_Income 6'
+		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Distribution of bequest
@@ -7949,18 +7956,19 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO 
 		ENDDO  
 		print*, ' Test 1 '
-
+print*, 'test Total_Income 7'
+		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 		! Distribution of bequest (matrix)	
 		do ai=1,MaxAge
 			DBN_bq(ai,:,:,:,:,:) = DBN1(ai,:,:,:,:,:)*(1.0_DP-survP(ai))
 		enddo 
 		DBN_bq = DBN_bq/sum(DBN_bq)
 		print*, ' Test 2 '
-		print*, 'test Total_Income'
+		print*, 'test Total_Income 8'
 		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 		! Vectorizations
 		DBN_bq_vec        = reshape(DBN_bq      ,(/size(DBN1)/)); print*, ' Test 2.1 '
-		print*, 'test Total_Income'
+		print*, 'test Total_Income 9'
 		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 		BQ_vec            = reshape(Aprime      ,(/size(DBN1)/)); print*, ' Test 2.2 '
 			print*, sum(DBN1), sum(Total_Income), size(DBN1)
