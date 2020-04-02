@@ -1570,7 +1570,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	real(DP), dimension(MaxAge):: CumDiscountF
 	! REAL(DP), dimension(MaxAge, na, nz, nlambda, ne) ::  Cons_Eq_Welfare ! ValueFunction_Bench, ValueFunction_Exp,
 	REAL(DP), dimension(nz) ::  temp_ce_by_z
-	REAL(DP), dimension(MaxAge, nz) :: frac_pos_welfare_by_age_z, size_pos_welfare_by_age_z, size_by_age_z_bench, size_by_age_z_exp
+	REAL(DP), dimension(MaxAge, nz) :: frac_pos_welfare_by_age_z, size_pos_welfare_by_age_z, size_by_age_z
 	INTEGER, dimension(max_age_category+1) :: age_limit
 	INTEGER :: age_group_counter
 	REAL(DP), dimension(max_age_category,nz) :: CE_by_agegroup_z 
@@ -1632,16 +1632,12 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	! Profit Matrix
 		Pr_mat = Profit_Matrix(R,P)
 
-	! Print policy functions and distribution 
-		OPEN (UNIT=90, FILE=trim(Result_Folder)//'dbn_by_age_z_bench', STATUS='replace')   
+	! Get distribution by age and z
 		DO age=1,MaxAge    
 		    DO zi=1,nz
-		        size_by_age_z_bench(age, zi) = sum(DBN_bench(age,:,zi,:,:,:))
+		        size_by_age_z(age, zi) = sum(DBN_bench(age,:,zi,:,:,:))
 		    ENDDO ! zi
-		    WRITE  (UNIT=90, FMT=*)  size_by_age_z_bench(age, :) 
 		ENDDO
-		close (unit=90)
-
 
 		
 
@@ -1790,13 +1786,10 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 
 
 		! FRACTION POSITIVE WELFARE BY AGE-Z GROUP
-		frac_pos_welfare=0.0_DP
-		size_pos_welfare_by_age_z=0.0_DP
-
-		size_by_agegroup_z_exp = 0.0_DP
-		size_pos_welfare_by_agegroup_z = 0.0_DP
-
-		tot_wealth_by_agegroup_z_exp = 0.0_DP
+		frac_pos_welfare 				= 0.0_DP
+		size_pos_welfare_by_age_z 		= 0.0_DP
+		size_by_agegroup_z 				= 0.0_DP
+		size_pos_welfare_by_agegroup_z 	= 0.0_DP
 
 		age_group_counter=1
 		DO age=1,MaxAge 
@@ -1817,12 +1810,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
                     size_pos_welfare_by_agegroup_z(age_group_counter,zi) = size_pos_welfare_by_agegroup_z(age_group_counter,zi) &
                          &+  DBN_bench(age,ai,zi,lambdai,ei,xi)       
                 endif 
-                size_by_agegroup_z_exp(age_group_counter,zi) = size_by_agegroup_z_exp(age_group_counter,zi) + &
+                size_by_agegroup_z(age_group_counter,zi) = size_by_agegroup_z(age_group_counter,zi) + &
                          & DBN1(age,ai,zi,lambdai,ei,xi)       
 
-                tot_wealth_by_agegroup_z_exp(age_group_counter,zi) = tot_wealth_by_agegroup_z_exp(age_group_counter,zi) + &
-                         & agrid(ai)*DBN1(age,ai,zi,lambdai,ei,xi)                           
-		                    
 	        ENDDO
 	        ENDDO
 	        ENDDO
@@ -1830,14 +1820,12 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    ENDDO
 		ENDDO
 
-
-	OPEN (UNIT=70, FILE=trim(Result_Folder)//'size_by_agegroup_z_exp.txt', STATUS='replace')  
+  
 	OPEN (UNIT=60, FILE=trim(Result_Folder)//'frac_pos_welfare_by_agegroup_z.txt', STATUS='replace')  
 	DO age_group_counter=1,max_age_category
-	    WRITE (UNIT=70, FMT=*) size_by_agegroup_z_exp(age_group_counter,:)
-	    WRITE (UNIT=60, FMT=*) size_pos_welfare_by_agegroup_z(age_group_counter,:)/ size_by_agegroup_z_bench(age_group_counter,:)
+	    WRITE (UNIT=60, FMT=*) size_pos_welfare_by_agegroup_z(age_group_counter,:)/ size_by_agegroup_z(age_group_counter,:)
 	ENDDO
-	CLOSE (UNIT=70); CLOSE (UNIT=60);
+	CLOSE (UNIT=60);
 
 	OPEN (UNIT=60, FILE=trim(Result_Folder)//'frac_pos_welfare.txt', STATUS='replace')  
 	WRITE  (UNIT=60, FMT=*) 100.0_dp*frac_pos_welfare
@@ -1845,7 +1833,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 
 	OPEN (UNIT=60, FILE=trim(Result_Folder)//'frac_pos_welfare_by_age_z.txt', STATUS='replace')  
 	DO age=1, MaxAge
-	    WRITE  (UNIT=60, FMT=*) size_pos_welfare_by_age_z(age,:)/size_by_age_z_bench(age,:)
+	    WRITE  (UNIT=60, FMT=*) size_pos_welfare_by_age_z(age,:)/size_by_age_z(age,:)
 	ENDDO
 	close (UNIT=60)
 
@@ -7413,7 +7401,7 @@ SUBROUTINE COMPUTE_STATS()
 
 	IMPLICIT NONE
 	INTEGER  :: prctile, group, i, j, age_group_counter
-	REAL(DP), DIMENSION(nz)    :: cdf_Gz_DBN, Capital_by_z 
+	REAL(DP), DIMENSION(nz)    :: cdf_Gz_DBN, Capital_by_z, DBN_Z, CDF_Z
 	REAL(DP) :: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz), Mean_Capital
 	REAL(DP) :: Std_k_Return,    Var_K_Return,    Mean_K_Return_by_z(nz)
 	REAL(DP) :: Std_AT_K_Return, Var_AT_K_Return, Mean_AT_K_Return_by_z(nz)
@@ -7424,19 +7412,18 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP) :: S_Rate_A_Age(max_age_category), S_Rate_A_AZ(max_age_category,nz), S_Rate_A_W(3)
 	REAL(DP) :: S_Rate_Y_Age(max_age_category), S_Rate_Y_AZ(max_age_category,nz), S_Rate_Y_W(3)
 	REAL(DP) :: size_Age(max_age_category), size_AZ(max_age_category,nz), size_W(3)
-	real(DP) :: leverage_age_z(MaxAge,nz), size_by_age_z(MaxAge,nz), constrained_firms_age_z(MaxAge,nz)
 	real(DP) :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
 	real(DP) :: FW_top_x(6), prctile_FW(6), prctile_bq(5), low_pct, high_pct, a, b, c, CCDF_c, c_low, c_high
 	REAL(DP), DIMENSION(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Labor_Income, Total_Income, K_L_Income, K_T_Income
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
-	real(DP) :: Frisch_Aux, Frisch_Aux_2
+	real(DP)       :: Frisch_Aux, Frisch_Aux_2
 	character(100) :: rowname
-	integer , dimension(draft_age_category+1)  :: draft_age_limit
-	REAL(DP), dimension(MaxAge, nz) 		   :: size_by_age_z
-	REAL(DP), dimension(draft_age_category,nz) :: size_draft_group_z, wealth_draft_group_z, capital_draft_group_z
-	REAL(DP), dimension(draft_age_category,draft_z_category) :: size_draft_group, &
+	integer        :: age_limit(max_age_category+1), draft_age_limit(draft_age_category+1)
+	real(DP), dimension(MaxAge, nz) 		   :: size_by_age_z, leverage_age_z, constrained_firms_age_z 
+	real(DP), dimension(draft_age_category,nz) :: size_draft_group_z, wealth_draft_group_z, capital_draft_group_z
+	real(DP), dimension(draft_age_category,draft_z_category) :: size_draft_group, &
 		& wealth_draft_group,  av_wealth_draft_group, frac_wealth_draft_group, & 
 		& capital_draft_group,  av_capital_draft_group, frac_capital_draft_group 
 	
@@ -7723,11 +7710,13 @@ SUBROUTINE COMPUTE_STATS()
 		DO xi=1,nx
 		DO zi=1,nz
 		DO ai=1,na
-		    External_Debt_GDP = External_Debt_GDP + sum(DBN1(:, ai, zi, :, :,xi))*abs(K_mat(ai,zi,xi)-agrid(ai))
+			if (K_mat(ai,zi,xi).gt.agrid(ai)) then 
+		    External_Debt_GDP = External_Debt_GDP + sum(DBN1(:, ai, zi, :, :,xi))*(K_mat(ai,zi,xi)-agrid(ai))
+		    endif 
 		ENDDO
 		ENDDO
 		ENDDO
-		External_Debt_GDP = 0.5_dp*External_Debt_GDP / YBAR
+		External_Debt_GDP = External_Debt_GDP / YBAR
 
 
 	!------------------------------------------------------------------------------------
