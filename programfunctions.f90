@@ -8133,9 +8133,12 @@ SUBROUTINE COMPUTE_STATS()
 	        	capital_draft_group_z(age,zi) = capital_draft_group_z(age,zi) + K_mat(ai,zi,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)
 
 	        	! Consumption, Labor and Savings by group
-	        	 Cons_draft_group_z(age,zi) =  Cons_draft_group_z(age,zi) +   Cons(age2,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)
-	        	Hours_draft_group_z(age,zi) = Hours_draft_group_z(age,zi) +  Hours(age2,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)
-	        	   Ap_draft_group_z(age,zi) =    Ap_draft_group_z(age,zi) + Aprime(age2,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        	 Cons_draft_group_z(age,zi) =  Cons_draft_group_z(age,zi) + &
+	        	 								&  Cons(age2,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        	Hours_draft_group_z(age,zi) = Hours_draft_group_z(age,zi) + &
+	        									& Hours(age2,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        	   Ap_draft_group_z(age,zi) =    Ap_draft_group_z(age,zi) + &
+	        	   								&Aprime(age2,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)
 	    	enddo 
 	    	enddo 
 	    	enddo 
