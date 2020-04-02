@@ -7960,9 +7960,9 @@ SUBROUTINE COMPUTE_STATS()
 		print*, ' Test 2 '
 		
 		! Vectorizations
-		DBN_bq_vec        = reshape(DBN_bq      ,(/size(DBN1)/))
-		BQ_vec            = reshape(Aprime      ,(/size(DBN1)/))
-		Inc_vec 		  = reshape(Total_Income,(/size(DBN1)/))
+		DBN_bq_vec        = reshape(DBN_bq      ,(/size(DBN1)/)); print*, ' Test 2.1 '
+		BQ_vec            = reshape(Aprime      ,(/size(DBN1)/)); print*, ' Test 2.2 '
+		Inc_vec 		  = reshape(Total_Income,(/size(DBN1)/)); 
 		print*, ' Test 2.5 '
 
 		! Mean Bequest
