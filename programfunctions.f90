@@ -7418,8 +7418,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(draft_age_category,draft_z_category) :: size_draft_group, &
 		& wealth_draft_group,  av_wealth_draft_group, frac_wealth_draft_group, & 
 		& capital_draft_group,  av_capital_draft_group, frac_capital_draft_group, &
-		& cons_draft_group,  av_cons_draft_group, hours_draft_group, &
-		& Ap_draft_group,  av_Ap_draft_group, frac_Ap_draft_group
+		& cons_draft_group, hours_draft_group, Ap_draft_group,  av_Ap_draft_group, frac_Ap_draft_group
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
@@ -8155,7 +8154,7 @@ SUBROUTINE COMPUTE_STATS()
 		capital_draft_group = Draft_Table(capital_draft_group_z,DBN_z,.true.)
 
 		! Cons, Hours, Ap of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		 Cons_draft_group = Draft_Table(  Cons_draft_group_z,DBN_z,.true. )
+		 Cons_draft_group = Draft_Table(  Cons_draft_group_z,DBN_z,.false.)
 		Hours_draft_group = Draft_Table( Hours_draft_group_z,DBN_z,.false.)
 		   Ap_draft_group = Draft_Table(Aprime_draft_group_z,DBN_z,.true. )
 
@@ -8164,7 +8163,6 @@ SUBROUTINE COMPUTE_STATS()
 	    frac_wealth_draft_group      = 100.0_dp*wealth_draft_group/sum(wealth_draft_group)
 	    av_capital_draft_group       = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*capital_draft_group/size_draft_group
 	    frac_capital_draft_group     = 100.0_dp*capital_draft_group/sum(capital_draft_group)
-	    av_Cons_draft_group  		 = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*consdraft_group/size_draft_group
 	    av_Ap_draft_group            = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*Ap_draft_group/size_draft_group
 	    frac_Ap_draft_group     	 = 100.0_dp*Ap_draft_group/sum(Ap_draft_group)
 
@@ -8179,7 +8177,6 @@ SUBROUTINE COMPUTE_STATS()
 	    OPEN (UNIT=87, FILE=trim(Result_Folder)//'draft_group_av_capital.txt'	, STATUS='replace') 
 	    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_frac_capital.txt'	, STATUS='replace') 
 	    OPEN (UNIT=89, FILE=trim(Result_Folder)//'draft_group_cons.txt'			, STATUS='replace') 
-	    OPEN (UNIT=90, FILE=trim(Result_Folder)//'draft_group_av_cons.txt'		, STATUS='replace') 
 	    OPEN (UNIT=91, FILE=trim(Result_Folder)//'draft_group_hours.txt'		, STATUS='replace') 
 	    OPEN (UNIT=92, FILE=trim(Result_Folder)//'draft_group_savings.txt'		, STATUS='replace') 
 	    OPEN (UNIT=93, FILE=trim(Result_Folder)//'draft_group_av_savings.txt'	, STATUS='replace') 
@@ -8195,7 +8192,6 @@ SUBROUTINE COMPUTE_STATS()
 		    WRITE  (UNIT=88, FMT=*)  frac_capital_draft_group(age,:)
 
 		    WRITE  (UNIT=89, FMT=*)  Cons_draft_group(age,:)
-		    WRITE  (UNIT=90, FMT=*)  av_Cons_draft_group(age,:)
 		    WRITE  (UNIT=91, FMT=*)  Hours_draft_group(age,:)
 		    WRITE  (UNIT=92, FMT=*)  Ap_draft_group(age,:)
 		    WRITE  (UNIT=93, FMT=*)  av_Ap_draft_group(age,:)
@@ -8204,7 +8200,7 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO
 		close(unit=81)
 		close(unit=83); close(unit=84); close(unit=85); close(unit=86); close(unit=87); close(unit=88);
-		close(unit=89); close(unit=90); close(unit=91); close(unit=92); close(unit=93); close(unit=94);
+		close(unit=89); close(unit=91); close(unit=92); close(unit=93); close(unit=94);
 
 
 
