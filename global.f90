@@ -182,7 +182,7 @@ MODULE global
         & ValueFunction_tr, Bq_Value_tr
     ! Welfare Gain
     REAL(DP), DIMENSION(:,:,:,:,:,:)  , allocatable :: CE1_tr
-    REAL(DP) :: CE1_nb_tr,  CE1_pop_tr, CE2_nb_tr,  CE2_pop_tr
+    REAL(DP) :: CE1_nb_tr,  CE1_pop_tr, CE2_nb_tr,  CE2_pop_tr, frac_pos_welfare 
 	! Policy function and value function (defined on the adjusted grid for breakpoints)
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_t_pr, Hours_t_pr
 
