@@ -7419,7 +7419,8 @@ SUBROUTINE COMPUTE_STATS()
 		& K_Tax_draft_group_z, L_Tax_draft_group_z, K_Tax_Inc_draft_group_z, L_Tax_Inc_draft_group_z, &
 		& T_Inc_draft_group_z, K_Inc_draft_group_z, L_Inc_draft_group_z, K_Inc_frac_draft_group_z, L_Inc_frac_draft_group_z, &
 		&      Tax_Increase_tk_draft_group_z,      Tax_Increase_tl_draft_group_z,      Tax_Increase_draft_group_z, &
-		& Tax_Rate_Increase_tk_draft_group_z, Tax_Rate_Increase_tl_draft_group_z, Tax_Rate_Increase_draft_group_z
+		& Tax_Rate_Increase_tk_draft_group_z, Tax_Rate_Increase_tl_draft_group_z, Tax_Rate_Increase_draft_group_z, & 
+		& Inc_Increase_draft_group_z, K_Inc_Increase_draft_group_z, L_Inc_Increase_draft_group_z
 	real(DP), dimension(draft_age_category,draft_z_category) :: size_draft_group, &
 		& wealth_draft_group,  av_wealth_draft_group, frac_wealth_draft_group, & 
 		& capital_draft_group,  av_capital_draft_group, frac_capital_draft_group, &
@@ -7427,7 +7428,8 @@ SUBROUTINE COMPUTE_STATS()
 		& K_Tax_draft_group, L_Tax_draft_group, K_Tax_Inc_draft_group, L_Tax_Inc_draft_group, &
 		& T_Inc_draft_group, K_Inc_draft_group, L_Inc_draft_group, K_Inc_frac_draft_group, L_Inc_frac_draft_group, &
 		& Tax_Increase_tk_draft_group, Tax_Increase_tl_draft_group, Tax_Increase_draft_group, &
-		& Tax_Rate_Increase_tk_draft_group, Tax_Rate_Increase_tl_draft_group, Tax_Rate_Increase_draft_group
+		& Tax_Rate_Increase_tk_draft_group, Tax_Rate_Increase_tl_draft_group, Tax_Rate_Increase_draft_group, &
+		& Inc_Increase_draft_group, K_Inc_Increase_draft_group, L_Inc_Increase_draft_group
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income, K_Income, L_Income, K_Tax, L_Tax ! , Firm_Output, Firm_Profit
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Total_Income_bench, K_Income_bench, L_Income_bench, K_Tax_bench, L_Tax_bench
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
@@ -8383,6 +8385,8 @@ SUBROUTINE COMPUTE_STATS()
 		Tax_Increase_tk_draft_group_z = 0.0_dp ; Tax_Increase_tl_draft_group_z = 0.0_dp ;
 		Tax_Increase_draft_group_z = 0.0_dp ; Tax_Rate_Increase_draft_group_z = 0.0_dp ;
 		Tax_Rate_Increase_tk_draft_group_z = 0.0_dp ; Tax_Rate_Increase_tl_draft_group_z = 0.0_dp ;
+		Inc_Increase_draft_group_z = 0.0_dp  ; 
+		K_Inc_Increase_draft_group_z = 0.0_dp ; L_Inc_Increase_draft_group_z = 0.0_dp;
 		do zi  = 1,nz
 		do age = 1,draft_age_category
 	        do xi=1,nx
@@ -8398,19 +8402,30 @@ SUBROUTINE COMPUTE_STATS()
 		    		if (KeepSSatBench .eq. 1) then 
 		    		L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
 		    		else 
-		    		L_Inc_aux   = RetY_lambda_e(lambdai,ei)*EBAR_bench/Ebar_exps
+		    		L_Inc_aux   = RetY_lambda_e(lambdai,ei)*EBAR_bench/Ebar_exp
 		    		endif 
 		    	endif 
 		    	K_Inc_aux   = R_bench*agrid(ai) + Pr_mat_bench(ai,zi,xi)
 
-		    	Total_Income(age2,ai,zi,lambdai,ei,xi) = L_Inc_aux + K_Inc_aux
-		    	K_Income(age2,ai,zi,lambdai,ei,xi) 	   = K_Inc_aux
-		    	L_Income(age2,ai,zi,lambdai,ei,xi) 	   = L_Inc_aux
+		    	Total_Income_bench(age2,ai,zi,lambdai,ei,xi) = L_Inc_aux + K_Inc_aux
+		    	K_Income_bench(age2,ai,zi,lambdai,ei,xi) 	 = K_Inc_aux
+		    	L_Income_bench(age2,ai,zi,lambdai,ei,xi) 	 = L_Inc_aux
 
 		    	! Tax by agent (capital and labor) in benchmark
-		    	K_Tax(age2,ai,zi,lambdai,ei,xi)  = tauK_bench*K_Inc_aux
+		    	K_Tax_bench(age2,ai,zi,lambdai,ei,xi)  = tauK_bench*K_Inc_aux
 		    	if (age.lt.draft_age_category) then
-		    	L_Tax(age2,ai,zi,lambdai,ei,xi)  = L_Inc_aux - psi_bench*(L_Inc_aux)**(1.0_DP-tauPL_bench)
+		    	L_Tax_bench(age2,ai,zi,lambdai,ei,xi)  = L_Inc_aux - psi_bench*(L_Inc_aux)**(1.0_DP-tauPL_bench)
+		    	endif 
+
+		    	! Compare income 
+		    	if (Total_Income(age2,ai,zi,lambdai,ei,xi).gt.Total_Income_bench(age2,ai,zi,lambdai,ei,xi)) then
+		    	Inc_Increase_draft_group_z(age,zi) = Inc_Increase_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
+		    	if (K_Income(age2,ai,zi,lambdai,ei,xi).gt.K_Income_bench(age2,ai,zi,lambdai,ei,xi)) then
+		    	K_Inc_Increase_draft_group_z(age,zi) = K_Inc_Increase_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
+		    	if (L_Income(age2,ai,zi,lambdai,ei,xi).gt.L_Income_bench(age2,ai,zi,lambdai,ei,xi)) then
+		    	L_Inc_Increase_draft_group_z(age,zi) = L_Inc_Increase_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
 
@@ -8488,12 +8503,24 @@ SUBROUTINE COMPUTE_STATS()
 			! Fix fractions
 			Tax_Rate_Increase_draft_group = 100.0_dp*Tax_Rate_Increase_draft_group/size_draft_group
 
+		! Frac. total income increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		Inc_Increase_draft_group   = Draft_Table(  Inc_Increase_draft_group_z,DBN_z,.true.)
+		K_Inc_Increase_draft_group = Draft_Table(K_Inc_Increase_draft_group_z,DBN_z,.true.)
+		L_Inc_Increase_draft_group = Draft_Table(L_Inc_Increase_draft_group_z,DBN_z,.true.)
+			! Fix fractions
+			  Inc_Increase_draft_group = 100.0_dp*  Inc_Increase_draft_group/size_draft_group
+			K_Inc_Increase_draft_group = 100.0_dp*K_Inc_Increase_draft_group/size_draft_group
+			L_Inc_Increase_draft_group = 100.0_dp*L_Inc_Increase_draft_group/size_draft_group
+
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_frac_Tax_K.txt', STATUS='replace') 
 	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_frac_Tax_L.txt', STATUS='replace') 
 	    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_frac_Tax.txt', STATUS='replace') 
 	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate_K.txt', STATUS='replace') 
 	    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate_L.txt', STATUS='replace') 
 	    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate.txt', STATUS='replace') 
+	    OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_frac_Tot_Inc_Incr.txt', STATUS='replace') 
+	    OPEN (UNIT=87, FILE=trim(Result_Folder)//'draft_group_frac_K_Inc_Incr.txt', STATUS='replace') 
+	    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_frac_L_Inc_Incr.txt', STATUS='replace') 
 		do age = 1,draft_age_category
 		    WRITE  (UNIT=80, FMT=*)  Tax_Increase_tk_draft_group(age,:)
 		    WRITE  (UNIT=81, FMT=*)  Tax_Increase_tl_draft_group(age,:)
@@ -8501,8 +8528,12 @@ SUBROUTINE COMPUTE_STATS()
 		    WRITE  (UNIT=83, FMT=*)  Tax_Rate_Increase_tk_draft_group(age,:)
 		    WRITE  (UNIT=84, FMT=*)  Tax_Rate_Increase_tl_draft_group(age,:)
 		    WRITE  (UNIT=85, FMT=*)  Tax_Rate_Increase_draft_group(age,:)
+		    WRITE  (UNIT=86, FMT=*)  Inc_Increase_draft_group(age,:)
+		    WRITE  (UNIT=87, FMT=*)  K_Inc_Increase_draft_group(age,:)
+		    WRITE  (UNIT=88, FMT=*)  L_Inc_Increase_draft_group(age,:)
 		ENDDO
 		close(unit=80); close(unit=81); close(unit=82); close(unit=83); close(unit=84); close(unit=85)
+		close(unit=86); close(unit=87); close(unit=88);
 	endif 
 
 
