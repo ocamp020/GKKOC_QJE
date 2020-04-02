@@ -7416,7 +7416,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: FW_top_x(6), prctile_FW(6), prctile_bq(5), low_pct, high_pct, a, b, c, CCDF_c, c_low, c_high
 	REAL(DP), DIMENSION(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq
-	real(DP), dimension(:,:,:,:,:,:), allocatable :: Labor_Income, Total_Income, K_L_Income, K_T_Income
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: Total_Income
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP)       :: Frisch_Aux, Frisch_Aux_2
 	character(100) :: rowname
@@ -7438,10 +7438,7 @@ SUBROUTINE COMPUTE_STATS()
 	allocate(Firm_Output( MaxAge,na,nz,nlambda,ne,nx))
 	allocate(Firm_Profit( MaxAge,na,nz,nlambda,ne,nx))
 	allocate(DBN_bq(      MaxAge,na,nz,nlambda,ne,nx))
-	allocate(Labor_Income(MaxAge,na,nz,nlambda,ne,nx))
 	allocate(Total_Income(MaxAge,na,nz,nlambda,ne,nx))
-	allocate(K_L_Income(  MaxAge,na,nz,nlambda,ne,nx))
-	allocate(K_T_Income(  MaxAge,na,nz,nlambda,ne,nx))
 	allocate(constrained_firm_ind(MaxAge,na,nz,nlambda,ne,nx))
 
 
@@ -7962,7 +7959,7 @@ SUBROUTINE COMPUTE_STATS()
 		! Vectorizations
 		DBN_bq_vec        = reshape(DBN_bq      ,(/size(DBN1)/)); print*, ' Test 2.1 '
 		BQ_vec            = reshape(Aprime      ,(/size(DBN1)/)); print*, ' Test 2.2 '
-		Inc_vec 		  = reshape(Total_Income,(/size(DBN1)/)); 
+		Inc_vec 		  = reshape(Total_Income,(/size(DBN1)/)); print*, ' Test 2.3 '
 		print*, ' Test 2.5 '
 
 		! Mean Bequest
