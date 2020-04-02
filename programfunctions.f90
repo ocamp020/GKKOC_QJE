@@ -7414,19 +7414,15 @@ SUBROUTINE COMPUTE_STATS()
 	integer        :: age_limit(max_age_category+1), draft_age_limit(draft_age_category+1)
 	real(DP), dimension(MaxAge, nz) 		   :: size_by_age_z, leverage_age_z, constrained_firms_age_z 
 	real(DP), dimension(draft_age_category,nz) :: size_draft_group_z, wealth_draft_group_z, capital_draft_group_z, &
-		& Cons_draft_group_z, Hours_draft_group_z, Ap_draft_group_z
-	REAL(DP), dimension(draft_age_category,nz) :: K_Tax_draft_group_z, L_Tax_draft_group_z, C_Tax_draft_group_z
-	REAL(DP), dimension(draft_age_category,nz) :: T_Inc_draft_group_z, K_Inc_draft_group_z, L_Inc_draft_group_z
-	REAL(DP), dimension(draft_age_category,nz) :: K_Inc_frac_draft_group_z, L_Inc_frac_draft_group_z
-	REAL(DP), dimension(draft_age_category,nz) :: K_Tax_Inc_draft_group_z, L_Tax_Inc_draft_group_z, C_Tax_Inc_draft_group_z
+		& Cons_draft_group_z, Hours_draft_group_z, Ap_draft_group_z, & 
+		& K_Tax_draft_group_z, L_Tax_draft_group_z, K_Tax_Inc_draft_group_z, L_Tax_Inc_draft_group_z, &
+		& T_Inc_draft_group_z, K_Inc_draft_group_z, L_Inc_draft_group_z, K_Inc_frac_draft_group_z, L_Inc_frac_draft_group_z
 	real(DP), dimension(draft_age_category,draft_z_category) :: size_draft_group, &
 		& wealth_draft_group,  av_wealth_draft_group, frac_wealth_draft_group, & 
 		& capital_draft_group,  av_capital_draft_group, frac_capital_draft_group, &
 		& cons_draft_group, hours_draft_group, Ap_draft_group,  av_Ap_draft_group, frac_Ap_draft_group
-	REAL(DP), dimension(draft_age_category,draft_z_category) :: K_Tax_draft_group, L_Tax_draft_group, C_Tax_draft_group
-	REAL(DP), dimension(draft_age_category,draft_z_category) :: Tot_Income_draft_group, K_Inc_draft_group, L_Inc_draft_group
-	REAL(DP), dimension(draft_age_category,draft_z_category) :: K_Inc_frac_draft_group, L_Inc_frac_draft_group
-	REAL(DP), dimension(draft_age_category,draft_z_category) :: K_Tax_Inc_draft_group, L_Tax_Inc_draft_group, C_Tax_Inc_draft_group
+		& K_Tax_draft_group, L_Tax_draft_group, K_Tax_Inc_draft_group, L_Tax_Inc_draft_group, &
+		& T_Inc_draft_group, K_Inc_draft_group, L_Inc_draft_group, K_Inc_frac_draft_group, L_Inc_frac_draft_group
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income, K_Tax, L_Tax ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
