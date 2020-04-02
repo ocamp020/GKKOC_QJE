@@ -8320,9 +8320,6 @@ SUBROUTINE COMPUTE_STATS()
 		! Average Labor Tax to income ratio adjusted by productivity group
 		L_Tax_Inc_draft_group = Draft_Table(L_Tax_Inc_draft_group_z,DBN_z,.false.)
 
-		! Average Consumption Tax to income ratio adjusted by productivity group
-		C_Tax_Inc_draft_group = Draft_Table(C_Tax_Inc_draft_group_z,DBN_z,.false.)
-
 		! Capital Income Share Tax adjusted by productivity group
 		K_Inc_frac_draft_group = Draft_Table(K_Inc_frac_draft_group_z,DBN_z,.false.)
 
@@ -8341,7 +8338,7 @@ SUBROUTINE COMPUTE_STATS()
 	    do age = 1,draft_age_category
 		    WRITE  (UNIT=80, FMT=*)  K_Tax_draft_group(age,:)
 		    WRITE  (UNIT=81, FMT=*)  L_Tax_draft_group(age,:)
-		    WRITE  (UNIT=83, FMT=*)  Tot_Income_draft_group(age,:)
+		    WRITE  (UNIT=83, FMT=*)  T_Inc_draft_group(age,:)
 		    WRITE  (UNIT=84, FMT=*)  K_Tax_Inc_draft_group(age,:)
 		    WRITE  (UNIT=85, FMT=*)  L_Tax_Inc_draft_group(age,:)
 		    WRITE  (UNIT=87, FMT=*)  K_Inc_draft_group(age,:)
