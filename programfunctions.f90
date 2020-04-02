@@ -7399,7 +7399,7 @@ end Subroutine EGM_Working_Period_Transition
 SUBROUTINE COMPUTE_STATS()
 	use omp_lib
 	IMPLICIT NONE
-	real  :: prctile, group, i, j, age_group_counter, age2
+	integer  :: prctile, group, i, j, age_group_counter, age2
 	real(DP), dimension(nz)    :: Capital_by_z, DBN_Z, CDF_Z
 	real(DP) :: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz), Mean_Capital
 	real(DP) :: Std_k_Return,    Var_K_Return,    Mean_K_Return_by_z(nz)
