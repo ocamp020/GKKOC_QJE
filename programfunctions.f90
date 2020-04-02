@@ -7420,7 +7420,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(draft_age_category,draft_z_category) :: size_draft_group, &
 		& wealth_draft_group,  av_wealth_draft_group, frac_wealth_draft_group, & 
 		& capital_draft_group,  av_capital_draft_group, frac_capital_draft_group, &
-		& cons_draft_group, hours_draft_group, Ap_draft_group,  av_Ap_draft_group, frac_Ap_draft_group
+		& cons_draft_group, hours_draft_group, Ap_draft_group,  av_Ap_draft_group, frac_Ap_draft_group, &
 		& K_Tax_draft_group, L_Tax_draft_group, K_Tax_Inc_draft_group, L_Tax_Inc_draft_group, &
 		& T_Inc_draft_group, K_Inc_draft_group, L_Inc_draft_group, K_Inc_frac_draft_group, L_Inc_frac_draft_group
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income, K_Tax, L_Tax ! , Firm_Output, Firm_Profit
