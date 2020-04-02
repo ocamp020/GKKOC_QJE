@@ -7638,8 +7638,7 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO    
 		ENDDO    
 		ENDDO
-		print*, 'test Total_Income 1'
-		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
+
 			! Allocate MeanReturn to K
 			Mean_K_Return_by_z    = MeanReturn_by_z
 			Mean_AT_K_Return_by_z = MeanATReturn_by_z     
@@ -7696,15 +7695,11 @@ SUBROUTINE COMPUTE_STATS()
 		Std_AT_K_Return = Var_AT_K_Return**0.5_DP
 		Std_K_Return    = Var_K_Return**0.5_DP
 
-		print*, 'test Total_Income 2'
-		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
-
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Distribution of bequest
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
-		print*, 'Test Bequests'
 		Bequest_Wealth=0.0_DP
 		DO xi=1,nx
 		DO zi=1,nz
@@ -7717,32 +7712,21 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO    
 		ENDDO 
 		ENDDO  
-		print*, ' Test 1 '
-		print*, 'test Total_Income 7'
-		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
+
 		! Distribution of bequest (matrix)	
 		do ai=1,MaxAge
 			DBN_bq(ai,:,:,:,:,:) = DBN1(ai,:,:,:,:,:)*(1.0_DP-survP(ai))
 		enddo 
 		DBN_bq = DBN_bq/sum(DBN_bq)
-		print*, ' Test 2 '
-		print*, 'test Total_Income 8'
-		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
+
 		! Vectorizations
-		DBN_bq_vec        = reshape(DBN_bq      ,(/size(DBN1)/)); print*, ' Test 2.1 '
-		print*, 'test Total_Income 9'
-		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
-		BQ_vec            = reshape(Aprime      ,(/size(DBN1)/)); print*, ' Test 2.2 '
-			print*, sum(DBN1), sum(Total_Income), size(DBN1)
-			Inc_vec= 0.0_dp 
-			print*, sum(Inc_vec), sum(Total_Income), maxval(Total_Income), minval(Total_Income)
-		Inc_vec 		  = reshape(Total_Income,(/size(DBN1)/)); print*, ' Test 2.3 '
-		print*, ' Test 2.5 '
+		DBN_bq_vec        = reshape(DBN_bq      ,(/size(DBN1)/)); 
+		BQ_vec            = reshape(Aprime      ,(/size(DBN1)/)); 
+		Inc_vec 		  = reshape(Total_Income,(/size(DBN1)/)); 
 
 		! Mean Bequest
 		Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
 
-		print*, ' Test 3 '
 		if (solving_bench.eq.1) then
 			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Bequest_Stats_Bench.txt', STATUS='replace')
 		else
@@ -7874,8 +7858,6 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO
 		External_Debt_GDP = External_Debt_GDP / YBAR
 
-print*, 'test Total_Income 3'
-		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Savings Rate
@@ -7892,8 +7874,6 @@ print*, 'test Total_Income 3'
 	Y_Age 	 = 0.0_dp
 	Y_AZ  	 = 0.0_dp 
 	Y_W   	 = 0.0_dp
-		print*, 'test Total_Income 3.1'
-		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	DO age=1,MaxAge 
 
 	    DO while (age.gt.age_limit(group+1))
@@ -7957,16 +7937,12 @@ print*, 'test Total_Income 3'
         ENDDO
 	    ENDDO
 	ENDDO
-			print*, 'test Total_Income 3.2'
-		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	S_Rate_A_Age = (Ap_Age-A_Age)/A_Age
 	S_Rate_A_AZ  = (Ap_AZ-A_AZ)/A_AZ
 	S_Rate_A_W   = (Ap_W-A_W)/A_W
 	S_Rate_Y_Age = (Ap_Age-A_Age)/Y_Age
 	S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
 	S_Rate_Y_W   = (Ap_W-A_W)/Y_W
-		print*, 'test Total_Income 4'
-		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Leverage Ratio and fraction of constrainted firms 
@@ -8029,8 +8005,7 @@ print*, 'test Total_Income 3'
 			CLOSE(UNIT=11)
 
 			! deallocate(Firm_Output,Firm_Profit)
-print*, 'test Total_Income 5'
-		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
+
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Distribution of firm wealth
@@ -8085,15 +8060,11 @@ print*, 'test Total_Income 5'
 
 			CLOSE(UNIT=11)
 
-print*, 'test Total_Income 6'
-		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
-
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Frisch Elasticity 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
-		print*, 'Test Elasticity'
 		! This is only for agents with positive hours worked
 		Frisch_Elasticity = 0.0_dp
 		Size_Frisch       = 0.0_dp 
@@ -8133,7 +8104,6 @@ print*, 'test Total_Income 6'
 	! Draft Tables 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
-		print*, 'Test Draft Tables'
 		size_draft_group_z    = 0.0_dp
 		wealth_draft_group_z  = 0.0_dp
 		capital_draft_group_z = 0.0_dp 
@@ -8225,7 +8195,7 @@ print*, 'test Total_Income 6'
 	print*,'-----------------------------------------------------'
 	print*,"Statistics"
 	print*,' '
-	print*,'	Debt/GDP',External_Debt_GDP,'W/GDP',Wealth_Output,'Top 1% A',prct1_wealth,'Top 10% A',prct10_wealth
+	print*,'	Debt/GDP',External_Debt_GDP,'A/GDP',Wealth_Output,'Top 1% A',prct1_wealth,'Top 10% A',prct10_wealth
 	print*,'	STD Labor Earnings',Std_Log_Earnings_25_60,'Mean Labor (hours 25-60)',meanhours_25_60,'MeanReturn',MeanReturn
 	print*,' '; print*,' Constrainted Firms and Demand for Capital'
 	print*,' Z ','  Constrained_firms_by_z:     ',' Capital_high_shock ',' Capital_low_shock '
