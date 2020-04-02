@@ -7414,10 +7414,10 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP) :: size_Age(max_age_category), size_AZ(max_age_category,nz), size_W(3)
 	real(DP) :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
 	real(DP) :: FW_top_x(6), prctile_FW(6), prctile_bq(5), low_pct, high_pct, a, b, c, CCDF_c, c_low, c_high
-	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Total_Income
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
+	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP)       :: Frisch_Aux, Frisch_Aux_2
 	character(100) :: rowname
 	integer        :: age_limit(max_age_category+1), draft_age_limit(draft_age_category+1)
@@ -7959,6 +7959,9 @@ SUBROUTINE COMPUTE_STATS()
 		! Vectorizations
 		DBN_bq_vec        = reshape(DBN_bq      ,(/size(DBN1)/)); print*, ' Test 2.1 '
 		BQ_vec            = reshape(Aprime      ,(/size(DBN1)/)); print*, ' Test 2.2 '
+			print*, sum(DBN1), sum(Total_Income), size(DBN1)
+			Inc_vec= 0.0_dp 
+			print*, sum(Inc_vec)
 		Inc_vec 		  = reshape(Total_Income,(/size(DBN1)/)); print*, ' Test 2.3 '
 		print*, ' Test 2.5 '
 
