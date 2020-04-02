@@ -7414,8 +7414,7 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP) :: size_Age(max_age_category), size_AZ(max_age_category,nz), size_W(3)
 	real(DP) :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
 	real(DP) :: FW_top_x(6), prctile_FW(6), prctile_bq(5), low_pct, high_pct, a, b, c, CCDF_c, c_low, c_high
-	! real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq, Total_Income
-	real(DP), dimension(MaxAge,na,nz,nlambda,ne,nx) :: Firm_Output, Firm_Profit, DBN_bq, Total_Income
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq, Total_Income
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP)       :: Frisch_Aux, Frisch_Aux_2
@@ -7435,10 +7434,10 @@ SUBROUTINE COMPUTE_STATS()
 	allocate(DBN_bq_vec(		size(DBN1)))
 	allocate(CDF_bq(			size(DBN1)))
 	allocate(Inc_vec(			size(DBN1)))
-	! allocate(Firm_Output( MaxAge,na,nz,nlambda,ne,nx))
-	! allocate(Firm_Profit( MaxAge,na,nz,nlambda,ne,nx))
-	! allocate(DBN_bq(      MaxAge,na,nz,nlambda,ne,nx))
-	! allocate(Total_Income(MaxAge,na,nz,nlambda,ne,nx))
+	allocate(Firm_Output( MaxAge,na,nz,nlambda,ne,nx))
+	allocate(Firm_Profit( MaxAge,na,nz,nlambda,ne,nx))
+	allocate(DBN_bq(      MaxAge,na,nz,nlambda,ne,nx))
+	allocate(Total_Income(MaxAge,na,nz,nlambda,ne,nx))
 	allocate(constrained_firm_ind(MaxAge,na,nz,nlambda,ne,nx))
 
 
@@ -7744,6 +7743,8 @@ print*, 'test Total_Income 3'
 	size_Age = 0.0_dp
 	size_AZ  = 0.0_dp
 	size_W   = 0.0_dp
+		print*, 'test Total_Income 3.1'
+		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	DO age=1,MaxAge 
 
 	    DO while (age.gt.age_limit(group+1))
@@ -7812,13 +7813,15 @@ print*, 'test Total_Income 3'
         ENDDO
 	    ENDDO
 	ENDDO
+			print*, 'test Total_Income 3.2'
+		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	S_Rate_A_Age = (Ap_Age-A_Age)/A_Age
 	S_Rate_A_AZ  = (Ap_AZ-A_AZ)/A_AZ
 	S_Rate_A_W   = (Ap_W-A_W)/A_W
 	S_Rate_Y_Age = (Ap_Age-A_Age)/Y_Age
 	S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
 	S_Rate_Y_W   = (Ap_W-A_W)/Y_W
-print*, 'test Total_Income 4'
+		print*, 'test Total_Income 4'
 		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
