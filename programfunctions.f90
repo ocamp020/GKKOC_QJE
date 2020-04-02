@@ -7405,13 +7405,10 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP) :: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz), Mean_Capital
 	REAL(DP) :: Std_k_Return,    Var_K_Return,    Mean_K_Return_by_z(nz)
 	REAL(DP) :: Std_AT_K_Return, Var_AT_K_Return, Mean_AT_K_Return_by_z(nz)
-	REAL(DP) :: A_Age(max_age_category), A_AZ(max_age_category,nz), A_W(3)
-	REAL(DP) :: Ap_Age(max_age_category), Ap_AZ(max_age_category,nz), Ap_W(3)
-	REAL(DP) :: Y_Age(max_age_category), Y_AZ(max_age_category,nz), Y_W(3)
-	REAL(DP) :: S_Age(max_age_category), S_AZ(max_age_category,nz), S_W(3)
-	REAL(DP) :: S_Rate_A_Age(max_age_category), S_Rate_A_AZ(max_age_category,nz), S_Rate_A_W(3)
-	REAL(DP) :: S_Rate_Y_Age(max_age_category), S_Rate_Y_AZ(max_age_category,nz), S_Rate_Y_W(3)
-	real(DP) :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
+	REAL(DP), dimension(max_age_category)    :: A_Age, Ap_Age, Y_Age, S_Age, S_Rate_A_Age, S_Rate_Y_Age 
+	real(DP), dimension(max_age_category,nz) :: A_AZ , Ap_AZ , Y_AZ , S_AZ , S_Rate_A_AZ , S_Rate_Y_AZ  
+	real(DP), dimension(3) 					 :: A_W  , Ap_W  , Y_W  , S_W  , S_Rate_A_W  , S_Rate_Y_W  
+	real(DP), dimension(MaxAge) 			 :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
 	real(DP) :: FW_top_x(6), prctile_FW(6), prctile_bq(5), low_pct, high_pct, a, b, c, CCDF_c, c_low, c_high
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq, Total_Income
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
