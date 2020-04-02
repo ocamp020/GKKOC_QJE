@@ -7448,7 +7448,7 @@ SUBROUTINE COMPUTE_STATS()
 	!$ call omp_set_num_threads(20)
 	! $ print *, "OMP Test Message"
 
-	! print*, ' '; print*,' Entering Compute_Stats'; print*, ' '; 
+	print*, ' '; print*,' Entering Compute_Stats'; print*, ' '; 
 	
 	! Age Brackets
 		draft_age_limit = [0, 1, 15, 30, 45, MaxAge ] 
@@ -7458,6 +7458,7 @@ SUBROUTINE COMPUTE_STATS()
 	! Size by age-z and age_group_z
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
+		print*, 'Test DBN_az'
 		OPEN (UNIT=90, FILE=trim(Result_Folder)//'size_by_age_z.txt', STATUS='replace')   
 		size_by_age_z =0.0_DP
 		DO age=1,MaxAge 
@@ -7474,6 +7475,7 @@ SUBROUTINE COMPUTE_STATS()
 	! Distribution of Assets
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
+		print*, 'Test assets'
 		DO ai=1,na
 		     pr_a_dbn(ai)          = sum(DBN1(:,ai,:,:,:,:)) 
 		     cdf_a_dbn(ai)         = sum( pr_a_dbn(1:ai) )      
@@ -7519,7 +7521,7 @@ SUBROUTINE COMPUTE_STATS()
 	! Labor Earnings and Hours of working age population
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
-
+		print*, 'Test labor earnings'
 		! COMPUTE AVERAGE HOURS FOR AGES 25-60 (5-40 IN THE MODEL) INCLUDING NON-WORKERS
 		! COMPUTE VARIANCE OF LOG EARNINGS FOR 25-60 FOR THOSE WHO WORK MORE THAN 260 HOURS
 		! WHICH CORRESPOND TO 0.055 IN THE MODEL
@@ -7576,7 +7578,7 @@ SUBROUTINE COMPUTE_STATS()
 	! Income, Wealth, Returns to Capital
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
-
+		print*, 'Test wealth'
 		! Sources of income
 		Pr_mat = Profit_Matrix(R,P)
 		K_mat  = K_Matrix(R,P)
@@ -7706,6 +7708,7 @@ SUBROUTINE COMPUTE_STATS()
     ! Debt to GDP Ratio
     !------------------------------------------------------------------------------------
     !------------------------------------------------------------------------------------
+	    print*, 'Test Debt'
 	    External_Debt_GDP = 0.0_DP
 		DO xi=1,nx
 		DO zi=1,nz
@@ -7724,6 +7727,7 @@ SUBROUTINE COMPUTE_STATS()
 	! Savings Rate
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
+	print*, 'Test Savings'
 	group 	 = 1
 	A_Age 	 = 0.0_dp
 	A_AZ  	 = 0.0_dp 
@@ -7817,6 +7821,7 @@ SUBROUTINE COMPUTE_STATS()
 	! Leverage Ratio and fraction of constrainted firms 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
+		print*, 'Test Leverage'
 		leverage_age_z = 0.0_dp 
 		size_by_age_z  = 0.0_dp 
 		constrained_firms_age_z = 0.0_dp
@@ -7877,6 +7882,7 @@ SUBROUTINE COMPUTE_STATS()
 	! Distribution of firm wealth
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
+		print*, 'Test Firm Wealth'
 		do ai=1,na
 			Firm_Wealth(:,ai,:,:,:,:) = V_Pr(:,ai,:,:,:,:) + (1.0_dp+R)*agrid(ai)
 		enddo
@@ -7931,6 +7937,7 @@ SUBROUTINE COMPUTE_STATS()
 	! Distribution of bequest
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
+		print*, 'Test Bequests'
 		Bequest_Wealth=0.0_DP
 		DO xi=1,nx
 		DO zi=1,nz
@@ -8075,7 +8082,7 @@ SUBROUTINE COMPUTE_STATS()
 	! Frisch Elasticity 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
-
+		print*, 'Test Elasticity'
 		! This is only for agents with positive hours worked
 		Frisch_Elasticity = 0.0_dp
 		Size_Frisch       = 0.0_dp 
@@ -8115,7 +8122,7 @@ SUBROUTINE COMPUTE_STATS()
 	! Draft Tables 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
-
+		print*, 'Test Draft Tables'
 		size_draft_group_z    = 0.0_dp
 		wealth_draft_group_z  = 0.0_dp
 		capital_draft_group_z = 0.0_dp 
