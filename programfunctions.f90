@@ -8399,6 +8399,7 @@ SUBROUTINE COMPUTE_STATS()
 		    		L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
 		    		else 
 		    		L_Inc_aux   = RetY_lambda_e(lambdai,ei)*EBAR_bench/Ebar_exps
+		    		endif 
 		    	endif 
 		    	K_Inc_aux   = R_bench*agrid(ai) + Pr_mat_bench(ai,zi,xi)
 
