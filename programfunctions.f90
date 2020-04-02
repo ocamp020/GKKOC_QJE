@@ -7644,6 +7644,8 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO    
 		ENDDO    
 		ENDDO
+		print*, 'test Total_Income'
+		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 			! Allocate MeanReturn to K
 			Mean_K_Return_by_z    = MeanReturn_by_z
 			Mean_AT_K_Return_by_z = MeanATReturn_by_z     
