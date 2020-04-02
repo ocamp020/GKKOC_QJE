@@ -7961,7 +7961,7 @@ SUBROUTINE COMPUTE_STATS()
 		BQ_vec            = reshape(Aprime      ,(/size(DBN1)/)); print*, ' Test 2.2 '
 			print*, sum(DBN1), sum(Total_Income), size(DBN1)
 			Inc_vec= 0.0_dp 
-			print*, sum(Inc_vec)
+			print*, sum(Inc_vec), sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 		Inc_vec 		  = reshape(Total_Income,(/size(DBN1)/)); print*, ' Test 2.3 '
 		print*, ' Test 2.5 '
 
