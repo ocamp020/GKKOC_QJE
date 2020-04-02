@@ -7411,7 +7411,6 @@ SUBROUTINE COMPUTE_STATS()
 	REAL(DP) :: S_Age(max_age_category), S_AZ(max_age_category,nz), S_W(3)
 	REAL(DP) :: S_Rate_A_Age(max_age_category), S_Rate_A_AZ(max_age_category,nz), S_Rate_A_W(3)
 	REAL(DP) :: S_Rate_Y_Age(max_age_category), S_Rate_Y_AZ(max_age_category,nz), S_Rate_Y_W(3)
-	REAL(DP) :: size_Age(max_age_category), size_AZ(max_age_category,nz), size_W(3)
 	real(DP) :: constrained_firms_age(MaxAge), size_by_age(MaxAge)
 	real(DP) :: FW_top_x(6), prctile_FW(6), prctile_bq(5), low_pct, high_pct, a, b, c, CCDF_c, c_low, c_high
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Firm_Output, Firm_Profit, DBN_bq, Total_Income
@@ -7740,9 +7739,6 @@ print*, 'test Total_Income 3'
 	Y_Age 	 = 0.0_dp
 	Y_AZ  	 = 0.0_dp 
 	Y_W   	 = 0.0_dp
-	size_Age = 0.0_dp
-	size_AZ  = 0.0_dp
-	size_W   = 0.0_dp
 		print*, 'test Total_Income 3.1'
 		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	DO age=1,MaxAge 
@@ -7756,8 +7752,6 @@ print*, 'test Total_Income 3'
         DO zi=1,nz
         DO lambdai=1,nlambda
         DO ei=1,ne
-        	size_Age(group)   = size_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)
-        	size_AZ(group,zi) = size_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
 
         	A_Age(group)      = A_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
         	A_AZ(group,zi)    = A_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
@@ -7776,7 +7770,6 @@ print*, 'test Total_Income 3'
         	endif
 
         	if (ai.le.prctile_ai_ind(90)) then 
-        		size_W(1) = size_W(1) + DBN1(age,ai,zi,lambdai,ei,xi)
         		A_W(1)    = A_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
         		Ap_W(1)   = Ap_W(1)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
         		if (age.lt.RetAge) then 
@@ -7786,7 +7779,6 @@ print*, 'test Total_Income 3'
         		Y_W(1)    = Y_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*(YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
         		endif 
         	else if  ((ai.gt.prctile_ai_ind(90)).and.(ai.le.prctile_ai_ind(99))) then
-        		size_W(2) = size_W(2) + DBN1(age,ai,zi,lambdai,ei,xi)
         		A_W(2)    = A_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
         		Ap_W(2)   = Ap_W(2)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
         		if (age.lt.RetAge) then 
@@ -7797,7 +7789,6 @@ print*, 'test Total_Income 3'
         					& (YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
         		endif
         	else 
-        		size_W(3) = size_W(3) + DBN1(age,ai,zi,lambdai,ei,xi)
         		A_W(3)    = A_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
         		Ap_W(3)   = Ap_W(3)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
         		if (age.lt.RetAge) then 
