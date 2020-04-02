@@ -7730,93 +7730,93 @@ print*, 'test Total_Income 3'
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! print*, 'Test Savings'
-	group 	 = 1
-	A_Age 	 = 0.0_dp
-	A_AZ  	 = 0.0_dp 
-	A_W  	 = 0.0_dp
-	Ap_Age 	 = 0.0_dp
-	Ap_AZ  	 = 0.0_dp 
-	Ap_W  	 = 0.0_dp
-	Y_Age 	 = 0.0_dp
-	Y_AZ  	 = 0.0_dp 
-	Y_W   	 = 0.0_dp
-	size_Age = 0.0_dp
-	size_AZ  = 0.0_dp
-	size_W   = 0.0_dp
-	DO age=1,MaxAge 
+	! group 	 = 1
+	! A_Age 	 = 0.0_dp
+	! A_AZ  	 = 0.0_dp 
+	! A_W  	 = 0.0_dp
+	! Ap_Age 	 = 0.0_dp
+	! Ap_AZ  	 = 0.0_dp 
+	! Ap_W  	 = 0.0_dp
+	! Y_Age 	 = 0.0_dp
+	! Y_AZ  	 = 0.0_dp 
+	! Y_W   	 = 0.0_dp
+	! size_Age = 0.0_dp
+	! size_AZ  = 0.0_dp
+	! size_W   = 0.0_dp
+	! DO age=1,MaxAge 
 
-	    DO while (age.gt.age_limit(group+1))
-	        group = group+1
-	    ENDDO    
+	!     DO while (age.gt.age_limit(group+1))
+	!         group = group+1
+	!     ENDDO    
 	 
-	 	DO xi=1,nx
-	    DO ai=1,na
-        DO zi=1,nz
-        DO lambdai=1,nlambda
-        DO ei=1,ne
-        	size_Age(group)   = size_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)
-        	size_AZ(group,zi) = size_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
+	!  	DO xi=1,nx
+	!     DO ai=1,na
+ !        DO zi=1,nz
+ !        DO lambdai=1,nlambda
+ !        DO ei=1,ne
+ !        	size_Age(group)   = size_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)
+ !        	size_AZ(group,zi) = size_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
 
-        	A_Age(group)      = A_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
-        	A_AZ(group,zi)    = A_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+ !        	A_Age(group)      = A_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+ !        	A_AZ(group,zi)    = A_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
 
-        	Ap_Age(group)     = Ap_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
-        	Ap_AZ(group,zi)   = Ap_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+ !        	Ap_Age(group)     = Ap_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+ !        	Ap_AZ(group,zi)   = Ap_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
 
-        	if (age.lt.RetAge) then
-        	Y_Age(group)      = Y_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*&
-        						& ( YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
-        	Y_AZ(group,zi)    = Y_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*&
-        						& ( YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
-        	else 
-        	Y_Age(group)      = Y_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*( YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei) )
-        	Y_AZ(group,zi)    = Y_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*( YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei) )
-        	endif
+ !        	if (age.lt.RetAge) then
+ !        	Y_Age(group)      = Y_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*&
+ !        						& ( YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+ !        	Y_AZ(group,zi)    = Y_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*&
+ !        						& ( YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+ !        	else 
+ !        	Y_Age(group)      = Y_Age(group)   + DBN1(age,ai,zi,lambdai,ei,xi)*( YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei) )
+ !        	Y_AZ(group,zi)    = Y_AZ(group,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*( YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei) )
+ !        	endif
 
-        	if (ai.le.prctile_ai_ind(90)) then 
-        		size_W(1) = size_W(1) + DBN1(age,ai,zi,lambdai,ei,xi)
-        		A_W(1)    = A_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
-        		Ap_W(1)   = Ap_W(1)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
-        		if (age.lt.RetAge) then 
-        		Y_W(1)    = Y_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
-        					& (YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
-        		else 
-        		Y_W(1)    = Y_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*(YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
-        		endif 
-        	else if  ((ai.gt.prctile_ai_ind(90)).and.(ai.le.prctile_ai_ind(99))) then
-        		size_W(2) = size_W(2) + DBN1(age,ai,zi,lambdai,ei,xi)
-        		A_W(2)    = A_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
-        		Ap_W(2)   = Ap_W(2)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
-        		if (age.lt.RetAge) then 
-        		Y_W(2)    = Y_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
-        					& (YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
-        		else 
-        		Y_W(2)    = Y_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
-        					& (YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
-        		endif
-        	else 
-        		size_W(3) = size_W(3) + DBN1(age,ai,zi,lambdai,ei,xi)
-        		A_W(3)    = A_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
-        		Ap_W(3)   = Ap_W(3)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
-        		if (age.lt.RetAge) then 
-        		Y_W(3)    = Y_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
-        					&	(YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
-        		else 
-        		Y_W(3)    = Y_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*(YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
-        		endif
-        	endif 
-        ENDDO
-        ENDDO
-        ENDDO
-        ENDDO
-	    ENDDO
-	ENDDO
-	S_Rate_A_Age = (Ap_Age-A_Age)/A_Age
-	S_Rate_A_AZ  = (Ap_AZ-A_AZ)/A_AZ
-	S_Rate_A_W   = (Ap_W-A_W)/A_W
-	S_Rate_Y_Age = (Ap_Age-A_Age)/Y_Age
-	S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
-	S_Rate_Y_W   = (Ap_W-A_W)/Y_W
+ !        	if (ai.le.prctile_ai_ind(90)) then 
+ !        		size_W(1) = size_W(1) + DBN1(age,ai,zi,lambdai,ei,xi)
+ !        		A_W(1)    = A_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+ !        		Ap_W(1)   = Ap_W(1)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+ !        		if (age.lt.RetAge) then 
+ !        		Y_W(1)    = Y_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
+ !        					& (YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+ !        		else 
+ !        		Y_W(1)    = Y_W(1)    + DBN1(age,ai,zi,lambdai,ei,xi)*(YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
+ !        		endif 
+ !        	else if  ((ai.gt.prctile_ai_ind(90)).and.(ai.le.prctile_ai_ind(99))) then
+ !        		size_W(2) = size_W(2) + DBN1(age,ai,zi,lambdai,ei,xi)
+ !        		A_W(2)    = A_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+ !        		Ap_W(2)   = Ap_W(2)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+ !        		if (age.lt.RetAge) then 
+ !        		Y_W(2)    = Y_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
+ !        					& (YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+ !        		else 
+ !        		Y_W(2)    = Y_W(2)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
+ !        					& (YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
+ !        		endif
+ !        	else 
+ !        		size_W(3) = size_W(3) + DBN1(age,ai,zi,lambdai,ei,xi)
+ !        		A_W(3)    = A_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*agrid(ai)
+ !        		Ap_W(3)   = Ap_W(3)   + DBN1(age,ai,zi,lambdai,ei,xi)*Aprime(age,ai,zi,lambdai,ei,xi)
+ !        		if (age.lt.RetAge) then 
+ !        		Y_W(3)    = Y_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*&
+ !        					&	(YGRID(ai,zi,xi)+ Y_h(Hours(age,ai,zi,lambdai,ei,xi),age,lambdai,ei,Wage))
+ !        		else 
+ !        		Y_W(3)    = Y_W(3)    + DBN1(age,ai,zi,lambdai,ei,xi)*(YGRID(ai,zi,xi)+ RetY_lambda_e(lambdai,ei))
+ !        		endif
+ !        	endif 
+ !        ENDDO
+ !        ENDDO
+ !        ENDDO
+ !        ENDDO
+	!     ENDDO
+	! ENDDO
+	! S_Rate_A_Age = (Ap_Age-A_Age)/A_Age
+	! S_Rate_A_AZ  = (Ap_AZ-A_AZ)/A_AZ
+	! S_Rate_A_W   = (Ap_W-A_W)/A_W
+	! S_Rate_Y_Age = (Ap_Age-A_Age)/Y_Age
+	! S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
+	! S_Rate_Y_W   = (Ap_W-A_W)/Y_W
 print*, 'test Total_Income 4'
 		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 	!------------------------------------------------------------------------------------
