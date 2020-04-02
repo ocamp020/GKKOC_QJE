@@ -7413,10 +7413,13 @@ SUBROUTINE COMPUTE_STATS()
 	character(100) :: rowname
 	integer        :: age_limit(max_age_category+1), draft_age_limit(draft_age_category+1)
 	real(DP), dimension(MaxAge, nz) 		   :: size_by_age_z, leverage_age_z, constrained_firms_age_z 
-	real(DP), dimension(draft_age_category,nz) :: size_draft_group_z, wealth_draft_group_z, capital_draft_group_z
+	real(DP), dimension(draft_age_category,nz) :: size_draft_group_z, wealth_draft_group_z, capital_draft_group_z, &
+		& Cons_draft_group_z, Hours_draft_group_z, Ap_draft_group_z
 	real(DP), dimension(draft_age_category,draft_z_category) :: size_draft_group, &
 		& wealth_draft_group,  av_wealth_draft_group, frac_wealth_draft_group, & 
-		& capital_draft_group,  av_capital_draft_group, frac_capital_draft_group 
+		& capital_draft_group,  av_capital_draft_group, frac_capital_draft_group, &
+		& cons_draft_group,  av_cons_draft_group, hours_draft_group, &
+		& Ap_draft_group,  av_Ap_draft_group, frac_Ap_draft_group
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
@@ -8105,8 +8108,8 @@ SUBROUTINE COMPUTE_STATS()
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 		size_draft_group_z    = 0.0_dp
-		wealth_draft_group_z  = 0.0_dp
-		capital_draft_group_z = 0.0_dp 
+		wealth_draft_group_z  = 0.0_dp; capital_draft_group_z = 0.0_dp ;
+		Cons_draft_group_z    = 0.0_dp; Hours_draft_group_z = 0.0_dp   ; Ap_draft_group_z = 0.0_dp 
 		do zi  = 1,nz
 		do age = 1,draft_age_category
 			size_draft_group_z(age,zi) = sum(DBN1(draft_age_limit(age)+1:draft_age_limit(age+1),:,zi,:,:,:))
@@ -8116,13 +8119,14 @@ SUBROUTINE COMPUTE_STATS()
 		    do lambdai=1,nlambda
 		    do ai=1,na
 		    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
-		    	! Wealth by group
-	        	wealth_draft_group_z(age,zi)  = wealth_draft_group_z(age,zi) + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
-
-	        	! Capital by group
+		    	! Wealth and Private Capital by group
+	        	 wealth_draft_group_z(age,zi) =  wealth_draft_group_z(age,zi) + agrid(ai)      *DBN1(age2,ai,zi,lambdai,ei,xi)
 	        	capital_draft_group_z(age,zi) = capital_draft_group_z(age,zi) + K_mat(ai,zi,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)
 
-
+	        	! Consumption, Labor and Savings by group
+	        	 Cons_draft_group_z(age,zi) =  Cons_draft_group_z(age,zi) +   Cons(age,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        	Hours_draft_group_z(age,zi) = Hours_draft_group_z(age,zi) +  Hours(age,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        	   Ap_draft_group_z(age,zi) =    Ap_draft_group_z(age,zi) + Aprime(age,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)
 
 	    	enddo 
 	    	enddo 
@@ -8150,33 +8154,57 @@ SUBROUTINE COMPUTE_STATS()
 		! Capital of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
 		capital_draft_group = Draft_Table(capital_draft_group_z,DBN_z,.true.)
 
+		! Cons, Hours, Ap of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		 Cons_draft_group = Draft_Table(  Cons_draft_group_z,DBN_z,.true. )
+		Hours_draft_group = Draft_Table( Hours_draft_group_z,DBN_z,.false.)
+		   Ap_draft_group = Draft_Table(Aprime_draft_group_z,DBN_z,.true. )
+
 		! Fix fractions
 	    av_wealth_draft_group        = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*wealth_draft_group/size_draft_group
 	    frac_wealth_draft_group      = 100.0_dp*wealth_draft_group/sum(wealth_draft_group)
 	    av_capital_draft_group       = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*capital_draft_group/size_draft_group
 	    frac_capital_draft_group     = 100.0_dp*capital_draft_group/sum(capital_draft_group)
+	    av_Cons_draft_group  		 = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*consdraft_group/size_draft_group
+	    av_Ap_draft_group            = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*Ap_draft_group/size_draft_group
+	    frac_Ap_draft_group     	 = 100.0_dp*Ap_draft_group/sum(Ap_draft_group)
+
 
 
 	    ! Write results in file
-	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size.txt', STATUS='replace') 
-	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_wealth.txt', STATUS='replace') 
-	    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_av_wealth.txt', STATUS='replace') 
-	    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_frac_wealth.txt', STATUS='replace') 
-	    OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_capital.txt', STATUS='replace') 
-	    OPEN (UNIT=87, FILE=trim(Result_Folder)//'draft_group_av_capital.txt', STATUS='replace') 
-	    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_frac_capital.txt', STATUS='replace') 
+	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size.txt'			, STATUS='replace') 
+	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_wealth.txt'		, STATUS='replace') 
+	    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_av_wealth.txt'	, STATUS='replace') 
+	    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_frac_wealth.txt'	, STATUS='replace') 
+	    OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_capital.txt'		, STATUS='replace') 
+	    OPEN (UNIT=87, FILE=trim(Result_Folder)//'draft_group_av_capital.txt'	, STATUS='replace') 
+	    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_frac_capital.txt'	, STATUS='replace') 
+	    OPEN (UNIT=89, FILE=trim(Result_Folder)//'draft_group_cons.txt'			, STATUS='replace') 
+	    OPEN (UNIT=90, FILE=trim(Result_Folder)//'draft_group_av_cons.txt'		, STATUS='replace') 
+	    OPEN (UNIT=91, FILE=trim(Result_Folder)//'draft_group_hours.txt'		, STATUS='replace') 
+	    OPEN (UNIT=92, FILE=trim(Result_Folder)//'draft_group_savings.txt'		, STATUS='replace') 
+	    OPEN (UNIT=93, FILE=trim(Result_Folder)//'draft_group_av_savings.txt'	, STATUS='replace') 
+	    OPEN (UNIT=94, FILE=trim(Result_Folder)//'draft_group_frac_savings.txt'	, STATUS='replace') 
 		do age = 1,draft_age_category
 		    WRITE  (UNIT=81, FMT=*)  size_draft_group(age,:)
+
 		    WRITE  (UNIT=83, FMT=*)  wealth_draft_group(age,:)
 		    WRITE  (UNIT=84, FMT=*)  av_wealth_draft_group(age,:)
 		    WRITE  (UNIT=85, FMT=*)  frac_wealth_draft_group(age,:)
 		    WRITE  (UNIT=86, FMT=*)  capital_draft_group(age,:)
 		    WRITE  (UNIT=87, FMT=*)  av_capital_draft_group(age,:)
 		    WRITE  (UNIT=88, FMT=*)  frac_capital_draft_group(age,:)
+
+		    WRITE  (UNIT=89, FMT=*)  Cons_draft_group(age,:)
+		    WRITE  (UNIT=90, FMT=*)  av_Cons_draft_group(age,:)
+		    WRITE  (UNIT=91, FMT=*)  Hours_draft_group(age,:)
+		    WRITE  (UNIT=92, FMT=*)  Ap_draft_group(age,:)
+		    WRITE  (UNIT=93, FMT=*)  av_Ap_draft_group(age,:)
+		    WRITE  (UNIT=94, FMT=*)  frac_Ap_draft_group(age,:)
+
 		ENDDO
 		close(unit=81)
-		close(unit=83); close(unit=84); close(unit=85);
-		close(unit=86); close(unit=87); close(unit=88);
+		close(unit=83); close(unit=84); close(unit=85); close(unit=86); close(unit=87); close(unit=88);
+		close(unit=89); close(unit=90); close(unit=91); close(unit=92); close(unit=93); close(unit=94);
 
 
 
