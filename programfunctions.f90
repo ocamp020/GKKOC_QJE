@@ -7956,9 +7956,12 @@ SUBROUTINE COMPUTE_STATS()
 		enddo 
 		DBN_bq = DBN_bq/sum(DBN_bq)
 		print*, ' Test 2 '
-		
+		print*, 'test Total_Income'
+		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 		! Vectorizations
 		DBN_bq_vec        = reshape(DBN_bq      ,(/size(DBN1)/)); print*, ' Test 2.1 '
+		print*, 'test Total_Income'
+		print*, sum(Total_Income), maxval(Total_Income), minval(Total_Income)
 		BQ_vec            = reshape(Aprime      ,(/size(DBN1)/)); print*, ' Test 2.2 '
 			print*, sum(DBN1), sum(Total_Income), size(DBN1)
 			Inc_vec= 0.0_dp 
