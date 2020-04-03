@@ -8416,7 +8416,7 @@ SUBROUTINE COMPUTE_STATS()
 		    		if (KeepSSatBench .eq. 1) then 
 		    		L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
 		    		else 
-		    		L_Inc_aux   = RetY_lambda_e(lambdai,ei)*EBAR_bench/Ebar_exp
+		    		L_Inc_aux   = RetY_lambda_e(lambdai,ei)*EBAR_bench/EBAR
 		    		endif 
 		    	endif 
 		    	K_Inc_aux   = R_bench*agrid(ai) + Pr_mat_bench(ai,zi,xi)
@@ -8460,8 +8460,7 @@ SUBROUTINE COMPUTE_STATS()
 		    	endif 
 
 				! Compare Capital tax rate
-		    	If ( (K_Tax(age2,ai,zi,lambdai,ei,xi)/K_Income(age2,ai,zi,lambdai,ei,xi) - & 
-		    	  &  K_Tax_bench(age2,ai,zi,lambdai,ei,xi)/K_Income_bench(age2,ai,zi,lambdai,ei,xi)).gt.1.0E-07_DP )  then
+		    	If (K_Tax(age2,ai,zi,lambdai,ei,xi)/K_Income(age2,ai,zi,lambdai,ei,xi) .gt. tauK_bench)  then
 		    	Tax_Rate_Increase_tk_draft_group_z(age,zi) = Tax_Rate_Increase_tk_draft_group_z(age,zi) + & 
 		    		&  DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
@@ -8480,10 +8479,12 @@ SUBROUTINE COMPUTE_STATS()
 		    	Tax_Rate_Increase_draft_group_z(age,zi) = Tax_Rate_Increase_draft_group_z(age,zi)+DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
+		    	if (age2.lt.RetAge) then
 		    	print*, 'test rates',(K_Tax(age2,ai,zi,lambdai,ei,xi)/K_Income(age2,ai,zi,lambdai,ei,xi)),&
 		    						& K_Tax_bench(age2,ai,zi,lambdai,ei,xi)/K_Income_bench(age2,ai,zi,lambdai,ei,xi), &
 		    						& L_Tax(age2,ai,zi,lambdai,ei,xi)/L_Income(age2,ai,zi,lambdai,ei,xi), &
 		    						& L_Tax_bench(age2,ai,zi,lambdai,ei,xi)/L_Income_bench(age2,ai,zi,lambdai,ei,xi)
+				endif
 	    	enddo 
 	    	enddo 
 	    	enddo 
