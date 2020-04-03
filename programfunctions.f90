@@ -8413,7 +8413,7 @@ SUBROUTINE COMPUTE_STATS()
 		    		L_Inc_bench = RetY_lambda_e(lambdai,ei)*EBAR_bench/EBAR
 		    		endif 
 		    	endif 
-		    	K_Inc_aux       = R*agrid(ai) + Pr_mat(ai,zi,xi)
+		    	K_Inc_aux   = R*agrid(ai) + Pr_mat(ai,zi,xi)
 		    	K_Inc_bench = R_bench*agrid(ai) + Pr_mat_bench(ai,zi,xi)
 
 		    	! Tax by agent (capital and labor) in benchmark
@@ -8461,9 +8461,11 @@ SUBROUTINE COMPUTE_STATS()
 		    	endif 
 
 		    	! Compare Labor tax rate
+		    	if ((L_inc_aux.gt.0.0_dp).and.(L_inc_bench.gt.0.0_dp)) then
 		    	If ( (L_Tax_aux/L_Inc_aux - L_Tax_bench/L_Inc_bench).gt.1.0E-07_dp ) then
 		    	Tax_Rate_Increase_tl_draft_group_z(age,zi) = Tax_Rate_Increase_tl_draft_group_z(age,zi) + & 
 		    		& DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    	endif 
 		    	endif 
 
 		    	! Compare Total tax rates
@@ -8476,7 +8478,8 @@ SUBROUTINE COMPUTE_STATS()
 		    	print*, 'test rates',(K_Tax_aux/K_Inc_aux),&
 		    						& K_Tax_bench/K_Inc_bench, &
 		    						& L_Tax_aux/L_Inc_aux, &
-		    						& L_Tax_bench/L_Inc_bench
+		    						& L_Tax_bench/L_Inc_bench, &
+		    						& K_Inc_aux+L_Inc_aux,K_Inc_bench+L_Inc_bench 
 				endif
 	    	enddo 
 	    	enddo 
