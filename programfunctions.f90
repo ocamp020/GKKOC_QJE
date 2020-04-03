@@ -8243,6 +8243,7 @@ SUBROUTINE COMPUTE_STATS()
 		    	! Income for each agent 
 		    	if (age2.lt.RetAge) then
 		    	L_Inc_aux   = yh(age2,lambdai,ei)*Hours(age2,ai,zi,lambdai,ei,xi)
+		    	print*, L_Inc_aux,Wage_bench,yh(age2,lambdai,ei),Hours(age2,ai,zi,lambdai,ei,xi)
 		    	else
 		    	L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
 		    	endif 
