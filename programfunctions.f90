@@ -8189,46 +8189,37 @@ SUBROUTINE COMPUTE_STATS()
 
 		! Fix fractions
 	    av_wealth_draft_group        = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*wealth_draft_group/size_draft_group
-	    frac_wealth_draft_group      = 100.0_dp*wealth_draft_group/sum(wealth_draft_group)
 	    av_capital_draft_group       = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*capital_draft_group/size_draft_group
-	    frac_capital_draft_group     = 100.0_dp*capital_draft_group/sum(capital_draft_group)
 	    av_Ap_draft_group            = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*Ap_draft_group/size_draft_group
-	    frac_Ap_draft_group     	 = 100.0_dp*Ap_draft_group/sum(Ap_draft_group)
 
 
 	    ! Write results in file
 	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size.txt'			, STATUS='replace') 
 	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_wealth.txt'		, STATUS='replace') 
 	    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_av_wealth.txt'	, STATUS='replace') 
-	    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_frac_wealth.txt'	, STATUS='replace') 
 	    OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_capital.txt'		, STATUS='replace') 
 	    OPEN (UNIT=87, FILE=trim(Result_Folder)//'draft_group_av_capital.txt'	, STATUS='replace') 
-	    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_frac_capital.txt'	, STATUS='replace') 
 	    OPEN (UNIT=89, FILE=trim(Result_Folder)//'draft_group_cons.txt'			, STATUS='replace') 
 	    OPEN (UNIT=91, FILE=trim(Result_Folder)//'draft_group_hours.txt'		, STATUS='replace') 
 	    OPEN (UNIT=92, FILE=trim(Result_Folder)//'draft_group_savings.txt'		, STATUS='replace') 
 	    OPEN (UNIT=93, FILE=trim(Result_Folder)//'draft_group_av_savings.txt'	, STATUS='replace') 
-	    OPEN (UNIT=94, FILE=trim(Result_Folder)//'draft_group_frac_savings.txt'	, STATUS='replace') 
 		do age = 1,draft_age_category
 		    WRITE  (UNIT=81, FMT=*)  size_draft_group(age,:)
 
 		    WRITE  (UNIT=83, FMT=*)  wealth_draft_group(age,:)
 		    WRITE  (UNIT=84, FMT=*)  av_wealth_draft_group(age,:)
-		    WRITE  (UNIT=85, FMT=*)  frac_wealth_draft_group(age,:)
 		    WRITE  (UNIT=86, FMT=*)  capital_draft_group(age,:)
 		    WRITE  (UNIT=87, FMT=*)  av_capital_draft_group(age,:)
-		    WRITE  (UNIT=88, FMT=*)  frac_capital_draft_group(age,:)
 
 		    WRITE  (UNIT=89, FMT=*)  Cons_draft_group(age,:)
 		    WRITE  (UNIT=91, FMT=*)  Hours_draft_group(age,:)
 		    WRITE  (UNIT=92, FMT=*)  Ap_draft_group(age,:)
 		    WRITE  (UNIT=93, FMT=*)  av_Ap_draft_group(age,:)
-		    WRITE  (UNIT=94, FMT=*)  frac_Ap_draft_group(age,:)
 
 		ENDDO
 		close(unit=81)
-		close(unit=83); close(unit=84); close(unit=85); close(unit=86); close(unit=87); close(unit=88);
-		close(unit=89); close(unit=91); close(unit=92); close(unit=93); close(unit=94);
+		close(unit=83); close(unit=84); close(unit=86); close(unit=87);
+		close(unit=89); close(unit=91); close(unit=92); close(unit=93); 
 
 
 	!------------------------------------------------------------------------------------
@@ -8333,21 +8324,21 @@ SUBROUTINE COMPUTE_STATS()
 		! Total Pre-Tax Labor Income adjusted by productivity group
 		L_Inc_draft_group = Draft_Table(L_Inc_draft_group_z,DBN_z,.true.)
 
-		! Average return by productivity group
-		Return_draft_group    = 100.0_dp*Draft_Table(   Return_draft_group_z,DBN_z,.true.)/size_draft_group
-		Return_AT_draft_group = 100.0_dp*Draft_Table(Return_AT_draft_group_z,DBN_z,.true.)/size_draft_group
-
 		! Get ratios to total income in group
-		K_Tax_draft_group = K_Tax_draft_group/T_Inc_draft_group
-		L_Tax_draft_group = L_Tax_draft_group/T_Inc_draft_group
-		K_Inc_draft_group = K_Inc_draft_group/T_Inc_draft_group
-		L_Inc_draft_group = L_Inc_draft_group/T_Inc_draft_group
+		K_Tax_draft_group = 100.0_dp*K_Tax_draft_group/T_Inc_draft_group
+		L_Tax_draft_group = 100.0_dp*L_Tax_draft_group/T_Inc_draft_group
+		K_Inc_draft_group = 100.0_dp*K_Inc_draft_group/T_Inc_draft_group
+		L_Inc_draft_group = 100.0_dp*L_Inc_draft_group/T_Inc_draft_group
 
 		! Divide by mass in group
-		K_Tax_Inc_draft_group_z  = K_Tax_Inc_draft_group_z/size_draft_group_z
-		L_Tax_Inc_draft_group_z  = L_Tax_Inc_draft_group_z/size_draft_group_z
-		K_Inc_frac_draft_group_z = K_Inc_frac_draft_group_z/size_draft_group_z 
-		L_Inc_frac_draft_group_z = L_Inc_frac_draft_group_z/size_draft_group_z 
+		K_Tax_Inc_draft_group_z  = 100.0_dp*K_Tax_Inc_draft_group_z/size_draft_group_z
+		L_Tax_Inc_draft_group_z  = 100.0_dp*L_Tax_Inc_draft_group_z/size_draft_group_z
+		K_Inc_frac_draft_group_z = 100.0_dp*K_Inc_frac_draft_group_z/size_draft_group_z 
+		L_Inc_frac_draft_group_z = 100.0_dp*L_Inc_frac_draft_group_z/size_draft_group_z 
+
+		! Average return by productivity group
+		Return_draft_group_z     = 100.0_dp*   Return_draft_group_z/size_draft_group
+		Return_AT_draft_group_z  = 100.0_dp*Return_AT_draft_group_z/size_draft_group
 
 		! Average Capital Tax to income ratio adjusted by productivity group
 		K_Tax_Inc_draft_group = Draft_Table(K_Tax_Inc_draft_group_z,DBN_z,.false.)
@@ -8361,6 +8352,10 @@ SUBROUTINE COMPUTE_STATS()
 		! Labor Income Share Tax adjusted by productivity group
 		L_Inc_frac_draft_group = Draft_Table(L_Inc_frac_draft_group_z,DBN_z,.false.)
 
+		! Average Return by productivity group
+		   Return_draft_group = Draft_Table(   Return_draft_group_z,DBN_z,.false.)
+		Return_AT_draft_group = Draft_Table(Return_AT_draft_group_z,DBN_z,.false.)
+
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_Tax_K.txt', STATUS='replace') 
 	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_Tax_L.txt', STATUS='replace') 
 	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_Inc.txt', STATUS='replace') 
@@ -8370,6 +8365,8 @@ SUBROUTINE COMPUTE_STATS()
 	    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_L_Inc.txt', STATUS='replace') 
 	    OPEN (UNIT=89, FILE=trim(Result_Folder)//'draft_group_K_Inc_frac.txt', STATUS='replace') 
 	    OPEN (UNIT=90, FILE=trim(Result_Folder)//'draft_group_L_Inc_frac.txt', STATUS='replace') 
+	    OPEN (UNIT=91, FILE=trim(Result_Folder)//'draft_group_Return.txt', STATUS='replace') 
+	    OPEN (UNIT=92, FILE=trim(Result_Folder)//'draft_group_Return_AT.txt', STATUS='replace') 
 	    do age = 1,draft_age_category
 		    WRITE  (UNIT=80, FMT=*)  K_Tax_draft_group(age,:)
 		    WRITE  (UNIT=81, FMT=*)  L_Tax_draft_group(age,:)
@@ -8380,9 +8377,11 @@ SUBROUTINE COMPUTE_STATS()
 		    WRITE  (UNIT=88, FMT=*)  L_Inc_draft_group(age,:)
 		    WRITE  (UNIT=89, FMT=*)  K_Inc_frac_draft_group(age,:)
 		    WRITE  (UNIT=90, FMT=*)  L_Inc_frac_draft_group(age,:)
+		    WRITE  (UNIT=91, FMT=*)  Return_draft_group(age,:)
+		    WRITE  (UNIT=92, FMT=*)  Return_AT_draft_group(age,:)
 		ENDDO
 		close(unit=80); close(unit=81); close(unit=83); close(unit=84); close(unit=85)
-		close(unit=87); close(unit=88); close(unit=89); close(unit=90); 
+		close(unit=87); close(unit=88); close(unit=89); close(unit=90); close(unit=91); close(unit=92); 
 
 
 
