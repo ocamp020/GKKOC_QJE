@@ -7433,7 +7433,7 @@ SUBROUTINE COMPUTE_STATS()
 		& Tax_Rate_Increase_tk_draft_group, Tax_Rate_Increase_tl_draft_group, Tax_Rate_Increase_draft_group, &
 		& Inc_Increase_draft_group, K_Inc_Increase_draft_group, L_Inc_Increase_draft_group, &
 		& Return_draft_group, Return_AT_draft_group
-	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income, K_Income, L_Income, K_Tax, L_Tax ! , Firm_Output, Firm_Profit
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 
@@ -7448,11 +7448,6 @@ SUBROUTINE COMPUTE_STATS()
 	! allocate(Firm_Output( MaxAge,na,nz,nlambda,ne,nx))
 	! allocate(Firm_Profit( MaxAge,na,nz,nlambda,ne,nx))
 	allocate(DBN_bq(       MaxAge,na,nz,nlambda,ne,nx))
-	allocate(Total_Income( MaxAge,na,nz,nlambda,ne,nx))
-	allocate(K_Income(	   MaxAge,na,nz,nlambda,ne,nx))
-	allocate(L_Income(	   MaxAge,na,nz,nlambda,ne,nx))
-	allocate(K_Tax(  	   MaxAge,na,nz,nlambda,ne,nx))
-	allocate(L_Tax( 	   MaxAge,na,nz,nlambda,ne,nx))
 	allocate(constrained_firm_ind(MaxAge,na,nz,nlambda,ne,nx))
 
 
