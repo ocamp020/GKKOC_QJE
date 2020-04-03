@@ -8229,6 +8229,7 @@ SUBROUTINE COMPUTE_STATS()
 		L_Tax_Inc_draft_group_z		= 0.0_dp
 		Return_draft_group_z 		= 0.0_dp
 		Return_AT_draft_group_z     = 0.0_dp
+		print*, ' Test Hours',sum(Hours)
 		do zi  = 1,nz
 		do age = 1,draft_age_category
 	        do xi=1,nx
@@ -8240,9 +8241,9 @@ SUBROUTINE COMPUTE_STATS()
 		    	! Income for each agent 
 		    	if (age2.lt.RetAge) then
 		    	L_Inc_aux   = yh(age2,lambdai,ei)*Hours(age2,ai,zi,lambdai,ei,xi)
-		    	if (solving_bench.ne.1) then 
-		    	print*, L_Inc_aux,yh(age2,lambdai,ei),Hours(age2,ai,zi,lambdai,ei,xi)
-		    	endif 
+		    	! if (solving_bench.ne.1) then 
+		    	! print*, L_Inc_aux,yh(age2,lambdai,ei),Hours(age2,ai,zi,lambdai,ei,xi)
+		    	! endif 
 		    	else
 		    	L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
 		    	endif 
@@ -8297,7 +8298,7 @@ SUBROUTINE COMPUTE_STATS()
 	    	enddo  
 		enddo
 		enddo
-
+		print*, ' Test Hours 2',sum(Hours)
 		! Total Capital Tax adjusted by productivity group
 		K_Tax_draft_group = Draft_Table(K_Tax_draft_group_z,DBN_z,.true.)
 
@@ -8390,6 +8391,7 @@ SUBROUTINE COMPUTE_STATS()
 		Tax_Rate_Increase_tk_draft_group_z = 0.0_dp ; Tax_Rate_Increase_tl_draft_group_z = 0.0_dp ;
 		Inc_Increase_draft_group_z = 0.0_dp  ; 
 		K_Inc_Increase_draft_group_z = 0.0_dp ; L_Inc_Increase_draft_group_z = 0.0_dp;
+		print*, ' Test Hours 3',sum(Hours), sum(Hours_bench)
 		do zi  = 1,nz
 		do age = 1,draft_age_category
 	        do xi=1,nx
