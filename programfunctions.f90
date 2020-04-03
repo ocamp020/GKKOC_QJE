@@ -8299,7 +8299,7 @@ SUBROUTINE COMPUTE_STATS()
 	        	Return_draft_group_z(age,zi)    = Return_draft_group_z(age,zi) + &
 	        		&                     K_Inc_aux/agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
         		Return_AT_draft_group_z(age,zi) = Return_AT_draft_group_z(age,zi) + &
-	        		& (K_Inc_aux - (YGRID(ai,zi,xi)-agrid(ai)))/agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		& (YGRID(ai,zi,xi)-agrid(ai))/agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
 
 	    	enddo 
 	    	enddo 
