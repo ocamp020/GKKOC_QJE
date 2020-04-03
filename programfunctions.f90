@@ -8472,14 +8472,14 @@ SUBROUTINE COMPUTE_STATS()
 		    	Tax_Rate_Increase_draft_group_z(age,zi) = Tax_Rate_Increase_draft_group_z(age,zi)+DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
-		  !   	if (age2.lt.RetAge) then
-		  !   	print*, 'test rates',(K_Tax(age2,ai,zi,lambdai,ei,xi)/K_Income(age2,ai,zi,lambdai,ei,xi)),&
-		  !   						& K_Tax_bench/K_Inc_aux, &
-		  !   						& L_Tax(age2,ai,zi,lambdai,ei,xi)/L_Income(age2,ai,zi,lambdai,ei,xi), &
-		  !   						& L_Tax_bench/L_Inc_aux, &
-		  !   						& L_Tax(age2,ai,zi,lambdai,ei,xi),L_Income(age2,ai,zi,lambdai,ei,xi), &
-		  !   						& L_Tax_bench,L_Inc_aux
-				! endif
+		    	if (age2.lt.RetAge) then
+		    	print*, 'test rates',(K_Tax(age2,ai,zi,lambdai,ei,xi)/K_Income(age2,ai,zi,lambdai,ei,xi)),&
+		    						& K_Tax_bench/K_Inc_aux, &
+		    						& L_Tax(age2,ai,zi,lambdai,ei,xi)/L_Income(age2,ai,zi,lambdai,ei,xi), &
+		    						& L_Tax_bench/L_Inc_aux, &
+		    						& L_Tax(age2,ai,zi,lambdai,ei,xi),L_Income(age2,ai,zi,lambdai,ei,xi), &
+		    						& L_Tax_bench,L_Inc_aux
+				endif
 	    	enddo 
 	    	enddo 
 	    	enddo 
