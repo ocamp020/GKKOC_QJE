@@ -7410,7 +7410,8 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(MaxAge) 			 :: constrained_firms_age, size_by_age
 	real(DP) 	   :: Pr_mat_bench(na,nz,nx), FW_top_x(6), prctile_FW(6), prctile_bq(5)
 	real(DP)  	   :: low_pct, high_pct, a, b, c, CCDF_c, c_low, c_high
-	real(DP)       :: Frisch_Aux, Frisch_Aux_2, K_Inc_aux, L_Inc_aux, K_Tax_bench, L_Tax_bench
+	real(DP)       :: Frisch_Aux, Frisch_Aux_2, 
+	real(DP)       :: K_Inc_aux, L_Inc_aux, K_Tax_aux, L_Tax_aux, K_Inc_bench, L_Inc_bench, K_Tax_bench, L_Tax_bench
 	character(100) :: rowname
 	integer        :: age_limit(max_age_category+1), draft_age_limit(draft_age_category+1)
 	real(DP), dimension(MaxAge, nz) 		   :: size_by_age_z, leverage_age_z, constrained_firms_age_z 
@@ -8243,15 +8244,11 @@ SUBROUTINE COMPUTE_STATS()
 		    	! Income for each agent 
 		    	if (age2.lt.RetAge) then
 		    	L_Inc_aux   = yh(age2,lambdai,ei)*Hours(age2,ai,zi,lambdai,ei,xi)
-		    	print*, L_Inc_aux,Wage_bench,yh(age2,lambdai,ei),Hours(age2,ai,zi,lambdai,ei,xi)
+		    	! print*, L_Inc_aux,Wage_bench,yh(age2,lambdai,ei),Hours(age2,ai,zi,lambdai,ei,xi)
 		    	else
 		    	L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
 		    	endif 
 		    	K_Inc_aux   = R*agrid(ai) + Pr_mat(ai,zi,xi)
-
-		    	Total_Income(age2,ai,zi,lambdai,ei,xi) = L_Inc_aux + K_Inc_aux
-		    	K_Income(age2,ai,zi,lambdai,ei,xi) 	   = K_Inc_aux
-		    	L_Income(age2,ai,zi,lambdai,ei,xi) 	   = L_Inc_aux
 
 		    	! Income by group (total, capital, labor)
 	    		T_Inc_draft_group_z(age,zi) = T_Inc_draft_group_z(age,zi) + (K_Inc_aux +L_Inc_aux)*DBN1(age2,ai,zi,lambdai,ei,xi)
@@ -8266,25 +8263,27 @@ SUBROUTINE COMPUTE_STATS()
 	        		& ( L_Inc_aux )/( K_Inc_aux + L_Inc_aux )*DBN1(age2,ai,zi,lambdai,ei,xi)
 
         		! Tax by agent (capital and labor)
-		    	K_Tax(age2,ai,zi,lambdai,ei,xi)  = K_Inc_aux - (YGRID(ai,zi,xi) - agrid(ai))
+		    	K_Tax_aux  = K_Inc_aux - (YGRID(ai,zi,xi) - agrid(ai))
 		    	if (age2.lt.RetAge) then
-		    	L_Tax(age2,ai,zi,lambdai,ei,xi)  = L_Inc_aux - psi*(L_Inc_aux)**(1.0_DP-tauPL)
+		    	L_Tax_aux  = L_Inc_aux - psi*(L_Inc_aux)**(1.0_DP-tauPL)
+		    	else 
+		    	L_Tax_aux  = 0.0_dp 
 		    	endif 
 
 		    	! Tax by group (capital and labor)
 	        	K_Tax_draft_group_z(age,zi) = K_Tax_draft_group_z(age,zi) + & 
-	        		& K_Tax(age2,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		& K_Tax_aux*DBN1(age2,ai,zi,lambdai,ei,xi)
 	        	if (age2.lt.RetAge) then
         		L_Tax_draft_group_z(age,zi) = L_Tax_draft_group_z(age,zi) + & 
-	        		& L_Tax(age2,ai,zi,lambdai,ei,xi)* DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		& L_Tax_aux* DBN1(age2,ai,zi,lambdai,ei,xi)
 	        	endif 
 
 	        	! Tax to total income by agent (averaged)
         		K_Tax_Inc_draft_group_z(age,zi) = K_Tax_Inc_draft_group_z(age,zi) + & 
-	        		& K_Tax(age2,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)/( K_Inc_aux + L_Inc_aux )
+	        		& K_Tax_aux*DBN1(age2,ai,zi,lambdai,ei,xi)/( K_Inc_aux + L_Inc_aux )
 	        	if (age2.lt.RetAge) then
         		L_Tax_Inc_draft_group_z(age,zi) = L_Tax_Inc_draft_group_z(age,zi) + & 
-	        		& L_Tax(age2,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)/( K_Inc_aux + L_Inc_aux )
+	        		& L_Tax_aux*DBN1(age2,ai,zi,lambdai,ei,xi)/( K_Inc_aux + L_Inc_aux )
 	        	endif 
 
 	        	! Return by agent (averaged)
@@ -8403,69 +8402,73 @@ SUBROUTINE COMPUTE_STATS()
 
 		    	! Income for each agent in benchmark
 		    	if (age2.lt.RetAge) then
-		    	L_Inc_aux   = Wage_bench*eff_un(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi)
-		    	print*, L_Inc_aux,Wage_bench,eff_un(age2,lambdai,ei),Hours_bench(age2,ai,zi,lambdai,ei,xi)
+		    	L_Inc_aux     = yh(age2,lambdai,ei)*Hours(age2,ai,zi,lambdai,ei,xi)
+		    	L_Inc_bench   = Wage_bench*eff_un(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi)
+		    	! print*, L_Inc_aux,Wage_bench,eff_un(age2,lambdai,ei),Hours_bench(age2,ai,zi,lambdai,ei,xi)
 		    	else
+	    		L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
 		    		if (KeepSSatBench .eq. 1) then 
-		    		L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
+		    		L_Inc_bench = RetY_lambda_e(lambdai,ei) 
 		    		else 
-		    		L_Inc_aux   = RetY_lambda_e(lambdai,ei)*EBAR_bench/EBAR
+		    		L_Inc_bench = RetY_lambda_e(lambdai,ei)*EBAR_bench/EBAR
 		    		endif 
 		    	endif 
-		    	K_Inc_aux   = R_bench*agrid(ai) + Pr_mat_bench(ai,zi,xi)
+		    	K_Inc_aux       = R*agrid(ai) + Pr_mat(ai,zi,xi)
+		    	K_Inc_bench = R_bench*agrid(ai) + Pr_mat_bench(ai,zi,xi)
 
 		    	! Tax by agent (capital and labor) in benchmark
-		    	K_Tax_bench  = tauK_bench*K_Inc_aux
+		    	K_Tax_aux   = K_Inc_aux - (YGRID(ai,zi,xi) - agrid(ai))
+		    	K_Tax_bench = tauK_bench*K_Inc_bench
 		    	if (age2.lt.RetAge) then
-		    	L_Tax_bench  = L_Inc_aux - psi_bench*(L_Inc_aux)**(1.0_DP-tauPL_bench)
+		    	L_Tax_aux   = L_Inc_aux   - psi*(L_Inc_aux)**(1.0_DP-tauPL)
+		    	L_Tax_bench = L_Inc_bench - psi_bench*(L_Inc_bench)**(1.0_DP-tauPL_bench)
 		    	else 
-		    	L_Tax_bench  = 0.0_dp 
+		    	L_Tax_aux   = 0.0_dp
+		    	L_Tax_bench = 0.0_dp 
 		    	endif 
 
 		    	! Compare income 
-		    	if (Total_Income(age2,ai,zi,lambdai,ei,xi).gt.(L_Inc_aux + K_Inc_aux)) then
+		    	if ((L_Inc_aux + K_Inc_aux).gt.(L_Inc_bench + K_Inc_bench)) then
 		    	Inc_Increase_draft_group_z(age,zi) = Inc_Increase_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
-		    	if (K_Income(age2,ai,zi,lambdai,ei,xi).gt.K_Inc_aux) then
+		    	if (K_Inc_aux.gt.K_Inc_bench) then
 		    	K_Inc_Increase_draft_group_z(age,zi) = K_Inc_Increase_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
-		    	if (L_Income(age2,ai,zi,lambdai,ei,xi).gt.L_Inc_aux) then
+		    	if (L_Inc_aux.gt.L_Inc_bench) then
 		    	L_Inc_Increase_draft_group_z(age,zi) = L_Inc_Increase_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
 
 		    	! Compare Capital taxes
-		    	If ( K_Tax(age2,ai,zi,lambdai,ei,xi) .gt. tauK_bench*K_Inc_aux ) then
+		    	If ( K_Tax_aux .gt. tauK_bench*K_Inc_bench ) then
 		    	Tax_Increase_tk_draft_group_z(age,zi) = Tax_Increase_tk_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
 		    	! Compare Labor taxes
-		    	If ( L_Tax(age2,ai,zi,lambdai,ei,xi) .gt. L_Tax_bench) then
+		    	If ( L_Tax_aux .gt. L_Tax_bench) then
 		    	Tax_Increase_tl_draft_group_z(age,zi) = Tax_Increase_tl_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
 		    	! Compare Total taxes
-		    	If ( (K_Tax(age2,ai,zi,lambdai,ei,xi)+L_Tax(age2,ai,zi,lambdai,ei,xi)) .gt. &
-		    	  &  ( tauK_bench*K_Inc_aux +L_Tax_bench) ) then
+		    	If ( (K_Tax_aux+L_Tax_aux) .gt. ( tauK_bench*K_Inc_bench +L_Tax_bench) ) then
 		    	Tax_Increase_draft_group_z(age,zi) = Tax_Increase_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
 				! Compare Capital tax rate
-		    	If (K_Tax(age2,ai,zi,lambdai,ei,xi)/K_Income(age2,ai,zi,lambdai,ei,xi) .gt. tauK_bench)  then
+		    	If (K_Tax_aux/K_Inc_aux .gt. tauK_bench)  then
 		    	Tax_Rate_Increase_tk_draft_group_z(age,zi) = Tax_Rate_Increase_tk_draft_group_z(age,zi) + & 
 		    		&  DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
 		    	! Compare Labor tax rate
-		    	If ( (L_Tax(age2,ai,zi,lambdai,ei,xi)/L_Income(age2,ai,zi,lambdai,ei,xi) - & 
-		    	  &  L_Tax_bench/L_Inc_aux).gt.1.0E-07_dp ) then
+		    	If ( (L_Tax_aux/L_Inc_aux - L_Tax_bench/L_Inc_bench).gt.1.0E-07_dp ) then
 		    	Tax_Rate_Increase_tl_draft_group_z(age,zi) = Tax_Rate_Increase_tl_draft_group_z(age,zi) + & 
 		    		& DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
 		    	! Compare Total tax rates
-		    	If ( ( ( K_Tax(age2,ai,zi,lambdai,ei,xi)+L_Tax(age2,ai,zi,lambdai,ei,xi))/Total_Income(age2,ai,zi,lambdai,ei,xi) &
-		    	& - ( tauK_bench*K_Inc_aux + L_Tax_bench)/(K_Inc_aux + L_Inc_aux) ).gt.1.0E-07_dp ) then
+		    	If ( ( ( K_Tax_aux+L_Tax_aux)/(K_Inc_aux+L_Inc_aux) &
+		    	& - ( tauK_bench*K_Inc_bench + L_Tax_bench)/(K_Inc_bench + L_Inc_bench) ).gt.1.0E-07_dp ) then
 		    	Tax_Rate_Increase_draft_group_z(age,zi) = Tax_Rate_Increase_draft_group_z(age,zi)+DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
