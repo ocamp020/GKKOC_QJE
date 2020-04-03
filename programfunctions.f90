@@ -7410,7 +7410,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(MaxAge) 			 :: constrained_firms_age, size_by_age
 	real(DP) 	   :: Pr_mat_bench(na,nz,nx), FW_top_x(6), prctile_FW(6), prctile_bq(5)
 	real(DP)  	   :: low_pct, high_pct, a, b, c, CCDF_c, c_low, c_high
-	real(DP)       :: Frisch_Aux, Frisch_Aux_2, 
+	real(DP)       :: Frisch_Aux, Frisch_Aux_2
 	real(DP)       :: K_Inc_aux, L_Inc_aux, K_Tax_aux, L_Tax_aux, K_Inc_bench, L_Inc_bench, K_Tax_bench, L_Tax_bench
 	character(100) :: rowname
 	integer        :: age_limit(max_age_category+1), draft_age_limit(draft_age_category+1)
