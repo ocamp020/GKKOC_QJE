@@ -8337,8 +8337,8 @@ SUBROUTINE COMPUTE_STATS()
 		L_Inc_frac_draft_group_z = 100.0_dp*L_Inc_frac_draft_group_z/size_draft_group_z 
 
 		! Average return by productivity group
-		Return_draft_group_z     = 100.0_dp*   Return_draft_group_z/size_draft_group
-		Return_AT_draft_group_z  = 100.0_dp*Return_AT_draft_group_z/size_draft_group
+		Return_draft_group_z     = 100.0_dp*   Return_draft_group_z/size_draft_group_z
+		Return_AT_draft_group_z  = 100.0_dp*Return_AT_draft_group_z/size_draft_group_z 
 
 		! Average Capital Tax to income ratio adjusted by productivity group
 		K_Tax_Inc_draft_group = Draft_Table(K_Tax_Inc_draft_group_z,DBN_z,.false.)
@@ -10414,10 +10414,11 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) "Results for benchmark economy"
 			WRITE(UNIT=19, FMT=*) ' '
 	else
-		OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='old', POSITION='append', iostat=status) 
-			if (status.ne.0) then 
-			OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='replace') 
-			end if 
+		OPEN (UNIT=19, FILE=trim(Result_Folder)//'output_exp.txt', STATUS='replace') 
+		! OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='old', POSITION='append', iostat=status) 
+		! 	if (status.ne.0) then 
+		! 	OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='replace') 
+		! 	end if 
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Wealth Taxes'
 			WRITE(UNIT=19, FMT=*) ' '
