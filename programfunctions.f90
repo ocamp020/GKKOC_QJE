@@ -8416,6 +8416,8 @@ SUBROUTINE COMPUTE_STATS()
 		    	K_Inc_aux   = R*agrid(ai) + Pr_mat(ai,zi,xi)
 		    	K_Inc_bench = R_bench*agrid(ai) + Pr_mat_bench(ai,zi,xi)
 
+		    	print*, K_Inc_aux, K_Inc_bench, L_Inc_aux, L_Inc_bench
+
 		    	! Tax by agent (capital and labor) in benchmark
 		    	K_Tax_aux   = K_Inc_aux - (YGRID(ai,zi,xi) - agrid(ai))
 		    	K_Tax_bench = tauK_bench*K_Inc_bench
@@ -10456,7 +10458,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Moments:'
 			WRITE(UNIT=19, FMT=*) 'Debt_Output'		  	, External_Debt_GDP
 			WRITE(UNIT=19, FMT=*) 'Wealth_Output'	  	, Wealth_Output
-			WRITE(UNIT=19, FMT=*) 'TFP_Q' 				, QBAR/NBAR
+			WRITE(UNIT=19, FMT=*) 'TFP_Q' 				, QBAR/K_P
 			WRITE(UNIT=19, FMT=*) 'Wealth_Top_1%' 		, prct1_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_Top_10%'		, prct10_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_Top_20%'		, prct20_wealth
