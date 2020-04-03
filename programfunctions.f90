@@ -10435,7 +10435,6 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 
 	end if 
 			WRITE(UNIT=19, FMT=*) 'Aggregate Variables'
-			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'GBAR'	, GBAR
 			WRITE(UNIT=19, FMT=*) 'KBAR'	, MeanWealth
 			WRITE(UNIT=19, FMT=*) 'QBAR'	, QBAR
@@ -10447,10 +10446,14 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'wage'	, wage
 			WRITE(UNIT=19, FMT=*) 'R'		, 100.0_dp*R
 			WRITE(UNIT=19, FMT=*) ' '
-			WRITE(UNIT=19, FMT=*) 'Moments:'
+			WRITE(UNIT=19, FMT=*) 'After Tax Prices'
+			WRITE(UNIT=19, FMT=*) 'R_AT' 	, 100.0_dp*( (1.0_dp-tauW_at)(1.0_dp+(1.0_dp-tauK)*R)-1.0_dp )
+			WRITE(UNIT=19, FMT=*) 'wage_AT' , psi*wage
 			WRITE(UNIT=19, FMT=*) ' '
+			WRITE(UNIT=19, FMT=*) 'Moments:'
 			WRITE(UNIT=19, FMT=*) 'Debt_Output'		  	, External_Debt_GDP
 			WRITE(UNIT=19, FMT=*) 'Wealth_Output'	  	, Wealth_Output
+			WRITE(UNIT=19, FMT=*) 'TFP_Q' 				, QBAR/NBAR
 			WRITE(UNIT=19, FMT=*) 'Wealth_Top_1%' 		, prct1_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_Top_10%'		, prct10_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_Top_20%'		, prct20_wealth
@@ -10463,16 +10466,15 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			do zi=1,nz
 			WRITE(UNIT=19, FMT=*) 'Mean_Return_by_z'	, 100.0_dp*MeanReturn_by_z(zi)
 			enddo 
-			WRITE(UNIT=19, FMT=*) 'Moments'				, SSE_Moments 
-			WRITE(UNIT=19, FMT=*) ' '
-			WRITE(UNIT=19, FMT=*) 'Present_Value_Wealth'
-			WRITE(UNIT=19, FMT=*) "Mean_PV_Wealth"		    , Mean_Firm_Wealth
-			WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_0.01%' 	, FW_top_x_share(6)
-			WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_0.1%' 		, FW_top_x_share(5)
-			WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_1%' 		, FW_top_x_share(4)
-			WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_10%'		, FW_top_x_share(3)
-			WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_20%'		, FW_top_x_share(2)
-			WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_40%'		, FW_top_x_share(1)
+			! WRITE(UNIT=19, FMT=*) ' '
+			! WRITE(UNIT=19, FMT=*) 'Present_Value_Wealth'
+			! WRITE(UNIT=19, FMT=*) "Mean_PV_Wealth"		    , Mean_Firm_Wealth
+			! WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_0.01%' 	, FW_top_x_share(6)
+			! WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_0.1%' 		, FW_top_x_share(5)
+			! WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_1%' 		, FW_top_x_share(4)
+			! WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_10%'		, FW_top_x_share(3)
+			! WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_20%'		, FW_top_x_share(2)
+			! WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_40%'		, FW_top_x_share(1)
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Bequest'
 			WRITE(UNIT=19, FMT=*) 'Total_Bequest_Wealth'	, Bequest_Wealth/MeanWealth 
@@ -10503,6 +10505,9 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Y_C'		   				, YBAR_C 
 			WRITE(UNIT=19, FMT=*) 'L_C'		   				, L_C 
 			WRITE(UNIT=19, FMT=*) 'K_C'		   				, K_C 
+			WRITE(UNIT=19, FMT=*) 'Y_P'		   				, YBAR_P
+			WRITE(UNIT=19, FMT=*) 'L_P'		   				, L_P 
+			WRITE(UNIT=19, FMT=*) 'K_P'		   				, K_P 
 			WRITE(UNIT=19, FMT=*) ' '
 		CLOSE(Unit=19)
 	if (bench_indx.ne.1) then
