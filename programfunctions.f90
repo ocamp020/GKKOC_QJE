@@ -8160,7 +8160,7 @@ SUBROUTINE COMPUTE_STATS()
 	    	enddo 
 	    	enddo 
 	    	enddo  
-	    	print*,'age',age,'zi',zi,'wealth',wealth_draft_group_z(age,zi),'size',size_draft_group_z(age,zi)
+	    	! print*,'age',age,'zi',zi,'wealth',wealth_draft_group_z(age,zi),'size',size_draft_group_z(age,zi)
 		enddo
 		enddo 
 
@@ -8411,7 +8411,7 @@ SUBROUTINE COMPUTE_STATS()
 
 		    	! Income for each agent in benchmark
 		    	if (age.lt.RetAge) then
-		    	L_Inc_aux   = Wage_bench*eff_un(age2,lambdai,ei)*Hours(age2,ai,zi,lambdai,ei,xi)
+		    	L_Inc_aux   = Wage_bench*eff_un(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi)
 		    	else
 		    		if (KeepSSatBench .eq. 1) then 
 		    		L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
@@ -8471,6 +8471,8 @@ SUBROUTINE COMPUTE_STATS()
 		    	  &  L_Tax_bench(age2,ai,zi,lambdai,ei,xi)/L_Income_bench(age2,ai,zi,lambdai,ei,xi)) then
 		    	Tax_Rate_Increase_tl_draft_group_z(age,zi) = Tax_Rate_Increase_tl_draft_group_z(age,zi) + & 
 		    		& DBN_bench(age2,ai,zi,lambdai,ei,xi)
+		    		print*, L_Tax(age2,ai,zi,lambdai,ei,xi)/L_Income(age2,ai,zi,lambdai,ei,xi), &
+		    			 &  L_Tax_bench(age2,ai,zi,lambdai,ei,xi)/L_Income_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
 		    	! Compare Total tax rate
