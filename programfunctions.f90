@@ -8473,12 +8473,10 @@ SUBROUTINE COMPUTE_STATS()
 		    	endif 
 
 		    	if (age2.lt.RetAge) then
-		    	print*, 'test rates',(K_Tax(age2,ai,zi,lambdai,ei,xi)/K_Income(age2,ai,zi,lambdai,ei,xi)),&
-		    						& K_Tax_bench/K_Inc_aux, &
-		    						& L_Tax(age2,ai,zi,lambdai,ei,xi)/L_Income(age2,ai,zi,lambdai,ei,xi), &
-		    						& L_Tax_bench/L_Inc_aux, &
-		    						& L_Tax(age2,ai,zi,lambdai,ei,xi),L_Income(age2,ai,zi,lambdai,ei,xi), &
-		    						& L_Tax_bench,L_Inc_aux
+		    	print*, 'test rates',(K_Tax_aux/K_Inc_aux),&
+		    						& K_Tax_bench/K_Inc_bench, &
+		    						& L_Tax_aux/L_Inc_aux, &
+		    						& L_Tax_bench/L_Inc_bench
 				endif
 	    	enddo 
 	    	enddo 
