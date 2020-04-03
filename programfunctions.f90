@@ -8416,7 +8416,7 @@ SUBROUTINE COMPUTE_STATS()
 		    	K_Inc_aux   = R*agrid(ai) + Pr_mat(ai,zi,xi)
 		    	K_Inc_bench = R_bench*agrid(ai) + Pr_mat_bench(ai,zi,xi)
 
-		    	print*, K_Inc_aux, K_Inc_bench, L_Inc_aux, L_Inc_bench
+		    	! print*, K_Inc_aux, K_Inc_bench, L_Inc_aux, L_Inc_bench
 
 		    	! Tax by agent (capital and labor) in benchmark
 		    	K_Tax_aux   = K_Inc_aux - (YGRID(ai,zi,xi) - agrid(ai))
