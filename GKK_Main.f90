@@ -479,16 +479,6 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL GOVNT_BUDGET(.true.)
 	end if 
 
-		print*,"	Computing satitics"
-		CALL COMPUTE_STATS
-		print*,"	Writing variables"
-		CALL WRITE_VARIABLES(1)
-		if (Simul_Switch) then 
-			print*,"	Simulation"
-			CALL SIMULATION(solving_bench)
-		endif
-		
-
 	! Aggregate variables in benchmark economy
 		GBAR_bench  = GBAR
 		QBAR_bench  = QBAR 
@@ -523,6 +513,15 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		YBAR_P_bench = YBAR_P
 		L_P_bench 	 = L_P
 		K_P_bench    = K_P
+
+		print*,"	Computing satitics"
+		CALL COMPUTE_STATS
+		print*,"	Writing variables"
+		CALL WRITE_VARIABLES(1)
+		if (Simul_Switch) then 
+			print*,"	Simulation"
+			CALL SIMULATION(solving_bench)
+		endif
 
 		print*,' '
 		print*,'-------------------------------------------------------------------------'

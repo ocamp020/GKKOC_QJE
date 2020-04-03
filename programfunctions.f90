@@ -8160,10 +8160,11 @@ SUBROUTINE COMPUTE_STATS()
 	    	enddo 
 	    	enddo 
 	    	enddo  
+	    	print*,'age',age,'zi',zi,'wealth',wealth_draft_group_z(age,zi),'size',size_draft_group_z(age,zi)
 		enddo
 		enddo 
 
-		DBN_Z = sum(sum(sum(sum(sum(DBN_bench,6),5),4),2),1) 
+		DBN_Z = sum(sum(sum(sum(sum(DBN1,6),5),4),2),1) 
 		do zi=1,nz 
 			CDF_Z(zi) = sum(DBN_Z(1:zi))
 		enddo 
@@ -8235,8 +8236,8 @@ SUBROUTINE COMPUTE_STATS()
 	! Draft Tables 2: Income and Taxes 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
-		Pr_mat = Profit_Matrix(R_bench,P_bench)
-		CALL ComputeLaborUnits(EBAR_bench,wage_bench)
+		Pr_mat = Profit_Matrix(R,P)
+		CALL ComputeLaborUnits(EBAR,wage)
 
 		K_Tax_draft_group_z			= 0.0_dp
 		L_Tax_draft_group_z			= 0.0_dp
