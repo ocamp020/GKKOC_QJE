@@ -7420,7 +7420,8 @@ SUBROUTINE COMPUTE_STATS()
 		& T_Inc_draft_group_z, K_Inc_draft_group_z, L_Inc_draft_group_z, K_Inc_frac_draft_group_z, L_Inc_frac_draft_group_z, &
 		&      Tax_Increase_tk_draft_group_z,      Tax_Increase_tl_draft_group_z,      Tax_Increase_draft_group_z, &
 		& Tax_Rate_Increase_tk_draft_group_z, Tax_Rate_Increase_tl_draft_group_z, Tax_Rate_Increase_draft_group_z, & 
-		& Inc_Increase_draft_group_z, K_Inc_Increase_draft_group_z, L_Inc_Increase_draft_group_z
+		& Inc_Increase_draft_group_z, K_Inc_Increase_draft_group_z, L_Inc_Increase_draft_group_z, &
+		& Return_draft_group_z, Return_AT_draft_group_z 
 	real(DP), dimension(draft_age_category,draft_z_category) :: size_draft_group, &
 		& wealth_draft_group,  av_wealth_draft_group, frac_wealth_draft_group, & 
 		& capital_draft_group,  av_capital_draft_group, frac_capital_draft_group, &
@@ -7429,7 +7430,8 @@ SUBROUTINE COMPUTE_STATS()
 		& T_Inc_draft_group, K_Inc_draft_group, L_Inc_draft_group, K_Inc_frac_draft_group, L_Inc_frac_draft_group, &
 		& Tax_Increase_tk_draft_group, Tax_Increase_tl_draft_group, Tax_Increase_draft_group, &
 		& Tax_Rate_Increase_tk_draft_group, Tax_Rate_Increase_tl_draft_group, Tax_Rate_Increase_draft_group, &
-		& Inc_Increase_draft_group, K_Inc_Increase_draft_group, L_Inc_Increase_draft_group
+		& Inc_Increase_draft_group, K_Inc_Increase_draft_group, L_Inc_Increase_draft_group, &
+		& Return_draft_group, Return_AT_draft_group
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income, K_Income, L_Income, K_Tax, L_Tax ! , Firm_Output, Firm_Profit
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: Total_Income_bench, K_Income_bench, L_Income_bench, K_Tax_bench, L_Tax_bench
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
@@ -8180,9 +8182,9 @@ SUBROUTINE COMPUTE_STATS()
 		capital_draft_group = Draft_Table(capital_draft_group_z,DBN_z,.true.)
 
 		! Cons, Hours, Ap of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		 Cons_draft_group = Draft_Table(  Cons_draft_group_z,DBN_z,.false.)
-		Hours_draft_group = Draft_Table( Hours_draft_group_z,DBN_z,.false.)
-		   Ap_draft_group = Draft_Table(    Ap_draft_group_z,DBN_z,.true. )
+		 Cons_draft_group = Draft_Table(Cons_draft_group_z,DBN_z,.true.)*(EBAR_data/(EBAR_bench*0.727853584919652_dp))/size_draft_group
+		Hours_draft_group = Draft_Table( Hours_draft_group_z,DBN_z,.true.)/size_draft_group
+		   Ap_draft_group = Draft_Table(    Ap_draft_group_z,DBN_z,.true.)
 
 		! Fix fractions
 	    av_wealth_draft_group        = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*wealth_draft_group/size_draft_group
@@ -8245,6 +8247,8 @@ SUBROUTINE COMPUTE_STATS()
 		L_Inc_frac_draft_group_z    = 0.0_dp
 		K_Tax_Inc_draft_group_z		= 0.0_dp
 		L_Tax_Inc_draft_group_z		= 0.0_dp
+		Return_draft_group_z 		= 0.0_dp
+		Return_AT_draft_group_z     = 0.0_dp
 		do zi  = 1,nz
 		do age = 1,draft_age_category
 	        do xi=1,nx
@@ -8254,8 +8258,8 @@ SUBROUTINE COMPUTE_STATS()
 		    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
 
 		    	! Income for each agent 
-		    	if (age.lt.RetAge) then
-		    	L_Inc_aux   = yh(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi)
+		    	if (age2.lt.RetAge) then
+		    	L_Inc_aux   = yh(age2,lambdai,ei)*Hours(age2,ai,zi,lambdai,ei,xi)
 		    	else
 		    	L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
 		    	endif 
@@ -8266,38 +8270,44 @@ SUBROUTINE COMPUTE_STATS()
 		    	L_Income(age2,ai,zi,lambdai,ei,xi) 	   = L_Inc_aux
 
 		    	! Income by group (total, capital, labor)
-	    		T_Inc_draft_group_z(age,zi) = T_Inc_draft_group_z(age,zi) + (K_Inc_aux +L_Inc_aux)*DBN_bench(age2,ai,zi,lambdai,ei,xi)
-        		K_Inc_draft_group_z(age,zi) = K_Inc_draft_group_z(age,zi) + (K_Inc_aux 		  	 )*DBN_bench(age2,ai,zi,lambdai,ei,xi)
-        		L_Inc_draft_group_z(age,zi) = L_Inc_draft_group_z(age,zi) + (L_Inc_aux 		  	 )*DBN_bench(age2,ai,zi,lambdai,ei,xi)
+	    		T_Inc_draft_group_z(age,zi) = T_Inc_draft_group_z(age,zi) + (K_Inc_aux +L_Inc_aux)*DBN1(age2,ai,zi,lambdai,ei,xi)
+        		K_Inc_draft_group_z(age,zi) = K_Inc_draft_group_z(age,zi) + (K_Inc_aux 		  	 )*DBN1(age2,ai,zi,lambdai,ei,xi)
+        		L_Inc_draft_group_z(age,zi) = L_Inc_draft_group_z(age,zi) + (L_Inc_aux 		  	 )*DBN1(age2,ai,zi,lambdai,ei,xi)
 
         		! Fraction of capital and labor income by agent (averaged)
         		K_Inc_frac_draft_group_z(age,zi) = K_Inc_frac_draft_group_z(age,zi) + & 
-	        		& ( K_Inc_aux )/( K_Inc_aux + L_Inc_aux )*DBN_bench(age2,ai,zi,lambdai,ei,xi)
+	        		& ( K_Inc_aux )/( K_Inc_aux + L_Inc_aux )*DBN1(age2,ai,zi,lambdai,ei,xi)
 
         		L_Inc_frac_draft_group_z(age,zi) = L_Inc_frac_draft_group_z(age,zi) + & 
-	        		& ( L_Inc_aux )/( K_Inc_aux + L_Inc_aux )*DBN_bench(age2,ai,zi,lambdai,ei,xi)
+	        		& ( L_Inc_aux )/( K_Inc_aux + L_Inc_aux )*DBN1(age2,ai,zi,lambdai,ei,xi)
 
         		! Tax by agent (capital and labor)
 		    	K_Tax(age2,ai,zi,lambdai,ei,xi)  = K_Inc_aux - YGRID(ai,zi,xi)
-		    	if (age.lt.draft_age_category) then
+		    	if (age2.lt.RetAge) then
 		    	L_Tax(age2,ai,zi,lambdai,ei,xi)  = L_Inc_aux - psi*(L_Inc_aux)**(1.0_DP-tauPL)
 		    	endif 
 
 		    	! Tax by group (capital and labor)
 	        	K_Tax_draft_group_z(age,zi) = K_Tax_draft_group_z(age,zi) + & 
-	        		& K_Tax(age2,ai,zi,lambdai,ei,xi)*DBN_bench(age2,ai,zi,lambdai,ei,xi)
-	        	if (age.lt.draft_age_category) then
+	        		& K_Tax(age2,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        	if (age2.lt.RetAge) then
         		L_Tax_draft_group_z(age,zi) = L_Tax_draft_group_z(age,zi) + & 
-	        		& L_Tax(age2,ai,zi,lambdai,ei,xi)* DBN_bench(age2,ai,zi,lambdai,ei,xi)
+	        		& L_Tax(age2,ai,zi,lambdai,ei,xi)* DBN1(age2,ai,zi,lambdai,ei,xi)
 	        	endif 
 
 	        	! Tax to total income by agent (averaged)
         		K_Tax_Inc_draft_group_z(age,zi) = K_Tax_Inc_draft_group_z(age,zi) + & 
-	        		& K_Tax(age2,ai,zi,lambdai,ei,xi)*DBN_bench(age2,ai,zi,lambdai,ei,xi)/( K_Inc_aux + L_Inc_aux )
-	        	if (age.lt.draft_age_category) then
+	        		& K_Tax(age2,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)/( K_Inc_aux + L_Inc_aux )
+	        	if (age2.lt.RetAge) then
         		L_Tax_Inc_draft_group_z(age,zi) = L_Tax_Inc_draft_group_z(age,zi) + & 
-	        		& L_Tax(age2,ai,zi,lambdai,ei,xi)*DBN_bench(age2,ai,zi,lambdai,ei,xi)/( K_Inc_aux + L_Inc_aux )
+	        		& L_Tax(age2,ai,zi,lambdai,ei,xi)*DBN1(age2,ai,zi,lambdai,ei,xi)/( K_Inc_aux + L_Inc_aux )
 	        	endif 
+
+	        	! Return by agent (averaged)
+	        	Return_draft_group_z(age,zi)    = Return_draft_group_z(age,zi) + &
+	        		&                     K_Inc_aux/agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Return_AT_draft_group_z(age,zi) = Return_AT_draft_group_z(age,zi) + &
+	        		& (K_Inc_aux - YGRID(ai,zi,xi))/agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
 
 	    	enddo 
 	    	enddo 
@@ -8321,6 +8331,10 @@ SUBROUTINE COMPUTE_STATS()
 
 		! Total Pre-Tax Labor Income adjusted by productivity group
 		L_Inc_draft_group = Draft_Table(L_Inc_draft_group_z,DBN_z,.true.)
+
+		! Average return by productivity group
+		Return_draft_group    = 100.0_dp*Draft_Table(   Return_draft_group_z,DBN_z,.true.)/size_draft_group
+		Return_AT_draft_group = 100.0_dp*Draft_Table(Return_AT_draft_group_z,DBN_z,.true.)/size_draft_group
 
 		! Get ratios to total income in group
 		K_Tax_draft_group = K_Tax_draft_group/T_Inc_draft_group
