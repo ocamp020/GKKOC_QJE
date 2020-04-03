@@ -8483,7 +8483,9 @@ SUBROUTINE COMPUTE_STATS()
 		    	print*, 'test rates',(K_Tax(age2,ai,zi,lambdai,ei,xi)/K_Income(age2,ai,zi,lambdai,ei,xi)),&
 		    						& K_Tax_bench(age2,ai,zi,lambdai,ei,xi)/K_Income_bench(age2,ai,zi,lambdai,ei,xi), &
 		    						& L_Tax(age2,ai,zi,lambdai,ei,xi)/L_Income(age2,ai,zi,lambdai,ei,xi), &
-		    						& L_Tax_bench(age2,ai,zi,lambdai,ei,xi)/L_Income_bench(age2,ai,zi,lambdai,ei,xi)
+		    						& L_Tax_bench(age2,ai,zi,lambdai,ei,xi)/L_Income_bench(age2,ai,zi,lambdai,ei,xi), &
+		    						& L_Tax(age2,ai,zi,lambdai,ei,xi),L_Income(age2,ai,zi,lambdai,ei,xi), &
+		    						& L_Tax_bench(age2,ai,zi,lambdai,ei,xi),L_Income_bench(age2,ai,zi,lambdai,ei,xi)
 				endif
 	    	enddo 
 	    	enddo 
