@@ -8274,7 +8274,7 @@ SUBROUTINE COMPUTE_STATS()
 	        		& ( L_Inc_aux )/( K_Inc_aux + L_Inc_aux )*DBN1(age2,ai,zi,lambdai,ei,xi)
 
         		! Tax by agent (capital and labor)
-		    	K_Tax(age2,ai,zi,lambdai,ei,xi)  = K_Inc_aux - YGRID(ai,zi,xi)
+		    	K_Tax(age2,ai,zi,lambdai,ei,xi)  = K_Inc_aux - (YGRID(ai,zi,xi) - agrid(ai))
 		    	if (age2.lt.RetAge) then
 		    	L_Tax(age2,ai,zi,lambdai,ei,xi)  = L_Inc_aux - psi*(L_Inc_aux)**(1.0_DP-tauPL)
 		    	endif 
@@ -8299,7 +8299,7 @@ SUBROUTINE COMPUTE_STATS()
 	        	Return_draft_group_z(age,zi)    = Return_draft_group_z(age,zi) + &
 	        		&                     K_Inc_aux/agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
         		Return_AT_draft_group_z(age,zi) = Return_AT_draft_group_z(age,zi) + &
-	        		& (K_Inc_aux - YGRID(ai,zi,xi))/agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		& (K_Inc_aux - (YGRID(ai,zi,xi)-agrid(ai)))/agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
 
 	    	enddo 
 	    	enddo 
@@ -10512,7 +10512,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) ' '
 		CLOSE(Unit=19)
 	if (bench_indx.ne.1) then
-		OPEN (UNIT=19, FILE=trim(Result_Folder)//'output.txt', STATUS='old', POSITION='append') 
+		OPEN (UNIT=19, FILE=trim(Result_Folder)//'output_exp.txt', STATUS='old', POSITION='append') 
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Welfare and output gain'
 			WRITE(UNIT=19, FMT=*) ' '
@@ -10524,6 +10524,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) "Output_Gain(prct)"	  	, 100.0_DP*(Y_exp/Y_bench-1.0) 
 			WRITE(UNIT=19, FMT=*) "CE2_Pop(exp)"   , Av_Util_Pop
 			WRITE(UNIT=19, FMT=*) "CE2_NB(exp)"	   , Av_Util_NB
+			WRITE(UNIT=19, FMT=*) ' '
 		CLOSE(Unit=19)
 	end if 
 
