@@ -8479,6 +8479,11 @@ SUBROUTINE COMPUTE_STATS()
 		    		& Total_Income_bench(age2,ai,zi,lambdai,ei,xi) ).gt.1.0E-07_dp ) then
 		    	Tax_Rate_Increase_draft_group_z(age,zi) = Tax_Rate_Increase_draft_group_z(age,zi)+DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
+
+		    	print*, 'test rates',(K_Tax(age2,ai,zi,lambdai,ei,xi)/K_Income(age2,ai,zi,lambdai,ei,xi)),&
+		    						& K_Tax_bench(age2,ai,zi,lambdai,ei,xi)/K_Income_bench(age2,ai,zi,lambdai,ei,xi), &
+		    						& L_Tax(age2,ai,zi,lambdai,ei,xi)/L_Income(age2,ai,zi,lambdai,ei,xi), &
+		    						& L_Tax_bench(age2,ai,zi,lambdai,ei,xi)/L_Income_bench(age2,ai,zi,lambdai,ei,xi)
 	    	enddo 
 	    	enddo 
 	    	enddo 
