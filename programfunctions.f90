@@ -8410,7 +8410,7 @@ SUBROUTINE COMPUTE_STATS()
 		    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
 
 		    	! Income for each agent in benchmark
-		    	if (age.lt.RetAge) then
+		    	if (age2.lt.RetAge) then
 		    	L_Inc_aux   = Wage_bench*eff_un(age2,lambdai,ei)*Hours_bench(age2,ai,zi,lambdai,ei,xi)
 		    	else
 		    		if (KeepSSatBench .eq. 1) then 
@@ -8427,7 +8427,7 @@ SUBROUTINE COMPUTE_STATS()
 
 		    	! Tax by agent (capital and labor) in benchmark
 		    	K_Tax_bench(age2,ai,zi,lambdai,ei,xi)  = tauK_bench*K_Inc_aux
-		    	if (age.lt.draft_age_category) then
+		    	if (age2.lt.RetAge) then
 		    	L_Tax_bench(age2,ai,zi,lambdai,ei,xi)  = L_Inc_aux - psi_bench*(L_Inc_aux)**(1.0_DP-tauPL_bench)
 		    	endif 
 
@@ -8460,25 +8460,25 @@ SUBROUTINE COMPUTE_STATS()
 		    	endif 
 
 				! Compare Capital tax rate
-		    	If ( K_Tax(age2,ai,zi,lambdai,ei,xi)/K_Income(age2,ai,zi,lambdai,ei,xi) .gt. & 
-		    	  &  K_Tax_bench(age2,ai,zi,lambdai,ei,xi)/K_Income_bench(age2,ai,zi,lambdai,ei,xi)) then
+		    	If ( (K_Tax(age2,ai,zi,lambdai,ei,xi)/K_Income(age2,ai,zi,lambdai,ei,xi) - & 
+		    	  &  K_Tax_bench(age2,ai,zi,lambdai,ei,xi)/K_Income_bench(age2,ai,zi,lambdai,ei,xi)).gt.1.0E-05_DP )  then
 		    	Tax_Rate_Increase_tk_draft_group_z(age,zi) = Tax_Rate_Increase_tk_draft_group_z(age,zi) + & 
 		    		&  DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
 		    	! Compare Labor tax rate
-		    	If ( L_Tax(age2,ai,zi,lambdai,ei,xi)/L_Income(age2,ai,zi,lambdai,ei,xi) .gt. & 
-		    	  &  L_Tax_bench(age2,ai,zi,lambdai,ei,xi)/L_Income_bench(age2,ai,zi,lambdai,ei,xi)) then
+		    	If ( (L_Tax(age2,ai,zi,lambdai,ei,xi)/L_Income(age2,ai,zi,lambdai,ei,xi) - & 
+		    	  &  L_Tax_bench(age2,ai,zi,lambdai,ei,xi)/L_Income_bench(age2,ai,zi,lambdai,ei,xi)).gt.1.0E-05_dp ) then
 		    	Tax_Rate_Increase_tl_draft_group_z(age,zi) = Tax_Rate_Increase_tl_draft_group_z(age,zi) + & 
 		    		& DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    		print*, L_Tax(age2,ai,zi,lambdai,ei,xi)/L_Income(age2,ai,zi,lambdai,ei,xi), &
 		    			 &  L_Tax_bench(age2,ai,zi,lambdai,ei,xi)/L_Income_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
-		    	! Compare Total tax rate
-		    	If ( (K_Tax(age2,ai,zi,lambdai,ei,xi)+L_Tax(age2,ai,zi,lambdai,ei,xi))/Total_Income(age2,ai,zi,lambdai,ei,xi) &
-		    		& .gt. (K_Tax_bench(age2,ai,zi,lambdai,ei,xi)+L_Tax_bench(age2,ai,zi,lambdai,ei,xi))/&
-		    		& Total_Income_bench(age2,ai,zi,lambdai,ei,xi) ) then
+		    	! Compare Total tax rates
+		    	If ( ((K_Tax(age2,ai,zi,lambdai,ei,xi)+L_Tax(age2,ai,zi,lambdai,ei,xi))/Total_Income(age2,ai,zi,lambdai,ei,xi) &
+		    		& - (K_Tax_bench(age2,ai,zi,lambdai,ei,xi)+L_Tax_bench(age2,ai,zi,lambdai,ei,xi))/&
+		    		& Total_Income_bench(age2,ai,zi,lambdai,ei,xi) ).gt.1.0E-05_dp ) then
 		    	Tax_Rate_Increase_draft_group_z(age,zi) = Tax_Rate_Increase_draft_group_z(age,zi)+DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 	    	enddo 
