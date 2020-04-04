@@ -3201,6 +3201,7 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	GBAR_W		 = 0.0_DP
 	GBAR_L 		 = 0.0_DP
 	GBAR_C       = 0.0_DP
+	GBAR_BQ      = 0.0_DP
 	SSC_Payments = 0.0_DP
 	Tot_Lab_Inc  = 0.0_DP
 	Tot_Cap_Inc  = 0.0_DP
@@ -3219,7 +3220,9 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi)  &	
 	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)  									&
 	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)  			&
-	          & + tauC * cons(age, ai, zi, lambdai,ei,xi)  )   
+	          & + tauC  *  cons(age,ai,zi,lambdai,ei,xi)  										    & 
+	          & + tau_bq*aprime(age,ai,zi,lambdai,ei,xi)*(1.0_DP-survP(age)) )
+
 
 	    GBAR_L = GBAR_L  + DBN1(age,ai,zi,lambdai,ei,xi) * (  yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi) &
 	               &- psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL) )
@@ -3229,7 +3232,9 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	    GBAR_W = GBAR_W + DBN1(age,ai,zi,lambdai,ei,xi) * &
 	            & (( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi) )
 
-      	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei,xi) * tauC * cons(age, ai, zi, lambdai,ei,xi)
+      	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei,xi) * tauC * cons(age,ai,zi,lambdai,ei,xi)
+
+      	GBAR_BQ = GBAR_BQ +  DBN1(age,ai,zi,lambdai,ei,xi) * tau_bq * aprime(age,ai,zi,lambdai,ei,xi) * (1.0_dp-survP(age))
 
 	    Tot_Lab_Inc = Tot_Lab_Inc + DBN1(age,ai,zi,lambdai,ei,xi) * yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)
 
@@ -3267,15 +3272,20 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	print*, "Government Budget - Revenues and taxes"
 	print*,' '
 	print*,'	GBAR=',GBAR,'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=', GBAR_L/Ebar 
-	print*,'	GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C
+	print*,'	GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C, 'GBAR_BQ=', GBAR_BQ
 	print '(A,F7.4,X,X,A,F7.4,X,X,A,F7.4,X,X,A,F7.4,X,X,A,F7.4)',&
-			&'	Tau_K=', tauK, 'Tau_W_bt=', tauW_bt, 'Tau_W_at=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
+			&'	Tau_K=', tauK, 'Tau_W_bt=', tauW_bt, 'Tau_W_at=', tauW_at,&
+			& 'Tau_C=', tauC, 'Tau_BQ=', tau_bq, "Threshold", Y_a_threshold
 	print*, ' '
-	print '(A,F7.3)', ' 	Tax Revenue/GDP=      ', 100.0_dp*(GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
-	print '(A,F7.3)', ' 	Capital_Tax/Total_Tax=', 100.0_dp*GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
-	print '(A,F7.3)', ' 	Labor_Tax/Total_Tax=  ', 100.0_dp*GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
-	print '(A,F7.3)', ' 	Labor_Tax/GDP=        ', 100.0_dp*GBAR_L/YBAR
-	print '(A,F7.3)', ' 	Average Labor Tax=    ', 100.0_dp*GBAR_L/Tot_Lab_Inc
+	print '(A,F7.3)', ' 	Tax Revenue/GDP=      ', 100.0_dp*(GBAR_K+GBAR_W+GBAR_L+GBAR_C+GBAR_BQ)/YBAR
+	print '(A,F7.3)', ' 	Capital_Tax/Total_Tax=', 100.0_dp*(GBAR_K+GBAR_W)/(GBAR_K+GBAR_W+GBAR_L+GBAR_C+GBAR_BQ)
+	print '(A,F7.3)', ' 	Labor_Tax/Total_Tax  =', 100.0_dp*GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C+GBAR_BQ)
+	print '(A,F7.3)', ' 	Estate_Tax/Total_Tax =', 100.0_dp*GBAR_BQ/(GBAR_K+GBAR_W+GBAR_L+GBAR_C+GBAR_BQ)
+	print '(A,F7.3)', ' 	Capital_Tax/GDP      =', 100.0_dp*(GBAR_K+GBAR_W)/YBAR
+	print '(A,F7.3)', ' 	Average Capital Tax  =', 100.0_dp*(GBAR_K+GBAR_W)/Tot_Cap_Inc
+	print '(A,F7.3)', ' 	Labor_Tax/GDP        =', 100.0_dp*GBAR_L/YBAR
+	print '(A,F7.3)', ' 	Average Labor Tax    =', 100.0_dp*GBAR_L/Tot_Lab_Inc
+	print '(A,F7.3)', ' 	Estate_Tax/GDP       =', 100.0_dp*GBAR_BQ/YBAR
 	print '(A,F7.3,X,X,A,F7.3)', ' 		Total Labor Income=', Tot_Lab_Inc , 'EBAR=', EBAR
 	print*,'-----------------------------------------------------------------------------'
 	print*, ' '
@@ -3288,14 +3298,17 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	WRITE(UNIT=11, FMT=*) ' '
 	WRITE(UNIT=11, FMT=*) "Government Budget - Revenues and taxes"
 	WRITE(UNIT=11, FMT=*) 'GBAR=',GBAR,'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av.Labor_Tax=', GBAR_L/Ebar 
-	WRITE(UNIT=11, FMT=*) 'GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C
-	WRITE(UNIT=11, FMT=*) 'Tau_K=', tauK, 'Tau_W=', tauW_at, 'Tau_C=', tauC, "Threshold", Y_a_threshold
-	WRITE(UNIT=11, FMT=*) 'Tax_Revenue/GDP', (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
-	WRITE(UNIT=11, FMT=*) 'Capital_Tax/Total_Tax', GBAR_K/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
-	WRITE(UNIT=11, FMT=*) 'Capital_Tax/GDP', GBAR_K/YBAR
-	WRITE(UNIT=11, FMT=*) 'Labor_Tax/Total_Tax', GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
-	WRITE(UNIT=11, FMT=*) 'Labor_Tax/GDP', GBAR_L/YBAR
-	WRITE(UNIT=11, FMT=*) 'Average_Labor_Tax', GBAR_L/Tot_Lab_Inc
+	WRITE(UNIT=11, FMT=*) 'GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C, 'GBAR_BQ=', GBAR_BQ
+	WRITE(UNIT=11, FMT=*) 'Tau_K=', tauK, 'Tau_W=', tauW_at, 'Tau_C=', tauC, 'Tau_BQ=', tau_bq, "Threshold", Y_a_threshold
+	WRITE(UNIT=11, FMT=*) 'Tax Revenue/GDP=      ', 100.0_dp*(GBAR_K+GBAR_W+GBAR_L+GBAR_C+GBAR_BQ)/YBAR
+	WRITE(UNIT=11, FMT=*) 'Capital_Tax/Total_Tax=', 100.0_dp*(GBAR_K+GBAR_W)/(GBAR_K+GBAR_W+GBAR_L+GBAR_C+GBAR_BQ)
+	WRITE(UNIT=11, FMT=*) 'Labor_Tax/Total_Tax  =', 100.0_dp*GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C+GBAR_BQ)
+	WRITE(UNIT=11, FMT=*) 'Estate_Tax/Total_Tax =', 100.0_dp*GBAR_BQ/(GBAR_K+GBAR_W+GBAR_L+GBAR_C+GBAR_BQ)
+	WRITE(UNIT=11, FMT=*) 'Capital_Tax/GDP      =', 100.0_dp*(GBAR_K+GBAR_W)/YBAR
+	WRITE(UNIT=11, FMT=*) 'Average Capital Tax  =', 100.0_dp*(GBAR_K+GBAR_W)/Tot_Cap_Inc
+	WRITE(UNIT=11, FMT=*) 'Labor_Tax/GDP        =', 100.0_dp*GBAR_L/YBAR
+	WRITE(UNIT=11, FMT=*) 'Average Labor Tax    =', 100.0_dp*GBAR_L/Tot_Lab_Inc
+	WRITE(UNIT=11, FMT=*) 'Estate_Tax/GDP       =', 100.0_dp*GBAR_BQ/YBAR
 	WRITE(UNIT=11, FMT=*) 'Total_Labor_Income', Tot_Lab_Inc , 'EBAR', EBAR, 'Total_Capital_Income', Tot_Cap_Inc
 	Close(UNIT=11)
 	ENDIF  

@@ -112,6 +112,8 @@ MODULE global
     ! Labor income tax: This is a progresive tax.
 	! 1-psi controls the level of tax, and tauPL controls progressivity
 		REAL(DP) :: tauPL, psi
+    ! Estate Tax
+        REAL(DP) :: tau_bq= 0.40_DP
 
 
     ! Auxiliary variables to find wealth tax that balances the budget in experiment economy
@@ -164,7 +166,7 @@ MODULE global
     REAL(DP) :: Frisch_Elasticity, Size_Frisch, Hours_Frisch, Frisch_Elasticity_2
 
     ! Extra tax information
-    REAL(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, Tot_Lab_Inc, Tot_Cap_Inc
+    REAL(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, GBAR_BQ Tot_Lab_Inc, Tot_Cap_Inc
 
     ! Transition 
     LOGICAL :: Use_Transition_Seed

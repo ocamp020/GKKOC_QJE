@@ -313,6 +313,7 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 	GBAR_C 		= 0.0_DP
 	GBAR_L 		= 0.0_DP
 	GBAR_NL 	= 0.0_DP
+	GBAR_BQ     = 0.0_DP
 	BT_EARNINGS = 0.0_DP
 	A_EARNINGS 	= 0.0_DP
 
@@ -326,7 +327,8 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi) 	&	
 	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)  									&
 	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)  			&
-	          & + tauC * cons(age, ai, zi, lambdai,ei,xi)  )   
+	          & + tauC * cons(age, ai, zi, lambdai,ei,xi)  												&   
+	          & + tau_bq*aprime(age,ai,zi,lambdai,ei,xi)*(1.0_DP-survP(age)) )
 
 	    GBAR_NL = GBAR_NL + DBN1(age,ai,zi,lambdai,ei,xi) * ( tauK*( R*agrid(ai) + Pr_mat(ai,zi,xi) )   &
 	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi)  & 
@@ -345,6 +347,7 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 
       	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei,xi) * tauC * cons(age, ai, zi, lambdai,ei,xi)
 	    
+	    GBAR_BQ = GBAR_BQ +  DBN1(age,ai,zi,lambdai,ei,xi) * tau_bq * aprime(age,ai,zi,lambdai,ei,xi) * (1.0_dp-survP(age))
 	   
 	ENDDO
 	ENDDO
@@ -408,6 +411,7 @@ SUBROUTINE GOVNT_BUDGET_OPT_TauC()
 	GBAR_C 		= 0.0_DP
 	GBAR_L 		= 0.0_DP
 	GBAR_NL 	= 0.0_DP
+	GBAR_BQ     = 0.0_DP
 	BT_EARNINGS = 0.0_DP
 	A_EARNINGS 	= 0.0_DP
 	C_bar       = 0.0_DP
@@ -422,7 +426,8 @@ SUBROUTINE GOVNT_BUDGET_OPT_TauC()
 	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi) 	&	
 	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)  									&
 	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)  			&
-	          & + tauC * cons(age, ai, zi, lambdai,ei,xi)  )   
+	          & + tauC * cons(age, ai, zi, lambdai,ei,xi)  										    & 
+	          & + tau_bq*aprime(age,ai,zi,lambdai,ei,xi)*(1.0_DP-survP(age)) )
 
 	    GBAR_NL = GBAR_NL + DBN1(age,ai,zi,lambdai,ei,xi) * ( tauK*( R*agrid(ai) + Pr_mat(ai,zi,xi) )   &
 	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi)  & 
@@ -442,6 +447,8 @@ SUBROUTINE GOVNT_BUDGET_OPT_TauC()
       	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei,xi) * tauC * cons(age, ai, zi, lambdai,ei,xi)
 
       	C_bar = C_bar +  DBN1(age,ai,zi,lambdai,ei,xi) * cons(age, ai, zi, lambdai,ei,xi)
+
+      	GBAR_BQ = GBAR_BQ +  DBN1(age,ai,zi,lambdai,ei,xi) * tau_bq * aprime(age,ai,zi,lambdai,ei,xi) * (1.0_dp-survP(age))
 	    
 	   
 	ENDDO
