@@ -35,7 +35,7 @@ MODULE parameters
  
 
     ! Utility: Discount factor (beta) utility parameters sigma and gamma
-	REAL(DP)                 :: beta, sigma, gamma, phi, chi_bq, bq_0
+	REAL(DP)                 :: beta, sigma, gamma, phi, chi_bq, bq_0, chi_u
     
 	! Production 
 		! Final good producer

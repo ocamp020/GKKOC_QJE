@@ -135,8 +135,9 @@ PROGRAM main
 		phi    	= (1.0_dp-gamma)/gamma
 
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
-			chi_bq = 03.55_dp ! Scaling 
 			bq_0   = 00.30_dp ! Level shift 
+			chi_u  = 05.92    ! Scaling 
+			chi_bq = chi_u*(1-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 		! Corporate Sector
 			A_C    = 0.9409_dp
