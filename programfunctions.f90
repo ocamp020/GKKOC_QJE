@@ -5134,8 +5134,8 @@ SUBROUTINE FIND_DBN_Transition()
 	INTEGER    :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL       :: DBN_dist, DBN_criteria, Q_dist, NW_dist, Price_criteria, Chg_criteria, Old_DBN_dist, Chg_dist, R_dist, Db_dist
 	REAL(DP)   :: BBAR, Wealth, brent_value, K_bench, C_bench, K_exp, C_exp, R_old, Db_old, R_slope 
-	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
-	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi, PrBqlo, PrBqhi
+	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi, Bqlo, Bqhi
 	REAL(DP), DIMENSION(T+1) :: QBAR2_tr, NBAR2_tr, wage2_tr, Wealth_Top_1_Tr, Wealth_Top_10_Tr, R2_tr
 	INTEGER    :: prctile, ind_R 
 	REAL(DP)   :: Dampen
@@ -5148,10 +5148,14 @@ SUBROUTINE FIND_DBN_Transition()
 	!! Set Up
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	! Allocate
-	allocate( PrAprimehi( MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( PrAprimelo( MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( Aplo(       MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( Aphi(       MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrAprimelo(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrAprimehi(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Aplo(         MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Aphi(         MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrBqlo(   	MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrBqhi(   	MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Bqlo(         MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( BQhi(         MaxAge,na,nz,nlambda,ne,nx) )
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria    = 1.0E-05_DP
@@ -5420,6 +5424,22 @@ SUBROUTINE FIND_DBN_Transition()
 	        Aphi(age,ai,zi,lambdai,ei,xi)  	   = tkhi        
 	        PrAprimelo(age,ai,zi,lambdai,ei,xi) = (agrid(tkhi) - Aprime_tr(age,ai,zi,lambdai,ei,xi,ti))/(agrid(tkhi)-agrid(tklo))
 	        PrAprimehi(age,ai,zi,lambdai,ei,xi) = (Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) - agrid(tklo))/(agrid(tkhi)-agrid(tklo))
+
+	        if ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .ge. amax) then
+	            tklo =na-1
+	        elseif ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) .lt. amin) then
+	            tklo = 1
+	        else
+	            tklo = (((1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime_tr(age,ai,zi,lambdai,ei,xi,ti)-amin)/(amax-amin)) & 
+	            			& **(1.0_DP/a_theta)*(na-1)+1        
+	        endif
+	        tkhi = tklo + 1        
+	        Bqlo(age,ai,zi,lambdai,ei,xi)  	= tklo
+	        Bqhi(age,ai,zi,lambdai,ei,xi)  	= tkhi        
+	        PrBqlo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi) - (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) )&
+	        									& / ( agrid(tkhi) -agrid(tklo) )
+	        PrBqhi(age,ai,zi,lambdai,ei,xi) = ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime_tr(age,ai,zi,lambdai,ei,xi,ti) - agrid(tklo) )&
+	        									& / ( agrid(tkhi) -agrid(tklo) )
 		ENDDO
 		ENDDO
 		ENDDO
@@ -5429,10 +5449,11 @@ SUBROUTINE FIND_DBN_Transition()
 		! print*, ' Discretizing Policy Functions Completed'
 
 		! Probablities are adjusted to lie in [0,1]
-			PrAprimelo = min(PrAprimelo, 1.0_DP)
-			PrAprimelo = max(PrAprimelo, 0.0_DP)
-			PrAprimehi = min(PrAprimehi, 1.0_DP)
-			PrAprimehi = max(PrAprimehi, 0.0_DP)
+		PrAprimelo = min(PrAprimelo, 1.0_DP); PrAprimelo = max(PrAprimelo, 0.0_DP)
+		PrAprimehi = min(PrAprimehi, 1.0_DP); PrAprimehi = max(PrAprimehi, 0.0_DP)
+
+		PrBqlo = min(PrBqlo, 1.0_DP); PrBqlo = max(PrBqlo, 0.0_DP)
+		PrBqhi = min(PrBqhi, 1.0_DP); PrBqhi = max(PrBqhi, 0.0_DP)
 
 
 		! Everyone in MaxAge dies. Those who die, switch to z2, lambda2 and start at ne/2+1 and x=1
@@ -5445,14 +5466,12 @@ SUBROUTINE FIND_DBN_Transition()
 	    DO e1=1, ne
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN1(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
-	           		& DBN1(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1 ) + &
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
-	            DBN1(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
-	           		& DBN1(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1 ) + &
-	           		&  DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN1(1,Bqlo(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1 ,1)   =  &
+	           		& DBN1(1,Bqlo(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1) + DBN_tr(age1,a1,z1,lambda1,e1,x1,ti) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN1(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1 ,1)   =  &
+	           		& DBN1(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1) + DBN_tr(age1,a1,z1,lambda1,e1,x1,ti) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	    ENDDO
@@ -5473,14 +5492,12 @@ SUBROUTINE FIND_DBN_Transition()
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN1(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
-	           		& DBN1(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1 ) + &
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
-	            DBN1(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
-	           		& DBN1(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1 ) + &
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN1(1,Bqlo(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1 ,1)   =  &
+	           		& DBN1(1,Bqlo(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1) + DBN_tr(age1,a1,z1,lambda1,e1,x1,ti) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN1(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1 ,1)   =  &
+	           		& DBN1(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1) + DBN_tr(age1,a1,z1,lambda1,e1,x1,ti) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	        
@@ -5515,14 +5532,12 @@ SUBROUTINE FIND_DBN_Transition()
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN1(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
-	           		& DBN1(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1 ) + & 
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
-	            DBN1(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
-	           		& DBN1(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1 ) + & 
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN1(1,Bqlo(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1 ,1)   =  &
+	           		& DBN1(1,Bqlo(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1) + DBN_tr(age1,a1,z1,lambda1,e1,x1,ti) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN1(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1 ,1)   =  &
+	           		& DBN1(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1) + DBN_tr(age1,a1,z1,lambda1,e1,x1,ti) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	        
@@ -9414,17 +9429,21 @@ Function Agg_Debt_Tr(R_in)
 	real(dp)             :: Wealth
 	INTEGER :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, x1, x2
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Ap_aux, DBN_aux
-	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi
-	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi, PrBqlo, PrBqhi
+	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi, Bqlo, Bqhi
 
 	!$ call omp_set_num_threads(nz)
 
-	allocate( Ap_aux(MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( DBN_aux(MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Ap_aux(     MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( DBN_aux(    MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( PrAprimehi( MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( PrAprimelo( MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Aplo(       MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Aphi(       MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrBqlo(     MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrBqhi(     MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Bqlo(       MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( BQhi(       MaxAge,na,nz,nlambda,ne,nx) )
 
 	! Assign new interest rate to R_tr
 	R_tr(ti) = R_in 
@@ -9465,6 +9484,21 @@ Function Agg_Debt_Tr(R_in)
 	        Aphi(age,ai,zi,lambdai,ei,xi)  	   = tkhi        
 	        PrAprimelo(age,ai,zi,lambdai,ei,xi) = (agrid(tkhi) - Ap_aux(age,ai,zi,lambdai,ei,xi))/(agrid(tkhi)-agrid(tklo))
 	        PrAprimehi(age,ai,zi,lambdai,ei,xi) = (Ap_aux(age,ai,zi,lambdai,ei,xi) - agrid(tklo))/(agrid(tkhi)-agrid(tklo))
+
+        if ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Ap_aux(age,ai,zi,lambdai,ei,xi) .ge. amax) then
+            tklo =na-1
+        elseif ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Ap_aux(age,ai,zi,lambdai,ei,xi) .lt. amin) then
+            tklo = 1
+        else
+            tklo = (((1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Ap_aux(age,ai,zi,lambdai,ei,xi)-amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+        endif
+        tkhi = tklo + 1        
+        Bqlo(age,ai,zi,lambdai,ei,xi)  	= tklo
+        Bqhi(age,ai,zi,lambdai,ei,xi)  	= tkhi        
+        PrBqlo(age,ai,zi,lambdai,ei,xi) = &
+        	& ( agrid(tkhi) - (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Ap_aux(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
+        PrBqhi(age,ai,zi,lambdai,ei,xi) = &
+        	& ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Ap_aux(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
 		ENDDO
 		ENDDO
 		ENDDO
@@ -9474,10 +9508,11 @@ Function Agg_Debt_Tr(R_in)
 		! print*, ' Discretizing Policy Functions Completed'
 
 		! Probablities are adjusted to lie in [0,1]
-			PrAprimelo = min(PrAprimelo, 1.0_DP)
-			PrAprimelo = max(PrAprimelo, 0.0_DP)
-			PrAprimehi = min(PrAprimehi, 1.0_DP)
-			PrAprimehi = max(PrAprimehi, 0.0_DP)
+		PrAprimelo = min(PrAprimelo, 1.0_DP); PrAprimelo = max(PrAprimelo, 0.0_DP)
+		PrAprimehi = min(PrAprimehi, 1.0_DP); PrAprimehi = max(PrAprimehi, 0.0_DP)
+
+		PrBqlo = min(PrBqlo, 1.0_DP); PrBqlo = max(PrBqlo, 0.0_DP)
+		PrBqhi = min(PrBqhi, 1.0_DP); PrBqhi = max(PrBqhi, 0.0_DP)
 
 
 		! Everyone in MaxAge dies. Those who die, switch to z2, lambda2 and start at ne/2+1 and x=1
@@ -9490,14 +9525,12 @@ Function Agg_Debt_Tr(R_in)
 	    DO e1=1, ne
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
-	           		& DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1 ) + &
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti-1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
-	            DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1 )   =  &
-	           		& DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1 ) + &
-	           		&  DBN_tr(age1, a1, z1, lambda1, e1, x1,ti-1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN_aux(1,Bqlo(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN_aux(1,Bqlo(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1) + DBN_tr(age1,a1,z1,lambda1,e1,x1,ti-1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN_aux(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN_aux(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1) + DBN_tr(age1,a1,z1,lambda1,e1,x1,ti-1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	    ENDDO
@@ -9518,14 +9551,12 @@ Function Agg_Debt_Tr(R_in)
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + &
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti-1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
-	            DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + &
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti-1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN_aux(1,Bqlo(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN_aux(1,Bqlo(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1) + DBN_tr(age1,a1,z1,lambda1,e1,x1,ti-1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN_aux(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN_aux(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1) + DBN_tr(age1,a1,z1,lambda1,e1,x1,ti-1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	        
@@ -9560,14 +9591,12 @@ Function Agg_Debt_Tr(R_in)
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN_aux(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + & 
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti-1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1,a1,z1,lambda1,e1,x1)
-	            DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN_aux(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + & 
-	           		& DBN_tr(age1, a1, z1, lambda1, e1, x1,ti-1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN_aux(1,Bqlo(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN_aux(1,Bqlo(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1) + DBN_tr(age1,a1,z1,lambda1,e1,x1,ti-1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN_aux(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN_aux(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1) + DBN_tr(age1,a1,z1,lambda1,e1,x1,ti-1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	        
