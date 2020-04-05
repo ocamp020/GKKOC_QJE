@@ -113,7 +113,7 @@ MODULE global
 	! 1-psi controls the level of tax, and tauPL controls progressivity
 		REAL(DP) :: tauPL, psi
     ! Estate Tax
-        REAL(DP) :: tau_bq= 0.40_DP
+        REAL(DP) :: tau_bq=0.40_DP, bq_fee=0.50_dp
 
 
     ! Auxiliary variables to find wealth tax that balances the budget in experiment economy
