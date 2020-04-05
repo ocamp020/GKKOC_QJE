@@ -9842,7 +9842,7 @@ SUBROUTINE  INITIALIZE()
 
 	! Transitory investment productivity x
 		if (nx.gt.1) then
-			print*, 'X probability '
+			! print*, 'X probability '
 			xgrid = (/x_hi , x_lo , x_0/)
 			! Low z types stay in x=1 until retirement
 				pr_x(1,1,1:4,:) = 0.97_dp 
