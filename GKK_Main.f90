@@ -123,10 +123,10 @@ PROGRAM main
 		! Calibration to book value and rho_z=0.1 and x_hi=10
 		Params =[ 0.9473_dp, 0.00_dp, 0.1_dp, 0.0352_dp , 0.307_dp, 0.46_dp ] 
 		
-		beta   	= 0.9600_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+		beta   	= 0.9650_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
-		sigma_z_eps      = 0.0880_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+		sigma_z_eps      = 0.0900_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 		sigma_lambda_eps = 0.309_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
 		gamma  	=  0.4580_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
@@ -140,7 +140,7 @@ PROGRAM main
 			chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 		! Corporate Sector
-			A_C    = 0.9409_dp ! 0.9409_dp (value without estate tax)
+			A_C    = 0.9509_dp ! 0.9409_dp (value without estate tax)
 
 		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
