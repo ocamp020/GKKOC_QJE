@@ -7779,7 +7779,7 @@ SUBROUTINE COMPUTE_STATS()
 		DO ai=1,na
 		DO lambdai=1,nlambda
 		DO ei=1, ne
-		   Bequest_Wealth = Bequest_Wealth + DBN1(1, ai, zi, lambdai, ei, xi)*agrid(ai)
+		   Bequest_Wealth = Bequest_Wealth + DBN1(1, ai, zi, lambdai, ei, xi)*agrid(ai)/((1.0_dp-tau_bq)*(1.0_dp-bq_fee))
 		ENDDO
 		ENDDO
 		ENDDO    
@@ -10541,7 +10541,6 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Bequest'
 			WRITE(UNIT=19, FMT=*) 'Total_Bequest_Wealth'	, Bequest_Wealth/MeanWealth 
 			WRITE(UNIT=19, FMT=*) 'Mean_Bequest_Wealth'	    , Mean_Bequest/MeanWealth 
-			WRITE(UNIT=19, FMT=*) 'Mean_Bequest/PV_Wealth'	, Bequest_Wealth/Mean_Firm_Wealth 
 			WRITE(UNIT=19, FMT=*) 'BQ/Inc_for_90th_pct' 	, Bq_Inc(3,:)
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Labor'
@@ -10551,14 +10550,16 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Frisch_Elasticity_Av'   	, Frisch_Elasticity_2
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Taxes'
-			WRITE(UNIT=19, FMT=*) 'Tax_Rev/GDP'				, (GBAR_K+GBAR_W+GBAR_L+GBAR_C)/YBAR
-			WRITE(UNIT=19, FMT=*) 'Capital_Tax/Total_Tax'	, (GBAR_K+GBAR_W)/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+			WRITE(UNIT=19, FMT=*) 'Tax_Rev/GDP'				, (GBAR_K+GBAR_W+GBAR_L+GBAR_C+GBAR_BQ)/YBAR
+			WRITE(UNIT=19, FMT=*) 'Capital_Tax/Total_Tax'	, (GBAR_K+GBAR_W)/(GBAR_K+GBAR_W+GBAR_L+GBAR_C+GBAR_BQ)
 			WRITE(UNIT=19, FMT=*) 'Capital_Tax/_GDP'		, (GBAR_K+GBAR_W)/YBAR
-			WRITE(UNIT=19, FMT=*) 'Labor_Tax/Total_Tax'		, GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+			WRITE(UNIT=19, FMT=*) 'Labor_Tax/Total_Tax'		, GBAR_L/(GBAR_K+GBAR_W+GBAR_L+GBAR_C+GBAR_BQ)
 			WRITE(UNIT=19, FMT=*) 'Labor_Tax/GDP'			, GBAR_L/YBAR
 			WRITE(UNIT=19, FMT=*) 'Average_Labor_Tax'		, GBAR_L/Tot_Lab_Inc
-			WRITE(UNIT=19, FMT=*) 'Cons_Tax/Total_Tax'		, GBAR_C/(GBAR_K+GBAR_W+GBAR_L+GBAR_C)
+			WRITE(UNIT=19, FMT=*) 'Cons_Tax/Total_Tax'		, GBAR_C/(GBAR_K+GBAR_W+GBAR_L+GBAR_C+GBAR_BQ)
 			WRITE(UNIT=19, FMT=*) 'Cons_Tax/GDP'			, GBAR_C/YBAR
+			WRITE(UNIT=19, FMT=*) 'Estate_Tax/Total_Tax'	, GBAR_BQ/(GBAR_K+GBAR_W+GBAR_L+GBAR_C+GBAR_BQ)
+			WRITE(UNIT=19, FMT=*) 'Estate_Tax/GDP'			, GBAR_BQ/YBAR
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Public_Corporate_Sector'
 			WRITE(UNIT=19, FMT=*) 'Y_C/YBAR'				, 100.0_dp*YBAR_C/YBAR
