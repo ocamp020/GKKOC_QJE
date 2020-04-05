@@ -3784,8 +3784,8 @@ SUBROUTINE FIND_DBN_EQ_PF()
 	INTEGER:: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL   :: DBN_dist, DBN_criteria
 	real(dp)   ::BBAR, MeanWealth, brent_value
-	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, DBN2
-	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi
+	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, PrBqlo, PrBqhi, DBN2
+	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi, Bqlo, Bqhi
 	real(dp), dimension(na,nz,nx) :: YGRID_old
 
 	!$ call omp_set_num_threads(nz)
@@ -3847,6 +3847,21 @@ SUBROUTINE FIND_DBN_EQ_PF()
         Aphi(age,ai,zi,lambdai,ei,xi)  		= tkhi        
         PrAprimelo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
         PrAprimehi(age,ai,zi,lambdai,ei,xi) = ( Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+
+        if ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
+            tklo =na-1
+        elseif ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .lt. amin) then
+            tklo = 1
+        else
+            tklo = (((1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi)-amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+        endif
+        tkhi = tklo + 1        
+        Bqlo(age,ai,zi,lambdai,ei,xi)  	= tklo
+        Bqhi(age,ai,zi,lambdai,ei,xi)  	= tkhi        
+        PrBqlo(age,ai,zi,lambdai,ei,xi) = &
+        	& ( agrid(tkhi) - (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
+        PrBqhi(age,ai,zi,lambdai,ei,xi) = &
+        	& ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
 	ENDDO
 	ENDDO
 	ENDDO
@@ -3855,10 +3870,11 @@ SUBROUTINE FIND_DBN_EQ_PF()
 	ENDDO
 
 	! Probablities are adjusted to lie in [0,1]
-		PrAprimelo = min(PrAprimelo, 1.0_DP)
-		PrAprimelo = max(PrAprimelo, 0.0_DP)
-		PrAprimehi = min(PrAprimehi, 1.0_DP)
-		PrAprimehi = max(PrAprimehi, 0.0_DP)
+		PrAprimelo = min(PrAprimelo, 1.0_DP); PrAprimelo = max(PrAprimelo, 0.0_DP)
+		PrAprimehi = min(PrAprimehi, 1.0_DP); PrAprimehi = max(PrAprimehi, 0.0_DP)
+
+		PrBqlo = min(PrBqlo, 1.0_DP); PrBqlo = max(PrBqlo, 0.0_DP)
+		PrBqhi = min(PrBqhi, 1.0_DP); PrBqhi = max(PrBqhi, 0.0_DP)
 
 	! Compute distribution of assets by age and state
 		! Distribution is obtained by iterating over an initial distribution using policy functions
@@ -3878,14 +3894,15 @@ SUBROUTINE FIND_DBN_EQ_PF()
 	    DO a1=1,na
 	    DO lambda1=1,nlambda
 	    DO e1=1, ne
+	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
-	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	    ENDDO
@@ -3904,12 +3921,12 @@ SUBROUTINE FIND_DBN_EQ_PF()
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
-	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	        
@@ -3940,12 +3957,12 @@ SUBROUTINE FIND_DBN_EQ_PF()
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
-	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	        
@@ -4028,15 +4045,18 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
 	INTEGER:: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL   :: DBN_dist, DBN_criteria
 	real(dp)   :: BBAR, MeanWealth, brent_value
-	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: PrAprimelo, PrAprimehi, DBN2
-	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable :: Aplo, Aphi
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable ::  PrAprimelo, PrAprimehi, PrBqlo, PrBqhi, DBN2
+	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable ::  Aplo, Aphi, Bqlo, Bqhi
 
-	! Allocate
-	allocate( PrAprimehi( MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( PrAprimelo( MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( Aplo(       MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( Aphi(       MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( DBN2(       MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( DBN2(         MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrAprimelo(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrAprimehi(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Aplo(         MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Aphi(         MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrBqlo(   	MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrBqhi(   	MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Bqlo(         MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( BQhi(         MaxAge,na,nz,nlambda,ne,nx) )
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-07_DP
@@ -4091,6 +4111,21 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
         Aphi(age,ai,zi,lambdai,ei,xi)  		= tkhi        
         PrAprimelo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
         PrAprimehi(age,ai,zi,lambdai,ei,xi) = ( Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+
+        if ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
+            tklo =na-1
+        elseif ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .lt. amin) then
+            tklo = 1
+        else
+            tklo = (((1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi)-amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+        endif
+        tkhi = tklo + 1        
+        Bqlo(age,ai,zi,lambdai,ei,xi)  	= tklo
+        Bqhi(age,ai,zi,lambdai,ei,xi)  	= tkhi        
+        PrBqlo(age,ai,zi,lambdai,ei,xi) = &
+        	& ( agrid(tkhi) - (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
+        PrBqhi(age,ai,zi,lambdai,ei,xi) = &
+        	& ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
 	ENDDO
 	ENDDO
 	ENDDO
@@ -4099,10 +4134,11 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
 	ENDDO
 
 	! Probablities are adjusted to lie in [0,1]
-		PrAprimelo = min(PrAprimelo, 1.0_DP)
-		PrAprimelo = max(PrAprimelo, 0.0_DP)
-		PrAprimehi = min(PrAprimehi, 1.0_DP)
-		PrAprimehi = max(PrAprimehi, 0.0_DP)
+		PrAprimelo = min(PrAprimelo, 1.0_DP); PrAprimelo = max(PrAprimelo, 0.0_DP)
+		PrAprimehi = min(PrAprimehi, 1.0_DP); PrAprimehi = max(PrAprimehi, 0.0_DP)
+
+		PrBqlo = min(PrBqlo, 1.0_DP); PrBqlo = max(PrBqlo, 0.0_DP)
+		PrBqhi = min(PrBqhi, 1.0_DP); PrBqhi = max(PrBqhi, 0.0_DP)
 
 	! Compute distribution of assets by age and state
 		! Distribution is obtained by iterating over an initial distribution using policy functions
@@ -4124,12 +4160,12 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
 	    DO e1=1, ne
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
-	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	    ENDDO
@@ -4148,12 +4184,12 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
-	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	        
@@ -4184,12 +4220,12 @@ SUBROUTINE FIND_DBN_EQ_PF_Interp(YGRID_bench)
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
-	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	        
@@ -4270,8 +4306,8 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	INTEGER    :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL       :: DBN_dist, DBN_criteria, tauW_aux
 	real(dp)   :: BBAR, Wealth, brent_value
-	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, DBN2
-	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi
+	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, PrBqlo, PrBqhi, DBN2
+	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi, Bqlo, Bqhi
 	real(dp), dimension(na,nz,nx) :: YGRID_bench
 	real(dp), dimension(MaxAge, na, nz, nlambda, ne, nx) :: Aprime_aux, Cons_aux, Hours_aux 
 
@@ -4350,6 +4386,21 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
         Aphi(age,ai,zi,lambdai,ei,xi)  		= tkhi        
         PrAprimelo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
         PrAprimehi(age,ai,zi,lambdai,ei,xi) = ( Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+
+        if ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
+            tklo =na-1
+        elseif ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .lt. amin) then
+            tklo = 1
+        else
+            tklo = (((1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi)-amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+        endif
+        tkhi = tklo + 1        
+        Bqlo(age,ai,zi,lambdai,ei,xi)  	= tklo
+        Bqhi(age,ai,zi,lambdai,ei,xi)  	= tkhi        
+        PrBqlo(age,ai,zi,lambdai,ei,xi) = &
+        	& ( agrid(tkhi) - (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
+        PrBqhi(age,ai,zi,lambdai,ei,xi) = &
+        	& ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
 	ENDDO
 	ENDDO
 	ENDDO
@@ -4358,10 +4409,11 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	ENDDO
 
 	! Probablities are adjusted to lie in [0,1]
-		PrAprimelo = min(PrAprimelo, 1.0_DP)
-		PrAprimelo = max(PrAprimelo, 0.0_DP)
-		PrAprimehi = min(PrAprimehi, 1.0_DP)
-		PrAprimehi = max(PrAprimehi, 0.0_DP)
+		PrAprimelo = min(PrAprimelo, 1.0_DP); PrAprimelo = max(PrAprimelo, 0.0_DP)
+		PrAprimehi = min(PrAprimehi, 1.0_DP); PrAprimehi = max(PrAprimehi, 0.0_DP)
+
+		PrBqlo = min(PrBqlo, 1.0_DP); PrBqlo = max(PrBqlo, 0.0_DP)
+		PrBqhi = min(PrBqhi, 1.0_DP); PrBqhi = max(PrBqhi, 0.0_DP)
 
 	! Compute distribution of assets by age and state
 		! Distribution is obtained by iterating over an initial distribution using policy functions
@@ -4383,12 +4435,12 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	    DO e1=1, ne
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
-	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	    ENDDO
@@ -4407,12 +4459,12 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
-	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	        
@@ -4443,12 +4495,12 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
-	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	        
@@ -4630,8 +4682,26 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 			        tkhi = tklo + 1        
 			        Aplo(age,ai,zi,lambdai,ei,xi)  		= tklo
 			        Aphi(age,ai,zi,lambdai,ei,xi)  		= tkhi        
-			        PrAprimelo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
-			        PrAprimehi(age,ai,zi,lambdai,ei,xi) = ( Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+			        PrAprimelo(age,ai,zi,lambdai,ei,xi) = &
+			        	& ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
+			        PrAprimehi(age,ai,zi,lambdai,ei,xi) = &
+			        	& ( Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+
+			        if ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
+			            tklo =na-1
+			        elseif ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .lt. amin) then
+			            tklo = 1
+			        else
+			            tklo = (((1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi)-amin)/(amax-amin))&
+			            	&**(1.0_DP/a_theta)*(na-1)+1          
+			        endif
+			        tkhi = tklo + 1        
+			        Bqlo(age,ai,zi,lambdai,ei,xi)  	= tklo
+			        Bqhi(age,ai,zi,lambdai,ei,xi)  	= tkhi        
+			        PrBqlo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi)-(1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) )&
+			        									& / ( agrid(tkhi) -agrid(tklo) )
+			        PrBqhi(age,ai,zi,lambdai,ei,xi) = ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi)-agrid(tklo) )&
+			        									&  / ( agrid(tkhi) -agrid(tklo) )
 				ENDDO
 				ENDDO
 				ENDDO
@@ -4640,10 +4710,11 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 				ENDDO
 	
 	        ! Probablities are adjusted to lie in [0,1]
-		        PrAprimelo = min(PrAprimelo, 1.0_DP)
-		        PrAprimelo = max(PrAprimelo, 0.0_DP)
-		        PrAprimehi = min(PrAprimehi, 1.0_DP)
-		        PrAprimehi = max(PrAprimehi, 0.0_DP)  
+					PrAprimelo = min(PrAprimelo, 1.0_DP); PrAprimelo = max(PrAprimelo, 0.0_DP)
+					PrAprimehi = min(PrAprimehi, 1.0_DP); PrAprimehi = max(PrAprimehi, 0.0_DP)
+
+					PrBqlo = min(PrBqlo, 1.0_DP); PrBqlo = max(PrBqlo, 0.0_DP)
+					PrBqhi = min(PrBqhi, 1.0_DP); PrBqhi = max(PrBqhi, 0.0_DP) 
 
 		    ! Reset counter for next update of policy functions
 	        iter_indx=0
@@ -4668,8 +4739,8 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 	INTEGER:: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL   :: DBN_dist, DBN_criteria
 	real(dp)   ::BBAR, Wealth, brent_value
-	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, DBN2
-	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi
+	REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: PrAprimelo, PrAprimehi, PrBqlo, PrBqhi, DBN2
+	INTEGER,  DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: Aplo, Aphi, Bqlo, Bqhi
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.0E-07_DP
@@ -4713,6 +4784,21 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
         Aphi(age,ai,zi,lambdai,ei,xi)  		= tkhi        
         PrAprimelo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
         PrAprimehi(age,ai,zi,lambdai,ei,xi) = ( Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+
+        if ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
+            tklo =na-1
+        elseif ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .lt. amin) then
+            tklo = 1
+        else
+            tklo = (((1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi)-amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+        endif
+        tkhi = tklo + 1        
+        Bqlo(age,ai,zi,lambdai,ei,xi)  	= tklo
+        Bqhi(age,ai,zi,lambdai,ei,xi)  	= tkhi        
+        PrBqlo(age,ai,zi,lambdai,ei,xi) = &
+        	& ( agrid(tkhi) - (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
+        PrBqhi(age,ai,zi,lambdai,ei,xi) = &
+        	& ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
 	ENDDO
 	ENDDO
 	ENDDO
@@ -4721,10 +4807,11 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 	ENDDO
 
 	! Probablities are adjusted to lie in [0,1]
-		PrAprimelo = min(PrAprimelo, 1.0_DP)
-		PrAprimelo = max(PrAprimelo, 0.0_DP)
-		PrAprimehi = min(PrAprimehi, 1.0_DP)
-		PrAprimehi = max(PrAprimehi, 0.0_DP)
+		PrAprimelo = min(PrAprimelo, 1.0_DP); PrAprimelo = max(PrAprimelo, 0.0_DP)
+		PrAprimehi = min(PrAprimehi, 1.0_DP); PrAprimehi = max(PrAprimehi, 0.0_DP)
+
+		PrBqlo = min(PrBqlo, 1.0_DP); PrBqlo = max(PrBqlo, 0.0_DP)
+		PrBqhi = min(PrBqhi, 1.0_DP); PrBqhi = max(PrBqhi, 0.0_DP)
 
 	! Compute distribution of assets by age and state
 		! Distribution is obtained by iterating over an initial distribution using policy functions
@@ -4746,12 +4833,12 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 	    DO e1=1, ne
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
-	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	    ENDDO
@@ -4770,12 +4857,12 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
-	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	        
@@ -4806,12 +4893,12 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aplo(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrAprimelo(age1, a1, z1, lambda1, e1, x1)
-	            DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2,lambda2,ne/2+1 , 1)   =  &
-	           		& DBN2(1,Aphi(age1, a1, z1, lambda1, e1,x1), z2, lambda2, ne/2+1, 1) + DBN1(age1, a1, z1, lambda1, e1, x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2)*pr_lambda(lambda1,lambda2)    *  PrAprimehi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
 	        
@@ -4980,6 +5067,22 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 			        Aphi(age,ai,zi,lambdai,ei,xi)  		= tkhi        
 			        PrAprimelo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
 			        PrAprimehi(age,ai,zi,lambdai,ei,xi) = ( Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+
+			        if ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
+			            tklo =na-1
+			        elseif ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .lt. amin) then
+			            tklo = 1
+			        else
+			            tklo = (((1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi)-amin)/(amax-amin))&
+			            	&**(1.0_DP/a_theta)*(na-1)+1          
+			        endif
+			        tkhi = tklo + 1        
+			        Bqlo(age,ai,zi,lambdai,ei,xi)  	= tklo
+			        Bqhi(age,ai,zi,lambdai,ei,xi)  	= tkhi        
+			        PrBqlo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi)-(1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) )&
+			        									& / ( agrid(tkhi) -agrid(tklo) )
+			        PrBqhi(age,ai,zi,lambdai,ei,xi) = ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi)-agrid(tklo) )&
+			        									&  / ( agrid(tkhi) -agrid(tklo) )
 				ENDDO
 				ENDDO
 				ENDDO
@@ -4988,10 +5091,11 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 				ENDDO
 	
 	        ! Probablities are adjusted to lie in [0,1]
-		        PrAprimelo = min(PrAprimelo, 1.0_DP)
-		        PrAprimelo = max(PrAprimelo, 0.0_DP)
-		        PrAprimehi = min(PrAprimehi, 1.0_DP)
-		        PrAprimehi = max(PrAprimehi, 0.0_DP)  
+					PrAprimelo = min(PrAprimelo, 1.0_DP); PrAprimelo = max(PrAprimelo, 0.0_DP)
+					PrAprimehi = min(PrAprimehi, 1.0_DP); PrAprimehi = max(PrAprimehi, 0.0_DP)
+
+					PrBqlo = min(PrBqlo, 1.0_DP); PrBqlo = max(PrBqlo, 0.0_DP)
+					PrBqhi = min(PrBqhi, 1.0_DP); PrBqhi = max(PrBqhi, 0.0_DP)   
 
 		    ! Reset counter for next update of policy functions
 	        iter_indx=0
