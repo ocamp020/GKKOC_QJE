@@ -136,7 +136,7 @@ PROGRAM main
 
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 			bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
-			chi_u  = 04.00    ! Scaling 03.55_dp (value without estate tax)
+			chi_u  = 02.00    ! Scaling 03.55_dp (value without estate tax)
 			chi_bq = chi_u*(1-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 		! Corporate Sector
@@ -193,12 +193,12 @@ PROGRAM main
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 		print*,' '; print*,'----------------------------------------------------------------------------------'
 		print*, "Results are stored in directory: ", Result_Folder
-		print*,'na=',na,'update_period=',update_period,"NSU_Switch=",NSU_Switch
-		print '(A,F7.4,X,A,F7.4,X,A,F7.4)','Utility parameters:  sigma=',sigma,'gamma=',gamma,'phi',phi
-		print '(A,F7.4,X,A,F7.4)','Labor Taxes: tauPl=',tauPl,'psi',psi
-		print '(A,F7.4,X)', 'Borrowing Constraint: Theta=',theta
-		print '(A,F7.3,X,A,I3,X,A,F7.3,X,A,I7)', 'm tauchen for zgrid is ',mtauchen_z,'nz=',nz, 'amax=',amax, 'totpop=', totpop
-		print '(A,F7.4,X,A,F7.4,X,A,F7.4,X,A,F7.4)', 'x_hi', x_hi, 'a_x', a_x, 'b_x', b_x, 'sigmaz', sigma_z_eps
+		print*,'	na=',na,'update_period=',update_period,"NSU_Switch=",NSU_Switch
+		print '(A,F7.4,X,A,F7.4,X,A,F7.4)','	Utility parameters:  sigma=',sigma,'gamma=',gamma,'phi',phi
+		print '(A,F7.4,X,A,F7.4)','	Labor Taxes: tauPl=',tauPl,'psi',psi
+		print '(A,F7.3,X,F7.3,X,F7.3,X,F7.3,X,F7.3,X,F7.3,X,F7.3,X,F7.3,X,F7.3)', '	Borrowing Constraint: Theta=',theta
+		print '(A,F7.3,X,A,I3,X,A,F11.2,X,A,I10)', '	m tauchen for zgrid is ',mtauchen_z,'nz=',nz, 'amax=',amax, 'totpop=', totpop
+		print '(A,F7.4,X,A,F7.4,X,A,F7.4,X,A,F7.4)', '	x_hi', x_hi, 'a_x', a_x, 'b_x', b_x, 'sigmaz', sigma_z_eps
 		print*,'----------------------------------------------------------------------------------'; print*,' '
 
 
