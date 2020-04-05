@@ -166,7 +166,7 @@ MODULE global
     REAL(DP) :: Frisch_Elasticity, Size_Frisch, Hours_Frisch, Frisch_Elasticity_2
 
     ! Extra tax information
-    REAL(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, GBAR_BQ Tot_Lab_Inc, Tot_Cap_Inc
+    REAL(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, GBAR_BQ, Tot_Lab_Inc, Tot_Cap_Inc
 
     ! Transition 
     LOGICAL :: Use_Transition_Seed
