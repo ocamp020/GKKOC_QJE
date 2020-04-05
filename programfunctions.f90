@@ -9869,11 +9869,11 @@ SUBROUTINE  INITIALIZE()
 				! xz_grid = spread(zgrid,1,nx)*spread(xgrid,2,nz)
 				! xz_grid(1,:)   = zgrid 	; xz_grid(2,1:3) = zgrid(1:3)	;	xz_grid(2,4:)  = zgrid(4)
 				! xz_grid(1,:) = zgrid; xz_grid(2,:) = 0.00_dp*zgrid
-				print*, ' xgrid', xgrid
-				print*, ' zgrid', zgrid 
-				do xi=1,nx
-				print*, 'xzgrid', xz_grid(xi,:)
-				enddo
+				! print*, ' xgrid', xgrid
+				! print*, ' zgrid', zgrid 
+				! do xi=1,nx
+				! print*, 'xzgrid', xz_grid(xi,:)
+				! enddo
 				! print*, 'xgrid error'
 				! STOP 
 		else 
@@ -10124,7 +10124,7 @@ SUBROUTINE  INITIALIZE()
 		ENDDO
 		ENDDO
 		ENDDO  
-		print*,'Initial Distrbution', sum(DBN1)
+		! print*,'Initial Distrbution', sum(DBN1)
 		DBN1 = DBN1/sum(DBN1)
 
 	CALL LIFETIME_Y_ESTIMATE
