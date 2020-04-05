@@ -7909,13 +7909,12 @@ SUBROUTINE COMPUTE_STATS()
 		do ai=1,MaxAge
 			DBN_bq(ai,:,:,:,:,:) = DBN1(ai,:,:,:,:,:)*(1.0_DP-survP(ai))
 		enddo 
+		DBN_bq = DBN_bq/sum(DBN_bq)
 
 		! Vectorizations
 		DBN_bq_vec        = reshape(DBN_bq      ,(/size(DBN1)/)); 
 		BQ_vec            = reshape(Aprime      ,(/size(DBN1)/)); 
 		Inc_vec 		  = reshape(Total_Income,(/size(DBN1)/)); 
-		print*,'Bequest test=', Bequest_Wealth, sum(BQ_vec*DBN_bq_vec)
-		DBN_bq = DBN_bq/sum(DBN_bq)
 
 		! Mean Bequest
 		Mean_Bequest      = sum(BQ_vec*DBN_bq_vec)
