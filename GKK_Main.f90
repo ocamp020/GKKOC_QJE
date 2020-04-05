@@ -126,7 +126,7 @@ PROGRAM main
 		beta   	= 0.9475_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		rho_z  	= 0.1_dp ! params(3) 
-		sigma_z_eps      =  0.0867_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+		sigma_z_eps      = 0.0867_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 		sigma_lambda_eps = 0.309_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
 		gamma  	=  0.4580_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
@@ -136,7 +136,7 @@ PROGRAM main
 
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 			bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
-			chi_u  = 05.92    ! Scaling 03.55_dp (value without estate tax)
+			chi_u  = 05.02    ! Scaling 03.55_dp (value without estate tax)
 			chi_bq = chi_u*(1-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 		! Corporate Sector
