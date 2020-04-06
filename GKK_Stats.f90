@@ -3219,38 +3219,38 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN (UNIT=27, FILE=trim(bench_folder)//'L_P'    , STATUS='old', ACTION='read')		
 		OPEN (UNIT=28, FILE=trim(bench_folder)//'K_P'    , STATUS='old', ACTION='read')		
 
-		READ (UNIT=1,  FMT=*), cons
-		READ (UNIT=2,  FMT=*), aprime
-		READ (UNIT=3,  FMT=*), hours
-		READ (UNIT=4,  FMT=*), ValueFunction
-		READ (UNIT=70, FMT=*), Bq_Value
-		READ (UNIT=5,  FMT=*), DBN1 
-		READ (UNIT=60, FMT=*), GBAR 
-		READ (UNIT=7,  FMT=*), EBAR
-		READ (UNIT=8,  FMT=*), NBAR
-		READ (UNIT=9,  FMT=*), QBAR
-		READ (UNIT=10, FMT=*), P
-		READ (UNIT=11, FMT=*), R
-		READ (UNIT=12, FMT=*), wage 
-		READ (UNIT=13, FMT=*), YBAR
+		READ (UNIT=1,  FMT=*) cons
+		READ (UNIT=2,  FMT=*) aprime
+		READ (UNIT=3,  FMT=*) hours
+		READ (UNIT=4,  FMT=*) ValueFunction
+		READ (UNIT=70, FMT=*) Bq_Value
+		READ (UNIT=5,  FMT=*) DBN1 
+		READ (UNIT=60, FMT=*) GBAR 
+		READ (UNIT=7,  FMT=*) EBAR
+		READ (UNIT=8,  FMT=*) NBAR
+		READ (UNIT=9,  FMT=*) QBAR
+		READ (UNIT=10, FMT=*) P
+		READ (UNIT=11, FMT=*) R
+		READ (UNIT=12, FMT=*) wage 
+		READ (UNIT=13, FMT=*) YBAR
 
-		READ (UNIT=14, FMT=*), tauK
-		READ (UNIT=15, FMT=*), tauPL
-		READ (UNIT=16, FMT=*), psi
-		READ (UNIT=17, FMT=*), tauW_bt
-		READ (UNIT=18, FMT=*), tauW_at
+		READ (UNIT=14, FMT=*) tauK
+		READ (UNIT=15, FMT=*) tauPL
+		READ (UNIT=16, FMT=*) psi
+		READ (UNIT=17, FMT=*) tauW_bt
+		READ (UNIT=18, FMT=*) tauW_at
 
-		READ (UNIT=19, FMT=*), V_Pr
-		! READ (UNIT=20, FMT=*), V_Pr_nb
-		READ (UNIT=21, FMT=*), SSC_Payments
-		READ (UNIT=22, FMT=*), Income_AT
+		READ (UNIT=19, FMT=*) V_Pr
+		! READ (UNIT=20, FMT=*) V_Pr_nb
+		READ (UNIT=21, FMT=*) SSC_Payments
+		READ (UNIT=22, FMT=*) Income_AT
 
-		READ (UNIT=23, FMT=*), YBAR_C
-		READ (UNIT=24, FMT=*), L_C
-		READ (UNIT=25, FMT=*), K_C
-		READ (UNIT=26, FMT=*), YBAR_P
-		READ (UNIT=27, FMT=*), L_P
-		READ (UNIT=28, FMT=*), K_P
+		READ (UNIT=23, FMT=*) YBAR_C
+		READ (UNIT=24, FMT=*) L_C
+		READ (UNIT=25, FMT=*) K_C
+		READ (UNIT=26, FMT=*) YBAR_P
+		READ (UNIT=27, FMT=*) L_P
+		READ (UNIT=28, FMT=*) K_P
 
 		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=70); CLOSE (unit=5)
 		CLOSE (unit=60); CLOSE (unit=7); CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10)
@@ -3372,34 +3372,34 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN (UNIT=26, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_L_P' 	, STATUS='old', ACTION='read')
 		OPEN (UNIT=27, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_K_P' 	, STATUS='old', ACTION='read')
 
-		READ (UNIT=1,  FMT=*), cons
-		READ (UNIT=2,  FMT=*), aprime
-		READ (UNIT=3,  FMT=*), hours
-		READ (UNIT=4,  FMT=*), ValueFunction
-		READ (UNIT=70, FMT=*), Bq_Value
-		READ (UNIT=5,  FMT=*), DBN1 
-		READ (UNIT=60, FMT=*), GBAR 
-		READ (UNIT=7,  FMT=*), EBAR
-		READ (UNIT=8,  FMT=*), NBAR
-		READ (UNIT=9,  FMT=*), QBAR
-		READ (UNIT=10, FMT=*), P
-		READ (UNIT=11, FMT=*), R
-		READ (UNIT=12, FMT=*), wage 
-		READ (UNIT=13, FMT=*), YBAR
-		READ (UNIT=14, FMT=*), tauK
-		READ (UNIT=15, FMT=*), psi
-		READ (UNIT=16, FMT=*), tauPL
-		READ (UNIT=17, FMT=*), tauW_bt
-		READ (UNIT=18, FMT=*), tauW_at
-		READ (UNIT=19, FMT=*), V_Pr
-		READ (UNIT=20, FMT=*), V_Pr_nb
-		READ (UNIT=21, FMT=*), Income_AT
-		READ (UNIT=22, FMT=*), YBAR_C 
-		READ (UNIT=23, FMT=*), L_C 
-		READ (UNIT=24, FMT=*), K_C 
-		READ (UNIT=25, FMT=*), YBAR_P
-		READ (UNIT=26, FMT=*), L_P 
-		READ (UNIT=27, FMT=*), K_P 
+		READ (UNIT=1,  FMT=*) cons
+		READ (UNIT=2,  FMT=*) aprime
+		READ (UNIT=3,  FMT=*) hours
+		READ (UNIT=4,  FMT=*) ValueFunction
+		READ (UNIT=70, FMT=*) Bq_Value
+		READ (UNIT=5,  FMT=*) DBN1 
+		READ (UNIT=60, FMT=*) GBAR 
+		READ (UNIT=7,  FMT=*) EBAR
+		READ (UNIT=8,  FMT=*) NBAR
+		READ (UNIT=9,  FMT=*) QBAR
+		READ (UNIT=10, FMT=*) P
+		READ (UNIT=11, FMT=*) R
+		READ (UNIT=12, FMT=*) wage 
+		READ (UNIT=13, FMT=*) YBAR
+		READ (UNIT=14, FMT=*) tauK
+		READ (UNIT=15, FMT=*) psi
+		READ (UNIT=16, FMT=*) tauPL
+		READ (UNIT=17, FMT=*) tauW_bt
+		READ (UNIT=18, FMT=*) tauW_at
+		READ (UNIT=19, FMT=*) V_Pr
+		READ (UNIT=20, FMT=*) V_Pr_nb
+		READ (UNIT=21, FMT=*) Income_AT
+		READ (UNIT=22, FMT=*) YBAR_C 
+		READ (UNIT=23, FMT=*) L_C 
+		READ (UNIT=24, FMT=*) K_C 
+		READ (UNIT=25, FMT=*) YBAR_P
+		READ (UNIT=26, FMT=*) L_P 
+		READ (UNIT=27, FMT=*) K_P 
 		print*, "Reading of experimental results completed"; print*, ' '
 	endif 
 
