@@ -589,6 +589,11 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 		Wealth_factor = Y_a_threshold/W_bench
 
+		! Wealth tax: minimum wealth tax to consider and increments for balancing budget
+		tauWmin_bt=0.00_DP
+		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
+		tauWmin_at=0.008_DP
+		tauWinc_at=0.002_DP ! Minimum tax above threshold and increments
 		if (KeepSSatBench .eq. 0) then
 		tauWmin_at = 0.015_dp
 		tauWinc_at = 0.002_dp
