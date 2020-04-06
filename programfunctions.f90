@@ -3881,18 +3881,18 @@ SUBROUTINE FIND_DBN_Transition()
 			OPEN (UNIT=3,  FILE=trim(Result_Folder)//'R_tr'		 , STATUS='old', ACTION='read')
 			OPEN (UNIT=4,  FILE=trim(Result_Folder)//'Debt_SS' 	 , STATUS='old', ACTION='read')
 			OPEN (UNIT=5,  FILE=trim(Result_Folder)//'DBN_SS' 	 , STATUS='old', ACTION='read')
-			READ (UNIT=1,  FMT=*), QBAR_tr
-			READ (UNIT=3,  FMT=*), R_tr
-			READ (UNIT=4,  FMT=*), Debt_SS
-			READ (UNIT=5,  FMT=*), DBN1
+			READ (UNIT=1,  FMT=*) QBAR_tr
+			READ (UNIT=3,  FMT=*) R_tr
+			READ (UNIT=4,  FMT=*) Debt_SS
+			READ (UNIT=5,  FMT=*) DBN1
 			CLOSE (unit=1); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=5);
 
 			if (A_C.gt.0.0_dp) then 
 			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
-			READ (UNIT=2,  FMT=*), NBAR_tr
+			READ (UNIT=2,  FMT=*) NBAR_tr
 			else
 			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'Wage_tr'	 , STATUS='old', ACTION='read')
-			READ (UNIT=2,  FMT=*), wage_tr
+			READ (UNIT=2,  FMT=*) wage_tr
 			endif 
 			CLOSE (unit=2); 
 			print*, 'Reading completed'
