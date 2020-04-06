@@ -1912,9 +1912,9 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		OPEN (UNIT=1,  FILE=trim(Bench_Simul_Folder)//'Life_Cycle_a_panel_bench.txt'  , STATUS='old', ACTION='read')
 		OPEN (UNIT=2,  FILE=trim(Bench_Simul_Folder)//'Life_Cycle_x_panel_bench.txt'  , STATUS='old', ACTION='read')
 		OPEN (UNIT=3,  FILE=trim(Bench_Simul_Folder)//'Life_Cycle_d_panel_bench.txt'  , STATUS='old', ACTION='read')
-			READ (UNIT=1,  FMT=*), Panel_a_ben
-			READ (UNIT=2,  FMT=*), Panel_x_ben 
-			READ (UNIT=3,  FMT=*), Panel_d_ben 
+			READ (UNIT=1,  FMT=*) Panel_a_ben
+			READ (UNIT=2,  FMT=*) Panel_x_ben 
+			READ (UNIT=3,  FMT=*) Panel_d_ben 
 		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
 
 		print*, 'Starting Simutime loop for benchmark counterfactual'

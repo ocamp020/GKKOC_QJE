@@ -97,18 +97,18 @@ Program GKK_Simul
   OPEN  (UNIT=11, FILE=trim(Result_Folder)//'Exp_results_wage'  , STATUS='old', ACTION='read')
   OPEN  (UNIT=12, FILE=trim(Result_Folder)//'Exp_results_YBAR'  , STATUS='old', ACTION='read')
 
-  READ (UNIT=1,  FMT=*), Cons
-  READ (UNIT=2,  FMT=*), aprime
-  READ (UNIT=3,  FMT=*), hours
-  READ (UNIT=4,  FMT=*), ValueFunction
-  READ (UNIT=5,  FMT=*), DBN1
-  READ (UNIT=60, FMT=*), GBAR
-  READ (UNIT=7,  FMT=*), EBAR
-  READ (UNIT=8,  FMT=*), NBAR
-  READ (UNIT=9,  FMT=*), QBAR
-  READ (UNIT=10, FMT=*), rr
-  READ (UNIT=11, FMT=*), wage
-  READ (UNIT=12, FMT=*), YBAR
+  READ (UNIT=1,  FMT=*) Cons
+  READ (UNIT=2,  FMT=*) aprime
+  READ (UNIT=3,  FMT=*) hours
+  READ (UNIT=4,  FMT=*) ValueFunction
+  READ (UNIT=5,  FMT=*) DBN1
+  READ (UNIT=60, FMT=*) GBAR
+  READ (UNIT=7,  FMT=*) EBAR
+  READ (UNIT=8,  FMT=*) NBAR
+  READ (UNIT=9,  FMT=*) QBAR
+  READ (UNIT=10, FMT=*) rr
+  READ (UNIT=11, FMT=*) wage
+  READ (UNIT=12, FMT=*) YBAR
 
   CLOSE (unit=1)
   CLOSE (unit=2)

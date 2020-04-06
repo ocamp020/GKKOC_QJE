@@ -4080,7 +4080,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 		print*,'---------------------------------------------------'
 		! Read Tax
 			! OPEN (UNIT=4,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='old', ACTION='read')
-			! READ (UNIT=4,  FMT=*), tauW_at
+			! READ (UNIT=4,  FMT=*) tauW_at
 			! CLOSE(unit=4)
 			! R=   1.9480499900981853E-002 
 			! P=  0.13847606093758086 
@@ -4426,10 +4426,10 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 				OPEN (UNIT=2,  FILE=trim(Result_Folder)//'tauK_tr'	 , STATUS='old', ACTION='read')
 				OPEN (UNIT=3,  FILE=trim(Result_Folder)//'tauL_tr'	 , STATUS='old', ACTION='read')
 				OPEN (UNIT=4,  FILE=trim(Result_Folder)//'tauW_at_tr', STATUS='old', ACTION='read')
-				READ (UNIT=1,  FMT=*), tauC
-				READ (UNIT=2,  FMT=*), tauK
-				READ (UNIT=3,  FMT=*), psi
-				READ (UNIT=4,  FMT=*), tauW_at
+				READ (UNIT=1,  FMT=*) tauC
+				READ (UNIT=2,  FMT=*) tauK
+				READ (UNIT=3,  FMT=*) psi
+				READ (UNIT=4,  FMT=*) tauW_at
 				CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4);
 				print*, '	Reading completed'; print*, ' '
 
