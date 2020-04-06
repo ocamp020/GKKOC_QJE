@@ -424,6 +424,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -567,6 +568,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -778,6 +780,7 @@ Subroutine Find_Capital_and_Wealth_Tax(compute_exp,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -859,6 +862,7 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -1027,6 +1031,7 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -1235,6 +1240,7 @@ Subroutine Solve_Experiment_Fixed_PF_Interp (compute_exp_pf_interp,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -1449,6 +1455,7 @@ Subroutine Solve_Experiment_Fixed_PF_Prices(compute_exp_prices,Simul_Switch)
 	use parameters
 	use global 
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -1625,6 +1632,7 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 	use parameters
 	use global 
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -1814,6 +1822,7 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 	use parameters
 	use global 
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -1956,6 +1965,7 @@ Subroutine Solve_Tax_Reform_Decomposition
 	use parameters
 	use global 
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -2043,6 +2053,7 @@ Subroutine Solve_Interpolated_Economy(YGRID_exp)
 	use parameters
 	use global 
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -2143,6 +2154,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	use Opt_Tax_Parameters
 	use Opt_Tax_Functions
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -2461,6 +2473,7 @@ Subroutine Solve_Opt_Tax_K_and_W(Simul_Switch)
 	use Opt_Tax_Parameters
 	use Opt_Tax_Functions
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -2665,6 +2678,7 @@ Subroutine Solve_Opt_Threshold
 	use Opt_Tax_Functions
 	use Simulation_Module
 	use programfunctions
+	use GKK_Stats
 	use Toolbox
 	use omp_lib
 	implicit none 
@@ -2990,6 +3004,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 	use Opt_Tax_Functions
 	use Simulation_Module
 	use programfunctions
+	use GKK_Stats
 	use Toolbox
 	use omp_lib
 	implicit none 
@@ -3385,6 +3400,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 	use Opt_Tax_Functions
 	use Simulation_Module
 	use programfunctions
+	use GKK_Stats
 	use Toolbox
 	use omp_lib
 	implicit none 
@@ -3878,6 +3894,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	use parameters
 	use global 
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -4161,6 +4178,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 	use parameters
 	use global 
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
