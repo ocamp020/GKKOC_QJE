@@ -30,6 +30,7 @@ PROGRAM main
 	USE parameters
 	USE GLOBAL
 	use programfunctions
+	use GKK_Stats
 	use Simulation_Module
 	use Toolbox
 	use omp_lib
@@ -64,8 +65,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
-			compute_exp   = .true.
+			compute_bench = .false.
+			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .true.
