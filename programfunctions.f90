@@ -10642,7 +10642,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'R'		, 100.0_dp*R
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'After Tax Prices'
-			WRITE(UNIT=19, FMT=*) 'R_AT' 	, 100.0_dp*( (1.0_dp-tauW_at)*(1.0_dp+(1.0_dp-tauK)*R)-1.0_dp )
+			WRITE(UNIT=19, FMT=*) 'R_AT' 	, 100.0_dp*(-tauW_at+(1.0_dp-tauK)*R)
 			WRITE(UNIT=19, FMT=*) 'wage_AT' , psi*wage
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Moments:'
