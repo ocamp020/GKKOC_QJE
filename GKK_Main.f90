@@ -135,7 +135,7 @@ PROGRAM main
 		phi    	= (1.0_dp-gamma)/gamma
 
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
-			bq_0   = 00.50_dp ! Level shift 00.30_dp (value without estate tax)
+			bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
 			chi_u  = 00.10_dp ! Scaling 03.55_dp (value without estate tax)
 			chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
