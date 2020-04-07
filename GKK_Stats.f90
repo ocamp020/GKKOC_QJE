@@ -1371,7 +1371,7 @@ SUBROUTINE COMPUTE_STATS()
 		& Tax_Rate_Increase_tk_draft_group, Tax_Rate_Increase_tl_draft_group, Tax_Rate_Increase_draft_group, &
 		& Inc_Increase_draft_group, K_Inc_Increase_draft_group, L_Inc_Increase_draft_group, &
 		& Return_draft_group, Return_AT_draft_group, &
-		& Entrepreneur_10_draft_group_z, Entrepreneur_50_draft_group_z
+		& Entrepreneur_10_draft_group, Entrepreneur_50_draft_group
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
