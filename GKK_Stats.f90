@@ -1354,7 +1354,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(draft_age_category,nz) :: size_draft_group_z, wealth_draft_group_z, capital_draft_group_z, &
 		& Cons_draft_group_z, Hours_draft_group_z, Ap_draft_group_z, & 
 		& K_Tax_draft_group_z, L_Tax_draft_group_z, K_Tax_Inc_draft_group_z, L_Tax_Inc_draft_group_z, &
-		& T_Inc_draft_group_z, K_Inc_draft_group_z, L_Inc_draft_group_z, K_Inc_frac_draft_group_z, L_Inc_frac_draft_group_z, &
+		& T_Inc_draft_group_z, K_Inc_draft_group_z, L_Inc_draft_group_z, av_K_Inc_draft_group_z, av_L_Inc_draft_group_z, &
 		&      Tax_Increase_tk_draft_group_z,      Tax_Increase_tl_draft_group_z,      Tax_Increase_draft_group_z, &
 		& Tax_Rate_Increase_tk_draft_group_z, Tax_Rate_Increase_tl_draft_group_z, Tax_Rate_Increase_draft_group_z, & 
 		& Inc_Increase_draft_group_z, K_Inc_Increase_draft_group_z, L_Inc_Increase_draft_group_z, &
@@ -1365,7 +1365,7 @@ SUBROUTINE COMPUTE_STATS()
 		& capital_draft_group,  av_capital_draft_group, frac_capital_draft_group, &
 		& cons_draft_group, hours_draft_group, Ap_draft_group,  av_Ap_draft_group, frac_Ap_draft_group, &
 		& K_Tax_draft_group, L_Tax_draft_group, K_Tax_Inc_draft_group, L_Tax_Inc_draft_group, &
-		& T_Inc_draft_group, K_Inc_draft_group, L_Inc_draft_group, K_Inc_frac_draft_group, L_Inc_frac_draft_group, &
+		& T_Inc_draft_group, K_Inc_draft_group, L_Inc_draft_group, av_K_Inc_draft_group, av_L_Inc_draft_group, &
 		& frac_K_Tax_draft_group, frac_L_Tax_draft_group, frac_K_Inc_draft_group, frac_L_Inc_draft_group, &
 		& Tax_Increase_tk_draft_group, Tax_Increase_tl_draft_group, Tax_Increase_draft_group, &
 		& Tax_Rate_Increase_tk_draft_group, Tax_Rate_Increase_tl_draft_group, Tax_Rate_Increase_draft_group, &
@@ -2207,10 +2207,10 @@ SUBROUTINE COMPUTE_STATS()
         		L_Inc_draft_group_z(age,zi) = L_Inc_draft_group_z(age,zi) + (L_Inc_aux 		  	  )*DBN1(age2,ai,zi,lambdai,ei,xi)
 
         		! Fraction of capital and labor income by agent (averaged)
-        		av_K_Inc_to_Inc_draft_group_z(age,zi) = av_K_Inc_to_Inc_draft_group_z(age,zi) + & 
+        		av_K_Inc_draft_group_z(age,zi) = av_K_Inc_draft_group_z(age,zi) + & 
 	        		& ( K_Inc_aux )/( K_Inc_aux + L_Inc_aux )*DBN1(age2,ai,zi,lambdai,ei,xi)
 
-        		av_L_Inc_to_Inc_draft_group_z(age,zi) = av_L_Inc_to_Inc_draft_group_z(age,zi) + & 
+        		av_L_Inc_draft_group_z(age,zi) = av_L_Inc_draft_group_z(age,zi) + & 
 	        		& ( L_Inc_aux )/( K_Inc_aux + L_Inc_aux )*DBN1(age2,ai,zi,lambdai,ei,xi)
 
         		! Tax by agent (capital and labor)
@@ -2292,8 +2292,8 @@ SUBROUTINE COMPUTE_STATS()
 		! Divide by mass in group
 		K_Tax_Inc_draft_group_z  = 100.0_dp*K_Tax_Inc_draft_group_z/size_draft_group_z
 		L_Tax_Inc_draft_group_z  = 100.0_dp*L_Tax_Inc_draft_group_z/size_draft_group_z
-		av_K_Inc_to_Inc_draft_group_z = 100.0_dp*av_K_Inc_to_Inc_draft_group_z/size_draft_group_z 
-		av_L_Inc_to_Inc_draft_group_z = 100.0_dp*av_L_Inc_to_Inc_draft_group_z/size_draft_group_z 
+		av_K_Inc_draft_group_z = 100.0_dp*av_K_Inc_draft_group_z/size_draft_group_z 
+		av_L_Inc_draft_group_z = 100.0_dp*av_L_Inc_draft_group_z/size_draft_group_z 
 
 		! Average return by productivity group
 		Return_draft_group_z     = 100.0_dp*   Return_draft_group_z/size_draft_group_z
@@ -2306,10 +2306,10 @@ SUBROUTINE COMPUTE_STATS()
 		L_Tax_Inc_draft_group = Draft_Table(L_Tax_Inc_draft_group_z,DBN_z,.false.)
 
 		! Capital Income Share Tax adjusted by productivity group
-		av_K_Inc_to_Inc_draft_group = Draft_Table(av_K_Inc_to_Inc_draft_group_z,DBN_z,.false.)
+		av_K_Inc_draft_group = Draft_Table(av_K_Inc_draft_group_z,DBN_z,.false.)
 
 		! Labor Income Share Tax adjusted by productivity group
-		av_L_Inc_to_Inc_draft_group = Draft_Table(av_L_Inc_to_Inc_draft_group_z,DBN_z,.false.)
+		av_L_Inc_draft_group = Draft_Table(av_L_Inc_draft_group_z,DBN_z,.false.)
 
 		! Average Return by productivity group
 		   Return_draft_group = Draft_Table(   Return_draft_group_z,DBN_z,.false.)
@@ -2349,8 +2349,8 @@ SUBROUTINE COMPUTE_STATS()
 		    WRITE  (UNIT=86, FMT=*)  L_Tax_Inc_draft_group(age,:)
 		    WRITE  (UNIT=87, FMT=*)  K_Inc_draft_group(age,:)
 		    WRITE  (UNIT=88, FMT=*)  L_Inc_draft_group(age,:)
-		    WRITE  (UNIT=89, FMT=*)  av_K_Inc_to_Inc_draft_group(age,:)
-		    WRITE  (UNIT=90, FMT=*)  av_L_Inc_to_Inc_draft_group(age,:)
+		    WRITE  (UNIT=89, FMT=*)  av_K_Inc_draft_group(age,:)
+		    WRITE  (UNIT=90, FMT=*)  av_L_Inc_draft_group(age,:)
 		    WRITE  (UNIT=91, FMT=*)  frac_K_Inc_draft_group(age,:)
 		    WRITE  (UNIT=92, FMT=*)  frac_L_Inc_draft_group(age,:)
 		    WRITE  (UNIT=93, FMT=*)  Return_draft_group(age,:)
