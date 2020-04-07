@@ -2171,8 +2171,8 @@ SUBROUTINE COMPUTE_STATS()
 		T_Inc_draft_group_z			= 0.0_dp
 		K_Inc_draft_group_z         = 0.0_dp
 		L_Inc_draft_group_z         = 0.0_dp
-		K_Inc_frac_draft_group_z    = 0.0_dp
-		L_Inc_frac_draft_group_z    = 0.0_dp
+		av_K_Inc_draft_group_z    	= 0.0_dp
+		av_L_Inc_draft_group_z    	= 0.0_dp
 		K_Tax_Inc_draft_group_z		= 0.0_dp
 		L_Tax_Inc_draft_group_z		= 0.0_dp
 		Return_draft_group_z 		= 0.0_dp
@@ -2292,8 +2292,8 @@ SUBROUTINE COMPUTE_STATS()
 		! Divide by mass in group
 		K_Tax_Inc_draft_group_z  = 100.0_dp*K_Tax_Inc_draft_group_z/size_draft_group_z
 		L_Tax_Inc_draft_group_z  = 100.0_dp*L_Tax_Inc_draft_group_z/size_draft_group_z
-		av_K_Inc_draft_group_z = 100.0_dp*av_K_Inc_draft_group_z/size_draft_group_z 
-		av_L_Inc_draft_group_z = 100.0_dp*av_L_Inc_draft_group_z/size_draft_group_z 
+		av_K_Inc_draft_group_z 	 = 100.0_dp*av_K_Inc_draft_group_z/size_draft_group_z 
+		av_L_Inc_draft_group_z 	 = 100.0_dp*av_L_Inc_draft_group_z/size_draft_group_z 
 
 		! Average return by productivity group
 		Return_draft_group_z     = 100.0_dp*   Return_draft_group_z/size_draft_group_z
@@ -2356,7 +2356,7 @@ SUBROUTINE COMPUTE_STATS()
 		    WRITE  (UNIT=93, FMT=*)  Return_draft_group(age,:)
 		    WRITE  (UNIT=94, FMT=*)  Return_AT_draft_group(age,:)
 		    WRITE  (UNIT=95, FMT=*)  Entrepreneur_10_draft_group(age,:)
-		    WRITE  (UNIT=96, FMT=*)  Entrepreneur_40_draft_group(age,:)
+		    WRITE  (UNIT=96, FMT=*)  Entrepreneur_50_draft_group(age,:)
 		ENDDO
 		close(unit=80); close(unit=81); close(unit=83); close(unit=84); close(unit=85)
 		close(unit=87); close(unit=88); close(unit=89); close(unit=90); close(unit=91); close(unit=92); 
