@@ -1375,7 +1375,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: DBN_az(na,nz)
 	real(DP) :: Z_share_top_wealth(draft_age_category,nz), draft_group_share_top_wealth(draft_age_category,draft_z_category)
 	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx)
-	integer  :: pct_graph_lim(13), ind_lo, ind_hi, ii
+	integer  :: pct_graph_lim(13), ind_lo, ind_hi
 	real(DP) :: ret_by_wealth(12), pct_graph_wealth(12)
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
@@ -1757,22 +1757,22 @@ SUBROUTINE COMPUTE_STATS()
 
 		! Average return by bin
 		do ii=1,12
-			if (ii.eq.1) 
+			if (i.lt.2) 
 				ind_lo = 1
 			else 
-				ind_lo = prctile_ai_ind(pct_graph_lim(ii  ))
+				ind_lo = prctile_ai_ind(pct_graph_lim(i  ))
 			endif 
-				ind_hi = prctile_ai_ind(pct_graph_lim(ii+1))
+				ind_hi = prctile_ai_ind(pct_graph_lim(i+1))
 
-			pct_graph_wealth(ii) = prctile_ai(pct_graph_lim(i+1))
-			ret_by_wealth(ii)    = BT_Return(ind_lo:ind_hi,:,:)*DBN_azx(ind_lo:ind_hi,:,:)/sum(DBN_azx(ind_lo:ind_hi,:,:))
+			pct_graph_wealth(i) = prctile_ai(pct_graph_lim(i+1))
+			ret_by_wealth(i)    = BT_Return(ind_lo:ind_hi,:,:)*DBN_azx(ind_lo:ind_hi,:,:)/sum(DBN_azx(ind_lo:ind_hi,:,:))
 		enddo 
 
 		OPEN (UNIT=81, FILE=trim(Result_Folder)//'Returns_by_Wealth_pct.txt', STATUS='replace') 
 			WRITE  (UNIT=81, FMT=*)  'Returns by Percntile of Wealth'
 			WRITE  (UNIT=81, FMT=*)  'Group pct_low pct_high pct_wealth av_return'
-	    do ii = 1,12
-		    WRITE  (UNIT=81, FMT=*)  ii,pct_graph_lim(ii),pct_graph_lim(ii+1),pct_graph_wealth(ii),ret_by_wealth(ii)
+	    do i = 1,12
+		    WRITE  (UNIT=81, FMT=*)  i,pct_graph_lim(i),pct_graph_lim(i+1),pct_graph_wealth(i),ret_by_wealth(i)
 		ENDDO
 		close(unit=81)
 
