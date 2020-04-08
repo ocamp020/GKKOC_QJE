@@ -1470,7 +1470,7 @@ SUBROUTINE COMPUTE_STATS()
 
 		! Z Composition of top wealth groups
 		DBN_az = sum(sum(sum(sum(DBN1,6),5),4),1) 
-		do zi=1:nz 
+		do zi=1,nz 
 		Z_share_top_wealth(1,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(99)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(99)),2,nz) )  
 		Z_share_top_wealth(2,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(95)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(95)),2,nz) )  
 		Z_share_top_wealth(3,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(90)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(90)),2,nz) )  
