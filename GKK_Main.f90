@@ -65,7 +65,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
+			compute_bench = .true.
 			compute_exp   = .true.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
@@ -141,7 +141,7 @@ PROGRAM main
 			chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 		! Corporate Sector
-			A_C    = 0.9590_dp ! 0.9409_dp (value without estate tax)
+			A_C    = 0.0_dp ! 0.9409_dp (value without estate tax)
 
 		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
@@ -178,7 +178,8 @@ PROGRAM main
  		Debt_SS = 0.0_DP
 
 	! Resutls Folder
-		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
+	if (A_C.eq.0.0_dp) then 
+ 		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './Revision/Model_2.0/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './Revision/Model_2.0_PT/' 
@@ -187,6 +188,17 @@ PROGRAM main
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
 			Result_Folder = './Revision/Model_2.0_PT_SU/' 
 		end if
+	else 
+ 		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
+			Result_Folder = './Revision/Model_2.0_Corp/' 
+		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
+			Result_Folder = './Revision/Model_2.0_Corp_PT/' 
+		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
+			Result_Folder = './Revision/Model_2.0_Corp_SU/' 
+		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
+			Result_Folder = './Revision/Model_2.0_Corp_PT_SU/' 
+		end if
+	endif 
 
 		
 
@@ -452,8 +464,8 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL INITIALIZE
 		
 	if (compute_bench) then
-		print*,"	Reading initial conditions from file"
-		CALL Write_Benchmark_Results(.false.)
+		! print*,"	Reading initial conditions from file"
+		! CALL Write_Benchmark_Results(.false.)
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
 		print*,"	Computing government spending"
@@ -554,7 +566,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark
