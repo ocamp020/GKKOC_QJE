@@ -1713,11 +1713,11 @@ SUBROUTINE COMPUTE_STATS()
 				if (CCDF_c<prctile_bq(i)) then 
 					b = c 
 					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_azx_vec,>=c)
+					CCDF_c = sum(DBN_azx_vec,Return_vec>=c)
 				else 
 					a = c 
 					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_azx_vec,>=c)
+					CCDF_c = sum(DBN_azx_vec,Return_vec>=c)
 				endif
 				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
 			enddo 
