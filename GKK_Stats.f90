@@ -1757,7 +1757,7 @@ SUBROUTINE COMPUTE_STATS()
 
 		! Average return by bin
 		do ii=1,12
-			if (i.lt.2) 
+			if (i.eq.1) then
 				ind_lo = 1
 			else 
 				ind_lo = prctile_ai_ind(pct_graph_lim(i  ))
