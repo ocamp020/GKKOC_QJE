@@ -2308,6 +2308,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        	! Set Corporate values to zero
         		K_C    = 0.0_dp; L_C    = 0.0_dp; YBAR_C = 0.0_dp
         		K_P    = 0.0_dp; L_P    = 0.0_dp; YBAR_P = 0.0_dp
+        		Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 
 	        	! Solve for aggregates and clear capital market with R
 		        P    = alpha* QBAR **(alpha-mu) * NBAR **(1.0_DP-alpha)
