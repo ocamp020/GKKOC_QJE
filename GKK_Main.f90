@@ -124,24 +124,46 @@ PROGRAM main
 		! Calibration to book value and rho_z=0.1 and x_hi=10
 		Params =[ 0.9473_dp, 0.00_dp, 0.1_dp, 0.0352_dp , 0.307_dp, 0.46_dp ] 
 		
-		beta   	= 0.9586_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
-		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
-		rho_z  	= 0.1_dp ! params(3) 
-		sigma_z_eps      = 0.0782_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
-		sigma_lambda_eps = 0.307_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
-		gamma  	=  0.4500_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
-		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
+
+
+		! Corporate Sector
+			A_C    = 0.0_dp ! 0.9590_dp for Corp model ! 0.9409_dp (value without estate tax)
+
+		if (A_C.eq.0.0_dp)
 		
-		sigma  	= 4.0_dp
-		phi    	= (1.0_dp-gamma)/gamma
+		! Main Parameters 
+			beta   	= 0.9586_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+			sigma_z_eps      = 0.0782_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+			sigma_lambda_eps = 0.307_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
+			gamma  	=  0.4500_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
 
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 			bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
 			chi_u  = 00.35_dp ! Scaling 03.55_dp (value without estate tax)
 			chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
-		! Corporate Sector
-			A_C    = 0.0_dp ! 0.9409_dp (value without estate tax)
+		else
+
+		! Main Parameters 
+			beta   	= 0.9581_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+			sigma_z_eps      = 0.09333_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+			sigma_lambda_eps = 0.314_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
+			gamma  	=  0.4400_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+		
+		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
+			bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
+			chi_u  = 00.10_dp ! Scaling 03.55_dp (value without estate tax)
+			chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
+
+		endif 
+
+		! Other parameters 
+		rho_z  	= 0.1_dp ! params(3)
+		sigma  	= 4.0_dp
+		phi    	= (1.0_dp-gamma)/gamma
+		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
+		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
+
 
 		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
