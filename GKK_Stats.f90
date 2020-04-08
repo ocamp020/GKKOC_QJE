@@ -1772,7 +1772,8 @@ SUBROUTINE COMPUTE_STATS()
 			WRITE  (UNIT=81, FMT=*)  'Returns by Percntile of Wealth'
 			WRITE  (UNIT=81, FMT=*)  'Group pct_low mid_pct pct_high pct_wealth av_return'
 	    do i = 1,12
-		    WRITE  (UNIT=81, FMT=*)  i,pct_graph_lim(i),(pct_graph_lim(i)+pct_graph_lim(i+1))/2,pct_graph_lim(i+1),pct_graph_wealth(i),ret_by_wealth(i)
+		    WRITE  (UNIT=81, FMT=*)  i,pct_graph_lim(i),(pct_graph_lim(i)+pct_graph_lim(i+1))/2,pct_graph_lim(i+1),&
+		    					& 	pct_graph_wealth(i),ret_by_wealth(i)
 		ENDDO
 		close(unit=81)
 
