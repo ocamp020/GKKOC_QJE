@@ -1469,7 +1469,7 @@ SUBROUTINE COMPUTE_STATS()
 		prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
 
 		! Z Composition of top wealth groups
-		DBN_az = sum(sum(sum(sum(DBN,6),5),4),1) 
+		DBN_az = sum(sum(sum(sum(DBN1,6),5),4),1) 
 
 		print*,(agrid.ge.prctile_ai(99))
 		print*,size((agrid.ge.prctile_ai(99))),shape((agrid.ge.prctile_ai(99)))
