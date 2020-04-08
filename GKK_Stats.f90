@@ -1474,7 +1474,7 @@ SUBROUTINE COMPUTE_STATS()
 		print*,(agrid.ge.prctile_ai(99))
 		print*,size((agrid.ge.prctile_ai(99))),shape((agrid.ge.prctile_ai(99)))
 		print*,size(spread((agrid.ge.prctile_ai(99)),1,nz)),shape(spread((agrid.ge.prctile_ai(99)),2,nz))
-		print*,100.0_dp*cdf_a_dbn((agrid.ge.prctile_ai(99)))
+		print*,100.0_dp*cdf_a_dbn(prctile_ai_ind(99))
 		STOP
 		! do zi=1:nz 
 		! Z_share_top_wealth(1,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(99)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(99)),2,nz) )  
