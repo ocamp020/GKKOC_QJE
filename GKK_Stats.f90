@@ -1706,7 +1706,7 @@ SUBROUTINE COMPUTE_STATS()
 			a = c
 			b = maxval(Return_vec)
 			c = (a+b)/2.0_dp
-			CCDF_c = sum(DBN_Return_vec,Return_vec>=c)
+			CCDF_c = sum(DBN_azx_vec,Return_vec>=c)
 			!print*, ' '
 			!print*, 'Percentile', prctile_bq(i)
 			do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
