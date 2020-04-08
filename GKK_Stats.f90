@@ -1737,6 +1737,7 @@ SUBROUTINE COMPUTE_STATS()
 		WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x*tauK
 		else
 		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x-tauW_at
+		endif 
 		CLOSE(UNIT=11)
 		print*,' Return Percentiles'
 		print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
