@@ -1372,6 +1372,8 @@ SUBROUTINE COMPUTE_STATS()
 		& Inc_Increase_draft_group, K_Inc_Increase_draft_group, L_Inc_Increase_draft_group, &
 		& Return_draft_group, Return_AT_draft_group, &
 		& Entrepreneur_10_draft_group, Entrepreneur_50_draft_group
+	real(DP) :: DBN_az(na,nz)
+	real(DP) :: Z_share_top_wealth(draft_age_category,nz), draft_group_share_top_wealth(draft_age_category,draft_z_category)
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
@@ -1415,6 +1417,11 @@ SUBROUTINE COMPUTE_STATS()
 		    WRITE  (UNIT=90, FMT=*)  size_by_age_z(age, :) 
 		ENDDO
 		CLOSE(unit=90)
+
+		DBN_Z = sum(sum(sum(sum(sum(DBN1,6),5),4),2),1) 
+		do zi=1,nz 
+			CDF_Z(zi) = sum(DBN_Z(1:zi))
+		enddo 
 		
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
@@ -1460,6 +1467,27 @@ SUBROUTINE COMPUTE_STATS()
 		prct10_wealth = 1.0_DP-cdf_tot_a_by_prctile(90)/cdf_tot_a_by_prctile(100)
 		prct20_wealth = 1.0_DP-cdf_tot_a_by_prctile(80)/cdf_tot_a_by_prctile(100)
 		prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
+
+		! Z Composition of top wealth groups
+		DBN_az = sum(sum(sum(sum(DBN,6),5),4),1) 
+
+		do zi=1:nz 
+		Z_share_top_wealth(1,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(99)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(99)),1,nz) )  
+		Z_share_top_wealth(2,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(95)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(95)),1,nz) )  
+		Z_share_top_wealth(3,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(90)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(90)),1,nz) )  
+		Z_share_top_wealth(4,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(50)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(50)),1,nz) )  
+		Z_share_top_wealth(5,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(25)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(25)),1,nz) )  
+		enddo 
+
+		! Composition by draft groups of top wealth groups
+		draft_group_share_top_wealth = Draft_Table(Z_share_top_wealth,DBN_z,.true.)
+
+	    ! Write results in file
+	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_share_top_wealth.txt', STATUS='replace') 
+	    do age = 1,draft_age_category
+		    WRITE  (UNIT=81, FMT=*)  draft_group_share_top_wealth(age,:)
+		ENDDO
+		close(unit=81)
 
 	
 	!------------------------------------------------------------------------------------
