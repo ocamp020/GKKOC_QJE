@@ -1731,8 +1731,12 @@ SUBROUTINE COMPUTE_STATS()
 		print*,' '
 		print*,'-----------------------------------------------------'
 		WRITE(UNIT=11, FMT=*) 'Return Percentiles'
-		WRITE(UNIT=11, FMT=*) 'p10 p50 p90 p95 p99'
-		WRITE(UNIT=11, FMT=*) BQ_top_x
+		WRITE(UNIT=11, FMT=*) 'Tax p10 p50 p90 p95 p99'
+		WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x
+		if (solving_bench.eq.1) then 
+		WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x*tauK
+		else
+		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x-tauW_at
 		CLOSE(UNIT=11)
 		print*,' Return Percentiles'
 		print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
