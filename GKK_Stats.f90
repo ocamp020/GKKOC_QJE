@@ -1756,7 +1756,7 @@ SUBROUTINE COMPUTE_STATS()
 		pct_graph_lim = (/0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100/)
 
 		! Average return by bin
-		do ii=1,12
+		do i=1,12
 			if (i.eq.1) then
 				ind_lo = 1
 			else 
@@ -1765,7 +1765,7 @@ SUBROUTINE COMPUTE_STATS()
 				ind_hi = prctile_ai_ind(pct_graph_lim(i+1))
 
 			pct_graph_wealth(i) = prctile_ai(pct_graph_lim(i+1))
-			ret_by_wealth(i)    = BT_Return(ind_lo:ind_hi,:,:)*DBN_azx(ind_lo:ind_hi,:,:)/sum(DBN_azx(ind_lo:ind_hi,:,:))
+			ret_by_wealth(i)    = sum(BT_Return(ind_lo:ind_hi,:,:)*DBN_azx(ind_lo:ind_hi,:,:))/sum(DBN_azx(ind_lo:ind_hi,:,:))
 		enddo 
 
 		OPEN (UNIT=81, FILE=trim(Result_Folder)//'Returns_by_Wealth_pct.txt', STATUS='replace') 
