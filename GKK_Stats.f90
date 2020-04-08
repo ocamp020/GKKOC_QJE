@@ -1475,7 +1475,7 @@ SUBROUTINE COMPUTE_STATS()
 		print*,size((agrid.ge.prctile_ai(99))),shape((agrid.ge.prctile_ai(99)))
 		print*,size(spread((agrid.ge.prctile_ai(99)),1,nz)),shape(spread((agrid.ge.prctile_ai(99)),2,nz))
 		print*,100.0_dp*cdf_a_dbn(prctile_ai_ind(99)),100.0_dp*cdf_a_dbn(prctile_ai_ind(95)),&
-			& 100.0_dp*cdf_a_dbn(prctile_ai_ind(90)),100.0_dp*cdf_a_dbn(prctile_ai_ind(50)
+			& 100.0_dp*cdf_a_dbn(prctile_ai_ind(90)),100.0_dp*cdf_a_dbn(prctile_ai_ind(50))
 		print*,prctile_ai_ind(99),prctile_ai_ind(95),prctile_ai_ind(90),prctile_ai_ind(50)
 		STOP
 		! do zi=1:nz 
