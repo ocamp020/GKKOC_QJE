@@ -141,7 +141,7 @@ PROGRAM main
 			chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 		! Corporate Sector
-			A_C    = 0.9590_dp ! 0.9409_dp (value without estate tax)
+			A_C    = 0.9595_dp ! 0.9409_dp (value without estate tax)
 
 		x_hi	= 5.00_dp
 		x_lo	= 1.00_dp
