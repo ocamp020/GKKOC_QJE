@@ -129,7 +129,7 @@ PROGRAM main
 		! Corporate Sector
 			A_C    = 0.0_dp ! 0.9590_dp for Corp model ! 0.9409_dp (value without estate tax)
 
-		if (A_C.eq.0.0_dp)
+		if (A_C.eq.0.0_dp) then
 		
 		! Main Parameters 
 			beta   	= 0.9586_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
