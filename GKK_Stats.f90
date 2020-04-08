@@ -1374,7 +1374,8 @@ SUBROUTINE COMPUTE_STATS()
 		& Entrepreneur_10_draft_group, Entrepreneur_50_draft_group
 	real(DP) :: DBN_az(na,nz)
 	real(DP) :: Z_share_top_wealth(draft_age_category,nz), draft_group_share_top_wealth(draft_age_category,draft_z_category)
-	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
+	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx)
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income, BT_Return ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 
@@ -1676,6 +1677,68 @@ SUBROUTINE COMPUTE_STATS()
 		StdReturn       = VarReturn**0.5_DP
 		Std_AT_K_Return = Var_AT_K_Return**0.5_DP
 		Std_K_Return    = Var_K_Return**0.5_DP
+
+
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+	! Distribution of Returns (this recycles bequest variables)
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------ 
+		DBN_azx = sum(sum(sum(DBN1,5),4),1) 
+		do xi=1,nx 
+		do zi=1,nz
+		do ai=1,na 
+			BT_Return(ai,zi,xi)    = 100.0_dp*(R+Pr_mat(ai,zi,xi)/agrid(ai))
+		enddo 
+		enddo 
+		enddo 
+
+		! Vectorizations
+		DBN_azx_vec = reshape(DBN_azx   ,(/size(DBN_azx)/)); 
+		Return_vec  = reshape(BT_Return ,(/size(DBN_azx)/)); 
+
+		! Compute bequest by percentile (percentiles for counter CDF)
+		prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+		a = minval(Return_vec)
+		b = maxval(Return_vec) 
+		c = a
+		do i=1,size(prctile_bq)
+			a = c
+			b = maxval(Return_vec)
+			c = (a+b)/2.0_dp
+			CCDF_c = sum(DBN_Return_vec,Return_vec>=c)
+			!print*, ' '
+			!print*, 'Percentile', prctile_bq(i)
+			do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+				if (CCDF_c<prctile_bq(i)) then 
+					b = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_vec,>=c)
+				else 
+					a = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_vec,>=c)
+				endif
+				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+			enddo 
+			BQ_top_x(i) = c 
+		enddo 
+		if (solving_bench.eq.1) then
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Return_Pct_Bench.txt', STATUS='replace')
+		else
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Return_Pct_Exp.txt', STATUS='replace')
+		end if 
+		print*,' '
+		print*,'-----------------------------------------------------'
+		WRITE(UNIT=11, FMT=*) 'Return Percentiles'
+		WRITE(UNIT=11, FMT=*) 'p10 p50 p90 p95 p99'
+		WRITE(UNIT=11, FMT=*) BQ_top_x
+		CLOSE(UNIT=11)
+		print*,' Return Percentiles'
+		print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
+			& ' 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5)
+		print*,'-----------------------------------------------------'; print*, ' '
+
 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
