@@ -421,7 +421,7 @@ SUBROUTINE COMPUTE_STATS()
 		if (solving_bench.eq.1) then 
 		WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x*(1.0_dp-tauK)
 		else
-		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x-tauW_at
+		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x-100.0_dp*tauW_at
 		endif 
 		CLOSE(UNIT=11)
 		print*,' Return Percentiles'
