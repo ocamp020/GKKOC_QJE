@@ -974,6 +974,7 @@ SUBROUTINE COMPUTE_STATS()
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 		Pr_mat = Profit_Matrix(R,P)
+		K_mat  = K_Matrix(R,P)
 		CALL ComputeLaborUnits(EBAR,wage)
 
 		K_Tax_draft_group_z			= 0.0_dp
@@ -1054,11 +1055,12 @@ SUBROUTINE COMPUTE_STATS()
 	        		& (YGRID(ai,zi,xi)-agrid(ai))/agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
 
         		! Share of entrepreneurs
-        		if ((Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.10_dp) then 
+
+        		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.10_dp) then 
         		Entrepreneur_10_draft_group_z(age,zi) = Entrepreneur_10_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_10 = Entrepreneur_10 + DBN1(age2,ai,zi,lambdai,ei,xi)
         		endif 
-        		if ((Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.50_dp) then 
+        		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.50_dp) then 
         		Entrepreneur_50_draft_group_z(age,zi) = Entrepreneur_50_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_10 = Entrepreneur_10 + DBN1(age2,ai,zi,lambdai,ei,xi)
         		endif 
