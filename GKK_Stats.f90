@@ -1198,7 +1198,7 @@ SUBROUTINE COMPUTE_STATS()
 		Tax_Rate_Increase_tk_draft_group_z = 0.0_dp ; Tax_Rate_Increase_tl_draft_group_z = 0.0_dp ;
 		Inc_Increase_draft_group_z = 0.0_dp  ; 
 		K_Inc_Increase_draft_group_z = 0.0_dp ; L_Inc_Increase_draft_group_z = 0.0_dp;
-		print*, ' Test Hours 3',sum(Hours), sum(Hours_bench)
+
 		do zi  = 1,nz
 		do age = 1,draft_age_category
 	        do xi=1,nx
