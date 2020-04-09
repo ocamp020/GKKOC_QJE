@@ -1062,7 +1062,7 @@ SUBROUTINE COMPUTE_STATS()
         		endif 
         		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.50_dp) then 
         		Entrepreneur_50_draft_group_z(age,zi) = Entrepreneur_50_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
-        		Entrepreneur_10 = Entrepreneur_10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_50 = Entrepreneur_50 + DBN1(age2,ai,zi,lambdai,ei,xi)
         		endif 
 
 	    	enddo 
@@ -1176,8 +1176,8 @@ SUBROUTINE COMPUTE_STATS()
 
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'Entrepreneur_10_50.txt', STATUS='replace') 
 		WRITE  (UNIT=80, FMT=*)  'Share of entrepreneurs '
-		WRITE  (UNIT=80, FMT=*)  'Profits/Before_Tax_Income>10% ',Entrepreneur_10
-		WRITE  (UNIT=80, FMT=*)  'Profits/Before_Tax_Income>50% ',Entrepreneur_50
+		WRITE  (UNIT=80, FMT=*)  'Profits/Before_Tax_Income>10% ',100.0_dp*Entrepreneur_10
+		WRITE  (UNIT=80, FMT=*)  'Profits/Before_Tax_Income>50% ',100.0_dp*Entrepreneur_50
 		close(unit=80); 
 
 
