@@ -58,8 +58,8 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: DBN_az(na,nz)
 	real(DP) :: Z_share_top_wealth(draft_age_category,nz), draft_group_share_top_wealth(draft_age_category,draft_z_category)
 	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx)
-	integer  :: pct_graph_lim(13), ind_lo, ind_hi
-	real(DP) :: ret_by_wealth(12), pct_graph_wealth(12)
+	integer  :: ind_lo, ind_hi, prctile_ai_ind_age(14)
+	real(DP) :: pct_graph_lim(14), ret_by_wealth(draft_age_category,13), pct_graph_wealth(draft_age_category,13)
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
@@ -436,29 +436,71 @@ SUBROUTINE COMPUTE_STATS()
 	!------------------------------------------------------------------------------------ 
 		! Compute average returns (unweighted) for bins of the wealth distribution
 		! Bins chosen as 0-10%, 10-20%, 20-30%, ...80-90%, 90-95%, 95-99%, 99%+ (12 bins)
-		pct_graph_lim = (/0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100/)
+		pct_graph_lim = (/0.0_dp, 10.0_dp, 20.0_dp, 30.0_dp, 40.0_dp, 50.0_dp, 60.0_dp, 70.0_dp,&
+								& 80.0_dp, 90.0_dp, 95.0_dp, 99.0_dp, 99.9.0_dp, 100.0_dp/)
+
+		do age=1,draft_age_category+1
+
+		! Distribution of assets by age group
+		if (age.le.draft_age_category) then
+			! Select ages in age group 
+			pr_a_dbn = sum(sum(sum(sum(sum(DBN1(draft_age_limit(age)+1:draft_age_limit(age+1),:,:,:,:,:),6),5),4),3),1) 
+			! Distribution of returns for age group
+			DBN_azx  = sum(sum(sum(DBN1(draft_age_limit(age)+1:draft_age_limit(age+1),:,:,:,:,:),5),4),1) 
+		else 
+			! All ages 
+			pr_a_dbn = sum(sum(sum(sum(sum(DBN1,6),5),4),3),1) 
+			! Distribution of returns for age group
+			DBN_azx  = sum(sum(sum(DBN1,5),4),1) 
+		endif
+		 	pr_a_dbn = pr_a_dbn/sum(pr_a_dbn)
+		 	DBN_azx  = DBN_azx/sum(DBN_azx)
+		
+		! CDF of assets 
+		do ai=1,na
+		    cdf_a_dbn(ai)         = sum( pr_a_dbn(1:ai) )      
+		enddo 
+		cdf_a_dbn = cdf_a_dbn + 1.0_DP - cdf_a_dbn(na)
+
+		! Index of percentiles
+		prctile_ai_ind_age(1) = 1 
+		prctile_ai_ind_age(14)
+		DO prctile=2,14
+		    ai=1
+		    DO while (cdf_a_dbn(ai) .lt. (pct_graph_lim(prctile)/100.0_DP-0.000000000000001))
+		        ai=ai+1
+		    ENDDO
+		    prctile_ai_ind_age(prctile) = ai
+		ENDDO
+
 
 		! Average return by bin
-		do i=1,12
-			if (i.eq.1) then
-				ind_lo = 1
-			else 
-				ind_lo = prctile_ai_ind(pct_graph_lim(i  ))
-			endif 
-				ind_hi = prctile_ai_ind(pct_graph_lim(i+1))
+		do i=1,13
+			ind_lo = prctile_ai_ind_age(i  )
+			ind_hi = prctile_ai_ind_age(i+1)
 
-			pct_graph_wealth(i) = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*prctile_ai(pct_graph_lim(i+1))
-			ret_by_wealth(i)    = sum(BT_Return(ind_lo:ind_hi,:,:)*DBN_azx(ind_lo:ind_hi,:,:))/sum(DBN_azx(ind_lo:ind_hi,:,:))
+			pct_graph_wealth(age,i) = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*agrid(prctile_ai_ind_age(i+1))
+			ret_by_wealth(age,i)    = sum(BT_Return(ind_lo:ind_hi,:,:)*DBN_azx(ind_lo:ind_hi,:,:))/sum(DBN_azx(ind_lo:ind_hi,:,:))
 		enddo 
 
+		enddo 
+
+		if (solving_bench.eq.1) then 
 		OPEN (UNIT=81, FILE=trim(Result_Folder)//'Returns_by_Wealth_pct.txt', STATUS='replace') 
-			WRITE  (UNIT=81, FMT=*)  'Returns by Percntile of Wealth'
-			WRITE  (UNIT=81, FMT=*)  'Group pct_low mid_pct pct_high pct_wealth av_return'
-	    do i = 1,12
-		    WRITE  (UNIT=81, FMT=*)  i,pct_graph_lim(i),(pct_graph_lim(i)+pct_graph_lim(i+1))/2,pct_graph_lim(i+1),&
-		    					& 	pct_graph_wealth(i),ret_by_wealth(i)
-		ENDDO
-		close(unit=81)
+		OPEN (UNIT=82, FILE=trim(Result_Folder)//'Wealth_pct_by_age_group.txt', STATUS='replace') 
+		else 
+		OPEN (UNIT=81, FILE=trim(Result_Folder)//'Returns_by_Wealth_pct.txt', STATUS='replace') 
+		OPEN (UNIT=82, FILE=trim(Result_Folder)//'Wealth_pct_by_age_group.txt', STATUS='replace') 
+		endif 
+			WRITE (UNIT=81, FMT=*)  'Returns by Percntile of Wealth'
+			WRITE (UNIT=82, FMT=*)  'Percentile of Wealth by age group'
+			WRITE (UNIT=81, FMT=*)  'p10 p20 p30 p40 p50 p60 p70 p80 p90 p95 p99 p99.9 p100'
+			WRITE (UNIT=82, FMT=*)  'p10 p20 p30 p40 p50 p60 p70 p80 p90 p95 p99 p99.9 p100'
+		do age=1,draft_age_category+1
+			WRITE (UNIT=81, FMT=*)  ret_by_wealth(age,:) 
+			WRITE (UNIT=82, FMT=*)  pct_graph_wealth(age,:) 
+		enddo 
+		close(unit=81); close(unit=82);
 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
