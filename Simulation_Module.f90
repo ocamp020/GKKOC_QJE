@@ -1721,8 +1721,8 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		Panel_r(i,1,i_z) = ( P*(xz_grid(Panel_x(i,1,i_z),i_z)*Panel_k(i,1,i_z))**mu - (R+DepRate)*Panel_k(i,1,i_z) +&
 	     								&   R*Panel_a(i,1,i_z) )/Panel_a(i,1,i_z)
 
-		Panel_r_at(i,1,i_z) = ( ( ( (P*(xz_grid(Panel_x(i,1,i_z),i_z)*Panel_k(i,1,i_z))**mu - (R+DepRate)*Panel_k(i,1,i_z)) &
-							& + R*Panel_a(i,1,i_z))*(1.0_dp-tauK) + Panel_a(i,1,i_z))*(1.0_dp-tauW_at) )/Panel_a(i,1,i_z) - 1.0_dp 
+		Panel_r_at(i,1,i_z) = ( ( (P*(xz_grid(Panel_x(i,1,i_z),i_z)*Panel_k(i,1,i_z))**mu - (R+DepRate)*Panel_k(i,1,i_z)) &
+							& + R*Panel_a(i,1,i_z))*(1.0_dp-tauK) )/Panel_a(i,1,i_z) - tauW_at
 
 	! Consumption and Labor
  		if (Panel_a(i,1,i_z) .ge. amax) then
@@ -1821,8 +1821,8 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 				Panel_r(i,age,i_z) = ( P*(xz_grid(Panel_x(i,age,i_z),i_z)*Panel_k(i,age,i_z))**mu - (R+DepRate)*Panel_k(i,age,i_z) +&
 			     								&   R*Panel_a(i,age,i_z) )/Panel_a(i,age,i_z)
 
-				Panel_r_at(i,age,i_z) = ( ( ( (P*(xz_grid(Panel_x(i,age,i_z),i_z)*Panel_k(i,age,i_z))**mu - (R+DepRate)*Panel_k(i,age,i_z)) &
-									& + R*Panel_a(i,age,i_z))*(1.0_dp-tauK) + Panel_a(i,age,i_z))*(1.0_dp-tauW_at) )/Panel_a(i,age,i_z) - 1.0_dp 
+				Panel_r_at(i,age,i_z) = ( ( (P*(xz_grid(Panel_x(i,age,i_z),i_z)*Panel_k(i,age,i_z))**mu - (R+DepRate)*Panel_k(i,age,i_z)) &
+									& + R*Panel_a(i,age,i_z))*(1.0_dp-tauK) )/Panel_a(i,age,i_z) - tauW_at
 
 			! Consumption and Labor
 		 		if (Panel_a(i,age,i_z) .ge. amax) then
@@ -1935,8 +1935,8 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 								&   (R+DepRate)*Panel_k_ben(i,age,i_z) + R*Panel_a_ben(i,age,i_z) )/Panel_a_ben(i,age,i_z)
 
 			Panel_r_at_ben(i,age,i_z) = ( ( ( (P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - &
-								& (R+DepRate)*Panel_k_ben(i,age,i_z)) + R*Panel_a_ben(i,age,i_z))*(1.0_dp-tauK) + &
-								& Panel_a_ben(i,age,i_z))*(1.0_dp-tauW_at) )/Panel_a_ben(i,age,i_z) - 1.0_dp 	    
+								& (R+DepRate)*Panel_k_ben(i,age,i_z)) + R*Panel_a_ben(i,age,i_z))*(1.0_dp-tauK) &
+								& ))/Panel_a_ben(i,age,i_z) - tauW_at	    
 
 			ENDDO ! paneli 		
 		ENDDO ! age
@@ -2190,8 +2190,8 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		Panel_r(i,1)    = ( P*(xz_grid(Panel_x(i,1),i_z)*Panel_k(i,1))**mu - (R+DepRate)*Panel_k(i,1) +&
 	     								&   R*Panel_a(i,1) )/Panel_a(i,1)
 
-		Panel_r_at(i,1) = ( ( ( (P*(xz_grid(Panel_x(i,1),i_z)*Panel_k(i,1))**mu - (R+DepRate)*Panel_k(i,1)) &
-							& + R*Panel_a(i,1))*(1.0_dp-tauK) + Panel_a(i,1))*(1.0_dp-tauW_at) )/Panel_a(i,1) - 1.0_dp 
+		Panel_r_at(i,1) = ( ( (P*(xz_grid(Panel_x(i,1),i_z)*Panel_k(i,1))**mu - (R+DepRate)*Panel_k(i,1)) &
+							& + R*Panel_a(i,1))*(1.0_dp-tauK) )/Panel_a(i,1) - tauW_at
 
 	! Consumption and Labor
  		if (Panel_a(i,1) .ge. amax) then
@@ -2290,8 +2290,8 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 				Panel_r(i,age) = ( P*(xz_grid(Panel_x(i,age),i_z)*Panel_k(i,age))**mu - (R+DepRate)*Panel_k(i,age) +&
 			     								&   R*Panel_a(i,age) )/Panel_a(i,age)
 
-				Panel_r_at(i,age) = ( ( ( (P*(xz_grid(Panel_x(i,age),i_z)*Panel_k(i,age))**mu - (R+DepRate)*Panel_k(i,age)) &
-									& + R*Panel_a(i,age))*(1.0_dp-tauK) + Panel_a(i,age))*(1.0_dp-tauW_at) )/Panel_a(i,age) - 1.0_dp 
+				Panel_r_at(i,age) = ( ( (P*(xz_grid(Panel_x(i,age),i_z)*Panel_k(i,age))**mu - (R+DepRate)*Panel_k(i,age)) &
+									& + R*Panel_a(i,age))*(1.0_dp-tauK) /Panel_a(i,age) - tauW_at
 
 			! Consumption and Labor
 		 		if (Panel_a(i,age) .ge. amax) then
@@ -2496,7 +2496,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Return_Stats_ben.txt', STATUS='replace')
 	else 
 		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Return_Stats_exp.txt', STATUS='replace')
-		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Return_at_Stats_exp.txt', STATUS='replace')
+		! OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Return_at_Stats_exp.txt', STATUS='replace')
 	endif 
 
 	WRITE(UNIT=10, FMT=*) " "
