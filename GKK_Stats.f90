@@ -3310,19 +3310,7 @@ END SUBROUTINE WRITE_VARIABLES
 SUBROUTINE Write_Benchmark_Results(Compute_bench)
 	IMPLICIT NONE
 	logical :: Compute_bench
-	character(100) :: bench_folder, string_theta
-
-	write(string_theta,'(f4.2)')  theta_folder
-
-	if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-		bench_folder = './NSU_ZS_LT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
-	else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-		bench_folder = './NSU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
-	else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-		bench_folder = './SU_ZS_LT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
-	else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-		bench_folder = './SU_ZS_PT_Results/Theta_'//trim(string_theta)//'/Bench_Files/'
-	end if 
+	character(100) :: bench_folder
 
 	bench_folder = trim(Result_Folder)//'Bench_Files/'
 		call system( 'mkdir -p ' // trim(bench_folder) )

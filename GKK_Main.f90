@@ -53,7 +53,6 @@ PROGRAM main
 	call Allocate_Variables
 
 	! Capital Market
-		theta_folder = 1.50_dp
 		do zi=1,nz
 		theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 		enddo
