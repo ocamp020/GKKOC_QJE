@@ -2291,7 +2291,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 			     								&   R*Panel_a(i,age) )/Panel_a(i,age)
 
 				Panel_r_at(i,age) = ( ( (P*(xz_grid(Panel_x(i,age),i_z)*Panel_k(i,age))**mu - (R+DepRate)*Panel_k(i,age)) &
-									& + R*Panel_a(i,age))*(1.0_dp-tauK) /Panel_a(i,age) - tauW_at
+									& + R*Panel_a(i,age))*(1.0_dp-tauK) ) /Panel_a(i,age) - tauW_at
 
 			! Consumption and Labor
 		 		if (Panel_a(i,age) .ge. amax) then
