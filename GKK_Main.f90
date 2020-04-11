@@ -2200,7 +2200,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .false.
+		load_seed    = .true.
 
 
 	if (read_results.eqv..false.) then 
@@ -2236,8 +2236,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	CLOSE (unit=77) 
     	
-    	tau_grid_min  = 20
-    	tau_grid_max  = 40
+    	tau_grid_min  = 15
+    	tau_grid_max  = 30
     	tau_grid_step = 2
 
     	! Set Y_a_threshold
@@ -2248,8 +2248,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	! Load results form file for re-starts of the code
 	if (load_seed) then
-		CALL Write_Experimental_Results(.false.)
-    	! psi = 1.0_dp-0.1465
+		! CALL Write_Experimental_Results(.false.)
+    	psi = 1.0_dp-0.20
 	endif 
 
 	print*,'	Optimal Tax Loop'
