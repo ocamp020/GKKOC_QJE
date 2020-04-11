@@ -59,7 +59,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: Z_share_top_wealth(draft_age_category,nz), draft_group_share_top_wealth(draft_age_category,draft_z_category)
 	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx)
 	integer  :: ind_lo, ind_hi, prctile_ai_ind_age(14)
-	real(DP) :: pct_graph_lim(14), ret_by_wealth(draft_age_category,13), pct_graph_wealth(draft_age_category,13)
+	real(DP) :: pct_graph_lim(14), ret_by_wealth(draft_age_category+1,13), pct_graph_wealth(draft_age_category+1,13)
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
@@ -437,7 +437,7 @@ SUBROUTINE COMPUTE_STATS()
 		! Compute average returns (unweighted) for bins of the wealth distribution
 		! Bins chosen as 0-10%, 10-20%, 20-30%, ...80-90%, 90-95%, 95-99%, 99%+ (12 bins)
 		pct_graph_lim = (/0.0_dp, 10.0_dp, 20.0_dp, 30.0_dp, 40.0_dp, 50.0_dp, 60.0_dp, 70.0_dp,&
-								& 80.0_dp, 90.0_dp, 95.0_dp, 99.0_dp, 99.9.0_dp, 100.0_dp/)
+								& 80.0_dp, 90.0_dp, 95.0_dp, 99.0_dp, 99.90_dp, 100.0_dp/)
 
 		do age=1,draft_age_category+1
 
@@ -464,7 +464,6 @@ SUBROUTINE COMPUTE_STATS()
 
 		! Index of percentiles
 		prctile_ai_ind_age(1) = 1 
-		prctile_ai_ind_age(14)
 		DO prctile=2,14
 		    ai=1
 		    DO while (cdf_a_dbn(ai) .lt. (pct_graph_lim(prctile)/100.0_DP-0.000000000000001))
