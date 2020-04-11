@@ -41,8 +41,8 @@ $(Folder)/programfunctions.o: programfunctions.f90
 $(Folder)/Simulation_Module.o: Simulation_Module.f90
 	gfortran $(omp_flag) -O3 $(Flags) -J$(Folder) -c Simulation_Module.f90 -o $(Folder)/Simulation_Module.o
 
-$(Folder)/GKK_Stats.o: GKK_Stats.f90 $(Folder)/programfunctions.o
-	gfortran $(omp_flag) -O3 $(Flags) -J$(Folder) -c GKK_Stats.f90 $(Folder)/programfunctions.o -o $(Folder)/GKK_Stats.o
+$(Folder)/GKK_Stats.o: GKK_Stats.f90
+	gfortran $(omp_flag) -O3 $(Flags) -J$(Folder) -c GKK_Stats.f90 -o $(Folder)/GKK_Stats.o
 
 # Compile and execute programs
 Sergio_Simple.a: GKK_simple.f90 $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o
