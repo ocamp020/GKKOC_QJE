@@ -2249,7 +2249,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	! Load results form file for re-starts of the code
 	if (load_seed) then
 		! CALL Write_Experimental_Results(.false.)
-    	psi = 1.0_dp-0.20
+    	psi = 1.0_dp-0.18_dp
 	endif 
 
 	print*,'	Optimal Tax Loop'
