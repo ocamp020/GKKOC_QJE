@@ -127,8 +127,8 @@ PROGRAM main
 
 
 		! Corporate Sector
-			! A_C    = 0.0_dp ! 
-			A_C    = 0.9590_dp ! for Corp model ! 0.9409_dp (value without estate tax)
+			A_C    = 0.0_dp ! 
+			! A_C    = 0.9590_dp ! for Corp model ! 0.9409_dp (value without estate tax)
 
 		if (A_C.eq.0.0_dp) then
 		
