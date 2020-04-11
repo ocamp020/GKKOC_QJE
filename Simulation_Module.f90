@@ -2117,51 +2117,51 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	print*, ' Begin Simulation: Life Cycle Return Panel'
 	print*,' '
 	print*,' 	Allocating variables'
-	allocate(Panel_l(				size(sample_size)) ) ;
-	allocate(Panel_z(				size(sample_size)) ) ;
+	allocate(Panel_l(				sample_size) ) ;
+	allocate(Panel_z(				sample_size) ) ;
 
-	allocate(Panel_e( 				size(sample_size,RetAge)) ) ;
-	allocate(Panel_x( 				size(sample_size,RetAge)) ) ;
-	allocate(Panel_Death( 			size(sample_size,RetAge)) ) ;
-	allocate(Panel_x_ben( 			size(sample_size,RetAge)) ) ;
-	allocate(Panel_d_ben( 			size(sample_size,RetAge)) ) ;
-	allocate(Panel_a( 				size(sample_size,RetAge)) ) ;
-	allocate(Panel_c( 				size(sample_size,RetAge)) ) ;
-	allocate(Panel_k( 				size(sample_size,RetAge)) ) ;
-	allocate(Panel_h( 				size(sample_size,RetAge)) ) ;
-	allocate(Panel_r( 				size(sample_size,RetAge)) ) ;
-	allocate(Panel_r_at( 			size(sample_size,RetAge)) ) ;
+	allocate(Panel_e( 				sample_size,RetAge) ) ;
+	allocate(Panel_x( 				sample_size,RetAge) ) ;
+	allocate(Panel_Death( 			sample_size,RetAge) ) ;
+	allocate(Panel_x_ben( 			sample_size,RetAge) ) ;
+	allocate(Panel_d_ben( 			sample_size,RetAge) ) ;
+	allocate(Panel_a( 				sample_size,RetAge) ) ;
+	allocate(Panel_c( 				sample_size,RetAge) ) ;
+	allocate(Panel_k( 				sample_size,RetAge) ) ;
+	allocate(Panel_h( 				sample_size,RetAge) ) ;
+	allocate(Panel_r( 				sample_size,RetAge) ) ;
+	allocate(Panel_r_at( 			sample_size,RetAge) ) ;
 
-	allocate(Av_Return(				size(sample_size)) ) ;
-	allocate(Av_Return_at(			size(sample_size)) ) ;
-	allocate(Av_Return_W(			size(sample_size)) ) ;
-	allocate(Av_Return_at_W(		size(sample_size)) ) ;
-	allocate(R_Av_Return(			size(sample_size)) ) ;
-	allocate(R_Av_Return_at(		size(sample_size)) ) ;
-	allocate(Av_Return_2024(		size(sample_size)) ) ;
-	allocate(Av_Return_at_2024(		size(sample_size)) ) ;
-	allocate(Av_Return_W_2024(		size(sample_size)) ) ;
-	allocate(Av_Return_at_W_2024(	size(sample_size)) ) ;
-	allocate(R_Av_Return_2024(		size(sample_size)) ) ;
-	allocate(R_Av_Return_at_2024(	size(sample_size)) ) ; 
-	allocate(Av_Return_2565(		size(sample_size)) ) ;
-	allocate(Av_Return_at_2565(		size(sample_size)) ) ;
-	allocate(Av_Return_W_2565(		size(sample_size)) ) ;
-	allocate(Av_Return_at_W_2565(	size(sample_size)) ) ;
-	allocate(R_Av_Return_2565(		size(sample_size)) ) ;
-	allocate(R_Av_Return_at_2565(	size(sample_size)) ) ;  
-	allocate(Av_Return_2029(		size(sample_size)) ) ;
-	allocate(Av_Return_at_2029(		size(sample_size)) ) ;
-	allocate(Av_Return_W_2029(		size(sample_size)) ) ;
-	allocate(Av_Return_at_W_2029(	size(sample_size)) ) ;
-	allocate(R_Av_Return_2029(		size(sample_size)) ) ;
-	allocate(R_Av_Return_at_2029(	size(sample_size)) ) ;  
-	allocate(Av_Return_3065(		size(sample_size)) ) ;
-	allocate(Av_Return_at_3065(		size(sample_size)) ) ;
-	allocate(Av_Return_W_3065(		size(sample_size)) ) ;
-	allocate(Av_Return_at_W_3065(	size(sample_size)) ) ;
-	allocate(R_Av_Return_3065(		size(sample_size)) ) ;
-	allocate(R_Av_Return_at_3065(	size(sample_size)) ) ;
+	allocate(Av_Return(				sample_size) ) ;
+	allocate(Av_Return_at(			sample_size) ) ;
+	allocate(Av_Return_W(			sample_size) ) ;
+	allocate(Av_Return_at_W(		sample_size) ) ;
+	allocate(R_Av_Return(			sample_size) ) ;
+	allocate(R_Av_Return_at(		sample_size) ) ;
+	allocate(Av_Return_2024(		sample_size) ) ;
+	allocate(Av_Return_at_2024(		sample_size) ) ;
+	allocate(Av_Return_W_2024(		sample_size) ) ;
+	allocate(Av_Return_at_W_2024(	sample_size) ) ;
+	allocate(R_Av_Return_2024(		sample_size) ) ;
+	allocate(R_Av_Return_at_2024(	sample_size) ) ; 
+	allocate(Av_Return_2565(		sample_size) ) ;
+	allocate(Av_Return_at_2565(		sample_size) ) ;
+	allocate(Av_Return_W_2565(		sample_size) ) ;
+	allocate(Av_Return_at_W_2565(	sample_size) ) ;
+	allocate(R_Av_Return_2565(		sample_size) ) ;
+	allocate(R_Av_Return_at_2565(	sample_size) ) ;  
+	allocate(Av_Return_2029(		sample_size) ) ;
+	allocate(Av_Return_at_2029(		sample_size) ) ;
+	allocate(Av_Return_W_2029(		sample_size) ) ;
+	allocate(Av_Return_at_W_2029(	sample_size) ) ;
+	allocate(R_Av_Return_2029(		sample_size) ) ;
+	allocate(R_Av_Return_at_2029(	sample_size) ) ;  
+	allocate(Av_Return_3065(		sample_size) ) ;
+	allocate(Av_Return_at_3065(		sample_size) ) ;
+	allocate(Av_Return_W_3065(		sample_size) ) ;
+	allocate(Av_Return_at_W_3065(	sample_size) ) ;
+	allocate(R_Av_Return_3065(		sample_size) ) ;
+	allocate(R_Av_Return_at_3065(	sample_size) ) ;
 
 
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/Asset_Return_Panel/' )
