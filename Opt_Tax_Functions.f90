@@ -376,11 +376,19 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 
 	GBAR = GBAR -  SSC_Payments
 
+
+	print*,' '; print*,'-----------------------------------------------------------------------------'
+	print*, "Government Budget - Revenues and taxes"
 	print*,' '
-	print*,'Results from GOVNT_BUDGET'
-	print*, 'GBAR_bench',GBAR_bench, 'GBAR=',GBAR, 'SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=',GBAR_L/Ebar 
-	print*, 'GBAR_NL  =',GBAR_NL, 'BT_EARNINGS=',BT_EARNINGS,'A_EARNINGS=',A_EARNINGS 
-	PRINT*,'PSI=',psi, 'tauK=', tauK, 'tauW_at=',tauW_at, 'tauC', tauC
+	print '(A,F8.5,X,A,F8.5)','GBAR_bench=',GBAR_bench, 'GBAR=',GBAR
+	print '(A,F7.4,X,A,F7.4,X,A,F7.4)','	SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=',100.0_dp*GBAR_L/Ebar
+	print '(A,F7.4,X,A,F7.4,X,A,F7.4,X,A,F7.4)','	GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C, 'GBAR_BQ=', GBAR_BQ
+	print '(A,F7.4,X,A,F7.4,X,A,F7.4)','	GBAR_NL=',GBAR_NL, 'BT_EARNINGS=',BT_EARNINGS,'A_EARNINGS=',A_EARNINGS 
+	print '(A,F7.4,X,X,A,F7.4,X,X,A,F7.4,X,X,A,F7.4,X,X,A,F7.4,X,X,A,F7.4)',&
+			&'	Tau_L=',100.0_dp*(1.0_dp-psi),'Tau_K=', 100.0_dp*tauK, 'Tau_W=', 100.0_dp*tauW_at,&
+			& 'Tau_C=', 100.0_dp*tauC, 'Tau_BQ=', 100.0_dp*tau_bq, "Threshold", Y_a_threshold
+	print*,'-----------------------------------------------------------------------------'
+	print*, ' '
 
 	! OBTAIN NEW PSI IF GOVETNMENT BUDGET DOES NOT BALANCE
 	if (solving_bench .eq. 0) then
