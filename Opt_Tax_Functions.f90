@@ -332,7 +332,8 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 
 	    GBAR_NL = GBAR_NL + DBN1(age,ai,zi,lambdai,ei,xi) * ( tauK*( R*agrid(ai) + Pr_mat(ai,zi,xi) )   &
 	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi)  & 
-	          & + tauC * cons(age, ai, zi, lambdai,ei,xi)  )         
+	          & + tauC * cons(age, ai, zi, lambdai,ei,xi)   												&   
+	          & + tau_bq*aprime(age,ai,zi,lambdai,ei,xi)*(1.0_DP-survP(age)) )
 
 	    GBAR_L = GBAR_L  + DBN1(age,ai,zi,lambdai,ei,xi) * (  yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi) &
 	          &- psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL) )
