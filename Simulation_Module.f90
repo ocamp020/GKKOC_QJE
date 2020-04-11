@@ -2083,7 +2083,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	real(dp) :: tempno, tempnoage
 	real(dp) :: start_timet, finish_timet
 	! Result Storage
-	integer , parameter :: sample_size = 10000 ! 1000000
+	integer , parameter :: sample_size = 1000 ! 1000000
 	integer  :: i, i_z, i_x, tklo, tkhi, i_pct
 	integer , dimension(sample_size)        :: Panel_l, Panel_z
 	integer , dimension(sample_size,RetAge) :: Panel_e, Panel_x, Panel_Death, Panel_x_ben, Panel_d_ben
@@ -2115,6 +2115,8 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 
 	print*,' '; print*,'----------------------------------------------------------------------------'
 	print*, ' Begin Simulation: Life Cycle Return Panel'
+
+	memory_test 10 25
 
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/Asset_Return_Panel/' )
 
