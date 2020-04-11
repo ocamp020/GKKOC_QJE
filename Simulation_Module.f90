@@ -2081,26 +2081,26 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	! Simulation variables
 	integer  :: thread_num
 	real(dp) :: tempno, tempnoage
-	REAL(DP) :: start_timet, finish_timet
+	real(dp) :: start_timet, finish_timet
 	! Result Storage
 	integer , parameter :: sample_size = 1000000
 	integer  :: i, i_z, i_x, tklo, tkhi, i_pct
 	integer , dimension(sample_size)        :: Panel_l, Panel_z
 	integer , dimension(sample_size,RetAge) :: Panel_e, Panel_x, Panel_Death, Panel_x_ben, Panel_d_ben
-	real(DP), dimension(sample_size,RetAge) :: Panel_a, Panel_c, Panel_k, Panel_h, Panel_r, Panel_r_at
-	real(DP), dimension(RetAge)             :: Mean_a, Mean_c, Mean_k, Mean_h, Mean_r, Mean_r_at, Mean_r_w, Mean_r_at_w
-	real(DP), dimension(RetAge)             :: Mean_k_ben, Mean_r_ben, Mean_r_at_ben, Mean_r_w_ben, Mean_r_at_w_ben
+	real(dp), dimension(sample_size,RetAge) :: Panel_a, Panel_c, Panel_k, Panel_h, Panel_r, Panel_r_at
+	real(dp), dimension(RetAge)             :: Mean_a, Mean_c, Mean_k, Mean_h, Mean_r, Mean_r_at, Mean_r_w, Mean_r_at_w
+	real(dp), dimension(RetAge)             :: Mean_k_ben, Mean_r_ben, Mean_r_at_ben, Mean_r_w_ben, Mean_r_at_w_ben
 	integer , dimension(RetAge)             :: Mean_Death
-	real(DP)				                :: DBN_A_nb(na), DBN_Z(nz), CDF_A_nb(na), CDF_Z(nz)
-	real(DP), dimension(sample_size) 		:: Av_Return,	Av_Return_at, Av_Return_W, Av_Return_at_W , R_Av_Return, R_Av_Return_at
-	real(DP), dimension(sample_size) 		:: Av_Return_2024,	Av_Return_at_2024, Av_Return_W_2024, Av_Return_at_W_2024
-	real(DP), dimension(sample_size) 		:: R_Av_Return_2024,	R_Av_Return_at_2024 
-	real(DP), dimension(sample_size) 		:: Av_Return_2565,	Av_Return_at_2565, Av_Return_W_2565, Av_Return_at_W_2565
-	real(DP), dimension(sample_size) 		:: R_Av_Return_2565,	R_Av_Return_at_2565 
-	real(DP), dimension(sample_size) 		:: Av_Return_2029,	Av_Return_at_2029, Av_Return_W_2029, Av_Return_at_W_2029
-	real(DP), dimension(sample_size) 		:: R_Av_Return_2029,	R_Av_Return_at_2029 
-	real(DP), dimension(sample_size) 		:: Av_Return_3065,	Av_Return_at_3065, Av_Return_W_3065, Av_Return_at_W_3065
-	real(DP), dimension(sample_size) 		:: R_Av_Return_3065,	R_Av_Return_at_3065
+	real(dp)				                :: DBN_A_nb(na), DBN_Z(nz), CDF_A_nb(na), CDF_Z(nz)
+	real(dp), dimension(sample_size) 		:: Av_Return,	Av_Return_at, Av_Return_W, Av_Return_at_W , R_Av_Return, R_Av_Return_at
+	real(dp), dimension(sample_size) 		:: Av_Return_2024,	Av_Return_at_2024, Av_Return_W_2024, Av_Return_at_W_2024
+	real(dp), dimension(sample_size) 		:: R_Av_Return_2024,	R_Av_Return_at_2024 
+	real(dp), dimension(sample_size) 		:: Av_Return_2565,	Av_Return_at_2565, Av_Return_W_2565, Av_Return_at_W_2565
+	real(dp), dimension(sample_size) 		:: R_Av_Return_2565,	R_Av_Return_at_2565 
+	real(dp), dimension(sample_size) 		:: Av_Return_2029,	Av_Return_at_2029, Av_Return_W_2029, Av_Return_at_W_2029
+	real(dp), dimension(sample_size) 		:: R_Av_Return_2029,	R_Av_Return_at_2029 
+	real(dp), dimension(sample_size) 		:: Av_Return_3065,	Av_Return_at_3065, Av_Return_W_3065, Av_Return_at_W_3065
+	real(dp), dimension(sample_size) 		:: R_Av_Return_3065,	R_Av_Return_at_3065
 	real(dp), dimension(10) :: prctile_ret
 	real(dp), dimension(11) :: prc_Av_Return, prc_Av_Return_at, prc_Av_Return_W, prc_Av_Return_at_W
 	real(dp), dimension(11) :: prc_Av_Return_2024, prc_Av_Return_at_2024, prc_Av_Return_W_2024, prc_Av_Return_at_W_2024 
@@ -2113,6 +2113,8 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	real(dp), dimension(11) :: prc_R_Av_Return_2029, prc_R_Av_Return_at_2029
 	real(dp), dimension(11) :: prc_R_Av_Return_3065, prc_R_Av_Return_at_3065
 
+	print*,' '; print*,'----------------------------------------------------------------------------'
+	print*, ' Begin Simulation: Life Cycle Return Panel'
 
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/Asset_Return_Panel/' )
 
