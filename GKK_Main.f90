@@ -2236,8 +2236,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	CLOSE (unit=77) 
     	
-    	tau_grid_min  = 31
-    	tau_grid_max  = 40
+    	tau_grid_min  = 40
+    	tau_grid_max  = 50
     	tau_grid_step = 2
 
     	! Set Y_a_threshold
