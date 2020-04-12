@@ -2369,6 +2369,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		CALL Firm_Value
 
+	! Allocate variables
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)	
+
 	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
 		QBAR_exp  = QBAR 
