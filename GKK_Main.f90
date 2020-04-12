@@ -126,8 +126,8 @@ PROGRAM main
 
 
 		! Corporate Sector
-			A_C    = 0.0_dp ! 
-			! A_C    = 0.9590_dp ! for Corp model ! 0.9409_dp (value without estate tax)
+			! A_C    = 0.0_dp ! 
+			A_C    = 0.9590_dp ! for Corp model ! 0.9409_dp (value without estate tax)
 
 		if (A_C.eq.0.0_dp) then
 		
@@ -2199,7 +2199,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .true.
+		load_seed    = .false.
 
 
 	if (read_results.eqv..false.) then 
@@ -2235,8 +2235,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_2.txt', STATUS='replace')
     	CLOSE (unit=77) 
     	
-    	tau_grid_min  = 36
-    	tau_grid_max  = 44
+    	tau_grid_min  = 30
+    	tau_grid_max  = 50
     	tau_grid_step = 2
 
     	! Set Y_a_threshold
