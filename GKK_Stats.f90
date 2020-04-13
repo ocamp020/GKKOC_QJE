@@ -3293,7 +3293,6 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) "CE1_NB(bench)"  , Welfare_Gain_NB_bench
 			WRITE(UNIT=19, FMT=*) "CE1_NB(exp)"    , Welfare_Gain_NB_exp
 			WRITE(UNIT=19, FMT=*) "Frac_pos_welfare(bench)" , 100.0_dp*frac_pos_welfare
-			WRITE(UNIT=19, FMT=*) "Output_Gain(prct)"	  	, 100.0_DP*(Y_exp/Y_bench-1.0) 
 			WRITE(UNIT=19, FMT=*) "CE2_Pop(exp)"   , Av_Util_Pop
 			WRITE(UNIT=19, FMT=*) "CE2_NB(exp)"	   , Av_Util_NB
 			WRITE(UNIT=19, FMT=*) ' '
