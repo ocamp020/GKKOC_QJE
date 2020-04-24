@@ -158,7 +158,7 @@ PROGRAM main
 
 			! Capital Market
 				do zi=1,nz
-				theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+				theta(zi)    = 1.00_dp+(3.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 				enddo
 
 		else
@@ -595,8 +595,8 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		print 12345, &
 			& " 	A/Y=",MeanWealth/YBAR,'BQ/A=',100.0_dp*Bequest_Wealth/MeanWealth ,'BQ/Inc=',Bq_Inc(3,1),&
 			& 'Top_1%=',100.0_dp*prct1_wealth,'L_C/N=',100.0_dp*L_C/NBAR,&
-			& 'stdEarn=',Std_Log_Earnings_25_60,'N',meanhours_25_60
-		12345 format (A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)
+			& 'stdEarn=',Std_Log_Earnings_25_60,'N',meanhours_25_60,'D/Y',External_Debt_GDP
+		12345 format (A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)
 		print*,'-------------------------------------------------------------------------'
 		print*,' ';print*,' ';print*,' '
 
