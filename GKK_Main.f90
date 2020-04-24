@@ -606,13 +606,13 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		endif 
 
 		! Call Simulation_Life_Cycle_Patterns(solving_bench)
-		! Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
+		Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
 
 
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		STOP
+		! STOP
 		
 
 end Subroutine Solve_Benchmark
