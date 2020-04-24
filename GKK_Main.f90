@@ -158,7 +158,7 @@ PROGRAM main
 
 			! Capital Market
 				do zi=1,nz
-				theta(zi)    = 1.00_dp+(3.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+				theta(zi)    = 1.00_dp+(4.00_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 				enddo
 
 		else
