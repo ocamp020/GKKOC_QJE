@@ -52,10 +52,6 @@ PROGRAM main
 	! Allocate Variables
 	call Allocate_Variables
 
-	! Capital Market
-		do zi=1,nz
-		theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
-		enddo
 	! Threshold 
 		Threshold_Factor = 0.00_dp 
 
@@ -63,9 +59,9 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
-			compute_bench = .false.
-			compute_exp   = .false.
+		Tax_Reform    = .true.
+			compute_bench = .true.
+			compute_exp   = .true.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
 				Fixed_PF_interp = .true.
@@ -81,7 +77,7 @@ PROGRAM main
 		Tax_Reform_Decomposition = .false.
 		compute_exp_fixed_prices_and_taxes = .false.
 
-		Opt_Tax       = .true.
+		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
@@ -126,21 +122,44 @@ PROGRAM main
 
 
 		! Corporate Sector
-			! A_C    = 0.0_dp ! 
-			A_C    = 0.9590_dp ! for Corp model ! 0.9409_dp (value without estate tax)
+			A_C    = 0.0_dp ! 
+			! A_C    = 0.9590_dp ! for Corp model ! 0.9409_dp (value without estate tax)
 
 		if (A_C.eq.0.0_dp) then
 		
-		! Main Parameters 
-			beta   	= 0.9586_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
-			sigma_z_eps      = 0.0783_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
-			sigma_lambda_eps = 0.307_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
-			gamma  	=  0.4500_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+		! Debt/Output = 1.3 
+			! ! Main Parameters 
+			! 	beta   	= 0.9586_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+			! 	sigma_z_eps      = 0.0783_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+			! 	sigma_lambda_eps = 0.307_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
+			! 	gamma  	=  0.4500_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
 
-		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
-			bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
-			chi_u  = 00.35_dp ! Scaling 03.55_dp (value without estate tax)
-			chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
+			! ! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
+			! 	bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
+			! 	chi_u  = 00.35_dp ! Scaling 03.55_dp (value without estate tax)
+			! 	chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
+
+			! ! Capital Market
+			! 	do zi=1,nz
+			! 	theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+			! 	enddo
+
+		! Debt/Output = 2.0
+			! Main Parameters 
+				beta   	= 0.9586_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+				sigma_z_eps      = 0.0783_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+				sigma_lambda_eps = 0.307_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
+				gamma  	=  0.4500_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+
+			! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
+				bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
+				chi_u  = 00.35_dp ! Scaling 03.55_dp (value without estate tax)
+				chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
+
+			! Capital Market
+				do zi=1,nz
+				theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+				enddo
 
 		else
 
@@ -154,6 +173,11 @@ PROGRAM main
 			bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
 			chi_u  = 00.10_dp ! Scaling 03.55_dp (value without estate tax)
 			chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
+
+		! Capital Market
+			do zi=1,nz
+			theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+			enddo
 
 		endif 
 
@@ -202,13 +226,13 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.0/' 
+			Result_Folder = './Revision/Model_2.0_HD/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.0_PT/' 
+			Result_Folder = './Revision/Model_2.0_HD_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.0_SU/' 
+			Result_Folder = './Revision/Model_2.0_HD_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.0_PT_SU/' 
+			Result_Folder = './Revision/Model_2.0_HD_PT_SU/' 
 		end if
 	else 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
@@ -588,7 +612,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark
