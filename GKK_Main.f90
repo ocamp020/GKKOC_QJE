@@ -60,7 +60,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
+			compute_bench = .true.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .false.
@@ -91,7 +91,7 @@ PROGRAM main
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .false. ! true=tau_K, false=tau_W
 		
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 
@@ -128,12 +128,32 @@ PROGRAM main
 
 		if (A_C.eq.0.0_dp) then
 		
-		! Debt/Output = 1.3 
+		! ! Debt/Output = 1.3 
+		! 	! Main Parameters 
+		! 		beta   	= 0.9586_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+		! 		sigma_z_eps      = 0.0783_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+		! 		sigma_lambda_eps = 0.307_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
+		! 		gamma  	=  0.4500_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+		! 		sigma  	= 4.0_dp
+
+		! 	! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
+		! 		bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
+		! 		chi_u  = 00.35_dp ! Scaling 03.55_dp (value without estate tax)
+		! 		chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
+
+		! 	! Capital Market
+		! 		do zi=1,nz
+		! 		theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+		! 		enddo
+
+		! Debt/Output = 1.3, sigma=2 
 			! Main Parameters 
+				sigma 
 				beta   	= 0.9586_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
 				sigma_z_eps      = 0.0783_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 				sigma_lambda_eps = 0.307_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
-				gamma  	=  0.4500_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+				gamma  	= 0.4500_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+				sigma  	= 2.0_dp
 
 			! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 				bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
@@ -151,6 +171,7 @@ PROGRAM main
 			! 	sigma_z_eps      = 0.0695_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 			! 	sigma_lambda_eps = 0.310_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
 			! 	gamma  	=  0.4450_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+			! 	sigma  	= 4.0_dp
 
 			! ! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 			! 	bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
@@ -169,6 +190,7 @@ PROGRAM main
 			sigma_z_eps      = 0.09333_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 			sigma_lambda_eps = 0.314_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
 			gamma  	=  0.4400_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+			sigma  	= 4.0_dp
 		
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 			bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
@@ -184,7 +206,6 @@ PROGRAM main
 
 		! Other parameters 
 		rho_z  	= 0.1_dp ! params(3)
-		sigma  	= 4.0_dp
 		phi    	= (1.0_dp-gamma)/gamma
 		mu_z   	= params(2) ! this is just shifting the z grids. it is zero now.
 		Params =[beta, mu_z, rho_z, sigma_z_eps, sigma_lambda_eps, gamma] 
@@ -227,7 +248,9 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.0/' 
+			! Result_Folder = './Revision/Model_2.0/'
+			Result_Folder = './Revision/Model_2.0_sigma/' 
+			! Result_Folder = './Revision/Model_2.0_luxury/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './Revision/Model_2.0_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
@@ -607,7 +630,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		endif 
 
 		! Call Simulation_Life_Cycle_Patterns(solving_bench)
-		Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
+		! Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
 
 
 		! print*,"	Efficiency Computation"
