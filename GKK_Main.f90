@@ -638,7 +638,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 			& 'Top_1%=',100.0_dp*prct1_wealth,'L_C/N=',100.0_dp*L_C/NBAR,&
 			& 'stdEarn=',Std_Log_Earnings_25_60,'N',meanhours_25_60,'D/Y',External_Debt_GDP,&
 			& 'Luxury',(EBAR_data/(EBAR_bench*0.727853584919652_dp))*bq_0
-		12345 format (A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)
+		12345 format (A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F12.1)
 		print*,'-------------------------------------------------------------------------'
 		print*,' ';print*,' ';print*,' '
 
