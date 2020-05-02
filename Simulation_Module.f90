@@ -23,23 +23,23 @@ SUBROUTINE  SIMULATION(bench_indx)
 		INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
 		INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
 		INTEGER , DIMENSION(:), allocatable :: panelage, panelz, panellambda, panele, panelx, panelz_old, panellambda_old
-		REAL(DP), DIMENSION(:), allocatable :: panela, panelPV_a, panelK, panel_Y_L, panelRet, panelRet_K
+		REAL(DP), DIMENSION(:), allocatable :: panela! , panelPV_a, panelK, panel_Y_L, panelRet, panelRet_K
 
 		! Intergenerational statistics
-		INTEGER , DIMENSION(:)      , allocatable :: eligible, death_count
-		REAL(SP), DIMENSION(:)      , allocatable :: panela_parents, panela_sons
-		REAL(SP), DIMENSION(:)      , allocatable :: eligible_panela_parents, eligible_panela_sons
-		INTEGER , DIMENSION(:)      , allocatable :: panelage_parents, panelage_sons
-		INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_parents, eligible_panelage_sons
-		INTEGER                     			  :: n_eligible
-		! Intergenerational statistics 30-50
-		REAL(SP), DIMENSION(:)  , allocatable :: assets_dad, assets_son, return_dad, return_son, PV_dad, PV_son
-		INTEGER , DIMENSION(:)  , allocatable :: age_dad, age_son, z_dad, z_son
-		REAL(SP), DIMENSION(:,:), allocatable :: IGM_a_matrix, IGM_r_matrix, IGM_pv_matrix
-		INTEGER , DIMENSION(:,:), allocatable :: IGM_z_matrix
-		REAL(SP), DIMENSION(:)  , allocatable :: panela_dad, panela_son, panelz_dad, panelz_son
-		REAL(SP), DIMENSION(:)  , allocatable :: panelr_dad, panelr_son, panelPV_dad, panelPV_son
-		INTEGER 						      :: IGM_index
+		! INTEGER , DIMENSION(:)      , allocatable :: eligible, death_count
+		! REAL(SP), DIMENSION(:)      , allocatable :: panela_parents, panela_sons
+		! REAL(SP), DIMENSION(:)      , allocatable :: eligible_panela_parents, eligible_panela_sons
+		! INTEGER , DIMENSION(:)      , allocatable :: panelage_parents, panelage_sons
+		! INTEGER , DIMENSION(:)      , allocatable :: eligible_panelage_parents, eligible_panelage_sons
+		! INTEGER                     			  :: n_eligible
+		! ! Intergenerational statistics 30-50
+		! REAL(SP), DIMENSION(:)  , allocatable :: assets_dad, assets_son, return_dad, return_son, PV_dad, PV_son
+		! INTEGER , DIMENSION(:)  , allocatable :: age_dad, age_son, z_dad, z_son
+		! REAL(SP), DIMENSION(:,:), allocatable :: IGM_a_matrix, IGM_r_matrix, IGM_pv_matrix
+		! INTEGER , DIMENSION(:,:), allocatable :: IGM_z_matrix
+		! REAL(SP), DIMENSION(:)  , allocatable :: panela_dad, panela_son, panelz_dad, panelz_son
+		! REAL(SP), DIMENSION(:)  , allocatable :: panelr_dad, panelr_son, panelPV_dad, panelPV_son
+		! INTEGER 						      :: IGM_index
 
 		! ! Intergenerational statistics 40-60
 		! REAL(SP), DIMENSION(totpop) 	     :: assets_dad_2, assets_son_2, return_dad_2, return_son_2, PV_dad_2, PV_son_2
@@ -50,24 +50,24 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! REAL(SP), DIMENSION(:) , allocatable :: panelr_dad_2, panelr_son_2, panelPV_dad_2, panelPV_son_2
 		! INTEGER 						     :: IGM_index_2
 		! Average Return by age group
-		INTEGER , PARAMETER  				 :: ret_size=1200000
-		REAL(DP), DIMENSION(ret_size) 	     :: ret_aux=0.0_dp, ret_20, ret_21_25 , ret_26_30 , ret_31_35 , ret_36_40 
-		REAL(DP), DIMENSION(ret_size) 	     :: ret_41_45 , ret_46_50 , ret_51_55 , ret_56_60 , ret_61_65 , ret_66_70
-		REAL(DP), DIMENSION(ret_size) 	     :: ret_w_aux=0.0_dp, ret_w_20, ret_w_21_25 , ret_w_26_30 , ret_w_31_35 , ret_w_36_40 
-		REAL(DP), DIMENSION(ret_size) 	     :: ret_w_41_45 , ret_w_46_50 , ret_w_51_55 , ret_w_56_60 , ret_w_61_65 , ret_w_66_70
-		REAL(DP), DIMENSION(ret_size) 	     :: ret_k_aux=0.0_dp, ret_k_20=0.0_dp, ret_k_21_25=0.0_dp, ret_k_26_30=0.0_dp
-		REAL(DP), DIMENSION(ret_size) 	     :: ret_k_31_35=0.0_dp, ret_k_36_40=0.0_dp, ret_k_41_45=0.0_dp , ret_k_46_50=0.0_dp
-		REAL(DP), DIMENSION(ret_size) 	     :: ret_k_51_55=0.0_dp , ret_k_56_60=0.0_dp , ret_k_61_65=0.0_dp , ret_k_66_70=0.0_dp
-		REAL(DP), DIMENSION(ret_size) 	     :: ret_k_w_aux=0.0_dp, ret_k_w_20=0.0_dp, ret_k_w_21_25=0.0_dp, ret_k_w_26_30=0.0_dp
-		REAL(DP), DIMENSION(ret_size) 	     :: ret_k_w_31_35=0.0_dp, ret_k_w_36_40=0.0_dp, ret_k_w_41_45=0.0_dp, ret_k_w_46_50=0.0_dp
-		REAL(DP), DIMENSION(ret_size) 	     :: ret_k_w_51_55=0.0_dp, ret_k_w_56_60=0.0_dp, ret_k_w_61_65=0.0_dp, ret_k_w_66_70=0.0_dp
-		INTEGER , DIMENSION(ret_size) 	     :: Ind_K=0, Ind_K_20, Ind_K_21_25 , Ind_K_26_30 , Ind_K_31_35 , Ind_K_36_40 
-		INTEGER , DIMENSION(ret_size) 	     :: Ind_K_41_45 , Ind_K_46_50 , Ind_K_51_55 , Ind_K_56_60 , Ind_K_61_65 , Ind_K_66_70
-		REAL(DP), DIMENSION(ret_size) 	     :: cum_assets, cum_K
-		REAL(DP) 						 	 :: Std_Dev_Return_Age(12)    , Mean_Return_Age(12)    , prc_Return_Age(12,9)
-		REAL(DP) 						 	 :: Std_Dev_Return_W_Age(12)  , Mean_Return_W_Age(12)  , prc_Return_W_Age(12,9)
-		REAL(DP) 						 	 :: Std_Dev_Return_K_Age(12)  , Mean_Return_K_Age(12)  , prc_Return_K_Age(12,9)
-		REAL(DP) 						 	 :: Std_Dev_Return_K_W_Age(12), Mean_Return_K_W_Age(12), prc_Return_K_W_Age(12,9)
+		! INTEGER , PARAMETER  				 :: ret_size=1200000
+		! REAL(DP), DIMENSION(ret_size) 	     :: ret_aux=0.0_dp, ret_20, ret_21_25 , ret_26_30 , ret_31_35 , ret_36_40 
+		! REAL(DP), DIMENSION(ret_size) 	     :: ret_41_45 , ret_46_50 , ret_51_55 , ret_56_60 , ret_61_65 , ret_66_70
+		! REAL(DP), DIMENSION(ret_size) 	     :: ret_w_aux=0.0_dp, ret_w_20, ret_w_21_25 , ret_w_26_30 , ret_w_31_35 , ret_w_36_40 
+		! REAL(DP), DIMENSION(ret_size) 	     :: ret_w_41_45 , ret_w_46_50 , ret_w_51_55 , ret_w_56_60 , ret_w_61_65 , ret_w_66_70
+		! REAL(DP), DIMENSION(ret_size) 	     :: ret_k_aux=0.0_dp, ret_k_20=0.0_dp, ret_k_21_25=0.0_dp, ret_k_26_30=0.0_dp
+		! REAL(DP), DIMENSION(ret_size) 	     :: ret_k_31_35=0.0_dp, ret_k_36_40=0.0_dp, ret_k_41_45=0.0_dp , ret_k_46_50=0.0_dp
+		! REAL(DP), DIMENSION(ret_size) 	     :: ret_k_51_55=0.0_dp , ret_k_56_60=0.0_dp , ret_k_61_65=0.0_dp , ret_k_66_70=0.0_dp
+		! REAL(DP), DIMENSION(ret_size) 	     :: ret_k_w_aux=0.0_dp, ret_k_w_20=0.0_dp, ret_k_w_21_25=0.0_dp, ret_k_w_26_30=0.0_dp
+		! REAL(DP), DIMENSION(ret_size) 	     :: ret_k_w_31_35=0.0_dp, ret_k_w_36_40=0.0_dp, ret_k_w_41_45=0.0_dp, ret_k_w_46_50=0.0_dp
+		! REAL(DP), DIMENSION(ret_size) 	     :: ret_k_w_51_55=0.0_dp, ret_k_w_56_60=0.0_dp, ret_k_w_61_65=0.0_dp, ret_k_w_66_70=0.0_dp
+		! INTEGER , DIMENSION(ret_size) 	     :: Ind_K=0, Ind_K_20, Ind_K_21_25 , Ind_K_26_30 , Ind_K_31_35 , Ind_K_36_40 
+		! INTEGER , DIMENSION(ret_size) 	     :: Ind_K_41_45 , Ind_K_46_50 , Ind_K_51_55 , Ind_K_56_60 , Ind_K_61_65 , Ind_K_66_70
+		! REAL(DP), DIMENSION(ret_size) 	     :: cum_assets, cum_K
+		! REAL(DP) 						 	 :: Std_Dev_Return_Age(12)    , Mean_Return_Age(12)    , prc_Return_Age(12,9)
+		! REAL(DP) 						 	 :: Std_Dev_Return_W_Age(12)  , Mean_Return_W_Age(12)  , prc_Return_W_Age(12,9)
+		! REAL(DP) 						 	 :: Std_Dev_Return_K_Age(12)  , Mean_Return_K_Age(12)  , prc_Return_K_Age(12,9)
+		! REAL(DP) 						 	 :: Std_Dev_Return_K_W_Age(12), Mean_Return_K_W_Age(12), prc_Return_K_W_Age(12,9)
 		REAL(DP)  							 :: K_aux, prctile_ret(9)
 		INTEGER 							 :: i_pct
 		
@@ -79,6 +79,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		REAL(DP)      :: top_A(80), A_cut, A_hi, A_low
 		character(10) :: top_folder
 
+		print*,'test 1'
+
 		! Allocate variables
 		allocate( panelage(   		totpop) )
 		allocate( panelz(     		totpop) )
@@ -88,35 +90,37 @@ SUBROUTINE  SIMULATION(bench_indx)
 		allocate( panelz_old(     	totpop) )
 		allocate( panellambda_old(	totpop) )
 		allocate( panela(			totpop) )
-		allocate( panelPV_a(		totpop) )
-		allocate( panelK(			totpop) )
-		allocate( panel_Y_L(		totpop) )
-		allocate( panelRet(			totpop) )
-		allocate( panelRet_K(		totpop) )
-		allocate( eligible(			totpop) )
-		allocate( death_count(		totpop) )
-		allocate( panela_parents(	totpop) )
-		allocate( panela_sons(		totpop) )
-		allocate( panelage_parents(	totpop) )
-		allocate( panelage_sons(	totpop) )
-		allocate( assets_dad(		totpop) )
-		allocate( assets_son(		totpop) )
-		allocate( return_dad(		totpop) )
-		allocate( return_son(		totpop) )
-		allocate( PV_dad(			totpop) )
-		allocate( PV_son(			totpop) )
-		allocate( age_dad(			totpop) )
-		allocate( age_son(			totpop) )
-		allocate( z_dad(			totpop) )
-		allocate( z_son(			totpop) )
+		! allocate( panelPV_a(		totpop) )
+		! allocate( panelK(			totpop) )
+		! allocate( panel_Y_L(		totpop) )
+		! allocate( panelRet(			totpop) )
+		! allocate( panelRet_K(		totpop) )
 		allocate( panel_top_ind(	totpop) )
-		allocate( IGM_a_matrix(  2,4000000) )
-		allocate( IGM_r_matrix(  2,4000000) )
-		allocate( IGM_pv_matrix( 2,4000000) )
-		allocate( IGM_z_matrix(  2,4000000) )
-			panelRet_K = 0.0_sp
+
+		! allocate( eligible(			totpop) )
+		! allocate( death_count(		totpop) )
+		! allocate( panela_parents(	totpop) )
+		! allocate( panela_sons(		totpop) )
+		! allocate( panelage_parents(	totpop) )
+		! allocate( panelage_sons(	totpop) )
+		! allocate( assets_dad(		totpop) )
+		! allocate( assets_son(		totpop) )
+		! allocate( return_dad(		totpop) )
+		! allocate( return_son(		totpop) )
+		! allocate( PV_dad(			totpop) )
+		! allocate( PV_son(			totpop) )
+		! allocate( age_dad(			totpop) )
+		! allocate( age_son(			totpop) )
+		! allocate( z_dad(			totpop) )
+		! allocate( z_son(			totpop) )
+		! allocate( IGM_a_matrix(  2,4000000) )
+		! allocate( IGM_r_matrix(  2,4000000) )
+		! allocate( IGM_pv_matrix( 2,4000000) )
+		! allocate( IGM_z_matrix(  2,4000000) )
+			! panelRet_K = 0.0_sp
 
 		print*, 'Starting Simulation Module'
+
 
 		call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
 
@@ -198,6 +202,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 
 		! SET INITIAL ASSET DISTRIBUTION
+		print*, ' Initial assets set at 1.0_DP'
 		panela            = 1.0_DP
 
 		!=============================================================================
@@ -208,17 +213,16 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		!call cpu_time(start_timet) 
 		
-		eligible    = 1 
-		death_count = 0
-
-		age_dad = 0 ; age_son = 0 ; assets_dad = 0.0_dp ; assets_son = 0.0_dp ; PV_dad = 0.0_dp ; PV_son = 0.0_dp;
-		IGM_index = 1 ; IGM_a_matrix = 0.0_dp ; IGM_r_matrix = 0.0_dp ; IGM_z_matrix = 0 ; 
-		IGM_pv_matrix = 0.0_dp ; IGM_pv_matrix = 0 ; 
+		! eligible    = 1 
+		! death_count = 0
+		! age_dad = 0 ; age_son = 0 ; assets_dad = 0.0_dp ; assets_son = 0.0_dp ; PV_dad = 0.0_dp ; PV_son = 0.0_dp;
+		! IGM_index = 1 ; IGM_a_matrix = 0.0_dp ; IGM_r_matrix = 0.0_dp ; IGM_z_matrix = 0 ; 
+		! IGM_pv_matrix = 0.0_dp ; IGM_pv_matrix = 0 ; 
 		! age_dad_2 = 0 ; age_son_2 = 0 ; assets_dad_2 = 0.0_dp ; assets_son_2 = 0.0_dp ; PV_dad_2 = 0.0_dp ; PV_son_2 = 0.0_dp;
 		! IGM_index_2 = 1 ; IGM_a_matrix_2 = 0.0_dp ; IGM_r_matrix_2 = 0.0_dp ; IGM_z_matrix_2 = 0 ; 
 		! IGM_pv_matrix_2 = 0.0_dp ; IGM_pv_matrix_2 = 0 ; 
 		
-		print*, 'Starting Simutime loop'
+		print*, 'Starting Asset Simutime loop'
 		DO simutime=1, MaxSimuTime
 			!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi, &
 			!$omp& currenta,currentzi,currentlambdai,currentei,currentxi,tklo,tkhi,tempno,k_igm,&
@@ -233,7 +237,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		       	currentxi 		= panelx(paneli)
 		        
 				!  COMPUTE NEXT PERIOD'S ASSET
-	            ! do linear interpolation here to find aprime. calling the function takes much more time
+				! do linear interpolation here to find aprime. calling the function takes much more time
 		            if (currenta .ge. amax) then
 	                	tklo = na-1
 	                elseif (currenta .lt. amin) then
@@ -257,15 +261,18 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		             
 				! DRAW NEXT PERIOD'S AGE DBN
-		      	tempnoage = omp_ran1() ! ran1(newiseed)  
-		  
-		      	IF (tempnoage .gt. survP(age)) THEN
+				tempnoage = omp_ran1() ! ran1(newiseed)  
+				
+				IF (tempnoage .gt. survP(age)) THEN
 					panelage(paneli)   = 1
+
+					! Bequest Taxes 
+					panela(paneli) = (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*panela(paneli)
 				ELSE
 					panelage(paneli)   = age+1
 					panelz(paneli)     = currentzi
 					panellambda(paneli)= currentlambdai   
-		      	ENDIF
+				ENDIF
 		    
 				! DRAW Z and LAMBDA DISTRIBUTION FOR ONE-YEAR OLDS
 		     	age = panelage(paneli)   
@@ -296,7 +303,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 					panele(paneli) 		= ei 
 					panelx(paneli)		= xi
 
-	       		else  IF (age .gt. 1) THEN
+	       		ELSE
 	       			! !$omp critical
 	       			! print*,'Test 1'
 	       			currentxi = panelx(paneli)
@@ -320,29 +327,29 @@ SUBROUTINE  SIMULATION(bench_indx)
 		            ! !$omp end critical          
 		     	ENDIF ! new age==1
 
-		  !    	! Inter-Generation Mobility 30-50
-		  !    	if (IGM_index.le.4000000) then
-		  !    		! Reset variables if son dies before 50
-			 !     	if ((age.eq.1).and.(age_son(paneli).lt.31)) then 
-			 !     		! !$omp critical
-			 !     		! print*, ' Agent died', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
-			 !     		! !$omp end critical
-			 !     		age_dad(paneli)    = 0 		; age_son(paneli)    = 0 
-			 !     		assets_dad(paneli) = 0.0_dp ; assets_son(paneli) = 0.0_dp
-			 !     		z_dad(paneli)      = 0      ; z_son(paneli)  	 = 0
-			 !     		return_dad(paneli) = 0.0_dp ; return_son(paneli) = 0.0_dp
-			 !     		PV_dad(paneli)     = 0.0_dp ; PV_son(paneli)     = 0.0_dp
-			 !     	endif 
-		  !    		! Update age of current "son"
-		  !    			age_son(paneli)    = age
-		  !    		! Update variables for agents between 30-50 
-		  !    		if ((age.ge.11).and.(age.le.31)) then 
-		  !    			k_igm = min(theta(panelz(paneli))*currenta,&
-		  !    					&(mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-			 !     		assets_son(paneli) = panela(paneli) + assets_son(paneli)
-			 !     		return_son(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*k_igm)**mu - (R+DepRate)*k_igm +&
-		  !    								&   R*panela(paneli) )/panela(paneli) + return_son(paneli)
-			 !     		if (panela(paneli) .ge. amax) then
+				! Inter-Generation Mobility 30-50
+				! if (IGM_index.le.4000000) then
+		  		!	! Reset variables if son dies before 50
+			 	!	if ((age.eq.1).and.(age_son(paneli).lt.31)) then 
+				!		! !$omp critical
+				!		! print*, ' Agent died', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
+				!		! !$omp end critical
+				!		age_dad(paneli)    = 0 		; age_son(paneli)    = 0 
+				!		assets_dad(paneli) = 0.0_dp ; assets_son(paneli) = 0.0_dp
+				!		z_dad(paneli)      = 0      ; z_son(paneli)  	 = 0
+				!		return_dad(paneli) = 0.0_dp ; return_son(paneli) = 0.0_dp
+				!		PV_dad(paneli)     = 0.0_dp ; PV_son(paneli)     = 0.0_dp
+			 	!	endif 
+		  		!	! Update age of current "son"
+		  		!		age_son(paneli)    = age
+		  		!	! Update variables for agents between 30-50 
+		  		!	if ((age.ge.11).and.(age.le.31)) then 
+		  		!		k_igm = min(theta(panelz(paneli))*currenta,&
+		  		!			&(mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+			 	!		assets_son(paneli) = panela(paneli) + assets_son(paneli)
+		 		!		return_son(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*k_igm)**mu - (R+DepRate)*k_igm +&
+		  		!    						&   R*panela(paneli) )/panela(paneli) + return_son(paneli)
+			 	!		if (panela(paneli) .ge. amax) then
 				! 	        tklo = na-1
 				! 	    elseif (panela(paneli) .lt. amin) then
 				!             tklo = 1
@@ -357,16 +364,16 @@ SUBROUTINE  SIMULATION(bench_indx)
 				! 	                       	&		V_Pr(age,tkhi,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli)) )  &
 				! 	                       	&  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*panela(paneli)
 
-			 !     		! !$omp critical
-			 !     		! print*, ' Potential Agent', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
-			 !     		! !$omp end critical
-			 !     	endif 
-			 !     	! Generation change and Save results 
-			 !     	if (age.eq.31) then 
-			 !     		z_son(paneli) = panelz(paneli)
-			 !     		!$omp critical
-			 !     		!print*, ' Son is 50:', IGM_index, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli)
-			 !     		if ((age_dad(paneli).eq.31).and.(simutime.gt.1800)) then  
+			 	!     	! !$omp critical
+			 	!     	! print*, ' Potential Agent', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
+			 	!     	! !$omp end critical
+			 	!	endif 
+			 	!	! Generation change and Save results 
+			 	!   if (age.eq.31) then 
+			 	!     	z_son(paneli) = panelz(paneli)
+			 	!     	!$omp critical
+			 	!     	!print*, ' Son is 50:', IGM_index, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli)
+			 	!     	if ((age_dad(paneli).eq.31).and.(simutime.gt.1800)) then  
 				!      		IGM_a_matrix(1,IGM_index)  = assets_dad(paneli)
 				!      		IGM_a_matrix(2,IGM_index)  = assets_son(paneli)
 				!      		IGM_r_matrix(1,IGM_index)  = return_dad(paneli)
@@ -377,275 +384,275 @@ SUBROUTINE  SIMULATION(bench_indx)
 				!      		IGM_z_matrix(2,IGM_index)  = z_son(paneli)
 				!      		IGM_index = IGM_index + 1
 				!      		! print*, ' Save result', IGM_index-1
-			 !     		endif 
-			 !     		!$omp end critical
-			 !     		age_dad(paneli)    = 31
-			 !     		assets_dad(paneli) = assets_son(paneli)
-			 !     		return_dad(paneli) = return_son(paneli)
-			 !     		PV_dad(paneli)     = PV_son(paneli)
-			 !     		z_dad(paneli)      = panelz(paneli)
-			 !     		assets_son(paneli) = 0.0_dp 
-			 !     		return_son(paneli) = 0.0_dp  
-			 !     		PV_son(paneli)     = 0.0_dp    		
-			 !     		z_son(paneli)      = 0
-			 !     	endif 
-		  !    	endif
+			 	!		endif 
+			 	!		!$omp end critical
+			 	!		age_dad(paneli)    = 31
+			 	!		assets_dad(paneli) = assets_son(paneli)
+			 	!		return_dad(paneli) = return_son(paneli)
+			 	!		PV_dad(paneli)     = PV_son(paneli)
+			 	!		z_dad(paneli)      = panelz(paneli)
+			 	!		assets_son(paneli) = 0.0_dp 
+			 	!		return_son(paneli) = 0.0_dp  
+			 	!		PV_son(paneli)     = 0.0_dp    		
+			 	!		z_son(paneli)      = 0
+		 		!	endif 
+		  		! endif ! IGM_index.le.4000000
 
-		  !    	! Inter-Generation Mobility 40-60
-		  !    	! if (IGM_index_2.le.4000000) then
-		  !    	! 	! Reset variables if son dies before 60
-		  !    	! 	if ((age.eq.1).and.(age_son_2(paneli).lt.41)) then 
-			 !     ! 		! !$omp critical
-			 !     ! 		! print*, ' Agent died', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
-			 !     ! 		! !$omp end critical
-			 !     ! 		age_dad_2(paneli)    = 0 	  ; age_son_2(paneli)    = 0 
-			 !     ! 		assets_dad_2(paneli) = 0.0_dp ; assets_son_2(paneli) = 0.0_dp
-			 !     ! 		z_dad_2(paneli)      = 0      ; z_son_2(paneli)  	 = 0
-			 !     ! 		return_dad_2(paneli) = 0.0_dp ; return_son_2(paneli) = 0.0_dp
-			 !     ! 		PV_dad_2(paneli)     = 0.0_dp ; PV_son_2(paneli)     = 0.0_dp
-			 !     ! 	endif 
-			 !     ! 	! Update age of current "son"
-			 !     ! 		age_son_2(paneli)    = age 
-		  !    	! 	! Update variables for agents between 40-60 
-		  !    	! 	if ((age.ge.21).and.(age.le.41)) then 
-		  !    	! 		k_igm = min(theta(panelz(paneli))*currenta,&
-		  !    	! 				& (mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-			 !     ! 		assets_son_2(paneli) = panela(paneli) + assets_son_2(paneli)
-			 !     ! 		return_son_2(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*k_igm)**mu - (R+DepRate)*k_igm +&
-		  !    	! 							&   R*panela(paneli) )/panela(paneli) + return_son_2(paneli)
-			 !     ! 		if (panela(paneli) .ge. amax) then
-				! 	   !      tklo = na-1
-				! 	   !  elseif (panela(paneli) .lt. amin) then
-				!     !         tklo = 1
-				!     !     else
-				!     !         tklo = ((panela(paneli)- amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-				! 	   !  endif    
-				! 	   !  tkhi = tklo + 1        
+		     	! Inter-Generation Mobility 40-60
+		     	! if (IGM_index_2.le.4000000) then
+		     	! 	! Reset variables if son dies before 60
+		     	! 	if ((age.eq.1).and.(age_son_2(paneli).lt.41)) then 
+			     ! 		! !$omp critical
+			     ! 		! print*, ' Agent died', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
+			     ! 		! !$omp end critical
+			     ! 		age_dad_2(paneli)    = 0 	  ; age_son_2(paneli)    = 0 
+			     ! 		assets_dad_2(paneli) = 0.0_dp ; assets_son_2(paneli) = 0.0_dp
+			     ! 		z_dad_2(paneli)      = 0      ; z_son_2(paneli)  	 = 0
+			     ! 		return_dad_2(paneli) = 0.0_dp ; return_son_2(paneli) = 0.0_dp
+			     ! 		PV_dad_2(paneli)     = 0.0_dp ; PV_son_2(paneli)     = 0.0_dp
+			     ! 	endif 
+			     ! 	! Update age of current "son"
+			     ! 		age_son_2(paneli)    = age 
+		     	! 	! Update variables for agents between 40-60 
+		     	! 	if ((age.ge.21).and.(age.le.41)) then 
+		     	! 		k_igm = min(theta(panelz(paneli))*currenta,&
+		     	! 				& (mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+			     ! 		assets_son_2(paneli) = panela(paneli) + assets_son_2(paneli)
+			     ! 		return_son_2(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*k_igm)**mu - (R+DepRate)*k_igm +&
+		     	! 							&   R*panela(paneli) )/panela(paneli) + return_son_2(paneli)
+			     ! 		if (panela(paneli) .ge. amax) then
+					   !      tklo = na-1
+					   !  elseif (panela(paneli) .lt. amin) then
+				    !         tklo = 1
+				    !     else
+				    !         tklo = ((panela(paneli)- amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+					   !  endif    
+					   !  tkhi = tklo + 1        
 
-				! 	   !  PV_son_2(paneli)  = (   (agrid(tkhi) - panela(paneli)) * & 
-				! 	   !  					&		V_Pr(age,tklo,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli))  &
-				! 	   !                     	&  + (panela(paneli) - agrid(tklo)) * &
-				! 	   !                     	&		V_Pr(age,tkhi,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli)) ) &
-				! 	   !                     	&  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*panela(paneli)
-			 !     ! 		! !$omp critical
-			 !     ! 		! print*, ' Potential Agent', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
-			 !     ! 		! !$omp end critical
-			 !     ! 	endif 
-			 !     ! 	! Generation change and Save results 
-			 !     ! 	if (age.eq.41) then 
-			 !     ! 		z_son_2(paneli) = panelz(paneli)
-			 !     ! 		!$omp critical
-			 !     ! 		!print*, ' Son is 50:', IGM_index, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli)
-			 !     ! 		if ((age_dad_2(paneli).eq.41).and.(simutime.gt.1800)) then  
-				!     !  		IGM_a_matrix_2(1,IGM_index_2) = assets_dad_2(paneli)
-				!     !  		IGM_a_matrix_2(2,IGM_index_2) = assets_son_2(paneli)
-				!     !  		IGM_r_matrix_2(1,IGM_index_2) = return_dad_2(paneli)
-				!     !  		IGM_r_matrix_2(2,IGM_index_2) = return_son_2(paneli)
-				!     !  		IGM_pv_matrix_2(1,IGM_index)  = PV_dad_2(paneli)
-				!     !  		IGM_pv_matrix_2(2,IGM_index)  = PV_son_2(paneli)
-				!     !  		IGM_z_matrix_2(1,IGM_index_2) = z_dad_2(paneli)
-				!     !  		IGM_z_matrix_2(2,IGM_index_2) = z_son_2(paneli)
-				!     !  		IGM_index_2 = IGM_index_2 + 1
-				!     !  		! print*, ' Save result', IGM_index-1
-			 !     ! 		endif 
-			 !     ! 		!$omp end critical
-			 !     ! 		age_dad_2(paneli)    = 41
-			 !     ! 		assets_dad_2(paneli) = assets_son_2(paneli)
-			 !     ! 		return_dad_2(paneli) = return_son_2(paneli)
-			 !     ! 		PV_dad_2(paneli)     = PV_son_2(paneli)
-			 !     ! 		z_dad_2(paneli)      = panelz(paneli)
-			 !     ! 		assets_son_2(paneli) = 0.0_dp    
-			 !     ! 		return_son_2(paneli) = 0.0_dp
-			 !     ! 		PV_son_2(paneli)     = 0.0_dp  
-			 !     ! 		z_son_2(paneli)      = 0  		
-			 !     ! 	endif 
-		  !    	! endif
+					   !  PV_son_2(paneli)  = (   (agrid(tkhi) - panela(paneli)) * & 
+					   !  					&		V_Pr(age,tklo,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli))  &
+					   !                     	&  + (panela(paneli) - agrid(tklo)) * &
+					   !                     	&		V_Pr(age,tkhi,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli)) ) &
+					   !                     	&  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*panela(paneli)
+			     ! 		! !$omp critical
+			     ! 		! print*, ' Potential Agent', IGM_index, 'age_son',age_son(paneli), 'agent', paneli
+			     ! 		! !$omp end critical
+			     ! 	endif 
+			     ! 	! Generation change and Save results 
+			     ! 	if (age.eq.41) then 
+			     ! 		z_son_2(paneli) = panelz(paneli)
+			     ! 		!$omp critical
+			     ! 		!print*, ' Son is 50:', IGM_index, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli)
+			     ! 		if ((age_dad_2(paneli).eq.41).and.(simutime.gt.1800)) then  
+				    !  		IGM_a_matrix_2(1,IGM_index_2) = assets_dad_2(paneli)
+				    !  		IGM_a_matrix_2(2,IGM_index_2) = assets_son_2(paneli)
+				    !  		IGM_r_matrix_2(1,IGM_index_2) = return_dad_2(paneli)
+				    !  		IGM_r_matrix_2(2,IGM_index_2) = return_son_2(paneli)
+				    !  		IGM_pv_matrix_2(1,IGM_index)  = PV_dad_2(paneli)
+				    !  		IGM_pv_matrix_2(2,IGM_index)  = PV_son_2(paneli)
+				    !  		IGM_z_matrix_2(1,IGM_index_2) = z_dad_2(paneli)
+				    !  		IGM_z_matrix_2(2,IGM_index_2) = z_son_2(paneli)
+				    !  		IGM_index_2 = IGM_index_2 + 1
+				    !  		! print*, ' Save result', IGM_index-1
+			     ! 		endif 
+			     ! 		!$omp end critical
+			     ! 		age_dad_2(paneli)    = 41
+			     ! 		assets_dad_2(paneli) = assets_son_2(paneli)
+			     ! 		return_dad_2(paneli) = return_son_2(paneli)
+			     ! 		PV_dad_2(paneli)     = PV_son_2(paneli)
+			     ! 		z_dad_2(paneli)      = panelz(paneli)
+			     ! 		assets_son_2(paneli) = 0.0_dp    
+			     ! 		return_son_2(paneli) = 0.0_dp
+			     ! 		PV_son_2(paneli)     = 0.0_dp  
+			     ! 		z_son_2(paneli)      = 0  		
+			     ! 	endif 
+		     	! endif
 
-		  !    	! Average Return by age group
-		  !    	if (paneli.le.ret_size) then 
-		  !    	K_aux = min(theta(panelz(paneli))*panela(paneli),&
-		  !    			&(mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-	   !   		ret_aux(paneli)     = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
-	   !   								&   R*panela(paneli) )/panela(paneli) + ret_aux(paneli)
-	   !   		ret_w_aux(paneli)   = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
-	   !   								&   R*panela(paneli) ) + ret_w_aux(paneli)
-	   !   		cum_assets(paneli)  = panela(paneli) + cum_assets(paneli)
-	   !   		if (panelx(paneli).lt.3) then 
-	   !   		ret_k_aux(paneli)   = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
-	   !   								&   R*panela(paneli) )/K_aux + ret_k_aux(paneli)
-	   !   		ret_k_w_aux(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
-	   !   								&   R*panela(paneli) ) + ret_k_w_aux(paneli)
-	   !   		cum_K(paneli)       = K_aux + cum_K(paneli)
-	   !   		ind_K(paneli) 		= 1 + ind_K(paneli)
-	   !   		endif 
+		!   !    	! Average Return by age group
+		!   !    	if (paneli.le.ret_size) then 
+		!   !    	K_aux = min(theta(panelz(paneli))*panela(paneli),&
+		!   !    			&(mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+	 !   !   		ret_aux(paneli)     = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
+	 !   !   								&   R*panela(paneli) )/panela(paneli) + ret_aux(paneli)
+	 !   !   		ret_w_aux(paneli)   = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
+	 !   !   								&   R*panela(paneli) ) + ret_w_aux(paneli)
+	 !   !   		cum_assets(paneli)  = panela(paneli) + cum_assets(paneli)
+	 !   !   		if (panelx(paneli).lt.3) then 
+	 !   !   		ret_k_aux(paneli)   = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
+	 !   !   								&   R*panela(paneli) )/K_aux + ret_k_aux(paneli)
+	 !   !   		ret_k_w_aux(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
+	 !   !   								&   R*panela(paneli) ) + ret_k_w_aux(paneli)
+	 !   !   		cum_K(paneli)       = K_aux + cum_K(paneli)
+	 !   !   		ind_K(paneli) 		= 1 + ind_K(paneli)
+	 !   !   		endif 
 
-	   !   		if (age.eq.1) then
-	   !   			ret_20(paneli)        = ret_aux(paneli) 
-	   !   			ret_aux(paneli)       = 0.0_dp 
-	   !   			ret_w_20(paneli)      = ret_w_aux(paneli)/cum_assets(paneli)
-	   !   			ret_w_aux(paneli)     = 0.0_dp 
-	   !   			cum_assets(paneli)    = 0.0_dp 
-	   !   			if (cum_K(paneli).gt.0.0_dp) then 
-	   !   			ret_k_20(paneli)      = ret_k_aux(paneli)/ind_K(paneli)
-	   !   			ret_k_w_20(paneli)    = ret_k_w_aux(paneli)/cum_K(paneli)
-	   !   			ind_K_20(paneli)      = 1
-	   !   			endif 
-	   !   			ret_k_aux(paneli)     = 0.0_dp 
-	   !   			ret_k_w_aux(paneli)   = 0.0_dp 
-	   !   			cum_K(paneli)         = 0.0_dp
-	   !   			ind_K(paneli)         = 0
-	   !   		elseif (age.eq.6) then
-	   !   			ret_21_25(paneli)     = ret_aux(paneli)/5.0_dp 
-	   !   			ret_aux(paneli)       = 0.0_dp 
-	   !   			ret_w_21_25(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
-	   !   			ret_w_aux(paneli)     = 0.0_dp 
-	   !   			cum_assets(paneli)    = 0.0_dp 
-	   !   			if (cum_K(paneli).gt.0.0_dp) then 
-	   !   			ret_k_21_25(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
-	   !   			ret_k_w_21_25(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	   !   			ind_K_21_25(paneli)   = 1
-	   !   			endif 
-	   !   			ret_k_aux(paneli)     = 0.0_dp 
-	   !   			ret_k_w_aux(paneli)   = 0.0_dp 
-	   !   			cum_K(paneli)         = 0.0_dp
-	   !   			ind_K(paneli)         = 0
-    !  			elseif (age.eq.11) then 
-    !  				ret_26_30(paneli)     = ret_aux(paneli)/5.0_dp 
-	   !   			ret_aux(paneli)       = 0.0_dp 
-	   !   			ret_w_26_30(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
-	   !   			ret_w_aux(paneli)     = 0.0_dp 
-	   !   			cum_assets(paneli)    = 0.0_dp 
-	   !   			if (cum_K(paneli).gt.0.0_dp) then 
-	   !   			ret_k_26_30(paneli)   = ret_k_aux(paneli)/ind_K(paneli)
-	   !   			ret_k_w_26_30(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	   !   			ind_K_26_30(paneli)   = 1
-	   !   			endif 
-	   !   			ret_k_aux(paneli)     = 0.0_dp 
-	   !   			ret_k_w_aux(paneli)   = 0.0_dp 
-	   !   			cum_K(paneli)         = 0.0_dp
-	   !   			ind_K(paneli)         = 0
-    !  			elseif (age.eq.15) then 
-    !  				ret_31_35(paneli)     = ret_aux(paneli)/5.0_dp 
-	   !   			ret_aux(paneli)       = 0.0_dp 
-	   !   			ret_w_31_35(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
-	   !   			ret_w_aux(paneli)     = 0.0_dp
-	   !   			cum_assets(paneli)    = 0.0_dp 
-	   !   			if (cum_K(paneli).gt.0.0_dp) then 
-	   !   			ret_k_31_35(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
-	   !   			ret_k_w_31_35(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	   !   			ind_K_31_35(paneli)   = 1
-	   !   			endif 
-	   !   			ret_k_aux(paneli)     = 0.0_dp 
-	   !   			ret_k_w_aux(paneli)   = 0.0_dp 
-	   !   			cum_K(paneli)         = 0.0_dp
-	   !   			ind_K(paneli)         = 0
-    !  			elseif (age.eq.21) then 
-    !  				ret_36_40(paneli)     = ret_aux(paneli)/5.0_dp 
-	   !   			ret_aux(paneli)       = 0.0_dp 
-	   !   			ret_w_36_40(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
-	   !   			ret_w_aux(paneli)     = 0.0_dp 
-	   !   			cum_assets(paneli)    = 0.0_dp 
-	   !   			if (cum_K(paneli).gt.0.0_dp) then 
-	   !   			ret_k_36_40(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
-	   !   			ret_k_w_36_40(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	   !   			ind_K_36_40(paneli)   = 1
-	   !   			endif 
-	   !   			ret_k_aux(paneli)     = 0.0_dp 
-	   !   			ret_k_w_aux(paneli)   = 0.0_dp 
-	   !   			cum_K(paneli)         = 0.0_dp
-	   !   			ind_K(paneli)         = 0
-    !  			elseif (age.eq.26) then 
-    !  				ret_41_45(paneli)     = ret_aux(paneli)/5.0_dp 
-	   !   			ret_aux(paneli)       = 0.0_dp 
-	   !   			ret_w_41_45(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
-	   !   			ret_w_aux(paneli)     = 0.0_dp 
-	   !   			cum_assets(paneli)    = 0.0_dp 
-	   !   			if (cum_K(paneli).gt.0.0_dp) then 
-	   !   			ret_k_41_45(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
-	   !   			ret_k_w_41_45(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	   !   			ind_K_41_45(paneli)   = 1
-	   !   			endif 
-	   !   			ret_k_aux(paneli)     = 0.0_dp 
-	   !   			ret_k_w_aux(paneli)   = 0.0_dp 
-	   !   			cum_K(paneli)         = 0.0_dp
-	   !   			ind_K(paneli)         = 0
-    !  			elseif (age.eq.31) then 
-    !  				ret_46_50(paneli)     = ret_aux(paneli)/5.0_dp 
-	   !   			ret_aux(paneli)       = 0.0_dp 
-	   !   			ret_w_46_50(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
-	   !   			ret_w_aux(paneli)     = 0.0_dp 
-	   !   			cum_assets(paneli)    = 0.0_dp 
-	   !   			if (cum_K(paneli).gt.0.0_dp) then 
-	   !   			ret_k_46_50(paneli)   = ret_k_aux(paneli)/ind_K(paneli)
-	   !   			ret_k_w_46_50(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	   !   			ind_K_46_50(paneli)   = 1
-	   !   			endif 
-	   !   			ret_k_aux(paneli)     = 0.0_dp 
-	   !   			ret_k_w_aux(paneli)   = 0.0_dp 
-	   !   			cum_K(paneli)         = 0.0_dp
-	   !   			ind_K(paneli)         = 0
-    !  			elseif (age.eq.36) then 
-    !  				ret_51_55(paneli)     = ret_aux(paneli)/5.0_dp 
-	   !   			ret_aux(paneli)       = 0.0_dp 
-	   !   			ret_w_51_55(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
-	   !   			ret_w_aux(paneli)     = 0.0_dp 
-	   !   			cum_assets(paneli)    = 0.0_dp 
-	   !   			if (cum_K(paneli).gt.0.0_dp) then 
-	   !   			ret_k_51_55(paneli)   = ret_k_aux(paneli)/ind_K(paneli)
-	   !   			ret_k_w_51_55(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	   !   			ind_K_51_55(paneli)   = 1
-	   !   			endif 
-	   !   			ret_k_aux(paneli)     = 0.0_dp 
-	   !   			ret_k_w_aux(paneli)   = 0.0_dp 
-	   !   			cum_K(paneli)         = 0.0_dp
-	   !   			ind_K(paneli)         = 0
-    !  			elseif (age.eq.41) then 
-    !  				ret_56_60(paneli)     = ret_aux(paneli)/5.0_dp 
-	   !   			ret_aux(paneli)       = 0.0_dp 
-	   !   			ret_w_56_60(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
-	   !   			ret_w_aux(paneli)     = 0.0_dp 
-	   !   			cum_assets(paneli)    = 0.0_dp 
-	   !   			if (cum_K(paneli).gt.0.0_dp) then 
-	   !   			ret_k_56_60(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
-	   !   			ret_k_w_56_60(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	   !   			ind_K_56_60(paneli)   = 1
-	   !   			endif 
-	   !   			ret_k_aux(paneli)     = 0.0_dp 
-	   !   			ret_k_w_aux(paneli)   = 0.0_dp 
-	   !   			cum_K(paneli)         = 0.0_dp
-	   !   			ind_K(paneli)         = 0
-    !  			elseif (age.eq.46) then 
-    !  				ret_61_65(paneli)     = ret_aux(paneli)/5.0_dp 
-	   !   			ret_aux(paneli)       = 0.0_dp 
-	   !   			ret_w_61_65(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
-	   !   			ret_w_aux(paneli)     = 0.0_dp 
-	   !   			cum_assets(paneli)    = 0.0_dp 
-	   !   			if (cum_K(paneli).gt.0.0_dp) then 
-	   !   			ret_k_61_65(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
-	   !   			ret_k_w_61_65(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	   !   			ind_K_61_65(paneli)   = 1
-	   !   			endif 
-	   !   			ret_k_aux(paneli)     = 0.0_dp 
-	   !   			ret_k_w_aux(paneli)   = 0.0_dp 
-	   !   			cum_K(paneli)         = 0.0_dp
-	   !   			ind_K(paneli)         = 0
-    !  			elseif (age.eq.51) then 
-    !  				ret_66_70(paneli)     = ret_aux(paneli)/5.0_dp 
-	   !   			ret_aux(paneli)       = 0.0_dp 
-	   !   			ret_w_66_70(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
-	   !   			ret_w_aux(paneli)     = 0.0_dp  
-	   !   			cum_assets(paneli)    = 0.0_dp 
-	   !   			if (cum_K(paneli).gt.0.0_dp) then 
-	   !   			ret_k_66_70(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
-	   !   			ret_k_w_66_70(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
-	   !   			ind_K_66_70(paneli)   = 1
-	   !   			endif 
-	   !   			ret_k_aux(paneli)     = 0.0_dp 
-	   !   			ret_k_w_aux(paneli)   = 0.0_dp 
-	   !   			cum_K(paneli)         = 0.0_dp
-	   !   			ind_K(paneli)         = 0
-    !  			endif 
-				! endif 
+	 !   !   		if (age.eq.1) then
+	 !   !   			ret_20(paneli)        = ret_aux(paneli) 
+	 !   !   			ret_aux(paneli)       = 0.0_dp 
+	 !   !   			ret_w_20(paneli)      = ret_w_aux(paneli)/cum_assets(paneli)
+	 !   !   			ret_w_aux(paneli)     = 0.0_dp 
+	 !   !   			cum_assets(paneli)    = 0.0_dp 
+	 !   !   			if (cum_K(paneli).gt.0.0_dp) then 
+	 !   !   			ret_k_20(paneli)      = ret_k_aux(paneli)/ind_K(paneli)
+	 !   !   			ret_k_w_20(paneli)    = ret_k_w_aux(paneli)/cum_K(paneli)
+	 !   !   			ind_K_20(paneli)      = 1
+	 !   !   			endif 
+	 !   !   			ret_k_aux(paneli)     = 0.0_dp 
+	 !   !   			ret_k_w_aux(paneli)   = 0.0_dp 
+	 !   !   			cum_K(paneli)         = 0.0_dp
+	 !   !   			ind_K(paneli)         = 0
+	 !   !   		elseif (age.eq.6) then
+	 !   !   			ret_21_25(paneli)     = ret_aux(paneli)/5.0_dp 
+	 !   !   			ret_aux(paneli)       = 0.0_dp 
+	 !   !   			ret_w_21_25(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
+	 !   !   			ret_w_aux(paneli)     = 0.0_dp 
+	 !   !   			cum_assets(paneli)    = 0.0_dp 
+	 !   !   			if (cum_K(paneli).gt.0.0_dp) then 
+	 !   !   			ret_k_21_25(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
+	 !   !   			ret_k_w_21_25(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	 !   !   			ind_K_21_25(paneli)   = 1
+	 !   !   			endif 
+	 !   !   			ret_k_aux(paneli)     = 0.0_dp 
+	 !   !   			ret_k_w_aux(paneli)   = 0.0_dp 
+	 !   !   			cum_K(paneli)         = 0.0_dp
+	 !   !   			ind_K(paneli)         = 0
+  !   !  			elseif (age.eq.11) then 
+  !   !  				ret_26_30(paneli)     = ret_aux(paneli)/5.0_dp 
+	 !   !   			ret_aux(paneli)       = 0.0_dp 
+	 !   !   			ret_w_26_30(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
+	 !   !   			ret_w_aux(paneli)     = 0.0_dp 
+	 !   !   			cum_assets(paneli)    = 0.0_dp 
+	 !   !   			if (cum_K(paneli).gt.0.0_dp) then 
+	 !   !   			ret_k_26_30(paneli)   = ret_k_aux(paneli)/ind_K(paneli)
+	 !   !   			ret_k_w_26_30(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	 !   !   			ind_K_26_30(paneli)   = 1
+	 !   !   			endif 
+	 !   !   			ret_k_aux(paneli)     = 0.0_dp 
+	 !   !   			ret_k_w_aux(paneli)   = 0.0_dp 
+	 !   !   			cum_K(paneli)         = 0.0_dp
+	 !   !   			ind_K(paneli)         = 0
+  !   !  			elseif (age.eq.15) then 
+  !   !  				ret_31_35(paneli)     = ret_aux(paneli)/5.0_dp 
+	 !   !   			ret_aux(paneli)       = 0.0_dp 
+	 !   !   			ret_w_31_35(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
+	 !   !   			ret_w_aux(paneli)     = 0.0_dp
+	 !   !   			cum_assets(paneli)    = 0.0_dp 
+	 !   !   			if (cum_K(paneli).gt.0.0_dp) then 
+	 !   !   			ret_k_31_35(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
+	 !   !   			ret_k_w_31_35(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	 !   !   			ind_K_31_35(paneli)   = 1
+	 !   !   			endif 
+	 !   !   			ret_k_aux(paneli)     = 0.0_dp 
+	 !   !   			ret_k_w_aux(paneli)   = 0.0_dp 
+	 !   !   			cum_K(paneli)         = 0.0_dp
+	 !   !   			ind_K(paneli)         = 0
+  !   !  			elseif (age.eq.21) then 
+  !   !  				ret_36_40(paneli)     = ret_aux(paneli)/5.0_dp 
+	 !   !   			ret_aux(paneli)       = 0.0_dp 
+	 !   !   			ret_w_36_40(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
+	 !   !   			ret_w_aux(paneli)     = 0.0_dp 
+	 !   !   			cum_assets(paneli)    = 0.0_dp 
+	 !   !   			if (cum_K(paneli).gt.0.0_dp) then 
+	 !   !   			ret_k_36_40(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
+	 !   !   			ret_k_w_36_40(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	 !   !   			ind_K_36_40(paneli)   = 1
+	 !   !   			endif 
+	 !   !   			ret_k_aux(paneli)     = 0.0_dp 
+	 !   !   			ret_k_w_aux(paneli)   = 0.0_dp 
+	 !   !   			cum_K(paneli)         = 0.0_dp
+	 !   !   			ind_K(paneli)         = 0
+  !   !  			elseif (age.eq.26) then 
+  !   !  				ret_41_45(paneli)     = ret_aux(paneli)/5.0_dp 
+	 !   !   			ret_aux(paneli)       = 0.0_dp 
+	 !   !   			ret_w_41_45(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
+	 !   !   			ret_w_aux(paneli)     = 0.0_dp 
+	 !   !   			cum_assets(paneli)    = 0.0_dp 
+	 !   !   			if (cum_K(paneli).gt.0.0_dp) then 
+	 !   !   			ret_k_41_45(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
+	 !   !   			ret_k_w_41_45(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	 !   !   			ind_K_41_45(paneli)   = 1
+	 !   !   			endif 
+	 !   !   			ret_k_aux(paneli)     = 0.0_dp 
+	 !   !   			ret_k_w_aux(paneli)   = 0.0_dp 
+	 !   !   			cum_K(paneli)         = 0.0_dp
+	 !   !   			ind_K(paneli)         = 0
+  !   !  			elseif (age.eq.31) then 
+  !   !  				ret_46_50(paneli)     = ret_aux(paneli)/5.0_dp 
+	 !   !   			ret_aux(paneli)       = 0.0_dp 
+	 !   !   			ret_w_46_50(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
+	 !   !   			ret_w_aux(paneli)     = 0.0_dp 
+	 !   !   			cum_assets(paneli)    = 0.0_dp 
+	 !   !   			if (cum_K(paneli).gt.0.0_dp) then 
+	 !   !   			ret_k_46_50(paneli)   = ret_k_aux(paneli)/ind_K(paneli)
+	 !   !   			ret_k_w_46_50(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	 !   !   			ind_K_46_50(paneli)   = 1
+	 !   !   			endif 
+	 !   !   			ret_k_aux(paneli)     = 0.0_dp 
+	 !   !   			ret_k_w_aux(paneli)   = 0.0_dp 
+	 !   !   			cum_K(paneli)         = 0.0_dp
+	 !   !   			ind_K(paneli)         = 0
+  !   !  			elseif (age.eq.36) then 
+  !   !  				ret_51_55(paneli)     = ret_aux(paneli)/5.0_dp 
+	 !   !   			ret_aux(paneli)       = 0.0_dp 
+	 !   !   			ret_w_51_55(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
+	 !   !   			ret_w_aux(paneli)     = 0.0_dp 
+	 !   !   			cum_assets(paneli)    = 0.0_dp 
+	 !   !   			if (cum_K(paneli).gt.0.0_dp) then 
+	 !   !   			ret_k_51_55(paneli)   = ret_k_aux(paneli)/ind_K(paneli)
+	 !   !   			ret_k_w_51_55(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	 !   !   			ind_K_51_55(paneli)   = 1
+	 !   !   			endif 
+	 !   !   			ret_k_aux(paneli)     = 0.0_dp 
+	 !   !   			ret_k_w_aux(paneli)   = 0.0_dp 
+	 !   !   			cum_K(paneli)         = 0.0_dp
+	 !   !   			ind_K(paneli)         = 0
+  !   !  			elseif (age.eq.41) then 
+  !   !  				ret_56_60(paneli)     = ret_aux(paneli)/5.0_dp 
+	 !   !   			ret_aux(paneli)       = 0.0_dp 
+	 !   !   			ret_w_56_60(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
+	 !   !   			ret_w_aux(paneli)     = 0.0_dp 
+	 !   !   			cum_assets(paneli)    = 0.0_dp 
+	 !   !   			if (cum_K(paneli).gt.0.0_dp) then 
+	 !   !   			ret_k_56_60(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
+	 !   !   			ret_k_w_56_60(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	 !   !   			ind_K_56_60(paneli)   = 1
+	 !   !   			endif 
+	 !   !   			ret_k_aux(paneli)     = 0.0_dp 
+	 !   !   			ret_k_w_aux(paneli)   = 0.0_dp 
+	 !   !   			cum_K(paneli)         = 0.0_dp
+	 !   !   			ind_K(paneli)         = 0
+  !   !  			elseif (age.eq.46) then 
+  !   !  				ret_61_65(paneli)     = ret_aux(paneli)/5.0_dp 
+	 !   !   			ret_aux(paneli)       = 0.0_dp 
+	 !   !   			ret_w_61_65(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
+	 !   !   			ret_w_aux(paneli)     = 0.0_dp 
+	 !   !   			cum_assets(paneli)    = 0.0_dp 
+	 !   !   			if (cum_K(paneli).gt.0.0_dp) then 
+	 !   !   			ret_k_61_65(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
+	 !   !   			ret_k_w_61_65(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	 !   !   			ind_K_61_65(paneli)   = 1
+	 !   !   			endif 
+	 !   !   			ret_k_aux(paneli)     = 0.0_dp 
+	 !   !   			ret_k_w_aux(paneli)   = 0.0_dp 
+	 !   !   			cum_K(paneli)         = 0.0_dp
+	 !   !   			ind_K(paneli)         = 0
+  !   !  			elseif (age.eq.51) then 
+  !   !  				ret_66_70(paneli)     = ret_aux(paneli)/5.0_dp 
+	 !   !   			ret_aux(paneli)       = 0.0_dp 
+	 !   !   			ret_w_66_70(paneli)   = ret_w_aux(paneli)/cum_assets(paneli)
+	 !   !   			ret_w_aux(paneli)     = 0.0_dp  
+	 !   !   			cum_assets(paneli)    = 0.0_dp 
+	 !   !   			if (cum_K(paneli).gt.0.0_dp) then 
+	 !   !   			ret_k_66_70(paneli)   = ret_k_aux(paneli)/ind_K(paneli) 
+	 !   !   			ret_k_w_66_70(paneli) = ret_k_w_aux(paneli)/cum_K(paneli)
+	 !   !   			ind_K_66_70(paneli)   = 1
+	 !   !   			endif 
+	 !   !   			ret_k_aux(paneli)     = 0.0_dp 
+	 !   !   			ret_k_w_aux(paneli)   = 0.0_dp 
+	 !   !   			cum_K(paneli)         = 0.0_dp
+	 !   !   			ind_K(paneli)         = 0
+  !   !  			endif 
+		! 		! endif 
 
 			ENDDO ! paneli
 			
@@ -664,34 +671,34 @@ SUBROUTINE  SIMULATION(bench_indx)
 			! 	if (simutime.eq.(MaxSimuTime-54)) then 
 			!     	panela_parents   = panela
 			!     	! panelage_parents = panelage
-		 !        endif 
-		 !        if ((simutime.ge.(MaxSimuTime-(5+53))).and.(simutime.le.(MaxSimuTime-(5+51)))) then 
+		 	!	endif 
+		 	!	if ((simutime.ge.(MaxSimuTime-(5+53))).and.(simutime.le.(MaxSimuTime-(5+51)))) then 
 			!     	panela_parents   = panela_parents  + panela
 			!     	! panelage_parents = panelage
 			!     	where(panelage==1) eligible = 0 
-		 !        endif 
-		 !        if (simutime.eq.(MaxSimuTime-(5+50))) then 
+		 	!	endif 
+		 	!	if (simutime.eq.(MaxSimuTime-(5+50))) then 
 			!     	panela_parents   = panela_parents   + panela
 			!     	panelage_parents = panelage
 			!     	where(panelage==1) eligible = 0 
-		 !        endif 
-		 !        if ((simutime.ge.(MaxSimuTime-(5+49))).and.(simutime.le.(MaxSimuTime-4))) then
-		 !        	where(panelage==1) death_count = death_count + 1
-		 !        endif
-		 !        if (simutime.eq.(MaxSimuTime-4)) then 
+		 	!	endif 
+		 	!	if ((simutime.ge.(MaxSimuTime-(5+49))).and.(simutime.le.(MaxSimuTime-4))) then
+		 	!		where(panelage==1) death_count = death_count + 1
+		 	!	endif
+		 	!	if (simutime.eq.(MaxSimuTime-4)) then 
 			!     	panela_sons   = panela
 			!     	! panelage_sons = panelage 
-		 !        endif 
-		 !        if ((simutime.ge.(MaxSimuTime-3)).and.(simutime.le.(MaxSimuTime-1))) then 
+		 	!	endif 
+		 	!	if ((simutime.ge.(MaxSimuTime-3)).and.(simutime.le.(MaxSimuTime-1))) then 
 			!     	panela_sons   = panela_sons   + panela
 			!     	! panelage_sons = panelage 
 			!     	where(panelage==1) eligible = 0 
-		 !        endif 
-		 !        if (simutime.eq.(MaxSimuTime)) then 
+		 	!	endif 
+		 	!	if (simutime.eq.(MaxSimuTime)) then 
 			!     	! panela_sons   = panela_sons   + panela
 			!     	panelage_sons = panelage 
 			!     	where(panelage==1) eligible = 0 
-		 !        endif 
+		 	!	endif 
 
 		 		
 		 		print*, "Simulation period", simutime
@@ -703,384 +710,385 @@ SUBROUTINE  SIMULATION(bench_indx)
 			print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8), sum(panela)/real(totpop,8)
 
 
-		print*, ' '
-		print*, 'Compute variables for final cross-section'
-		!$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi,h_i)
-		DO paneli=1,totpop
-		    currenta 		= panela(paneli)
-		    age 			= panelage(paneli)
-		    currentzi 		= panelz(paneli)
-		    currentlambdai 	= panellambda(paneli) 
-		    currentei 		= panele(paneli)
-		    currentxi 		= panelx(paneli)
+		! print*, ' '
+		! print*, 'Compute variables for final cross-section'
+		! ! !$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi,h_i)
+		! ! DO paneli=1,totpop
+		! !     currenta 		= panela(paneli)
+		! !     age 			= panelage(paneli)
+		! !     currentzi 		= panelz(paneli)
+		! !     currentlambdai 	= panellambda(paneli) 
+		! !     currentei 		= panele(paneli)
+		! !     currentxi 		= panelx(paneli)
 
-		    if (currenta .ge. amax) then
-		        tklo = na-1
-		    elseif (currenta .lt. amin) then
-	            tklo = 1
-	        else
-	            tklo = ((currenta - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-		    endif    
-		    tkhi = tklo + 1   
+		! !     if (currenta .ge. amax) then
+		! !         tklo = na-1
+		! !     elseif (currenta .lt. amin) then
+	 ! !            tklo = 1
+	 ! !        else
+	 ! !            tklo = ((currenta - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+		! !     endif    
+		! !     tkhi = tklo + 1   
 
-		    panelK(paneli)    = min(theta(currentzi)*currenta,(mu*P*xz_grid(currentxi,currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		! !     panelK(paneli)    = min(theta(currentzi)*currenta,&
+		! !     		& (mu*P*xz_grid(currentxi,currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
-			if (age.lt.RetAge) then 
-		        h_i  = ((agrid(tkhi) - currenta)*hours(age,tklo,currentzi,currentlambdai,currentei,currentxi) &
-		           &  + (currenta - agrid(tklo))*hours(age,tkhi,currentzi,currentlambdai,currentei,currentxi) ) &
-		                                &  / ( agrid(tkhi) - agrid(tklo) )  
+		! ! 	if (age.lt.RetAge) then 
+		! !         h_i  = ((agrid(tkhi) - currenta)*hours(age,tklo,currentzi,currentlambdai,currentei,currentxi) &
+		! !            &  + (currenta - agrid(tklo))*hours(age,tkhi,currentzi,currentlambdai,currentei,currentxi) ) &
+		! !                                 &  / ( agrid(tkhi) - agrid(tklo) )  
 
-				panel_Y_L(paneli) = psi*( Wage*eff_un(age,currentlambdai,currentei)*h_i)**(1.0_dp-tauPL)
-			else 
-				panel_Y_L(paneli) = RetY_lambda_e(currentlambdai,currentei)
-			endif 
+		! ! 		panel_Y_L(paneli) = psi*( Wage*eff_un(age,currentlambdai,currentei)*h_i)**(1.0_dp-tauPL)
+		! ! 	else 
+		! ! 		panel_Y_L(paneli) = RetY_lambda_e(currentlambdai,currentei)
+		! ! 	endif 
 
-			if (age.eq.1) then 
-				currentzi = panelz_old(paneli)
-				currentlambdai = panellambda_old(paneli)
-				panelPV_a(paneli) = (   (agrid(tkhi) - currenta) * V_Pr_nb(tklo,currentzi,currentlambdai)  &
-		                       &  + (currenta - agrid(tklo)) * V_Pr_nb(tkhi,currentzi,currentlambdai)) &
-		                       &  / ( agrid(tkhi) - agrid(tklo) )
-		    else 
+		! ! 	if (age.eq.1) then 
+		! ! 		currentzi = panelz_old(paneli)
+		! ! 		currentlambdai = panellambda_old(paneli)
+		! ! 		panelPV_a(paneli) = (   (agrid(tkhi) - currenta) * V_Pr_nb(tklo,currentzi,currentlambdai)  &
+		! !                        &  + (currenta - agrid(tklo)) * V_Pr_nb(tkhi,currentzi,currentlambdai)) &
+		! !                        &  / ( agrid(tkhi) - agrid(tklo) )
+		! !     else 
 		    	
-		    	panelPV_a(paneli) = (   (agrid(tkhi) - currenta) * V_Pr(age,tklo,currentzi,currentlambdai, currentei, currentxi)  &
-		                       &  + (currenta - agrid(tklo)) * V_Pr(age,tkhi,currentzi,currentlambdai, currentei, currentxi)) &
-		                       &  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*currenta 
-		    endif 
+		! !     	panelPV_a(paneli) = (   (agrid(tkhi) - currenta) * V_Pr(age,tklo,currentzi,currentlambdai, currentei, currentxi)  &
+		! !                        &  + (currenta - agrid(tklo)) * V_Pr(age,tkhi,currentzi,currentlambdai, currentei, currentxi)) &
+		! !                        &  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*currenta 
+		! !     endif 
 
-		    panelRet(paneli) 	= ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
-	     								&   R*panela(paneli) )/panela(paneli)
-		    if (panelx(paneli).lt.3) then 
-		    panelRet_K(paneli) 	= ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
-	     								&   R*panela(paneli) )/panelK(paneli)
-		    endif 
+		! !     panelRet(paneli) 	= ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
+	 ! !     								&   R*panela(paneli) )/panela(paneli)
+		! !     if (panelx(paneli).lt.3) then 
+		! !     panelRet_K(paneli) 	= ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
+	 ! !     								&   R*panela(paneli) )/panelK(paneli)
+		! !     endif 
 	     	 
 		           
-		ENDDO ! paneli
+		! ! ENDDO ! paneli
 
 
 
-		! 	! IGM 30-50
-		! 		! Get mean of assets and return
-		! 		IGM_a_matrix  = IGM_a_matrix/real(21,8) 
-		! 		IGM_r_matrix  = IGM_r_matrix/real(21,8) 
-		! 		IGM_pv_matrix = IGM_pv_matrix/real(21,8) 
-		! 		! Get number of eligibles
-		! 		n_eligible = count(IGM_a_matrix(1,:).gt.0.0_dp)
-		! 		! Allocate variables
-		! 		allocate(panela_dad(n_eligible) , panela_son(n_eligible) )
-		! 		allocate(panelr_dad(n_eligible) , panelr_son(n_eligible) )
-		! 		allocate(panelpv_dad(n_eligible), panelpv_son(n_eligible))
-		! 		allocate(panelz_dad(n_eligible) , panelz_son(n_eligible) )
-		! 		panela_dad  = pack(IGM_a_matrix(1,:)  , (IGM_a_matrix(1,:).gt.0.0_dp) )
-		! 		panela_son  = pack(IGM_a_matrix(2,:)  , (IGM_a_matrix(2,:).gt.0.0_dp) )
-		! 		panelr_dad  = pack(IGM_r_matrix(1,:)  , (IGM_r_matrix(1,:).gt.0.0_dp) )
-		! 		panelr_son  = pack(IGM_r_matrix(2,:)  , (IGM_r_matrix(2,:).gt.0.0_dp) )
-		! 		panelpv_dad = pack(IGM_pv_matrix(1,:) , (IGM_pv_matrix(1,:).gt.0.0_dp))
-		! 		panelpv_son = pack(IGM_pv_matrix(2,:) , (IGM_pv_matrix(2,:).gt.0.0_dp))
-		! 		panelz_dad  = pack(IGM_z_matrix(1,:)  , (IGM_z_matrix(1,:).gt.0.0_dp) )
-		! 		panelz_son  = pack(IGM_z_matrix(2,:)  , (IGM_z_matrix(2,:).gt.0.0_dp) )
-		! 	! Print
-		! 		print*, 'IGM 30-50'
-		! 		print*, 'n_eligible', n_eligible, 'mean_panel_dad', sum(panela_dad)/n_eligible, 'mean_panel_son', sum(panela_son)/n_eligible
-		! 	! ! IGM 40-60
-		! 	! 	! Get mean of assets and return
-		! 	! 	IGM_a_matrix_2  = IGM_a_matrix_2/real(21,8) 
-		! 	! 	IGM_r_matrix_2  = IGM_r_matrix_2/real(21,8) 
-		! 	! 	IGM_pv_matrix_2 = IGM_pv_matrix_2/real(21,8) 
-		! 	! 	! Get number of eligibles
-		! 	! 	n_eligible = count(IGM_a_matrix_2(1,:).gt.0.0_dp)
-		! 	! 	! Allocate variables
-		! 	! 	allocate(panela_dad_2(n_eligible) , panela_son_2(n_eligible))
-		! 	! 	allocate(panelr_dad_2(n_eligible) , panelr_son_2(n_eligible))
-		! 	! 	allocate(panelpv_dad_2(n_eligible), panelpv_son_2(n_eligible))
-		! 	! 	allocate(panelz_dad_2(n_eligible) , panelz_son_2(n_eligible))
-		! 	! 	panela_dad_2  = pack(IGM_a_matrix_2(1,:)  , (IGM_a_matrix_2(1,:).gt.0.0_dp) )
-		! 	! 	panela_son_2  = pack(IGM_a_matrix_2(2,:)  , (IGM_a_matrix_2(2,:).gt.0.0_dp) )
-		! 	! 	panelr_dad_2  = pack(IGM_r_matrix_2(1,:)  , (IGM_r_matrix_2(1,:).gt.0.0_dp) )
-		! 	! 	panelr_son_2  = pack(IGM_r_matrix_2(2,:)  , (IGM_r_matrix_2(2,:).gt.0.0_dp) )
-		! 	! 	panelpv_dad_2 = pack(IGM_pv_matrix_2(1,:) , (IGM_pv_matrix_2(1,:).gt.0.0_dp))
-		! 	! 	panelpv_son_2 = pack(IGM_pv_matrix_2(2,:) , (IGM_pv_matrix_2(2,:).gt.0.0_dp))
-		! 	! 	panelz_dad_2  = pack(IGM_z_matrix_2(1,:)  , (IGM_z_matrix_2(1,:).gt.0.0_dp) )
-		! 	! 	panelz_son_2  = pack(IGM_z_matrix_2(2,:)  , (IGM_z_matrix_2(2,:).gt.0.0_dp) )
-		! 	! ! Print
-		! 	! 	print*, 'IGM 20-40'
-		! 	! 	print*, 'n_eligible', n_eligible, 'mean_panel_dad', sum(panela_dad_2)/n_eligible, 'mean_panel_son', sum(panela_son_2)/n_eligible
+		! ! 	! IGM 30-50
+		! ! 		! Get mean of assets and return
+		! ! 		IGM_a_matrix  = IGM_a_matrix/real(21,8) 
+		! ! 		IGM_r_matrix  = IGM_r_matrix/real(21,8) 
+		! ! 		IGM_pv_matrix = IGM_pv_matrix/real(21,8) 
+		! ! 		! Get number of eligibles
+		! ! 		n_eligible = count(IGM_a_matrix(1,:).gt.0.0_dp)
+		! ! 		! Allocate variables
+		! ! 		allocate(panela_dad(n_eligible) , panela_son(n_eligible) )
+		! ! 		allocate(panelr_dad(n_eligible) , panelr_son(n_eligible) )
+		! ! 		allocate(panelpv_dad(n_eligible), panelpv_son(n_eligible))
+		! ! 		allocate(panelz_dad(n_eligible) , panelz_son(n_eligible) )
+		! ! 		panela_dad  = pack(IGM_a_matrix(1,:)  , (IGM_a_matrix(1,:).gt.0.0_dp) )
+		! ! 		panela_son  = pack(IGM_a_matrix(2,:)  , (IGM_a_matrix(2,:).gt.0.0_dp) )
+		! ! 		panelr_dad  = pack(IGM_r_matrix(1,:)  , (IGM_r_matrix(1,:).gt.0.0_dp) )
+		! ! 		panelr_son  = pack(IGM_r_matrix(2,:)  , (IGM_r_matrix(2,:).gt.0.0_dp) )
+		! ! 		panelpv_dad = pack(IGM_pv_matrix(1,:) , (IGM_pv_matrix(1,:).gt.0.0_dp))
+		! ! 		panelpv_son = pack(IGM_pv_matrix(2,:) , (IGM_pv_matrix(2,:).gt.0.0_dp))
+		! ! 		panelz_dad  = pack(IGM_z_matrix(1,:)  , (IGM_z_matrix(1,:).gt.0.0_dp) )
+		! ! 		panelz_son  = pack(IGM_z_matrix(2,:)  , (IGM_z_matrix(2,:).gt.0.0_dp) )
+		! ! 	! Print
+		! ! 		print*, 'IGM 30-50'
+		! ! 		print*, 'n_eligible', n_eligible, 'mean_panel_dad', sum(panela_dad)/n_eligible, 'mean_panel_son', sum(panela_son)/n_eligible
+		! ! 	! ! IGM 40-60
+		! ! 	! 	! Get mean of assets and return
+		! ! 	! 	IGM_a_matrix_2  = IGM_a_matrix_2/real(21,8) 
+		! ! 	! 	IGM_r_matrix_2  = IGM_r_matrix_2/real(21,8) 
+		! ! 	! 	IGM_pv_matrix_2 = IGM_pv_matrix_2/real(21,8) 
+		! ! 	! 	! Get number of eligibles
+		! ! 	! 	n_eligible = count(IGM_a_matrix_2(1,:).gt.0.0_dp)
+		! ! 	! 	! Allocate variables
+		! ! 	! 	allocate(panela_dad_2(n_eligible) , panela_son_2(n_eligible))
+		! ! 	! 	allocate(panelr_dad_2(n_eligible) , panelr_son_2(n_eligible))
+		! ! 	! 	allocate(panelpv_dad_2(n_eligible), panelpv_son_2(n_eligible))
+		! ! 	! 	allocate(panelz_dad_2(n_eligible) , panelz_son_2(n_eligible))
+		! ! 	! 	panela_dad_2  = pack(IGM_a_matrix_2(1,:)  , (IGM_a_matrix_2(1,:).gt.0.0_dp) )
+		! ! 	! 	panela_son_2  = pack(IGM_a_matrix_2(2,:)  , (IGM_a_matrix_2(2,:).gt.0.0_dp) )
+		! ! 	! 	panelr_dad_2  = pack(IGM_r_matrix_2(1,:)  , (IGM_r_matrix_2(1,:).gt.0.0_dp) )
+		! ! 	! 	panelr_son_2  = pack(IGM_r_matrix_2(2,:)  , (IGM_r_matrix_2(2,:).gt.0.0_dp) )
+		! ! 	! 	panelpv_dad_2 = pack(IGM_pv_matrix_2(1,:) , (IGM_pv_matrix_2(1,:).gt.0.0_dp))
+		! ! 	! 	panelpv_son_2 = pack(IGM_pv_matrix_2(2,:) , (IGM_pv_matrix_2(2,:).gt.0.0_dp))
+		! ! 	! 	panelz_dad_2  = pack(IGM_z_matrix_2(1,:)  , (IGM_z_matrix_2(1,:).gt.0.0_dp) )
+		! ! 	! 	panelz_son_2  = pack(IGM_z_matrix_2(2,:)  , (IGM_z_matrix_2(2,:).gt.0.0_dp) )
+		! ! 	! ! Print
+		! ! 	! 	print*, 'IGM 20-40'
+		! ! 	! 	print*, 'n_eligible', n_eligible, 'mean_panel_dad', sum(panela_dad_2)/n_eligible, 'mean_panel_son', sum(panela_son_2)/n_eligible
 
 
-		! 	! Mean of assets 
-		! 		panela_parents = panela_parents/5.0_dp 
-		! 		panela_sons    = panela_sons/5.0_dp 
+		! ! 	! Mean of assets 
+		! ! 		panela_parents = panela_parents/5.0_dp 
+		! ! 		panela_sons    = panela_sons/5.0_dp 
 
-		! 	! Clean eligibles 
-		! 		where(death_count/=1) eligible = 0
-		! 		where(panelage_sons.lt.25) eligible = 0
-		! 		where(panelage_sons.gt.41) eligible = 0
-		! 		where(panelage_parents.lt.25) eligible = 0
-		! 		where(panelage_parents.gt.41) eligible = 0
+		! ! 	! Clean eligibles 
+		! ! 		where(death_count/=1) eligible = 0
+		! ! 		where(panelage_sons.lt.25) eligible = 0
+		! ! 		where(panelage_sons.gt.41) eligible = 0
+		! ! 		where(panelage_parents.lt.25) eligible = 0
+		! ! 		where(panelage_parents.gt.41) eligible = 0
 
 
-		! 	! Get data on intergenerational mobility
-		! 		n_eligible = sum(eligible)
+		! ! 	! Get data on intergenerational mobility
+		! ! 		n_eligible = sum(eligible)
 
-		! 		allocate( eligible_panela_parents(n_eligible), eligible_panela_sons(n_eligible) )
+		! ! 		allocate( eligible_panela_parents(n_eligible), eligible_panela_sons(n_eligible) )
 
-		! 		eligible_panela_parents 	= pack(panela_parents   , (eligible.eq.1) )
-		! 		eligible_panela_sons    	= pack(panela_sons      , (eligible.eq.1) )
+		! ! 		eligible_panela_parents 	= pack(panela_parents   , (eligible.eq.1) )
+		! ! 		eligible_panela_sons    	= pack(panela_sons      , (eligible.eq.1) )
 
-		! 		allocate( eligible_panelage_parents(n_eligible), eligible_panelage_sons(n_eligible) )
+		! ! 		allocate( eligible_panelage_parents(n_eligible), eligible_panelage_sons(n_eligible) )
 
-		! 		eligible_panelage_parents 	= pack(panelage_parents , (eligible.eq.1) )
-		! 		eligible_panelage_sons    	= pack(panelage_sons	, (eligible.eq.1) )
+		! ! 		eligible_panelage_parents 	= pack(panelage_parents , (eligible.eq.1) )
+		! ! 		eligible_panelage_sons    	= pack(panelage_sons	, (eligible.eq.1) )
 				
 
-		! 	print*, ' '
-		! 	print*, 'n_eligible', sum(eligible)
-		! 	print*, 'panela_parents', sum(eligible_panela_parents)/n_eligible, 'panela_sons', sum(eligible_panela_sons)/n_eligible
-		! 	print*, 'panelage_parents', sum(eligible_panelage_parents)/n_eligible, 'panelage_sons', sum(eligible_panelage_sons)/n_eligible
-		! 	print*, ' '
+		! ! 	print*, ' '
+		! ! 	print*, 'n_eligible', sum(eligible)
+		! ! 	print*, 'panela_parents', sum(eligible_panela_parents)/n_eligible, 'panela_sons', sum(eligible_panela_sons)/n_eligible
+		! ! 	print*, 'panelage_parents', sum(eligible_panelage_parents)/n_eligible, 'panelage_sons', sum(eligible_panelage_sons)/n_eligible
+		! ! 	print*, ' '
 
-		! 	print*, 'Start of std dev of return by age'
-		! 	! Std Dev of return by age
-		! 	Std_Dev_Return_Age(1)  = sqrt( sum( (ret_20   -sum(ret_20)   /ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_Age(2)  = sqrt( sum( (ret_21_25-sum(ret_21_25)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_Age(3)  = sqrt( sum( (ret_26_30-sum(ret_26_30)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_Age(4)  = sqrt( sum( (ret_31_35-sum(ret_31_35)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_Age(5)  = sqrt( sum( (ret_36_40-sum(ret_36_40)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_Age(6)  = sqrt( sum( (ret_41_45-sum(ret_41_45)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_Age(7)  = sqrt( sum( (ret_46_50-sum(ret_46_50)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_Age(8)  = sqrt( sum( (ret_51_55-sum(ret_51_55)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_Age(9)  = sqrt( sum( (ret_56_60-sum(ret_56_60)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_Age(10) = sqrt( sum( (ret_61_65-sum(ret_61_65)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_Age(11) = sqrt( sum( (ret_66_70-sum(ret_66_70)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_Age(12) = sqrt( sum( (panelRet -sum(panelRet) /totpop  )**2.0_dp ) /real(totpop-1,DP  )  )
+		! ! 	print*, 'Start of std dev of return by age'
+		! ! 	! Std Dev of return by age
+		! ! 	Std_Dev_Return_Age(1)  = sqrt( sum( (ret_20   -sum(ret_20)   /ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_Age(2)  = sqrt( sum( (ret_21_25-sum(ret_21_25)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_Age(3)  = sqrt( sum( (ret_26_30-sum(ret_26_30)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_Age(4)  = sqrt( sum( (ret_31_35-sum(ret_31_35)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_Age(5)  = sqrt( sum( (ret_36_40-sum(ret_36_40)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_Age(6)  = sqrt( sum( (ret_41_45-sum(ret_41_45)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_Age(7)  = sqrt( sum( (ret_46_50-sum(ret_46_50)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_Age(8)  = sqrt( sum( (ret_51_55-sum(ret_51_55)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_Age(9)  = sqrt( sum( (ret_56_60-sum(ret_56_60)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_Age(10) = sqrt( sum( (ret_61_65-sum(ret_61_65)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_Age(11) = sqrt( sum( (ret_66_70-sum(ret_66_70)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_Age(12) = sqrt( sum( (panelRet -sum(panelRet) /totpop  )**2.0_dp ) /real(totpop-1,DP  )  )
 
-		! 	Std_Dev_Return_W_Age(1)  = sqrt( sum( (ret_w_20   -sum(ret_w_20)   /ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_W_Age(2)  = sqrt( sum( (ret_w_21_25-sum(ret_w_21_25)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_W_Age(3)  = sqrt( sum( (ret_w_26_30-sum(ret_w_26_30)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_W_Age(4)  = sqrt( sum( (ret_w_31_35-sum(ret_w_31_35)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_W_Age(5)  = sqrt( sum( (ret_w_36_40-sum(ret_w_36_40)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_W_Age(6)  = sqrt( sum( (ret_w_41_45-sum(ret_w_41_45)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_W_Age(7)  = sqrt( sum( (ret_w_46_50-sum(ret_w_46_50)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_W_Age(8)  = sqrt( sum( (ret_w_51_55-sum(ret_w_51_55)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_W_Age(9)  = sqrt( sum( (ret_w_56_60-sum(ret_w_56_60)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_W_Age(10) = sqrt( sum( (ret_w_61_65-sum(ret_w_61_65)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_W_Age(11) = sqrt( sum( (ret_w_66_70-sum(ret_w_66_70)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
-		! 	Std_Dev_Return_W_Age(12) = sqrt( sum( ((panelRet  -sum(panelRet*panela)/sum(panela)   )**2.0_dp)*panela ) /sum(panela)  )
+		! ! 	Std_Dev_Return_W_Age(1)  = sqrt( sum( (ret_w_20   -sum(ret_w_20)   /ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_W_Age(2)  = sqrt( sum( (ret_w_21_25-sum(ret_w_21_25)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_W_Age(3)  = sqrt( sum( (ret_w_26_30-sum(ret_w_26_30)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_W_Age(4)  = sqrt( sum( (ret_w_31_35-sum(ret_w_31_35)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_W_Age(5)  = sqrt( sum( (ret_w_36_40-sum(ret_w_36_40)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_W_Age(6)  = sqrt( sum( (ret_w_41_45-sum(ret_w_41_45)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_W_Age(7)  = sqrt( sum( (ret_w_46_50-sum(ret_w_46_50)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_W_Age(8)  = sqrt( sum( (ret_w_51_55-sum(ret_w_51_55)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_W_Age(9)  = sqrt( sum( (ret_w_56_60-sum(ret_w_56_60)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_W_Age(10) = sqrt( sum( (ret_w_61_65-sum(ret_w_61_65)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_W_Age(11) = sqrt( sum( (ret_w_66_70-sum(ret_w_66_70)/ret_size)**2.0_dp ) /real(ret_size-1,DP)  )
+		! ! 	Std_Dev_Return_W_Age(12) = sqrt( sum( ((panelRet  -sum(panelRet*panela)/sum(panela)   )**2.0_dp)*panela ) /sum(panela)  )
 
-		! 	Std_Dev_Return_K_Age(1)  = sqrt( sum( (ret_k_20   -sum(ret_k_20   , Ind_K_20   ==1)/sum(Ind_K_20   )**2.0_dp) , Ind_K_20   ==1) & 
-		! 								&	/real(sum(Ind_K_20)   -1,DP)  )
-		! 	Std_Dev_Return_K_Age(2)  = sqrt( sum( (ret_k_21_25-sum(ret_k_21_25, Ind_K_21_25==1)/sum(Ind_K_21_25)**2.0_dp) , Ind_K_21_25==1) & 
-		! 								&	/real(sum(Ind_K_21_25)-1,DP)  )
-		! 	Std_Dev_Return_K_Age(3)  = sqrt( sum( (ret_k_26_30-sum(ret_k_26_30, Ind_K_26_30==1)/sum(Ind_K_26_30)**2.0_dp) , Ind_K_26_30==1) & 
-		! 								&	/real(sum(Ind_K_26_30)-1,DP)  )
-		! 	Std_Dev_Return_K_Age(4)  = sqrt( sum( (ret_k_31_35-sum(ret_k_31_35, Ind_K_31_35==1)/sum(Ind_K_31_35)**2.0_dp) , Ind_K_31_35==1) & 
-		! 								&	/real(sum(Ind_K_31_35)-1,DP)  )
-		! 	Std_Dev_Return_K_Age(5)  = sqrt( sum( (ret_k_36_40-sum(ret_k_36_40, Ind_K_36_40==1)/sum(Ind_K_36_40)**2.0_dp) , Ind_K_36_40==1) & 
-		! 								&	/real(sum(Ind_K_36_40)-1,DP)  )
-		! 	Std_Dev_Return_K_Age(6)  = sqrt( sum( (ret_k_41_45-sum(ret_k_41_45, Ind_K_41_45==1)/sum(Ind_K_41_45)**2.0_dp) , Ind_K_41_45==1) & 
-		! 								&	/real(sum(Ind_K_41_45)-1,DP)  )
-		! 	Std_Dev_Return_K_Age(7)  = sqrt( sum( (ret_k_46_50-sum(ret_k_46_50, Ind_K_46_50==1)/sum(Ind_K_46_50)**2.0_dp) , Ind_K_46_50==1) & 
-		! 								&	/real(sum(Ind_K_46_50)-1,DP)  )
-		! 	Std_Dev_Return_K_Age(8)  = sqrt( sum( (ret_k_51_55-sum(ret_k_51_55, Ind_K_51_55==1)/sum(Ind_K_51_55)**2.0_dp) , Ind_K_51_55==1) & 
-		! 								&	/real(sum(Ind_K_51_55)-1,DP)  )
-		! 	Std_Dev_Return_K_Age(9)  = sqrt( sum( (ret_k_56_60-sum(ret_k_56_60, Ind_K_56_60==1)/sum(Ind_K_56_60)**2.0_dp) , Ind_K_56_60==1) & 
-		! 								&	/real(sum(Ind_K_56_60)-1,DP)  )
-		! 	Std_Dev_Return_K_Age(10) = sqrt( sum( (ret_k_61_65-sum(ret_k_61_65, Ind_K_61_65==1)/sum(Ind_K_61_65)**2.0_dp) , Ind_K_61_65==1) & 
-		! 								&	/real(sum(Ind_K_61_65)-1,DP)  )
-		! 	Std_Dev_Return_K_Age(11) = sqrt( sum( (ret_k_66_70-sum(ret_k_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)**2.0_dp) , Ind_K_66_70==1) & 
-		! 								&	/real(sum(Ind_K_66_70)-1,DP)  )
-		! 	Std_Dev_Return_K_Age(12) = sqrt( sum( (pack(panelRet_K,(panelx.lt.3)) -sum(panelRet_K,(panelx.lt.3)) /count((panelx.lt.3))&
-		! 								&	)**2.0_dp ) /real(count((panelx.lt.3))-1,DP  )  )
+		! ! 	Std_Dev_Return_K_Age(1)  = sqrt( sum( (ret_k_20   -sum(ret_k_20   , Ind_K_20   ==1)/sum(Ind_K_20   )**2.0_dp) , Ind_K_20   ==1) & 
+		! ! 								&	/real(sum(Ind_K_20)   -1,DP)  )
+		! ! 	Std_Dev_Return_K_Age(2)  = sqrt( sum( (ret_k_21_25-sum(ret_k_21_25, Ind_K_21_25==1)/sum(Ind_K_21_25)**2.0_dp) , Ind_K_21_25==1) & 
+		! ! 								&	/real(sum(Ind_K_21_25)-1,DP)  )
+		! ! 	Std_Dev_Return_K_Age(3)  = sqrt( sum( (ret_k_26_30-sum(ret_k_26_30, Ind_K_26_30==1)/sum(Ind_K_26_30)**2.0_dp) , Ind_K_26_30==1) & 
+		! ! 								&	/real(sum(Ind_K_26_30)-1,DP)  )
+		! ! 	Std_Dev_Return_K_Age(4)  = sqrt( sum( (ret_k_31_35-sum(ret_k_31_35, Ind_K_31_35==1)/sum(Ind_K_31_35)**2.0_dp) , Ind_K_31_35==1) & 
+		! ! 								&	/real(sum(Ind_K_31_35)-1,DP)  )
+		! ! 	Std_Dev_Return_K_Age(5)  = sqrt( sum( (ret_k_36_40-sum(ret_k_36_40, Ind_K_36_40==1)/sum(Ind_K_36_40)**2.0_dp) , Ind_K_36_40==1) & 
+		! ! 								&	/real(sum(Ind_K_36_40)-1,DP)  )
+		! ! 	Std_Dev_Return_K_Age(6)  = sqrt( sum( (ret_k_41_45-sum(ret_k_41_45, Ind_K_41_45==1)/sum(Ind_K_41_45)**2.0_dp) , Ind_K_41_45==1) & 
+		! ! 								&	/real(sum(Ind_K_41_45)-1,DP)  )
+		! ! 	Std_Dev_Return_K_Age(7)  = sqrt( sum( (ret_k_46_50-sum(ret_k_46_50, Ind_K_46_50==1)/sum(Ind_K_46_50)**2.0_dp) , Ind_K_46_50==1) & 
+		! ! 								&	/real(sum(Ind_K_46_50)-1,DP)  )
+		! ! 	Std_Dev_Return_K_Age(8)  = sqrt( sum( (ret_k_51_55-sum(ret_k_51_55, Ind_K_51_55==1)/sum(Ind_K_51_55)**2.0_dp) , Ind_K_51_55==1) & 
+		! ! 								&	/real(sum(Ind_K_51_55)-1,DP)  )
+		! ! 	Std_Dev_Return_K_Age(9)  = sqrt( sum( (ret_k_56_60-sum(ret_k_56_60, Ind_K_56_60==1)/sum(Ind_K_56_60)**2.0_dp) , Ind_K_56_60==1) & 
+		! ! 								&	/real(sum(Ind_K_56_60)-1,DP)  )
+		! ! 	Std_Dev_Return_K_Age(10) = sqrt( sum( (ret_k_61_65-sum(ret_k_61_65, Ind_K_61_65==1)/sum(Ind_K_61_65)**2.0_dp) , Ind_K_61_65==1) & 
+		! ! 								&	/real(sum(Ind_K_61_65)-1,DP)  )
+		! ! 	Std_Dev_Return_K_Age(11) = sqrt( sum( (ret_k_66_70-sum(ret_k_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)**2.0_dp) , Ind_K_66_70==1) & 
+		! ! 								&	/real(sum(Ind_K_66_70)-1,DP)  )
+		! ! 	Std_Dev_Return_K_Age(12) = sqrt( sum( (pack(panelRet_K,(panelx.lt.3)) -sum(panelRet_K,(panelx.lt.3)) /count((panelx.lt.3))&
+		! ! 								&	)**2.0_dp ) /real(count((panelx.lt.3))-1,DP  )  )
 
-		! 	Std_Dev_Return_K_W_Age(1)  = sqrt( sum( (ret_k_w_20   -sum(ret_k_w_20   , Ind_K_20   ==1)/sum(Ind_K_20   )**2.0_dp) , &
-		! 								& Ind_K_20   ==1) / real(sum(Ind_K_20)   -1,DP)  )
-		! 	Std_Dev_Return_K_W_Age(2)  = sqrt( sum( (ret_k_w_21_25-sum(ret_k_w_21_25, Ind_K_21_25==1)/sum(Ind_K_21_25)**2.0_dp) , &
-		! 								& Ind_K_21_25==1) / real(sum(Ind_K_21_25)-1,DP)  )
-		! 	Std_Dev_Return_K_W_Age(3)  = sqrt( sum( (ret_k_w_26_30-sum(ret_k_w_26_30, Ind_K_26_30==1)/sum(Ind_K_26_30)**2.0_dp) , &
-		! 								& Ind_K_26_30==1) / real(sum(Ind_K_26_30)-1,DP)  )
-		! 	Std_Dev_Return_K_W_Age(4)  = sqrt( sum( (ret_k_w_31_35-sum(ret_k_w_31_35, Ind_K_31_35==1)/sum(Ind_K_31_35)**2.0_dp) , &
-		! 								& Ind_K_31_35==1) / real(sum(Ind_K_31_35)-1,DP)  )
-		! 	Std_Dev_Return_K_W_Age(5)  = sqrt( sum( (ret_k_w_36_40-sum(ret_k_w_36_40, Ind_K_36_40==1)/sum(Ind_K_36_40)**2.0_dp) , &
-		! 								& Ind_K_36_40==1) / real(sum(Ind_K_36_40)-1,DP)  )
-		! 	Std_Dev_Return_K_W_Age(6)  = sqrt( sum( (ret_k_w_41_45-sum(ret_k_w_41_45, Ind_K_41_45==1)/sum(Ind_K_41_45)**2.0_dp) , &
-		! 								& Ind_K_41_45==1) / real(sum(Ind_K_41_45)-1,DP)  )
-		! 	Std_Dev_Return_K_W_Age(7)  = sqrt( sum( (ret_k_w_46_50-sum(ret_k_w_46_50, Ind_K_46_50==1)/sum(Ind_K_46_50)**2.0_dp) , &
-		! 								& Ind_K_46_50==1) / real(sum(Ind_K_46_50)-1,DP)  )
-		! 	Std_Dev_Return_K_W_Age(8)  = sqrt( sum( (ret_k_w_51_55-sum(ret_k_w_51_55, Ind_K_51_55==1)/sum(Ind_K_51_55)**2.0_dp) , &
-		! 								& Ind_K_51_55==1) / real(sum(Ind_K_51_55)-1,DP)  )
-		! 	Std_Dev_Return_K_W_Age(9)  = sqrt( sum( (ret_k_w_56_60-sum(ret_k_w_56_60, Ind_K_56_60==1)/sum(Ind_K_56_60)**2.0_dp) , &
-		! 								& Ind_K_56_60==1) / real(sum(Ind_K_56_60)-1,DP)  )
-		! 	Std_Dev_Return_K_W_Age(10) = sqrt( sum( (ret_k_w_61_65-sum(ret_k_w_61_65, Ind_K_61_65==1)/sum(Ind_K_61_65)**2.0_dp) , &
-		! 								& Ind_K_61_65==1) / real(sum(Ind_K_61_65)-1,DP)  )
-		! 	Std_Dev_Return_K_W_Age(11) = sqrt( sum( (ret_k_w_66_70-sum(ret_k_w_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)**2.0_dp) , &
-		! 								& Ind_K_66_70==1) / real(sum(Ind_K_66_70)-1,DP)  )
-		! 	Std_Dev_Return_K_W_Age(12) = sqrt( sum( ((pack(panelRet_K,(panelx.lt.3)) -sum(panelRet_K*panelK,(panelx.lt.3)) & 
-		! 							& /sum(panelK,(panelx.lt.3)) )**2.0_dp)*pack(panelK,(panelx.lt.3)) ) /sum(panelK,(panelx.lt.3)))
-		! 	print*, 'End of std dev of return by age'
+		! ! 	Std_Dev_Return_K_W_Age(1)  = sqrt( sum( (ret_k_w_20   -sum(ret_k_w_20   , Ind_K_20   ==1)/sum(Ind_K_20   )**2.0_dp) , &
+		! ! 								& Ind_K_20   ==1) / real(sum(Ind_K_20)   -1,DP)  )
+		! ! 	Std_Dev_Return_K_W_Age(2)  = sqrt( sum( (ret_k_w_21_25-sum(ret_k_w_21_25, Ind_K_21_25==1)/sum(Ind_K_21_25)**2.0_dp) , &
+		! ! 								& Ind_K_21_25==1) / real(sum(Ind_K_21_25)-1,DP)  )
+		! ! 	Std_Dev_Return_K_W_Age(3)  = sqrt( sum( (ret_k_w_26_30-sum(ret_k_w_26_30, Ind_K_26_30==1)/sum(Ind_K_26_30)**2.0_dp) , &
+		! ! 								& Ind_K_26_30==1) / real(sum(Ind_K_26_30)-1,DP)  )
+		! ! 	Std_Dev_Return_K_W_Age(4)  = sqrt( sum( (ret_k_w_31_35-sum(ret_k_w_31_35, Ind_K_31_35==1)/sum(Ind_K_31_35)**2.0_dp) , &
+		! ! 								& Ind_K_31_35==1) / real(sum(Ind_K_31_35)-1,DP)  )
+		! ! 	Std_Dev_Return_K_W_Age(5)  = sqrt( sum( (ret_k_w_36_40-sum(ret_k_w_36_40, Ind_K_36_40==1)/sum(Ind_K_36_40)**2.0_dp) , &
+		! ! 								& Ind_K_36_40==1) / real(sum(Ind_K_36_40)-1,DP)  )
+		! ! 	Std_Dev_Return_K_W_Age(6)  = sqrt( sum( (ret_k_w_41_45-sum(ret_k_w_41_45, Ind_K_41_45==1)/sum(Ind_K_41_45)**2.0_dp) , &
+		! ! 								& Ind_K_41_45==1) / real(sum(Ind_K_41_45)-1,DP)  )
+		! ! 	Std_Dev_Return_K_W_Age(7)  = sqrt( sum( (ret_k_w_46_50-sum(ret_k_w_46_50, Ind_K_46_50==1)/sum(Ind_K_46_50)**2.0_dp) , &
+		! ! 								& Ind_K_46_50==1) / real(sum(Ind_K_46_50)-1,DP)  )
+		! ! 	Std_Dev_Return_K_W_Age(8)  = sqrt( sum( (ret_k_w_51_55-sum(ret_k_w_51_55, Ind_K_51_55==1)/sum(Ind_K_51_55)**2.0_dp) , &
+		! ! 								& Ind_K_51_55==1) / real(sum(Ind_K_51_55)-1,DP)  )
+		! ! 	Std_Dev_Return_K_W_Age(9)  = sqrt( sum( (ret_k_w_56_60-sum(ret_k_w_56_60, Ind_K_56_60==1)/sum(Ind_K_56_60)**2.0_dp) , &
+		! ! 								& Ind_K_56_60==1) / real(sum(Ind_K_56_60)-1,DP)  )
+		! ! 	Std_Dev_Return_K_W_Age(10) = sqrt( sum( (ret_k_w_61_65-sum(ret_k_w_61_65, Ind_K_61_65==1)/sum(Ind_K_61_65)**2.0_dp) , &
+		! ! 								& Ind_K_61_65==1) / real(sum(Ind_K_61_65)-1,DP)  )
+		! ! 	Std_Dev_Return_K_W_Age(11) = sqrt( sum( (ret_k_w_66_70-sum(ret_k_w_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)**2.0_dp) , &
+		! ! 								& Ind_K_66_70==1) / real(sum(Ind_K_66_70)-1,DP)  )
+		! ! 	Std_Dev_Return_K_W_Age(12) = sqrt( sum( ((pack(panelRet_K,(panelx.lt.3)) -sum(panelRet_K*panelK,(panelx.lt.3)) & 
+		! ! 							& /sum(panelK,(panelx.lt.3)) )**2.0_dp)*pack(panelK,(panelx.lt.3)) ) /sum(panelK,(panelx.lt.3)))
+		! ! 	print*, 'End of std dev of return by age'
 
-		! 	print*, ' '
-		! 	print*, 'Start of mean of return by age'
-		! 	! Mean of return by age
-		! 	Mean_Return_Age(1)  = sum(ret_20)   /ret_size
-		! 	Mean_Return_Age(2)  = sum(ret_21_25)/ret_size
-		! 	Mean_Return_Age(3)  = sum(ret_26_30)/ret_size
-		! 	Mean_Return_Age(4)  = sum(ret_31_35)/ret_size
-		! 	Mean_Return_Age(5)  = sum(ret_36_40)/ret_size
-		! 	Mean_Return_Age(6)  = sum(ret_41_45)/ret_size
-		! 	Mean_Return_Age(7)  = sum(ret_46_50)/ret_size
-		! 	Mean_Return_Age(8)  = sum(ret_51_55)/ret_size
-		! 	Mean_Return_Age(9)  = sum(ret_56_60)/ret_size
-		! 	Mean_Return_Age(10) = sum(ret_61_65)/ret_size
-		! 	Mean_Return_Age(11) = sum(ret_66_70)/ret_size
-		! 	Mean_Return_Age(12) = sum(panelRet) /totpop
+		! ! 	print*, ' '
+		! ! 	print*, 'Start of mean of return by age'
+		! ! 	! Mean of return by age
+		! ! 	Mean_Return_Age(1)  = sum(ret_20)   /ret_size
+		! ! 	Mean_Return_Age(2)  = sum(ret_21_25)/ret_size
+		! ! 	Mean_Return_Age(3)  = sum(ret_26_30)/ret_size
+		! ! 	Mean_Return_Age(4)  = sum(ret_31_35)/ret_size
+		! ! 	Mean_Return_Age(5)  = sum(ret_36_40)/ret_size
+		! ! 	Mean_Return_Age(6)  = sum(ret_41_45)/ret_size
+		! ! 	Mean_Return_Age(7)  = sum(ret_46_50)/ret_size
+		! ! 	Mean_Return_Age(8)  = sum(ret_51_55)/ret_size
+		! ! 	Mean_Return_Age(9)  = sum(ret_56_60)/ret_size
+		! ! 	Mean_Return_Age(10) = sum(ret_61_65)/ret_size
+		! ! 	Mean_Return_Age(11) = sum(ret_66_70)/ret_size
+		! ! 	Mean_Return_Age(12) = sum(panelRet) /totpop
 
-		! 	Mean_Return_W_Age(1)  = sum(ret_w_20)   /ret_size
-		! 	Mean_Return_W_Age(2)  = sum(ret_w_21_25)/ret_size
-		! 	Mean_Return_W_Age(3)  = sum(ret_w_26_30)/ret_size
-		! 	Mean_Return_W_Age(4)  = sum(ret_w_31_35)/ret_size
-		! 	Mean_Return_W_Age(5)  = sum(ret_w_36_40)/ret_size
-		! 	Mean_Return_W_Age(6)  = sum(ret_w_41_45)/ret_size
-		! 	Mean_Return_W_Age(7)  = sum(ret_w_46_50)/ret_size
-		! 	Mean_Return_W_Age(8)  = sum(ret_w_51_55)/ret_size
-		! 	Mean_Return_W_Age(9)  = sum(ret_w_56_60)/ret_size
-		! 	Mean_Return_W_Age(10) = sum(ret_w_61_65)/ret_size
-		! 	Mean_Return_W_Age(11) = sum(ret_w_66_70)/ret_size
-		! 	Mean_Return_W_Age(12) = sum(panelRet*panela)/sum(panela)
+		! ! 	Mean_Return_W_Age(1)  = sum(ret_w_20)   /ret_size
+		! ! 	Mean_Return_W_Age(2)  = sum(ret_w_21_25)/ret_size
+		! ! 	Mean_Return_W_Age(3)  = sum(ret_w_26_30)/ret_size
+		! ! 	Mean_Return_W_Age(4)  = sum(ret_w_31_35)/ret_size
+		! ! 	Mean_Return_W_Age(5)  = sum(ret_w_36_40)/ret_size
+		! ! 	Mean_Return_W_Age(6)  = sum(ret_w_41_45)/ret_size
+		! ! 	Mean_Return_W_Age(7)  = sum(ret_w_46_50)/ret_size
+		! ! 	Mean_Return_W_Age(8)  = sum(ret_w_51_55)/ret_size
+		! ! 	Mean_Return_W_Age(9)  = sum(ret_w_56_60)/ret_size
+		! ! 	Mean_Return_W_Age(10) = sum(ret_w_61_65)/ret_size
+		! ! 	Mean_Return_W_Age(11) = sum(ret_w_66_70)/ret_size
+		! ! 	Mean_Return_W_Age(12) = sum(panelRet*panela)/sum(panela)
 
-		! 	Mean_Return_K_Age(1)  = sum(ret_k_20   , Ind_K_20   ==1)/sum(Ind_K_20   )
-		! 	Mean_Return_K_Age(2)  = sum(ret_k_21_25, Ind_K_21_25==1)/sum(Ind_K_21_25)
-		! 	Mean_Return_K_Age(3)  = sum(ret_k_26_30, Ind_K_26_30==1)/sum(Ind_K_26_30)
-		! 	Mean_Return_K_Age(4)  = sum(ret_k_31_35, Ind_K_31_35==1)/sum(Ind_K_31_35)
-		! 	Mean_Return_K_Age(5)  = sum(ret_k_36_40, Ind_K_36_40==1)/sum(Ind_K_36_40)
-		! 	Mean_Return_K_Age(6)  = sum(ret_k_41_45, Ind_K_41_45==1)/sum(Ind_K_41_45)
-		! 	Mean_Return_K_Age(7)  = sum(ret_k_46_50, Ind_K_46_50==1)/sum(Ind_K_46_50)
-		! 	Mean_Return_K_Age(8)  = sum(ret_k_51_55, Ind_K_51_55==1)/sum(Ind_K_51_55)
-		! 	Mean_Return_K_Age(9)  = sum(ret_k_56_60, Ind_K_56_60==1)/sum(Ind_K_56_60)
-		! 	Mean_Return_K_Age(10) = sum(ret_k_61_65, Ind_K_61_65==1)/sum(Ind_K_61_65)
-		! 	Mean_Return_K_Age(11) = sum(ret_k_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)
-		! 	Mean_Return_K_Age(12) = sum(panelRet_K,(panelx.lt.3)) /count((panelx.lt.3))
+		! ! 	Mean_Return_K_Age(1)  = sum(ret_k_20   , Ind_K_20   ==1)/sum(Ind_K_20   )
+		! ! 	Mean_Return_K_Age(2)  = sum(ret_k_21_25, Ind_K_21_25==1)/sum(Ind_K_21_25)
+		! ! 	Mean_Return_K_Age(3)  = sum(ret_k_26_30, Ind_K_26_30==1)/sum(Ind_K_26_30)
+		! ! 	Mean_Return_K_Age(4)  = sum(ret_k_31_35, Ind_K_31_35==1)/sum(Ind_K_31_35)
+		! ! 	Mean_Return_K_Age(5)  = sum(ret_k_36_40, Ind_K_36_40==1)/sum(Ind_K_36_40)
+		! ! 	Mean_Return_K_Age(6)  = sum(ret_k_41_45, Ind_K_41_45==1)/sum(Ind_K_41_45)
+		! ! 	Mean_Return_K_Age(7)  = sum(ret_k_46_50, Ind_K_46_50==1)/sum(Ind_K_46_50)
+		! ! 	Mean_Return_K_Age(8)  = sum(ret_k_51_55, Ind_K_51_55==1)/sum(Ind_K_51_55)
+		! ! 	Mean_Return_K_Age(9)  = sum(ret_k_56_60, Ind_K_56_60==1)/sum(Ind_K_56_60)
+		! ! 	Mean_Return_K_Age(10) = sum(ret_k_61_65, Ind_K_61_65==1)/sum(Ind_K_61_65)
+		! ! 	Mean_Return_K_Age(11) = sum(ret_k_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)
+		! ! 	Mean_Return_K_Age(12) = sum(panelRet_K,(panelx.lt.3)) /count((panelx.lt.3))
 
-		! 	Mean_Return_K_W_Age(1)  = sum(ret_k_w_20   , Ind_K_20   ==1)/sum(Ind_K_20   )
-		! 	Mean_Return_K_W_Age(2)  = sum(ret_k_w_21_25, Ind_K_21_25==1)/sum(Ind_K_21_25)
-		! 	Mean_Return_K_W_Age(3)  = sum(ret_k_w_26_30, Ind_K_26_30==1)/sum(Ind_K_26_30)
-		! 	Mean_Return_K_W_Age(4)  = sum(ret_k_w_31_35, Ind_K_31_35==1)/sum(Ind_K_31_35)
-		! 	Mean_Return_K_W_Age(5)  = sum(ret_k_w_36_40, Ind_K_36_40==1)/sum(Ind_K_36_40)
-		! 	Mean_Return_K_W_Age(6)  = sum(ret_k_w_41_45, Ind_K_41_45==1)/sum(Ind_K_41_45)
-		! 	Mean_Return_K_W_Age(7)  = sum(ret_k_w_46_50, Ind_K_46_50==1)/sum(Ind_K_46_50)
-		! 	Mean_Return_K_W_Age(8)  = sum(ret_k_w_51_55, Ind_K_51_55==1)/sum(Ind_K_51_55)
-		! 	Mean_Return_K_W_Age(9)  = sum(ret_k_w_56_60, Ind_K_56_60==1)/sum(Ind_K_56_60)
-		! 	Mean_Return_K_W_Age(10) = sum(ret_k_w_61_65, Ind_K_61_65==1)/sum(Ind_K_61_65)
-		! 	Mean_Return_K_W_Age(11) = sum(ret_k_w_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)
-		! 	Mean_Return_K_W_Age(12) = sum(panelRet_K*panelK,(panelx.lt.3)) /sum(panelK,(panelx.lt.3))
-		! 	print*, 'End of mean of return by age'
+		! ! 	Mean_Return_K_W_Age(1)  = sum(ret_k_w_20   , Ind_K_20   ==1)/sum(Ind_K_20   )
+		! ! 	Mean_Return_K_W_Age(2)  = sum(ret_k_w_21_25, Ind_K_21_25==1)/sum(Ind_K_21_25)
+		! ! 	Mean_Return_K_W_Age(3)  = sum(ret_k_w_26_30, Ind_K_26_30==1)/sum(Ind_K_26_30)
+		! ! 	Mean_Return_K_W_Age(4)  = sum(ret_k_w_31_35, Ind_K_31_35==1)/sum(Ind_K_31_35)
+		! ! 	Mean_Return_K_W_Age(5)  = sum(ret_k_w_36_40, Ind_K_36_40==1)/sum(Ind_K_36_40)
+		! ! 	Mean_Return_K_W_Age(6)  = sum(ret_k_w_41_45, Ind_K_41_45==1)/sum(Ind_K_41_45)
+		! ! 	Mean_Return_K_W_Age(7)  = sum(ret_k_w_46_50, Ind_K_46_50==1)/sum(Ind_K_46_50)
+		! ! 	Mean_Return_K_W_Age(8)  = sum(ret_k_w_51_55, Ind_K_51_55==1)/sum(Ind_K_51_55)
+		! ! 	Mean_Return_K_W_Age(9)  = sum(ret_k_w_56_60, Ind_K_56_60==1)/sum(Ind_K_56_60)
+		! ! 	Mean_Return_K_W_Age(10) = sum(ret_k_w_61_65, Ind_K_61_65==1)/sum(Ind_K_61_65)
+		! ! 	Mean_Return_K_W_Age(11) = sum(ret_k_w_66_70, Ind_K_66_70==1)/sum(Ind_K_66_70)
+		! ! 	Mean_Return_K_W_Age(12) = sum(panelRet_K*panelK,(panelx.lt.3)) /sum(panelK,(panelx.lt.3))
+		! ! 	print*, 'End of mean of return by age'
 
-		! 	print*, ' '
-		! 	print*, 'Start of pcrt of return by age'
+		! ! 	print*, ' '
+		! ! 	print*, 'Start of pcrt of return by age'
 
-		! 	! Percentiles of return by age
-		! 	prctile_ret = (/0.999_dp, 0.99_dp, 0.95_dp, 0.90_dp, 0.75_dp, 0.50_dp, 0.25_dp, 0.10_dp, 0.01_dp/)
+		! ! 	! Percentiles of return by age
+		! ! 	prctile_ret = (/0.999_dp, 0.99_dp, 0.95_dp, 0.90_dp, 0.75_dp, 0.50_dp, 0.25_dp, 0.10_dp, 0.01_dp/)
 
-		! 	do i_pct=1,9 
-		! 		print*, 'Ret prc=', prctile_ret(i_pct)
-		! 		prc_Return_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_20)
-		! 		prc_Return_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_21_25)
-		! 		prc_Return_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_26_30)
-		! 		prc_Return_Age(4 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_31_35)
-		! 		prc_Return_Age(5 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_36_40)
-		! 		prc_Return_Age(6 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_41_45)
-		! 		prc_Return_Age(7 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_46_50)
-		! 		prc_Return_Age(8 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_51_55)
-		! 		prc_Return_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_56_60)
-		! 		prc_Return_Age(10,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_61_65)
-		! 		prc_Return_Age(11,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_66_70)
-		! 		prc_Return_Age(12,i_pct) = Percentile(prctile_ret(i_pct),totpop  ,real(panelRet,DP) )
-		! 		print*, 'Ret W prc=', prctile_ret(i_pct)
-		! 		prc_Return_W_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_20)
-		! 		prc_Return_W_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_21_25)
-		! 		prc_Return_W_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_26_30)
-		! 		prc_Return_W_Age(4 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_31_35)
-		! 		prc_Return_W_Age(5 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_36_40)
-		! 		prc_Return_W_Age(6 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_41_45)
-		! 		prc_Return_W_Age(7 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_46_50)
-		! 		prc_Return_W_Age(8 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_51_55)
-		! 		prc_Return_W_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_56_60)
-		! 		prc_Return_W_Age(10,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_61_65)
-		! 		prc_Return_W_Age(11,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_66_70)
-		! 		prc_Return_W_Age(12,i_pct) = Percentile(prctile_ret(i_pct),totpop  ,real(panelRet,DP),real(panela/sum(panela),DP))
-		! 		print*, 'Ret K prc=', prctile_ret(i_pct)
-		! 		prc_Return_K_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_20   ),pack(ret_k_20   ,Ind_K_20   ==1))
-		! 		prc_Return_K_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_21_25),pack(ret_k_21_25,Ind_K_21_25==1))
-		! 		prc_Return_K_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_26_30),pack(ret_k_26_30,Ind_K_26_30==1))
-		! 		prc_Return_K_Age(4 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_31_35),pack(ret_k_31_35,Ind_K_31_35==1))
-		! 		prc_Return_K_Age(5 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_36_40),pack(ret_k_36_40,Ind_K_36_40==1))
-		! 		prc_Return_K_Age(6 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_41_45),pack(ret_k_41_45,Ind_K_41_45==1))
-		! 		prc_Return_K_Age(7 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_46_50),pack(ret_k_46_50,Ind_K_46_50==1))
-		! 		prc_Return_K_Age(8 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_51_55),pack(ret_k_51_55,Ind_K_51_55==1))
-		! 		prc_Return_K_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_56_60),pack(ret_k_56_60,Ind_K_56_60==1))
-		! 		prc_Return_K_Age(10,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_61_65),pack(ret_k_61_65,Ind_K_61_65==1))
-		! 		prc_Return_K_Age(11,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_66_70),pack(ret_k_66_70,Ind_K_66_70==1))
-		! 		prc_Return_K_Age(12,i_pct) = Percentile(prctile_ret(i_pct),count((panelx.lt.3)),real(pack(panelRet_K,(panelx.lt.3)),DP))
-		! 		print*, 'Ret K W prc=', prctile_ret(i_pct)
-		! 		prc_Return_K_W_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_20   ),pack(ret_k_w_20   ,Ind_K_20   ==1))
-		! 		prc_Return_K_W_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_21_25),pack(ret_k_w_21_25,Ind_K_21_25==1))
-		! 		prc_Return_K_W_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_26_30),pack(ret_k_w_26_30,Ind_K_26_30==1))
-		! 		prc_Return_K_W_Age(4 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_31_35),pack(ret_k_w_31_35,Ind_K_31_35==1))
-		! 		prc_Return_K_W_Age(5 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_36_40),pack(ret_k_w_36_40,Ind_K_36_40==1))
-		! 		prc_Return_K_W_Age(6 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_41_45),pack(ret_k_w_41_45,Ind_K_41_45==1))
-		! 		prc_Return_K_W_Age(7 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_46_50),pack(ret_k_w_46_50,Ind_K_46_50==1))
-		! 		prc_Return_K_W_Age(8 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_51_55),pack(ret_k_w_51_55,Ind_K_51_55==1))
-		! 		prc_Return_K_W_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_56_60),pack(ret_k_w_56_60,Ind_K_56_60==1))
-		! 		prc_Return_K_W_Age(10,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_61_65),pack(ret_k_w_61_65,Ind_K_61_65==1))
-		! 		prc_Return_K_W_Age(11,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_66_70),pack(ret_k_w_66_70,Ind_K_66_70==1))
-		! 		prc_Return_K_W_Age(12,i_pct) = Percentile(prctile_ret(i_pct),count((panelx.lt.3)),real(pack(panelRet_K,(panelx.lt.3)),DP),&
-		! 										&	real(pack(panelK,(panelx.lt.3))/sum(panelK,(panelx.lt.3)),DP))
-		! 	enddo 
-		! 	print*, 'End of prc of return by age'
+		! ! 	do i_pct=1,9 
+		! ! 		print*, 'Ret prc=', prctile_ret(i_pct)
+		! ! 		prc_Return_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_20)
+		! ! 		prc_Return_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_21_25)
+		! ! 		prc_Return_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_26_30)
+		! ! 		prc_Return_Age(4 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_31_35)
+		! ! 		prc_Return_Age(5 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_36_40)
+		! ! 		prc_Return_Age(6 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_41_45)
+		! ! 		prc_Return_Age(7 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_46_50)
+		! ! 		prc_Return_Age(8 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_51_55)
+		! ! 		prc_Return_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_56_60)
+		! ! 		prc_Return_Age(10,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_61_65)
+		! ! 		prc_Return_Age(11,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_66_70)
+		! ! 		prc_Return_Age(12,i_pct) = Percentile(prctile_ret(i_pct),totpop  ,real(panelRet,DP) )
+		! ! 		print*, 'Ret W prc=', prctile_ret(i_pct)
+		! ! 		prc_Return_W_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_20)
+		! ! 		prc_Return_W_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_21_25)
+		! ! 		prc_Return_W_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_26_30)
+		! ! 		prc_Return_W_Age(4 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_31_35)
+		! ! 		prc_Return_W_Age(5 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_36_40)
+		! ! 		prc_Return_W_Age(6 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_41_45)
+		! ! 		prc_Return_W_Age(7 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_46_50)
+		! ! 		prc_Return_W_Age(8 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_51_55)
+		! ! 		prc_Return_W_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_56_60)
+		! ! 		prc_Return_W_Age(10,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_61_65)
+		! ! 		prc_Return_W_Age(11,i_pct) = Percentile(prctile_ret(i_pct),ret_size,ret_w_66_70)
+		! ! 		prc_Return_W_Age(12,i_pct) = Percentile(prctile_ret(i_pct),totpop  ,real(panelRet,DP),real(panela/sum(panela),DP))
+		! ! 		print*, 'Ret K prc=', prctile_ret(i_pct)
+		! ! 		prc_Return_K_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_20   ),pack(ret_k_20   ,Ind_K_20   ==1))
+		! ! 		prc_Return_K_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_21_25),pack(ret_k_21_25,Ind_K_21_25==1))
+		! ! 		prc_Return_K_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_26_30),pack(ret_k_26_30,Ind_K_26_30==1))
+		! ! 		prc_Return_K_Age(4 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_31_35),pack(ret_k_31_35,Ind_K_31_35==1))
+		! ! 		prc_Return_K_Age(5 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_36_40),pack(ret_k_36_40,Ind_K_36_40==1))
+		! ! 		prc_Return_K_Age(6 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_41_45),pack(ret_k_41_45,Ind_K_41_45==1))
+		! ! 		prc_Return_K_Age(7 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_46_50),pack(ret_k_46_50,Ind_K_46_50==1))
+		! ! 		prc_Return_K_Age(8 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_51_55),pack(ret_k_51_55,Ind_K_51_55==1))
+		! ! 		prc_Return_K_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_56_60),pack(ret_k_56_60,Ind_K_56_60==1))
+		! ! 		prc_Return_K_Age(10,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_61_65),pack(ret_k_61_65,Ind_K_61_65==1))
+		! ! 		prc_Return_K_Age(11,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_66_70),pack(ret_k_66_70,Ind_K_66_70==1))
+		! ! 		prc_Return_K_Age(12,i_pct) = Percentile(prctile_ret(i_pct),count((panelx.lt.3)),real(pack(panelRet_K,(panelx.lt.3)),DP))
+		! ! 		print*, 'Ret K W prc=', prctile_ret(i_pct)
+		! ! 		prc_Return_K_W_Age(1 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_20   ),pack(ret_k_w_20   ,Ind_K_20   ==1))
+		! ! 		prc_Return_K_W_Age(2 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_21_25),pack(ret_k_w_21_25,Ind_K_21_25==1))
+		! ! 		prc_Return_K_W_Age(3 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_26_30),pack(ret_k_w_26_30,Ind_K_26_30==1))
+		! ! 		prc_Return_K_W_Age(4 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_31_35),pack(ret_k_w_31_35,Ind_K_31_35==1))
+		! ! 		prc_Return_K_W_Age(5 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_36_40),pack(ret_k_w_36_40,Ind_K_36_40==1))
+		! ! 		prc_Return_K_W_Age(6 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_41_45),pack(ret_k_w_41_45,Ind_K_41_45==1))
+		! ! 		prc_Return_K_W_Age(7 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_46_50),pack(ret_k_w_46_50,Ind_K_46_50==1))
+		! ! 		prc_Return_K_W_Age(8 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_51_55),pack(ret_k_w_51_55,Ind_K_51_55==1))
+		! ! 		prc_Return_K_W_Age(9 ,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_56_60),pack(ret_k_w_56_60,Ind_K_56_60==1))
+		! ! 		prc_Return_K_W_Age(10,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_61_65),pack(ret_k_w_61_65,Ind_K_61_65==1))
+		! ! 		prc_Return_K_W_Age(11,i_pct) = Percentile(prctile_ret(i_pct),sum(Ind_K_66_70),pack(ret_k_w_66_70,Ind_K_66_70==1))
+		! ! 		prc_Return_K_W_Age(12,i_pct) = Percentile(prctile_ret(i_pct),count((panelx.lt.3)),real(pack(panelRet_K,(panelx.lt.3)),DP),&
+		! ! 										&	real(pack(panelK,(panelx.lt.3))/sum(panelK,(panelx.lt.3)),DP))
+		! ! 	enddo 
+		! ! 	print*, 'End of prc of return by age'
 
-		! 	if (bench_indx.eq.1) then
-		! 	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Return_Stats_by_Age_bench.txt', STATUS='replace')
-		! 	else
-		! 	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Return_Stats_by_Age_exp.txt'  , STATUS='replace')
-		! 	endif 
+		! ! 	if (bench_indx.eq.1) then
+		! ! 	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Return_Stats_by_Age_bench.txt', STATUS='replace')
+		! ! 	else
+		! ! 	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Return_Stats_by_Age_exp.txt'  , STATUS='replace')
+		! ! 	endif 
 
-		! 	WRITE(UNIT=10, FMT=*) ' '
-		! 	WRITE(UNIT=10, FMT=*) 'Std Dev of Return by Age'
-		! 	WRITE(UNIT=10, FMT=*) '20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 ','All '
-		! 	WRITE(UNIT=10, FMT=*) Std_Dev_Return_Age
-		! 	WRITE(UNIT=10, FMT=*) Mean_Return_Age
-		! 	do i_pct=1,9 
-		! 		WRITE(UNIT=10, FMT=*) prc_Return_Age(:,i_pct)
-		! 	enddo 
-		! 	WRITE(UNIT=10, FMT=*) ' '
-		! 	WRITE(UNIT=10, FMT=*) 'Std Dev of Return W by Age'
-		! 	WRITE(UNIT=10, FMT=*) ' 20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 ','All '
-		! 	WRITE(UNIT=10, FMT=*) Std_Dev_Return_W_Age
-		! 	WRITE(UNIT=10, FMT=*) Mean_Return_W_Age
-		! 	do i_pct=1,9 
-		! 		WRITE(UNIT=10, FMT=*) prc_Return_W_Age(:,i_pct)
-		! 	enddo 
-		! 	WRITE(UNIT=10, FMT=*) ' '
-		! 	WRITE(UNIT=10, FMT=*) 'Std Dev of Return K by Age'
-		! 	WRITE(UNIT=10, FMT=*) ' 20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 ','All '
-		! 	WRITE(UNIT=10, FMT=*) Std_Dev_Return_K_Age
-		! 	WRITE(UNIT=10, FMT=*) Mean_Return_K_Age
-		! 	do i_pct=1,9 
-		! 		WRITE(UNIT=10, FMT=*) prc_Return_K_Age(:,i_pct)
-		! 	enddo 
-		! 	WRITE(UNIT=10, FMT=*) ' '
-		! 	WRITE(UNIT=10, FMT=*) 'Std Dev of Return K W by Age'
-		! 	WRITE(UNIT=10, FMT=*) ' 20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 ','All '
-		! 	WRITE(UNIT=10, FMT=*) Std_Dev_Return_K_W_Age
-		! 	WRITE(UNIT=10, FMT=*) Mean_Return_K_W_Age
-		! 	do i_pct=1,9 
-		! 		WRITE(UNIT=10, FMT=*) prc_Return_K_W_Age(:,i_pct)
-		! 	enddo 
-		! 	WRITE(UNIT=10, FMT=*) ' '
-		! 	WRITE(UNIT=10, FMT=*) sum(Ind_K_20   ),sum(Ind_K_21_25),sum(Ind_K_26_30),sum(Ind_K_31_35),sum(Ind_K_36_40),&
-		! 						& sum(Ind_K_41_45),sum(Ind_K_46_50),sum(Ind_K_51_55),sum(Ind_K_56_60),sum(Ind_K_61_65),sum(Ind_K_66_70)
+		! ! 	WRITE(UNIT=10, FMT=*) ' '
+		! ! 	WRITE(UNIT=10, FMT=*) 'Std Dev of Return by Age'
+		! ! 	WRITE(UNIT=10, FMT=*) '20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 ','All '
+		! ! 	WRITE(UNIT=10, FMT=*) Std_Dev_Return_Age
+		! ! 	WRITE(UNIT=10, FMT=*) Mean_Return_Age
+		! ! 	do i_pct=1,9 
+		! ! 		WRITE(UNIT=10, FMT=*) prc_Return_Age(:,i_pct)
+		! ! 	enddo 
+		! ! 	WRITE(UNIT=10, FMT=*) ' '
+		! ! 	WRITE(UNIT=10, FMT=*) 'Std Dev of Return W by Age'
+		! ! 	WRITE(UNIT=10, FMT=*) ' 20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 ','All '
+		! ! 	WRITE(UNIT=10, FMT=*) Std_Dev_Return_W_Age
+		! ! 	WRITE(UNIT=10, FMT=*) Mean_Return_W_Age
+		! ! 	do i_pct=1,9 
+		! ! 		WRITE(UNIT=10, FMT=*) prc_Return_W_Age(:,i_pct)
+		! ! 	enddo 
+		! ! 	WRITE(UNIT=10, FMT=*) ' '
+		! ! 	WRITE(UNIT=10, FMT=*) 'Std Dev of Return K by Age'
+		! ! 	WRITE(UNIT=10, FMT=*) ' 20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 ','All '
+		! ! 	WRITE(UNIT=10, FMT=*) Std_Dev_Return_K_Age
+		! ! 	WRITE(UNIT=10, FMT=*) Mean_Return_K_Age
+		! ! 	do i_pct=1,9 
+		! ! 		WRITE(UNIT=10, FMT=*) prc_Return_K_Age(:,i_pct)
+		! ! 	enddo 
+		! ! 	WRITE(UNIT=10, FMT=*) ' '
+		! ! 	WRITE(UNIT=10, FMT=*) 'Std Dev of Return K W by Age'
+		! ! 	WRITE(UNIT=10, FMT=*) ' 20 ','21-25 ','26-30 ','31-35 ','36-40 ','41-45 ','46-50 ','51-55 ','56-60 ','61-65 ','66-70 ','All '
+		! ! 	WRITE(UNIT=10, FMT=*) Std_Dev_Return_K_W_Age
+		! ! 	WRITE(UNIT=10, FMT=*) Mean_Return_K_W_Age
+		! ! 	do i_pct=1,9 
+		! ! 		WRITE(UNIT=10, FMT=*) prc_Return_K_W_Age(:,i_pct)
+		! ! 	enddo 
+		! ! 	WRITE(UNIT=10, FMT=*) ' '
+		! ! 	WRITE(UNIT=10, FMT=*) sum(Ind_K_20   ),sum(Ind_K_21_25),sum(Ind_K_26_30),sum(Ind_K_31_35),sum(Ind_K_36_40),&
+		! ! 						& sum(Ind_K_41_45),sum(Ind_K_46_50),sum(Ind_K_51_55),sum(Ind_K_56_60),sum(Ind_K_61_65),sum(Ind_K_66_70)
 
-		! 	CLOSE(UNIT=10)
+		! ! 	CLOSE(UNIT=10)
 
 
 		print*, ' '
@@ -1092,20 +1100,20 @@ SUBROUTINE  SIMULATION(bench_indx)
 			OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_bench'		, STATUS='replace')
 			OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/panellambda_bench'   , STATUS='replace')
 			OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_bench'        , STATUS='replace')
-			OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_bench'     , STATUS='replace')
-			OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_bench'        , STATUS='replace')
+			! OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_bench'     , STATUS='replace')
+			! OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_bench'        , STATUS='replace')
 			OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
-			OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_bench'    	, STATUS='replace')
+			! OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_bench'    	, STATUS='replace')
 		else 
 			OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
 			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_exp'		, STATUS='replace')
 			OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_exp'		 	, STATUS='replace')
 			OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/panellambda_exp'   	, STATUS='replace')
 			OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_exp'        	, STATUS='replace')
-			OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_exp'       , STATUS='replace')
-			OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_exp' 	        , STATUS='replace')
+			! OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_exp'       , STATUS='replace')
+			! OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_exp' 	        , STATUS='replace')
 			OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_exp'	        , STATUS='replace')
-			OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_exp'    	, STATUS='replace')
+			! OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_exp'    	, STATUS='replace')
 		endif 
 
 
@@ -1114,110 +1122,114 @@ SUBROUTINE  SIMULATION(bench_indx)
 		WRITE  (UNIT=12, FMT=*) panelz 
 		WRITE  (UNIT=13, FMT=*) panellambda 
 		WRITE  (UNIT=14, FMT=*) panele 
-		WRITE  (UNIT=26, FMT='(F12.4)') panelPV_a
-		WRITE  (UNIT=27, FMT='(F12.4)') panelK
+		! WRITE  (UNIT=26, FMT='(F12.4)') panelPV_a
+		! WRITE  (UNIT=27, FMT='(F12.4)') panelK
 		WRITE  (UNIT=28, FMT=*) panelx
-		WRITE  (UNIT=24, FMT='(F12.4)') panel_Y_L
+		! WRITE  (UNIT=24, FMT='(F12.4)') panel_Y_L
 
 		close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14)
-		close (unit=26); close (unit=27); close (unit=28); close (unit=24) 
+		close (unit=28); ! close (unit=26); close (unit=27); close (unit=24) 
 
-		! if (bench_indx==1) then
-		! 	OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_parents' 	, STATUS='replace')
-		! 	OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_sons'    	, STATUS='replace')
-		! 	OPEN(UNIT=22, FILE=trim(Result_Folder)//'Simul/panelage_parents' 	, STATUS='replace')
-		! 	OPEN(UNIT=23, FILE=trim(Result_Folder)//'Simul/panelage_sons'    	, STATUS='replace')
-		! 	WRITE (UNIT=20, FMT='(F12.4)') eligible_panela_parents
-		! 	WRITE (UNIT=21, FMT='(F12.4)') eligible_panela_sons
-		! 	WRITE (UNIT=22, FMT=*) eligible_panelage_parents
-		! 	WRITE (UNIT=23, FMT=*) eligible_panelage_sons
-		! 	close (unit=20); close (unit=21); close (unit=22); close (unit=23)
+		! ! if (bench_indx==1) then
+		! ! 	OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_parents' 	, STATUS='replace')
+		! ! 	OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/panela_sons'    	, STATUS='replace')
+		! ! 	OPEN(UNIT=22, FILE=trim(Result_Folder)//'Simul/panelage_parents' 	, STATUS='replace')
+		! ! 	OPEN(UNIT=23, FILE=trim(Result_Folder)//'Simul/panelage_sons'    	, STATUS='replace')
+		! ! 	WRITE (UNIT=20, FMT='(F12.4)') eligible_panela_parents
+		! ! 	WRITE (UNIT=21, FMT='(F12.4)') eligible_panela_sons
+		! ! 	WRITE (UNIT=22, FMT=*) eligible_panelage_parents
+		! ! 	WRITE (UNIT=23, FMT=*) eligible_panelage_sons
+		! ! 	close (unit=20); close (unit=21); close (unit=22); close (unit=23)
 
-		! 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_3050' )
-		! 	OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panela_parents' , STATUS='replace')
-		! 	OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panela_sons'     , STATUS='replace')
-		! 	WRITE (UNIT=20, FMT='(F12.4)') panela_dad
-		! 	WRITE (UNIT=21, FMT='(F12.4)') panela_son
-		! 	close (unit=20); close (unit=21); 
-		! 	OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelr_parents' , STATUS='replace')
-		! 	OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelr_sons'     , STATUS='replace')
-		! 	WRITE (UNIT=20, FMT='(F12.4)') panelr_dad
-		! 	WRITE (UNIT=21, FMT='(F12.4)') panelr_son
-		! 	close (unit=20); close (unit=21); 
-		! 	OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelpv_parents' , STATUS='replace')
-		! 	OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelpv_sons'     , STATUS='replace')
-		! 	WRITE (UNIT=20, FMT='(F12.4)') panelpv_dad
-		! 	WRITE (UNIT=21, FMT='(F12.4)') panelpv_son
-		! 	close (unit=20); close (unit=21); 
-		! 	OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelz_parents' , STATUS='replace')
-		! 	OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelz_sons'     , STATUS='replace')
-		! 	WRITE (UNIT=20, FMT=*) panelz_dad
-		! 	WRITE (UNIT=21, FMT=*) panelz_son
-		! 	close (unit=20); close (unit=21); 
+		! ! 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_3050' )
+		! ! 	OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panela_parents' , STATUS='replace')
+		! ! 	OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panela_sons'     , STATUS='replace')
+		! ! 	WRITE (UNIT=20, FMT='(F12.4)') panela_dad
+		! ! 	WRITE (UNIT=21, FMT='(F12.4)') panela_son
+		! ! 	close (unit=20); close (unit=21); 
+		! ! 	OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelr_parents' , STATUS='replace')
+		! ! 	OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelr_sons'     , STATUS='replace')
+		! ! 	WRITE (UNIT=20, FMT='(F12.4)') panelr_dad
+		! ! 	WRITE (UNIT=21, FMT='(F12.4)') panelr_son
+		! ! 	close (unit=20); close (unit=21); 
+		! ! 	OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelpv_parents' , STATUS='replace')
+		! ! 	OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelpv_sons'     , STATUS='replace')
+		! ! 	WRITE (UNIT=20, FMT='(F12.4)') panelpv_dad
+		! ! 	WRITE (UNIT=21, FMT='(F12.4)') panelpv_son
+		! ! 	close (unit=20); close (unit=21); 
+		! ! 	OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelz_parents' , STATUS='replace')
+		! ! 	OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelz_sons'     , STATUS='replace')
+		! ! 	WRITE (UNIT=20, FMT=*) panelz_dad
+		! ! 	WRITE (UNIT=21, FMT=*) panelz_son
+		! ! 	close (unit=20); close (unit=21); 
 
-		! 	! call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_4060' )
-		! 	! OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_4060/panela_parents' , STATUS='replace')
-		! 	! OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060/panela_sons'     , STATUS='replace')
-		! 	! WRITE (UNIT=20, FMT='(F12.4)') panela_dad_2
-		! 	! WRITE (UNIT=21, FMT='(F12.4)') panela_son_2
-		! 	! close (unit=20); close (unit=21); 
-		! 	! OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelr_parents' , STATUS='replace')
-		! 	! OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelr_sons'     , STATUS='replace')
-		! 	! WRITE (UNIT=20, FMT='(F12.4)') panelr_dad
-		! 	! WRITE (UNIT=21, FMT='(F12.4)') panelr_son
-		! 	! close (unit=20); close (unit=21); 
-		! 	! OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelpv_parents' , STATUS='replace')
-		! 	! OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelpv_sons'     , STATUS='replace')
-		! 	! WRITE (UNIT=20, FMT='(F12.4)') panelpv_dad
-		! 	! WRITE (UNIT=21, FMT='(F12.4)') panelpv_son
-		! 	! close (unit=20); close (unit=21); 
-		! 	! OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelz_parents' , STATUS='replace')
-		! 	! OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelz_sons'     , STATUS='replace')
-		! 	! WRITE (UNIT=20, FMT=*) panelz_dad
-		! 	! WRITE (UNIT=21, FMT=*) panelz_son
-		! 	! close (unit=20); close (unit=21); 
+		! ! 	! call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_4060' )
+		! ! 	! OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_4060/panela_parents' , STATUS='replace')
+		! ! 	! OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060/panela_sons'     , STATUS='replace')
+		! ! 	! WRITE (UNIT=20, FMT='(F12.4)') panela_dad_2
+		! ! 	! WRITE (UNIT=21, FMT='(F12.4)') panela_son_2
+		! ! 	! close (unit=20); close (unit=21); 
+		! ! 	! OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelr_parents' , STATUS='replace')
+		! ! 	! OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelr_sons'     , STATUS='replace')
+		! ! 	! WRITE (UNIT=20, FMT='(F12.4)') panelr_dad
+		! ! 	! WRITE (UNIT=21, FMT='(F12.4)') panelr_son
+		! ! 	! close (unit=20); close (unit=21); 
+		! ! 	! OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelpv_parents' , STATUS='replace')
+		! ! 	! OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelpv_sons'     , STATUS='replace')
+		! ! 	! WRITE (UNIT=20, FMT='(F12.4)') panelpv_dad
+		! ! 	! WRITE (UNIT=21, FMT='(F12.4)') panelpv_son
+		! ! 	! close (unit=20); close (unit=21); 
+		! ! 	! OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelz_parents' , STATUS='replace')
+		! ! 	! OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_4060/panelz_sons'     , STATUS='replace')
+		! ! 	! WRITE (UNIT=20, FMT=*) panelz_dad
+		! ! 	! WRITE (UNIT=21, FMT=*) panelz_son
+		! ! 	! close (unit=20); close (unit=21); 
 			
-		! endif
+		! ! endif
 
 
-		! if (bench_indx==1) then
-		! print*, 'Identifying top agents'
-		! ! Top Agents - Assets
-		! 	n_top = totpop 
-		! 	A_hi  = maxval(panela)
-		! 	A_low = minval(panela)
-		! 	A_cut = (A_hi+A_low)/2.0_dp 
-		! 	do while (n_top.ne.80)
-		! 		n_top = count(panela.ge.A_cut)
-		! 		if (n_top.gt.80) then
-		! 			A_low = A_cut 
-		! 		endif 
-		! 		if (n_top.lt.80) then
-		! 			A_hi  = A_cut 
-		! 		endif 
-		! 		A_cut = (A_hi+A_low)/2.0_dp 
-		! 		print*, A_cut, n_top, count(panela.ge.A_cut) 
-		! 	enddo 
-		! 	print*,' '
-		! 	print*,'A_cut final:'
-		! 	print*, A_cut, n_top, count(panela.ge.A_cut) 
+		if (bench_indx==1) then
+		print*,' '
+		print*, 'Identifying top agents'
+		! Top Agents - Assets
+			n_top = totpop 
+			A_hi  = maxval(panela)
+			A_low = minval(panela)
+			A_cut = (A_hi+A_low)/2.0_dp 
+			do while (n_top.ne.80)
+				n_top = count(panela.ge.A_cut)
+				if (n_top.gt.80) then
+					A_low = A_cut 
+				endif 
+				if (n_top.lt.80) then
+					A_hi  = A_cut 
+				endif 
+				A_cut = (A_hi+A_low)/2.0_dp 
+				print*, A_cut, n_top, count(panela.ge.A_cut) 
+			enddo 
+			print*,' '
+			print*,'A_cut final:'
+			print*, A_cut, n_top, count(panela.ge.A_cut) 
 
-		! 	panel_top_ind = (/(paneli, paneli=1,totpop, 1)/)
-		! 	top_ind = pack(panel_top_ind  , (panela.ge.A_cut) )
-		! 	top_A   = pack(panela         , (panela.gt.A_cut) )
-		! 	! Sort by assets
-		! 	call Sort(80,top_A,top_A,top_ind_aux)
-		! 	top_ind = top_ind(top_ind_aux)
-		! 	! Test print
-		! 	print*,' '
-		! 	print*,'Top Agents and Top Assets'
-		! 	do paneli=1,80
-		! 		print*, top_ind(paneli),top_A(paneli)
-		! 	enddo
-		! 	print*,'Max(A)', maxval(panela)
+			do paneli=1,totpop
+			panel_top_ind(paneli) = paneli 
+			enddo 
+			! panel_top_ind = (/(paneli, paneli=1,totpop, 1)/)
+			top_ind = pack(panel_top_ind  , (panela.ge.A_cut) )
+			top_A   = pack(panela         , (panela.gt.A_cut) )
+			! Sort by assets
+			call Sort(80,top_A,top_A,top_ind_aux)
+			top_ind = top_ind(top_ind_aux)
+			! Test print
+			print*,' '
+			print*,'Top Agents and Top Assets'
+			do paneli=1,80
+				print*, top_ind(paneli),top_A(paneli)
+			enddo
+			print*,'Max(A)', maxval(panela)
 
-		! 	top_folder = 'Top_A/'
-		! 	call SIMULATION_TOP(bench_indx,top_ind,top_folder)
+			top_folder = 'Top_A/'
+			call SIMULATION_TOP(bench_indx,top_ind,top_folder)
 
 		! ! Top Agents - PV
 		! 	n_top = totpop 
@@ -1256,7 +1268,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! 	top_folder = 'Top_PV/'
 		! 	call SIMULATION_TOP(bench_indx,top_ind,top_folder)
 
-		! endif 
+		endif ! bench_indx==1 for Top Agents 
 
 
 
@@ -1280,12 +1292,27 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	REAL(DP) :: start_timet, finish_timet, h_i
 	INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
 	INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
-	INTEGER , DIMENSION(totpop) :: panelage, panelz, panellambda, panele, panelx, panelz_old, panellambda_old 
-	REAL(SP), DIMENSION(totpop) :: panela, panelPV_a, panelK 
+
+	INTEGER , DIMENSION(:), allocatable :: panelage, panelz, panellambda, panele, panelx, panelz_old, panellambda_old
+	REAL(SP), DIMENSION(:), allocatable :: panela, panelPV_a, panelK 
+	
 	INTEGER , DIMENSION(150,80) :: panelage_top, panelz_top, panelx_top, panel_lambda_top, panele_top
 	REAL(SP), DIMENSION(150,80) :: panela_top, panelK_top, panel_YL_top, panel_PV_top
 	REAL(SP), DIMENSION(150,80) :: prc_all_top, prc_cohort_top, prc_PV_all_top, prc_PV_cohort_top
+	REAL(SP), DIMENSION(80)		:: panela_top_nb
+	REAL(DP) 					:: Share_Self_Made_100, Share_Self_Made_1000
 	INTEGER 				    :: ii, age_top, thread_num
+
+	allocate( panelage(   		totpop) )
+	allocate( panelz(     		totpop) )
+	allocate( panellambda(		totpop) )
+	allocate( panele(     		totpop) )
+	allocate( panelx(     		totpop) )
+	allocate( panelz_old(     	totpop) )
+	allocate( panellambda_old(	totpop) )
+	allocate( panela(			totpop) )
+	allocate( panelPV_a(		totpop) )
+	allocate( panelK(			totpop) )
 
 	!$ call omp_set_num_threads(20)
 	!$OMP parallel
@@ -1421,6 +1448,9 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	  
 	      	IF (tempnoage .gt. survP(age)) THEN
 				panelage(paneli)   = 1
+
+				! Bequest Taxes
+				panela(paneli) = (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*panela(paneli)
 			ELSE
 				panelage(paneli)   = age+1
 				panelz(paneli)     = currentzi
@@ -1521,7 +1551,8 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 
      		!$omp parallel do private(tklo,tkhi,h_i)
      		do ii=1,80   
-     		panelk_top(age_top,ii)  = min( theta(panelz_top(age_top,ii))*panela_top(age_top,ii) ,&
+     		panelk_top(age_top,ii)  = min( &
+     			& theta(panelz_top(age_top,ii))*panela_top(age_top,ii) ,&
      			& (mu*P*xz_grid(panelx_top(age_top,ii),panelz_top(age_top,ii))**mu & 
      				& /(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
@@ -1568,16 +1599,56 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 
      		enddo
      	endif
-	    ! print*, "Simulation period", simutime
+	    print*, "Simulation period (Top Agents)", simutime
 	ENDDO ! simutime
 	print*,' '
 	print*,'Averages'
 	print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8), sum(panela)/real(totpop,8)
 
-
 	print*, ' '
 	print*, 'Writing simulation results for top agents'
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' // trim(folder) )
+
+
+	! Get wealth when newborn
+	Share_Self_Made_100  = 0.0_dp
+	Share_Self_Made_1000 = 0.0_dp
+	if (bench_indx.eq.1) then
+	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'Self_Made_Stats_bench.txt', STATUS='replace')
+	else
+	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'Self_Made_Stats_exp.txt', STATUS='replace')
+	endif 
+	WRITE(UNIT=10,FMT=*) "Self Made Stats for Top Agents"  
+	WRITE(UNIT=10,FMT=*) "Agent","Age","Initial_Assets","Final_Assets","Asset_Growth"
+	do ii=1,80
+		panela_top_nb(ii) = panela_top(150-panelage_top(150,ii)+1 , ii)
+		if (panela_top(150,ii)/panela_top_nb(ii).gt.100) then
+		Share_Self_Made_100 = Share_Self_Made_100 + 1.0_dp
+		endif 
+		if (panela_top(150,ii)/panela_top_nb(ii).gt.1000) then
+		Share_Self_Made_1000 = Share_Self_Made_1000 + 1.0_dp
+		endif 
+		WRITE(UNIT=10,FMT=*) ii,panelage_top(150,ii),panela_top_nb(ii),panela_top(150,ii),&
+							& 100.0_dp*(panela_top(150,ii)/panela_top_nb(ii)-1.0_dp)
+	enddo
+	Share_Self_Made_100  = 100.0_dp*(Share_Self_Made_100 /80.0_dp)
+	Share_Self_Made_1000 = 100.0_dp*(Share_Self_Made_1000/80.0_dp)
+	WRITE(UNIT=10,FMT=*) " "  
+	WRITE(UNIT=10,FMT=*) "---------------------------------------"  
+	WRITE(UNIT=10,FMT=*) " "  
+	WRITE(UNIT=10,FMT=*) "Self_Made_100",Share_Self_Made_100
+	WRITE(UNIT=10,FMT=*) "Self_Made_1000",Share_Self_Made_1000  
+	WRITE(UNIT=10,FMT=*) " "  
+	WRITE(UNIT=10,FMT=*) "---------------------------------------"  
+	CLOSE(UNIT=10)
+
+	print*,' '
+	print*,'----------------------------------'
+	print*,'Self Made Stats'
+	print*," 	Self_Made_100",Share_Self_Made_100
+	print*,"	Self_Made_1000",Share_Self_Made_1000 
+	print*,'----------------------------------'
+	print*,' '
 
 
 	if (bench_indx.eq.1) then
@@ -1790,6 +1861,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 				Panel_Death(i,age,i_z) = 0
 				Panel_x(i,age,i_z)     = 1
 				Panel_e(i,age,i_z)	   = ne/2+1
+				Panel_a(i,age,i_z)     = (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Panel_a(i,age,i_z)
 			ELSE
 				! Agent Survives
 				Panel_Death(i,age,i_z) = 1
@@ -2309,6 +2381,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 				Panel_Death(i,age) = 0
 				Panel_x(i,age)     = 1
 				Panel_e(i,age)	   = ne/2+1
+				Panel_a(i,age)     = (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Panel_a(i,age)
 			ELSE
 				! Agent Survives
 				Panel_Death(i,age) = 1
