@@ -63,7 +63,7 @@ PROGRAM main
 			compute_bench = .false.
 			compute_exp   = .true.
 			compute_exp_pf= .false.
-				Fixed_PF        = .false.
+				Fixed_PF        = .true.
 				Fixed_PF_interp = .true.
 				Fixed_PF_prices = .false.
 			compute_exp_prices    = .false.
@@ -146,17 +146,35 @@ PROGRAM main
 		! 		theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 		! 		enddo
 
-		! Debt/Output = 1.3, sigma=2 
+		! ! Debt/Output = 1.3, sigma=2 
+		! 	! Main Parameters 
+		! 		beta   	= 0.9610_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+		! 		sigma_z_eps      = 0.0832_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+		! 		sigma_lambda_eps = 0.307_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
+		! 		gamma  	= 0.4480_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+		! 		sigma  	= 2.0_dp
+
+		! 	! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
+		! 		bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
+		! 		chi_u  = 01.33_dp ! Scaling 03.55_dp (value without estate tax)
+		! 		chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
+
+		! 	! Capital Market
+		! 		do zi=1,nz
+		! 		theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+		! 		enddo
+
+		! Debt/Output = 1.3, high luxury component
 			! Main Parameters 
-				beta   	= 0.9610_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
-				sigma_z_eps      = 0.0832_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+				beta   	= 0.9586_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+				sigma_z_eps      = 0.0783_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 				sigma_lambda_eps = 0.307_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
-				gamma  	= 0.4480_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
-				sigma  	= 2.0_dp
+				gamma  	=  0.4500_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+				sigma  	= 4.0_dp
 
 			! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 				bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
-				chi_u  = 01.33_dp ! Scaling 03.55_dp (value without estate tax)
+				chi_u  = 00.35_dp ! Scaling 03.55_dp (value without estate tax)
 				chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 			! Capital Market
@@ -248,8 +266,8 @@ PROGRAM main
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
 			! Result_Folder = './Revision/Model_2.0/'
-			Result_Folder = './Revision/Model_2.0_sigma/' 
-			! Result_Folder = './Revision/Model_2.0_luxury/'
+			! Result_Folder = './Revision/Model_2.0_sigma/' 
+			Result_Folder = './Revision/Model_2.0_luxury/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './Revision/Model_2.0_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
@@ -618,7 +636,8 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		print 12345, &
 			& " 	A/Y=",MeanWealth/YBAR,'BQ/A=',100.0_dp*Bequest_Wealth/MeanWealth ,'BQ/Inc=',Bq_Inc(3,1),&
 			& 'Top_1%=',100.0_dp*prct1_wealth,'L_C/N=',100.0_dp*L_C/NBAR,&
-			& 'stdEarn=',Std_Log_Earnings_25_60,'N',meanhours_25_60,'D/Y',External_Debt_GDP
+			& 'stdEarn=',Std_Log_Earnings_25_60,'N',meanhours_25_60,'D/Y',External_Debt_GDP,&
+			& 'Luxury',(EBAR_data/(EBAR_bench*0.727853584919652_dp))*bq_0
 		12345 format (A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)
 		print*,'-------------------------------------------------------------------------'
 		print*,' ';print*,' ';print*,' '
@@ -629,13 +648,13 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		endif 
 
 		! Call Simulation_Life_Cycle_Patterns(solving_bench)
-		Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
+		! Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
 
 
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark
