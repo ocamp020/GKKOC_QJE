@@ -139,7 +139,7 @@ MODULE global
 	    REAL(DP) :: meanhours_25_60, Var_Log_Earnings_25_60, Std_Log_Earnings_25_60, MeanWealth, Wealth_Output
 	    REAL(DP) :: MeanReturn, StdReturn, VarReturn
 	    REAL(DP), DIMENSION(nz) :: MeanReturn_by_z(nz), size_by_z(nz), Wealth_by_z(nz)
-	    REAL(DP) :: prct1_wealth, prct10_wealth, prct20_wealth, prct40_wealth
+	    REAL(DP) :: prct1_wealth, prct10_wealth, prct20_wealth, prct40_wealth, prct999_wealth, prct9999_wealth
 	    REAL(DP) :: SSE_Moments, Min_SSE_Moments
 	    REAL(DP) :: MeanCons, External_Debt_GDP
 	    REAL(DP) :: Mean_Firm_Wealth, Firm_Wealth_by_z

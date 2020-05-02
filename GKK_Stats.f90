@@ -174,6 +174,27 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO
 		close(unit=81)
 
+		! Find top 99.9 and top 99.99
+		print*,' '
+		print*,'Top Wealth Shares'
+		! Top 99.9
+		 	ai=1
+		    DO while (cdf_a_dbn(ai) .lt. (99.9_dp/100.0_DP-0.000000000000001))
+		        ai=ai+1
+		    ENDDO
+			prct999_wealth  = sum(tot_a_by_grid(ai:))/sum(tot_a_by_grid)
+			print*,'Top  0.10: ai',ai,'Wealth_Share',prct999_wealth!,'Total_Wealth',sum(tot_a_by_grid)
+		! Top 99.99
+		 	ai=1
+		    DO while (cdf_a_dbn(ai) .lt. (99.99_dp/100.0_DP-0.000000000000001))
+		        ai=ai+1
+		    ENDDO
+			prct9999_wealth = sum(tot_a_by_grid(ai:))/sum(tot_a_by_grid)
+			print*,'Top  0.01: ai',ai,'Wealth_Share',prct9999_wealth!,'Total_Wealth',sum(tot_a_by_grid)
+			print*,'Top  1.00: ai',prctile_ai_ind(99),'Wealth_Share',prct1_wealth
+			print*,'Top 10.00: ai',prctile_ai_ind(90),'Wealth_Share',prct10_wealth
+		print*,' '
+
 	
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
@@ -3222,7 +3243,13 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'Moments:'
 			WRITE(UNIT=19, FMT=*) 'Debt_Output'		  	, External_Debt_GDP
 			WRITE(UNIT=19, FMT=*) 'Wealth_Output'	  	, Wealth_Output
+			if (A_C.gt.0.0_dp) then 
 			WRITE(UNIT=19, FMT=*) 'TFP_Q' 				, QBAR/K_P
+			else 
+			WRITE(UNIT=19, FMT=*) 'TFP_Q' 				, QBAR/MeanWealth
+			endif 
+			WRITE(UNIT=19, FMT=*) 'Wealth_Top_0.01%' 	, prct9999_wealth
+			WRITE(UNIT=19, FMT=*) 'Wealth_Top_0.1%' 	, prct999_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_Top_1%' 		, prct1_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_Top_10%'		, prct10_wealth
 			WRITE(UNIT=19, FMT=*) 'Wealth_Top_20%'		, prct20_wealth

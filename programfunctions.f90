@@ -4820,8 +4820,8 @@ SUBROUTINE FIND_DBN_Transition()
 
 	    	! Print Summary File
 			OPEN  (UNIT=78,FILE=trim(Result_Folder)//'Transition_Summary.txt'   , STATUS='replace')
-			WRITE (UNIT=78,FMT=*) 'Period','Q','N','R','Wage','Y','K','C','Y_C','L_C','K_C','Y_P','L_P','K_P','Debt', &
-					&'GBAR','GBAR_K','GBAR_W','GBAR_L','GBAR_C','SSC',' Wealth_Top_1','Wealth_Top_10'
+			WRITE (UNIT=78,FMT=*) 'Period Q N R Wage Y K C Y_C L_C K_C Y_P L_P K_P Debt ', &
+					&'GBAR GBAR_K GBAR_W GBAR_L GBAR_C SSC  Wealth_Top_1 Wealth_Top_10'
 			WRITE (UNIT=78,FMT=*) 'SS_1',QBAR_bench,NBAR_bench,R_bench,wage_bench & 
 										& ,Y_bench,K_bench,C_bench &
 										& ,YBAR_C_bench,L_C_bench,K_C_bench,YBAR_P_bench,L_P_bench,K_P_bench &
@@ -4837,7 +4837,7 @@ SUBROUTINE FIND_DBN_Transition()
 			WRITE (UNIT=78,FMT=*) 'SS_2',QBAR_exp,NBAR_exp,R_exp,wage_exp & 
 								&  ,Y_exp,K_exp,C_exp &
 								&  ,YBAR_C_exp,L_C_exp,K_C_exp,YBAR_P_exp,L_P_exp,K_P_exp &
-								&  ,Debt_exp,GBAR_exp,'99','99','99','99','99','99' &
+								&  ,Debt_exp,GBAR_exp,'99 99 99 99 99 99' &
 								&  ,Wealth_Top_1_tr(T+1),Wealth_Top_10_tr(T+1)
 			CLOSE (UNIT=78);
 
