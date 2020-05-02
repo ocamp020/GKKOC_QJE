@@ -173,8 +173,8 @@ PROGRAM main
 				sigma  	= 4.0_dp
 
 			! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
-				bq_0   = 02.05_dp ! Level shift 00.30_dp (value without estate tax)
-				chi_u  = 01.40_dp ! Scaling 03.55_dp (value without estate tax)
+				bq_0   = 02.02_dp ! Level shift 00.30_dp (value without estate tax)
+				chi_u  = 01.70_dp ! Scaling 03.55_dp (value without estate tax)
 				chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 			! Capital Market
