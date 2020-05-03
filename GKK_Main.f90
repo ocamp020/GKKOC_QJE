@@ -2301,14 +2301,17 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	CLOSE (unit=77) 
     	
-    	tau_grid_min  = 20
-    	tau_grid_max  = 55
+    	tau_grid_min  = 30
+    	tau_grid_max  = 50
     	tau_grid_step = 1
 
     	! Set Y_a_threshold
 			call Find_TauW_Threshold(DBN_bench,W_bench)  
 			Y_a_threshold = Threshold_Factor*Ebar_bench !0.75_dp
 			Wealth_factor = Y_a_threshold/W_bench
+
+		! Set high psi
+		psi = 0.87_dp
 	endif 
 
 	! Load results form file for re-starts of the code
