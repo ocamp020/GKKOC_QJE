@@ -1619,7 +1619,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'Self_Made_Stats_exp.txt', STATUS='replace')
 	endif 
 	WRITE(UNIT=10,FMT=*) "Self Made Stats for Top Agents"  
-	WRITE(UNIT=10,FMT=*) "Agent","Age","Initial_Assets","Final_Assets","Asset_Growth"
+	WRITE(UNIT=10,FMT=*) "Agent Age Initial_Assets Final_Assets Asset_Growth"
 	do ii=1,80
 		panela_top_nb(ii) = panela_top(150-panelage_top(150,ii)+1 , ii)
 		if (panela_top(150,ii)/panela_top_nb(ii).gt.100) then
@@ -1628,7 +1628,9 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 		if (panela_top(150,ii)/panela_top_nb(ii).gt.1000) then
 		Share_Self_Made_1000 = Share_Self_Made_1000 + 1.0_dp
 		endif 
-		WRITE(UNIT=10,FMT=*) ii,panelage_top(150,ii),panela_top_nb(ii),panela_top(150,ii),&
+		WRITE(UNIT=10,FMT=*) ii,panelage_top(150,ii),&
+							& (EBAR_data/(EBAR_bench*0.727853584919652_dp))*panela_top_nb(ii),&
+							& (EBAR_data/(EBAR_bench*0.727853584919652_dp))*panela_top(150,ii),&
 							& 100.0_dp*(panela_top(150,ii)/panela_top_nb(ii)-1.0_dp)
 	enddo
 	Share_Self_Made_100  = 100.0_dp*(Share_Self_Made_100 /80.0_dp)
