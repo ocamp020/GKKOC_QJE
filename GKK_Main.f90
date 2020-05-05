@@ -77,7 +77,7 @@ PROGRAM main
 		Tax_Reform_Decomposition = .false.
 		compute_exp_fixed_prices_and_taxes = .false.
 
-		Opt_Tax       = .false.
+		Opt_Tax       = .true.
 			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
