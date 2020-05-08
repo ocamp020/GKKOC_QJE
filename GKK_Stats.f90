@@ -2759,7 +2759,7 @@ END SUBROUTINE  COMPUTE_WELFARE_GAIN_TRANSITION
 SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 	IMPLICIT NONE
 	REAL(dp) :: size_nb
-	REAL(dp) :: C_bench, C_exp, C_nb_bench, C_nb_exp, H_bench, H_exp, H_NB_bench, H_NB_exp, BQ_bench, BQ_exp, BQ_NB_benc, BQ_NB_exp
+	REAL(dp) :: C_bench, C_exp, C_nb_bench, C_nb_exp, H_bench, H_exp, H_NB_bench, H_NB_exp, BQ_bench, BQ_exp, BQ_NB_bench, BQ_NB_exp
 	REAL(dp) :: CE1_nb, CE1_nb_c, CE1_nb_cl, CE1_nb_cd, CE1_nb_h, CE1_nb_hl, CE1_nb_hd, CE1_nb_b, CE1_nb_bl, CE1_nb_bd
 	REAL(dp) :: CE1_pop, CE1_pop_c, CE1_pop_cl, CE1_pop_cd, CE1_pop_h, CE1_pop_hl, CE1_pop_hd, CE1_pop_b, CE1_pop_bl, CE1_pop_bd
 	REAL(dp) :: CE2_nb, CE2_nb_c, CE2_nb_cl, CE2_nb_cd, CE2_nb_h, CE2_nb_hl, CE2_nb_hd, CE2_nb_b, CE2_nb_bl, CE2_nb_bd
@@ -2841,7 +2841,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			CE1_nb_h	= 100.0_dp*sum( CE1_h_mat(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:) )/size_nb
 			CE1_nb_hd	= 100.0_dp*( (CE1_nb_h/100.0_dp+1.0_dp)/(CE1_nb_hl/100.0_dp+1.0_dp) - 1.0_dp )
 			CE1_nb_b	= 100.0_dp*sum( CE1_b_mat(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:) )/size_nb
-			CE1_nb_bd	= 100.0_dp*( (CE1_nb_/100.0_dp+1.0_dp)/(CE1_nb_bl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE1_nb_bd	= 100.0_dp*( (CE1_nb_b/100.0_dp+1.0_dp)/(CE1_nb_bl/100.0_dp+1.0_dp) - 1.0_dp )
 
 			CE1_pop		= 100.0_dp*sum( CE1_mat  *DBN_bench )
 			CE1_pop_c	= 100.0_dp*sum( CE1_c_mat*DBN_bench )
@@ -2849,7 +2849,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			CE1_pop_h	= 100.0_dp*sum( CE1_h_mat*DBN_bench )
 			CE1_pop_hd	= 100.0_dp*( (CE1_pop_h/100.0_dp+1.0_dp)/(CE1_pop_hl/100.0_dp+1.0_dp) - 1.0_dp )
 			CE1_pop_b	= 100.0_dp*sum( CE1_b_mat*DBN_bench )
-			CE1_pop_bd	= 100.0_dp*( (CE1_pop_/100.0_dp+1.0_dp)/(CE1_pop_bl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE1_pop_bd	= 100.0_dp*( (CE1_pop_b/100.0_dp+1.0_dp)/(CE1_pop_bl/100.0_dp+1.0_dp) - 1.0_dp )
 
 
 
@@ -2912,11 +2912,11 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			CE2_nb_bl  = 100.0_dp*( BQ_exp/BQ_bench-1.0_dp ) ! 100.0_dp*( BQ_nb_exp/BQ_nb_bench-1.0_dp )
 			CE2_pop_bl = 100.0_dp*( BQ_exp/BQ_bench-1.0_dp )
 			! Distribution
-			CE2_nb_bd  = 100.0_dp*( (CE2_nb_/100.0_dp+1.0_dp)/(CE2_nb_bl/100.0_dp+1.0_dp) - 1.0_dp )
-			CE2_pop_bd = 100.0_dp*( (CE2_pop_/100.0_dp+1.0_dp)/(CE2_pop_bl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE2_nb_bd  = 100.0_dp*( (CE2_nb_b/100.0_dp+1.0_dp)/(CE2_nb_bl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE2_pop_bd = 100.0_dp*( (CE2_pop_b/100.0_dp+1.0_dp)/(CE2_pop_bl/100.0_dp+1.0_dp) - 1.0_dp )
 
 	! Tables 
-		OPEN  (UNIT=1,  FILE=trim(CE_Folder)//'CE_Decomposition.txt'  , STATUS='replace')
+		OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'CE_Decomposition.txt'  , STATUS='replace')
 		WRITE (UNIT=1,  FMT=*) ' '
 		WRITE (UNIT=1,  FMT=*) 'Decomposition: Consumption Equivalent Welfare'
 		WRITE (UNIT=1,  FMT=*) ' '
