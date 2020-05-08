@@ -2764,7 +2764,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 	REAL(dp) :: CE1_pop, CE1_pop_c, CE1_pop_cl, CE1_pop_cd, CE1_pop_h, CE1_pop_hl, CE1_pop_hd, CE1_pop_b, CE1_pop_bl, CE1_pop_bd
 	REAL(dp) :: CE2_nb, CE2_nb_c, CE2_nb_cl, CE2_nb_cd, CE2_nb_h, CE2_nb_hl, CE2_nb_hd, CE2_nb_b, CE2_nb_bl, CE2_nb_bd
 	REAL(dp) :: CE2_pop, CE2_pop_c, CE2_pop_cl, CE2_pop_cd, CE2_pop_h, CE2_pop_hl, CE2_pop_hd, CE2_pop_b, CE2_pop_bl, CE2_pop_bd
-	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: ValueF_aux, Bq_Value_aux
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Value_aux, Bq_Value_aux
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: CE1_mat, CE1_c_mat, CE1_h_mat, CE1_b_mat
 
 	allocate( Value_aux(      MaxAge,na,nz,nlambda,ne,nx) )
