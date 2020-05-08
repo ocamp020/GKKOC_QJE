@@ -2756,6 +2756,268 @@ END SUBROUTINE  COMPUTE_WELFARE_GAIN_TRANSITION
 !========================================================================================
 !========================================================================================
 
+SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
+	IMPLICIT NONE
+	REAL(dp) :: size_nb
+	REAL(dp) :: C_bench, C_exp, C_nb_bench, C_nb_exp, H_bench, H_exp, H_NB_bench, H_NB_exp, BQ_bench, BQ_exp, BQ_NB_benc, BQ_NB_exp
+	REAL(dp) :: CE1_nb, CE1_nb_c, CE1_nb_cl, CE1_nb_cd, CE1_nb_h, CE1_nb_hl, CE1_nb_hd, CE1_nb_b, CE1_nb_bl, CE1_nb_bd
+	REAL(dp) :: CE1_pop, CE1_pop_c, CE1_pop_cl, CE1_pop_cd, CE1_pop_h, CE1_pop_hl, CE1_pop_hd, CE1_pop_b, CE1_pop_bl, CE1_pop_bd
+	REAL(dp) :: CE2_nb, CE2_nb_c, CE2_nb_cl, CE2_nb_cd, CE2_nb_h, CE2_nb_hl, CE2_nb_hd, CE2_nb_b, CE2_nb_bl, CE2_nb_bd
+	REAL(dp) :: CE2_pop, CE2_pop_c, CE2_pop_cl, CE2_pop_cd, CE2_pop_h, CE2_pop_hl, CE2_pop_hd, CE2_pop_b, CE2_pop_bl, CE2_pop_bd
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: ValueF_aux, Bq_Value_aux
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: CE1_mat, CE1_c_mat, CE1_h_mat, CE1_b_mat
+
+	allocate( Value_aux(      MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Bq_Value_aux(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE1_mat(   	  MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE1_c_mat(   	  MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE1_h_mat(   	  MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE1_b_mat(   	  MaxAge,na,nz,nlambda,ne,nx) )
+
+	! Size of new borns 
+	size_nb     = sum(DBN_bench(1,:,:,:,:,:))
+	
+	! Define benchmark and experiment variales
+	C_bench 	= sum(Cons_bench*DBN_bench)
+	C_exp   	= sum(Cons_exp*DBN_exp)
+	C_nb_bench 	= sum(Cons_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	C_nb_exp   	= sum(Cons_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:))
+
+	H_bench 	= sum(Hours_bench*DBN_bench)
+	H_exp   	= sum(Hours_exp*DBN_exp)
+	H_NB_bench 	= sum(Hours_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	H_NB_exp   	= sum(Hours_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:)) 
+
+	BQ_bench 	= sum(Aprime_bench*DBN_bench)
+	BQ_exp   	= sum(Aprime_exp*DBN_exp)
+	BQ_NB_bench = sum(Aprime_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
+	BQ_NB_exp   = sum(Aprime_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))/sum(DBN_exp(1,:,:,:,:,:)) 
+
+	! Auxiliary Value Functions
+		! Note: we are keeping Aprime at bench values, which affects bequest and expected values trhough 
+		!		changes in states. An alternative is to use Aprime_exp and adjust net out the value of 
+		!		bequests by subtracting Bq_Value_exp and adding Bq_value_bench from the auxiliary values
+		! Change Consumption 
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons_exp,Hours_bench,Aprime_exp,ValueFunction,Bq_Value 	 )
+			! Adjust Value to keep bequest value at benchmark level
+			ValueFunction = ValueFunction - Bq_Value + Bq_Value_bench
+		! Change Consumption and Leisure
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons_exp,Hours_exp  ,Aprime_exp,Value_aux    ,Bq_Value_aux)
+			! Adjust Value to keep bequest value at benchmark level
+			Value_aux = Value_aux - Bq_Value_aux + Bq_Value_bench
+
+	! CE1 Measures 
+		CE1_mat =((ValueFunction_exp  -Bq_Value_bench)/&
+				& (ValueFunction_Bench-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+
+		! Decomposition: Consumption
+			! Total
+			CE1_c_mat  =((ValueFunction      -Bq_Value_bench)/&
+					   & (ValueFunction_Bench-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+			! Level
+			CE1_pop_cl = 100.0_dp*( C_exp/C_bench-1.0_dp )
+			CE1_nb_cl  = 100.0_dp*( C_exp/C_bench-1.0_dp )! 100.0_dp*( C_nb_exp/C_nb_bench-1.0_dp )
+
+		! Decomposition: Leisure
+			! Total
+			CE1_h_mat  =((Value_aux    -Bq_Value_bench)/&
+					   & (ValueFunction-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+			! Level
+			CE1_pop_hl = 100.0_dp*( ((1.0_dp-H_exp   )/(1.0_dp-H_bench   ))**((1.0_dp-gamma)/gamma) -1.0_dp )
+			CE1_nb_hl  = 100.0_dp*( ((1.0_dp-H_exp   )/(1.0_dp-H_bench   ))**((1.0_dp-gamma)/gamma) -1.0_dp ) ! 100.0_dp*( ((1.0_dp-H_nb_exp)/(1.0_dp-H_nb_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
+
+		! Decomposition: Bequests
+			! Total
+			CE1_b_mat  =((ValueFunction_exp-Bq_Value_bench)/&
+					   & (Value_aux        -Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+			! Level
+			CE1_pop_bl = 100.0_dp*( BQ_exp/BQ_bench-1.0_dp )
+			CE1_nb_bl  = 100.0_dp*( BQ_exp/BQ_bench-1.0_dp ) ! 100.0_dp*( BQ_nb_exp/BQ_nb_bench-1.0_dp )
+
+		! Aggregating CE1 for population or newborns 
+			CE1_nb		= 100.0_dp*sum( CE1_mat(1,:,:,:,:,:)  *DBN_bench(1,:,:,:,:,:) )/size_nb
+			CE1_nb_c	= 100.0_dp*sum( CE1_c_mat(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:) )/size_nb
+			CE1_nb_cd	= 100.0_dp*( (CE1_nb_c/100.0_dp+1.0_dp)/(CE1_nb_cl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE1_nb_h	= 100.0_dp*sum( CE1_h_mat(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:) )/size_nb
+			CE1_nb_hd	= 100.0_dp*( (CE1_nb_h/100.0_dp+1.0_dp)/(CE1_nb_hl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE1_nb_b	= 100.0_dp*sum( CE1_b_mat(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:) )/size_nb
+			CE1_nb_bd	= 100.0_dp*( (CE1_nb_/100.0_dp+1.0_dp)/(CE1_nb_bl/100.0_dp+1.0_dp) - 1.0_dp )
+
+			CE1_pop		= 100.0_dp*sum( CE1_mat  *DBN_bench )
+			CE1_pop_c	= 100.0_dp*sum( CE1_c_mat*DBN_bench )
+			CE1_pop_cd	= 100.0_dp*( (CE1_pop_c/100.0_dp+1.0_dp)/(CE1_pop_cl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE1_pop_h	= 100.0_dp*sum( CE1_h_mat*DBN_bench )
+			CE1_pop_hd	= 100.0_dp*( (CE1_pop_h/100.0_dp+1.0_dp)/(CE1_pop_hl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE1_pop_b	= 100.0_dp*sum( CE1_b_mat*DBN_bench )
+			CE1_pop_bd	= 100.0_dp*( (CE1_pop_/100.0_dp+1.0_dp)/(CE1_pop_bl/100.0_dp+1.0_dp) - 1.0_dp )
+
+
+
+	! CE2 Measures 
+		CE2_nb  =  100.0_dp*(( (sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
+	    					&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
+	                        &  sum((ValueFunction_Bench(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
+	                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+
+		CE2_pop = 100.0_dp*(( (sum(ValueFunction_exp*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
+	    					& sum((ValueFunction_Bench-Bq_Value_Bench)*DBN_bench)  ) &
+	                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+
+		! Decomposition: Consumption
+			! Total (note that auxiliary value functions are weighted with benchmark distribution)
+			CE2_nb_c   =  100.0_dp*(( (sum(ValueFunction(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) - &
+	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
+	                        	&  sum((ValueFunction_Bench(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
+	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+
+			CE2_pop_c  = 100.0_dp*(( (sum(ValueFunction*DBN_bench)-sum(Bq_Value_Bench*DBN_bench)) / &
+	    						& sum((ValueFunction_Bench-Bq_Value_Bench)*DBN_bench)  ) &
+	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+			! Level
+			CE2_nb_cl  = 100.0_dp*( C_exp/C_bench-1.0_dp ) ! 100.0_dp*( C_nb_exp/C_nb_bench-1.0_dp )
+			CE2_pop_cl = 100.0_dp*( C_exp/C_bench-1.0_dp )
+			! Distribution
+			CE2_nb_cd  = 100.0_dp*( (CE2_nb_c/100.0_dp+1.0_dp)/(CE2_nb_cl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE2_pop_cd = 100.0_dp*( (CE2_pop_c/100.0_dp+1.0_dp)/(CE2_pop_cl/100.0_dp+1.0_dp) - 1.0_dp )
+
+		! Decomposition: Leisure
+			! Total (note that auxiliary value functions are weighted with benchmark distribution)
+			CE2_nb_h   =  100.0_dp*(( (sum(Value_aux(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) - &
+	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
+	                        	&  sum((ValueFunction(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
+	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+
+			CE2_pop_h  = 100.0_dp*(( (sum(Value_aux*DBN_bench)-sum(Bq_Value_Bench*DBN_bench)) / &
+	    						& sum((ValueFunction-Bq_Value_Bench)*DBN_bench)  ) &
+	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+			! Level
+			CE2_nb_hl  = 100.0_dp*( ((1.0_dp-H_exp   )/(1.0_dp-H_bench   ))**((1.0_dp-gamma)/gamma) -1.0_dp ) ! 100.0_dp*( ((1.0_dp-H_nb_exp)/(1.0_dp-H_nb_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
+			CE2_pop_hl = 100.0_dp*( ((1.0_dp-H_exp   )/(1.0_dp-H_bench   ))**((1.0_dp-gamma)/gamma) -1.0_dp )
+			! Distribution
+			CE2_nb_hd  = 100.0_dp*( (CE2_nb_h/100.0_dp+1.0_dp)/(CE2_nb_hl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE2_pop_hd = 100.0_dp*( (CE2_pop_h/100.0_dp+1.0_dp)/(CE2_pop_hl/100.0_dp+1.0_dp) - 1.0_dp )
+
+		! Decomposition: Bequests
+			! Total (note that auxiliary value functions are weighted with experiment distribution)
+			CE2_nb_b   =  100.0_dp*(( (sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)) - &
+	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
+	                        	&  sum((Value_aux(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
+	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+
+			CE2_pop_b  = 100.0_dp*(( (sum(ValueFunction_exp*DBN_bench)-sum(Bq_Value_Bench*DBN_bench)) / &
+	    						& sum((Value_aux-Bq_Value_Bench)*DBN_bench)  ) &
+	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+
+			! Level
+			CE2_nb_bl  = 100.0_dp*( BQ_exp/BQ_bench-1.0_dp ) ! 100.0_dp*( BQ_nb_exp/BQ_nb_bench-1.0_dp )
+			CE2_pop_bl = 100.0_dp*( BQ_exp/BQ_bench-1.0_dp )
+			! Distribution
+			CE2_nb_bd  = 100.0_dp*( (CE2_nb_/100.0_dp+1.0_dp)/(CE2_nb_bl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE2_pop_bd = 100.0_dp*( (CE2_pop_/100.0_dp+1.0_dp)/(CE2_pop_bl/100.0_dp+1.0_dp) - 1.0_dp )
+
+	! Tables 
+		OPEN  (UNIT=1,  FILE=trim(CE_Folder)//'CE_Decomposition.txt'  , STATUS='replace')
+		WRITE (UNIT=1,  FMT=*) ' '
+		WRITE (UNIT=1,  FMT=*) 'Decomposition: Consumption Equivalent Welfare'
+		WRITE (UNIT=1,  FMT=*) ' '
+		WRITE (UNIT=1,  FMT=*) 'CE1 '	, 'NB '		, 'Pop '	 , 'Test ' 	
+		WRITE (UNIT=1,  FMT=*) 'CE1'	, CE1_nb 	, CE1_pop    , 100*((1+CE1_nb_c/100)*(1+CE1_nb_h/100)*(1+CE1_nb_b/100)-1)
+		WRITE (UNIT=1,  FMT=*) 'CE1_c'	, CE1_nb_c 	, CE1_pop_c   
+		WRITE (UNIT=1,  FMT=*) 'CE1_h'	, CE1_nb_h 	, CE1_pop_h  
+		WRITE (UNIT=1,  FMT=*) 'CE1_h'	, CE1_nb_b 	, CE1_pop_b  
+		WRITE (UNIT=1,  FMT=*) '------'
+		WRITE (UNIT=1,  FMT=*) 'CE1_c'	, CE1_nb_c 	, CE1_pop_c  , 100*((1+CE1_nb_cl/100)*(1+CE1_nb_cd/100)-1)				
+		WRITE (UNIT=1,  FMT=*) 'CE1_cl'	, CE1_nb_cl	, CE1_pop_cl
+		WRITE (UNIT=1,  FMT=*) 'CE1_cd'	, CE1_nb_cd , CE1_pop_cd
+		WRITE (UNIT=1,  FMT=*) '------'
+		WRITE (UNIT=1,  FMT=*) 'CE1_h'	, CE1_nb_h 	, CE1_pop_h  , 100*((1+CE1_nb_hl/100)*(1+CE1_nb_hd/100)-1)		
+		WRITE (UNIT=1,  FMT=*) 'CE1_hl'	, CE1_nb_hl , CE1_pop_hl
+		WRITE (UNIT=1,  FMT=*) 'CE1_hd'	, CE1_nb_hd , CE1_pop_hd 
+		WRITE (UNIT=1,  FMT=*) '------'
+		WRITE (UNIT=1,  FMT=*) 'CE1_b'	, CE1_nb_b 	, CE1_pop_b  , 100*((1+CE1_nb_bl/100)*(1+CE1_nb_bd/100)-1)		
+		WRITE (UNIT=1,  FMT=*) 'CE1_bl'	, CE1_nb_bl , CE1_pop_bl
+		WRITE (UNIT=1,  FMT=*) 'CE1_bd'	, CE1_nb_bd , CE1_pop_bd 
+		WRITE (UNIT=1,  FMT=*) ' '
+		WRITE (UNIT=1,  FMT=*) '-------------------------------'
+		WRITE (UNIT=1,  FMT=*) ' '
+		WRITE (UNIT=1,  FMT=*) 'CE2 '	, 'NB '		, 'Pop '	 , 'Test ' 	
+		WRITE (UNIT=1,  FMT=*) 'CE2'	, CE2_nb 	, CE2_pop 	 , 100*((1+CE2_nb_c/100)*(1+CE2_nb_h/100)*(1+CE2_nb_b/100)-1)
+		WRITE (UNIT=1,  FMT=*) 'CE2_c'	, CE2_nb_c 	, CE2_pop_c  , 100*((1+CE2_nb_cl/100)*(1+CE2_nb_cd/100)-1)		
+		WRITE (UNIT=1,  FMT=*) 'CE2_h'	, CE2_nb_h 	, CE2_pop_h  , 100*((1+CE2_nb_hl/100)*(1+CE2_nb_hd/100)-1)
+		WRITE (UNIT=1,  FMT=*) 'CE2_b'	, CE2_nb_b 	, CE2_pop_b  , 100*((1+CE2_nb_bl/100)*(1+CE2_nb_bd/100)-1)
+		WRITE (UNIT=1,  FMT=*) '------'
+		WRITE (UNIT=1,  FMT=*) 'CE2_c'	, CE2_nb_c 	, CE2_pop_c  , 100*((1+CE2_nb_cl/100)*(1+CE2_nb_cd/100)-1)		
+		WRITE (UNIT=1,  FMT=*) 'CE2_cl'	, CE2_nb_cl	, CE2_pop_cl
+		WRITE (UNIT=1,  FMT=*) 'CE2_cd'	, CE2_nb_cd , CE2_pop_cd
+		WRITE (UNIT=1,  FMT=*) '------'
+		WRITE (UNIT=1,  FMT=*) 'CE2_h'	, CE2_nb_h 	, CE2_pop_h  , 100*((1+CE2_nb_hl/100)*(1+CE2_nb_hd/100)-1)
+		WRITE (UNIT=1,  FMT=*) 'CE2_hl'	, CE2_nb_hl , CE2_pop_hl
+		WRITE (UNIT=1,  FMT=*) 'CE2_hd'	, CE2_nb_hd , CE2_pop_hd 
+		WRITE (UNIT=1,  FMT=*) '------'
+		WRITE (UNIT=1,  FMT=*) 'CE2_b'	, CE2_nb_b 	, CE2_pop_b  , 100*((1+CE2_nb_bl/100)*(1+CE2_nb_bd/100)-1)		
+		WRITE (UNIT=1,  FMT=*) 'CE2_bl'	, CE2_nb_bl , CE2_pop_bl
+		WRITE (UNIT=1,  FMT=*) 'CE2_bd'	, CE2_nb_bd , CE2_pop_bd 
+		WRITE (UNIT=1,  FMT=*) ' '
+		CLOSE (unit=1)
+
+		print*, ' '
+		print*, '-----------------------------------------------------------------------------------'
+		print*, ' '
+		print*, 'Decomposition: Consumption Equivalent Welfare'
+		print*, ' '
+		print*, '	CE1 '	, 'NB '		, 'Pop '	 , 'Test ' 
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1'	, CE1_nb 	, CE1_pop  , 100*((1+CE1_nb_c/100)*(1+CE1_nb_h/100)*(1+CE1_nb_b/100)-1)
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_c'	, CE1_nb_c 	, CE1_pop_c   
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_h'	, CE1_nb_h 	, CE1_pop_h  
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_h'	, CE1_nb_b 	, CE1_pop_b  
+		print*, '------'
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE1_c'	, CE1_nb_c 	, CE1_pop_c  , 100*((1+CE1_nb_cl/100)*(1+CE1_nb_cd/100)-1)				
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE1_cl'	, CE1_nb_cl	, CE1_pop_cl
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE1_cd'	, CE1_nb_cd , CE1_pop_cd
+		print*, '------'
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE1_h'	, CE1_nb_h 	, CE1_pop_h  , 100*((1+CE1_nb_hl/100)*(1+CE1_nb_hd/100)-1)		
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE1_hl'	, CE1_nb_hl , CE1_pop_hl
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE1_hd'	, CE1_nb_hd , CE1_pop_hd 
+		print*, '------'
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE1_b'	, CE1_nb_b 	, CE1_pop_b  , 100*((1+CE1_nb_bl/100)*(1+CE1_nb_bd/100)-1)		
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE1_bl'	, CE1_nb_bl , CE1_pop_bl
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE1_bd'	, CE1_nb_bd , CE1_pop_bd 
+		print*, ' '
+		print*, '-------------------------------'
+		print*, ' '
+		print*, '	CE2 '	, 'NB '		, 'Pop '	 , 'Test ' 	
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2'	, CE2_nb 	, CE2_pop 	 , 100*((1+CE2_nb_c/100)*(1+CE2_nb_h/100)*(1+CE2_nb_b/100)-1)
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_c'	, CE2_nb_c 	, CE2_pop_c  , 100*((1+CE2_nb_cl/100)*(1+CE2_nb_cd/100)-1)		
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_h'	, CE2_nb_h 	, CE2_pop_h  , 100*((1+CE2_nb_hl/100)*(1+CE2_nb_hd/100)-1)
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_b'	, CE2_nb_b 	, CE2_pop_b  , 100*((1+CE2_nb_bl/100)*(1+CE2_nb_bd/100)-1)
+		print*, '------'
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE2_c'	, CE2_nb_c 	, CE2_pop_c  , 100*((1+CE2_nb_cl/100)*(1+CE2_nb_cd/100)-1)		
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE2_cl'	, CE2_nb_cl	, CE2_pop_cl
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE2_cd'	, CE2_nb_cd , CE2_pop_cd
+		print*, '------'
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE2_h'	, CE2_nb_h 	, CE2_pop_h  , 100*((1+CE2_nb_hl/100)*(1+CE2_nb_hd/100)-1)
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE2_hl'	, CE2_nb_hl , CE2_pop_hl
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE2_hd'	, CE2_nb_hd , CE2_pop_hd 
+		print*, '------'
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE2_b'	, CE2_nb_b 	, CE2_pop_b  , 100*((1+CE2_nb_bl/100)*(1+CE2_nb_bd/100)-1)		
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE2_bl'	, CE2_nb_bl , CE2_pop_bl
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '		CE2_bd'	, CE2_nb_bd , CE2_pop_bd 	
+		print*, ' '
+		print*, '-----------------------------------------------------------------------------------'
+		print*, ' '
+
+
+
+
+
+
+END SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
 
 Function Draft_Table(Table_az,DBN_z,Cum_flag)
 	implicit none
