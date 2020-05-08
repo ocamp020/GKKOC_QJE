@@ -2309,7 +2309,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	logical  :: read_results, load_seed
 
 	! Set flag for reading results or computing optimal taxes
-		read_results = .false.
+		read_results = .true.
 		load_seed    = .false.
 
 
@@ -2543,7 +2543,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
   		    & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
 		CLOSE (UNIT=77)
 
-	else 
+	else ! (Read_Results.eqv..true.)
 
 	! Read results from file 
 		CALL Write_Experimental_Results(.false.)
