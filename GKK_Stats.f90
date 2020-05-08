@@ -2966,10 +2966,10 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		print*, '-----------------------------------------------------------------------------------'
 		print*, ' '
 		print*, 'Aggregates'
-		print 'A,F7.3,F7.3,F6.2', 'Consumption: ',C_bench,C_Exp,100.0_dp*(C_exp/C_bench-1.0_dp)
-		print 'A,F7.3,F7.3,F6.2', 'Hours      : ',H_bench,H_Exp,100.0_dp*(H_exp/H_bench-1.0_dp)
-		print 'A,F7.3,F7.3,F6.2', 'Leisure    : ',(1.0_dp-H_bench),(1.0_dp-H_Exp),100.0_dp*((1.0_dp-H_exp)/(1.0_dp-H_bench)-1.0_dp)
-		print 'A,F7.3,F7.3,F6.2', 'Bequest    : ',Bq_bench,Bq_Exp,100.0_dp*(Bq_exp/Bq_bench-1.0_dp)
+		print '(A,F7.3,F7.3,F6.2)', 'Consumption: ',C_bench,C_Exp,100.0_dp*(C_exp/C_bench-1.0_dp)
+		print '(A,F7.3,F7.3,F6.2)', 'Hours      : ',H_bench,H_Exp,100.0_dp*(H_exp/H_bench-1.0_dp)
+		print '(A,F7.3,F7.3,F6.2)', 'Leisure    : ',(1.0_dp-H_bench),(1.0_dp-H_Exp),100.0_dp*((1.0_dp-H_exp)/(1.0_dp-H_bench)-1.0_dp)
+		print '(A,F7.3,F7.3,F6.2)', 'Bequest    : ',Bq_bench,Bq_Exp,100.0_dp*(Bq_exp/Bq_bench-1.0_dp)
 		print*, ' '
 		print*, 'Decomposition: Consumption Equivalent Welfare'
 		print*, ' '
