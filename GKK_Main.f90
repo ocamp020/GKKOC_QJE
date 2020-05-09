@@ -185,43 +185,43 @@ PROGRAM main
 		! 		theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 		! 		enddo
 
-		! ! Debt/Output = 1.3, lambda = 4
-		! 	! Main Parameters 
-		! 		beta   	= 0.9588_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
-		! 		sigma_z_eps      = 0.09900_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
-		! 		sigma_lambda_eps = 0.307_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
-		! 		gamma  	=  0.4500_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
-		! 		sigma  	= 4.0_dp
-		! 		x_hi	= 4.00_dp
-
-		! 	! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
-		! 		bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
-		! 		chi_u  = 00.30_dp ! Scaling 03.55_dp (value without estate tax)
-		! 		chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
-
-		! 	! Capital Market
-		! 		do zi=1,nz
-		! 		theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
-		! 		enddo
-
-		! Debt/Output = 1.3, lambda = 1
+		! Debt/Output = 1.3, lambda = 4
 			! Main Parameters 
-				beta   	= 0.9673_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
-				sigma_z_eps      = 0.3795_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
-				sigma_lambda_eps = 0.310_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
-				gamma  	=  0.4450_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+				beta   	= 0.9588_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+				sigma_z_eps      = 0.09900_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+				sigma_lambda_eps = 0.307_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
+				gamma  	=  0.4500_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
 				sigma  	= 4.0_dp
-				x_hi	= 1.00_dp
+				x_hi	= 4.00_dp
 
 			! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 				bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
-				chi_u  = 00.01_dp ! Scaling 03.55_dp (value without estate tax)
+				chi_u  = 00.30_dp ! Scaling 03.55_dp (value without estate tax)
 				chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 			! Capital Market
 				do zi=1,nz
 				theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 				enddo
+
+		! ! Debt/Output = 1.3, lambda = 1
+		! 	! Main Parameters 
+		! 		beta   	= 0.9673_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+		! 		sigma_z_eps      = 0.3795_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+		! 		sigma_lambda_eps = 0.310_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
+		! 		gamma  	=  0.4450_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+		! 		sigma  	= 4.0_dp
+		! 		x_hi	= 1.00_dp
+
+		! 	! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
+		! 		bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
+		! 		chi_u  = 00.01_dp ! Scaling 03.55_dp (value without estate tax)
+		! 		chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
+
+		! 	! Capital Market
+		! 		do zi=1,nz
+		! 		theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+		! 		enddo
 
 		! Debt/Output = 2.0
 			! ! Main Parameters 
@@ -310,8 +310,8 @@ PROGRAM main
 			! Result_Folder = './Revision/Model_2.0/'
 			! Result_Folder = './Revision/Model_2.0_sigma/' 
 			! Result_Folder = './Revision/Model_2.0_luxury/'
-			! Result_Folder = './Revision/Model_2.0_lambda_4/'
-			Result_Folder = './Revision/Model_2.0_lambda_1/' 
+			Result_Folder = './Revision/Model_2.0_lambda_4/'
+			! Result_Folder = './Revision/Model_2.0_lambda_1/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './Revision/Model_2.0_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
