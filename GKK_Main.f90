@@ -91,7 +91,7 @@ PROGRAM main
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .false. ! true=tau_K, false=tau_W
 		
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 
@@ -714,7 +714,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		endif 
 
 		! Call Simulation_Life_Cycle_Patterns(solving_bench)
-		Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
+		! Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
 
 
 		! print*,"	Efficiency Computation"
@@ -761,8 +761,8 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		! Wealth tax: minimum wealth tax to consider and increments for balancing budget
 		tauWmin_bt=0.00_DP
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
-		tauWmin_at=0.008_DP
-		tauWinc_at=0.002_DP ! Minimum tax above threshold and increments
+		tauWmin_at=0.009_DP
+		tauWinc_at=0.001_DP ! Minimum tax above threshold and increments
 		if (KeepSSatBench .eq. 0) then
 		tauWmin_at = 0.015_dp
 		tauWinc_at = 0.002_dp
