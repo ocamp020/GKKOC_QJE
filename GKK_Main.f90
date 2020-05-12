@@ -2331,7 +2331,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	logical  :: read_results, load_seed
 
 	! Set flag for reading results or computing optimal taxes
-		read_results = .true.
+		read_results = .false.
 		load_seed    = .false.
 
 
