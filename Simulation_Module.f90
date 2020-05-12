@@ -1300,7 +1300,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	REAL(SP), DIMENSION(150,80) :: panela_top, panelK_top, panel_YL_top, panel_PV_top
 	REAL(SP), DIMENSION(150,80) :: prc_all_top, prc_cohort_top, prc_PV_all_top, prc_PV_cohort_top
 	REAL(SP), DIMENSION(80)		:: panela_top_nb
-	REAL(DP) 					:: Share_Self_Made_100, Share_Self_Made_1000
+	REAL(DP) 					:: Share_Self_Made_100, Share_Self_Made_1000, Share_Self_Made_250
 	INTEGER 				    :: ii, age_top, thread_num
 
 	allocate( panelage(   		totpop) )
@@ -1613,6 +1613,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	! Get wealth when newborn
 	Share_Self_Made_100  = 0.0_dp
 	Share_Self_Made_1000 = 0.0_dp
+	Share_Self_Made_250  = 0.0_dp
 	if (bench_indx.eq.1) then
 	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'Self_Made_Stats_bench.txt', STATUS='replace')
 	else
@@ -1628,18 +1629,22 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 		if (panela_top(150,ii)/panela_top_nb(ii).gt.1000) then
 		Share_Self_Made_1000 = Share_Self_Made_1000 + 1.0_dp
 		endif 
+		if ((EBAR_data/(EBAR_bench*0.727853584919652_dp)*panela_top_nb(ii)).lt.250000) then
+		Share_Self_Made_250 = Share_Self_Made_250 + 1.0_dp
+		endif 
 		WRITE(UNIT=10,FMT=*) ii,panelage_top(150,ii),&
 							& (EBAR_data/(EBAR_bench*0.727853584919652_dp))*panela_top_nb(ii),&
 							& (EBAR_data/(EBAR_bench*0.727853584919652_dp))*panela_top(150,ii),&
 							& 100.0_dp*(panela_top(150,ii)/panela_top_nb(ii)-1.0_dp)
 	enddo
 	Share_Self_Made_100  = 100.0_dp*(Share_Self_Made_100 /80.0_dp)
-	Share_Self_Made_1000 = 100.0_dp*(Share_Self_Made_1000/80.0_dp)
+	Share_Self_Made_250  = 100.0_dp*(Share_Self_Made_250/80.0_dp)
 	WRITE(UNIT=10,FMT=*) " "  
 	WRITE(UNIT=10,FMT=*) "---------------------------------------"  
 	WRITE(UNIT=10,FMT=*) " "  
 	WRITE(UNIT=10,FMT=*) "Self_Made_100",Share_Self_Made_100
-	WRITE(UNIT=10,FMT=*) "Self_Made_1000",Share_Self_Made_1000  
+	WRITE(UNIT=10,FMT=*) "Self_Made_1000",Share_Self_Made_1000 
+	WRITE(UNIT=10,FMT=*) "Self_Made_250",Share_Self_Made_250
 	WRITE(UNIT=10,FMT=*) " "  
 	WRITE(UNIT=10,FMT=*) "---------------------------------------"  
 	CLOSE(UNIT=10)
@@ -1649,6 +1654,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	print*,'Self Made Stats'
 	print*," 	Self_Made_100",Share_Self_Made_100
 	print*,"	Self_Made_1000",Share_Self_Made_1000 
+	print*,"	Self_Made_250",Share_Self_Made_250
 	print*,'----------------------------------'
 	print*,' '
 
