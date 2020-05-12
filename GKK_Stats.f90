@@ -2977,7 +2977,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1'	, CE1_nb 	, CE1_pop   , 100*((1+CE1_nb_c/100)*(1+CE1_nb_h/100)*(1+CE1_nb_b/100)-1)
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_c'	, CE1_nb_c 	, CE1_pop_c   
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_h'	, CE1_nb_h 	, CE1_pop_h  
-		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_h'	, CE1_nb_b 	, CE1_pop_b  
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_b'	, CE1_nb_b 	, CE1_pop_b  
 		print*, '	------'
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_c'	, CE1_nb_c 	, CE1_pop_c  , 100*((1+CE1_nb_cl/100)*(1+CE1_nb_cd/100)-1)				
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_cl'	, CE1_nb_cl	, CE1_pop_cl
