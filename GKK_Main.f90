@@ -91,7 +91,7 @@ PROGRAM main
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .false. ! true=tau_K, false=tau_W
 		
-		Simul_Switch  = .false.
+		Simul_Switch  = .true.
 
 
 
@@ -734,13 +734,13 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		endif 
 
 		! Call Simulation_Life_Cycle_Patterns(solving_bench)
-		! Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
+		Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
 
 
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		STOP
+		! STOP
 		
 
 end Subroutine Solve_Benchmark
