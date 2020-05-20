@@ -281,7 +281,7 @@ PROGRAM main
 				theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 				enddo
 			! No bequest fees
-				bq_fee = 0.20_dp
+				bq_fee = 0.00_dp
 
 		! Debt/Output = 2.0
 			! ! Main Parameters 
