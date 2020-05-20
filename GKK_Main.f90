@@ -303,7 +303,7 @@ PROGRAM main
 				enddo
 
 			! p_x 
-				p1_x = 0.08_dp 
+				p1_x = 0.05_dp 
 
 
 		! Debt/Output = 2.0
@@ -398,7 +398,7 @@ PROGRAM main
 			! Result_Folder = './Revision/Model_2.0_lambda_3/' 
 			! Result_Folder = './Revision/Model_2.0_lambda_2/' 
 			! Result_Folder = './Revision/Model_2.0_no_fee/'
-			Result_Folder = './Revision/Model_2.0_p1_low/'
+			Result_Folder = './Revision/Model_2.0_p1_high/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './Revision/Model_2.0_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
