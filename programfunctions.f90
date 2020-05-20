@@ -6920,17 +6920,17 @@ SUBROUTINE  INITIALIZE()
 			! print*, 'X probability '
 			xgrid = (/x_hi , x_lo , x_0/)
 			! Low z types stay in x=1 until retirement
-				pr_x(1,1,1:4,:) = 0.97_dp 
+				pr_x(1,1,1:4,:) = 1.00_dp - p2_x
 				pr_x(1,2,1:4,:) = 0.00_dp 
-				pr_x(1,3,1:4,:) = 0.03_dp
+				pr_x(1,3,1:4,:) = p2_x
 			! High z types have 5% probability of going from x=1 to x=2
-				pr_x(1,1,5:nz,:) = 0.92_dp 
-				pr_x(1,2,5:nz,:) = 0.05_dp 
-				pr_x(1,3,5:nz,:) = 0.03_dp
+				pr_x(1,1,5:nz,:) = 1.00_dp - p1_x - p2_x
+				pr_x(1,2,5:nz,:) = p1_x 
+				pr_x(1,3,5:nz,:) = p2_x
 			! x=2 goes to x=3 with probability 3%
 				pr_x(2,1,:,:) = 0.00_dp 
-				pr_x(2,2,:,:) = 0.97_dp 
-				pr_x(2,3,:,:) = 0.03_dp
+				pr_x(2,2,:,:) = 1.00_dp - p2_x
+				pr_x(2,3,:,:) = p2_x
 			! x=3 is an absorbing state
 				pr_x(3,1,:,:) = 0.00_dp 
 				pr_x(3,2,:,:) = 0.00_dp 
