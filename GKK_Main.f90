@@ -303,7 +303,7 @@ PROGRAM main
 				enddo
 
 			! p_x 
-				p1_x = 0.05_dp 
+				p1_x = 0.08_dp 
 
 
 		! Debt/Output = 2.0
