@@ -3048,6 +3048,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_c'	, CE2_nb_c 	, CE2_pop_c  , 100*((1+CE2_nb_cl/100)*(1+CE2_nb_cd/100)-1)		
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_h'	, CE2_nb_h 	, CE2_pop_h  , 100*((1+CE2_nb_hl/100)*(1+CE2_nb_hd/100)-1)
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_b'	, CE2_nb_b 	, CE2_pop_b  , 100*((1+CE2_nb_bl/100)*(1+CE2_nb_bd/100)-1)
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_ch'	, CE2_nb_ch , CE2_pop_ch , 100*((1+CE2_nb_chl/100)*(1+CE2_nb_chd/100)-1)
 		print*, '	------'
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_c'	, CE2_nb_c 	, CE2_pop_c  , 100*((1+CE2_nb_cl/100)*(1+CE2_nb_cd/100)-1)		
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_cl'	, CE2_nb_cl	, CE2_pop_cl
@@ -3076,7 +3077,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		!		changes in states. An alternative is to use Aprime_exp and adjust net out the value of 
 		!		bequests by subtracting Bq_Value_exp and adding Bq_value_bench from the auxiliary values
 		! Change Consumption 
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons_exp,Hours_bench,Aprime_exp,ValueFunction,Bq_Value 	 )
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons_bench,Hours_exp,Aprime_exp,ValueFunction,Bq_Value 	 )
 			! Adjust Value to keep bequest value at benchmark level
 			ValueFunction = ValueFunction - Bq_Value + Bq_Value_bench
 		! Change Consumption and Leisure
@@ -3088,21 +3089,22 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		CE1_mat =((ValueFunction_exp  -Bq_Value_bench)/&
 				& (ValueFunction_Bench-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
 
-		! Decomposition: Consumption
-			! Total
-			CE1_c_mat  =((ValueFunction      -Bq_Value_bench)/&
-					   & (ValueFunction_Bench-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
-			! Level
-			CE1_pop_cl = 100.0_dp*( C_exp/C_bench-1.0_dp )
-			CE1_nb_cl  = 100.0_dp*( C_exp/C_bench-1.0_dp )! 100.0_dp*( C_nb_exp/C_nb_bench-1.0_dp )
-
 		! Decomposition: Leisure
 			! Total
-			CE1_h_mat  =((Value_aux    -Bq_Value_bench)/&
-					   & (ValueFunction-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+			CE1_h_mat  =((ValueFunction      -Bq_Value_bench)/&
+					   & (ValueFunction_Bench-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
 			! Level
 			CE1_pop_hl = 100.0_dp*( ((1.0_dp-H_exp   )/(1.0_dp-H_bench   ))**((1.0_dp-gamma)/gamma) -1.0_dp )
 			CE1_nb_hl  = 100.0_dp*( ((1.0_dp-H_exp   )/(1.0_dp-H_bench   ))**((1.0_dp-gamma)/gamma) -1.0_dp ) ! 100.0_dp*( ((1.0_dp-H_nb_exp)/(1.0_dp-H_nb_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
+
+
+		! Decomposition: Consumption
+			! Total
+			CE1_c_mat  =((Value_aux      -Bq_Value_bench)/&
+					   & (ValueFunction-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+			! Level
+			CE1_pop_cl = 100.0_dp*( C_exp/C_bench-1.0_dp )
+			CE1_nb_cl  = 100.0_dp*( C_exp/C_bench-1.0_dp )! 100.0_dp*( C_nb_exp/C_nb_bench-1.0_dp )
 
 		! Decomposition: Bequests
 			! Total
@@ -3153,33 +3155,15 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 	    					& sum((ValueFunction_Bench-Bq_Value_Bench)*DBN_bench)  ) &
 	                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 
-		! Decomposition: Consumption
+		! Decomposition: Leisure
 			! Total (note that auxiliary value functions are weighted with benchmark distribution)
-			CE2_nb_c   =  100.0_dp*(( (sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
+			CE2_nb_h   =  100.0_dp*(( (sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
 	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
 	                        	&  sum((ValueFunction_Bench(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
 	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 
-			CE2_pop_c  = 100.0_dp*(( (sum(ValueFunction*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
+			CE2_pop_h  = 100.0_dp*(( (sum(ValueFunction*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
 	    						& sum((ValueFunction_Bench-Bq_Value_Bench)*DBN_bench)  ) &
-	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
-			! Level
-			CE2_nb_cl  = 100.0_dp*( C_exp/C_bench-1.0_dp ) ! 100.0_dp*( C_nb_exp/C_nb_bench-1.0_dp )
-			CE2_pop_cl = 100.0_dp*( C_exp/C_bench-1.0_dp )
-			! Distribution
-			CE2_nb_cd  = 100.0_dp*( (CE2_nb_c/100.0_dp+1.0_dp)/(CE2_nb_cl/100.0_dp+1.0_dp) - 1.0_dp )
-			CE2_pop_cd = 100.0_dp*( (CE2_pop_c/100.0_dp+1.0_dp)/(CE2_pop_cl/100.0_dp+1.0_dp) - 1.0_dp )
-
-		! Decomposition: Leisure
-			! Total (note that auxiliary value functions are weighted with benchmark distribution)
-			CE2_nb_h   =  100.0_dp*(( (sum(Value_aux(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
-	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
-	                        	&  (sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
-	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))  ) &
-	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
-
-			CE2_pop_h  = 100.0_dp*(( (sum(Value_aux*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
-	    						& (sum(ValueFunction*DBN_exp)-sum(Bq_Value_Bench*DBN_bench))  ) &
 	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 			! Level
 			CE2_nb_hl  = 100.0_dp*( ((1.0_dp-H_exp   )/(1.0_dp-H_bench   ))**((1.0_dp-gamma)/gamma) -1.0_dp ) ! 100.0_dp*( ((1.0_dp-H_nb_exp)/(1.0_dp-H_nb_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
@@ -3187,6 +3171,27 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			! Distribution
 			CE2_nb_hd  = 100.0_dp*( (CE2_nb_h/100.0_dp+1.0_dp)/(CE2_nb_hl/100.0_dp+1.0_dp) - 1.0_dp )
 			CE2_pop_hd = 100.0_dp*( (CE2_pop_h/100.0_dp+1.0_dp)/(CE2_pop_hl/100.0_dp+1.0_dp) - 1.0_dp )
+
+		! Decomposition: Consumption
+			! Total (note that auxiliary value functions are weighted with benchmark distribution)
+			CE2_nb_c   =  100.0_dp*(( (sum(Value_aux(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
+	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
+	                        	&  (sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
+	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))  ) &
+	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+
+			CE2_pop_c  = 100.0_dp*(( (sum(Value_aux*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
+	    						& (sum(ValueFunction*DBN_exp)-sum(Bq_Value_Bench*DBN_bench))  ) &
+	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+
+			! Level
+			CE2_nb_cl  = 100.0_dp*( C_exp/C_bench-1.0_dp ) ! 100.0_dp*( C_nb_exp/C_nb_bench-1.0_dp )
+			CE2_pop_cl = 100.0_dp*( C_exp/C_bench-1.0_dp )
+			! Distribution
+			CE2_nb_cd  = 100.0_dp*( (CE2_nb_c/100.0_dp+1.0_dp)/(CE2_nb_cl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE2_pop_cd = 100.0_dp*( (CE2_pop_c/100.0_dp+1.0_dp)/(CE2_pop_cl/100.0_dp+1.0_dp) - 1.0_dp )
+
+
 
 		! Decomposition: Bequests
 			! Total (note that auxiliary value functions are weighted with experiment distribution)
@@ -3228,7 +3233,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 
 
 	! Tables 
-		OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'CE_Decomposition.txt'  , STATUS='replace')
+		OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'CE_Decomposition_alt_order.txt'  , STATUS='replace')
 		WRITE (UNIT=1,  FMT=*) ' '
 		WRITE (UNIT=1,  FMT=*) 'Decomposition: Consumption Equivalent Welfare'
 		WRITE (UNIT=1,  FMT=*) ' '
@@ -3285,20 +3290,14 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		print*, ' '
 		print*, '-----------------------------------------------------------------------------------'
 		print*, ' '
-		print*, 'Aggregates'
-		print '(A,F7.3,F7.3,F6.2)', 'Consumption: ',C_bench,C_Exp,100.0_dp*(C_exp/C_bench-1.0_dp)
-		print '(A,F7.3,F7.3,F6.2)', 'Hours      : ',H_bench,H_Exp,100.0_dp*(H_exp/H_bench-1.0_dp)
-		print '(A,F7.3,F7.3,F6.2)', 'Leisure    : ',(1.0_dp-H_bench),(1.0_dp-H_Exp),100.0_dp*((1.0_dp-H_exp)/(1.0_dp-H_bench)-1.0_dp)
-		print '(A,F7.3,F7.3,F6.2)', 'Bequest    : ',Bq_bench,Bq_Exp,100.0_dp*(Bq_exp/Bq_bench-1.0_dp)
-		print*, ' '
 		print*, 'Decomposition: Consumption Equivalent Welfare'
+		print*, ' 	Alternative Order'
 		print*, ' '
 		print*, '	CE1 '	, 'NB '		, 'Pop '	 , 'Test ' 
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1'	, CE1_nb 	, CE1_pop   , 100*((1+CE1_nb_c/100)*(1+CE1_nb_h/100)*(1+CE1_nb_b/100)-1)
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_c'	, CE1_nb_c 	, CE1_pop_c   
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_h'	, CE1_nb_h 	, CE1_pop_h  
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_b'	, CE1_nb_b 	, CE1_pop_b  
-		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_ch'	, CE1_nb_ch , CE1_pop_ch  
 		print*, '	------'
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_c'	, CE1_nb_c 	, CE1_pop_c  , 100*((1+CE1_nb_cl/100)*(1+CE1_nb_cd/100)-1)				
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_cl'	, CE1_nb_cl	, CE1_pop_cl
@@ -3307,14 +3306,6 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_h'	, CE1_nb_h 	, CE1_pop_h  , 100*((1+CE1_nb_hl/100)*(1+CE1_nb_hd/100)-1)		
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_hl'	, CE1_nb_hl , CE1_pop_hl
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_hd'	, CE1_nb_hd , CE1_pop_hd 
-		print*, '	------'
-		print '(A,X,F6.3,X,F6.3,X,F6.3)', '	CE1_b'	, CE1_nb_b 	, CE1_pop_b  , 100*((1+CE1_nb_bl/100)*(1+CE1_nb_bd/100)-1)		
-		! print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_bl'	, CE1_nb_bl , CE1_pop_bl
-		! print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_bd'	, CE1_nb_bd , CE1_pop_bd 
-		print*, '	------'
-		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_ch'	, CE1_nb_ch  , CE1_pop_ch  , 100*((1+CE1_nb_chl/100)*(1+CE1_nb_chd/100)-1)		
-		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_chl', CE1_nb_chl , CE1_pop_chl
-		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_chd', CE1_nb_chd , CE1_pop_chd 
 		print*, ' '
 		print*, '-------------------------------'
 		print*, ' '
@@ -3331,14 +3322,6 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_h'	, CE2_nb_h 	, CE2_pop_h  , 100*((1+CE2_nb_hl/100)*(1+CE2_nb_hd/100)-1)
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_hl'	, CE2_nb_hl , CE2_pop_hl
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_hd'	, CE2_nb_hd , CE2_pop_hd 
-		print*, '	------'
-		print '(A,X,F6.3,X,F6.3,X,F6.3)', '	CE2_b'	, CE2_nb_b 	, CE2_pop_b  , 100*((1+CE2_nb_bl/100)*(1+CE2_nb_bd/100)-1)		
-		! print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_bl'	, CE2_nb_bl , CE2_pop_bl
-		! print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_bd'	, CE2_nb_bd , CE2_pop_bd 	
-		print*, '	------'
-		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_ch'	, CE2_nb_ch  , CE2_pop_ch  , 100*((1+CE2_nb_chl/100)*(1+CE2_nb_chd/100)-1)
-		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_chl', CE2_nb_chl , CE2_pop_chl
-		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_chd', CE2_nb_chd , CE2_pop_chd 
 		print*, ' '
 		print*, '-----------------------------------------------------------------------------------'
 		print*, ' '
