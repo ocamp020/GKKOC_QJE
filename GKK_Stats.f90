@@ -2852,6 +2852,8 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			CE1_nb_hd	= 100.0_dp*( (CE1_nb_h/100.0_dp+1.0_dp)/(CE1_nb_hl/100.0_dp+1.0_dp) - 1.0_dp )
 			CE1_nb_b	= 100.0_dp*sum( CE1_b_mat(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:) )/size_nb
 			CE1_nb_bd	= 100.0_dp*( (CE1_nb_b/100.0_dp+1.0_dp)/(CE1_nb_bl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE1_nb_ch	= 100.0_dp*sum( CE1_ch_mat(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:) )/size_nb
+			CE1_nb_chd	= 100.0_dp*( (CE1_nb_ch/100.0_dp+1.0_dp)/(CE1_nb_chl/100.0_dp+1.0_dp) - 1.0_dp )
 
 			CE1_pop		= 100.0_dp*sum( CE1_mat  *DBN_bench )
 			CE1_pop_c	= 100.0_dp*sum( CE1_c_mat*DBN_bench )
@@ -2860,6 +2862,8 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			CE1_pop_hd	= 100.0_dp*( (CE1_pop_h/100.0_dp+1.0_dp)/(CE1_pop_hl/100.0_dp+1.0_dp) - 1.0_dp )
 			CE1_pop_b	= 100.0_dp*sum( CE1_b_mat*DBN_bench )
 			CE1_pop_bd	= 100.0_dp*( (CE1_pop_b/100.0_dp+1.0_dp)/(CE1_pop_bl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE1_pop_ch	= 100.0_dp*sum( CE1_ch_mat*DBN_bench )
+			CE1_pop_chd	= 100.0_dp*( (CE1_pop_ch/100.0_dp+1.0_dp)/(CE1_pop_chl/100.0_dp+1.0_dp) - 1.0_dp )
 
 
 
@@ -2926,6 +2930,24 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			! Distribution
 			CE2_nb_bd  = 100.0_dp*( (CE2_nb_b/100.0_dp+1.0_dp)/(CE2_nb_bl/100.0_dp+1.0_dp) - 1.0_dp )
 			CE2_pop_bd = 100.0_dp*( (CE2_pop_b/100.0_dp+1.0_dp)/(CE2_pop_bl/100.0_dp+1.0_dp) - 1.0_dp )
+
+		! Decomposition: Consumption and Leisure
+			! Total (note that auxiliary value functions are weighted with benchmark distribution)
+			CE2_nb_ch   =  100.0_dp*(( (sum(Value_aux(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
+	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
+	                        	&  sum((ValueFunction_Bench(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
+	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+
+			CE2_pop_ch  = 100.0_dp*(( (sum(Value_aux*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
+	    						& sum((ValueFunction_Bench-Bq_Value_Bench)*DBN_bench)  ) &
+	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+			! Level
+			CE2_pop_chl = 100.0_dp*( C_exp/C_bench*((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
+			CE2_nb_chl  = 100.0_dp*( C_exp/C_bench*((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) -1.0_dp ) ! 100.0_dp*( C_nb_exp/C_nb_bench*((1.0_dp-H_nb_exp)/(1.0_dp-H_nb_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
+			! Distribution
+			CE2_nb_chd  = 100.0_dp*( (CE2_nb_ch/100.0_dp+1.0_dp)/(CE2_nb_chl/100.0_dp+1.0_dp) - 1.0_dp )
+			CE2_pop_chd = 100.0_dp*( (CE2_pop_ch/100.0_dp+1.0_dp)/(CE2_pop_chl/100.0_dp+1.0_dp) - 1.0_dp )
+
 
 
 
