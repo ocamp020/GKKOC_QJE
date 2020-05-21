@@ -2961,7 +2961,8 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		WRITE (UNIT=1,  FMT=*) 'CE1'	, CE1_nb 	, CE1_pop    , 100*((1+CE1_nb_c/100)*(1+CE1_nb_h/100)*(1+CE1_nb_b/100)-1)
 		WRITE (UNIT=1,  FMT=*) 'CE1_c'	, CE1_nb_c 	, CE1_pop_c   
 		WRITE (UNIT=1,  FMT=*) 'CE1_h'	, CE1_nb_h 	, CE1_pop_h  
-		WRITE (UNIT=1,  FMT=*) 'CE1_h'	, CE1_nb_b 	, CE1_pop_b  
+		WRITE (UNIT=1,  FMT=*) 'CE1_b'	, CE1_nb_b 	, CE1_pop_b 
+		WRITE (UNIT=1,  FMT=*) 'CE1_ch'	, CE1_nb_ch , CE1_pop_ch
 		WRITE (UNIT=1,  FMT=*) '------'
 		WRITE (UNIT=1,  FMT=*) 'CE1_c'	, CE1_nb_c 	, CE1_pop_c  , 100*((1+CE1_nb_cl/100)*(1+CE1_nb_cd/100)-1)				
 		WRITE (UNIT=1,  FMT=*) 'CE1_cl'	, CE1_nb_cl	, CE1_pop_cl
@@ -2972,8 +2973,12 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		WRITE (UNIT=1,  FMT=*) 'CE1_hd'	, CE1_nb_hd , CE1_pop_hd 
 		WRITE (UNIT=1,  FMT=*) '------'
 		WRITE (UNIT=1,  FMT=*) 'CE1_b'	, CE1_nb_b 	, CE1_pop_b  , 100*((1+CE1_nb_bl/100)*(1+CE1_nb_bd/100)-1)		
-		WRITE (UNIT=1,  FMT=*) 'CE1_bl'	, CE1_nb_bl , CE1_pop_bl
-		WRITE (UNIT=1,  FMT=*) 'CE1_bd'	, CE1_nb_bd , CE1_pop_bd 
+		! WRITE (UNIT=1,  FMT=*) 'CE1_bl'	, CE1_nb_bl , CE1_pop_bl
+		! WRITE (UNIT=1,  FMT=*) 'CE1_bd'	, CE1_nb_bd , CE1_pop_bd 
+		WRITE (UNIT=1,  FMT=*) '------'
+		WRITE (UNIT=1,  FMT=*) 'CE1_ch'	, CE1_nb_ch  , CE1_pop_ch  , 100*((1+CE1_nb_chl/100)*(1+CE1_nb_chd/100)-1)		
+		WRITE (UNIT=1,  FMT=*) 'CE1_chl', CE1_nb_chl , CE1_pop_chl
+		WRITE (UNIT=1,  FMT=*) 'CE1_chd', CE1_nb_chd , CE1_pop_chd
 		WRITE (UNIT=1,  FMT=*) ' '
 		WRITE (UNIT=1,  FMT=*) '-------------------------------'
 		WRITE (UNIT=1,  FMT=*) ' '
@@ -2982,6 +2987,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		WRITE (UNIT=1,  FMT=*) 'CE2_c'	, CE2_nb_c 	, CE2_pop_c  , 100*((1+CE2_nb_cl/100)*(1+CE2_nb_cd/100)-1)		
 		WRITE (UNIT=1,  FMT=*) 'CE2_h'	, CE2_nb_h 	, CE2_pop_h  , 100*((1+CE2_nb_hl/100)*(1+CE2_nb_hd/100)-1)
 		WRITE (UNIT=1,  FMT=*) 'CE2_b'	, CE2_nb_b 	, CE2_pop_b  , 100*((1+CE2_nb_bl/100)*(1+CE2_nb_bd/100)-1)
+		WRITE (UNIT=1,  FMT=*) 'CE2_ch'	, CE2_nb_ch , CE2_pop_ch
 		WRITE (UNIT=1,  FMT=*) '------'
 		WRITE (UNIT=1,  FMT=*) 'CE2_c'	, CE2_nb_c 	, CE2_pop_c  , 100*((1+CE2_nb_cl/100)*(1+CE2_nb_cd/100)-1)		
 		WRITE (UNIT=1,  FMT=*) 'CE2_cl'	, CE2_nb_cl	, CE2_pop_cl
@@ -2992,8 +2998,12 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		WRITE (UNIT=1,  FMT=*) 'CE2_hd'	, CE2_nb_hd , CE2_pop_hd 
 		WRITE (UNIT=1,  FMT=*) '------'
 		WRITE (UNIT=1,  FMT=*) 'CE2_b'	, CE2_nb_b 	, CE2_pop_b  , 100*((1+CE2_nb_bl/100)*(1+CE2_nb_bd/100)-1)		
-		WRITE (UNIT=1,  FMT=*) 'CE2_bl'	, CE2_nb_bl , CE2_pop_bl
-		WRITE (UNIT=1,  FMT=*) 'CE2_bd'	, CE2_nb_bd , CE2_pop_bd 
+		! WRITE (UNIT=1,  FMT=*) 'CE2_bl'	, CE2_nb_bl , CE2_pop_bl
+		! WRITE (UNIT=1,  FMT=*) 'CE2_bd'	, CE2_nb_bd , CE2_pop_bd 
+		WRITE (UNIT=1,  FMT=*) '------'
+		WRITE (UNIT=1,  FMT=*) 'CE2_ch'	, CE2_nb_ch  , CE2_pop_ch  , 100*((1+CE2_nb_chl/100)*(1+CE2_nb_chd/100)-1)		
+		WRITE (UNIT=1,  FMT=*) 'CE2_chl', CE2_nb_chl , CE2_pop_chl
+		WRITE (UNIT=1,  FMT=*) 'CE2_chd', CE2_nb_chd , CE2_pop_chd
 		WRITE (UNIT=1,  FMT=*) ' '
 		CLOSE (unit=1)
 
@@ -3013,6 +3023,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_c'	, CE1_nb_c 	, CE1_pop_c   
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_h'	, CE1_nb_h 	, CE1_pop_h  
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_b'	, CE1_nb_b 	, CE1_pop_b  
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_ch'	, CE1_nb_ch , CE1_pop_ch  
 		print*, '	------'
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_c'	, CE1_nb_c 	, CE1_pop_c  , 100*((1+CE1_nb_cl/100)*(1+CE1_nb_cd/100)-1)				
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_cl'	, CE1_nb_cl	, CE1_pop_cl
@@ -3023,8 +3034,12 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_hd'	, CE1_nb_hd , CE1_pop_hd 
 		print*, '	------'
 		print '(A,X,F6.3,X,F6.3,X,F6.3)', '	CE1_b'	, CE1_nb_b 	, CE1_pop_b  , 100*((1+CE1_nb_bl/100)*(1+CE1_nb_bd/100)-1)		
-		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_bl'	, CE1_nb_bl , CE1_pop_bl
-		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_bd'	, CE1_nb_bd , CE1_pop_bd 
+		! print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_bl'	, CE1_nb_bl , CE1_pop_bl
+		! print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_bd'	, CE1_nb_bd , CE1_pop_bd 
+		print*, '	------'
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_ch'	, CE1_nb_ch  , CE1_pop_ch  , 100*((1+CE1_nb_chl/100)*(1+CE1_nb_chd/100)-1)		
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_chl', CE1_nb_chl , CE1_pop_chl
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE1_chd', CE1_nb_chd , CE1_pop_chd 
 		print*, ' '
 		print*, '-------------------------------'
 		print*, ' '
@@ -3043,8 +3058,12 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_hd'	, CE2_nb_hd , CE2_pop_hd 
 		print*, '	------'
 		print '(A,X,F6.3,X,F6.3,X,F6.3)', '	CE2_b'	, CE2_nb_b 	, CE2_pop_b  , 100*((1+CE2_nb_bl/100)*(1+CE2_nb_bd/100)-1)		
-		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_bl'	, CE2_nb_bl , CE2_pop_bl
-		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_bd'	, CE2_nb_bd , CE2_pop_bd 	
+		! print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_bl'	, CE2_nb_bl , CE2_pop_bl
+		! print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_bd'	, CE2_nb_bd , CE2_pop_bd 	
+		print*, '	------'
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_ch'	, CE2_nb_ch  , CE2_pop_ch  , 100*((1+CE2_nb_chl/100)*(1+CE2_nb_chd/100)-1)
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_chl', CE2_nb_chl , CE2_pop_chl
+		print '(A,X,F6.2,X,F6.2,X,F6.2)', '	CE2_chd', CE2_nb_chd , CE2_pop_chd 
 		print*, ' '
 		print*, '-----------------------------------------------------------------------------------'
 		print*, ' '
