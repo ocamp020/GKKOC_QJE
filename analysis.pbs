@@ -17,7 +17,7 @@
 	#PBS -m abe
 	#PBS -M ocamp020@umn.edu
 	#PBS -j oe
-	#PBS -N batch_OTW_Model_2_no_fee
+	#PBS -N batch_OTW_Model_2_sigma_3
 	#PBS -S /bin/tcsh
 	#PBS -e analysis.err
 
@@ -26,5 +26,5 @@
 	module load gcc/8.2.0
 	cd RA_Guvenen/GKKC_Code/
 	make clean
-	rm -f log_OTW_Model_2_no_fee.txt
-	make GKK_Main > log_OTW_Model_2_no_fee.txt
+	rm -f log_OTW_Model_2_sigma_3.txt
+	make GKK_Main > log_OTW_Model_2_sigma_3.txt
