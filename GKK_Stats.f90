@@ -2762,10 +2762,11 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 	REAL(dp) :: C_bench, C_exp, C_nb_bench, C_nb_exp, H_bench, H_exp, H_NB_bench, H_NB_exp, BQ_bench, BQ_exp, BQ_NB_bench, BQ_NB_exp
 	REAL(dp) :: CE1_nb, CE1_nb_c, CE1_nb_cl, CE1_nb_cd, CE1_nb_h, CE1_nb_hl, CE1_nb_hd, CE1_nb_b, CE1_nb_bl, CE1_nb_bd
 	REAL(dp) :: CE1_pop, CE1_pop_c, CE1_pop_cl, CE1_pop_cd, CE1_pop_h, CE1_pop_hl, CE1_pop_hd, CE1_pop_b, CE1_pop_bl, CE1_pop_bd
+	REAL(dp) :: CE1_nb_ch, CE1_nb_chl, CE1_nb_chd, CE1_pop_ch, CE1_pop_chl, CE1_pop_chd
 	REAL(dp) :: CE2_nb, CE2_nb_c, CE2_nb_cl, CE2_nb_cd, CE2_nb_h, CE2_nb_hl, CE2_nb_hd, CE2_nb_b, CE2_nb_bl, CE2_nb_bd
 	REAL(dp) :: CE2_pop, CE2_pop_c, CE2_pop_cl, CE2_pop_cd, CE2_pop_h, CE2_pop_hl, CE2_pop_hd, CE2_pop_b, CE2_pop_bl, CE2_pop_bd
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Value_aux, Bq_Value_aux
-	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: CE1_mat, CE1_c_mat, CE1_h_mat, CE1_b_mat
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: CE1_mat, CE1_c_mat, CE1_h_mat, CE1_b_mat, CE1_ch_mat
 
 	allocate( Value_aux(      MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Bq_Value_aux(   MaxAge,na,nz,nlambda,ne,nx) )
@@ -2773,6 +2774,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 	allocate( CE1_c_mat(   	  MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( CE1_h_mat(   	  MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( CE1_b_mat(   	  MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( CE1_ch_mat(  	  MaxAge,na,nz,nlambda,ne,nx) )
 
 	! Size of new borns 
 	size_nb     = sum(DBN_bench(1,:,:,:,:,:))
@@ -2833,6 +2835,14 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			! Level
 			CE1_pop_bl = 100.0_dp*( BQ_exp/BQ_bench-1.0_dp )
 			CE1_nb_bl  = 100.0_dp*( BQ_exp/BQ_bench-1.0_dp ) ! 100.0_dp*( BQ_nb_exp/BQ_nb_bench-1.0_dp )
+
+		! Decomposition: Consumption and Leisure
+			CE1_ch_mat = ((Value_aux    -Bq_Value_bench)/&
+					   & (ValueFunction_Bench-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+
+			! Level
+			CE1_pop_chl = 100.0_dp*( C_exp/C_bench*((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
+			CE1_nb_chl  = 100.0_dp*( C_exp/C_bench*((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) -1.0_dp ) ! 100.0_dp*( C_nb_exp/C_nb_bench*((1.0_dp-H_nb_exp)/(1.0_dp-H_nb_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
 
 		! Aggregating CE1 for population or newborns 
 			CE1_nb		= 100.0_dp*sum( CE1_mat(1,:,:,:,:,:)  *DBN_bench(1,:,:,:,:,:) )/size_nb
@@ -2916,6 +2926,8 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			! Distribution
 			CE2_nb_bd  = 100.0_dp*( (CE2_nb_b/100.0_dp+1.0_dp)/(CE2_nb_bl/100.0_dp+1.0_dp) - 1.0_dp )
 			CE2_pop_bd = 100.0_dp*( (CE2_pop_b/100.0_dp+1.0_dp)/(CE2_pop_bl/100.0_dp+1.0_dp) - 1.0_dp )
+
+
 
 	! Tables 
 		OPEN  (UNIT=1,  FILE=trim(Result_Folder)//'CE_Decomposition.txt'  , STATUS='replace')
