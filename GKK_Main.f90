@@ -301,7 +301,7 @@ PROGRAM main
 				enddo
 
 			! No bequest fees
-				bq_fee = 0.20_dp
+				bq_fee = 0.00_dp
 
 
 		! ! Debt/Output = 1.3 - No bequest fees 
