@@ -3857,6 +3857,7 @@ SUBROUTINE FIND_DBN_Transition()
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		if (Use_Transition_Seed.eqv..false.) then 
 		! Guess NBAR, QBAR and R as a linear combination of starting and end values
+			print*, NBAR_exp, wage_exp, QBAR_exp, R_exp
 			if (A_C.gt.0.0_dp) then 
 			NBAR_tr(1)   = NBAR_bench ; NBAR_tr(T+1) = NBAR_exp   ;
 			else
