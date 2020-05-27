@@ -212,7 +212,7 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			! Result_Folder = './Revision/Model_2.1/'
+			Result_Folder = './Revision/Model_2.1/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './Revision/Model_2.1_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
@@ -4334,7 +4334,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		if (read_results.eqv..false.) then 
 		! Solve for the optimal tax for iterative loops of Debt_Absorption
 
-		DO Debt_Absorption_iter=0,10
+		DO Debt_Absorption_iter=0,10,2
 
 			! Set Debt_Absorption
 			Debt_Absorption = real(Debt_Absorption_iter,8)/10.0_dp
