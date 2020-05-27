@@ -3857,19 +3857,18 @@ SUBROUTINE FIND_DBN_Transition()
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		if (Use_Transition_Seed.eqv..false.) then 
 		! Guess NBAR, QBAR and R as a linear combination of starting and end values
-			print*, NBAR_exp, wage_exp, QBAR_exp, R_exp
 			if (A_C.gt.0.0_dp) then 
-			NBAR_tr(1)   = NBAR_bench ; NBAR_tr(T+1) = NBAR_exp   ;
-			else
 			wage_tr(1)   = wage_bench ; wage_tr(T+1) = wage_exp   ;
+			else
+			NBAR_tr(1)   = NBAR_bench ; NBAR_tr(T+1) = NBAR_exp   ;
 			endif 
 			QBAR_tr(1)   = QBAR_bench ; QBAR_tr(T+1) = QBAR_exp   ;
 			R_tr(1)      = R_bench    ; R_tr(T+1)    = R_exp      ;
 			do ti=2,T
 				if (A_C.gt.0.0_dp) then 
-				NBAR_tr(ti) = NBAR_tr(ti-1) + (NBAR_tr(T+1)-NBAR_tr(1))/T
-				else
 				wage_tr(ti) = wage_tr(ti-1) + (wage_tr(T+1)-wage_tr(1))/T
+				else
+				NBAR_tr(ti) = NBAR_tr(ti-1) + (NBAR_tr(T+1)-NBAR_tr(1))/T
 				endif 
 				QBAR_tr(ti) = QBAR_tr(ti-1) + (QBAR_tr(T+1)-QBAR_tr(1))/T
 				R_tr(ti)    = R_tr(ti-1) + (R_tr(T+1)-R_tr(1))/T
@@ -3890,11 +3889,11 @@ SUBROUTINE FIND_DBN_Transition()
 			CLOSE (unit=1); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=5);
 
 			if (A_C.gt.0.0_dp) then 
-			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
-			READ (UNIT=2,  FMT=*) NBAR_tr
-			else
 			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'Wage_tr'	 , STATUS='old', ACTION='read')
 			READ (UNIT=2,  FMT=*) wage_tr
+			else
+			OPEN (UNIT=2,  FILE=trim(Result_Folder)//'NBAR_tr'	 , STATUS='old', ACTION='read')
+			READ (UNIT=2,  FMT=*) NBAR_tr
 			endif 
 			CLOSE (unit=2); 
 			print*, 'Reading completed'
