@@ -2890,7 +2890,7 @@ Subroutine Solve_Opt_Threshold
 
 		! Search for optimal tax
 		print*,'	Optimal Tax Search'
-		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.001_dp,Opt_TauW+0.001_dp)
+		call Find_Opt_Tax(.false.,Opt_TauW,Opt_TauW-0.001_dp,Opt_TauW+0.001_dp)
 		tauW_at = Opt_tauW
 		OPT_psi  = psi
 
