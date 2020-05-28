@@ -2770,8 +2770,8 @@ Subroutine Solve_Opt_Threshold
  		maxbrentvaluet_th = -10000.0_DP
 
 	! Set Grid for Optimal Tax
-    	tau_grid_min  = 30
-    	tau_grid_max  = 40
+    	tau_grid_min  = 25
+    	tau_grid_max  = 35
     	tau_grid_step = 1
 
 	! Load results form file for re-starts of the code
