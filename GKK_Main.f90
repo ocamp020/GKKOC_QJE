@@ -2729,6 +2729,9 @@ Subroutine Solve_Opt_Threshold
 	! Save base folder
 		folder_aux = Result_Folder
 
+	! Experiment economy
+		solving_bench=0
+
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
 		load_seed    = .false.
