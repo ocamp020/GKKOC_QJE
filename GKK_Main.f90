@@ -375,11 +375,6 @@ PROGRAM main
 		if (Opt_Threshold) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
 
-			folder_aux = Result_Folder
-			Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold/'
-			call system( 'mkdir -p ' // trim(Result_Folder) )
-
-			
 			call Solve_Opt_Threshold
 		endif 
 
@@ -2729,10 +2724,29 @@ Subroutine Solve_Opt_Threshold
 	INTEGER  :: Threshold_ind
 	integer  :: tau_grid_min, tau_grid_max, tau_grid_step
 	logical  :: read_results, load_seed
+	character(100) :: folder_aux
+
+	! Save base folder
+		folder_aux = Result_Folder
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
 		load_seed    = .false.
+
+
+	if (load_seed.eqv..false.) then 
+	! Load Optimal Tax Variables (for first start)
+		Result_Folder = trim(folder_aux)//'Opt_Tax_W/'
+		
+		! Load variables
+		CALL Write_Experimental_Results(.false.)
+	endif
+
+	! Set Results Folder
+		Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold/'
+		call system( 'mkdir -p ' // trim(Result_Folder) )
+
+
 
 	if (read_results.eqv..false.) then 
  	!====================================================================================================
@@ -2770,8 +2784,7 @@ Subroutine Solve_Opt_Threshold
 		! OPT_Threshold = 0.2_dp 
 		! OPT_psi_th    = OPT_psi 
 		! OPT_tauW_th   = OPT_tauW_th
- 	endif 
-
+	endif 
 	
 	OPEN(UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold.txt', STATUS='replace')
 	WRITE(UNIT=77, FMT=*) 'Threshold_Factor ', 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
