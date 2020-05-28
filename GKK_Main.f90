@@ -2734,7 +2734,7 @@ Subroutine Solve_Opt_Threshold
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .false.
+		load_seed    = .true.
 
 
 	if (load_seed.eqv..false.) then 
@@ -2889,8 +2889,8 @@ Subroutine Solve_Opt_Threshold
       	  	CLOSE (unit=77)
       	  	CALL Write_Experimental_Results(.true.)
 
-      	  	! Deallocate variables
-			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+   			! ! Deallocate variables
+			! deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
 	    ENDDO
 
@@ -2989,8 +2989,8 @@ Subroutine Solve_Opt_Threshold
   	  	! Save results 
   	  	CALL Write_Experimental_Results(.true.)
 
-   		! Deallocate variables
-		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+  !  		! Deallocate variables
+		! deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
     ENDDO ! Threshold loop
 
