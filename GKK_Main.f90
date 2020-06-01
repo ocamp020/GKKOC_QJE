@@ -2770,8 +2770,8 @@ Subroutine Solve_Opt_Threshold
  		maxbrentvaluet_th = -10000.0_DP
 
 	! Set Grid for Optimal Tax
-    	tau_grid_min  = 25
-    	tau_grid_max  = 35
+    	tau_grid_min  = 30
+    	tau_grid_max  = 40
     	tau_grid_step = 1
 
 	! Load results form file for re-starts of the code
@@ -2799,7 +2799,7 @@ Subroutine Solve_Opt_Threshold
 
 
 	print*, '	Threshold Loop'	
-	DO Threshold_ind = 05,50,5
+	DO Threshold_ind = 030,40,2
 
 		! Compute Threshold Factor for each iteration 
 		Threshold_Factor = real(Threshold_ind,8)/100.0_dp
@@ -2857,8 +2857,8 @@ Subroutine Solve_Opt_Threshold
 			! Write experimental results in output.txt
 				CALL WRITE_VARIABLES(0)
 
-		    if (brentvaluet .gt. maxbrentvaluet) then
-		        maxbrentvaluet = brentvaluet
+		    if (Av_Util_NB .gt. maxbrentvaluet) then
+		        maxbrentvaluet = Av_Util_NB
 		        OPT_tauK = tauK
 				OPT_tauW = tauW_at
 				OPT_psi  = psi
@@ -2955,8 +2955,8 @@ Subroutine Solve_Opt_Threshold
 
 		! Update optimal threshold
 		brentvaluet = sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:));
-	    if (brentvaluet .gt. maxbrentvaluet_th) then
-	        maxbrentvaluet_th = brentvaluet
+	    if (Av_Util_NB .gt. maxbrentvaluet_th) then
+	        maxbrentvaluet_th = Av_Util_NB
 			OPT_tauW_th 	  = tauW_at
 			OPT_psi_th  	  = psi
 			OPT_Threshold 	  = Threshold_Factor
@@ -2988,9 +2988,6 @@ Subroutine Solve_Opt_Threshold
 
   	  	! Save results 
   	  	CALL Write_Experimental_Results(.true.)
-
-  !  		! Deallocate variables
-		! deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
     ENDDO ! Threshold loop
 
@@ -3069,9 +3066,6 @@ Subroutine Solve_Opt_Threshold
       & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
   	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet, Threshold_Share, Tot_Cap_Inc
   	CLOSE (unit=77)
-
-  	! Deallocate variables
-		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
 
 
