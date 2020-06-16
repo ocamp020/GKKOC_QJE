@@ -4380,7 +4380,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		Aprime_exp        = Aprime 
 
 	! Set reference value for psi, tau_K and tau_W
-		psi_0  = psi
+		psi_0  = 1.0_dp - 0.16989829280240965_dp
 			! OTW with tauL set to 1.0_dp-0.15540_dp 
 			! OTK with tauL set to 1.0_dp-0.3740_dp
 			! If not using tauL set to psi
@@ -4428,7 +4428,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		if (read_results.eqv..false.) then 
 		! Solve for the optimal tax for iterative loops of Debt_Absorption
 
-		DO Debt_Absorption_iter=4,10,2
+		DO Debt_Absorption_iter=8,10,2
 
 			! Set Debt_Absorption
 			Debt_Absorption = real(Debt_Absorption_iter,8)/10.0_dp
