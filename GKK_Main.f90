@@ -2725,18 +2725,20 @@ Subroutine Solve_Opt_Threshold
 	real(DP) :: OPT_Threshold, OPT_psi_th, OPT_tauW_th, maxbrentvaluet_th 
 	INTEGER  :: Threshold_ind
 	integer  :: tau_grid_min, tau_grid_max, tau_grid_step
-	logical  :: read_results, load_seed
-	character(100) :: folder_aux
+	logical  :: read_results, load_seed, only_grid
+	character(100) :: folder_aux, OTW_Folder
 
 	! Save base folder
 		folder_aux = Result_Folder
+		OTW_Folder = trim(folder_aux)//'Opt_Tax_W/'
 
 	! Experiment economy
 		solving_bench=0
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .true.
+		load_seed    = .false.
+		only_grid    = .true.
 
 
 	if (load_seed.eqv..false.) then 
@@ -2749,6 +2751,7 @@ Subroutine Solve_Opt_Threshold
 
 	! Set Results Folder
 		Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold/'
+		folder_aux    = Result_Folder
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
 
@@ -2772,8 +2775,8 @@ Subroutine Solve_Opt_Threshold
  		maxbrentvaluet_th = -10000.0_DP
 
 	! Set Grid for Optimal Tax
-    	tau_grid_min  = 30
-    	tau_grid_max  = 40
+    	tau_grid_min  = 25
+    	tau_grid_max  = 45
     	tau_grid_step = 1
 
 	! Load results form file for re-starts of the code
@@ -2801,7 +2804,12 @@ Subroutine Solve_Opt_Threshold
 
 
 	print*, '	Threshold Loop'	
-	DO Threshold_ind = 030,40,2
+	DO Threshold_ind = 010,50,10
+
+		! Load Optimal Wealth Tax Results to start iteration fresh
+		Result_Folder = OTW_Folder
+		CALL Write_Experimental_Results(.false.)
+		Result_Folder = folder_aux
 
 		! Compute Threshold Factor for each iteration 
 		Threshold_Factor = real(Threshold_ind,8)/100.0_dp
@@ -2906,6 +2914,20 @@ Subroutine Solve_Opt_Threshold
 		print*,'------------------------------------------------------------------------------';print*,' '
 
 
+		if (only_grid) then
+
+		! Solve model with optimal taxes
+			CALL FIND_DBN_EQ
+			CALL GOVNT_BUDGET(.true.)
+			CALL Compute_After_Tax_Income
+
+		! Compute value function and store policy functions, value function and distribution in file
+			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
+			CALL Firm_Value
+			CALL Write_Experimental_Results(.true.)
+
+		else 
+
 		! Search for optimal tax
 		print*,'	Optimal Tax Search'
 		call Find_Opt_Tax(.false.,Opt_TauW,Opt_TauW-0.001_dp,Opt_TauW+0.001_dp)
@@ -2917,6 +2939,8 @@ Subroutine Solve_Opt_Threshold
 		print '(A,F7.3,X,A,F7.3,X,A,F7.3)', &
 			&"	Optimal Taxes:  tau_K=", 100.0_dp*tauK,"tau_W=",100.0_dp*tauW_at,"tau_L=", 100.0_dp*(1.0_dp-psi)
 		print*,'------------------------------------------------------------------------------';print*,' '
+
+		endif 
 
 
 		! Aggregate variable in experimental economy
