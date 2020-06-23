@@ -2750,7 +2750,7 @@ Subroutine Solve_Opt_Threshold
 	endif
 
 	! Set Results Folder
-		Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold/'
+		Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold_high/'
 		folder_aux    = Result_Folder
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
@@ -2804,7 +2804,7 @@ Subroutine Solve_Opt_Threshold
 
 
 	print*, '	Threshold Loop'	
-	DO Threshold_ind = 010,50,10
+	DO Threshold_ind = 090,100,10
 
 		! Load Optimal Wealth Tax Results to start iteration fresh
 		Result_Folder = OTW_Folder
