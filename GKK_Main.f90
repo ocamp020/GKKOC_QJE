@@ -2794,7 +2794,7 @@ Subroutine Solve_Opt_Threshold
 		! OPT_tauW_th   = OPT_tauW_th
 	endif 
 	
-	OPEN(UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold.txt', STATUS='replace')
+	OPEN(UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_2.txt', STATUS='replace')
 	WRITE(UNIT=77, FMT=*) 'Threshold_Factor ', 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
 		      & 'MeanWealth ','QBAR ','NBAR ','YBAR ','Y_Growth ', 'wage ', &
 		      & 'Av_Util_NB ', 'CE2_NB ', 'CE2_Pop ', &
@@ -2804,7 +2804,7 @@ Subroutine Solve_Opt_Threshold
 
 
 	print*, '	Threshold Loop'	
-	DO Threshold_ind = 090,100,10
+	DO Threshold_ind = 120,160,20
 
 		! Load Optimal Wealth Tax Results to start iteration fresh
 		Result_Folder = OTW_Folder
@@ -2883,7 +2883,7 @@ Subroutine Solve_Opt_Threshold
 	      	print*,'------------------------------------------------------------------------------';print*,' '
 
 		      
-		    OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold.txt', STATUS='old', POSITION='append')
+		    OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_2.txt', STATUS='old', POSITION='append')
 		    WRITE  (UNIT=77, FMT=*) Threshold_Factor, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
@@ -2997,7 +2997,7 @@ Subroutine Solve_Opt_Threshold
 	      	print*,'------------------------------------------------------------------------------';print*,' '
 
 
-	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold.txt', STATUS='old', POSITION='append') 
+	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_2.txt', STATUS='old', POSITION='append') 
 	    WRITE  (UNIT=77, FMT=*) Threshold_Factor, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
 	      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
 	      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
