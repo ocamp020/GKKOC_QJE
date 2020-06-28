@@ -80,7 +80,7 @@ PROGRAM main
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .true. ! true=tau_K, false=tau_W
 
-		Opt_Threshold = .true.
+		Opt_Threshold = .false.
 
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
@@ -88,10 +88,10 @@ PROGRAM main
 		Opt_Tau_CX = .false.
 
 		Transition_Tax_Reform = .false.
-		Transition_OT = .false.
+		Transition_OT = .true.
 			budget_balance = .true.
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
-			Opt_Tax_KW_TR  = .false. ! true=tau_K, false=tau_W
+			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 		
 		Simul_Switch  = .false.
 
@@ -4411,7 +4411,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		tauK_0 = tauK 
 		tauW_0 = tauW_at
 
-	Use_Transition_Seed = .true.
+	Use_Transition_Seed = .false.
 
 		
 	if (budget_balance) then 
@@ -4452,7 +4452,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		if (read_results.eqv..false.) then 
 		! Solve for the optimal tax for iterative loops of Debt_Absorption
 
-		DO Debt_Absorption_iter=8,10,2
+		DO Debt_Absorption_iter=0,10,2
 
 			! Set Debt_Absorption
 			Debt_Absorption = real(Debt_Absorption_iter,8)/10.0_dp
