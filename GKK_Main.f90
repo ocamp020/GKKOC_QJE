@@ -74,7 +74,8 @@ PROGRAM main
 		Tax_Reform_tau_C = .false.
 			compute_exp_tau_c = .true.
 
-		Tax_Reform_Decomposition = .false.
+		Tax_Reform_Decomposition = .true.
+
 		compute_exp_fixed_prices_and_taxes = .false.
 
 		Opt_Tax       = .false.
@@ -88,7 +89,7 @@ PROGRAM main
 		Opt_Tau_CX = .false.
 
 		Transition_Tax_Reform = .false.
-		Transition_OT = .true.
+		Transition_OT = .false.
 			budget_balance = .true.
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
