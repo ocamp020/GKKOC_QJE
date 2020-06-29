@@ -2182,7 +2182,7 @@ Subroutine Solve_Interpolated_Economy(YGRID_exp)
 		CALL COMPUTE_WELFARE_GAIN
 
 	! Deallocate variables
-		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+		! deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
 
 
 end Subroutine Solve_Interpolated_Economy
