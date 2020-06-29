@@ -2030,6 +2030,7 @@ Subroutine Solve_Tax_Reform_Decomposition
 
 	!====================================================================================================
 	! Get Experiment Values
+		Result_Folder = trim(aux_folder)//'Tax_Reform/'
 		call Solve_Experiment(.false.,.false.)
 			P_aux = P_exp
 			R_aux = R_exp 
@@ -2042,7 +2043,7 @@ Subroutine Solve_Tax_Reform_Decomposition
 
 	!====================================================================================================
 	! Change folder		
-		Result_Folder = trim(Result_Folder)//'Tax_Reform_Decomposition/Only_Taxes/'
+		Result_Folder = trim(aux_folder)//'Tax_Reform_Decomposition/Only_Taxes/'
 		call system( 'mkdir -p ' // trim(Result_Folder) )			
 
 	!====================================================================================================
