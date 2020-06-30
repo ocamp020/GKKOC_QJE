@@ -56,7 +56,8 @@ SUBROUTINE COMPUTE_STATS()
 		& Return_draft_group, Return_AT_draft_group, &
 		& Entrepreneur_10_draft_group, Entrepreneur_50_draft_group
 	real(DP) :: DBN_az(na,nz)
-	real(DP) :: Z_share_top_wealth(draft_age_category,nz), draft_group_share_top_wealth(draft_age_category,draft_z_category)
+	real(DP) :: Z_share_top_wealth(draft_age_category,nz), draft_group_share_top_wealth(draft_age_category,draft_z_category), &
+				A_share_top_wealth(draft_age_category,nz), draft_group_wealth_share_top_wealth(draft_age_category,draft_z_category) 
 	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx)
 	integer  :: ind_lo, ind_hi, prctile_ai_ind_age(14)
 	real(DP) :: pct_graph_lim(14), ret_by_wealth(draft_age_category+1,13), pct_graph_wealth(draft_age_category+1,13)
@@ -162,15 +163,28 @@ SUBROUTINE COMPUTE_STATS()
 		Z_share_top_wealth(3,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(90)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(90)),2,nz) )  
 		Z_share_top_wealth(4,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(50)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(50)),2,nz) )  
 		Z_share_top_wealth(5,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(25)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(25)),2,nz) )  
+
+		A_share_top_wealth(1,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(99)) )/sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(99) )  
+		A_share_top_wealth(2,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(95)) )/sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(95) )  
+		A_share_top_wealth(3,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(90)) )/sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(90) )  
+		A_share_top_wealth(4,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(50)) )/sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(50) )  
+		A_share_top_wealth(5,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(25)) )/sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(25) )  
 		enddo 
 
 		! Composition by draft groups of top wealth groups
-		draft_group_share_top_wealth = Draft_Table(Z_share_top_wealth,DBN_z,.true.)
+		draft_group_share_top_wealth        = Draft_Table(Z_share_top_wealth,DBN_z,.true.)
+		draft_group_wealth_share_top_wealth = Draft_Table(A_share_top_wealth,DBN_z,.true.)
 
 	    ! Write results in file
 	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_share_top_wealth.txt', STATUS='replace') 
 	    do age = 1,draft_age_category
 		    WRITE  (UNIT=81, FMT=*)  draft_group_share_top_wealth(age,:)
+		ENDDO
+		close(unit=81)
+
+		OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_wealth_share_top_wealth.txt', STATUS='replace') 
+	    do age = 1,draft_age_category
+		    WRITE  (UNIT=81, FMT=*)  draft_group_wealth_share_top_wealth(age,:)
 		ENDDO
 		close(unit=81)
 

@@ -59,7 +59,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
+		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -74,7 +74,7 @@ PROGRAM main
 		Tax_Reform_tau_C = .false.
 			compute_exp_tau_c = .true.
 
-		Tax_Reform_Decomposition = .true.
+		Tax_Reform_Decomposition = .false.
 
 		compute_exp_fixed_prices_and_taxes = .false.
 
