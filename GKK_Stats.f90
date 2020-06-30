@@ -164,11 +164,16 @@ SUBROUTINE COMPUTE_STATS()
 		Z_share_top_wealth(4,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(50)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(50)),2,nz) )  
 		Z_share_top_wealth(5,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(25)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(25)),2,nz) )  
 
-		A_share_top_wealth(1,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(99)) )/sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(99) )  
-		A_share_top_wealth(2,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(95)) )/sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(95) )  
-		A_share_top_wealth(3,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(90)) )/sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(90) )  
-		A_share_top_wealth(4,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(50)) )/sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(50) )  
-		A_share_top_wealth(5,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(25)) )/sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(25) )  
+		A_share_top_wealth(1,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(99)) )&
+										& /sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(99) )  
+		A_share_top_wealth(2,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(95)) )&
+										& /sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(95) )  
+		A_share_top_wealth(3,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(90)) )&
+										& /sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(90) )  
+		A_share_top_wealth(4,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(50)) )&
+										& /sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(50) )  
+		A_share_top_wealth(5,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(25)) )&
+										& /sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(25) )  
 		enddo 
 
 		! Composition by draft groups of top wealth groups
