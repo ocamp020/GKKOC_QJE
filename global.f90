@@ -95,11 +95,11 @@ MODULE global
     	REAL(DP), DIMENSION(na,nz,nlambda) :: V_Pr_nb, V_Pr_nb_bench, V_Pr_nb_exp
 	
 	! Values for taxes in benchmark and experiment
-    REAL(DP) :: tauk_bench, tauPL_bench, psi_bench, tauw_bt_bench, tauw_at_bench, Y_a_threshold_bench 
-    REAL(DP) :: tauk_exp,   tauPL_exp,   psi_exp,   tauw_bt_exp,   tauw_at_exp,   Y_a_threshold_exp
+    REAL(DP) :: tauk_bench, tauPL_bench, psi_bench, tauw_bt_bench, tauw_at_bench, Y_a_threshold_bench, eta_K_bench 
+    REAL(DP) :: tauk_exp,   tauPL_exp,   psi_exp,   tauw_bt_exp,   tauw_at_exp,   Y_a_threshold_exp, eta_K_exp
 
     ! Values for taxes (when solving an economy)
-    REAL(DP) :: tauK
+    REAL(DP) :: tauK, eta_K=0.0_dp ! After tax capital income is (1-tauK)*(r*a+Pr)**(1-eta_K)
     REAL(DP) :: tauW_bt, tauW_at ! Wealth taxes below threshold and above threshold
     REAL(DP) :: Y_a_threshold = 0.0_dp ! Value of the threshold for change in tauW
 

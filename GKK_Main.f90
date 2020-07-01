@@ -484,6 +484,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 
 	! Set taxes for benchmark economy
 		tauK = 0.25_DP
+		eta_K = 0.0_DP
 		tauW_bt = 0.00_DP
 		tauW_at = 0.00_DP
 		Y_a_threshold = 0.00_DP
@@ -527,18 +528,19 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	end if 
 
 	! Aggregate variables in benchmark economy
-		GBAR_bench  = GBAR
-		QBAR_bench  = QBAR 
-		NBAR_bench  = NBAR 
-		Ebar_bench  = EBAR
-		P_bench     = P
-		R_bench     = R
-		wage_bench  = wage
-		Y_bench     = YBAR
-		tauK_bench  = tauK
-		tauPL_bench = tauPL
-		psi_bench   = psi
-		DBN_bench   = DBN1
+		GBAR_bench    = GBAR
+		QBAR_bench    = QBAR 
+		NBAR_bench    = NBAR 
+		Ebar_bench    = EBAR
+		P_bench       = P
+		R_bench       = R
+		wage_bench    = wage
+		Y_bench       = YBAR
+		tauK_bench    = tauK
+		eta_K_brench  = eta_K
+		tauPL_bench   = tauPL
+		psi_bench     = psi
+		DBN_bench     = DBN1
 		tauw_bt_bench = tauW_bt
 		tauw_at_bench = tauW_at
 		Y_a_threshold_bench = Y_a_threshold
@@ -626,7 +628,8 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	! Experiment economy
 		solving_bench=0
 	! Set capital taxes to zero
-		tauK = 0.0_DP
+		tauK  = 0.0_DP
+		eta_K = 0.0_DP 
 	! Set Y_a_threshold
 		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
 		!Y_a_threshold = 0.0_dp ! big_p   !8.1812138704441200
@@ -751,6 +754,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1
@@ -923,6 +927,7 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 		solving_bench=0
 	! Set capital taxes to zero
 		tauK    = 0.0_DP
+		eta_K   = 0.0_DP
 		tauW_bt = 0.0_DP
 		tauW_at = 0.0_DP
 	! Set Y_a_threshold
@@ -1015,6 +1020,7 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1
@@ -1091,7 +1097,8 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 	! Experiment economy
 		solving_bench=0
 	! Set capital taxes to zero
-		tauK = 0.0_DP
+		tauK  = 0.0_DP
+		eta_K = 0.0_DP
 		tauWmin_at= 0.005_DP
 		tauWinc_at= 0.005_DP
 	! Set Y_a_threshold
@@ -1225,6 +1232,7 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1
@@ -1309,7 +1317,8 @@ Subroutine Solve_Experiment_Fixed_PF_Interp (compute_exp_pf_interp,Simul_Switch)
 	! Experiment economy
 		solving_bench=0
 	! Set capital taxes to zero
-		tauK = 0.0_DP
+		tauK  = 0.0_DP
+		eta_K = 0.0_DP
 		tauWmin_at= 0.010_DP
 		tauWinc_at= 0.005_DP
 	! Set Y_a_threshold
@@ -1440,6 +1449,7 @@ Subroutine Solve_Experiment_Fixed_PF_Interp (compute_exp_pf_interp,Simul_Switch)
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1
@@ -1514,7 +1524,8 @@ Subroutine Solve_Experiment_Fixed_PF_Prices(compute_exp_prices,Simul_Switch)
 	! Experiment economy
 		solving_bench=0
 	! Set capital taxes to zero
-		tauK = 0.0_DP
+		tauK  = 0.0_DP
+		eta_K = 0.0_DP
 	! Set Y_a_threshold
 		write(*,*) "Y_a threshold is set to a proportion of the mean wealth under current distribution"
 		!Y_a_threshold = 0.0_dp ! big_p   !8.1812138704441200
@@ -1618,6 +1629,7 @@ Subroutine Solve_Experiment_Fixed_PF_Prices(compute_exp_prices,Simul_Switch)
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1
@@ -1692,7 +1704,8 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 	! Experiment economy
 		solving_bench=0
 	! Set capital taxes to zero
-		tauK = 0.0_DP
+		tauK  = 0.0_DP
+		eta_K = 0.0_DP
 		if (Fixed_P) then 
 		tauWmin_at= 0.0050_DP
 		tauWinc_at= 0.005_DP
@@ -1805,6 +1818,7 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1
@@ -1898,6 +1912,7 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 		R_exp	     = R_bench
 		wage_exp     = wage_bench
 		tauK_exp     = tauK_bench
+		eta_K_exp    = eta_K_bench
 		tauPL_exp    = tauPL_bench
 		psi_exp      = psi_bench
 		tauw_bt_exp  = tauW_bt_bench
@@ -1908,6 +1923,7 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 		R 			 = R_bench 
 		wage 		 = wage_bench 
 		tauK 		 = tauK_bench 
+		eta_K        = eta_K_bench
 		tauPL 		 = tauPL_bench 
 		tauw_bt      = tauw_bt_bench 
 		tauw_at      = tauw_at_bench 
@@ -1971,6 +1987,7 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1
@@ -2056,6 +2073,7 @@ Subroutine Solve_Tax_Reform_Decomposition
 		R 			 = R_bench 
 		wage 		 = wage_bench 
 		tauK 		 = tauK_exp
+		eta_K  		 = eta_K_exp
 		tauPL 		 = tauPL_exp
 		tauw_bt      = tauw_bt_exp
 		tauw_at      = tauw_at_exp
@@ -2160,6 +2178,7 @@ Subroutine Solve_Interpolated_Economy(YGRID_exp)
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1
@@ -2223,6 +2242,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	
 	! Set initial taxes for finding optimal ones
 		tauK     = 0.0_DP
+		eta_K    = 0.0_DP
 		tauW_at  = 0.0_DP
 		Opt_TauK = 0.0_DP
 		Opt_TauW = 0.0_DP
@@ -2290,6 +2310,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			R_exp	  = R
 			wage_exp  = wage
 			tauK_exp  = tauK
+			eta_K_exp = eta_K
 			tauPL_exp = tauPL
 			psi_exp   = psi
 			DBN_exp   = DBN1
@@ -2398,6 +2419,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1
@@ -2535,6 +2557,7 @@ Subroutine Solve_Opt_Tax_K_and_W(Simul_Switch)
 	
 	! Set initial taxes for finding optimal ones
 		tauK     = 0.0_DP
+		eta_K    = 0.0_DP
 		tauW_at  = 0.0_DP
 		Opt_TauK = 0.0_DP
 		Opt_TauW = 0.0_DP
@@ -2575,6 +2598,7 @@ Subroutine Solve_Opt_Tax_K_and_W(Simul_Switch)
 				R_exp	  = R
 				wage_exp  = wage
 				tauK_exp  = tauK
+				eta_K_exp = eta_K
 				tauPL_exp = tauPL
 				psi_exp   = psi
 				DBN_exp   = DBN1
@@ -2680,6 +2704,7 @@ Subroutine Solve_Opt_Tax_K_and_W(Simul_Switch)
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1
@@ -2845,6 +2870,7 @@ Subroutine Solve_Opt_Threshold
 				R_exp	  = R
 				wage_exp  = wage
 				tauK_exp  = tauK
+				eta_K_exp = eta_K
 				tauPL_exp = tauPL
 				psi_exp   = psi
 				DBN_exp   = DBN1
@@ -2955,6 +2981,7 @@ Subroutine Solve_Opt_Threshold
 			R_exp	  = R
 			wage_exp  = wage
 			tauK_exp  = tauK
+			eta_K_exp = eta_K
 			tauPL_exp = tauPL
 			psi_exp   = psi
 			DBN_exp   = DBN1
@@ -3054,6 +3081,7 @@ Subroutine Solve_Opt_Threshold
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1
@@ -3123,6 +3151,7 @@ Subroutine Solve_Opt_Threshold
 			R_exp	  = R
 			wage_exp  = wage
 			tauK_exp  = tauK
+			eta_K_exp = eta_K
 			tauPL_exp = tauPL
 			psi_exp   = psi
 			DBN_exp   = DBN1
@@ -3183,6 +3212,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 	
 	! Set initial taxes for finding optimal ones
 		tauK     = 0.0_DP
+		eta_K    = 0.0_DP
 		tauW_at  = 0.0_DP
 		Opt_TauK = 0.0_DP
 		Opt_TauW = 0.0_DP
@@ -3225,6 +3255,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 				R_exp	  = R
 				wage_exp  = wage
 				tauK_exp  = tauK
+				eta_K_exp = eta_K
 				tauPL_exp = tauPL
 				psi_exp   = psi
 				DBN_exp   = DBN1
@@ -3306,6 +3337,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			R_exp	  = R
 			wage_exp  = wage
 			tauK_exp  = tauK
+			eta_K_exp = eta_K
 			tauPL_exp = tauPL
 			psi_exp   = psi
 			DBN_exp   = DBN1
@@ -3394,6 +3426,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 				R_exp	  = R
 				wage_exp  = wage
 				tauK_exp  = tauK
+				eta_K_exp = eta_K
 				tauPL_exp = tauPL
 				psi_exp   = psi
 				DBN_exp   = DBN1
@@ -3484,6 +3517,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			R_exp	  = R
 			wage_exp  = wage
 			tauK_exp  = tauK
+			eta_K_exp = eta_K
 			tauPL_exp = tauPL
 			psi_exp   = psi
 			DBN_exp   = DBN1
@@ -3579,6 +3613,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 	
 	! Set initial taxes for finding optimal ones
 		tauK     = 0.0_DP
+		eta_K    = 0.0_DP
 		tauW_at  = 0.0_DP
 		Opt_TauK = 0.0_DP
 		Opt_TauW = 0.0_DP
@@ -3623,6 +3658,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 			R_exp	  = R
 			wage_exp  = wage
 			tauK_exp  = tauK
+			eta_K_exp = eta_K
 			tauPL_exp = tauPL
 			psi_exp   = psi
 			DBN_exp   = DBN1
@@ -3696,6 +3732,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 			R_exp	  = R
 			wage_exp  = wage
 			tauK_exp  = tauK
+			eta_K_exp = eta_K
 			tauPL_exp = tauPL
 			psi_exp   = psi
 			DBN_exp   = DBN1
@@ -3810,6 +3847,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 			R_exp	  = R
 			wage_exp  = wage
 			tauK_exp  = tauK
+			eta_K_exp = eta_K
 			tauPL_exp = tauPL
 			psi_exp   = psi
 			DBN_exp   = DBN1
@@ -3911,6 +3949,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1
@@ -4123,6 +4162,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 					R_exp	  = R
 					wage_exp  = wage
 					tauK_exp  = tauK
+					eta_K_exp = eta_K
 					tauPL_exp = tauPL
 					psi_exp   = psi
 					DBN_exp   = DBN1
@@ -4171,6 +4211,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 					R_exp	  = R
 					wage_exp  = wage
 					tauK_exp  = tauK
+					eta_K_exp = eta_K
 					tauPL_exp = tauPL
 					psi_exp   = psi
 					DBN_exp   = DBN1
@@ -4212,6 +4253,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 						R_exp	  = R
 						wage_exp  = wage
 						tauK_exp  = tauK
+						eta_K_exp = eta_K
 						tauPL_exp = tauPL
 						psi_exp   = psi
 						DBN_exp   = DBN1
@@ -4268,6 +4310,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 				R_exp	  = R
 				wage_exp  = wage
 				tauK_exp  = tauK
+				eta_K_exp = eta_K
 				tauPL_exp = tauPL
 				psi_exp   = psi
 				DBN_exp   = DBN1

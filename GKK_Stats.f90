@@ -58,7 +58,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: DBN_az(na,nz)
 	real(DP) :: Z_share_top_wealth(draft_age_category,nz), draft_group_share_top_wealth(draft_age_category,draft_z_category), &
 			&	A_share_top_wealth(draft_age_category,nz), draft_group_wealth_share_top_wealth(draft_age_category,draft_z_category) 
-	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx)
+	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), AT_Return(na,nz,nx), DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx)
 	integer  :: ind_lo, ind_hi, prctile_ai_ind_age(14)
 	real(DP) :: pct_graph_lim(14), ret_by_wealth(draft_age_category+1,13), pct_graph_wealth(draft_age_category+1,13)
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
@@ -417,10 +417,12 @@ SUBROUTINE COMPUTE_STATS()
 		do zi=1,nz
 		do ai=1,na 
 			BT_Return(ai,zi,xi)    = 100.0_dp*(R+Pr_mat(ai,zi,xi)/agrid(ai))
+			AT_Return(ai,zi,xi)    = 100.0_dp*((1.0_dp-tauK)*(R*agrid(ai)+Pr_mat(ai,zi,xi))**(1.0_dp-eta_K)/agrid(ai)-tauW_at)
 		enddo 
 		enddo 
 		enddo 
 
+		! Before tax returns 
 		! Vectorizations
 		DBN_azx_vec = reshape(DBN_azx   ,(/size(DBN_azx)/)); 
 		Return_vec  = reshape(BT_Return ,(/size(DBN_azx)/)); 
@@ -461,13 +463,44 @@ SUBROUTINE COMPUTE_STATS()
 		WRITE(UNIT=11, FMT=*) 'Return Percentiles'
 		WRITE(UNIT=11, FMT=*) 'Tax p10 p50 p90 p95 p99'
 		WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x
-		if (solving_bench.eq.1) then 
-		WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x*(1.0_dp-tauK)
-		else
-		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x-100.0_dp*tauW_at
-		endif 
-		CLOSE(UNIT=11)
 		print*,' Return Percentiles'
+		print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
+			& ' 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5)
+		print*,'-----------------------------------------------------'; print*, ' '
+
+		! After tax returns 
+		! Vectorizations 
+		Return_vec  = reshape(AT_Return ,(/size(DBN_azx)/)); 
+
+		! Compute bequest by percentile (percentiles for counter CDF)
+		a = minval(Return_vec)
+		b = maxval(Return_vec) 
+		c = a
+		do i=1,size(prctile_bq)
+			a = c
+			b = maxval(Return_vec)
+			c = (a+b)/2.0_dp
+			CCDF_c = sum(DBN_azx_vec,Return_vec>=c)
+			!print*, ' '
+			!print*, 'Percentile', prctile_bq(i)
+			do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+				if (CCDF_c<prctile_bq(i)) then 
+					b = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_vec,Return_vec>=c)
+				else 
+					a = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_vec,Return_vec>=c)
+				endif
+				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+			enddo 
+			BQ_top_x(i) = c 
+		enddo 
+		! Write into file 
+		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x
+		CLOSE(UNIT=11)
+		print*,' After Tax Return Percentiles'
 		print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
 			& ' 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5)
 		print*,'-----------------------------------------------------'; print*, ' '
@@ -1311,7 +1344,7 @@ SUBROUTINE COMPUTE_STATS()
 
 		    	! Tax by agent (capital and labor) in benchmark
 		    	K_Tax_aux   = K_Inc_aux - (YGRID(ai,zi,xi) - agrid(ai))
-		    	K_Tax_bench = tauK_bench*K_Inc_bench
+		    	K_Tax_bench = K_Inc_bench - (1.0_dp-tauK_bench)*K_Inc_bench**(1.0_dp-eta_K)
 		    	if (age2.lt.RetAge) then
 		    	L_Tax_aux   = L_Inc_aux   - psi*(L_Inc_aux)**(1.0_DP-tauPL)
 		    	L_Tax_bench = L_Inc_bench - psi_bench*(L_Inc_bench)**(1.0_DP-tauPL_bench)
@@ -1333,7 +1366,7 @@ SUBROUTINE COMPUTE_STATS()
 
 
 		    	! Compare Capital taxes
-		    	If ( K_Tax_aux .gt. tauK_bench*K_Inc_bench ) then
+		    	If ( K_Tax_aux .gt. K_Tax_bench ) then
 		    	Tax_Increase_tk_draft_group_z(age,zi) = Tax_Increase_tk_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
@@ -1343,12 +1376,12 @@ SUBROUTINE COMPUTE_STATS()
 		    	endif 
 
 		    	! Compare Total taxes
-		    	If ( (K_Tax_aux+L_Tax_aux) .gt. ( tauK_bench*K_Inc_bench +L_Tax_bench) ) then
+		    	If ( (K_Tax_aux+L_Tax_aux) .gt. ( K_Tax_bench +L_Tax_bench) ) then
 		    	Tax_Increase_draft_group_z(age,zi) = Tax_Increase_draft_group_z(age,zi) + DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
 				! Compare Capital tax rate
-		    	If (K_Tax_aux/K_Inc_aux .gt. tauK_bench)  then
+		    	If (K_Tax_aux/K_Inc_aux .gt. K_Tax_bench/K_Inc_bench)  then
 		    	Tax_Rate_Increase_tk_draft_group_z(age,zi) = Tax_Rate_Increase_tk_draft_group_z(age,zi) + & 
 		    		&  DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
@@ -1363,7 +1396,7 @@ SUBROUTINE COMPUTE_STATS()
 
 		    	! Compare Total tax rates
 		    	If ( ( ( K_Tax_aux+L_Tax_aux)/(K_Inc_aux+L_Inc_aux) &
-		    	& - ( tauK_bench*K_Inc_bench + L_Tax_bench)/(K_Inc_bench + L_Inc_bench) ).gt.1.0E-07_dp ) then
+		    	& - ( K_Tax_bench + L_Tax_bench)/(K_Inc_bench + L_Inc_bench) ).gt.1.0E-07_dp ) then
 		    	Tax_Rate_Increase_draft_group_z(age,zi) = Tax_Rate_Increase_draft_group_z(age,zi)+DBN_bench(age2,ai,zi,lambdai,ei,xi)
 		    	endif 
 
@@ -1651,6 +1684,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	! Solve for the benchmark economy 
 		solving_bench = 1
 		tauK    = tauK_bench
+		eta_K   = eta_K_bench
 		R       = R_bench
 		P       = P_bench
 		wage    = wage_bench
@@ -1693,6 +1727,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	! Solve the experimental economy  
 		solving_bench = 0  
 		tauK    = tauK_exp
+		eta_K   = eta_K_exp
 		R       = R_exp
 		P       = P_exp
 		wage    = wage_exp
@@ -3839,7 +3874,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'R'		, 100.0_dp*R
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'After_Tax_Prices'
-			WRITE(UNIT=19, FMT=*) 'R_AT' 	, 100.0_dp*(-tauW_at+(1.0_dp-tauK)*R)
+			WRITE(UNIT=19, FMT=*) 'R_AT' 	, 100.0_dp*(-tauW_at+(1.0_dp-tauK)*R) ! Only valid if eta_K=0
 			WRITE(UNIT=19, FMT=*) 'wage_AT' , psi*wage
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Moments:'
@@ -4001,6 +4036,9 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN  (UNIT=12, FILE=trim(bench_folder)//'tauK'  , STATUS='replace')
 		WRITE (UNIT=12, FMT=*) tauK
 		CLOSE (UNIT=12)
+		OPEN  (UNIT=12, FILE=trim(bench_folder)//'eta_K'  , STATUS='replace')
+		WRITE (UNIT=12, FMT=*) eta_K
+		CLOSE (UNIT=12)
 		OPEN  (UNIT=12, FILE=trim(bench_folder)//'tauPL'  , STATUS='replace')
 		WRITE (UNIT=12, FMT=*) tauPL
 		CLOSE (UNIT=12)
@@ -4050,6 +4088,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN (UNIT=13, FILE=trim(bench_folder)//'YBAR'  , STATUS='old', ACTION='read')
 
 		OPEN (UNIT=14, FILE=trim(bench_folder)//'tauK'    , STATUS='old', ACTION='read')
+		OPEN (UNIT=29, FILE=trim(bench_folder)//'eta_K'   , STATUS='old', ACTION='read')
 		OPEN (UNIT=15, FILE=trim(bench_folder)//'tauPL'   , STATUS='old', ACTION='read')
 		OPEN (UNIT=16, FILE=trim(bench_folder)//'psi'  	  , STATUS='old', ACTION='read')
 		OPEN (UNIT=17, FILE=trim(bench_folder)//'tauW_bt' , STATUS='old', ACTION='read')
@@ -4084,6 +4123,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		READ (UNIT=13, FMT=*) YBAR
 
 		READ (UNIT=14, FMT=*) tauK
+		READ (UNIT=29, FMT=*) eta_K
 		READ (UNIT=15, FMT=*) tauPL
 		READ (UNIT=16, FMT=*) psi
 		READ (UNIT=17, FMT=*) tauW_bt
@@ -4103,7 +4143,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 
 		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=70); CLOSE (unit=5)
 		CLOSE (unit=60); CLOSE (unit=7); CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10)
-		CLOSE (unit=11); CLOSE (unit=12); CLOSE (unit=13); CLOSE (unit=14); CLOSE (unit=15)
+		CLOSE (unit=11); CLOSE (unit=12); CLOSE (unit=13); CLOSE (unit=14); CLOSE (unit=15); CLOSE(unit=29);
 		CLOSE (unit=16); CLOSE (unit=17); CLOSE (unit=18); CLOSE (unit=19); !CLOSE (unit=20)
 		CLOSE (unit=21); CLOSE (unit=22); 
 		CLOSE (unit=23); CLOSE (unit=24); CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); CLOSE (unit=28);
@@ -4153,6 +4193,8 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 
 		OPEN  (UNIT=14, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauK'   , STATUS='replace')
 		WRITE (UNIT=14, FMT=*) tauK
+		OPEN  (UNIT=29, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_eta_K'   , STATUS='replace')
+		WRITE (UNIT=29, FMT=*) eta_K
 		OPEN  (UNIT=15, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_psi'  	 , STATUS='replace')
 		WRITE (UNIT=15, FMT=*) psi
 		OPEN  (UNIT=16, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauPL'  , STATUS='replace')
@@ -4207,6 +4249,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN (UNIT=12, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_wage'  	, STATUS='old', ACTION='read')
 		OPEN (UNIT=13, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_YBAR'  	, STATUS='old', ACTION='read')
 		OPEN (UNIT=14, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauK'	, STATUS='old', ACTION='read')
+		OPEN (UNIT=29, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_eta_K'	, STATUS='old', ACTION='read')
 		OPEN (UNIT=15, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_psi'	, STATUS='old', ACTION='read')
 		OPEN (UNIT=16, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauPL'	, STATUS='old', ACTION='read')
 		OPEN (UNIT=17, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauW_bt', STATUS='old', ACTION='read')
@@ -4236,6 +4279,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		READ (UNIT=12, FMT=*) wage 
 		READ (UNIT=13, FMT=*) YBAR
 		READ (UNIT=14, FMT=*) tauK
+		READ (UNIT=29, FMT=*) eta_K
 		READ (UNIT=15, FMT=*) psi
 		READ (UNIT=16, FMT=*) tauPL
 		READ (UNIT=17, FMT=*) tauW_bt
@@ -4257,7 +4301,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 	CLOSE (unit=10); CLOSE (unit=11); CLOSE (unit=12); CLOSE (unit=13); CLOSE (unit=14);
 	CLOSE (unit=15); CLOSE (unit=16); CLOSE (unit=17); CLOSE (unit=18); CLOSE (unit=19)
 	CLOSE (unit=20); CLOSE (unit=21); CLOSE (unit=22); CLOSE (unit=23); CLOSE (unit=24); 
-	CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); 
+	CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); CLOSE (unit=29); 
 
 END SUBROUTINE Write_Experimental_Results
 
@@ -4423,6 +4467,7 @@ Function Tax_Reform_Welfare(tk)
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp  = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1

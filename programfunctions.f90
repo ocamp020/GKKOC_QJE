@@ -123,13 +123,14 @@ end Subroutine Asset_Grid_Threshold
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
-		Y_a = ( a_in +  ( Pr + R*a_in ) *(1.0_DP-tauK) )
+		Y_a = ( a_in +  (1.0_DP-tauK)*( Pr + R*a_in )**(1.0_dp-eta_K) )
 
 		! Compute after tax wealth according to threshold
 		if (a_in.le.Y_a_threshold) then 
-			Y_a = a_in* (1.0_dp-tauW_bt) + ( Pr + R*a_in ) *(1.0_DP-tauK)  
+			Y_a = a_in* (1.0_dp-tauW_bt) + (1.0_DP-tauK)*( Pr + R*a_in )**(1.0_dp-eta_K) 
 		else
-			Y_a = Y_a_threshold*(1.0_dp-tauW_bt) + (a_in - Y_a_threshold) * (1.0_dp-tauW_at) + ( Pr + R*a_in ) *(1.0_DP-tauK)
+			Y_a = Y_a_threshold*(1.0_dp-tauW_bt) + (a_in - Y_a_threshold) * (1.0_dp-tauW_at) + &
+					&  (1.0_DP-tauK)*( Pr + R*a_in )**(1.0_dp-eta_K)
 		end if
 	END  FUNCTION Y_a
 
@@ -157,7 +158,7 @@ end Subroutine Asset_Grid_Threshold
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
-		Y_a = ( a_in +  ( Pr + R*a_in ) *(1.0_DP-tauK) )
+		Y_a = ( a_in +  (1.0_DP-tauK)*( Pr + R*a_in )**(1.0_dp-eta_K) )
 		if (a_in.le.Y_a_threshold) then 
 			tauW = tauW_bt 
 		else
@@ -166,10 +167,10 @@ end Subroutine Asset_Grid_Threshold
 
 		! After tax marginal benefit of assets
 		if (K.lt.theta(z_in)*a_in) then 
-			MB_a = (1.0_dp*(1.0_dp-tauW) + R*(1.0_dp-tauK))
+			MB_a = 1.0_dp*(1.0_dp-tauW) + (1.0_dp-eta_K)*(1.0_DP-tauK)*( Pr + R*a_in )**(-eta_K)*R
 		else 
-			MB_a = (1.0_dp*(1.0_dp-tauW) + R*(1.0_dp-tauK)) &
-         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
+			MB_a = 1.0_dp*(1.0_dp-tauW) + (1.0_dp-eta_K)*(1.0_DP-tauK)*( Pr + R*a_in )**(-eta_K)*( R  + &
+         		& (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in)) )
 		endif 
 
 	END  FUNCTION MB_a
@@ -184,10 +185,10 @@ end Subroutine Asset_Grid_Threshold
 		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
 		if (K.lt.theta(z_in)*a_in) then 
-			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK))
+			MB_a_at = 1.0_dp*(1.0_dp-tauW_at) + (1.0_dp-eta_K)*(1.0_DP-tauK)*( Pr + R*a_in )**(-eta_K)*R
 		else 
-			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK)) &
-         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
+			MB_a_at = 1.0_dp*(1.0_dp-tauW_at) + (1.0_dp-eta_K)*(1.0_DP-tauK)*( Pr + R*a_in )**(-eta_K)*( R  + &
+         		& (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in)) )
 		endif 
 
 	END  FUNCTION MB_a_at
@@ -202,10 +203,10 @@ end Subroutine Asset_Grid_Threshold
 		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
 		if (K.lt.theta(z_in)*a_in) then 
-			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK))
+			MB_a_bt = 1.0_dp*(1.0_dp-tauW_bt) + (1.0_dp-eta_K)*(1.0_DP-tauK)*( Pr + R*a_in )**(-eta_K)*R
 		else 
-			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK)) &
-         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
+			MB_a_bt = 1.0_dp*(1.0_dp-tauW_bt) + (1.0_dp-eta_K)*(1.0_DP-tauK)*( Pr + R*a_in )**(-eta_K)*( R  + &
+         		& (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in)) )
 		endif 
 
 	END  FUNCTION MB_a_bt
@@ -1900,8 +1901,9 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	DO zi=1,nz
 	DO lambdai=1,nlambda
 	DO ei=1,ne
-	    GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei,xi) * ( tauK*( R*agrid(ai) + Pr_mat(ai,zi,xi) )  	    &
-	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi)  &	
+	    GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei,xi) * ( &
+	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &  	    &
+	          & + ( agrid(ai) + (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K)  ) - YGRID(ai,zi,xi)   &
 	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)  									&
 	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)  			&
 	          & + tauC  *  cons(age,ai,zi,lambdai,ei,xi)  										    & 
@@ -1911,10 +1913,11 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	    GBAR_L = GBAR_L  + DBN1(age,ai,zi,lambdai,ei,xi) * (  yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi) &
 	               &- psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL) )
 
-	    GBAR_K = GBAR_K + DBN1(age,ai,zi,lambdai,ei,xi) * tauK*( R*agrid(ai) + Pr_mat(ai,zi,xi) )
+	    GBAR_K = GBAR_K + DBN1(age,ai,zi,lambdai,ei,xi) * &
+	    		& (R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K))
 
 	    GBAR_W = GBAR_W + DBN1(age,ai,zi,lambdai,ei,xi) * &
-	            & (( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi) )
+	            & (( agrid(ai) + (1.0_DP-tauK)*(R*agrid(ai)+Pr_mat(ai,zi,xi))**(1.0_dp-eta_K) ) - YGRID(ai,zi,xi) )
 
       	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei,xi) * tauC * cons(age,ai,zi,lambdai,ei,xi)
 
@@ -4023,6 +4026,7 @@ SUBROUTINE FIND_DBN_Transition()
 				R_exp	  = R
 				wage_exp  = wage
 				tauK_exp  = tauK
+				eta_K_exp = eta_K
 				tauPL_exp = tauPL
 				psi_exp   = psi
 				DBN_exp   = DBN1
@@ -6428,7 +6432,8 @@ Function Wealth_Matrix(R_in,P_in)
 
 	Pr = Profit_Matrix(R_in,P_in)
 
-	Wealth_Matrix = ( (1.0_dp+R_in*(1.0_DP-tauK))*spread(spread(agrid,2,nz),3,nx) +  Pr *(1.0_DP-tauK) )
+	Wealth_Matrix = ( (1.0_dp+(1.0_DP-tauK)*R_in**(1.0_dp-eta_K))*spread(spread(agrid,2,nz),3,nx) + &
+		&   (1.0_DP-tauK)*Pr**(1.0_dp-eta_K) )
 
 end Function Wealth_Matrix
 
@@ -6441,7 +6446,8 @@ Function Wealth_Matrix_t(R_in,P_in)
 
 	Pr = Profit_Matrix_t(R_in,P_in)
 
-	Wealth_Matrix_t = ( (1.0_dp+R_in*(1.0_DP-tauK))*spread(spread(agrid_t,2,nz),3,nx) +  Pr *(1.0_DP-tauK) )
+	Wealth_Matrix_t = ( (1.0_dp+(1.0_DP-tauK)*R_in**(1.0_dp-eta_K))*spread(spread(agrid_t,2,nz),3,nx) + &
+		&  (1.0_DP-tauK)*Pr**(1.0_dp-eta_K) )
 
 end Function Wealth_Matrix_t
 
