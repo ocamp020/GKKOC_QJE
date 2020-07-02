@@ -179,10 +179,12 @@ end Subroutine Asset_Grid_Threshold
 		IMPLICIT NONE   
 		real(DP), intent(in)  :: a_in
 		integer , intent(in)  :: x_in, z_in
-		real(DP)			  :: MB_a_at, K
+		real(DP)			  :: MB_a_at, K, Pr
 
 		! Capital demand 
 		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		! Profits 
+		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Compute asset marginal benefit - subject to taxes
 		if (K.lt.theta(z_in)*a_in) then 
 			MB_a_at = 1.0_dp*(1.0_dp-tauW_at) + (1.0_dp-eta_K)*(1.0_DP-tauK)*( Pr + R*a_in )**(-eta_K)*R
@@ -197,10 +199,12 @@ end Subroutine Asset_Grid_Threshold
 		IMPLICIT NONE   
 		real(DP), intent(in)  :: a_in
 		integer , intent(in)  :: x_in, z_in
-		real(DP)             :: MB_a_bt, K
+		real(DP)             :: MB_a_bt, K, Pr
 
 		! Capital demand 
 		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		! Profits 
+		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Compute asset marginal benefit - subject to taxes
 		if (K.lt.theta(z_in)*a_in) then 
 			MB_a_bt = 1.0_dp*(1.0_dp-tauW_bt) + (1.0_dp-eta_K)*(1.0_DP-tauK)*( Pr + R*a_in )**(-eta_K)*R
