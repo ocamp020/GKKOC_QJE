@@ -398,8 +398,7 @@ SUBROUTINE GOVNT_BUDGET_OPT_tauK()
 
 	    BT_EARNINGS = BT_EARNINGS + DBN1(age,ai,zi,lambdai,ei,xi) * (R*agrid(ai) + Pr_mat(ai,zi,xi)) 
 	    
-	    A_EARNINGS  = A_EARNINGS  + DBN1(age,ai,zi,lambdai,ei,xi) *&
-	                    & (R*agrid(ai) + Pr_mat(ai,zi,xi))**(1.0_dp-eta_K)
+	    A_EARNINGS  =  A_EARNINGS + DBN1(age,ai,zi,lambdai,ei,xi) * (R*agrid(ai) + Pr_mat(ai,zi,xi))**(1.0_dp-eta_K)
 	    
 	    GBAR_K = GBAR_K +DBN1(age,ai,zi,lambdai,ei,xi) * (  &
 	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) )
@@ -458,8 +457,9 @@ SUBROUTINE GOVNT_BUDGET_OPT_tauK()
 	if (solving_bench .eq. 0) then
 	    IF (  abs(100.0_DP*(1.0_DP-GBAR/GBAR_bench)) .gt. 0.01 ) THEN
 	        !new_psi =  ( BT_EARNINGS - GBAR_bench -  SSC_Payments   + GBAR_NL ) / A_EARNINGS
-	        new_tauK =  (  GBAR_bench + SSC_Payments - GBAR_NK ) / BT_EARNINGS
-	        PRINT*,'New tauK=',new_tauK,'Old tauK=',tauK
+	        ! new_tauK =  1.0_dp - (  GBAR_bench  - GBAR_NK ) / BT_EARNINGS
+	        new_tauK =  1.0_dp - (  GBAR_bench - GBAR  + GBAR_NK ) / A_EARNINGS
+	        PRINT*,'New tauK=',new_tauK,'Old tauK=',tauK,'G_gap=',100.0_DP*(1.0_DP-GBAR/GBAR_bench)
 	        tauK = 0.5_dp*new_tauK+0.5_dp*tauK
 	    ENDIF
 	endif     
