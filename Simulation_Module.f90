@@ -1800,7 +1800,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		Panel_r(i,1,i_z) = ( P*(xz_grid(Panel_x(i,1,i_z),i_z)*Panel_k(i,1,i_z))**mu - (R+DepRate)*Panel_k(i,1,i_z) +&
 	     								&   R*Panel_a(i,1,i_z) )/Panel_a(i,1,i_z)
 
-		Panel_r_at(i,1,i_z) = ( &
+		Panel_r_at(i,1,i_z) = &
 				& ( (1.0_dp-tauK)*( (P*(xz_grid(Panel_x(i,1,i_z),i_z)*Panel_k(i,1,i_z))**mu - (R+DepRate)*Panel_k(i,1,i_z)) &
 									& + R*Panel_a(i,1,i_z))**(1.0_dp-eta_K) )/Panel_a(i,1,i_z) - tauW_at
 
@@ -1902,7 +1902,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 				Panel_r(i,age,i_z) = ( P*(xz_grid(Panel_x(i,age,i_z),i_z)*Panel_k(i,age,i_z))**mu - (R+DepRate)*Panel_k(i,age,i_z) +&
 			     								&   R*Panel_a(i,age,i_z) )/Panel_a(i,age,i_z)
 
-				Panel_r_at(i,age,i_z) = ( &
+				Panel_r_at(i,age,i_z) = &
 					& ( (1.0_dp-tauK)*( (P*(xz_grid(Panel_x(i,age,i_z),i_z)*Panel_k(i,age,i_z))**mu - (R+DepRate)*Panel_k(i,age,i_z)) &
 										& + R*Panel_a(i,age,i_z))**(1.0_dp-eta_K) )/Panel_a(i,1,i_z) - tauW_at
 
@@ -2016,7 +2016,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 			Panel_r_ben(i,age,i_z) = ( P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - &
 								&   (R+DepRate)*Panel_k_ben(i,age,i_z) + R*Panel_a_ben(i,age,i_z) )/Panel_a_ben(i,age,i_z)
 
-			Panel_r_at_ben(i,age,i_z) = ( &
+			Panel_r_at_ben(i,age,i_z) = &
 					& ( (1.0_dp-tauK)*( (P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - (R+DepRate)*Panel_k_ben(i,age,i_z)) &
 										& + R*Panel_a_ben(i,age,i_z))**(1.0_dp-eta_K) )/Panel_a_ben(i,1,i_z) - tauW_at
 
@@ -2426,7 +2426,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 				Panel_r(i,age) = ( P*(xz_grid(Panel_x(i,age),i_z)*Panel_k(i,age))**mu - (R+DepRate)*Panel_k(i,age) +&
 			     								&   R*Panel_a(i,age) )/Panel_a(i,age)
 
-				Panel_r_at(i,age) = ( &
+				Panel_r_at(i,age) = &
 					& ( (1.0_dp-tauK)*( (P*(xz_grid(Panel_x(i,age),i_z)*Panel_k(i,age))**mu - (R+DepRate)*Panel_k(i,age)) &
 					&   + R*Panel_a(i,age))**(1.0_dp-eta_K) )/Panel_a(i,age) - tauW_at
 
