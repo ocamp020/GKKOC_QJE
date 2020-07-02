@@ -456,7 +456,7 @@ SUBROUTINE GOVNT_BUDGET_OPT_tauK()
 
 	! OBTAIN NEW tauK IF GOVETNMENT BUDGET DOES NOT BALANCE
 	if (solving_bench .eq. 0) then
-	    IF (  abs(100.0_DP*(1.0_DP-GBAR/GBAR_bench)) .gt. 0.005 ) THEN
+	    IF (  abs(100.0_DP*(1.0_DP-GBAR/GBAR_bench)) .gt. 0.01 ) THEN
 	        !new_psi =  ( BT_EARNINGS - GBAR_bench -  SSC_Payments   + GBAR_NL ) / A_EARNINGS
 	        new_tauK =  (  GBAR_bench + SSC_Payments - GBAR_NK ) / BT_EARNINGS
 	        PRINT*,'New tauK=',new_tauK,'Old tauK=',tauK
