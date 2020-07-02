@@ -537,7 +537,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		wage_bench    = wage
 		Y_bench       = YBAR
 		tauK_bench    = tauK
-		eta_K_brench  = eta_K
+		eta_K_bench   = eta_K
 		tauPL_bench   = tauPL
 		psi_bench     = psi
 		DBN_bench     = DBN1
@@ -2589,7 +2589,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt_tl.txt', STATUS='replace')
     	WRITE(UNIT=77, FMT=*) 'eta_K ', 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
-		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ' &
+		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ', &
 		      & 'Wealth_Output ', 'prct1_wealth ' , 'prct10_wealth ', 'Std_Log_Earnings ', 'mean_hours ', &
 	      	  & 'GBAR ', 'GBAR_K ', 'GBAR_W ', 'GBAR_L ', 'GBAR_C ','Tot_Cap_Inc ', &
 	      	  & 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet '
@@ -2611,7 +2611,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt.txt', STATUS='replace')
     	WRITE(UNIT=77, FMT=*) 'eta_K ', 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
-		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ' &
+		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ', &
 		      & 'Wealth_Output ', 'prct1_wealth ' , 'prct10_wealth ', 'Std_Log_Earnings ', 'mean_hours ', &
 	      	  & 'GBAR ', 'GBAR_K ', 'GBAR_W ', 'GBAR_L ', 'GBAR_C ','Tot_Cap_Inc ', &
 	      	  & 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet '
@@ -2638,12 +2638,12 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 	endif 
 
 	print*,' ';print*,'------------------------------------------------------------------'
-	print*,'	Optimal Tax Loop - eta_K'; print* ' '
+	print*,'	Optimal Tax Loop - eta_K'; print*, ' '
 	do eta_ind = eta_grid_min,eta_grid_max,eta_grid_step
 		eta_K = real(eta_ind,8)/100.0_DP
 
 		print*,' ';print*,'------------------------------------------------------------------'
-		print*,'		Optimal Tax Loop - tau_K'; print* ' '
+		print*,'		Optimal Tax Loop - tau_K'; print*,' '
 		do tauindx = tau_grid_min,tau_grid_max,tau_grid_step
 			if (Opt_Tax_tL) then 
 				tauK        = real(tauindx,8)/100_DP
@@ -2780,7 +2780,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 		
 
 	! Print resutls 
-		if (Opt_Tax_KW) then 
+		if (Opt_Tax_tL) then 
 	 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stat_opt_nlkt_tl.txt', STATUS='replace')
 	 	else
 	 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stat_opt_nlkt.txt', STATUS='replace')
