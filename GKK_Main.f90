@@ -2654,6 +2654,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 		print*,' ';print*,'------------------------------------------------------------------'
 		print*,'		Optimal Tax Loop - tau_K'; print*,' '
 		do tauindx = tau_grid_min,tau_grid_max,tau_grid_step
+			print*,' 			eta_K=',eta_K,'tauK=',tauK
 			if (Opt_Tax_tL) then 
 				tauK        = real(tauindx,8)/100_DP
 	            brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
