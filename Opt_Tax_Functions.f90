@@ -313,7 +313,7 @@ FUNCTION EQ_WELFARE_GIVEN_etaK(eta_K_in)
 	real(DP), intent(in) :: eta_k_in
 	real(DP) :: EQ_WELFARE_GIVEN_etaK
 
-	tauK    = tauk_in
+	eta_K   = eta_k_in
 	tauW_at = 0.0_DP
 
 	GBAR_exp = 0.0_DP
@@ -386,7 +386,7 @@ SUBROUTINE GOVNT_BUDGET_OPT_tauK()
 	DO lambdai=1,nlambda
 	DO ei=1,ne
 		GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei,xi) * ( &
-	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &  	    &
+	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &
 	          & + ( agrid(ai) + (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K)  ) - YGRID(ai,zi,xi)   &
 	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)  									&
 	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)  			&
