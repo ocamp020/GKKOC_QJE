@@ -460,9 +460,9 @@ SUBROUTINE GOVNT_BUDGET_OPT_tauK()
 	        ! new_tauK =  1.0_dp - (  GBAR_bench  - GBAR_NK ) / BT_EARNINGS
 	        new_tauK =  1.0_dp - ( BT_EARNINGS + GBAR_NK - GBAR_bench - SSC_Payments) / A_EARNINGS
 	        PRINT*,'New tauK=',new_tauK,'Old tauK=',tauK,'G_gap=',100.0_DP*(1.0_DP-GBAR/GBAR_bench)
-	        print*,'test GBAR_K:',BT_EARNINGS-A_EARNINGS*(1.0_dp-tauK),GBAR_K
-	        print*,'test GBAR  :',BT_EARNINGS-A_EARNINGS*(1.0_dp-tauK)+GBAR_NK,GBAR+SSC_Payments
-	        tauK = 0.5_dp*new_tauK+0.5_dp*tauK
+	        ! print*,'test GBAR_K:',BT_EARNINGS-A_EARNINGS*(1.0_dp-tauK),GBAR_K
+	        ! print*,'test GBAR  :',BT_EARNINGS-A_EARNINGS*(1.0_dp-tauK)+GBAR_NK,GBAR+SSC_Payments
+	        tauK = 0.8_dp*new_tauK+0.2_dp*tauK
 	    ENDIF
 	endif     
 
