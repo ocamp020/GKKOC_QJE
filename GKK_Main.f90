@@ -2594,7 +2594,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 	
 	if (Opt_Tax_tL) then
 		print*,''
-		print*,'--------------- OPTIMAL CAPITAL TAXES - fixed labor taxes -----------------'
+		print*,'--------------- OPTIMAL CAPITAL TAXES - changing labor taxes -----------------'
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt_tl.txt', STATUS='replace')
     	WRITE(UNIT=77, FMT=*) 'eta_K ', 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
@@ -2616,7 +2616,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
     	psi = psi_bench 
 	else
 		print*,''
-		print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
+		print*,'--------------- OPTIMAL CAPITAL TAXES - fixed labor taxes -----------------'
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt.txt', STATUS='replace')
     	WRITE(UNIT=77, FMT=*) 'eta_K ', 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
