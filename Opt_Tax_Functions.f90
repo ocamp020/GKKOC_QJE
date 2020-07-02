@@ -53,6 +53,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauK(tauk_in)
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1
@@ -74,7 +75,9 @@ FUNCTION EQ_WELFARE_GIVEN_TauK(tauk_in)
 	!CLOSE (unit=3)
 	!
 	!print*,'tauK=', tauK, ' CE_NEWBORN=', CE_NEWBORN, 'Av. Util=',sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
-	print*, 'tauK=', tauK,'Av_Utility_NEWBORN=', -EQ_WELFARE_GIVEN_TAUK, 'Psi=', psi
+	print*,' ';print*,'------------------------------------------------------------------------'
+	print*, 'eta_K=',eta_K,'tauK=', tauK,'Av_Utility_NEWBORN=', -EQ_WELFARE_GIVEN_TAUK, 'Psi=', psi
+	print*,'------------------------------------------------------------------------';print*,' '
 
 END  FUNCTION EQ_WELFARE_GIVEN_TAUK
 
@@ -105,6 +108,7 @@ FUNCTION EQ_WELFARE_GIVEN_TauW(tauW_in)
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
+		eta_K_exp = eta_K
 		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
@@ -302,6 +306,169 @@ FUNCTION EQ_WELFARE_GIVEN_PSI(tauK_in,tauW_in,psi_in)
 END  FUNCTION EQ_WELFARE_GIVEN_PSI
 
 
+!================================================================================
+
+FUNCTION EQ_WELFARE_GIVEN_etaK(eta_K_in)
+	IMPLICIT NONE 
+	real(DP), intent(in) :: eta_k_in
+	real(DP) :: EQ_WELFARE_GIVEN_etaK
+
+	tauK    = tauk_in
+	tauW_at = 0.0_DP
+
+	GBAR_exp = 0.0_DP
+	DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.003 ) ! as long as the difference is greater than 0.05% continue
+	    CALL FIND_DBN_EQ
+	    CALL GOVNT_BUDGET_OPT_tauK
+	    GBAR_exp = GBAR    
+	ENDDO
+
+	! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		eta_K_exp = eta_K
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+	! CALL COMPUTE_WELFARE_GAIN
+	CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
+	EQ_WELFARE_GIVEN_etaK = - sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+
+	!CALL COMPUTE_STATS
+
+	!
+	!OPEN   (UNIT=3, FILE='psi', STATUS='replace')
+	!print*,'Budget balancing psi=',psi
+	!WRITE(unit=3, FMT=*) psi
+	!CLOSE (unit=3)
+	!
+	!print*,'tauK=', tauK, ' CE_NEWBORN=', CE_NEWBORN, 'Av. Util=',sum(ValueFunction(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:))
+	print*,' ';print*,'------------------------------------------------------------------------'
+	print*, 'eta_K=',eta_K,'tauK=', tauK,'Av_Utility_NEWBORN=', -EQ_WELFARE_GIVEN_etaK
+	print*,'------------------------------------------------------------------------';print*,' '
+
+END  FUNCTION EQ_WELFARE_GIVEN_etaK
+
+
+!====================================================================
+
+SUBROUTINE GOVNT_BUDGET_OPT_tauK()
+	IMPLICIT NONE
+
+	real(DP) :: GBAR_W,  GBAR_L, GBAR_C, GBAR_NK, BT_EARNINGS , A_EARNINGS, SSC_Payments
+	real(DP) :: new_tauK
+
+	GBAR        = 0.0_DP
+	GBAR_K 		= 0.0_DP
+	GBAR_W		= 0.0_DP
+	GBAR_C 		= 0.0_DP
+	GBAR_L 		= 0.0_DP
+	GBAR_NK 	= 0.0_DP
+	GBAR_BQ     = 0.0_DP
+	BT_EARNINGS = 0.0_DP
+	A_EARNINGS 	= 0.0_DP
+
+	DO xi=1,nx
+	DO age=1, MaxAge
+	DO ai=1,na
+	DO zi=1,nz
+	DO lambdai=1,nlambda
+	DO ei=1,ne
+		GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei,xi) * ( &
+	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &  	    &
+	          & + ( agrid(ai) + (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K)  ) - YGRID(ai,zi,xi)   &
+	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)  									&
+	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)  			&
+	          & + tauC * cons(age, ai, zi, lambdai,ei,xi)  												&   
+	          & + tau_bq*aprime(age,ai,zi,lambdai,ei,xi)*(1.0_DP-survP(age)) )
+
+	    GBAR_L = GBAR_L  + DBN1(age,ai,zi,lambdai,ei,xi) * (  yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi) &
+	          &- psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL) )
+
+	    BT_EARNINGS = BT_EARNINGS + DBN1(age,ai,zi,lambdai,ei,xi) * (R*agrid(ai) + Pr_mat(ai,zi,xi)) 
+	    
+	    A_EARNINGS  = A_EARNINGS  + DBN1(age,ai,zi,lambdai,ei,xi) *&
+	                    & (R*agrid(ai) + Pr_mat(ai,zi,xi))**(1.0_dp-eta_K)
+	    
+	    GBAR_K = GBAR_K +DBN1(age,ai,zi,lambdai,ei,xi) * (  &
+	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) )
+
+	    GBAR_W = GBAR_W +DBN1(age,ai,zi,lambdai,ei,xi) * (  &
+	    	  &   ( agrid(ai) + (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K)  ) - YGRID(ai,zi,xi)    )
+
+      	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei,xi) * tauC * cons(age, ai, zi, lambdai,ei,xi)
+	    
+	    GBAR_BQ = GBAR_BQ +  DBN1(age,ai,zi,lambdai,ei,xi) * tau_bq * aprime(age,ai,zi,lambdai,ei,xi) * (1.0_dp-survP(age))
+	   
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+
+	GBAR_NK = GBAR - GBAR_K 
+
+	SSC_Payments = 0.0_DP
+
+	DO xi=1,nx
+	DO age=RetAge, MaxAge
+	DO ai=1,na
+	DO zi=1,nz
+	DO lambdai=1,nlambda
+	DO ei=1,ne
+
+	    SSC_Payments = SSC_Payments + DBN1(age,ai,zi,lambdai,ei,xi) * RetY_lambda_e(lambdai,ei) 
+	    
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+
+	GBAR = GBAR -  SSC_Payments
+
+
+	print*,' '; print*,'-----------------------------------------------------------------------------'
+	print*, "Government Budget - Revenues and taxes"
+	print*,' '
+	print '(A,F8.5,X,A,F8.5)','GBAR_bench=',GBAR_bench, 'GBAR=',GBAR
+	print '(A,F7.4,X,A,F7.4,X,A,F7.4)','	SSC_Payments=', SSC_Payments, 'GBAR_L=',GBAR_L,'Av. Labor Tax=',100.0_dp*GBAR_L/Ebar
+	print '(A,F7.4,X,A,F7.4,X,A,F7.4,X,A,F7.4)','	GBAR_K=', GBAR_K, "GBAR_W=", GBAR_W, 'GBAR_C=', GBAR_C, 'GBAR_BQ=', GBAR_BQ
+	print '(A,F7.4,X,A,F7.4,X,A,F7.4)','	GBAR_NK=',GBAR_NK, 'BT_EARNINGS=',BT_EARNINGS,'A_EARNINGS=',A_EARNINGS 
+	print '(A,F7.4,X,X,A,F7.4,X,X,A,F7.4,X,X,A,F7.4,X,X,A,F7.4,X,X,A,F7.4,X,X,A,F7.4)',&
+			&'	Tau_L=',100.0_dp*(1.0_dp-psi),'Tau_K=', 100.0_dp*tauK, 'Tau_W=', 100.0_dp*tauW_at,&
+			& 'Tau_C=', 100.0_dp*tauC, 'Tau_BQ=', 100.0_dp*tau_bq, "Threshold", Y_a_threshold, "eta_K", eta_K
+	print*,'-----------------------------------------------------------------------------'
+	print*, ' '
+
+	! OBTAIN NEW tauK IF GOVETNMENT BUDGET DOES NOT BALANCE
+	if (solving_bench .eq. 0) then
+	    IF (  abs(100.0_DP*(1.0_DP-GBAR/GBAR_bench)) .gt. 0.001 ) THEN
+	        !new_psi =  ( BT_EARNINGS - GBAR_bench -  SSC_Payments   + GBAR_NL ) / A_EARNINGS
+	        new_tauK = 1.0_dp - (  GBAR_bench + SSC_Payments - GBAR_NK ) / BT_EARNINGS
+	        PRINT*,'NEW PSI=',new_tauK,'Old Psi=',tauK
+	        tauK = 0.5_dp*new_tauK+0.5_dp*tauK
+	    ENDIF
+	endif     
+
+
+
+END SUBROUTINE GOVNT_BUDGET_OPT_tauK
+
+
 !====================================================================
 
 SUBROUTINE GOVNT_BUDGET_OPT()
@@ -327,7 +494,7 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 	DO lambdai=1,nlambda
 	DO ei=1,ne
 		GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei,xi) * ( &
-	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &  	    &
+	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &  
 	          & + ( agrid(ai) + (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K)  ) - YGRID(ai,zi,xi)   &
 	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)  									&
 	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)  			&
@@ -335,7 +502,7 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 	          & + tau_bq*aprime(age,ai,zi,lambdai,ei,xi)*(1.0_DP-survP(age)) )
 
 	    GBAR_NL = GBAR_NL + DBN1(age,ai,zi,lambdai,ei,xi) * ( &
-	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &  	    &
+	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &  	
 	          & + ( agrid(ai) + (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K)  ) - YGRID(ai,zi,xi)   &
 	          & + tauC * cons(age, ai, zi, lambdai,ei,xi)   												&   
 	          & + tau_bq*aprime(age,ai,zi,lambdai,ei,xi)*(1.0_DP-survP(age)) )
@@ -349,7 +516,7 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 	                    & (yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)
 	    
 	    GBAR_K = GBAR_K +DBN1(age,ai,zi,lambdai,ei,xi) * (  &
-	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &  	    &
+	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &  	 
 	          & + ( agrid(ai) + (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K)  ) - YGRID(ai,zi,xi)    )
 
       	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei,xi) * tauC * cons(age, ai, zi, lambdai,ei,xi)
@@ -438,7 +605,7 @@ SUBROUTINE GOVNT_BUDGET_OPT_TauC()
 	DO lambdai=1,nlambda
 	DO ei=1,ne
 		GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei,xi) * ( &
-	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &  	    &
+	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &  
 	          & + ( agrid(ai) + (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K)  ) - YGRID(ai,zi,xi)   &	
 	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)  									&
 	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)  			&
@@ -446,7 +613,7 @@ SUBROUTINE GOVNT_BUDGET_OPT_TauC()
 	          & + tau_bq*aprime(age,ai,zi,lambdai,ei,xi)*(1.0_DP-survP(age)) )
 
 	    GBAR_NL = GBAR_NL + DBN1(age,ai,zi,lambdai,ei,xi) * ( &
-	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &  	    &
+	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &
 	          & + ( agrid(ai) + (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K)  ) - YGRID(ai,zi,xi)   & 
 	          & + tauC * cons(age, ai, zi, lambdai,ei,xi)  &   
 	          & + tau_bq*aprime(age,ai,zi,lambdai,ei,xi)*(1.0_DP-survP(age)) )         
@@ -460,7 +627,7 @@ SUBROUTINE GOVNT_BUDGET_OPT_TauC()
 	                    & (yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)
 	    
 	    GBAR_K = GBAR_K +DBN1(age,ai,zi,lambdai,ei,xi) * (  &
-	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &  	    &
+	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) & 
 	          & + ( agrid(ai) + (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K)  ) - YGRID(ai,zi,xi) )
 
       	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei,xi) * tauC * cons(age, ai, zi, lambdai,ei,xi)

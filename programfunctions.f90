@@ -1902,7 +1902,7 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	DO lambdai=1,nlambda
 	DO ei=1,ne
 	    GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei,xi) * ( &
-	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) &  	    &
+	    	  &   ( R*agrid(ai) + Pr_mat(ai,zi,xi) - (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K) ) & 
 	          & + ( agrid(ai) + (1.0_DP-tauK)*( R*agrid(ai) + Pr_mat(ai,zi,xi) )**(1.0_dp-eta_K)  ) - YGRID(ai,zi,xi)   &
 	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)  									&
 	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)  			&

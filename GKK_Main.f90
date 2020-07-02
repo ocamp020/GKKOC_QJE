@@ -2696,6 +2696,8 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 				OPT_tauW = tauW_at
 				OPT_psi  = psi
 				OPT_etaK = eta_K
+				! Save variables 
+		    	Call Write_Experimental_Results(.true.)
 			endif
 
 			! Print Results 
@@ -2718,9 +2720,6 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 			      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Tot_Cap_Inc, &
 			      	  & Av_Util_Pop, Av_Util_NB, brentvaluet
 		      	CLOSE (unit=77) 
-
-	      	! Save variables 
-		    	Call Write_Experimental_Results(.true.)
 		enddo
 	enddo  
 	print*,' ';print*,'------------------------------------------------------------------------------'
@@ -2737,14 +2736,16 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 
 	! Solve model with optimal taxes 
 	print*,'	Solving model with optimal taxes'
-		CALL FIND_DBN_EQ
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
-		CALL Firm_Value
+		CALL Write_Experimental_Results(.false.)
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		K_mat  = K_Matrix(R,P)
+		Pr_mat = Profit_Matrix(R,P)
+		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		CALL ComputeLaborUnits(EBAR,wage)
+		CALL GOVNT_BUDGET(.true.)
+		CALL Compute_After_Tax_Income
 
-	! Allocate variables
-		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)	
-
-	! Aggregate variable in experimental economy
+		! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
 		QBAR_exp  = QBAR 
 		NBAR_exp  = NBAR  
@@ -2754,7 +2755,6 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 		R_exp	  = R
 		wage_exp  = wage
 		tauK_exp  = tauK
-		eta_K_exp = eta_K
 		tauPL_exp = tauPL
 		psi_exp   = psi
 		DBN_exp   = DBN1
@@ -2768,19 +2768,16 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime 
 
-	! Compute moments
-		CALL COMPUTE_STATS
-		CALL GOVNT_BUDGET(.true.)
+		! Compute moments
+			CALL COMPUTE_STATS
 		
-	! Compute welfare gain between economies
-		CALL COMPUTE_WELFARE_GAIN
-		CALL COMPUTE_WELFARE_DECOMPOSITION
+		! Compute welfare gain between economies
+			CALL COMPUTE_WELFARE_GAIN
+			CALL COMPUTE_WELFARE_DECOMPOSITION
 
-	! Write experimental results in output.txt
-		CALL WRITE_VARIABLES(0)
-
-	! Save files
-		CALL Write_Experimental_Results(.true.)
+		! Write experimental results in output.txt
+			CALL WRITE_VARIABLES(0)
+		
 
 	! Print resutls 
 		if (Opt_Tax_KW) then 
