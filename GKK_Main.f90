@@ -40,7 +40,7 @@ PROGRAM main
 		REAL(DP) :: start_time, finish_time
 	! Compute benchmark or load results
 		logical  :: compute_bench, compute_exp, Opt_Tax, Opt_Tax_KW, Tax_Reform, Simul_Switch, Calibration_Switch
-		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, Opt_Tax_K_and_W, Tax_Reform_KW
+		logical  :: Opt_Threshold, Opt_Tau_C, Opt_Tau_CX, Opt_Tax_K_and_W, Tax_Reform_KW, Opt_NLKT, Opt_Tax_tL
 		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices, compute_exp_fixed_prices_and_taxes
 		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R , Tax_Reform_Decomposition
 		logical  :: Transition_Tax_Reform, Transition_OT, budget_balance, balance_tau_L
@@ -59,7 +59,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -93,6 +93,9 @@ PROGRAM main
 			budget_balance = .true.
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
+
+		Opt_NLKT = .true.  ! Solve for nonlinear capital income taxes 
+			Opt_Tax_tL = .false. ! If false set curvature and balance budget with level. If true balance with labor income taxes 
 		
 		Simul_Switch  = .false.
 
@@ -449,6 +452,12 @@ PROGRAM main
 		if (Transition_OT) then
 			call Solve_Transition_Opt_Taxes(Opt_Tax_KW_TR,budget_balance,balance_tau_L)
 		endif
+
+		if (Opt_NLKT) then 
+			call Solve_Benchmark(.false.,.false.)
+
+			call Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
+		endif 
 
 
 	call cpu_time(finish_time)
