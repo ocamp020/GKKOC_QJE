@@ -215,23 +215,23 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1/'
+			Result_Folder = './Revision/Model_2.1_NLKT/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_PT/' 
+			Result_Folder = './Revision/Model_2.1_NLKT_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_SU/' 
+			Result_Folder = './Revision/Model_2.1_NLKT_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_NLKT_PT_SU/' 
 		end if
 	else 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp/' 
+			Result_Folder = './Revision/Model_2.1_NLKT_Corp/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_PT/' 
+			Result_Folder = './Revision/Model_2.1_NLKT_Corp_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_SU/' 
+			Result_Folder = './Revision/Model_2.1_NLKT_Corp_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_NLKT_Corp_PT_SU/' 
 		end if
 	endif 
 
@@ -598,7 +598,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark
@@ -2525,6 +2525,335 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	! CALL SIMULATION(0)
 
 end Subroutine Solve_Opt_Tax
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
+	use parameters 
+	use global
+	use Opt_Tax_Parameters
+	use Opt_Tax_Functions
+	use programfunctions
+	use GKK_Stats
+	use Simulation_Module
+	use Toolbox
+	use omp_lib
+	implicit none 
+	logical, intent(in) :: Opt_Tax_tL,Simul_Switch
+	real(dp) :: CBAR_bench
+	integer  :: tau_grid_min, tau_grid_max, tau_grid_step
+	integer  :: eta_grid_min, eta_grid_max, eta_grid_step, eta_ind
+	logical  :: read_results, load_seed
+	character(100) :: folder_aux
+
+	! Save base folder
+		folder_aux = Result_Folder
+		if (Opt_Tax_tL) then 
+			Result_Folder = trim(folder_aux)//'Opt_NLKT_tL/'
+		else 
+			Result_Folder = trim(folder_aux)//'Opt_NLKT/'
+		endif 
+		call system( 'mkdir -p ' // trim(Result_Folder) )
+
+	! Set flag for reading results or computing optimal taxes
+		read_results = .false.
+		load_seed    = .false.
+
+	! Set benchmark consumption
+		CBAR_bench = MeanCons
+
+
+	if (read_results.eqv..false.) then 
+ 	!====================================================================================================
+	PRINT*,''
+	Print*,'--------------- SOLVING OPTIMAL Non Linear Capital TAXES -----------------'
+	PRINT*,''
+	
+	! Experiment economy
+		solving_bench=0
+	
+	! Set initial taxes for finding optimal ones
+		tauK      = 0.0_DP
+		eta_K     = 0.0_DP
+		tauW_at   = 0.0_DP
+		Opt_TauK  = 0.0_DP
+		Opt_etaK  = 0.0_DP
+		maxbrentvaluet=-10000.0_DP
+	
+	if (Opt_Tax_tL) then
+		print*,''
+		print*,'--------------- OPTIMAL CAPITAL TAXES - fixed labor taxes -----------------'
+		print*,''
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt_tl.txt', STATUS='replace')
+    	WRITE(UNIT=77, FMT=*) 'eta_K ', 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
+		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ' &
+		      & 'Wealth_Output ', 'prct1_wealth ' , 'prct10_wealth ', 'Std_Log_Earnings ', 'mean_hours ', &
+	      	  & 'GBAR ', 'GBAR_K ', 'GBAR_W ', 'GBAR_L ', 'GBAR_C ','Tot_Cap_Inc ', &
+	      	  & 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet '
+    	CLOSE (unit=77) 
+    	
+    	tau_grid_min  = -00
+    	tau_grid_max  = -45
+    	tau_grid_step = -1
+
+    	eta_grid_min  = -00
+    	eta_grid_max  = -20
+    	eta_grid_step = -1
+
+    	! Set initial psi
+    	psi = psi_bench 
+	else
+		print*,''
+		print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
+		print*,''
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt.txt', STATUS='replace')
+    	WRITE(UNIT=77, FMT=*) 'eta_K ', 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
+		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ' &
+		      & 'Wealth_Output ', 'prct1_wealth ' , 'prct10_wealth ', 'Std_Log_Earnings ', 'mean_hours ', &
+	      	  & 'GBAR ', 'GBAR_K ', 'GBAR_W ', 'GBAR_L ', 'GBAR_C ','Tot_Cap_Inc ', &
+	      	  & 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet '
+    	CLOSE (unit=77) 
+    	
+    	tau_grid_min  = 0 ! Not actually used 
+    	tau_grid_max  = 0
+    	tau_grid_step = 0
+
+    	eta_grid_min  = -00
+    	eta_grid_max  = -20
+    	eta_grid_step = -1
+
+    	! Set initial tauK
+    	tauK = tauK_bench
+
+	endif 
+
+
+	! Load results form file for re-starts of the code
+	if (load_seed) then
+		CALL Write_Experimental_Results(.false.)
+    	! psi = 1.0_dp-0.02811_dp
+	endif 
+
+	print*,' ';print*,'------------------------------------------------------------------'
+	print*,'	Optimal Tax Loop - eta_K'; print* ' '
+	do eta_ind = eta_grid_min,eta_grid_max,eta_grid_step
+		eta_K = real(eta_ind,8)/100.0_DP
+
+		print*,' ';print*,'------------------------------------------------------------------'
+		print*,'		Optimal Tax Loop - tau_K'; print* ' '
+		do tauindx = tau_grid_min,tau_grid_max,tau_grid_step
+			if (Opt_Tax_tL) then 
+				tauK        = real(tauindx,8)/100_DP
+	            brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
+			else 
+	            brentvaluet = - EQ_WELFARE_GIVEN_etaK(eta_K)
+			endif 
+
+			! Allocate variables
+			CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+
+	       ! Aggregate variable in experimental economy
+				GBAR_exp  = GBAR
+				QBAR_exp  = QBAR 
+				NBAR_exp  = NBAR  
+				Y_exp 	  = YBAR
+				Ebar_exp  = EBAR
+				P_exp     = P
+				R_exp	  = R
+				wage_exp  = wage
+				tauK_exp  = tauK
+				eta_K_exp = eta_K
+				tauPL_exp = tauPL
+				psi_exp   = psi
+				DBN_exp   = DBN1
+				tauw_bt_exp = tauW_bt
+				tauw_at_exp = tauW_at
+				Y_a_threshold_exp = Y_a_threshold
+
+				ValueFunction_exp = ValueFunction
+				Bq_Value_exp	  = Bq_Value
+				Cons_exp          = Cons           
+				Hours_exp         = Hours
+				Aprime_exp        = Aprime 
+
+			! Compute moments
+				CALL COMPUTE_STATS
+				CALL GOVNT_BUDGET(.true.)
+				
+			! Compute welfare gain between economies
+				CALL COMPUTE_WELFARE_GAIN
+
+			! Write experimental results in output.txt
+				CALL WRITE_VARIABLES(0)
+
+			! Update optimal tax
+		    if (brentvaluet .gt. maxbrentvaluet) then
+		        maxbrentvaluet = brentvaluet
+				OPT_tauK = tauK
+				OPT_tauW = tauW_at
+				OPT_psi  = psi
+				OPT_etaK = eta_K
+			endif
+
+			! Print Results 
+				print*,' ';print*,'------------------------------------------------------------------------------'
+			    print '(A,F7.3,X,A,F7.3,X,A,F7.4,X,A,F7.3,X,A,F7.3,X,A,F7.3,X,A,F12.6,X,A,F12.6)', &
+			    	  & 'eta_K=',eta_K,'tauK=', 100.0_dp*tauK,'tauW=', 100.0_dp*tauW_at,'tauL',100.0_dp*(1.0_dp-psi),&
+			    	  & 'Y/Y_bench=',100.0_dp*(YBAR/Y_bench-1), 'CE2=',Av_Util_NB, 'Brentvalue=',brentvaluet, & 
+			    	  & 'Av. Util=', sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:))
+		      	print*,'------------------------------------------------------------------------------';print*,' '
+
+		      	if (Opt_Tax_tL) then 
+		      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt_tl.txt', STATUS='old', POSITION='append')
+		      	else 
+		      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt.txt', STATUS='old', POSITION='append')
+		      	endif 
+			    WRITE  (UNIT=77, FMT=*) eta_K, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+				      &  MeanWealth, QBAR, QBAR/MeanWealth, NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+				      &  MeanCons, 100.0_DP*(MeanCons/CBAR_bench-1.0), wage, R, &
+				      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+			      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Tot_Cap_Inc, &
+			      	  & Av_Util_Pop, Av_Util_NB, brentvaluet
+		      	CLOSE (unit=77) 
+
+	      	! Save variables 
+		    	Call Write_Experimental_Results(.true.)
+		enddo
+	enddo  
+	print*,' ';print*,'------------------------------------------------------------------------------'
+	print*,'	End of Optimal Tax Loop'
+		tauK    = OPT_tauK
+		tauW_at = OPT_tauW
+		psi     = OPT_psi
+		eta_K   = OPT_etaK
+	print '(A,F7.3,X,A,F7.3,X,A,F7.3,X,A,F7.3)', &
+		&"	Current Optimal Taxes:  eta_K=",eta_K,"tau_K=", 100.0_dp*tauK,"tau_W=",100.0_dp*tauW_at,"tau_L=", 100.0_dp*(1.0_dp-psi)
+	print*,'------------------------------------------------------------------------------';print*,' '
+
+
+
+	! Solve model with optimal taxes 
+	print*,'	Solving model with optimal taxes'
+		CALL FIND_DBN_EQ
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
+		CALL Firm_Value
+
+	! Allocate variables
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)	
+
+	! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		eta_K_exp = eta_K
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+		ValueFunction_exp = ValueFunction
+		Bq_Value_exp	  = Bq_Value
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime 
+
+	! Compute moments
+		CALL COMPUTE_STATS
+		CALL GOVNT_BUDGET(.true.)
+		
+	! Compute welfare gain between economies
+		CALL COMPUTE_WELFARE_GAIN
+		CALL COMPUTE_WELFARE_DECOMPOSITION
+
+	! Write experimental results in output.txt
+		CALL WRITE_VARIABLES(0)
+
+	! Save files
+		CALL Write_Experimental_Results(.true.)
+
+	! Print resutls 
+		if (Opt_Tax_KW) then 
+	 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stat_opt_nlkt_tl.txt', STATUS='replace')
+	 	else
+	 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stat_opt_nlkt.txt', STATUS='replace')
+	 	endif 
+		WRITE  (UNIT=77, FMT=*) eta_K, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
+		      &  MeanWealth, QBAR, QBAR/MeanWealth, NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
+		      &  MeanCons, 100.0_DP*(MeanCons/CBAR_bench-1.0), wage, R, &
+		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+	      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Tot_Cap_Inc, &
+	      	  & Av_Util_Pop, Av_Util_NB, brentvaluet
+		CLOSE (UNIT=77)
+
+	else ! (Read_Results.eqv..true.)
+
+	! Read results from file 
+		CALL Write_Experimental_Results(.false.)
+		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
+		K_mat  = K_Matrix(R,P)
+		Pr_mat = Profit_Matrix(R,P)
+		CALL FORM_Y_MB_GRID(YGRID, MBGRID,YGRID_t,MBGRID_t)
+		CALL ComputeLaborUnits(EBAR,wage)
+		CALL GOVNT_BUDGET(.true.)
+		CALL Compute_After_Tax_Income
+		! CALL Write_Experimental_Results(.true.)
+
+	! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+		ValueFunction_exp = ValueFunction
+		Bq_Value_exp	  = Bq_Value
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime 
+
+	! Compute moments
+		CALL COMPUTE_STATS
+	
+	! Compute welfare gain between economies
+		CALL COMPUTE_WELFARE_GAIN
+		CALL COMPUTE_WELFARE_DECOMPOSITION
+
+	! Write experimental results in output.txt
+		CALL WRITE_VARIABLES(0)
+
+	endif 
+	
+	
+
+	! ! if (((theta.eq.1.50_dp)).and.(Threshold_Factor.eq.0.0_dp).and.(Simul_Switch)) then 
+	! !  	print*,"	Optimal Tax Simulation"
+	! ! 	CALL SIMULATION(solving_bench)
+	! ! endif
+	
+	! CALL SIMULATION(0)
+
+end Subroutine Solve_Opt_NLKT
 
 
 !========================================================================================
