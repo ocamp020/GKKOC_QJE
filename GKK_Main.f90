@@ -2628,7 +2628,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
     	
     	tau_grid_min  = 0 ! Not actually used 
     	tau_grid_max  = 0
-    	tau_grid_step = 0
+    	tau_grid_step = 1
 
     	eta_grid_min  = -00
     	eta_grid_max  = -20
