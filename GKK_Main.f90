@@ -2563,12 +2563,12 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 		if (Opt_Tax_tL) then 
 			Result_Folder = trim(folder_aux)//'Opt_NLKT_tL/'
 		else 
-			Result_Folder = trim(folder_aux)//'Opt_NLKT/'
+			Result_Folder = trim(folder_aux)//'Opt_NLKT_progressive/'
 		endif 
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	! Set flag for reading results or computing optimal taxes
-		read_results = .true.
+		read_results = .false.
 		load_seed    = .false.
 
 	! Set benchmark consumption
@@ -2630,9 +2630,9 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
     	tau_grid_max  = 0
     	tau_grid_step = 1
 
-    	eta_grid_min  = -00
-    	eta_grid_max  = -20
-    	eta_grid_step = -1
+    	eta_grid_min  = 00
+    	eta_grid_max  = 10
+    	eta_grid_step = 1
 
     	! Set initial tauK
     	tauK = tauK_bench
