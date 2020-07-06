@@ -59,7 +59,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -89,7 +89,7 @@ PROGRAM main
 		Opt_Tau_CX = .false.
 
 		Transition_Tax_Reform = .false.
-		Transition_OT = .false.
+		Transition_OT = .true.
 			budget_balance = .true.
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
@@ -4406,14 +4406,14 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		Aprime_exp        = Aprime 
 
 	! Set reference value for psi, tau_K and tau_W
-		psi_0  = psi
+		psi_0  = 1.0_dp - 0.35_dp
 			! OTW with tauL set to 1.0_dp - 0.16989829280240965_dp
 			! OTK with tauL set to 1.0_dp-0.3740_dp
 			! If not using tauL set to psi
 		tauK_0 = tauK 
 		tauW_0 = tauW_at
 
-	Use_Transition_Seed = .false.
+	Use_Transition_Seed = .true.
 
 		
 	if (budget_balance) then 
@@ -4454,7 +4454,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		if (read_results.eqv..false.) then 
 		! Solve for the optimal tax for iterative loops of Debt_Absorption
 
-		DO Debt_Absorption_iter=2,10,2
+		DO Debt_Absorption_iter=6,10,2
 
 			! Set Debt_Absorption
 			Debt_Absorption = real(Debt_Absorption_iter,8)/10.0_dp
