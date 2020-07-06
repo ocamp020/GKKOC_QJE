@@ -95,7 +95,7 @@ PROGRAM main
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 
 		Opt_NLKT = .true.  ! Solve for nonlinear capital income taxes 
-			Opt_Tax_tL = .false. ! If false set curvature and balance budget with level. If true balance with labor income taxes 
+			Opt_Tax_tL = .true. ! If false set curvature and balance budget with level. If true balance with labor income taxes 
 		
 		Simul_Switch  = .false.
 
@@ -2605,11 +2605,11 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
     	CLOSE (unit=77) 
     	
     	tau_grid_min  = -00
-    	tau_grid_max  = -45
-    	tau_grid_step = -1
+    	tau_grid_max  = -20
+    	tau_grid_step = -2
 
-    	eta_grid_min  = -00
-    	eta_grid_max  = -20
+    	eta_grid_min  = -01
+    	eta_grid_max  = -04
     	eta_grid_step = -1
 
     	! Set initial psi
