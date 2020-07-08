@@ -2602,12 +2602,10 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	print*, ' End of compute welfare gain'; print*, ' '
 
 	! Deallocate policy functions on adjusted grid (so that they can be allocated later)
-	deallocate( YGRID_t  )
-	deallocate( MBGRID_t ) 
-	deallocate( Cons_t   )
-	deallocate( Hours_t  )
-	deallocate( Aprime_t )
-
+	if (allocated(YGRID_t)) then 
+		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+	endif 
+	
 
 END SUBROUTINE  COMPUTE_WELFARE_GAIN
 
@@ -4448,7 +4446,9 @@ Function Tax_Reform_Welfare(tk)
 
 
 	! Deallocate variables
+	if (allocated(YGRID_t)) then 
 		deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+	endif 
 
 	! Output variable
 	Tax_Reform_Welfare = Av_Util_NB 

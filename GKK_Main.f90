@@ -838,6 +838,10 @@ Subroutine Solve_Experiment_tktw(budget_flag)
 	logical, intent(in) :: budget_flag
 	character(100) :: folder_aux
 
+	print*,' '; print*,'---------------------------------------------------------------------'
+	print*,'Solve Experiment tk and tw'
+	print*,'---------------------------------------------------------------------'; print*,' '
+
 	! Save base folder
 		folder_aux = Result_Folder
 
@@ -853,8 +857,12 @@ Subroutine Solve_Experiment_tktw(budget_flag)
 	! Change Folder 
 		if (budget_flag) then 
 			Result_Folder = trim(folder_aux)//'Tax_Reform_tktw/Budget_Balance/'
+			print*,' '; print*,'---------------------------------------------------------------------'
+			print*,'Adding wealth taxes balancing the budget with labor income taxes'
 		else 
 			Result_Folder = trim(folder_aux)//'Tax_Reform_tktw/No_Budget_Balance/'
+			print*,' '; print*,'---------------------------------------------------------------------'
+			print*,'Adding wealth taxes without balancing the budget'
 		endif 
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
