@@ -562,7 +562,7 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 	print '(A,F7.4,X,A,F7.4,X,A,F7.4)','	GBAR_NL=',GBAR_NL, 'BT_EARNINGS=',BT_EARNINGS,'A_EARNINGS=',A_EARNINGS 
 	print '(A,F7.4,X,X,A,F7.4,X,X,A,F7.4,X,X,A,F7.4,X,X,A,F7.4,X,X,A,F7.4)',&
 			&'	Tau_L=',100.0_dp*(1.0_dp-psi),'Tau_K=', 100.0_dp*tauK, 'Tau_W=', 100.0_dp*tauW_at,&
-			& 'Tau_C=', 100.0_dp*tauC, 'Tau_BQ=', 100.0_dp*tau_bq, "Threshold", Y_a_threshold
+			& 'Tau_C=', 100.0_dp*tauC, 'Tau_BQ=', 100.0_dp*tau_bq, "Threshold", Y_a_threshold, "eta_K", eta_K
 	print*,'-----------------------------------------------------------------------------'
 	print*, ' '
 
@@ -571,7 +571,7 @@ SUBROUTINE GOVNT_BUDGET_OPT()
 	    IF (  abs(100.0_DP*(1.0_DP-GBAR/GBAR_bench)) .gt. 0.02 ) THEN
 	        !new_psi =  ( BT_EARNINGS - GBAR_bench -  SSC_Payments   + GBAR_NL ) / A_EARNINGS
 	        new_psi = 1.0_dp - (  GBAR_bench + SSC_Payments - GBAR_NL ) / BT_EARNINGS
-	        PRINT*,'NEW PSI=',new_psi,'Old Psi=',psi
+	        PRINT*,'NEW PSI=',new_psi,'Old Psi=',psi,'G_gap=',100.0_DP*(1.0_DP-GBAR/GBAR_bench)
 	        psi = 0.8_dp*new_psi+0.2_dp*psi
 	    ENDIF
 	endif     

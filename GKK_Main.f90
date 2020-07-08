@@ -2569,7 +2569,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .false.
+		load_seed    = .true.
 
 	! Set benchmark consumption
 		CBAR_bench = MeanCons
@@ -2596,7 +2596,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 		print*,''
 		print*,'--------------- OPTIMAL CAPITAL TAXES - changing labor taxes -----------------'
 		print*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt_tl.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt_tl_progressive_2.txt', STATUS='replace')
     	WRITE(UNIT=77, FMT=*) 'eta_K ', 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
 		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ', &
 		      & 'Wealth_Output ', 'prct1_wealth ' , 'prct10_wealth ', 'Std_Log_Earnings ', 'mean_hours ', &
@@ -2604,16 +2604,16 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 	      	  & 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet '
     	CLOSE (unit=77) 
     	
-    	tau_grid_min  = -00
-    	tau_grid_max  = -20
+    	tau_grid_min  = -20
+    	tau_grid_max  = -36
     	tau_grid_step = -2
 
     	eta_grid_min  = 01
-    	eta_grid_max  = 04
+    	eta_grid_max  = 03
     	eta_grid_step = 1
 
     	! Set initial psi
-    	psi = 0.71504496952503_dp ! psi_bench 
+    	psi = 0.67679306938813_dp ! psi_bench 
 	else
 		print*,''
 		print*,'--------------- OPTIMAL CAPITAL TAXES - fixed labor taxes -----------------'
