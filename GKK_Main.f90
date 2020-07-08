@@ -44,7 +44,7 @@ PROGRAM main
 		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices, compute_exp_fixed_prices_and_taxes
 		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R , Tax_Reform_Decomposition
 		logical  :: Transition_Tax_Reform, Transition_OT, budget_balance, balance_tau_L
-		logical  :: Tax_Reform_tau_C, compute_exp_tau_c, Opt_Tax_KW_TR
+		logical  :: Tax_Reform_tau_C, compute_exp_tau_c, Opt_Tax_KW_TR, Tax_Reform_tktw
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -71,6 +71,8 @@ PROGRAM main
 				Fixed_P = .true.
 				Fixed_R = .true.
 
+		Tax_Reform_tktw = .true.
+
 		Tax_Reform_tau_C = .false.
 			compute_exp_tau_c = .true.
 
@@ -89,7 +91,7 @@ PROGRAM main
 		Opt_Tau_CX = .false.
 
 		Transition_Tax_Reform = .false.
-		Transition_OT = .true.
+		Transition_OT = .false.
 			budget_balance = .true.
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
@@ -334,6 +336,10 @@ PROGRAM main
 			endif 
 
 			compute_bench = .false.
+		endif 
+
+		if (Tax_Reform_tktw) then 
+			call Solve_Experiment_tktw
 		endif 
 
 		if (compute_exp_fixed_prices_and_taxes) then
@@ -813,7 +819,118 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 
 end Subroutine Solve_Experiment
 
+!========================================================================================
+!========================================================================================
+!========================================================================================
 
+Subroutine Solve_Experiment_tktw(budget_flag)
+	use parameters
+	use global 
+	use programfunctions
+	use GKK_Stats
+	use Simulation_Module
+	use Toolbox
+	use Opt_Tax_Parameters
+	use Opt_Tax_Functions
+	use omp_lib
+	implicit none 
+	logical, intent(in) :: budget_flag
+	character(100) :: folder_aux
+
+	! Save base folder
+		folder_aux = Result_Folder
+
+	! Load Benchmark Variables
+		call Solve_Benchmark(.false.,.false.)
+		! Change flag 
+		solving_bench=0
+
+	! Change taxes
+		tauK = tauK_bench
+		tauW_at = 0.02_dp 
+
+	! Change Folder 
+		if (budget_flag) then 
+			Result_Folder = trim(folder_aux)//'Tax_Reform_tktw/Budget_Balance/'
+		else 
+			Result_Folder = trim(folder_aux)//'Tax_Reform_tktw/No_Budget_Balance/'
+		endif 
+		call system( 'mkdir -p ' // trim(Result_Folder) )
+
+	! Balance the budget
+	if (budget_flag) then 
+		GBAR_exp = 0.0_dp 
+		DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.01 ) ! as long as the difference is greater than 0.01% continue
+		    CALL FIND_DBN_EQ
+		    CALL GOVNT_BUDGET_OPT
+		    GBAR_exp = GBAR    
+		ENDDO
+	endif 
+
+	! Solve Model 
+		print*,"	Computing equilibrium distribution"
+		CALL FIND_DBN_EQ
+		print*,"	Computing government spending"
+		CALL GOVNT_BUDGET(.true.)
+		print*,"	Computing Value Function"
+		! CALL COMPUTE_VALUE_FUNCTION_SPLINE
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
+		print*,"	Computing Firm Value Function"
+		CALL Firm_Value
+		print*, " 	Computing After Tax Income"
+		CALL Compute_After_Tax_Income
+		print*,"	Saving results in text files to be read later"
+		CALL Write_Experimental_Results(.true.)
+
+	! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+		ValueFunction_exp = ValueFunction
+		Bq_Value_exp      = Bq_Value
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime
+		V_Pr_exp          = V_Pr 
+		V_Pr_nb_exp  	  = V_Pr_nb
+
+		YBAR_C_exp = YBAR_C
+		L_C_exp    = L_C
+		K_C_exp    = K_C
+		YBAR_P_exp = YBAR_P
+		L_P_exp    = L_P
+		K_P_exp    = K_P
+
+	! Compute moments
+		CALL COMPUTE_STATS
+	
+	! Compute welfare gain between economies
+		CALL COMPUTE_WELFARE_GAIN
+		CALL COMPUTE_WELFARE_DECOMPOSITION
+
+	! Write experimental results in output.txt
+		CALL WRITE_VARIABLES(0)
+
+	! Deallocate variables
+		if (allocated(YGRID_t)) then 
+			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+		endif
+
+
+end Subroutine Solve_Experiment_tktw
 
 !========================================================================================
 !========================================================================================
