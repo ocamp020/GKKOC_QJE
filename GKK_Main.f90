@@ -2561,7 +2561,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 	! Save base folder
 		folder_aux = Result_Folder
 		if (Opt_Tax_tL) then 
-			Result_Folder = trim(folder_aux)//'Opt_NLKT_tL_regressive/'
+			Result_Folder = trim(folder_aux)//'Opt_NLKT_tL_progressive/'
 		else 
 			Result_Folder = trim(folder_aux)//'Opt_NLKT_progressive/'
 		endif 
@@ -2604,16 +2604,16 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 	      	  & 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet '
     	CLOSE (unit=77) 
     	
-    	tau_grid_min  = 00
-    	tau_grid_max  = 20
-    	tau_grid_step = 2
+    	tau_grid_min  = -00
+    	tau_grid_max  = -20
+    	tau_grid_step = -2
 
-    	eta_grid_min  = -04
-    	eta_grid_max  = -05
-    	eta_grid_step = -1
+    	eta_grid_min  = 01
+    	eta_grid_max  = 04
+    	eta_grid_step = 1
 
     	! Set initial psi
-    	psi = 0.681558612043434_dp! psi_bench 
+    	psi = 0.71504496952503_dp ! psi_bench 
 	else
 		print*,''
 		print*,'--------------- OPTIMAL CAPITAL TAXES - fixed labor taxes -----------------'
