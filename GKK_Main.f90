@@ -72,7 +72,7 @@ PROGRAM main
 				Fixed_R = .true.
 
 		Tax_Reform_tktw = .true.
-			budget_flag = .false.
+			budget_flag = .true.
 
 		Tax_Reform_tau_C = .false.
 			compute_exp_tau_c = .true.
