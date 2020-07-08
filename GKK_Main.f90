@@ -44,7 +44,7 @@ PROGRAM main
 		logical  :: compute_exp_pf, Fixed_PF, Fixed_PF_interp, Fixed_PF_prices, compute_exp_fixed_prices_and_taxes
 		logical  :: compute_exp_prices, Fixed_W, Fixed_P, Fixed_R , Tax_Reform_Decomposition
 		logical  :: Transition_Tax_Reform, Transition_OT, budget_balance, balance_tau_L
-		logical  :: Tax_Reform_tau_C, compute_exp_tau_c, Opt_Tax_KW_TR, Tax_Reform_tktw
+		logical  :: Tax_Reform_tau_C, compute_exp_tau_c, Opt_Tax_KW_TR, Tax_Reform_tktw, budget_flag
 	! Auxiliary variable for writing file
 		character(4)   :: string_theta
 		character(100) :: folder_aux
@@ -72,6 +72,7 @@ PROGRAM main
 				Fixed_R = .true.
 
 		Tax_Reform_tktw = .true.
+			budget_flag = .false.
 
 		Tax_Reform_tau_C = .false.
 			compute_exp_tau_c = .true.
@@ -339,7 +340,7 @@ PROGRAM main
 		endif 
 
 		if (Tax_Reform_tktw) then 
-			call Solve_Experiment_tktw
+			call Solve_Experiment_tktw(budget_flag)
 		endif 
 
 		if (compute_exp_fixed_prices_and_taxes) then
