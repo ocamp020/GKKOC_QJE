@@ -72,7 +72,7 @@ PROGRAM main
 				Fixed_R = .true.
 
 		Tax_Reform_tktw = .true.
-			budget_flag = .true.
+			budget_flag = .false.
 
 		Tax_Reform_tau_C = .false.
 			compute_exp_tau_c = .true.
@@ -82,7 +82,7 @@ PROGRAM main
 		compute_exp_fixed_prices_and_taxes = .false.
 
 		Opt_Tax       = .false.
-			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
+			Opt_Tax_KW    = .true. ! true=tau_K, false=tau_W
 
 		Opt_Threshold = .false.
 
