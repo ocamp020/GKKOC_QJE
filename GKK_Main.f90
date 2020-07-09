@@ -72,7 +72,7 @@ PROGRAM main
 				Fixed_R = .true.
 
 		Tax_Reform_tktw = .true.
-			budget_flag = .true.
+			budget_flag = .false.
 
 		Tax_Reform_tau_C = .false.
 			compute_exp_tau_c = .true.
@@ -852,15 +852,15 @@ Subroutine Solve_Experiment_tktw(budget_flag)
 
 	! Change taxes
 		tauK = tauK_bench
-		tauW_at = 0.02_dp 
+		tauW_at = 0.0119357175267747_dp ! 0.02_dp 
 
 	! Change Folder 
 		if (budget_flag) then 
-			Result_Folder = trim(folder_aux)//'Tax_Reform_tktw/Budget_Balance/'
+			Result_Folder = trim(folder_aux)//'Tax_Reform_tktw/Budget_Balance_119/'
 			print*,' '; print*,'---------------------------------------------------------------------'
 			print*,'Adding wealth taxes balancing the budget with labor income taxes'
 		else 
-			Result_Folder = trim(folder_aux)//'Tax_Reform_tktw/No_Budget_Balance/'
+			Result_Folder = trim(folder_aux)//'Tax_Reform_tktw/No_Budget_Balance_119/'
 			print*,' '; print*,'---------------------------------------------------------------------'
 			print*,'Adding wealth taxes without balancing the budget'
 		endif 
