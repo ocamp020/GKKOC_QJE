@@ -852,15 +852,15 @@ Subroutine Solve_Experiment_tktw(budget_flag)
 
 	! Change taxes
 		tauK = tauK_bench
-		tauW_at = 0.0119357175267747_dp ! 0.02_dp 
+		tauW_at = 0.0303366758418838_dp ! 0.0119357175267747_dp ! 0.02_dp 
 
 	! Change Folder 
 		if (budget_flag) then 
-			Result_Folder = trim(folder_aux)//'Tax_Reform_tktw/Budget_Balance_119/'
+			Result_Folder = trim(folder_aux)//'Tax_Reform_tktw/Budget_Balance_303/'
 			print*,' '; print*,'---------------------------------------------------------------------'
 			print*,'Adding wealth taxes balancing the budget with labor income taxes'
 		else 
-			Result_Folder = trim(folder_aux)//'Tax_Reform_tktw/No_Budget_Balance_119/'
+			Result_Folder = trim(folder_aux)//'Tax_Reform_tktw/No_Budget_Balance_303/'
 			print*,' '; print*,'---------------------------------------------------------------------'
 			print*,'Adding wealth taxes without balancing the budget'
 		endif 
