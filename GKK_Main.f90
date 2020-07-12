@@ -503,7 +503,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		
 	if (compute_bench) then
 		print*,"	Reading initial conditions from file"
-		CALL Write_Benchmark_Results(.false.)
+		! CALL Write_Benchmark_Results(.false.)
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
 		print*,"	Computing government spending"
