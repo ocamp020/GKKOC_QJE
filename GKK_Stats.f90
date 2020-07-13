@@ -1801,7 +1801,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    ENDDO
 		    WRITE  (UNIT=80, FMT=*) temp_ce_by_z
 		    print*,'age=',age, temp_ce_by_z, ', mean:  ', &
-		       & 100.0_dp*sum(Cons_Eq_Welfare(age,:,:,:,:)*DBN_bench(age,:,:,:,:))/sum(DBN_bench(age,:,:,:,:))
+		       & 100.0_dp*sum(Cons_Eq_Welfare(age,:,:,:,:)*DBN_bench(age,:,:,:,:,:))/sum(DBN_bench(age,:,:,:,:,:))
 		ENDDO
 
 		print*,'Test '
