@@ -2382,8 +2382,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	CLOSE (unit=77) 
     	
-    	tau_grid_min  = 25
-    	tau_grid_max  = 40
+    	tau_grid_min  = 15
+    	tau_grid_max  = 24
     	tau_grid_step = 1
 
     	! Set Y_a_threshold
@@ -2392,7 +2392,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			Wealth_factor = Y_a_threshold/W_bench
 
 		! Set high psi
-		psi = 0.80_dp
+		! psi = 0.80_dp
 	endif 
 
 	! Load results form file for re-starts of the code
@@ -2453,6 +2453,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			OPT_tauK = tauK
 			OPT_tauW = tauW_at
 			OPT_psi  = psi
+
+			! Save variables 
+	    	Call Write_Experimental_Results(.true.)
 		endif
 
 		! Print Results 
@@ -2476,14 +2479,15 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet
 	      	CLOSE (unit=77) 
 
-      	! Save variables 
-	    	Call Write_Experimental_Results(.true.)
+      	
 	enddo 
 	print*,' ';print*,'------------------------------------------------------------------------------'
 	print*,'	End of Optimal Tax Loop'
 		tauK    = OPT_tauK
 		tauW_at = OPT_tauW
 		psi     = OPT_psi
+		! Loadvariables 
+	    	Call Write_Experimental_Results(.false.)
 	print '(A,F7.3,X,A,F7.3,X,A,F7.3)', &
 		&"	Current Optimal Taxes:  tau_K=", 100.0_dp*tauK,"tau_W=",100.0_dp*tauW_at,"tau_L=", 100.0_dp*(1.0_dp-psi)
 	print*,'------------------------------------------------------------------------------';print*,' '
