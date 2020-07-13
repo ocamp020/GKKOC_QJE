@@ -1896,8 +1896,10 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	print*,''
 	print*,'---------------------------'
 	print*, ' CE 1 Computation'
-	print*,' Pop_bench_DBN =',100.0_DP*sum(Cons_Eq_Welfare*DBN_bench),sum(Cons_Eq_Welfare),sum(DBN_bench)
-	print*,' Pop_exp_DBN   =',100.0_DP*sum(Cons_Eq_Welfare*DBN1),sum(Cons_Eq_Welfare),sum(DBN1)
+	print*,' Pop_bench_DBN =',100.0_DP*sum(Cons_Eq_Welfare*DBN_bench),&
+				& sum(ValueFunction_exp*DBN_bench),sum(ValueFunction_Bench*DBN_bench),sum(Bq_Value_bench*DBN_bench)
+	print*,' Pop_exp_DBN   =',100.0_DP*sum(Cons_Eq_Welfare*DBN1),&
+				& sum(ValueFunction_exp*DBN1),sum(ValueFunction_Bench*DBN1),sum(Bq_Value_bench*DBN1)
 	print*,' NB_bench_DBN  =',&
 	    & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
 	print*,' NB_exp_dbn    =',&
@@ -1905,7 +1907,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
     print*,'Frac_Pos_Wel   =',100.0_dp*frac_pos_welfare
 	print*,'---------------------------'
 	print*,''
-
+Cons_Eq_Welfare(age,:,:,:,:,:)=((ValueFunction_exp(age,:,:,:,:,:)-Bq_Value_bench(age,:,:,:,:,:))/&
+		    									& (ValueFunction_Bench(age,:,:,:,:,:)-Bq_Value_bench(a
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	!! Draft Tables
