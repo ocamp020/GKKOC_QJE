@@ -179,11 +179,16 @@ SUBROUTINE COMPUTE_STATS()
 		A_share_top_wealth(5,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(25)) )&
 										& /sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(25) )  
 		do xi=1,nx 
-		Z_share_top_wealth_x(1,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(99)) )/sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(99)),2,nz),3,nx) )  
-		Z_share_top_wealth_x(2,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(95)) )/sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(95)),2,nz),3,nx) )  
-		Z_share_top_wealth_x(3,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(90)) )/sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(90)),2,nz),3,nx) )  
-		Z_share_top_wealth_x(4,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(50)) )/sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(50)),2,nz),3,nx) )  
-		Z_share_top_wealth_x(5,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(25)) )/sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(25)),2,nz),3,nx) )  
+		Z_share_top_wealth_x(1,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(99)) ) & 
+										& /sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(99)),2,nz),3,nx) )  
+		Z_share_top_wealth_x(2,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(95)) ) & 
+										& /sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(95)),2,nz),3,nx) )  
+		Z_share_top_wealth_x(3,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(90)) ) & 
+										& /sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(90)),2,nz),3,nx) )  
+		Z_share_top_wealth_x(4,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(50)) ) & 
+										& /sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(50)),2,nz),3,nx) )  
+		Z_share_top_wealth_x(5,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(25)) ) & 
+										& /sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(25)),2,nz),3,nx) )  
 
 		A_share_top_wealth_x(1,zi,xi) = sum( agrid*DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(99)) )&
 										& /sum( agrid*sum(sum(DBN_azx,2),3) , agrid.ge.prctile_ai(99) )  
