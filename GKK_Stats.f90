@@ -1800,9 +1800,15 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		         temp_ce_by_z(zi) = 100.0_dp*sum(Cons_Eq_Welfare(age,:,zi,:,:,:)*DBN_bench(age,:,zi,:,:,:))/sum(DBN_bench(age,:,zi,:,:,:))
 		    ENDDO
 		    WRITE  (UNIT=80, FMT=*) temp_ce_by_z
-		    !print*,'age=',age, temp_ce_by_z, ', mean:  ', &
-		    !    & 100.0_dp*sum(Cons_Eq_Welfare(age,:,:,:,:)*DBN_bench(age,:,:,:,:))/sum(DBN_bench(age,:,:,:,:))
+		    print*,'age=',age, temp_ce_by_z, ', mean:  ', &
+		       & 100.0_dp*sum(Cons_Eq_Welfare(age,:,:,:,:)*DBN_bench(age,:,:,:,:))/sum(DBN_bench(age,:,:,:,:))
 		ENDDO
+
+		print*,'Test '
+		print*,' Pop_bench_DBN =',100.0_DP*sum(Cons_Eq_Welfare*DBN_bench),&
+				& sum(ValueFunction_exp*DBN_bench),sum(ValueFunction_Bench*DBN_bench),sum(Bq_Value_bench*DBN_bench)
+		print*,' Pop_exp_DBN   =',100.0_DP*sum(Cons_Eq_Welfare*DBN1),&
+				& sum(ValueFunction_exp*DBN1),sum(ValueFunction_Bench*DBN1),sum(Bq_Value_bench*DBN1)
 
 		CE_NEWBORN = 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
 
