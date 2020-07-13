@@ -60,7 +60,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .true.
+			compute_bench = .false.
 			compute_exp   = .true.
 			compute_exp_pf= .false.
 				Fixed_PF        = .true.
@@ -97,7 +97,7 @@ PROGRAM main
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 		
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 
@@ -645,7 +645,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		! Wealth tax: minimum wealth tax to consider and increments for balancing budget
 		tauWmin_bt=0.00_DP
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
-		tauWmin_at=0.010_DP
+		tauWmin_at=0.013_DP
 		tauWinc_at=0.0005_DP ! Minimum tax above threshold and increments
 		if (KeepSSatBench .eq. 0) then
 		tauWmin_at = 0.015_dp
