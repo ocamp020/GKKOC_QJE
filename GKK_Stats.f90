@@ -16,7 +16,7 @@ Module GKK_Stats
 
 
 SUBROUTINE COMPUTE_STATS()
-	use omp_libs
+	use omp_lib
 	IMPLICIT NONE
 	integer  :: prctile, group, i, j, age_group_counter, age2
 	real(DP) :: Capital_by_z(nz), DBN_Z(nz), CDF_Z(nz), DBN_ZX(nz,nx)
