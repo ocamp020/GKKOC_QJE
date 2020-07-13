@@ -1805,7 +1805,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		ENDDO
 
 		print*,'Test X for age=81 and z=8'
-		do age=1:nx 
+		do age=1,nx 
 		print*,age, sum( ( ((ValueFunction_exp(81,:,8,:,:,age)-Bq_Value_bench(81,:,8,:,:,age))/&
 		    									& (ValueFunction_Bench(81,:,8,:,:,age)-Bq_Value_bench(81,:,8,:,:,age)) ) &
                                 				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP )*DBN_bench(81,:,8,:,:,age) )& 
