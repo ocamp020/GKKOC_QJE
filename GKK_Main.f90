@@ -647,7 +647,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		tauWmin_at=0.010_DP
 		tauWinc_at=0.0005_DP ! Minimum tax above threshold and increments
 		if (KeepSSatBench .eq. 0) then
-		tauWmin_at = 0.010_dp
+		tauWmin_at = 0.019_dp
 		tauWinc_at = 0.001_dp
 		endif 
 

@@ -19,7 +19,7 @@ SUBROUTINE COMPUTE_STATS()
 	use omp_lib
 	IMPLICIT NONE
 	integer  :: prctile, group, i, j, age_group_counter, age2
-	real(DP), dimension(nz)    :: Capital_by_z, DBN_Z, CDF_Z
+	real(DP) :: Capital_by_z(nz), DBN_Z(nz), CDF_Z(nz), DBN_XZ(nz,nx)
 	real(DP) :: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz), Mean_Capital
 	real(DP) :: Std_k_Return,    Var_K_Return,    Mean_K_Return_by_z(nz)
 	real(DP) :: Std_AT_K_Return, Var_AT_K_Return, Mean_AT_K_Return_by_z(nz)
@@ -58,6 +58,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: DBN_az(na,nz)
 	real(DP) :: Z_share_top_wealth(draft_age_category,nz), draft_group_share_top_wealth(draft_age_category,draft_z_category), &
 			&	A_share_top_wealth(draft_age_category,nz), draft_group_wealth_share_top_wealth(draft_age_category,draft_z_category) 
+	real(DP) :: Z_share_top_wealth_x(draft_age_category,nz,nx), A_share_top_wealth_x(draft_age_category,nz,nx)
 	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx)
 	integer  :: ind_lo, ind_hi, prctile_ai_ind_age(14)
 	real(DP) :: pct_graph_lim(14), ret_by_wealth(draft_age_category+1,13), pct_graph_wealth(draft_age_category+1,13)
@@ -109,6 +110,8 @@ SUBROUTINE COMPUTE_STATS()
 		do zi=1,nz 
 			CDF_Z(zi) = sum(DBN_Z(1:zi))
 		enddo 
+
+		DBN_XZ = sum(sum(sum(sum(DBN_bench,5),4),2),1) 
 		
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
@@ -156,7 +159,8 @@ SUBROUTINE COMPUTE_STATS()
 		prct40_wealth = 1.0_DP-cdf_tot_a_by_prctile(60)/cdf_tot_a_by_prctile(100)
 
 		! Z Composition of top wealth groups
-		DBN_az = sum(sum(sum(sum(DBN1,6),5),4),1) 
+		DBN_az  = sum(sum(sum(sum(DBN1,6),5),4),1) 
+		DBN_azx = sum(sum(sum(DBN1,5),4),1) 
 		do zi=1,nz 
 		Z_share_top_wealth(1,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(99)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(99)),2,nz) )  
 		Z_share_top_wealth(2,zi) = sum( DBN_az(:,zi) , (agrid.ge.prctile_ai(95)) )/sum( DBN_az , spread((agrid.ge.prctile_ai(95)),2,nz) )  
@@ -174,6 +178,24 @@ SUBROUTINE COMPUTE_STATS()
 										& /sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(50) )  
 		A_share_top_wealth(5,zi) = sum( agrid*DBN_az(:,zi) , (agrid.ge.prctile_ai(25)) )&
 										& /sum( agrid*sum(DBN_az,2) , agrid.ge.prctile_ai(25) )  
+		do xi=1,nx 
+		Z_share_top_wealth(1,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(99)) )/sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(99)),2,nz),3,nx) )  
+		Z_share_top_wealth(2,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(95)) )/sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(95)),2,nz),3,nx) )  
+		Z_share_top_wealth(3,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(90)) )/sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(90)),2,nz),3,nx) )  
+		Z_share_top_wealth(4,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(50)) )/sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(50)),2,nz),3,nx) )  
+		Z_share_top_wealth(5,zi,xi) = sum( DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(25)) )/sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(25)),2,nz),3,nx) )  
+
+		A_share_top_wealth(1,zi,xi) = sum( agrid*DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(99)) )&
+										& /sum(sum( agrid*sum(DBN_azx,2),3) , agrid.ge.prctile_ai(99) )  
+		A_share_top_wealth(2,zi,xi) = sum( agrid*DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(95)) )&
+										& /sum(sum( agrid*sum(DBN_azx,2),3) , agrid.ge.prctile_ai(95) )  
+		A_share_top_wealth(3,zi,xi) = sum( agrid*DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(90)) )&
+										& /sum(sum( agrid*sum(DBN_azx,2),3) , agrid.ge.prctile_ai(90) )  
+		A_share_top_wealth(4,zi,xi) = sum( agrid*DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(50)) )&
+										& /sum(sum( agrid*sum(DBN_azx,2),3) , agrid.ge.prctile_ai(50) )  
+		A_share_top_wealth(5,zi,xi) = sum( agrid*DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(25)) )&
+										& /sum(sum( agrid*sum(DBN_azx,2),3) , agrid.ge.prctile_ai(25) )  
+		enddo 
 		enddo 
 
 		! Composition by draft groups of top wealth groups
@@ -188,6 +210,23 @@ SUBROUTINE COMPUTE_STATS()
 		close(unit=81)
 
 		OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_wealth_share_top_wealth.txt', STATUS='replace') 
+	    do age = 1,draft_age_category
+		    WRITE  (UNIT=81, FMT=*)  draft_group_wealth_share_top_wealth(age,:)
+		ENDDO
+		close(unit=81)
+
+		! Composition by draft groups of top wealth groups
+		draft_group_share_top_wealth        = Draft_Table_X(Z_share_top_wealth_x,DBN_zx,.true.)
+		draft_group_wealth_share_top_wealth = Draft_Table_X(A_share_top_wealth_x,DBN_zx,.true.)
+
+	    ! Write results in file
+	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_share_top_wealth_xz.txt', STATUS='replace') 
+	    do age = 1,draft_age_category
+		    WRITE  (UNIT=81, FMT=*)  draft_group_share_top_wealth(age,:)
+		ENDDO
+		close(unit=81)
+
+		OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_wealth_share_top_wealth_xz.txt', STATUS='replace') 
 	    do age = 1,draft_age_category
 		    WRITE  (UNIT=81, FMT=*)  draft_group_wealth_share_top_wealth(age,:)
 		ENDDO
