@@ -645,7 +645,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		! Wealth tax: minimum wealth tax to consider and increments for balancing budget
 		tauWmin_bt=0.00_DP
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
-		tauWmin_at=0.013_DP
+		tauWmin_at=0.0175_DP
 		tauWinc_at=0.0005_DP ! Minimum tax above threshold and increments
 		if (KeepSSatBench .eq. 0) then
 		tauWmin_at = 0.015_dp
@@ -710,7 +710,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 				print '(A,F10.6,X,X,A,F10.6)','GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
 				print*,''
 				print*,'Bisection for TauW:'
-				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.001 ) ! as long as the difference is greater than 0.1% continue
+				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.002 ) ! as long as the difference is greater than 0.1% continue
 				    if (GBAR_exp .gt. GBAR_bench ) then
 				        tauW_up_bt  = tauW_bt 
 				        tauW_up_at  = tauW_at 
