@@ -2333,6 +2333,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	logical, intent(in) :: Opt_Tax_KW,Simul_Switch
 	integer  :: tau_grid_min, tau_grid_max, tau_grid_step
 	logical  :: read_results, load_seed
+	real(dp) :: MeanCons_bench 
+
+	MeanCons_bench = MeanCons 
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
@@ -2389,7 +2392,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			Wealth_factor = Y_a_threshold/W_bench
 
 		! Set high psi
-		! psi = 0.87_dp
+		psi = 0.80_dp
 	endif 
 
 	! Load results form file for re-starts of the code
