@@ -8,7 +8,7 @@ MODULE parameters
 
     ! Switch for computing social security with benchmark earnings
     	! If KeepSSatBench=1 then E_bar is kept at E_bar_bench for experiments
-    INTEGER(I4B),  PARAMETER :: KeepSSatBench=1 
+    INTEGER(I4B),  PARAMETER :: KeepSSatBench=0
 
 	! Labor efficiency shocks
 		! log(y)=  lambda + kappa + e 

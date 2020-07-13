@@ -59,9 +59,9 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
+		Tax_Reform    = .true.
 			compute_bench = .false.
-			compute_exp   = .false.
+			compute_exp   = .true.
 			compute_exp_pf= .false.
 				Fixed_PF        = .true.
 				Fixed_PF_interp = .true.
@@ -647,8 +647,8 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		tauWmin_at=0.010_DP
 		tauWinc_at=0.0005_DP ! Minimum tax above threshold and increments
 		if (KeepSSatBench .eq. 0) then
-		tauWmin_at = 0.015_dp
-		tauWinc_at = 0.002_dp
+		tauWmin_at = 0.010_dp
+		tauWinc_at = 0.001_dp
 		endif 
 
 	if (compute_exp) then 
