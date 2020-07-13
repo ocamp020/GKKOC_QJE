@@ -1896,8 +1896,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	print*,''
 	print*,'---------------------------'
 	print*, ' CE 1 Computation'
-	print*,' Pop_bench_DBN =',100.0_DP*sum(Cons_Eq_Welfare*DBN_bench)
-	print*,' Pop_exp_DBN   =',100.0_DP*sum(Cons_Eq_Welfare*DBN1)
+	print*,' Pop_bench_DBN =',100.0_DP*sum(Cons_Eq_Welfare*DBN_bench),sum(Cons_Eq_Welfare),sum(DBN_bench)
+	print*,' Pop_exp_DBN   =',100.0_DP*sum(Cons_Eq_Welfare*DBN1),sum(Cons_Eq_Welfare),sum(DBN1)
 	print*,' NB_bench_DBN  =',&
 	    & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
 	print*,' NB_exp_dbn    =',&
