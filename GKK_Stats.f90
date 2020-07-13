@@ -1808,7 +1808,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		do age=1,na 
 		print*,age, ((ValueFunction_exp(81,age,8,3,3,1)-Bq_Value_bench(81,age,8,3,3,1))/&
 		    									& (ValueFunction_Bench(81,age,8,3,3,1)-Bq_Value_bench(81,age,8,3,3,1)) ) &
-                                				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+                                				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP, &
 				& ValueFunction_exp(81,age,8,3,3,1)  -Bq_Value_bench(81,age,8,3,3,1)  , & 
 				& ValueFunction_Bench(81,age,8,3,3,1)-Bq_Value_bench(81,age,8,3,3,1)
 		enddo 
