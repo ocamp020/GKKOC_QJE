@@ -1810,7 +1810,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    									& (ValueFunction_Bench(81,age,8,3,3,1)-Bq_Value_bench(81,age,8,3,3,1)) ) &
                                 				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP, &
 				& ValueFunction_exp(81,age,8,3,3,1)  -Bq_Value_bench(81,age,8,3,3,1)  , & 
-				& ValueFunction_Bench(81,age,8,3,3,1)-Bq_Value_bench(81,age,8,3,3,1), Bq_Value_bench(81,age,8,3,3,1)
+				& ValueFunction_Bench(81,age,8,3,3,1)-Bq_Value_bench(81,age,8,3,3,1),&
+				& Bq_Value_bench(81,age,8,3,3,1), DBN_bench(81,age,8,3,3,1)
 		enddo 
 
 		CE_NEWBORN = 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
