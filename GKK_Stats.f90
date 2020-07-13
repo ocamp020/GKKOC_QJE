@@ -16,10 +16,10 @@ Module GKK_Stats
 
 
 SUBROUTINE COMPUTE_STATS()
-	use omp_lib
+	use omp_libs
 	IMPLICIT NONE
 	integer  :: prctile, group, i, j, age_group_counter, age2
-	real(DP) :: Capital_by_z(nz), DBN_Z(nz), CDF_Z(nz), DBN_XZ(nz,nx)
+	real(DP) :: Capital_by_z(nz), DBN_Z(nz), CDF_Z(nz), DBN_ZX(nz,nx)
 	real(DP) :: MeanATReturn, StdATReturn, VarATReturn, MeanATReturn_by_z(nz), Mean_Capital
 	real(DP) :: Std_k_Return,    Var_K_Return,    Mean_K_Return_by_z(nz)
 	real(DP) :: Std_AT_K_Return, Var_AT_K_Return, Mean_AT_K_Return_by_z(nz)
@@ -111,7 +111,7 @@ SUBROUTINE COMPUTE_STATS()
 			CDF_Z(zi) = sum(DBN_Z(1:zi))
 		enddo 
 
-		DBN_XZ = sum(sum(sum(sum(DBN_bench,5),4),2),1) 
+		DBN_ZX = sum(sum(sum(sum(DBN_bench,5),4),2),1) 
 		
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
@@ -191,15 +191,15 @@ SUBROUTINE COMPUTE_STATS()
 										& /sum( DBN_azx , spread(spread((agrid.ge.prctile_ai(25)),2,nz),3,nx) )  
 
 		A_share_top_wealth_x(1,zi,xi) = sum( agrid*DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(99)) )&
-										& /sum( agrid*sum(sum(DBN_azx,2),3) , agrid.ge.prctile_ai(99) )  
+										& /sum( agrid*sum(sum(DBN_azx,3),2) , agrid.ge.prctile_ai(99) )  
 		A_share_top_wealth_x(2,zi,xi) = sum( agrid*DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(95)) )&
-										& /sum( agrid*sum(sum(DBN_azx,2),3) , agrid.ge.prctile_ai(95) )  
+										& /sum( agrid*sum(sum(DBN_azx,3),2) , agrid.ge.prctile_ai(95) )  
 		A_share_top_wealth_x(3,zi,xi) = sum( agrid*DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(90)) )&
-										& /sum( agrid*sum(sum(DBN_azx,2),3) , agrid.ge.prctile_ai(90) )  
+										& /sum( agrid*sum(sum(DBN_azx,3),2) , agrid.ge.prctile_ai(90) )  
 		A_share_top_wealth_x(4,zi,xi) = sum( agrid*DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(50)) )&
-										& /sum( agrid*sum(sum(DBN_azx,2),3) , agrid.ge.prctile_ai(50) )  
+										& /sum( agrid*sum(sum(DBN_azx,3),2) , agrid.ge.prctile_ai(50) )  
 		A_share_top_wealth_x(5,zi,xi) = sum( agrid*DBN_azx(:,zi,xi) , (agrid.ge.prctile_ai(25)) )&
-										& /sum( agrid*sum(sum(DBN_azx,2),3) , agrid.ge.prctile_ai(25) )  
+										& /sum( agrid*sum(sum(DBN_azx,3),2) , agrid.ge.prctile_ai(25) )  
 		enddo 
 		enddo 
 
