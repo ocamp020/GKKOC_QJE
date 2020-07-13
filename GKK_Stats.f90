@@ -1812,7 +1812,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
                                 				!& /sum(DBN_bench(81,age,8,3,3,1)) ,& 
 				& sum( ((ValueFunction_exp(81,age,8,3,3,1)-Bq_Value_bench(81,age,8,3,3,1)) )*DBN_bench(81,age,8,3,3,1) )& 
                                 				!& /sum(DBN_bench(81,age,8,3,3,1)) , &
-				& sum( ((ValueFunction_Bench(81,age,8,3,3,1)-Bq_Value_bench(81,age,8,3,3,1)) )*DBN_bench(81,age,8,3,3,1) )& 
+				& sum( ((ValueFunction_Bench(81,age,8,3,3,1)-Bq_Value_bench(81,age,8,3,3,1)) )*DBN_bench(81,age,8,3,3,1) )!& 
                                 				!& /sum(DBN_bench(81,age,8,3,3,1))
 		enddo 
 
