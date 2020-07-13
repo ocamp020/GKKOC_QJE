@@ -1800,20 +1800,20 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		         temp_ce_by_z(zi) = 100.0_dp*sum(Cons_Eq_Welfare(age,:,zi,:,:,:)*DBN_bench(age,:,zi,:,:,:))/sum(DBN_bench(age,:,zi,:,:,:))
 		    ENDDO
 		    WRITE  (UNIT=80, FMT=*) temp_ce_by_z
-		    print*,'age=',age, temp_ce_by_z, ', mean:  ', &
-		       & 100.0_dp*sum(Cons_Eq_Welfare(age,:,:,:,:,:)*DBN_bench(age,:,:,:,:,:))/sum(DBN_bench(age,:,:,:,:,:))
+		    ! print*,'age=',age, temp_ce_by_z, ', mean:  ', &
+		    !    & 100.0_dp*sum(Cons_Eq_Welfare(age,:,:,:,:,:)*DBN_bench(age,:,:,:,:,:))/sum(DBN_bench(age,:,:,:,:,:))
 		ENDDO
 
-		print*,'Test X for age=81 and z=8'
-		do age=1,nx 
-		print*,age, sum( ( ((ValueFunction_exp(81,:,8,:,:,age)-Bq_Value_bench(81,:,8,:,:,age))/&
-		    									& (ValueFunction_Bench(81,:,8,:,:,age)-Bq_Value_bench(81,:,8,:,:,age)) ) &
-                                				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP )*DBN_bench(81,:,8,:,:,age) )& 
-                                				& /sum(DBN_bench(81,:,8,:,:,age)) ,& 
-				& sum( ((ValueFunction_exp(81,:,8,:,:,age)-Bq_Value_bench(81,:,8,:,:,age)) )*DBN_bench(81,:,8,:,:,age) )& 
-                                				& /sum(DBN_bench(81,:,8,:,:,age)) , &
-				& sum( ((ValueFunction_Bench(81,:,8,:,:,age)-Bq_Value_bench(81,:,8,:,:,age)) )*DBN_bench(81,:,8,:,:,age) )& 
-                                				& /sum(DBN_bench(81,:,8,:,:,age))
+		print*,'Test X for age=81 and z=8 and x=1'
+		do age=1,na 
+		print*,age, sum( ( ((ValueFunction_exp(81,age,8,3,3,1)-Bq_Value_bench(81,age,8,3,3,1))/&
+		    									& (ValueFunction_Bench(81,age,8,3,3,1)-Bq_Value_bench(81,age,8,3,3,1)) ) &
+                                				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP )*DBN_bench(81,age,8,3,3,1) )& 
+                                				& /sum(DBN_bench(81,age,8,3,3,1)) ,& 
+				& sum( ((ValueFunction_exp(81,age,8,3,3,1)-Bq_Value_bench(81,age,8,3,3,1)) )*DBN_bench(81,age,8,3,3,1) )& 
+                                				& /sum(DBN_bench(81,age,8,3,3,1)) , &
+				& sum( ((ValueFunction_Bench(81,age,8,3,3,1)-Bq_Value_bench(81,age,8,3,3,1)) )*DBN_bench(81,age,8,3,3,1) )& 
+                                				& /sum(DBN_bench(81,age,8,3,3,1))
 		enddo 
 
 		CE_NEWBORN = 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
