@@ -1907,8 +1907,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
     print*,'Frac_Pos_Wel   =',100.0_dp*frac_pos_welfare
 	print*,'---------------------------'
 	print*,''
-Cons_Eq_Welfare(age,:,:,:,:,:)=((ValueFunction_exp(age,:,:,:,:,:)-Bq_Value_bench(age,:,:,:,:,:))/&
-		    									& (ValueFunction_Bench(age,:,:,:,:,:)-Bq_Value_bench(a
+
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	!! Draft Tables
