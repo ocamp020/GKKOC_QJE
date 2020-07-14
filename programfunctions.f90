@@ -2229,7 +2229,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    ENDDO
 	    !$omp barrier
 	    
-	    DBN2 = 0.7_dp*DBN1 + 0.3_dp*DBN2
+	    DBN2 = 0.9_dp*DBN1 + 0.1_dp*DBN2
 	    DBN_dist = maxval(abs(DBN2-DBN1))
 	    ! print*, DBN_dist
 	    DBN1 = DBN2
@@ -2322,7 +2322,7 @@ SUBROUTINE FIND_DBN_EQ()
 		    		P = min(P,1.0_dp)
 		    		R_old = R 
 		            brent_value = brent(-0.1_DP,0.01_DP,1.00_DP,Agg_Debt, brent_tol,R)
-		            R = 0.7*R_old + 0.3*R
+		            R = 0.9*R_old + 0.1*R
 		        else
 		            R = 0.0_DP
 		        endif
