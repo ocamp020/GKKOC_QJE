@@ -2008,7 +2008,7 @@ SUBROUTINE FIND_DBN_EQ()
 	IMPLICIT NONE
 	INTEGER  :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL   	 :: DBN_dist, DBN_criteria
-	REAL(DP) :: BBAR, Wealth, brent_value
+	REAL(DP) :: BBAR, Wealth, brent_value, R_old
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable ::  PrAprimelo, PrAprimehi, PrBqlo, PrBqhi, DBN2
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable ::  Aplo, Aphi, Bqlo, Bqhi
 	! Timing
@@ -2320,7 +2320,9 @@ SUBROUTINE FIND_DBN_EQ()
 		    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
 		    	if (sum(theta)/nz .gt. 1.0_DP) then
 		    		P = min(P,1.0_dp)
-		            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R)
+		    		R_old = R 
+		            brent_value = brent(-0.1_DP,0.01_DP,0.1_DP,Agg_Debt, brent_tol,R)
+		            R = 0.7*R_old + 0.3*R
 		        else
 		            R = 0.0_DP
 		        endif
