@@ -2382,7 +2382,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	CLOSE (unit=77) 
     	
-    	tau_grid_min  = 10
+    	tau_grid_min  = 15
     	tau_grid_max  = 25
     	tau_grid_step = 1
 
