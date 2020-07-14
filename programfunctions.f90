@@ -2321,7 +2321,7 @@ SUBROUTINE FIND_DBN_EQ()
 		    	if (sum(theta)/nz .gt. 1.0_DP) then
 		    		P = min(P,1.0_dp)
 		    		R_old = R 
-		            brent_value = brent(-0.1_DP,0.01_DP,0.15_DP,Agg_Debt, brent_tol,R)
+		            brent_value = brent(-0.1_DP,0.01_DP,1.00_DP,Agg_Debt, brent_tol,R)
 		            R = 0.7*R_old + 0.3*R
 		        else
 		            R = 0.0_DP
