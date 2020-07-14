@@ -1811,7 +1811,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		DO ai=1,na
 		DO lambdai=1,nlambda
 		DO ei=1, ne
-			if isnan(Cons_Eq_Welfare(age,ai,zi,lambdai,ei,xi)).and.(DBN_bench(age,ai,zi,lambdai,ei,xi)<1e-6) then
+			if (isnan(Cons_Eq_Welfare(age,ai,zi,lambdai,ei,xi)).and.(DBN_bench(age,ai,zi,lambdai,ei,xi)<1e-6)) then
 				Cons_Eq_Welfare(age,ai,zi,lambdai,ei,xi) = 0.0_dp
 			endif
 		ENDDO
