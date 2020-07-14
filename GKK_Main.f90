@@ -2338,7 +2338,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	MeanCons_bench = MeanCons 
 
 	! Set flag for reading results or computing optimal taxes
-		read_results = .true.
+		read_results = .false.
 		load_seed    = .false.
 
 
@@ -2382,8 +2382,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	CLOSE (unit=77) 
     	
-    	tau_grid_min  = 15
-    	tau_grid_max  = 24
+    	tau_grid_min  = 10
+    	tau_grid_max  = 25
     	tau_grid_step = 1
 
     	! Set Y_a_threshold
