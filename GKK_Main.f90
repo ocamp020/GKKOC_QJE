@@ -95,7 +95,7 @@ PROGRAM main
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 
 		Opt_NLKT = .true.  ! Solve for nonlinear capital income taxes 
-			Opt_Tax_tL = .true. ! If false set curvature and balance budget with level. If true balance with labor income taxes 
+			Opt_Tax_tL = .false. ! If false set curvature and balance budget with level. If true balance with labor income taxes 
 		
 		Simul_Switch  = .false.
 
@@ -2563,12 +2563,12 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 		if (Opt_Tax_tL) then 
 			Result_Folder = trim(folder_aux)//'Opt_NLKT_tL_progressive/'
 		else 
-			Result_Folder = trim(folder_aux)//'Opt_NLKT_progressive/'
+			Result_Folder = trim(folder_aux)//'Opt_NLKT/'
 		endif 
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	! Set flag for reading results or computing optimal taxes
-		read_results = .false.
+		read_results = .true.
 		load_seed    = .true.
 
 	! Set benchmark consumption

@@ -58,13 +58,14 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: DBN_az(na,nz)
 	real(DP) :: Z_share_top_wealth(draft_age_category,nz), draft_group_share_top_wealth(draft_age_category,draft_z_category), &
 			&	A_share_top_wealth(draft_age_category,nz), draft_group_wealth_share_top_wealth(draft_age_category,draft_z_category) 
-	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), AT_Return(na,nz,nx), DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx)
+	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), AT_Return(na,nz,nx), K_Inc_mat(na,nz,nx),&
+		&  DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx), K_Inc_vec(na*nz*nx)
 	integer  :: ind_lo, ind_hi, prctile_ai_ind_age(14)
 	real(DP) :: pct_graph_lim(14), ret_by_wealth(draft_age_category+1,13), pct_graph_wealth(draft_age_category+1,13)
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
-
+	real(DP), dimension(100) :: K_Inc_pct, Av_K_Tax_Rate_by_pct, Mg_K_Tax_Rate_by_pct
 
 	allocate(DBN_vec(			size(DBN1)))
 	allocate(Firm_Wealth_vec(	size(DBN1)))
@@ -216,6 +217,7 @@ SUBROUTINE COMPUTE_STATS()
 			print*,'	Top  1.00: ai',prctile_ai_ind(99),'Wealth_Share',prct1_wealth
 			print*,'	Top 10.00: ai',prctile_ai_ind(90),'Wealth_Share',prct10_wealth
 		print*,' '
+
 
 	
 	!------------------------------------------------------------------------------------
@@ -416,6 +418,7 @@ SUBROUTINE COMPUTE_STATS()
 		do xi=1,nx 
 		do zi=1,nz
 		do ai=1,na 
+			K_Inc_mat(ai,zi,xi)    = R*agrid(ai)+Pr_mat(ai,zi,xi)
 			BT_Return(ai,zi,xi)    = 100.0_dp*(R+Pr_mat(ai,zi,xi)/agrid(ai))
 			AT_Return(ai,zi,xi)    = 100.0_dp*((1.0_dp-tauK)*(R*agrid(ai)+Pr_mat(ai,zi,xi))**(1.0_dp-eta_K)/agrid(ai)-tauW_at)
 		enddo 
@@ -504,6 +507,75 @@ SUBROUTINE COMPUTE_STATS()
 		print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
 			& ' 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5)
 		print*,'-----------------------------------------------------'; print*, ' '
+
+
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+	! Capital Income Taxes (Average and Marginal Tax Rates by Percentile)
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+
+	! By Percentiles of Assets 
+		do i=1,100
+		 	ai = prctile_ai_ind(i)
+			K_Inc_pct(i) = sum(  R*agrid(ai)+Pr_mat(ai,:,:)*sum(sum(sum(DBN1(:,ai,:,:,:,:),5),4),1) ) & 
+							& /sum( sum(sum(sum(DBN1(:,ai,:,:,:,:),5),4),1) )
+		enddo 
+
+ 		! Get Average and Marginal Taxes
+		Av_K_Tax_Rate_by_pct = 1.0_dp -           (1.0_dp-tauK)*(K_Inc_pct)**(-eta_K)
+		Mg_K_Tax_Rate_by_pct = 1.0_dp - (1-eta_K)*(1.0_dp-tauK)*(K_Inc_pct)**(-eta_K)
+
+		! Print Results 
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'K_Tax_Rates_by_pct_Wealth.txt', STATUS='replace')
+		WRITE(UNIT=11, FMT=*) 'Percentile K_Inc Av_Tax Mg_Tax'
+		do i=1,100
+		WRITE(UNIT=11, FMT=*) i,K_Inc_pct(i),Av_K_Tax_Rate_by_pct(i),Mg_K_Tax_Rate_by_pct(i)
+		enddo 
+		CLOSE(UNIT=11)
+
+
+	! By Percentiles of Capital Income 
+		! Capital Income Vectorization
+		K_Inc_vec  = reshape(K_Inc_mat ,(/size(DBN_azx)/)); 
+
+		! Compute bequest by percentile (percentiles for counter CDF)
+		a = minval(K_Inc_vec)
+		b = maxval(K_Inc_vec) 
+		c = a
+		do i=99,0,-1
+			a = c
+			b = maxval(K_Inc_vec)
+			c = (a+b)/2.0_dp
+			CCDF_c = sum(DBN_azx_vec,K_Inc_vec>=c)
+			!print*, ' '
+			!print*, 'Percentile', prctile_bq(i)
+			do while ((abs(CCDF_c-real(i,8))>0.00001_dp).and.(b-a>1e-9))
+				if (CCDF_c<real(i,8)) then 
+					b = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_vec,K_Inc_vec>=c)
+				else 
+					a = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_vec,K_Inc_vec>=c)
+				endif
+				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+			enddo 
+			K_Inc_pct(100-i) = c 
+		enddo 
+
+		! Get Average and Marginal Taxes
+		Av_K_Tax_Rate_by_pct = 1.0_dp -           (1.0_dp-tauK)*(K_Inc_pct)**(-eta_K)
+		Mg_K_Tax_Rate_by_pct = 1.0_dp - (1-eta_K)*(1.0_dp-tauK)*(K_Inc_pct)**(-eta_K)
+
+		! Print Results 
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'K_Tax_Rates_by_pct_K_Inc.txt', STATUS='replace')
+		WRITE(UNIT=11, FMT=*) 'Percentile K_Inc Av_Tax Mg_Tax'
+		do i=1,100
+		WRITE(UNIT=11, FMT=*) i,K_Inc_pct(i),Av_K_Tax_Rate_by_pct(i),Mg_K_Tax_Rate_by_pct(i)
+		enddo 
+		CLOSE(UNIT=11)
 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
