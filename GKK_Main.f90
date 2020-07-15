@@ -59,9 +59,9 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
-			compute_exp   = .true.
+			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .true.
 				Fixed_PF_interp = .true.
@@ -81,8 +81,8 @@ PROGRAM main
 
 		compute_exp_fixed_prices_and_taxes = .false.
 
-		Opt_Tax       = .false.
-			Opt_Tax_KW    = .true. ! true=tau_K, false=tau_W
+		Opt_Tax       = .true.
+			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
 
 		Opt_Threshold = .false.
 
@@ -372,7 +372,11 @@ PROGRAM main
 			if (Opt_Tax_KW) then 
 				Result_Folder = trim(folder_aux)//'Opt_Tax_K/'
 			else 
+				if (KeepSSatBench .eq. 1) then 
 				Result_Folder = trim(folder_aux)//'Opt_Tax_W/'
+				else 
+				Result_Folder = trim(folder_aux)//'Opt_Tax_W_SS/'
+				endif 
 			endif
 			call system( 'mkdir -p ' // trim(Result_Folder) )
 
@@ -2332,6 +2336,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	logical, intent(in) :: Opt_Tax_KW,Simul_Switch
 	integer  :: tau_grid_min, tau_grid_max, tau_grid_step
 	logical  :: read_results, load_seed
+	real(dp) :: MeanCons_bench
+
+	! Set benchmark consumption
+		MeanCons_bench = MeanCons
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
@@ -2359,7 +2367,6 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
-    	CLOSE (unit=77) 
     	
     	tau_grid_min  = -00
     	tau_grid_max  = -45
@@ -2372,9 +2379,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
-    	CLOSE (unit=77) 
     	
-    	tau_grid_min  = 25
+    	tau_grid_min  = 30
     	tau_grid_max  = 45
     	tau_grid_step = 1
 
@@ -2386,6 +2392,12 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		! Set high psi
 		! psi = 0.87_dp
 	endif 
+    	WRITE(UNIT=77, FMT=*) 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
+		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ', &
+		      & 'Wealth_Output ', 'prct1_wealth ' , 'prct10_wealth ', 'Std_Log_Earnings ', 'mean_hours ', &
+	      	  & 'GBAR ', 'GBAR_K ', 'GBAR_W ', 'GBAR_L ', 'GBAR_C ','Tot_Cap_Inc ', &
+	      	  & 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet '
+      	CLOSE (unit=77) 
 
 	! Load results form file for re-starts of the code
 	if (load_seed) then
@@ -2445,6 +2457,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			OPT_tauK = tauK
 			OPT_tauW = tauW_at
 			OPT_psi  = psi
+
+			! Save variables 
+	    	Call Write_Experimental_Results(.true.)
 		endif
 
 		! Print Results 
@@ -2460,28 +2475,22 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	      	else 
 	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='old', POSITION='append')
 	      	endif 
-		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
-			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-			      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
-				!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-			      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
-			      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
-			      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-			      &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
-			      &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
-			      &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
+		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, (GBAR_K+GBAR_W)/(GBAR_bench +SSC_Payments_bench ), & 
+			      &  MeanWealth, QBAR, QBAR/MeanWealth,NBAR, &
+			      &  YBAR, 100.0_DP*(Y_exp/Y_bench-1.0),MeanCons,100.0_DP*(MeanCons/MeanCons_bench-1.0), &
+			      &  wage, R, &
 			      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB, brentvaluet
+		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Tot_Cap_Inc, Av_Util_Pop, Av_Util_NB, brentvaluet
 	      	CLOSE (unit=77) 
 
-      	! Save variables 
-	    	Call Write_Experimental_Results(.true.)
 	enddo 
 	print*,' ';print*,'------------------------------------------------------------------------------'
 	print*,'	End of Optimal Tax Loop'
 		tauK    = OPT_tauK
 		tauW_at = OPT_tauW
 		psi     = OPT_psi
+		! Load variables 
+	    	Call Write_Experimental_Results(.false.)
 	print '(A,F7.3,X,A,F7.3,X,A,F7.3)', &
 		&"	Current Optimal Taxes:  tau_K=", 100.0_dp*tauK,"tau_W=",100.0_dp*tauW_at,"tau_L=", 100.0_dp*(1.0_dp-psi)
 	print*,'------------------------------------------------------------------------------';print*,' '
@@ -2557,18 +2566,12 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	 	else
 	 	OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w.txt', STATUS='replace')
 	 	endif 
-		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
-		    &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-		    &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
-		!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
-	 	    &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
-	 	    &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
-	 	    &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	 	    &100*( (sum(ValueFunction(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))/sum(DBN1(:,:,:,:,:,:)) /&
-	 	    &sum(ValueFunction_bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))/sum(DBN_bench(:,:,:,:,:,:))) &
-	 	    &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP ) , &
-	 	    & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
-  		    & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Av_Util_Pop, Av_Util_NB
+		WRITE(UNIT=77, FMT=*) tauK, tauW_at, psi, (GBAR_K+GBAR_W)/(GBAR_bench +SSC_Payments_bench ), & 
+		      &  MeanWealth, QBAR, QBAR/MeanWealth,NBAR, &
+		      &  YBAR, 100.0_DP*(Y_exp/Y_bench-1.0),MeanCons,100.0_DP*(MeanCons/MeanCons_bench-1.0), &
+		      &  wage, R, &
+		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
+		  	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Tot_Cap_Inc, Av_Util_Pop, Av_Util_NB, brentvaluet
 		CLOSE (UNIT=77)
 
 	else ! (Read_Results.eqv..true.)
