@@ -518,8 +518,8 @@ SUBROUTINE COMPUTE_STATS()
 	! By Percentiles of Assets 
 		do i=1,100
 		 	ai = prctile_ai_ind(i)
-			K_Inc_pct(i) = sum(  R*agrid(ai)+Pr_mat(ai,:,:)*sum(sum(sum(DBN1(:,ai,:,:,:,:),5),4),1) ) & 
-							& /sum( sum(sum(sum(DBN1(:,ai,:,:,:,:),5),4),1) )
+			K_Inc_pct(i) = sum(  (R*agrid(ai)+Pr_mat(ai,:,:))*DBN_azx(ai,:,:) ) & 
+							& /sum( DBN_azx(ai,:,:) )
 		enddo 
 
  		! Get Average and Marginal Taxes
