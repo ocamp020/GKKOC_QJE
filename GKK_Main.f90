@@ -2561,7 +2561,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 	! Save base folder
 		folder_aux = Result_Folder
 		if (Opt_Tax_tL) then 
-			Result_Folder = trim(folder_aux)//'Opt_NLKT_tL_progressive/'
+			Result_Folder = trim(folder_aux)//'Opt_NLKT_tL/'
 		else 
 			Result_Folder = trim(folder_aux)//'Opt_NLKT/'
 		endif 
