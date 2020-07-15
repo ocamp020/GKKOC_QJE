@@ -530,7 +530,7 @@ SUBROUTINE COMPUTE_STATS()
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'K_Tax_Rates_by_pct_Wealth.txt', STATUS='replace')
 		WRITE(UNIT=11, FMT=*) 'Percentile K_Inc Av_Tax Mg_Tax'
 		do i=1,100
-		WRITE(UNIT=11, FMT=*) i,K_Inc_pct(i),Av_K_Tax_Rate_by_pct(i),Mg_K_Tax_Rate_by_pct(i)
+		WRITE(UNIT=11, FMT=*) i,(EBAR_data/(EBAR_bench*0.727853584919652_dp))*K_Inc_pct(i),Av_K_Tax_Rate_by_pct(i),Mg_K_Tax_Rate_by_pct(i)
 		enddo 
 		CLOSE(UNIT=11)
 
@@ -573,7 +573,7 @@ SUBROUTINE COMPUTE_STATS()
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'K_Tax_Rates_by_pct_K_Inc.txt', STATUS='replace')
 		WRITE(UNIT=11, FMT=*) 'Percentile K_Inc Av_Tax Mg_Tax'
 		do i=1,100
-		WRITE(UNIT=11, FMT=*) i,K_Inc_pct(i),Av_K_Tax_Rate_by_pct(i),Mg_K_Tax_Rate_by_pct(i)
+		WRITE(UNIT=11, FMT=*) i,(EBAR_data/(EBAR_bench*0.727853584919652_dp))*K_Inc_pct(i),Av_K_Tax_Rate_by_pct(i),Mg_K_Tax_Rate_by_pct(i)
 		enddo 
 		CLOSE(UNIT=11)
 
