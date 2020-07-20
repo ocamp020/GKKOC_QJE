@@ -2281,11 +2281,11 @@ SUBROUTINE FIND_DBN_EQ()
 	        	brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt_C, brent_tol,R)
 
 		    	! Total wealth 
-		    	Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+		    	Wealth = sum( sum(sum(sum(sum(sum(DBN1                ,6),5),4),3),1)*agrid )
 
-	        	! Corporate Capital
-        		K_C    = sum( sum(sum(sum(sum(sum(DBN1(:,:,z_C:,:,:,:),6),5),4),3),1) * agrid ) 
-        		K_P    = Wealth - K_C
+	        	! Capital
+        		K_C    = sum( sum(sum(sum(sum(sum(DBN1(:,:,z_C:,:,:,:),6),5),4),3),1)*agrid ) 
+        		K_P    = Wealth - K_C - Debt_Absorption*Debt_SS 
 
 	        	! Update Wage 
 	        	if (alpha_C.eq.alpha) then 
@@ -2303,6 +2303,10 @@ SUBROUTINE FIND_DBN_EQ()
 
 	    		! Check that R_C>R (if not solve the equilibrium with a single interest rate)
 		    	if (R_C.lt.R) then 
+		    		print*,' '; 
+		    		print*,'Interest Rates Not in Order'
+		    		print*,'R',100.0_dp*R,'R_C',100.0_dp*R_C,'brentvalue',brent_value
+
 		        	! Private demand for capital
 		        	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_matrix(R,P))) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
 	        	
