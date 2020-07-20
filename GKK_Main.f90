@@ -130,14 +130,14 @@ PROGRAM main
 
 		! Corporate Sector
 			! A_C    = 0.0_dp ! 
-			A_C    = 0.9590_dp ! for Corp model ! 0.9409_dp (value without estate tax)
+			A_C    = 0.9700_dp ! for Corp model ! 0.9409_dp (value without estate tax)
 
 		if (A_C.eq.0.0_dp) then
 		
 		! Debt/Output = 1.5, lambda = 1.5, no bequest fee
 			! Main Parameters 
-				beta   	= 0.9650_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
-				sigma_z_eps      = 0.300_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+				beta   	= 0.9593_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+				sigma_z_eps      = 0.277_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 				sigma_lambda_eps = 0.309_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
 				gamma  	= 0.4450_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
 				sigma  	= 4.0_dp
@@ -164,8 +164,8 @@ PROGRAM main
 		! Corporate Sector
 
 		! Main Parameters 
-			beta   	= 0.9593_dp 
-			sigma_z_eps      = 0.277_dp 
+			beta   	= 0.9650_dp 
+			sigma_z_eps      = 0.300_dp 
 			sigma_lambda_eps = 0.309_dp
 			gamma  	=  0.4450_dp
 			sigma  	= 4.0_dp
@@ -518,8 +518,8 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL INITIALIZE
 		
 	if (compute_bench) then
-		print*,"	Reading initial conditions from file"
-		CALL Write_Benchmark_Results(.false.)
+		! print*,"	Reading initial conditions from file"
+		! CALL Write_Benchmark_Results(.false.)
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
 		print*,"	Computing government spending"
