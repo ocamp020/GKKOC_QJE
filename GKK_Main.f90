@@ -164,8 +164,8 @@ PROGRAM main
 		! Corporate Sector
 
 		! Main Parameters 
-			beta   	= 0.9650_dp 
-			sigma_z_eps      = 0.350_dp 
+			beta   	= 0.9600_dp 
+			sigma_z_eps      = 0.352_dp 
 			sigma_lambda_eps = 0.309_dp
 			gamma  	=  0.4450_dp
 			sigma  	= 4.0_dp
@@ -173,7 +173,7 @@ PROGRAM main
 		
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 			bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
-			chi_u  = 00.20_dp ! Scaling 03.55_dp (value without estate tax)
+			chi_u  = 00.10_dp ! Scaling 03.55_dp (value without estate tax)
 			chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 		! Capital Market
