@@ -6599,7 +6599,7 @@ Function Agg_Debt(R_in)
 
 end Function Agg_Debt
 
-========================================================================================
+!========================================================================================
 !========================================================================================
 ! This function computes the difference between capital demand and supply
 ! The function uses the interest rate R and implicitely the price of intermediate good P and distribution DBN1
@@ -6632,7 +6632,7 @@ Function Agg_Debt_C(R_in)
 	! print*, '------------',Wealth, Kd, Agg_Debt, R_in, P
 	Agg_Debt_C = (Agg_Debt_C/(Wealth-K_Corp))**2.0_dp
 
-end Function Agg_Debt
+end Function Agg_Debt_C
 
 !========================================================================================
 !========================================================================================
