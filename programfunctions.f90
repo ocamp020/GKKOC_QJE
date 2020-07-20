@@ -7060,6 +7060,7 @@ SUBROUTINE  INITIALIZE()
 
 		! Cut bottom elements of zgrid 
 		CALL Markov_Cut(nz_aux,zgrid_aux,pr_z_aux,Gz_aux,nz_aux-nz,zgrid,pr_z,Gz)
+		print*,'G_z = ',Gz
 
 	! Transitory investment productivity x
 		if (nx.gt.1) then
