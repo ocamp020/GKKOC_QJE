@@ -6607,7 +6607,7 @@ end Function Agg_Debt
 Function Agg_Debt_C(R_in)
 	Implicit None 
 	real(dp), intent(in) :: R_in
-	real(dp)             :: Agg_Debt
+	real(dp)             :: Agg_Debt_C
 	real(dp), dimension(na,nz,nx) :: DBN_azx, K_mat
 	real(dp)             :: Wealth , Kd, K_Corp
 
@@ -6621,16 +6621,16 @@ Function Agg_Debt_C(R_in)
 
 	Kd       = (sum(DBN_azx*(K_mat)))
 
-	Agg_Dept = Kd - (Wealth - K_Corp)
+	Agg_Dept_C = Kd - (Wealth - K_Corp)
 
 	! Adjust with Government Debt
-		Agg_Debt = Agg_Debt + Debt_Absorption*Debt_SS 
+		Agg_Debt_C = Agg_Debt_C + Debt_Absorption*Debt_SS 
 
 	! print*, mu, P, R_in, DepRate
 	! print*, xz_grid(1,5:)
 	! print*, (mu*P*xz_grid(1,5:)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu))
 	! print*, '------------',Wealth, Kd, Agg_Debt, R_in, P
-	Agg_Debt = (Agg_Debt/Wealth)**2.0_dp
+	Agg_Debt_C = (Agg_Debt_C/(Wealth-K_Corp))**2.0_dp
 
 end Function Agg_Debt
 
