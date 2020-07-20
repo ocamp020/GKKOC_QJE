@@ -173,13 +173,13 @@ end Subroutine Asset_Grid_Threshold
          	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
 		endif 
 
-		print*,' '; print*,'------------------------------'
-		print*,'Inside MB_a(',a_in,z_in,x_in,')=',MB_a
-		print*,'R_z(z_in)=',R_z(z_in)
-		print*,'R_z=',R_z
-		print*,'K=',K,'Pr=',PR,'Y_a=',Y_a
-		print*,'P'
-		print*,'------------------------------'; print*,' '
+		! print*,' '; print*,'------------------------------'
+		! print*,'Inside MB_a(',a_in,z_in,x_in,')=',MB_a
+		! print*,'R_z(z_in)=',R_z(z_in)
+		! print*,'R_z=',R_z
+		! print*,'K=',K,'Pr=',PR,'Y_a=',Y_a
+		! print*,'P'
+		! print*,'------------------------------'; print*,' '
 
 	END  FUNCTION MB_a
 
@@ -2056,7 +2056,7 @@ SUBROUTINE FIND_DBN_EQ()
 		YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
 		YBAR   = YBAR_P + YBAR_C
 
-		print*,'initial values:',Wealth,K_P,K_C,L_C,L_P,YBAR,YBAR_P,YBAR_C,P,R,R_C
+		! print*,'initial values:',Wealth,K_P,K_C,L_C,L_P,YBAR,YBAR_P,YBAR_C,P,R,R_C
 	endif ! If A_C=0 then all aggregates must be provided
 
 
