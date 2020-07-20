@@ -173,6 +173,10 @@ end Subroutine Asset_Grid_Threshold
          	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
 		endif 
 
+		print*,' '; print*,'------------------------------'
+		print*,'Inside MB_a(',a_in,z_in,x_in,')=',MB_a
+		print*,'------------------------------'; print*,' '
+
 	END  FUNCTION MB_a
 
 	FUNCTION MB_a_at(a_in,z_in,x_in)
