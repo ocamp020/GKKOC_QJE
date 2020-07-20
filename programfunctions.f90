@@ -123,13 +123,14 @@ end Subroutine Asset_Grid_Threshold
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
-		Y_a = ( a_in +  ( Pr + R*a_in ) *(1.0_DP-tauK) )
+		Y_a = ( a_in +  ( Pr + R_z(z_in)*a_in ) *(1.0_DP-tauK) )
 
 		! Compute after tax wealth according to threshold
 		if (a_in.le.Y_a_threshold) then 
-			Y_a = a_in* (1.0_dp-tauW_bt) + ( Pr + R*a_in ) *(1.0_DP-tauK)  
+			Y_a = a_in* (1.0_dp-tauW_bt) + ( Pr + R_z(z_in)*a_in ) *(1.0_DP-tauK)  
 		else
-			Y_a = Y_a_threshold*(1.0_dp-tauW_bt) + (a_in - Y_a_threshold) * (1.0_dp-tauW_at) + ( Pr + R*a_in ) *(1.0_DP-tauK)
+			Y_a = Y_a_threshold*(1.0_dp-tauW_bt) + &
+				& (a_in - Y_a_threshold) * (1.0_dp-tauW_at) + ( Pr + R_z(z_in)*a_in ) *(1.0_DP-tauK)
 		end if
 	END  FUNCTION Y_a
 
@@ -157,7 +158,7 @@ end Subroutine Asset_Grid_Threshold
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
-		Y_a = ( a_in +  ( Pr + R*a_in ) *(1.0_DP-tauK) )
+		Y_a = ( a_in +  ( Pr + R_z(z_in)*a_in ) *(1.0_DP-tauK) )
 		if (a_in.le.Y_a_threshold) then 
 			tauW = tauW_bt 
 		else
@@ -166,9 +167,9 @@ end Subroutine Asset_Grid_Threshold
 
 		! After tax marginal benefit of assets
 		if (K.lt.theta(z_in)*a_in) then 
-			MB_a = (1.0_dp*(1.0_dp-tauW) + R*(1.0_dp-tauK))
+			MB_a = (1.0_dp*(1.0_dp-tauW) + R_z(z_in)*(1.0_dp-tauK))
 		else 
-			MB_a = (1.0_dp*(1.0_dp-tauW) + R*(1.0_dp-tauK)) &
+			MB_a = (1.0_dp*(1.0_dp-tauW) + R_z(z_in)*(1.0_dp-tauK)) &
          	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
 		endif 
 
@@ -184,9 +185,9 @@ end Subroutine Asset_Grid_Threshold
 		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
 		if (K.lt.theta(z_in)*a_in) then 
-			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK))
+			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R_z(z_in)*(1.0_dp-tauK))
 		else 
-			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK)) &
+			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R_z(z_in)*(1.0_dp-tauK)) &
          	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
 		endif 
 
@@ -202,9 +203,9 @@ end Subroutine Asset_Grid_Threshold
 		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
 		if (K.lt.theta(z_in)*a_in) then 
-			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK))
+			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R_z(z_in)*(1.0_dp-tauK))
 		else 
-			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK)) &
+			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R_z(z_in)*(1.0_dp-tauK)) &
          	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
 		endif 
 
@@ -1900,8 +1901,8 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	DO zi=1,nz
 	DO lambdai=1,nlambda
 	DO ei=1,ne
-	    GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei,xi) * ( tauK*( R*agrid(ai) + Pr_mat(ai,zi,xi) )  	    &
-	          & + ( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi)  &	
+	    GBAR = GBAR + DBN1(age,ai,zi,lambdai,ei,xi) * ( tauK*( R_z(zi)*agrid(ai) + Pr_mat(ai,zi,xi) )  	    &
+	          & + ( agrid(ai) + ( R_z(zi)*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi)  &	
 	          & + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)  									&
 	          & - psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL)  			&
 	          & + tauC  *  cons(age,ai,zi,lambdai,ei,xi)  										    & 
@@ -1911,10 +1912,10 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	    GBAR_L = GBAR_L  + DBN1(age,ai,zi,lambdai,ei,xi) * (  yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi) &
 	               &- psi*(yh(age, lambdai,ei)*Hours(age, ai, zi, lambdai,ei,xi))**(1.0_DP-tauPL) )
 
-	    GBAR_K = GBAR_K + DBN1(age,ai,zi,lambdai,ei,xi) * tauK*( R*agrid(ai) + Pr_mat(ai,zi,xi) )
+	    GBAR_K = GBAR_K + DBN1(age,ai,zi,lambdai,ei,xi) * tauK*( R_z(zi)*agrid(ai) + Pr_mat(ai,zi,xi) )
 
 	    GBAR_W = GBAR_W + DBN1(age,ai,zi,lambdai,ei,xi) * &
-	            & (( agrid(ai) + ( R*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi) )
+	            & (( agrid(ai) + ( R_z(zi)*agrid(ai) + Pr_mat(ai,zi,xi) ) *(1.0_DP-tauK)  ) - YGRID(ai,zi,xi) )
 
       	GBAR_C = GBAR_C +  DBN1(age,ai,zi,lambdai,ei,xi) * tauC * cons(age,ai,zi,lambdai,ei,xi)
 
@@ -1922,7 +1923,7 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 
 	    Tot_Lab_Inc = Tot_Lab_Inc + DBN1(age,ai,zi,lambdai,ei,xi) * yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)
 
-	    Tot_Cap_Inc = Tot_Cap_Inc + DBN1(age,ai,zi,lambdai,ei,xi) * ( R*agrid(ai) + Pr_mat(ai,zi,xi) )
+	    Tot_Cap_Inc = Tot_Cap_Inc + DBN1(age,ai,zi,lambdai,ei,xi) * ( R_z(zi)*agrid(ai) + Pr_mat(ai,zi,xi) )
 	ENDDO
 	ENDDO
 	ENDDO
@@ -2029,16 +2030,18 @@ SUBROUTINE FIND_DBN_EQ()
 	DBN_criteria = 1.00E-07_DP
 
 
-	! Current aggregate values given QBAR and Wage
+	! Current aggregate values given QBAR and Wage and R
 	if (A_C.gt.0.0_dp) then 
-		L_P = ( (1.0_dp-alpha)*Aprod/Wage )**(1.0_dp/alpha) * QBAR 
-		P   = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
-		R   = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
-
-		Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+		L_P    = ( (1.0_dp-alpha)*Aprod/Wage )**(1.0_dp/alpha) * QBAR 
+		P      = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
     	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_Matrix(R,P))) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
-    	K_C    = Wealth - K_P - Debt_Absorption*Debt_SS
+    	
+    	Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+
+    	K_C    = sum( sum(sum(sum(sum(sum(DBN1(:,:,z_C:,:,:,:),6),5),4),3),1) * agrid ) 
     	L_C    = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
+    	R_C    = alpha_C * A_C * (L_C/K_C)**(1.0_dp-alpha_C) - DepRate
+
 		YBAR_P = AProd * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
 		YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
 		YBAR   = YBAR_P + YBAR_C
@@ -2263,50 +2266,86 @@ SUBROUTINE FIND_DBN_EQ()
 
 
 	        if (A_C.gt.0.0_dp) then 
-	        	! Capital Market: Supply of capital and private demand 
-	        	Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
-	        	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_mat)) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
-	        	
-	        	if (Wealth.gt.(K_P+Debt_Absorption*Debt_SS)) then 
-		        	! Corporate demand for capital
-		        	K_C    = Wealth - K_P - Debt_Absorption*Debt_SS
 
-		        	! Update Wage 
-		        	if (alpha_C.eq.alpha) then 
-		        		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
-		        	else 
-		        		print*, ' Solving labor market numerically'
-		        		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage)
-		        		print*, ' New Wage=',Wage,'Error=',brent_value
-		        	endif 
+	        	! Update Interest Rate (using old P)
+	        	brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt_C, brent_tol,R)
 
-	        	else ! Capital Market did not clear
+		    	! Total wealth 
+		    	Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 
-	        		print*, ' ';print*, ' 	Warning! Capital Market Did not Clear!';print*, ' ';
-		        	! Modify prices and quantities 
-		        	QBAR = 0.50_dp*QBAR 
-		        	Wage = Wage 
+	        	! Corporate Capital
+        		K_C    = sum( sum(sum(sum(sum(sum(DBN1(:,:,z_C:,:,:,:),6),5),4),3),1) * agrid ) 
+        		K_P    = Wealth - K_C
 
+	        	! Update Wage 
+	        	if (alpha_C.eq.alpha) then 
+	        		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
+	        	else 
+	        		print*, ' Solving labor market numerically'
+	        		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage)
+	        		print*, ' New Wage=',Wage,'Error=',brent_value
 	        	endif 
 
-	        	! Update other prices and quantities
-        		L_P  = ( (1.0_dp-alpha)*Aprod/Wage )**(1.0_dp/alpha  ) * QBAR 
-        		L_C  = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
-				
-				P    = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
-				R    = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
-				
-				Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+	        	! Update Other Corporate values 
+		    	L_C    = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
+		    	R_C    = alpha_C * A_C * (L_C/K_C)**(1.0_dp-alpha_C) - DepRate
+		    	
+
+	    		! Check that R_C>R (if not solve the equilibrium with a single interest rate)
+		    	if (R_C.lt.R) then 
+		        	! Private demand for capital
+		        	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_matrix(R,P))) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
+	        	
+		        	if (Wealth.gt.(K_P+Debt_Absorption*Debt_SS)) then 
+			        	! Corporate demand for capital
+			        	K_C    = Wealth - K_P - Debt_Absorption*Debt_SS
+
+			        	! Update Wage 
+			        	if (alpha_C.eq.alpha) then 
+			        		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
+			        	else 
+			        		print*, ' Solving labor market numerically'
+			        		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage)
+			        		print*, ' New Wage=',Wage,'Error=',brent_value
+			        	endif 
+
+		        	else ! Capital Market did not clear
+
+		        		print*, ' ';print*, ' 	Warning! Capital Market Did not Clear!';print*, ' ';
+			        	! Modify prices and quantities 
+			        	QBAR = 0.50_dp*QBAR 
+			        	Wage = Wage 
+
+		        	endif 
+
+		        	! Update Interest Rates 
+		        	R    = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
+					R_C  = R 
+
+		    	endif 
+
+
+		    	! Update Output and Aggregates 
+				L_P    = ( (1.0_dp-alpha)*Aprod/Wage )**(1.0_dp/alpha  ) * QBAR 
+				L_C    = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
+				P      = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
+				Ebar   = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 				YBAR_P = AProd * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
 				YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
 				YBAR   = YBAR_P + YBAR_C
+
+	        	
+	        	! Update interest rate vector 
+        		R_z(1:z_C-1) = R 
+        		R_z(z_C:)    = R_C
+
 				! print '(A,F9.3,F9.3,F9.3,X,X,A,F9.3,F9.3,F9.3)',&
 				! 		& ' 				Corp. Sector Levels:', YBAR_C, K_C, L_C , &
 				! 		& ' Ratios ', 100.0_dp*YBAR_C/YBAR, 100.0_dp*K_C/Wealth, 100.0_dp*L_C/NBAR
 
 	        else 
 	        	! Set Corporate values to zero
-        		K_C    = 0.0_dp; L_C    = 0.0_dp; YBAR_C = 0.0_dp
+        		K_C    = 0.0_dp; L_C    = 0.0_dp; YBAR_C = 0.0_dp;  R_C = 0.0_dp 
         		K_P    = 0.0_dp; L_P    = 0.0_dp; YBAR_P = 0.0_dp
         		Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 
@@ -2324,16 +2363,17 @@ SUBROUTINE FIND_DBN_EQ()
 		        else
 		            R = 0.0_DP
 		        endif
+		        	R_z = R
 
 	        endif 
 
 	    	!!
 	    	print 12345, &
 	    		& ' DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
-	    		& 'W=',wage,'R=',R,'P=',P,'Q=',QBAR, &
+	    		& 'W=',wage,'R=',R,'R_C=',R_C,'P=',P,'Q=',QBAR, &
 	    		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'K_C=',K_C,'L_C=',L_C
     		12345 format &
-    		&(A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X)
+    		&(A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X)
 	    	!!
 
 	    	! Solve the model at current aggregate values
@@ -2419,10 +2459,10 @@ SUBROUTINE FIND_DBN_EQ()
 	print*,' 	Stationary Equilibrium Found: '
 	print 12346, &
 		& ' 	DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
-		& 'W=',wage,'R=',R,'P=',P,'Q=',QBAR, &
+		& 'W=',wage,'R=',R,'R_C=',R_C,'P=',P,'Q=',QBAR, &
 		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'Y_C/Y=',100.0_dp*YBAR_C/YBAR,'Iter=',simutime
 	12346 format &
-	& (A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,I5)
+	& (A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,I5)
 	print*,' '; print*,'-----------------------------------------------------------------------------'
 	print*,' '
 
@@ -3236,43 +3276,79 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 	        QBAR = ( QBAR)**(1.0_DP/mu) 
 
 	        if (A_C.gt.0.0_dp) then 
-	        	! Capital Market: Supply of capital and private demand 
-	        	Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
-	        	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_mat)) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
-	        	
-	        	if (Wealth.gt.K_P) then 
-		        	! Corporate demand for capital
-		        	K_C    = Wealth - K_P 
 
-		        	! Update Wage 
-		        	if (alpha_C.eq.alpha) then 
-		        		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
-		        	else 
-		        		print*, ' Solving labor market numerically'
-		        		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage)
-		        		print*, ' New Wage=',Wage,'Error=',brent_value
-		        	endif 
+	        	! Update Interest Rate (using old P)
+	        	brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt_C, brent_tol,R)
 
-	        	else ! Capital Market did not clear
+		    	! Total wealth 
+		    	Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 
-	        		print*, ' ';print*, ' 	Warning! Capital Market Did not Clear!';print*, ' ';
-		        	! Modify prices and quantities 
-		        	QBAR = 0.50_dp*QBAR 
-		        	Wage = Wage 
+	        	! Corporate Capital
+        		K_C    = sum( sum(sum(sum(sum(sum(DBN1(:,:,z_C:,:,:,:),6),5),4),3),1) * agrid ) 
+        		K_P    = Wealth - K_C
 
+	        	! Update Wage 
+	        	if (alpha_C.eq.alpha) then 
+	        		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
+	        	else 
+	        		print*, ' Solving labor market numerically'
+	        		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage)
+	        		print*, ' New Wage=',Wage,'Error=',brent_value
 	        	endif 
 
-	        	! Update other prices and quantities
-        		L_P  = ( (1.0_dp-alpha)*Aprod/Wage )**(1.0_dp/alpha  ) * QBAR 
-        		L_C  = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
-				
-				P    = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
-				R    = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
-				
-				Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+	        	! Update Other Corporate values 
+		    	L_C    = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
+		    	R_C    = alpha_C * A_C * (L_C/K_C)**(1.0_dp-alpha_C) - DepRate
+		    	
+
+	    		! Check that R_C>R (if not solve the equilibrium with a single interest rate)
+		    	if (R_C.lt.R) then 
+		        	! Private demand for capital
+		        	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_matrix(R,P))) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
+	        	
+		        	if (Wealth.gt.(K_P+Debt_Absorption*Debt_SS)) then 
+			        	! Corporate demand for capital
+			        	K_C    = Wealth - K_P - Debt_Absorption*Debt_SS
+
+			        	! Update Wage 
+			        	if (alpha_C.eq.alpha) then 
+			        		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
+			        	else 
+			        		print*, ' Solving labor market numerically'
+			        		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage)
+			        		print*, ' New Wage=',Wage,'Error=',brent_value
+			        	endif 
+
+		        	else ! Capital Market did not clear
+
+		        		print*, ' ';print*, ' 	Warning! Capital Market Did not Clear!';print*, ' ';
+			        	! Modify prices and quantities 
+			        	QBAR = 0.50_dp*QBAR 
+			        	Wage = Wage 
+
+		        	endif 
+
+		        	! Update Interest Rates 
+		        	R    = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
+					R_C  = R 
+
+		    	endif 
+
+
+		    	! Update Output and Aggregates 
+				L_P    = ( (1.0_dp-alpha)*Aprod/Wage )**(1.0_dp/alpha  ) * QBAR 
+				L_C    = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
+				P      = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
+				Ebar   = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 				YBAR_P = AProd * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
 				YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
 				YBAR   = YBAR_P + YBAR_C
+
+	        	
+	        	! Update interest rate vector 
+        		R_z(1:z_C-1) = R 
+        		R_z(z_C:)    = R_C
+
 				! print '(A,F9.3,F9.3,F9.3,X,X,A,F9.3,F9.3,F9.3)',&
 				! 		& ' 				Corp. Sector Levels:', YBAR_C, K_C, L_C , &
 				! 		& ' Ratios ', 100.0_dp*YBAR_C/YBAR, 100.0_dp*K_C/Wealth, 100.0_dp*L_C/NBAR
@@ -3633,45 +3709,79 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 	        QBAR = ( QBAR)**(1.0_DP/mu)                
 
 	        if (A_C.gt.0.0_dp) then 
-	        	! Capital Market: Supply of capital and private demand 
-	        	Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
-	        	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_mat)) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
-	        	
-	        	if (Wealth.gt.K_P) then 
-		        	! Corporate demand for capital
-		        	K_C    = Wealth - K_P 
 
-		        	! Update Wage 
-		        	if (Fixed_W.eqv..false.) then
-		        	if (alpha_C.eq.alpha) then 
-		        		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
-		        	else 
-		        		print*, ' Solving labor market numerically'
-		        		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage)
-		        		print*, ' New Wage=',Wage,'Error=',brent_value
-		        	endif 
-		        	endif 
+	        	! Update Interest Rate (using old P)
+	        	brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt_C, brent_tol,R)
 
-	        	else ! Capital Market did not clear
+		    	! Total wealth 
+		    	Wealth = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 
-	        		print*, ' ';print*, ' 	Warning! Capital Market Did not Clear!';print*, ' ';
-		        	! Modify prices and quantities 
-		        	QBAR = 0.50_dp*QBAR 
-		        	if (Fixed_W.eqv..false.) Wage = Wage 
+	        	! Corporate Capital
+        		K_C    = sum( sum(sum(sum(sum(sum(DBN1(:,:,z_C:,:,:,:),6),5),4),3),1) * agrid ) 
+        		K_P    = Wealth - K_C
 
+	        	! Update Wage 
+	        	if (alpha_C.eq.alpha) then 
+	        		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
+	        	else 
+	        		print*, ' Solving labor market numerically'
+	        		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage)
+	        		print*, ' New Wage=',Wage,'Error=',brent_value
 	        	endif 
 
-	        	! Update other prices and quantities
-        		L_P  = ( (1.0_dp-alpha)*Aprod/Wage )**(1.0_dp/alpha  ) * QBAR 
-        		L_C  = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
-				
-				if (Fixed_P.eqv..false.) P    = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
-				if (Fixed_R.eqv..false.) R    = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
-				
-				Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
+	        	! Update Other Corporate values 
+		    	L_C    = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
+		    	R_C    = alpha_C * A_C * (L_C/K_C)**(1.0_dp-alpha_C) - DepRate
+		    	
+
+	    		! Check that R_C>R (if not solve the equilibrium with a single interest rate)
+		    	if (R_C.lt.R) then 
+		        	! Private demand for capital
+		        	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_matrix(R,P))) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
+	        	
+		        	if (Wealth.gt.(K_P+Debt_Absorption*Debt_SS)) then 
+			        	! Corporate demand for capital
+			        	K_C    = Wealth - K_P - Debt_Absorption*Debt_SS
+
+			        	! Update Wage 
+			        	if (alpha_C.eq.alpha) then 
+			        		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
+			        	else 
+			        		print*, ' Solving labor market numerically'
+			        		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage)
+			        		print*, ' New Wage=',Wage,'Error=',brent_value
+			        	endif 
+
+		        	else ! Capital Market did not clear
+
+		        		print*, ' ';print*, ' 	Warning! Capital Market Did not Clear!';print*, ' ';
+			        	! Modify prices and quantities 
+			        	QBAR = 0.50_dp*QBAR 
+			        	Wage = Wage 
+
+		        	endif 
+
+		        	! Update Interest Rates 
+		        	R    = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
+					R_C  = R 
+
+		    	endif 
+
+
+		    	! Update Output and Aggregates 
+				L_P    = ( (1.0_dp-alpha)*Aprod/Wage )**(1.0_dp/alpha  ) * QBAR 
+				L_C    = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
+				P      = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
+				Ebar   = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 				YBAR_P = AProd * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
 				YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
 				YBAR   = YBAR_P + YBAR_C
+
+	        	
+	        	! Update interest rate vector 
+        		R_z(1:z_C-1) = R 
+        		R_z(z_C:)    = R_C
+
 				! print '(A,F9.3,F9.3,F9.3,X,X,A,F9.3,F9.3,F9.3)',&
 				! 		& ' 				Corp. Sector Levels:', YBAR_C, K_C, L_C , &
 				! 		& ' Ratios ', 100.0_dp*YBAR_C/YBAR, 100.0_dp*K_C/Wealth, 100.0_dp*L_C/NBAR
@@ -6486,6 +6596,41 @@ Function Agg_Debt(R_in)
 	! print*, '------------',Wealth, Kd, Agg_Debt, R_in, P
 	Agg_Debt = (Agg_Debt/Wealth)**2.0_dp
 
+
+end Function Agg_Debt
+
+========================================================================================
+!========================================================================================
+! This function computes the difference between capital demand and supply
+! The function uses the interest rate R and implicitely the price of intermediate good P and distribution DBN1
+
+Function Agg_Debt_C(R_in)
+	Implicit None 
+	real(dp), intent(in) :: R_in
+	real(dp)             :: Agg_Debt
+	real(dp), dimension(na,nz,nx) :: DBN_azx, K_mat
+	real(dp)             :: Wealth , Kd, K_Corp
+
+	DBN_azx  = sum(sum(sum(DBN1,5),4),1)
+
+	Wealth   = sum( sum(sum(sum(sum(sum(DBN1                ,6),5),4),3),1)*agrid )
+
+	K_Corp   = sum( sum(sum(sum(sum(sum(DBN1(:,:,z_C:,:,:,:),6),5),4),3),1)*agrid ) 
+
+	K_mat    = K_matrix(R_in,P)
+
+	Kd       = (sum(DBN_azx*(K_mat)))
+
+	Agg_Dept = Kd - (Wealth - K_Corp)
+
+	! Adjust with Government Debt
+		Agg_Debt = Agg_Debt + Debt_Absorption*Debt_SS 
+
+	! print*, mu, P, R_in, DepRate
+	! print*, xz_grid(1,5:)
+	! print*, (mu*P*xz_grid(1,5:)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu))
+	! print*, '------------',Wealth, Kd, Agg_Debt, R_in, P
+	Agg_Debt = (Agg_Debt/Wealth)**2.0_dp
 
 end Function Agg_Debt
 

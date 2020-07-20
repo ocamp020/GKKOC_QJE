@@ -59,7 +59,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
+		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -81,7 +81,7 @@ PROGRAM main
 
 		compute_exp_fixed_prices_and_taxes = .false.
 
-		Opt_Tax       = .true.
+		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
 
 		Opt_Threshold = .false.
@@ -129,8 +129,8 @@ PROGRAM main
 
 
 		! Corporate Sector
-			A_C    = 0.0_dp ! 
-			! A_C    = 0.9590_dp ! for Corp model ! 0.9409_dp (value without estate tax)
+			! A_C    = 0.0_dp ! 
+			A_C    = 0.9590_dp ! for Corp model ! 0.9409_dp (value without estate tax)
 
 		if (A_C.eq.0.0_dp) then
 		
@@ -156,27 +156,33 @@ PROGRAM main
 			! No bequest fees
 				bq_fee = 0.00_dp
 
+			! Single capital market 
+				z_C = nz
+
 		else
 
-		! Corporate SEctor
+		! Corporate Sector
 
 		! Main Parameters 
-			beta   	= 0.9581_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
-			sigma_z_eps      = 0.09333_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
-			sigma_lambda_eps = 0.314_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
-			gamma  	=  0.4400_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+			beta   	= 0.9593_dp 
+			sigma_z_eps      = 0.277_dp 
+			sigma_lambda_eps = 0.309_dp
+			gamma  	=  0.4450_dp
 			sigma  	= 4.0_dp
-			x_hi	= 5.00_dp
+			x_hi	= 1.50_dp
 		
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 			bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
-			chi_u  = 00.10_dp ! Scaling 03.55_dp (value without estate tax)
+			chi_u  = 00.20_dp ! Scaling 03.55_dp (value without estate tax)
 			chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 		! Capital Market
 			do zi=1,nz
-			theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+			theta(zi)    = 1.00_dp+(2.80_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 			enddo
+
+		! Corporate Market
+			z_C = 7
 
 		endif 
 
@@ -265,10 +271,16 @@ PROGRAM main
 	! Set initia lvalues of R, Wage, Ebar to find equilibrium
 		! ------- DO NOT REMOVE THE LINES BELOW
 		R     =  0.05_dp
+		R_C   =  0.05_dp 
 		P     =  4.906133597851297E-002_dp
 		wage  =  1.97429920063330 
 		Ebar  =  1.82928004963637  
 		Ebar_bench = Ebar
+
+		R_z(1:z_C-1) = R 
+		R_z(z_C:)    = R_C 
+
+
 		 
 
 		! ------- DO NOT REMOVE THE LINES ABOVE
@@ -505,8 +517,8 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL INITIALIZE
 		
 	if (compute_bench) then
-		print*,"	Reading initial conditions from file"
-		CALL Write_Benchmark_Results(.false.)
+		! print*,"	Reading initial conditions from file"
+		! CALL Write_Benchmark_Results(.false.)
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
 		print*,"	Computing government spending"
@@ -544,6 +556,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		Ebar_bench  = EBAR
 		P_bench     = P
 		R_bench     = R
+		R_C_bench   = R_C
 		wage_bench  = wage
 		Y_bench     = YBAR
 		tauK_bench  = tauK
@@ -571,6 +584,8 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		YBAR_P_bench = YBAR_P
 		L_P_bench 	 = L_P
 		K_P_bench    = K_P
+
+		R_z_bench    = R_z 
 
 		print*,"	Computing satitics"
 		CALL COMPUTE_STATS
@@ -760,6 +775,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
@@ -903,6 +919,7 @@ Subroutine Solve_Experiment_tktw(budget_flag)
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
@@ -1143,6 +1160,7 @@ Subroutine Solve_Experiment_tauC(compute_exp,Simul_Switch)
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
@@ -1353,6 +1371,7 @@ Subroutine Solve_Experiment_Fixed_Policy_Functions(compute_exp_pf,Simul_Switch)
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
@@ -1568,6 +1587,7 @@ Subroutine Solve_Experiment_Fixed_PF_Interp (compute_exp_pf_interp,Simul_Switch)
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
@@ -1746,6 +1766,7 @@ Subroutine Solve_Experiment_Fixed_PF_Prices(compute_exp_prices,Simul_Switch)
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
@@ -1933,6 +1954,7 @@ Subroutine Solve_Experiment_Fixed_Prices(compute_exp_prices,Simul_Switch,Fixed_W
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
@@ -2036,6 +2058,7 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 
 		P 			 = P_bench 
 		R 			 = R_bench 
+		R_C 		 = R_C_bench
 		wage 		 = wage_bench 
 		tauK 		 = tauK_bench 
 		tauPL 		 = tauPL_bench 
@@ -2045,6 +2068,8 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 		Cons_bench   = Cons_exp 
 		Hours_bench  = Hours_exp
 		Aprime_bench = Aprime_exp
+
+		R_z          = R_z_bench
 
 
 	!====================================================================================================
@@ -2099,6 +2124,7 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
@@ -2115,6 +2141,10 @@ Subroutine Solve_Experiment_Fixed_Prices_and_Taxes
 		Aprime_exp        = Aprime
 		V_Pr_exp          = V_Pr 
 		V_Pr_nb_exp  	  = V_Pr_nb
+
+		R_z(1:z_C-1) = R 
+		R_z(z_C:)    = R_C 
+    
 
 		! Compute moments
 		CALL COMPUTE_STATS
@@ -2184,11 +2214,14 @@ Subroutine Solve_Tax_Reform_Decomposition
 		
 		P 			 = P_bench
 		R 			 = R_bench 
+		R_C 		 = R_C_bench
 		wage 		 = wage_bench 
 		tauK 		 = tauK_exp
 		tauPL 		 = tauPL_exp
 		tauw_bt      = tauw_bt_exp
 		tauw_at      = tauw_at_exp
+
+		R_z  		 = R_z_bench
 
 		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 
@@ -2213,7 +2246,12 @@ Subroutine Solve_Tax_Reform_Decomposition
 		
 		P 			 = P_exp
 		R 			 = R_exp 
+		R_C 	   	 = R_C_exp
 		wage 		 = wage_exp
+
+		R_z(1:z_C-1) = R 
+		R_z(z_C:)    = R_C 
+
 
 		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 
@@ -2288,6 +2326,7 @@ Subroutine Solve_Interpolated_Economy(YGRID_exp)
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp   = R_C 
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
@@ -2393,7 +2432,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		! psi = 0.87_dp
 	endif 
     	WRITE(UNIT=77, FMT=*) 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
-		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ', &
+		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ','R_C ', &
 		      & 'Wealth_Output ', 'prct1_wealth ' , 'prct10_wealth ', 'Std_Log_Earnings ', 'mean_hours ', &
 	      	  & 'GBAR ', 'GBAR_K ', 'GBAR_W ', 'GBAR_L ', 'GBAR_C ','Tot_Cap_Inc ', &
 	      	  & 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet '
@@ -2426,6 +2465,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			Ebar_exp  = EBAR
 			P_exp     = P
 			R_exp	  = R
+			R_C_exp   = R_C
 			wage_exp  = wage
 			tauK_exp  = tauK
 			tauPL_exp = tauPL
@@ -2478,7 +2518,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, (GBAR_K+GBAR_W)/(GBAR_bench +SSC_Payments_bench ), & 
 			      &  MeanWealth, QBAR, QBAR/MeanWealth,NBAR, &
 			      &  YBAR, 100.0_DP*(Y_exp/Y_bench-1.0),MeanCons,100.0_DP*(MeanCons/MeanCons_bench-1.0), &
-			      &  wage, R, &
+			      &  wage, R, R_C, &
 			      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
 		      	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Tot_Cap_Inc, Av_Util_Pop, Av_Util_NB, brentvaluet
 	      	CLOSE (unit=77) 
@@ -2531,6 +2571,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
@@ -2569,7 +2610,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		WRITE(UNIT=77, FMT=*) tauK, tauW_at, psi, (GBAR_K+GBAR_W)/(GBAR_bench +SSC_Payments_bench ), & 
 		      &  MeanWealth, QBAR, QBAR/MeanWealth,NBAR, &
 		      &  YBAR, 100.0_DP*(Y_exp/Y_bench-1.0),MeanCons,100.0_DP*(MeanCons/MeanCons_bench-1.0), &
-		      &  wage, R, &
+		      &  wage, R, R_C, &
 		      & Wealth_Output, prct1_wealth , prct10_wealth, Std_Log_Earnings_25_60, meanhours_25_60, &
 		  	  & GBAR, GBAR_K, GBAR_W, GBAR_L, GBAR_C, Tot_Cap_Inc, Av_Util_Pop, Av_Util_NB, brentvaluet
 		CLOSE (UNIT=77)
@@ -2595,6 +2636,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
@@ -2609,6 +2651,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		Cons_exp          = Cons           
 		Hours_exp         = Hours
 		Aprime_exp        = Aprime 
+
 
 	! Compute moments
 		CALL COMPUTE_STATS
@@ -2702,6 +2745,7 @@ Subroutine Solve_Opt_Tax_K_and_W(Simul_Switch)
 				Ebar_exp  = EBAR
 				P_exp     = P
 				R_exp	  = R
+				R_C_exp	  = R_C
 				wage_exp  = wage
 				tauK_exp  = tauK
 				tauPL_exp = tauPL
@@ -2740,7 +2784,7 @@ Subroutine Solve_Opt_Tax_K_and_W(Simul_Switch)
 		      
 		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-			      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+			      &  wage, R, R_C, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 				!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
 			      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
 			      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
@@ -2774,7 +2818,7 @@ Subroutine Solve_Opt_Tax_K_and_W(Simul_Switch)
 
 		WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 	      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-	      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+	      &  wage, R, R_C, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 		!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
 	      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
 	      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
@@ -2807,6 +2851,7 @@ Subroutine Solve_Opt_Tax_K_and_W(Simul_Switch)
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
@@ -2927,7 +2972,7 @@ Subroutine Solve_Opt_Threshold
 	
 	OPEN(UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_2.txt', STATUS='replace')
 	WRITE(UNIT=77, FMT=*) 'Threshold_Factor ', 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
-		      & 'MeanWealth ','QBAR ','NBAR ','YBAR ','Y_Growth ', 'wage ', &
+		      & 'MeanWealth ','QBAR ','NBAR ','YBAR ','Y_Growth ', 'wage ', 'R ','R_C ', &
 		      & 'Av_Util_NB ', 'CE2_NB ', 'CE2_Pop ', &
 		      & 'Wealth_Output ', 'prct1_wealth ' , 'prct10_wealth ', 'Std_Log_Earnings ', 'mean_hours ', &
 	      	  & 'GBAR ', 'GBAR_K ', 'GBAR_W ', 'GBAR_L ', 'GBAR_C ', 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet ','Threshold_Share'
@@ -2972,6 +3017,7 @@ Subroutine Solve_Opt_Threshold
 				Ebar_exp  = EBAR
 				P_exp     = P
 				R_exp	  = R
+				R_C_exp	  = R_C
 				wage_exp  = wage
 				tauK_exp  = tauK
 				tauPL_exp = tauPL
@@ -3017,7 +3063,7 @@ Subroutine Solve_Opt_Threshold
 		    OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_2.txt', STATUS='old', POSITION='append')
 		    WRITE  (UNIT=77, FMT=*) Threshold_Factor, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+		      &  wage, R, R_C, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
 		      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
 		      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
@@ -3082,6 +3128,7 @@ Subroutine Solve_Opt_Threshold
 			Ebar_exp  = EBAR
 			P_exp     = P
 			R_exp	  = R
+			R_C_exp	  = R_C
 			wage_exp  = wage
 			tauK_exp  = tauK
 			tauPL_exp = tauPL
@@ -3131,7 +3178,7 @@ Subroutine Solve_Opt_Threshold
 	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_threshold_2.txt', STATUS='old', POSITION='append') 
 	    WRITE  (UNIT=77, FMT=*) Threshold_Factor, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
 	      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-	      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+	      &  wage, R, R_C, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 		!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
 	      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
 	      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
@@ -3181,6 +3228,7 @@ Subroutine Solve_Opt_Threshold
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
@@ -3212,7 +3260,7 @@ Subroutine Solve_Opt_Threshold
 	OPEN  (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_threshold.txt', STATUS='replace')
     WRITE  (UNIT=77, FMT=*) Threshold_Factor, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
       &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+      &  wage, R, R_C, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 	!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
       &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
       &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
@@ -3250,6 +3298,7 @@ Subroutine Solve_Opt_Threshold
 			Ebar_exp  = EBAR
 			P_exp     = P
 			R_exp	  = R
+			R_C_exp	  = R_C
 			wage_exp  = wage
 			tauK_exp  = tauK
 			tauPL_exp = tauPL
@@ -3352,6 +3401,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 				Ebar_exp  = EBAR
 				P_exp     = P
 				R_exp	  = R
+				R_C_exp	  = R_C
 				wage_exp  = wage
 				tauK_exp  = tauK
 				tauPL_exp = tauPL
@@ -3390,7 +3440,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			      
 			    WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-			      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+			      &  wage, R, R_C, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 				!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
 			      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
 			      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
@@ -3433,6 +3483,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			Ebar_exp  = EBAR
 			P_exp     = P
 			R_exp	  = R
+			R_C_exp	  = R_C
 			wage_exp  = wage
 			tauK_exp  = tauK
 			tauPL_exp = tauPL
@@ -3461,7 +3512,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 
 		WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+		      &  wage, R, R_C, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
 		      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
 		      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
@@ -3521,6 +3572,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 				Ebar_exp  = EBAR
 				P_exp     = P
 				R_exp	  = R
+				R_C_exp	  = R_C
 				wage_exp  = wage
 				tauK_exp  = tauK
 				tauPL_exp = tauPL
@@ -3569,7 +3621,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_cons_tax_0.txt', STATUS='old', POSITION='append') 
 			    WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
 			      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-			      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+			      &  wage, R, R_C, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 				!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
 			      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
 			      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
@@ -3611,6 +3663,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 			Ebar_exp  = EBAR
 			P_exp     = P
 			R_exp	  = R
+			R_C_exp	  = R_C
 			wage_exp  = wage
 			tauK_exp  = tauK
 			tauPL_exp = tauPL
@@ -3650,7 +3703,7 @@ Subroutine Solve_Opt_Tau_C(Opt_Tax_KW)
 		OPEN (UNIT=77, FILE=trim(Result_Folder)//'stat_opt_tau_w_cons_tax.txt', STATUS='replace')
 		WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+		      &  wage, R, R_C, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
 		      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
 		      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
@@ -3750,6 +3803,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 			Ebar_exp  = EBAR
 			P_exp     = P
 			R_exp	  = R
+			R_C_exp	  = R_C
 			wage_exp  = wage
 			tauK_exp  = tauK
 			tauPL_exp = tauPL
@@ -3788,7 +3842,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		      
 		    WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+		      &  wage, R, R_C, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
 		      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
 		      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
@@ -3823,6 +3877,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 			Ebar_exp  = EBAR
 			P_exp     = P
 			R_exp	  = R
+			R_C_exp	  = R_C
 			wage_exp  = wage
 			tauK_exp  = tauK
 			tauPL_exp = tauPL
@@ -3861,7 +3916,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		      
 		    WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+		      &  wage,R,R_C, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:)*DBN1(1,:,:,:,:))/sum(DBN1(1,:,:,:,:)), &
 		      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
 		      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
@@ -3890,7 +3945,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 
 		WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+		      &  wage, R, R_C, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
 		      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
 		      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
@@ -3937,6 +3992,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 			Ebar_exp  = EBAR
 			P_exp     = P
 			R_exp	  = R
+			R_C_exp	  = R_C
 			wage_exp  = wage
 			tauK_exp  = tauK
 			tauPL_exp = tauPL
@@ -3975,7 +4031,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		      
 		    WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), &
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+		      &  wage, R, R_C, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
 		      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
 		      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
@@ -4005,7 +4061,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		
 		WRITE  (UNIT=77, FMT=*) tauC, tauK, tauW_at, psi, GBAR_K/(GBAR_bench +SSC_Payments_bench ), & 
 		      &  MeanWealth, QBAR,NBAR, YBAR, 100.0_DP*(Y_exp/Y_bench-1.0), &
-		      &  wage, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
+		      &  wage,R,R_C, sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)),  &
 			!      & 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)), &
 		      &100*( (sum(ValueFunction(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:))/sum(DBN1(1,:,:,:,:,:)) /&
 		      &sum(ValueFunction_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))) &
@@ -4038,6 +4094,7 @@ Subroutine Solve_Opt_Tau_CX(Opt_Tax_KW)
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL
@@ -4250,6 +4307,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 					Ebar_exp  = EBAR
 					P_exp     = P
 					R_exp	  = R
+					R_C_exp	  = R_C
 					wage_exp  = wage
 					tauK_exp  = tauK
 					tauPL_exp = tauPL
@@ -4298,6 +4356,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 					Ebar_exp  = EBAR
 					P_exp     = P
 					R_exp	  = R
+					R_C_exp	  = R_C
 					wage_exp  = wage
 					tauK_exp  = tauK
 					tauPL_exp = tauPL
@@ -4339,6 +4398,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 						Ebar_exp  = EBAR
 						P_exp     = P
 						R_exp	  = R
+						R_C_exp	  = R_C
 						wage_exp  = wage
 						tauK_exp  = tauK
 						tauPL_exp = tauPL
@@ -4395,6 +4455,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 				Ebar_exp  = EBAR
 				P_exp     = P
 				R_exp	  = R
+				R_C_exp	  = R_C
 				wage_exp  = wage
 				tauK_exp  = tauK
 				tauPL_exp = tauPL
@@ -4519,6 +4580,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL

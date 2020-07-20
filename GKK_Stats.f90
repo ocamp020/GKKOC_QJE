@@ -358,9 +358,9 @@ SUBROUTINE COMPUTE_STATS()
 		DO ei=1, ne
 
 			if (age.lt.RetAge) then
-	    	Total_Income(age,ai,zi,lambdai,ei,xi) = R*agrid(ai)+Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)
+	    	Total_Income(age,ai,zi,lambdai,ei,xi) = R_z(zi)*agrid(ai)+Pr_mat(ai,zi,xi) + yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)
 	    	else
-	    	Total_Income(age,ai,zi,lambdai,ei,xi) = R*agrid(ai)+Pr_mat(ai,zi,xi) + RetY_lambda_e(lambdai,ei) 
+	    	Total_Income(age,ai,zi,lambdai,ei,xi) = R_z(zi)*agrid(ai)+Pr_mat(ai,zi,xi) + RetY_lambda_e(lambdai,ei) 
 	    	endif 
 
 		    MeanWealth   = MeanWealth   + DBN1(age, ai, zi, lambdai, ei, xi)*agrid(ai)
@@ -372,9 +372,9 @@ SUBROUTINE COMPUTE_STATS()
 		    Capital_by_z(zi) = Capital_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)
 
 		    MeanReturn           = MeanReturn          + DBN1(age, ai, zi, lambdai, ei, xi) * &
-		    							& (R*agrid(ai) + Pr_mat(ai,zi,xi))
+		    							& (R_z(zi)*agrid(ai) + Pr_mat(ai,zi,xi))
 		    MeanReturn_by_z(zi)  = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * &
-		    							& (R*agrid(ai) + Pr_mat(ai,zi,xi)) 
+		    							& (R_z(zi)*agrid(ai) + Pr_mat(ai,zi,xi)) 
 		    
 		    MeanATReturn           = MeanATReturn          + DBN1(age, ai, zi, lambdai, ei, xi) * (YGRID(ai,zi,xi)-agrid(ai))
 		    MeanATReturn_by_z(zi)  = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * (YGRID(ai,zi,xi)-agrid(ai))
@@ -418,10 +418,10 @@ SUBROUTINE COMPUTE_STATS()
 		DO ei=1, ne  
 
 		    VarReturn    = VarReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
-		    				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/agrid(ai)-MeanReturn)**2.0_dp
+		    				& ((R_z(zi)*agrid(ai) + Pr_mat(ai,zi,xi))/agrid(ai)-MeanReturn)**2.0_dp
 
 		    Var_K_Return = Var_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
-		    				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp
+		    				& ((R_z(zi)*agrid(ai) + Pr_mat(ai,zi,xi))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp
 
 		    VarATReturn  = VarATReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
 		    				& ((YGRID(ai,zi,xi)-agrid(ai))/agrid(ai)-MeanATReturn)**2.0_dp 
@@ -460,7 +460,7 @@ SUBROUTINE COMPUTE_STATS()
 		do xi=1,nx 
 		do zi=1,nz
 		do ai=1,na 
-			BT_Return(ai,zi,xi)    = 100.0_dp*(R+Pr_mat(ai,zi,xi)/agrid(ai))
+			BT_Return(ai,zi,xi)    = 100.0_dp*(R_z(zi)+Pr_mat(ai,zi,xi)/agrid(ai))
 		enddo 
 		enddo 
 		enddo 
@@ -1138,7 +1138,7 @@ SUBROUTINE COMPUTE_STATS()
 		    	else
 		    	L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
 		    	endif 
-		    	K_Inc_aux   = R*agrid(ai) + Pr_mat(ai,zi,xi)
+		    	K_Inc_aux   = R_z(zi)*agrid(ai) + Pr_mat(ai,zi,xi)
 
 		    	! Income by group (total, capital, labor)
 	    		T_Inc_draft_group_z(age,zi) = T_Inc_draft_group_z(age,zi) + (K_Inc_aux + L_Inc_aux)*DBN1(age2,ai,zi,lambdai,ei,xi)
@@ -1348,8 +1348,8 @@ SUBROUTINE COMPUTE_STATS()
 		    		L_Inc_bench = RetY_lambda_e(lambdai,ei)*EBAR_bench/EBAR
 		    		endif 
 		    	endif 
-		    	K_Inc_aux   = R*agrid(ai) + Pr_mat(ai,zi,xi)
-		    	K_Inc_bench = R_bench*agrid(ai) + Pr_mat_bench(ai,zi,xi)
+		    	K_Inc_aux   = R_z(zi)*agrid(ai) + Pr_mat(ai,zi,xi)
+		    	K_Inc_bench = R_z_bench(zi)*agrid(ai) + Pr_mat_bench(ai,zi,xi)
 
 		    	! print*, K_Inc_aux, K_Inc_bench, L_Inc_aux, L_Inc_bench
 
@@ -1696,6 +1696,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		solving_bench = 1
 		tauK    = tauK_bench
 		R       = R_bench
+		R_C     = R_C_bench
 		P       = P_bench
 		wage    = wage_bench
 		Ebar    = Ebar_bench
@@ -1708,6 +1709,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		Cons   = Cons_bench
 		Hours  = Hours_bench
 		Aprime = Aprime_bench
+
+		R_z(1:z_C-1) = R
+		R_z(z_C:)    = R_C 
 
 		! print*,'BENCH: P=',P,'wage=',wage,'Ebar=',Ebar
 		! CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
@@ -1738,6 +1742,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		solving_bench = 0  
 		tauK    = tauK_exp
 		R       = R_exp
+		R_C     = R_C_exp
 		P       = P_exp
 		wage    = wage_exp
 		Ebar    = Ebar_exp
@@ -1751,6 +1756,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		Hours  = Hours_exp
 		Aprime = Aprime_exp
 		DBN1   = DBN_exp 
+
+		R_z(1:z_C-1) = R
+		R_z(z_C:)    = R_C 
 
 		!print*,' EXP: P=',P,'wage=',wage,'Ebar=',Ebar
 		!CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
@@ -3879,10 +3887,12 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			WRITE(UNIT=19, FMT=*) 'P'		, 100.0_dp*P
 			WRITE(UNIT=19, FMT=*) 'wage'	, wage
 			WRITE(UNIT=19, FMT=*) 'R'		, 100.0_dp*R
+			WRITE(UNIT=19, FMT=*) 'R_C'		, 100.0_dp*R_C
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'After_Tax_Prices'
 			WRITE(UNIT=19, FMT=*) 'R_AT' 	, 100.0_dp*(-tauW_at+(1.0_dp-tauK)*R)
 			WRITE(UNIT=19, FMT=*) 'wage_AT' , psi*wage
+			WRITE(UNIT=19, FMT=*) 'R_C_AT' 	, 100.0_dp*(-tauW_at+(1.0_dp-tauK)*R_C)
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Moments:'
 			WRITE(UNIT=19, FMT=*) 'Debt_Output'		  	, External_Debt_GDP
@@ -4033,6 +4043,9 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN  (UNIT=10, FILE=trim(bench_folder)//'R'    , STATUS='replace')
 		WRITE (UNIT=10, FMT=*) R
 		CLOSE (UNIT=10)
+		OPEN  (UNIT=10, FILE=trim(bench_folder)//'R_C'    , STATUS='replace')
+		WRITE (UNIT=10, FMT=*) R_C
+		CLOSE (UNIT=10)
 		OPEN  (UNIT=11, FILE=trim(bench_folder)//'wage'  , STATUS='replace')
 		WRITE (UNIT=11, FMT=*) wage 
 		CLOSE (UNIT=11)
@@ -4074,6 +4087,9 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		WRITE (UNIT=17, FMT=*) K_P
 		CLOSE (UNIT=12); CLOSE (UNIT=13); CLOSE (UNIT=14); CLOSE (UNIT=15); CLOSE (UNIT=16); CLOSE (UNIT=17); 
 
+		R_z(1:z_C-1) = R 
+		R_z(z_C:)    = R_C 
+
 		print*, "Writing of benchmark results completed"; print*, ' '
 	ELSE 
 		OPEN (UNIT=1,  FILE=trim(bench_folder)//'cons'  , STATUS='old', ACTION='read')
@@ -4088,6 +4104,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN (UNIT=9,  FILE=trim(bench_folder)//'QBAR'  , STATUS='old', ACTION='read')
 		OPEN (UNIT=10, FILE=trim(bench_folder)//'P'     , STATUS='old', ACTION='read')
 		OPEN (UNIT=11, FILE=trim(bench_folder)//'R'     , STATUS='old', ACTION='read')
+		OPEN (UNIT=29, FILE=trim(bench_folder)//'R_C'   , STATUS='old', ACTION='read')
 		OPEN (UNIT=12, FILE=trim(bench_folder)//'wage'  , STATUS='old', ACTION='read')
 		OPEN (UNIT=13, FILE=trim(bench_folder)//'YBAR'  , STATUS='old', ACTION='read')
 
@@ -4122,6 +4139,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		READ (UNIT=9,  FMT=*) QBAR
 		READ (UNIT=10, FMT=*) P
 		READ (UNIT=11, FMT=*) R
+		READ (UNIT=29, FMT=*) R_C
 		READ (UNIT=12, FMT=*) wage 
 		READ (UNIT=13, FMT=*) YBAR
 
@@ -4149,6 +4167,7 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		CLOSE (unit=16); CLOSE (unit=17); CLOSE (unit=18); CLOSE (unit=19); !CLOSE (unit=20)
 		CLOSE (unit=21); CLOSE (unit=22); 
 		CLOSE (unit=23); CLOSE (unit=24); CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); CLOSE (unit=28);
+		CLOSE (unit=29);
 
 		print*, "Reading of benchmark results completed"; print*, ' ';
 	END IF 
@@ -4188,6 +4207,8 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		WRITE (UNIT=10, FMT=*) P
 		OPEN  (UNIT=11, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_R'     , STATUS='replace')
 		WRITE (UNIT=11, FMT=*) R
+		OPEN  (UNIT=29, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_R_C'   , STATUS='replace')
+		WRITE (UNIT=29, FMT=*) R_C
 		OPEN  (UNIT=12, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_wage'  , STATUS='replace')
 		WRITE (UNIT=12, FMT=*) wage 
 		OPEN  (UNIT=13, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_YBAR'  , STATUS='replace')
@@ -4230,6 +4251,9 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN  (UNIT=27,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_K_P', STATUS='replace')
 		WRITE (UNIT=27,  FMT=*) K_P
 
+		R_z(1:z_C-1) = R 
+		R_z(z_C:)    = R_C 
+
 		print*, "Writing of experimental results completed"; print*, ' '
 
 	else 
@@ -4246,6 +4270,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN (UNIT=9 , FILE=trim(Result_Folder)//'Exp_Files/Exp_results_QBAR'  	, STATUS='old', ACTION='read')
 		OPEN (UNIT=10, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_P'     	, STATUS='old', ACTION='read')
 		OPEN (UNIT=11, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_R'     	, STATUS='old', ACTION='read')
+		OPEN (UNIT=29, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_R_C'    , STATUS='old', ACTION='read')
 		OPEN (UNIT=12, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_wage'  	, STATUS='old', ACTION='read')
 		OPEN (UNIT=13, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_YBAR'  	, STATUS='old', ACTION='read')
 		OPEN (UNIT=14, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_tauK'	, STATUS='old', ACTION='read')
@@ -4275,6 +4300,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		READ (UNIT=9,  FMT=*) QBAR
 		READ (UNIT=10, FMT=*) P
 		READ (UNIT=11, FMT=*) R
+		READ (UNIT=29, FMT=*) R_C
 		READ (UNIT=12, FMT=*) wage 
 		READ (UNIT=13, FMT=*) YBAR
 		READ (UNIT=14, FMT=*) tauK
@@ -4299,7 +4325,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 	CLOSE (unit=10); CLOSE (unit=11); CLOSE (unit=12); CLOSE (unit=13); CLOSE (unit=14);
 	CLOSE (unit=15); CLOSE (unit=16); CLOSE (unit=17); CLOSE (unit=18); CLOSE (unit=19)
 	CLOSE (unit=20); CLOSE (unit=21); CLOSE (unit=22); CLOSE (unit=23); CLOSE (unit=24); 
-	CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); 
+	CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); CLOSE (unit=29);
 
 END SUBROUTINE Write_Experimental_Results
 
@@ -4463,6 +4489,7 @@ Function Tax_Reform_Welfare(tk)
 		Ebar_exp  = EBAR
 		P_exp     = P
 		R_exp	  = R
+		R_C_exp	  = R_C
 		wage_exp  = wage
 		tauK_exp  = tauK
 		tauPL_exp = tauPL

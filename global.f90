@@ -69,13 +69,16 @@ MODULE global
  
  	! Aggregate variables
 	 	! Benchmark values of Q, N, E, Wage, R, G, Y
-	    REAL(DP) :: QBAR_bench, NBAR_bench, Ebar_bench, wage_bench, P_bench, GBAR_bench, Y_bench, W_bench, R_bench, SSC_Payments_bench
+	    REAL(DP) :: QBAR_bench, NBAR_bench, Ebar_bench, wage_bench, P_bench, GBAR_bench, Y_bench, W_bench, SSC_Payments_bench,&
+                    & R_bench, R_C_bench
 	    ! Experiment values of Q, N, E, Wage, R, G, Y
-	    REAL(DP) :: QBAR_exp,   NBAR_exp,   Ebar_exp,   wage_exp,   P_exp,   GBAR_exp, GBAR_exp_old, Y_exp, R_exp,Debt_exp
+	    REAL(DP) :: QBAR_exp,   NBAR_exp,   Ebar_exp,   wage_exp,   P_exp,   GBAR_exp, GBAR_exp_old, Y_exp, Debt_exp & 
+                    & R_exp, R_C_exp
 	    ! Values for aggregate variables (used when solving a given economy)
-	    REAL(DP) :: P, Ebar , wage, NBAR, QBAR, YBAR, GBAR, R, SSC_Payments, L_P, L_C, K_P, K_C, YBAR_P, YBAR_C
+	    REAL(DP) :: P, Ebar , wage, NBAR, QBAR, YBAR, GBAR, R, R_C, SSC_Payments, L_P, L_C, K_P, K_C, YBAR_P, YBAR_C
         REAL(DP) :: L_P_bench, L_C_bench, K_P_bench, K_C_bench, YBAR_P_bench, YBAR_C_bench
         REAL(DP) :: L_P_exp, L_C_exp, K_P_exp, K_C_exp, YBAR_P_exp, YBAR_C_exp
+        REAL(DP) :: R_z(nz), z_C, R_z_bench(nz)
 	    ! Wealth tax threshold as proportion of mean benchmark wealth
 	    REAL(DP) :: Wealth_factor, Threshold_Share
 
