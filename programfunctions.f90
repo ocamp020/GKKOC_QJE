@@ -175,6 +175,9 @@ end Subroutine Asset_Grid_Threshold
 
 		print*,' '; print*,'------------------------------'
 		print*,'Inside MB_a(',a_in,z_in,x_in,')=',MB_a
+		print*,'R_z(z_in)=',R_z(z_in)
+		print*,'R_z=',R_z
+		print*,'K=',K,'Pr=',PR,'Y_a=',Y_a
 		print*,'------------------------------'; print*,' '
 
 	END  FUNCTION MB_a
@@ -1095,7 +1098,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			! Usual EGM
 			call EGM_Working_Period( MBGRID_t(ai,zi,:) , H_min , state_FOC , & 
 			      & EndoCons(ai), EndoHours(ai) , EndoYgrid(ai)  )
-			print*, ' '; print*, 'Test MB=',MBGRID_t(ai,zi,:); print*, ' '
+			! print*, ' '; print*, 'Test MB=',MBGRID_t(ai,zi,:); print*, ' '
 		end if 
 
     	ENDDO ! ai
