@@ -1101,6 +1101,8 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			print*, "isnan - Consumption endogenous"
 			print*, age,zi,ai,lambdai,ei,xi
 			print*, EndoCons
+			print*, wage, R, R_C 
+			print*, R_z 
 			STOP 
 		end if 
 		! !$omp end critical
@@ -7060,7 +7062,7 @@ SUBROUTINE  INITIALIZE()
 
 		! Cut bottom elements of zgrid 
 		CALL Markov_Cut(nz_aux,zgrid_aux,pr_z_aux,Gz_aux,nz_aux-nz,zgrid,pr_z,Gz)
-		print*,'G_z = ',Gz
+		! print*,'G_z = ',Gz
 
 	! Transitory investment productivity x
 		if (nx.gt.1) then

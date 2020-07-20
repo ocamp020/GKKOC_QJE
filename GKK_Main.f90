@@ -182,7 +182,7 @@ PROGRAM main
 			enddo
 
 		! Corporate Market
-			z_C = 6
+			z_C = 5
 
 		endif 
 
