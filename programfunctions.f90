@@ -6621,7 +6621,8 @@ Function Agg_Debt_C(R_in)
 
 	Kd       = (sum(DBN_azx*(K_mat)))
 
-	Agg_Dept_C = Kd - (Wealth - K_Corp)
+	! Debt as difference between private demand supply of assets
+	Agg_Debt_C = Kd - (Wealth - K_Corp)
 
 	! Adjust with Government Debt
 		Agg_Debt_C = Agg_Debt_C + Debt_Absorption*Debt_SS 
