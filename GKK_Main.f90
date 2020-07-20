@@ -164,8 +164,8 @@ PROGRAM main
 		! Corporate Sector
 
 		! Main Parameters 
-			beta   	= 0.9605_dp 
-			sigma_z_eps      = 0.359_dp 
+			beta   	= 0.9610_dp 
+			sigma_z_eps      = 0.361_dp 
 			sigma_lambda_eps = 0.309_dp
 			gamma  	=  0.4450_dp
 			sigma  	= 4.0_dp
