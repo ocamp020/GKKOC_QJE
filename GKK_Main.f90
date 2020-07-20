@@ -165,9 +165,9 @@ PROGRAM main
 
 		! Main Parameters 
 			beta   	= 0.9613_dp 
-			sigma_z_eps      = 0.363_dp 
-			sigma_lambda_eps = 0.309_dp
-			gamma  	=  0.4450_dp
+			sigma_z_eps      = 0.367_dp 
+			sigma_lambda_eps = 0.311_dp
+			gamma  	=  0.4470_dp
 			sigma  	= 4.0_dp
 			x_hi	= 1.50_dp
 		
