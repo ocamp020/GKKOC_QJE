@@ -178,6 +178,7 @@ end Subroutine Asset_Grid_Threshold
 		print*,'R_z(z_in)=',R_z(z_in)
 		print*,'R_z=',R_z
 		print*,'K=',K,'Pr=',PR,'Y_a=',Y_a
+		print*,'P'
 		print*,'------------------------------'; print*,' '
 
 	END  FUNCTION MB_a
@@ -2055,7 +2056,7 @@ SUBROUTINE FIND_DBN_EQ()
 		YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
 		YBAR   = YBAR_P + YBAR_C
 
-		! print*,'initial values:',Wealth,K_P,K_C,L_C,L_P,YBAR,YBAR_P,YBAR_C,P,R
+		print*,'initial values:',Wealth,K_P,K_C,L_C,L_P,YBAR,YBAR_P,YBAR_C,P,R,R_C
 	endif ! If A_C=0 then all aggregates must be provided
 
 

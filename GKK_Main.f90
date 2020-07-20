@@ -276,6 +276,7 @@ PROGRAM main
 		wage  =  1.97429920063330 
 		Ebar  =  1.82928004963637  
 		Ebar_bench = Ebar
+		QBAR  =  3.00
 
 		R_z(1:z_C-1) = R 
 		R_z(z_C:)    = R_C 
