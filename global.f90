@@ -72,7 +72,7 @@ MODULE global
 	    REAL(DP) :: QBAR_bench, NBAR_bench, Ebar_bench, wage_bench, P_bench, GBAR_bench, Y_bench, W_bench, SSC_Payments_bench,&
                     & R_bench, R_C_bench
 	    ! Experiment values of Q, N, E, Wage, R, G, Y
-	    REAL(DP) :: QBAR_exp,   NBAR_exp,   Ebar_exp,   wage_exp,   P_exp,   GBAR_exp, GBAR_exp_old, Y_exp, Debt_exp & 
+	    REAL(DP) :: QBAR_exp,   NBAR_exp,   Ebar_exp,   wage_exp,   P_exp,   GBAR_exp, GBAR_exp_old, Y_exp, Debt_exp, & 
                     & R_exp, R_C_exp
 	    ! Values for aggregate variables (used when solving a given economy)
 	    REAL(DP) :: P, Ebar , wage, NBAR, QBAR, YBAR, GBAR, R, R_C, SSC_Payments, L_P, L_C, K_P, K_C, YBAR_P, YBAR_C
