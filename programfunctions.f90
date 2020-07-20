@@ -1091,7 +1091,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			! Usual EGM
 			call EGM_Working_Period( MBGRID_t(ai,zi,:) , H_min , state_FOC , & 
 			      & EndoCons(ai), EndoHours(ai) , EndoYgrid(ai)  )
-	
+			print*, ' '; print*, 'Test MB=',MBGRID_t(ai,zi,:); print*, ' '
 		end if 
 
     	ENDDO ! ai
@@ -1101,8 +1101,8 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			print*, "isnan - Consumption endogenous"
 			print*, age,zi,ai,lambdai,ei,xi
 			print*, EndoCons
-			print*, wage, R, R_C 
-			print*, R_z 
+			print*, 'wage, R, R_C',wage, R, R_C 
+			print*, 'R_z',R_z 
 			STOP 
 		end if 
 		! !$omp end critical
