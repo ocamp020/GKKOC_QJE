@@ -130,7 +130,7 @@ PROGRAM main
 
 		! Corporate Sector
 			! A_C    = 0.0_dp ! 
-			A_C    = 1.1200_dp ! for Corp model ! 0.9409_dp (value without estate tax)
+			A_C    = 1.1300_dp ! for Corp model ! 0.9409_dp (value without estate tax)
 
 		if (A_C.eq.0.0_dp) then
 		
@@ -164,8 +164,8 @@ PROGRAM main
 		! Corporate Sector
 
 		! Main Parameters 
-			beta   	= 0.9610_dp 
-			sigma_z_eps      = 0.361_dp 
+			beta   	= 0.9613_dp 
+			sigma_z_eps      = 0.363_dp 
 			sigma_lambda_eps = 0.309_dp
 			gamma  	=  0.4450_dp
 			sigma  	= 4.0_dp
