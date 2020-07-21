@@ -4087,9 +4087,6 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		WRITE (UNIT=17, FMT=*) K_P
 		CLOSE (UNIT=12); CLOSE (UNIT=13); CLOSE (UNIT=14); CLOSE (UNIT=15); CLOSE (UNIT=16); CLOSE (UNIT=17); 
 
-		R_z(1:z_C-1) = R 
-		R_z(z_C:)    = R_C 
-
 		print*, "Writing of benchmark results completed"; print*, ' '
 	ELSE 
 		OPEN (UNIT=1,  FILE=trim(bench_folder)//'cons'  , STATUS='old', ACTION='read')
@@ -4168,6 +4165,9 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		CLOSE (unit=21); CLOSE (unit=22); 
 		CLOSE (unit=23); CLOSE (unit=24); CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); CLOSE (unit=28);
 		CLOSE (unit=29);
+
+		R_z(1:z_C-1) = R 
+		R_z(z_C:)    = R_C 
 
 		print*, "Reading of benchmark results completed"; print*, ' ';
 	END IF 
@@ -4251,8 +4251,6 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN  (UNIT=27,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_K_P', STATUS='replace')
 		WRITE (UNIT=27,  FMT=*) K_P
 
-		R_z(1:z_C-1) = R 
-		R_z(z_C:)    = R_C 
 
 		print*, "Writing of experimental results completed"; print*, ' '
 
@@ -4318,6 +4316,9 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		READ (UNIT=26, FMT=*) L_P 
 		READ (UNIT=27, FMT=*) K_P 
 		print*, "Reading of experimental results completed"; print*, ' '
+
+		R_z(1:z_C-1) = R 
+		R_z(z_C:)    = R_C 
 	endif 
 
 	CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=70);
