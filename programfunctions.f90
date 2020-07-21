@@ -1981,7 +1981,8 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	print '(A,F7.3)', ' 	Labor_Tax/GDP        =', 100.0_dp*GBAR_L/YBAR
 	print '(A,F7.3)', ' 	Average Labor Tax    =', 100.0_dp*GBAR_L/Tot_Lab_Inc
 	print '(A,F7.3)', ' 	Estate_Tax/GDP       =', 100.0_dp*GBAR_BQ/YBAR
-	print '(A,F7.3,X,X,A,F7.3)', ' 		Total Labor Income=', Tot_Lab_Inc , 'EBAR=', EBAR
+	print '(A,F7.3,X,X,A,F7.3)', ' 		Total Labor Income  =', Tot_Lab_Inc , 'EBAR=', EBAR
+	print '(A,F7.3,X,X,A,F7.3)', ' 		Total Capital Income=', Tot_Cap_Inc , 'EBAR=', alpha*YBAR - DepRate*MeanWealth
 	print*,'-----------------------------------------------------------------------------'
 	print*, ' '
 
