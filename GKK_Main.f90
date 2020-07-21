@@ -2382,7 +2382,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		MeanCons_bench = MeanCons
 
 	! Set flag for reading results or computing optimal taxes
-		read_results = .false.
+		read_results = .true.
 		load_seed    = .true.
 
 
