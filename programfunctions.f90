@@ -2310,9 +2310,7 @@ SUBROUTINE FIND_DBN_EQ()
 
 	    		! Check that R_C>R (if not solve the equilibrium with a single interest rate)
 		    	if (R_C.lt.R) then 
-		    		print*,' '; 
-		    		print*,'Interest Rates Not in Order'
-		    		print*,'R',100.0_dp*R,'R_C',100.0_dp*R_C,'brentvalue',brent_value
+		    		print*,' 		Interest Rates Not in Order:  R=',100.0_dp*R,'R_C=',100.0_dp*R_C!,'brentvalue',brent_value
 
 		        	! Private demand for capital
 		        	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_matrix(R,P))) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
@@ -2342,6 +2340,8 @@ SUBROUTINE FIND_DBN_EQ()
 		        	! Update Interest Rates 
 		        	R    = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
 					R_C  = R 
+					print*,' 		New Interest Rate=',100.0_dp*R,&
+						& 100.0_dp*alpha*(( (1.0_dp-alpha_C)*A_C/Wage )**((1.0_dp-alpha)/alpha_C))*K_C*A_C
 
 		    	endif 
 
@@ -2393,8 +2393,8 @@ SUBROUTINE FIND_DBN_EQ()
 	    		& ' DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
 	    		& 'W=',wage,'R=',R,'R_C=',R_C,'P=',P,'Q=',QBAR, &
 	    		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'K_C=',K_C,'L_C=',L_C
-    		print 12347,' 		K_C=',K_C,'K_P=',K_P,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),'K_C+K_P=',K_P+K_C
-			print 12347,' 		L_C=',L_C,'L_P=',L_P,'N=',NBAR,'L_C+L_P=',L_C+L_P
+   !  		print 12347,' 		K_C=',K_C,'K_P=',K_P,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),'K_C+K_P=',K_P+K_C
+			! print 12347,' 		L_C=',L_C,'L_P=',L_P,'N=',NBAR,'L_C+L_P=',L_C+L_P
     		12345 format &
     		&(A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X)
     		12347 format &
@@ -2486,8 +2486,8 @@ SUBROUTINE FIND_DBN_EQ()
 		& ' 	DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
 		& 'W=',wage,'R=',R,'R_C=',R_C,'P=',P,'Q=',QBAR, &
 		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'Y_C/Y=',100.0_dp*YBAR_C/YBAR,'Iter=',simutime
-	print 12347,' 		K_C=',K_C,'K_P=',K_P,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),'K_C+K_P=',K_P+K_C
-	print 12347,' 		L_C=',L_C,'L_P=',L_P,'N=',NBAR,'L_C+L_P=',L_C+L_P
+	! print 12347,' 		K_C=',K_C,'K_P=',K_P,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),'K_C+K_P=',K_P+K_C
+	! print 12347,' 		L_C=',L_C,'L_P=',L_P,'N=',NBAR,'L_C+L_P=',L_C+L_P
 	12346 format &
 	& (A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,I5)
 	print*,' '; print*,'-----------------------------------------------------------------------------'
