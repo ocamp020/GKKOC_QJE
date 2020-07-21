@@ -2310,7 +2310,7 @@ SUBROUTINE FIND_DBN_EQ()
 
 	    		! Check that R_C>R (if not solve the equilibrium with a single interest rate)
 		    	if (R_C.lt.R) then 
-		    		print*,' 		Interest Rates Not in Order:  R=',100.0_dp*R,'R_C=',100.0_dp*R_C!,'brentvalue',brent_value
+		    		print*,' 		Interest Rates Not in Order:  R=',100.0_dp*R,'R_C=',100.0_dp*R_C,'K_C=',K_C,'K_P=',K_P!,'brentvalue',brent_value
 
 		        	! Private demand for capital
 		        	K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_matrix(R,P))) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
@@ -2341,7 +2341,8 @@ SUBROUTINE FIND_DBN_EQ()
 		        	R    = alpha_C * A_C * ( Wage/((1.0_dp-alpha_C)*A_C) )**(-(1.0_dp-alpha_C)/alpha_C) - DepRate
 					R_C  = R 
 					print*,' 		New Interest Rate=',100.0_dp*R,&
-						& 100.0_dp*alpha*(( (1.0_dp-alpha_C)*A_C/Wage )**((1.0_dp-alpha)/alpha_C))*K_C*A_C
+						& 100.0_dp*alpha*A_C*K_C**(alpha-1.0_dp)*(( (1.0_dp-alpha)*A_C/Wage )**(1.0_dp/alpha)*K_C)**(1.0_dp-alpha)-DepRate, &
+						& 'K_C=',K_C,'K_P=',K_P
 
 		    	endif 
 
