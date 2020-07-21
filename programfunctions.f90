@@ -1983,6 +1983,10 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	print '(A,F7.3)', ' 	Estate_Tax/GDP       =', 100.0_dp*GBAR_BQ/YBAR
 	print '(A,F7.3,X,X,A,F7.3)', ' 		Total Labor Income  =', Tot_Lab_Inc , 'EBAR=', EBAR
 	print '(A,F7.3,X,X,A,F7.3)', ' 		Total Capital Income=', Tot_Cap_Inc , 'EBAR=', alpha*YBAR - DepRate*MeanWealth
+	print*,'KBAR=',MeanWealth,'Integral=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),'K_C+K_P=',K_C+K_P
+	print*,'K_C=',K_C,'Integral=',sum( sum(sum(sum(sum(sum(DBN1(:,:,z_C:,:,:,:),6),5),4),3),1)*agrid ), &
+		   'K_P=',K_P,'Integral=',sum( sum(sum(sum(DBN1,5),4),1)*K_matrix(R,P) ) 
+	print*,'R_Z=',100.0_dp*R_z
 	print*,'-----------------------------------------------------------------------------'
 	print*, ' '
 
