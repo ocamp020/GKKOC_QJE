@@ -2387,7 +2387,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    		& 'W=',wage,'R=',R,'R_C=',R_C,'P=',P,'Q=',QBAR, &
 	    		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'K_C=',K_C,'L_C=',L_C
     		print 12347,' 		K_C=',K_C,'K_P=',K_P,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),'K_C+K_P=',K_P+K_C
-			print 12347,' 		L_C=',L_C,'L_P=',L_C,'N=',NBAR,'L_C+L_P=',L_C+L_P
+			print 12347,' 		L_C=',L_C,'L_P=',L_P,'N=',NBAR,'L_C+L_P=',L_C+L_P
     		12345 format &
     		&(A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X)
     		12347 format &
@@ -2480,7 +2480,7 @@ SUBROUTINE FIND_DBN_EQ()
 		& 'W=',wage,'R=',R,'R_C=',R_C,'P=',P,'Q=',QBAR, &
 		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'Y_C/Y=',100.0_dp*YBAR_C/YBAR,'Iter=',simutime
 	print 12347,' 		K_C=',K_C,'K_P=',K_P,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),'K_C+K_P=',K_P+K_C
-	print 12347,' 		L_C=',L_C,'L_P=',L_C,'N=',NBAR,'L_C+L_P=',L_C+L_P
+	print 12347,' 		L_C=',L_C,'L_P=',L_P,'N=',NBAR,'L_C+L_P=',L_C+L_P
 	12346 format &
 	& (A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,I5)
 	print*,' '; print*,'-----------------------------------------------------------------------------'
