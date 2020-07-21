@@ -2383,7 +2383,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .false.
+		load_seed    = .true.
 
 
 	if (read_results.eqv..false.) then 
