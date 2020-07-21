@@ -1889,7 +1889,6 @@ END SUBROUTINE COMPUTE_VALUE_FUNCTION_TRANSITION
 SUBROUTINE GOVNT_BUDGET(print_flag)
 	IMPLICIT NONE
 	LOGICAL, INTENT(IN) :: print_flag
-	real(dp) :: test 
 
 	! Initialize variables
 	GBAR 		 = 0.0_DP
@@ -1901,7 +1900,6 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	SSC_Payments = 0.0_DP
 	Tot_Lab_Inc  = 0.0_DP
 	Tot_Cap_Inc  = 0.0_DP
-	test         = 0.0_DP
 
 	! Compute total expenditure = total revenue
 		! For each state accumulate tax income weighted by equilibrium distribution
@@ -1936,7 +1934,6 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	    Tot_Lab_Inc = Tot_Lab_Inc + DBN1(age,ai,zi,lambdai,ei,xi) * yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)
 
 	    Tot_Cap_Inc = Tot_Cap_Inc + DBN1(age,ai,zi,lambdai,ei,xi) * ( R_z(zi)*agrid(ai) + Pr_mat(ai,zi,xi) )
-	    test = test + DBN1(age,ai,zi,lambdai,ei,xi) * ( R_z(zi)*agrid(ai) )
 	ENDDO
 	ENDDO
 	ENDDO
@@ -1985,16 +1982,13 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 	print '(A,F7.3)', ' 	Average Labor Tax    =', 100.0_dp*GBAR_L/Tot_Lab_Inc
 	print '(A,F7.3)', ' 	Estate_Tax/GDP       =', 100.0_dp*GBAR_BQ/YBAR
 	print '(A,F7.3,X,X,A,F7.3)', ' 		Total Labor Income  =', Tot_Lab_Inc , 'EBAR=', EBAR
-	print '(A,F7.3,X,X,A,F7.3)', ' 		Total Capital Income=', Tot_Cap_Inc , 'EBAR=', &
+	print '(A,F7.3,X,X,A,F7.3)', ' 		Total Capital Income=', Tot_Cap_Inc , 'Algebra=', &
 				& alpha*YBAR - DepRate*sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
-	print*,'KBAR=',MeanWealth,'Integral=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),'K_C+K_P=',K_C+K_P
-	print*,'K_C=',K_C,'Integral=',sum( sum(sum(sum(sum(sum(DBN1(:,:,z_C:,:,:,:),6),5),4),3),1)*agrid ), &
-		   'K_P=',K_P,'Integral=',sum( sum(sum(sum(DBN1,5),4),1)*K_matrix(R,P) ) 
-	print*,'R_Z=',100.0_dp*R_z
-	print*,'Profit Income',sum( sum(sum(sum(DBN1,5),4),1)*Pr_mat ),alpha*YBAR_P-(R+DepRate)*K_P 
-	print*,'Interest Income',test,R_C*K_C + R*K_P, alpha*YBAR_C-DepRate*K_C + R*K_P
-	print*,'R_C=',R_C,alpha*A_C*K_C**(alpha-1)*L_C**(1-alpha)-DepRate
-	print*,'alpha=',alpha,alpha_C
+	! print*,'KBAR=',MeanWealth,'Integral=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),'K_C+K_P=',K_C+K_P
+	! print*,'K_C=',K_C,'Integral=',sum( sum(sum(sum(sum(sum(DBN1(:,:,z_C:,:,:,:),6),5),4),3),1)*agrid ), &
+	! 	   'K_P=',K_P,'Integral=',sum( sum(sum(sum(DBN1,5),4),1)*K_matrix(R,P) ) 
+	! print*,'R_Z=',100.0_dp*R_z
+	! print*,'Profit Income',sum( sum(sum(sum(DBN1,5),4),1)*Pr_mat ),alpha*YBAR_P-(R+DepRate)*K_P 
 	print*,'-----------------------------------------------------------------------------'
 	print*, ' '
 
