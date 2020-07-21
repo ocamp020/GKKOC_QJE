@@ -1988,7 +1988,7 @@ SUBROUTINE GOVNT_BUDGET(print_flag)
 		   'K_P=',K_P,'Integral=',sum( sum(sum(sum(DBN1,5),4),1)*K_matrix(R,P) ) 
 	print*,'R_Z=',100.0_dp*R_z
 	print*,'Profit Income',sum( sum(sum(sum(DBN1,5),4),1)*Pr_mat ),alpha*YBAR_P-(R+DepRate)*K_P 
-	print*,'R_C=',R_C,alpha*K_C**(alpha-1)*L_C**(1-alpha)-DepRate
+	print*,'R_C=',R_C,alpha*A_C*K_C**(alpha-1)*L_C**(1-alpha)-DepRate
 	print*,'alpha=',alpha,alpha_C
 	print*,'-----------------------------------------------------------------------------'
 	print*, ' '
