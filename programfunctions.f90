@@ -2344,7 +2344,7 @@ SUBROUTINE FIND_DBN_EQ()
 					print*,' 		New Interest Rate=',100.0_dp*R,&
 						& 100.0_dp*(alpha*A_C*K_C**(alpha-1.0_dp)*(( (1.0_dp-alpha)*A_C/Wage )**(1.0_dp/alpha)*K_C)**(1.0_dp-alpha)-DepRate)
 					print*,'K_C=',K_C,'K_P=',K_P,'A=',Wealth,'K_C+K_P=',K_C+K_P
-					print*,'Error',brentvalue,brentvalue**0.5_dp*Wealth,abs(Wealth-K_C-K_P)/wealth
+					print*,'Error',brent_value,brent_value**0.5_dp*Wealth,abs(Wealth-K_C-K_P)/wealth
 
 		    	endif 
 
