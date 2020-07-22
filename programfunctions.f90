@@ -2335,7 +2335,7 @@ SUBROUTINE FIND_DBN_EQ()
 						R_C = R 
 
 					! Implied P 
-						L_P = ( (1.0_dp-alpha)*Aprod/Wage_aux )**(1.0_dp/alpha  ) * QBAR 
+						L_P = ( (1.0_dp-alpha)*Aprod/Wage )**(1.0_dp/alpha  ) * QBAR 
 						P   = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
 
 					! Private demand for capital
