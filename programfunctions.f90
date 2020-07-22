@@ -6706,7 +6706,7 @@ Function Agg_Debt_KC(K_C_in)
 		Agg_Debt_KC = K_C_in + K_Private + Debt_Absorption*Debt_SS  - Wealth
 		Agg_Debt_KC = (Agg_Debt_KC/Wealth)**2.0_dp
 
-	print*, 'K_C',K_C_in,'K_P',K_Private,'A',Wealth,'K_C+K_P',K_C_in+K_Private,'Res',abs(K_C_in+K_Private-Welath)
+	print*, 'K_C',K_C_in,'K_P',K_Private,'A',Wealth,'K_C+K_P',K_C_in+K_Private,'Res',abs(K_C_in+K_Private-Wealth)
 
 end Function Agg_Debt_KC
 
