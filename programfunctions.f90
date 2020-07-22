@@ -2313,7 +2313,7 @@ SUBROUTINE FIND_DBN_EQ()
 		    		print*,' 		Interest Rates Not in Order:  R=',100.0_dp*R,'R_C=',100.0_dp*R_C,'K_C=',K_C,'K_P=',K_P!,'brentvalue',brent_value
 
 		    		! Find Corporate Capital that clears capital market
-	        			brent_value = brent(0.0_dp,K_C/2.0_Dp,K_C,Agg_Debt_KC, brent_tol,K_C)
+	        			brent_value = brent(0.0_dp,K_C/2.0_Dp,K_C,Agg_Debt_KC,brent_tol,K_C)
 	        			if (brent_value.gt.1e-5) then 
 			        		print*, ' ';print*, ' 	Warning! Capital Market Did not Clear!';print*, ' ';
 				        	! Modify prices and quantities 
@@ -6675,7 +6675,7 @@ Function Agg_Debt_KC(K_C_in)
 	real(dp), intent(in) :: K_C_in
 	real(dp)             :: Agg_Debt_KC
 	real(dp), dimension(na,nz,nx) :: DBN_azx, K_mat
-	real(dp)             :: Wealth , K_Private, Wage_aux, R_aux, P_aux 
+	real(dp)             :: Wealth, K_Private, L_P_aux, Wage_aux, R_aux, P_aux, brent_value
 
 	! Aggregate supply of assets and Distribution
 		DBN_azx  = sum(sum(sum(DBN1,5),4),1)
@@ -6686,7 +6686,7 @@ Function Agg_Debt_KC(K_C_in)
     		Wage_aux = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C_in)/NBAR)**(alpha)
     	else 
     		print*, ' Solving labor market numerically'
-    		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage_aux)
+    		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing,brent_tol,Wage_aux)
     		print*, ' New Wage=',Wage,'Error=',brent_value
     	endif 
 
