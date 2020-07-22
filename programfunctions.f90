@@ -2310,7 +2310,7 @@ SUBROUTINE FIND_DBN_EQ()
 
 	    		! Check that R_C>R (if not solve the equilibrium with a single interest rate)
 		    	if (R_C.lt.R) then 
-		    		print*,' 		Interest Rates Not in Order:  R=',100.0_dp*R,'R_C=',100.0_dp*R_C,'K_C=',K_C,'K_P=',K_P!,'brentvalue',brent_value
+		    		print*,' 	Interest Rates Not in Order:  R=',100.0_dp*R,'R_C=',100.0_dp*R_C,'K_C=',K_C,'K_P=',K_P!,'brentvalue',brent_value
 
 		    		! Find Corporate Capital that clears capital market
 	        			brent_value = brent(0.0_dp,K_C/2.0_Dp,K_C,Agg_Debt_KC,brent_tol,K_C)
@@ -2341,9 +2341,8 @@ SUBROUTINE FIND_DBN_EQ()
 					! Private demand for capital
 		        		K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_matrix(R,P))) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
 	        	
-					print*,' 		New Interest Rate=',100.0_dp*R,&
-						& 100.0_dp*(alpha*A_C*K_C**(alpha-1.0_dp)*(( (1.0_dp-alpha)*A_C/Wage )**(1.0_dp/alpha)*K_C)**(1.0_dp-alpha)-DepRate)
-					print*,'		K_C=',K_C,'K_P=',K_P,'A=',Wealth,'K_C+K_P=',K_C+K_P
+					print*,' 	New Interest Rate=',100.0_dp*R,&!& 100.0_dp*(alpha*A_C*K_C**(alpha-1.0_dp)*(( (1.0_dp-alpha)*A_C/Wage )**(1.0_dp/alpha)*K_C)**(1.0_dp-alpha)-DepRate)
+						& 'K_C=',K_C,'K_P=',K_P,'A=',Wealth,'K_C+K_P=',K_C+K_P,'Res=',100.0_dp*abs(Wealth-K_C-K_P)/Wealth
 					! print*,'Error',brent_value,brent_value**0.5_dp*Wealth,abs(Wealth-K_C-K_P)/wealth
 					! print*,'R',R,'P',P,'W',Wage
 
