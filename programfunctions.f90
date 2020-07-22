@@ -2342,8 +2342,9 @@ SUBROUTINE FIND_DBN_EQ()
 		        		K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_matrix(R,P))) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
 	        	
 					print*,' 		New Interest Rate=',100.0_dp*R,&
-						& 100.0_dp*(alpha*A_C*K_C**(alpha-1.0_dp)*(( (1.0_dp-alpha)*A_C/Wage )**(1.0_dp/alpha)*K_C)**(1.0_dp-alpha)-DepRate), &
-						& 'K_C=',K_C,'K_P=',K_P,'A=',Wealth,'K_C+K_P=',K_C+K_P
+						& 100.0_dp*(alpha*A_C*K_C**(alpha-1.0_dp)*(( (1.0_dp-alpha)*A_C/Wage )**(1.0_dp/alpha)*K_C)**(1.0_dp-alpha)-DepRate)
+					print*,'K_C=',K_C,'K_P=',K_P,'A=',Wealth,'K_C+K_P=',K_C+K_P,&
+					print*,'Error',brentvalue,brentvalue**0.5_dp*Wealth,abs(Wealth-K_C-K_P)/wealth
 
 		    	endif 
 
