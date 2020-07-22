@@ -6693,7 +6693,7 @@ Function Agg_Debt_KC(K_C_in)
     	endif 
 
    	! Implied R 
-		R_aux   = alpha_C * A_C * ( ((1.0_dp-alpha_C)*A_C)/Wage )**((1.0_dp-alpha_C)/alpha_C) - DepRate
+		R_aux   = alpha_C * A_C * ( ((1.0_dp-alpha_C)*A_C)/Wage_aux )**((1.0_dp-alpha_C)/alpha_C) - DepRate
 
 	! Implied P 
 		L_P_aux = ( (1.0_dp-alpha)*Aprod/Wage_aux )**(1.0_dp/alpha  ) * QBAR 
@@ -6708,7 +6708,7 @@ Function Agg_Debt_KC(K_C_in)
 		Agg_Debt_KC = (Agg_Debt_KC/Wealth)**2.0_dp
 
 	print*, 'K_C',K_C_in,'K_P',K_Private,'A',Wealth,'K_C+K_P',K_C_in+K_Private,'Res',abs(K_C_in+K_Private-Wealth)
-	print*, 'R',R_aux,'P',P_aux,'W',W_aux
+	print*, 'R',R_aux,'P',P_aux,'W',Wage_aux
 
 end Function Agg_Debt_KC
 
