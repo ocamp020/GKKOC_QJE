@@ -2326,7 +2326,7 @@ SUBROUTINE FIND_DBN_EQ()
 			    		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
 			    	else 
 			    		print*, ' Solving labor market numerically'
-			    		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage_aux)
+			    		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing,brent_tol,Wage)
 			    		print*, ' New Wage=',Wage,'Error=',brent_value
 			    	endif 
 
