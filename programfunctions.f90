@@ -2137,11 +2137,20 @@ SUBROUTINE FIND_DBN_EQ()
 	    DO e1=1, ne
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
+	        	! px_nb of agents are born with x=1
 	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
-	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + px_nb*DBN1(age1,a1,z1,lambda1,e1,x1) &
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
 	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
-	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + px_nb*DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
+
+                ! 1-px_nb of agents are born with x=2
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2) + (1.0_dp-px_nb)*DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,2)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2) + (1.0_dp-px_nb)*DBN1(age1,a1,z1,lambda1,e1,x1) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
@@ -2163,12 +2172,21 @@ SUBROUTINE FIND_DBN_EQ()
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
+	        	! px_nb of agents are born with x=1
 	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
-	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + px_nb*DBN1(age1,a1,z1,lambda1,e1,x1) &
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
 	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
-	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + px_nb*DBN1(age1,a1,z1,lambda1,e1,x1) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
+
+                ! 1-px_nb of agents are born with x=2
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2) + (1.0_dp-px_nb)*DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,2)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2) + (1.0_dp-px_nb)*DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1) 
 	        ENDDO
 	        ENDDO
 	        
@@ -2201,11 +2219,20 @@ SUBROUTINE FIND_DBN_EQ()
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
+	        	! px_nb of agents are born with x=1
 	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
-	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + px_nb*DBN1(age1,a1,z1,lambda1,e1,x1) &
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
 	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
-	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + px_nb*DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
+
+                ! 1-px_nb of agents are born with x=2
+	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2) + (1.0_dp-px_nb)*DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,2)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2) + (1.0_dp-px_nb)*DBN1(age1,a1,z1,lambda1,e1,x1) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
 	        ENDDO
 	        ENDDO
@@ -6928,8 +6955,8 @@ SUBROUTINE  INITIALIZE()
 				pr_x(1,2,5:nz,:) = p1_x 
 				pr_x(1,3,5:nz,:) = p2_x
 			! x=2 goes to x=3 with probability 3%
-				pr_x(2,1,:,:) = 0.00_dp 
-				pr_x(2,2,:,:) = 1.00_dp - p2_x
+				pr_x(2,1,:,:) = p3_x 
+				pr_x(2,2,:,:) = 1.00_dp - p2_x - p3_x
 				pr_x(2,3,:,:) = p2_x
 			! x=3 is an absorbing state
 				pr_x(3,1,:,:) = 0.00_dp 
