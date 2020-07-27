@@ -558,7 +558,7 @@ SUBROUTINE COMPUTE_STATS()
 			CCDF_c = sum(DBN_azx_vec,K_Inc_vec>=c)
 			!print*, ' '
 			!print*, 'Percentile', prctile_bq(i)
-			do while ((abs(CCDF_c-real(pct_list_for_Top_Share(i),8)/100.0_dp)>0.00001_dp).and.(b-a>1e-9))
+			do while ((abs(CCDF_c-real(100-pct_list_for_Top_Share(i),8)/100.0_dp)>0.00001_dp).and.(b-a>1e-9))
 				if (CCDF_c<real(i,8)/100.0_dp) then 
 					b = c 
 					c = (a+b)/2.0_dp
