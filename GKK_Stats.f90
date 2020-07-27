@@ -568,7 +568,8 @@ SUBROUTINE COMPUTE_STATS()
 					c = (a+b)/2.0_dp
 					CCDF_c = sum(DBN_azx_vec,K_Inc_vec>=c)
 				endif
-				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+				print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',real(100-pct_list_for_Top_Share(i),8)/100.0_dp,&
+					&'Error', abs(CCDF_c-real(100-pct_list_for_Top_Share(i),8)/100.0_dp)
 			enddo 
 			K_Inc_pct(i) = c 
 			Top_Share_K_Inc(i) = sum(K_Inc_vec*DBN_azx_vec,K_Inc_vec>=c)/sum(K_Inc_vec*DBN_azx_vec)
