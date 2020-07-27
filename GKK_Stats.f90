@@ -553,7 +553,7 @@ SUBROUTINE COMPUTE_STATS()
 		c = a
 		do i=1,5
 			a = minval(K_Inc_vec)
-			b = c
+			b = maxval(K_Inc_vec)
 			c = (a+b)/2.0_dp
 			CCDF_c = sum(DBN_azx_vec,K_Inc_vec>=c)
 			print*, ' '
