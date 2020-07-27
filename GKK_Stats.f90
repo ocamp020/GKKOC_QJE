@@ -556,8 +556,8 @@ SUBROUTINE COMPUTE_STATS()
 			b = maxval(K_Inc_vec)
 			c = (a+b)/2.0_dp
 			CCDF_c = sum(DBN_azx_vec,K_Inc_vec>=c)
-			print*, ' '
-			print*, 'Percentile', real(100-pct_list_for_Top_Share(i),8)/100.0_dp
+			! print*, ' '
+			! print*, 'Percentile', real(100-pct_list_for_Top_Share(i),8)/100.0_dp
 			do while ((abs(CCDF_c-real(100-pct_list_for_Top_Share(i),8)/100.0_dp)>0.00001_dp).and.(b-a>1e-9))
 				if (CCDF_c<real(100-pct_list_for_Top_Share(i),8)/100.0_dp) then 
 					b = c 
@@ -568,11 +568,11 @@ SUBROUTINE COMPUTE_STATS()
 					c = (a+b)/2.0_dp
 					CCDF_c = sum(DBN_azx_vec,K_Inc_vec>=c)
 				endif
-				print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',real(100-pct_list_for_Top_Share(i),8)/100.0_dp,&
-					&'Error', abs(CCDF_c-real(100-pct_list_for_Top_Share(i),8)/100.0_dp)
+				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',real(100-pct_list_for_Top_Share(i),8)/100.0_dp,&
+				! 	&'Error', abs(CCDF_c-real(100-pct_list_for_Top_Share(i),8)/100.0_dp)
 			enddo 
 			K_Inc_pct(i) = c 
-			Top_Share_K_Inc(i) = sum(K_Inc_vec*DBN_azx_vec,K_Inc_vec>=c)/sum(K_Inc_vec*DBN_azx_vec)
+			Top_Share_K_Inc(i) = 100.0_dp*sum(K_Inc_vec*DBN_azx_vec,K_Inc_vec>=c)/sum(K_Inc_vec*DBN_azx_vec)
 		enddo 
 
 		! Print Results 
