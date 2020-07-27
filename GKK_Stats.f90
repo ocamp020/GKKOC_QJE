@@ -66,7 +66,8 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
-	real(DP) :: Top_Share_K_Inc(5), pct_list_for_Top_Share(5), K_Inc_pct(5)
+	real(DP) :: Top_Share_K_Inc(5), K_Inc_pct(5)
+	integer  :: pct_list_for_Top_Share(5)
 
 	allocate(DBN_vec(			size(DBN1)))
 	allocate(Firm_Wealth_vec(	size(DBN1)))
@@ -535,7 +536,7 @@ SUBROUTINE COMPUTE_STATS()
 		! Print Results 
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Top_Shares_K_Inc_by_Assets.txt', STATUS='replace')
 		WRITE(UNIT=11, FMT=*) 'Percentile Assets K_Inc_Share'
-		do i=1,100
+		do i=1,5
 		ai = prctile_ai_ind(pct_list_for_Top_Share(i))
 		WRITE(UNIT=11, FMT=*) pct_list_for_Top_Share(i),(EBAR_data/(EBAR_bench*0.727853584919652_dp))*agrid(ai),Top_Share_K_Inc(i)
 		enddo 
@@ -557,7 +558,7 @@ SUBROUTINE COMPUTE_STATS()
 			CCDF_c = sum(DBN_azx_vec,K_Inc_vec>=c)
 			!print*, ' '
 			!print*, 'Percentile', prctile_bq(i)
-			do while ((abs(CCDF_c-pct_list_for_Top_Share(i)/100.0_dp)>0.00001_dp).and.(b-a>1e-9))
+			do while ((abs(CCDF_c-real(pct_list_for_Top_Share(i),8)/100.0_dp)>0.00001_dp).and.(b-a>1e-9))
 				if (CCDF_c<real(i,8)/100.0_dp) then 
 					b = c 
 					c = (a+b)/2.0_dp
@@ -576,7 +577,7 @@ SUBROUTINE COMPUTE_STATS()
 		! Print Results 
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Top_Shares_K_Inc_by_K_Inc.txt', STATUS='replace')
 		WRITE(UNIT=11, FMT=*) 'Percentile K_Inc K_Inc_Share'
-		do i=1,100
+		do i=1,5
 		WRITE(UNIT=11, FMT=*) pct_list_for_Top_Share(i),(EBAR_data/(EBAR_bench*0.727853584919652_dp))*K_Inc_pct(i),Top_Share_K_Inc(i)
 		enddo 
 		CLOSE(UNIT=11)
