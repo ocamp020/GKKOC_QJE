@@ -119,9 +119,9 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)              :: Y_a, K, Pr
 
 		! Capital demand 
-		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+RW+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Profits 
-		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
+		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+RW+DepRate)*K
 		! Before tax wealth
 		Y_a = ( a_in +  ( Pr + R*a_in ) *(1.0_DP-tauK) )
 
@@ -153,9 +153,9 @@ end Subroutine Asset_Grid_Threshold
 		real(DP) :: K, Pr, Y_a, tauW
 
 		! Capital demand 
-		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+RW+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Profits 
-		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
+		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+RW+DepRate)*K
 		! Before tax wealth
 		Y_a = ( a_in +  ( Pr + R*a_in ) *(1.0_DP-tauK) )
 		if (a_in.le.Y_a_threshold) then 
@@ -169,7 +169,7 @@ end Subroutine Asset_Grid_Threshold
 			MB_a = (1.0_dp*(1.0_dp-tauW) + R*(1.0_dp-tauK))
 		else 
 			MB_a = (1.0_dp*(1.0_dp-tauW) + R*(1.0_dp-tauK)) &
-         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
+         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+RW+DepRate)*theta(z_in))*(1.0_dp-tauK)
 		endif 
 
 	END  FUNCTION MB_a
@@ -181,13 +181,13 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)			  :: MB_a_at, K
 
 		! Capital demand 
-		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+RW+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
 		if (K.lt.theta(z_in)*a_in) then 
 			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK))
 		else 
 			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK)) &
-         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
+         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+RW+DepRate)*theta(z_in))*(1.0_dp-tauK)
 		endif 
 
 	END  FUNCTION MB_a_at
@@ -199,13 +199,13 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)             :: MB_a_bt, K
 
 		! Capital demand 
-		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+RW+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
 		if (K.lt.theta(z_in)*a_in) then 
 			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK))
 		else 
 			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK)) &
-         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
+         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+RW+DepRate)*theta(z_in))*(1.0_dp-tauK)
 		endif 
 
 	END  FUNCTION MB_a_bt
@@ -6341,7 +6341,7 @@ Function K_Matrix(R_in,P_in)
 	do h=1,nx
 	do j=1,nz
 	do i=1,na 
-		K_Matrix(i,j,h) = min( theta(j)*agrid(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K_Matrix(i,j,h) = min( theta(j)*agrid(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+RW+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 	enddo
 	enddo
 	enddo 
@@ -6359,7 +6359,7 @@ Function K_Matrix_t(R_in,P_in)
 	do h=1,nx
 	do j=1,nz
 	do i=1,na_t
-		K_Matrix_t(i,j,h) = min( theta(j)*agrid_t(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K_Matrix_t(i,j,h) = min( theta(j)*agrid_t(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+RW+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 	enddo
 	enddo
 	enddo 
@@ -6386,7 +6386,7 @@ Function Profit_Matrix(R_in,P_in)
 	do h=1,nx
 	do j=1,nz 
 	do i=1,na 
-		Profit_Matrix(i,j,h) = P_in*(xz_grid(h,j)*K(i,j,h))**mu - (R_in+DepRate)*K(i,j,h)
+		Profit_Matrix(i,j,h) = P_in*(xz_grid(h,j)*K(i,j,h))**mu - (R_in+RW+DepRate)*K(i,j,h)
 	enddo 
 	enddo
 	enddo 
@@ -6406,7 +6406,7 @@ Function Profit_Matrix_t(R_in,P_in)
 	do h=1,nx 
 	do j=1,nz 
 	do i=1,na_t 
-		Profit_Matrix_t(i,j,h) = P_in*(xz_grid(h,j)*K(i,j,h))**mu - (R_in+DepRate)*K(i,j,h)
+		Profit_Matrix_t(i,j,h) = P_in*(xz_grid(h,j)*K(i,j,h))**mu - (R_in+RW+DepRate)*K(i,j,h)
 	enddo 
 	enddo 
 	enddo 

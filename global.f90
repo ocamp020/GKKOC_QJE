@@ -73,7 +73,7 @@ MODULE global
 	    ! Experiment values of Q, N, E, Wage, R, G, Y
 	    REAL(DP) :: QBAR_exp,   NBAR_exp,   Ebar_exp,   wage_exp,   P_exp,   GBAR_exp, GBAR_exp_old, Y_exp, R_exp,Debt_exp
 	    ! Values for aggregate variables (used when solving a given economy)
-	    REAL(DP) :: P, Ebar , wage, NBAR, QBAR, YBAR, GBAR, R, SSC_Payments, L_P, L_C, K_P, K_C, YBAR_P, YBAR_C
+	    REAL(DP) :: P, Ebar , wage, NBAR, QBAR, YBAR, GBAR, R, RW, SSC_Payments, L_P, L_C, K_P, K_C, YBAR_P, YBAR_C
         REAL(DP) :: L_P_bench, L_C_bench, K_P_bench, K_C_bench, YBAR_P_bench, YBAR_C_bench
         REAL(DP) :: L_P_exp, L_C_exp, K_P_exp, K_C_exp, YBAR_P_exp, YBAR_C_exp
 	    ! Wealth tax threshold as proportion of mean benchmark wealth
