@@ -59,9 +59,9 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
-			compute_bench = .true.
-			compute_exp   = .true.
+		Tax_Reform    = .false.
+			compute_bench = .false.
+			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .true.
 				Fixed_PF_interp = .true.
@@ -81,7 +81,7 @@ PROGRAM main
 
 		compute_exp_fixed_prices_and_taxes = .false.
 
-		Opt_Tax       = .false.
+		Opt_Tax       = .true.
 			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
 
 		Opt_Threshold = .false.
@@ -137,7 +137,7 @@ PROGRAM main
 		! Debt/Output = 1.5, lambda = 1.5, no bequest fee
 			! Main Parameters 
 				beta   	= 0.9900_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
-				sigma_z_eps      = 0.290_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+				sigma_z_eps      = 0.300_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 				sigma_lambda_eps = 0.309_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
 				gamma  	= 0.4450_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
 				sigma  	= 4.0_dp
@@ -2347,7 +2347,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .true.
+		load_seed    = .false.
 
 
 	if (read_results.eqv..false.) then 
@@ -2382,10 +2382,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
 		print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
 		print*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_2.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	
-    	tau_grid_min  = 40
-    	tau_grid_max  = 55
+    	tau_grid_min  = 10
+    	tau_grid_max  = 50
     	tau_grid_step = 1
 
     	! Set Y_a_threshold
@@ -2477,7 +2477,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	      	if (Opt_Tax_KW) then 
 	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
 	      	else 
-	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_2.txt', STATUS='old', POSITION='append')
+	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='old', POSITION='append')
 	      	endif 
 		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, (GBAR_K+GBAR_W)/(GBAR_bench +SSC_Payments_bench ), & 
 			      &  MeanWealth, QBAR, QBAR/MeanWealth,NBAR, &
