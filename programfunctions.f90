@@ -6360,7 +6360,7 @@ Function K_Matrix(R_in,P_in)
 	do i=1,na 
 		K_Matrix(i,j,h) = min( theta(j)*agrid(i) , max( & 
 				& min( agrid(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+   DepRate))**(1.0_dp/(1.0_dp-mu)) ) , &
-								& (mu*P_in*xz_grid(h,j)**mu/(R_in+RW+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+								& (mu*P_in*xz_grid(h,j)**mu/(R_in+RW+DepRate))**(1.0_dp/(1.0_dp-mu)) ) )
 	enddo
 	enddo
 	enddo 
@@ -6380,7 +6380,7 @@ Function K_Matrix_t(R_in,P_in)
 	do i=1,na_t
 		K_Matrix_t(i,j,h) = min( theta(j)*agrid_t(i) , max( & 
 				& min( agrid_t(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+   DepRate))**(1.0_dp/(1.0_dp-mu)) ) , &
-								  & (mu*P_in*xz_grid(h,j)**mu/(R_in+RW+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+								  & (mu*P_in*xz_grid(h,j)**mu/(R_in+RW+DepRate))**(1.0_dp/(1.0_dp-mu)) ) )
 	enddo
 	enddo
 	enddo 
