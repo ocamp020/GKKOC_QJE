@@ -120,8 +120,8 @@ end Subroutine Asset_Grid_Threshold
 
 		! Capital demand 
 		K   = min( theta(z_in)*a_in , max( &
-				& min(a_in,(mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)))) & 
-				&  ,(mu*P*xz_grid(x_in,z_in)**mu/(R+RW+DepRate))**(1.0_dp/(1.0_dp-mu))) )
+				& min( a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+   DepRate))**(1.0_dp/(1.0_dp-mu)) ) & 
+				&  , 	      (mu*P*xz_grid(x_in,z_in)**mu/(R+RW+DepRate))**(1.0_dp/(1.0_dp-mu)) ) )
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K - RW*max(0.0_dp,K-a_in)
 		! Before tax wealth
@@ -156,8 +156,8 @@ end Subroutine Asset_Grid_Threshold
 
 		! Capital demand 
 		K   = min( theta(z_in)*a_in , max( &
-				& min(a_in,(mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)))) & 
-				&  ,(mu*P*xz_grid(x_in,z_in)**mu/(R+RW+DepRate))**(1.0_dp/(1.0_dp-mu))) )
+				& min( a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+   DepRate))**(1.0_dp/(1.0_dp-mu)) ) & 
+				&  , 	      (mu*P*xz_grid(x_in,z_in)**mu/(R+RW+DepRate))**(1.0_dp/(1.0_dp-mu)) ) )
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K - RW*max(0.0_dp,K-a_in)
 		! Before tax wealth
@@ -189,8 +189,8 @@ end Subroutine Asset_Grid_Threshold
 
 		! Capital demand 
 		K   = min( theta(z_in)*a_in , max( &
-				& min(a_in,(mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)))) & 
-				&  ,(mu*P*xz_grid(x_in,z_in)**mu/(R+RW+DepRate))**(1.0_dp/(1.0_dp-mu))) )
+				& min( a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+   DepRate))**(1.0_dp/(1.0_dp-mu)) ) & 
+				&  , 	      (mu*P*xz_grid(x_in,z_in)**mu/(R+RW+DepRate))**(1.0_dp/(1.0_dp-mu)) ) )
 		! Compute asset marginal benefit - subject to taxes
 		if (K.lt.a_in) then 
 			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK))
@@ -212,8 +212,8 @@ end Subroutine Asset_Grid_Threshold
 
 		! Capital demand 
 		K   = min( theta(z_in)*a_in , max( &
-				& min(a_in,(mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)))) & 
-				&  ,(mu*P*xz_grid(x_in,z_in)**mu/(R+RW+DepRate))**(1.0_dp/(1.0_dp-mu))) )
+				& min( a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+   DepRate))**(1.0_dp/(1.0_dp-mu)) ) & 
+				&  , 	      (mu*P*xz_grid(x_in,z_in)**mu/(R+RW+DepRate))**(1.0_dp/(1.0_dp-mu)) ) )
 		! Compute asset marginal benefit - subject to taxes
 		if (K.lt.a_in) then 
 			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK))
