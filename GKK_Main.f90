@@ -224,23 +224,23 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_TFP/'
+			Result_Folder = './Revision/Model_2.1/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_TFP_PT/' 
+			Result_Folder = './Revision/Model_2.1_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_TFP_SU/' 
+			Result_Folder = './Revision/Model_2.1_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_TFP_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_PT_SU/' 
 		end if
 	else 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_TFP_Corp/' 
+			Result_Folder = './Revision/Model_2.1_Corp_TFP/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_TFP_Corp_PT/' 
+			Result_Folder = './Revision/Model_2.1_Corp_TFP_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_TFP_Corp_SU/' 
+			Result_Folder = './Revision/Model_2.1_Corp_TFP_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_TFP_Corp_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_Corp_TFP_PT_SU/' 
 		end if
 	endif 
 
