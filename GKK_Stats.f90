@@ -1916,6 +1916,23 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    !    & 100.0_dp*sum(Cons_Eq_Welfare(age,:,:,:,:)*DBN_bench(age,:,:,:,:))/sum(DBN_bench(age,:,:,:,:))
 		ENDDO
 
+		! Check for NaN
+		DO age=1,MaxAge
+		DO zi=1,nz
+		DO xi=1,nx
+		DO ai=1,na
+		DO lambdai=1,nlambda
+		DO ei=1, ne
+			if (isnan(Cons_Eq_Welfare(age,ai,zi,lambdai,ei,xi)).and.(DBN_bench(age,ai,zi,lambdai,ei,xi)<1e-6)) then
+				Cons_Eq_Welfare(age,ai,zi,lambdai,ei,xi) = 0.0_dp
+			endif
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+
 		CE_NEWBORN = 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
 
 		WRITE  (UNIT=50, FMT=*) 100.0_DP*sum(Cons_Eq_Welfare(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))/sum(DBN_bench(1,:,:,:,:,:))
