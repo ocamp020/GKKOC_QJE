@@ -78,7 +78,7 @@ MODULE global
 	    REAL(DP) :: P, Ebar , wage, NBAR, QBAR, YBAR, GBAR, R, R_C, SSC_Payments, L_P, L_C, K_P, K_C, YBAR_P, YBAR_C
         REAL(DP) :: L_P_bench, L_C_bench, K_P_bench, K_C_bench, YBAR_P_bench, YBAR_C_bench
         REAL(DP) :: L_P_exp, L_C_exp, K_P_exp, K_C_exp, YBAR_P_exp, YBAR_C_exp
-        REAL(DP) :: R_z(nz), R_z_bench(nz)
+        REAL(DP) :: R_z(nz), R_z_bench(nz), TFP_P
         INTEGER  :: z_C 
 	    ! Wealth tax threshold as proportion of mean benchmark wealth
 	    REAL(DP) :: Wealth_factor, Threshold_Share

@@ -2077,6 +2077,7 @@ SUBROUTINE FIND_DBN_EQ()
 		! Compute Capital demand and Profits by (a,z)
 			K_mat  = K_Matrix(R,P)
 			Pr_mat = Profit_Matrix(R,P)
+			TFP_P  = (QBAR/sum( (sum(sum(sum(DBN1,5),4),1)) *(K_matrix(R,P))))**alpha_C
 		! Form YGRID for the capital income economy given interest rate "P"
 			CALL FORM_Y_MB_GRID(YGRID,MBGRID,YGRID_t,MBGRID_t)
 		! Solve for policy and value functions 
@@ -2296,7 +2297,8 @@ SUBROUTINE FIND_DBN_EQ()
 
 	        	! Update Wage 
 	        	if (alpha_C.eq.alpha) then 
-	        		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
+	        		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + &
+	        				& ((1.0_dp-alpha)*A_C*TFP_P)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
 	        	else 
 	        		print*, ' Solving labor market numerically'
 	        		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing, brent_tol,Wage)
@@ -2304,8 +2306,8 @@ SUBROUTINE FIND_DBN_EQ()
 	        	endif 
 
 	        	! Update Other Corporate values 
-		    	L_C    = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
-		    	R_C    = alpha_C * A_C * (L_C/K_C)**(1.0_dp-alpha_C) - DepRate
+		    	L_C    = ( (1.0_dp-alpha_C)*A_C*TFP_P/Wage )**(1.0_dp/alpha_C) * K_C
+		    	R_C    = alpha_C * A_C*TFP_P * (L_C/K_C)**(1.0_dp-alpha_C) - DepRate
 		    	
 
 	    		! Check that R_C>R (if not solve the equilibrium with a single interest rate)
@@ -2324,7 +2326,8 @@ SUBROUTINE FIND_DBN_EQ()
 
         			! Update Wage 
 			    	if (alpha_C.eq.alpha) then 
-			    		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
+			    		Wage = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + &
+			    				&((1.0_dp-alpha)*A_C*TFP_P)**(1.0_dp/alpha)*K_C)/NBAR)**(alpha)
 			    	else 
 			    		print*, ' Solving labor market numerically'
 			    		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing,brent_tol,Wage)
@@ -2332,7 +2335,8 @@ SUBROUTINE FIND_DBN_EQ()
 			    	endif 
 
 				   	! Implied R 
-						R   = alpha_C * A_C * ( ((1.0_dp-alpha_C)*A_C)/Wage )**((1.0_dp-alpha_C)/alpha_C) - DepRate
+						R   = alpha_C * A_C*TFP_P * &
+							& ( ((1.0_dp-alpha_C)*A_C*TFP_P)/Wage )**((1.0_dp-alpha_C)/alpha_C) - DepRate
 						R_C = R 
 
 					! Implied P 
@@ -2341,6 +2345,7 @@ SUBROUTINE FIND_DBN_EQ()
 
 					! Private demand for capital
 		        		K_P    = sum( (sum(sum(sum(DBN1,5),4),1)) *(K_matrix(R,P))) ! Note: DBN_azx  = sum(sum(sum(DBN1,5),4),1)
+
 	        	
 					print '(A,F7.4,X,A,F7.4,X,A,F7.4,X,A,F7.4,X,A,F7.4,X,A,F7.4)',&
 						& ' 	New Interest Rate=',100.0_dp*R,&!& 100.0_dp*(alpha*A_C*K_C**(alpha-1.0_dp)*(( (1.0_dp-alpha)*A_C/Wage )**(1.0_dp/alpha)*K_C)**(1.0_dp-alpha)-DepRate)
@@ -2353,17 +2358,20 @@ SUBROUTINE FIND_DBN_EQ()
 
 		    	! Update Output and Aggregates 
 				L_P    = ( (1.0_dp-alpha)*Aprod/Wage )**(1.0_dp/alpha  ) * QBAR 
-				L_C    = ( (1.0_dp-alpha_C)*A_C/Wage )**(1.0_dp/alpha_C) * K_C
+				L_C    = ( (1.0_dp-alpha_C)*A_C*TFP_P/Wage )**(1.0_dp/alpha_C) * K_C
 				P      = alpha * QBAR**(alpha-mu) * L_P**(1.0_DP-alpha)
 				Ebar   = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
-				YBAR_P = AProd * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
-				YBAR_C = A_C   * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
+				YBAR_P = AProd     * QBAR**alpha   * L_P**(1.0_DP-alpha  ) 
+				YBAR_C = A_C*TFP_P * K_C **alpha_C * L_C**(1.0_DP-alpha_C) 
 				YBAR   = YBAR_P + YBAR_C
 
 	        	
 	        	! Update interest rate vector 
         		R_z(1:z_C-1) = R 
         		R_z(z_C:)    = R_C
+
+        		! Update TFP_P
+    			TFP_P  = (QBAR/K_P)**alpha_C
 
 				! print '(A,F9.3,F9.3,F9.3,X,X,A,F9.3,F9.3,F9.3)',&
 				! 		& ' 				Corp. Sector Levels:', YBAR_C, K_C, L_C , &
@@ -6686,7 +6694,7 @@ Function Agg_Debt_KC(K_C_in)
 
 	! Update Wage 
     	if (alpha_C.eq.alpha) then 
-    		Wage_aux = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C)**(1.0_dp/alpha)*K_C_in)/NBAR)**(alpha)
+    		Wage_aux = ((((1.0_dp-alpha)*Aprod)**(1.0_dp/alpha)*QBAR + ((1.0_dp-alpha)*A_C*TFP_P)**(1.0_dp/alpha)*K_C_in)/NBAR)**(alpha)
     	else 
     		print*, ' Solving labor market numerically'
     		brent_value = brent(0.001_DP,Wage,10.0_DP,Labor_Market_Clearing,brent_tol,Wage_aux)
@@ -6694,7 +6702,7 @@ Function Agg_Debt_KC(K_C_in)
     	endif 
 
    	! Implied R 
-		R_aux   = alpha_C * A_C * ( ((1.0_dp-alpha_C)*A_C)/Wage_aux )**((1.0_dp-alpha_C)/alpha_C) - DepRate
+		R_aux   = alpha_C * A_C*TFP_P * ( ((1.0_dp-alpha_C)*A_C*TFP_P)/Wage_aux )**((1.0_dp-alpha_C)/alpha_C) - DepRate
 
 	! Implied P 
 		L_P_aux = ( (1.0_dp-alpha)*Aprod/Wage_aux )**(1.0_dp/alpha  ) * QBAR 

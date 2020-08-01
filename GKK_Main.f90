@@ -60,8 +60,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
-			compute_exp   = .true.
+			compute_bench = .true.
+			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .true.
 				Fixed_PF_interp = .true.
@@ -130,7 +130,7 @@ PROGRAM main
 
 		! Corporate Sector
 			! A_C    = 0.0_dp ! 
-			A_C    = 1.1600_dp ! for Corp model ! 0.9409_dp (value without estate tax)
+			A_C    = 1.1600_dp/(5.3325427175774_dp/2.49439798830869_dp)**alpha_C ! for Corp model ! 0.9409_dp (value without estate tax)
 
 		if (A_C.eq.0.0_dp) then
 		
@@ -623,7 +623,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark
