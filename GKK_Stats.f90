@@ -55,7 +55,7 @@ SUBROUTINE COMPUTE_STATS()
 		& Inc_Increase_draft_group, K_Inc_Increase_draft_group, L_Inc_Increase_draft_group, &
 		& Return_draft_group, Return_AT_draft_group, &
 		& Entrepreneur_10_draft_group, Entrepreneur_50_draft_group
-	real(DP) :: DBN_az(na,nz)
+	real(DP) :: DBN_az(na,nz), size_by_age_zx(na,nz,nx)
 	real(DP) :: Z_share_top_wealth(draft_age_category,nz), draft_group_share_top_wealth(draft_age_category,draft_z_category), &
 			&	A_share_top_wealth(draft_age_category,nz), draft_group_wealth_share_top_wealth(draft_age_category,draft_z_category) 
 	real(DP) :: Z_share_top_wealth_x(draft_age_category,nz,nx), A_share_top_wealth_x(draft_age_category,nz,nx)
@@ -98,15 +98,23 @@ SUBROUTINE COMPUTE_STATS()
 	!------------------------------------------------------------------------------------
 		! print*, 'Test DBN_az'
 		OPEN (UNIT=90, FILE=trim(Result_Folder)//'size_by_age_z.txt', STATUS='replace')   
+		OPEN (UNIT=91, FILE=trim(Result_Folder)//'size_by_age_zx.txt', STATUS='replace')   
 		size_by_age_z =0.0_DP
 		DO age=1,MaxAge 
 		    DO zi=1,nz
-		        size_by_age_z(age, zi) = sum(DBN1(age,:,zi,:,:,:))
+		        size_by_age_z(age, zi    ) = sum(DBN1(age,:,zi,:,:,:))
+	        DO xi=1,nx
+	        	size_by_age_z(age, zi, xi) = sum(DBN1(age,:,zi,:,:,xi))
+	        ENDDO ! xi
 		    ENDDO ! zi
 
-		    WRITE  (UNIT=90, FMT=*)  size_by_age_z(age, :) 
+		    WRITE(UNIT=90, FMT=*) size_by_age_z(age, :) 
+		    WRITE(UNIT=91, FMT=*) size_by_age_z(age, 1, :), size_by_age_z(age, 2, :), size_by_age_z(age, 3, :), &
+		    					& size_by_age_z(age, 4, :), size_by_age_z(age, 5, :), size_by_age_z(age, 6, :), &
+		    					& size_by_age_z(age, 7, :), size_by_age_z(age, 8, :), size_by_age_z(age, 9, :)
 		ENDDO
 		CLOSE(unit=90)
+		CLOSE(unit=91)
 
 		DBN_Z = sum(sum(sum(sum(sum(DBN1,6),5),4),2),1) 
 		do zi=1,nz 
