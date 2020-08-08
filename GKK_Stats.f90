@@ -104,14 +104,14 @@ SUBROUTINE COMPUTE_STATS()
 		    DO zi=1,nz
 		        size_by_age_z(age, zi    ) = sum(DBN1(age,:,zi,:,:,:))
 	        DO xi=1,nx
-	        	size_by_age_z(age, zi, xi) = sum(DBN1(age,:,zi,:,:,xi))
+	        	size_by_age_zx(age, zi, xi) = sum(DBN1(age,:,zi,:,:,xi))
 	        ENDDO ! xi
 		    ENDDO ! zi
 
 		    WRITE(UNIT=90, FMT=*) size_by_age_z(age, :) 
-		    WRITE(UNIT=91, FMT=*) size_by_age_z(age, 1, :), size_by_age_z(age, 2, :), size_by_age_z(age, 3, :), &
-		    					& size_by_age_z(age, 4, :), size_by_age_z(age, 5, :), size_by_age_z(age, 6, :), &
-		    					& size_by_age_z(age, 7, :), size_by_age_z(age, 8, :), size_by_age_z(age, 9, :)
+		    WRITE(UNIT=91, FMT=*) size_by_age_zx(age, 1, :), size_by_age_zx(age, 2, :), size_by_age_zx(age, 3, :), &
+		    					& size_by_age_zx(age, 4, :), size_by_age_zx(age, 5, :), size_by_age_zx(age, 6, :), &
+		    					& size_by_age_zx(age, 7, :), size_by_age_zx(age, 8, :), size_by_age_zx(age, 9, :)
 		ENDDO
 		CLOSE(unit=90)
 		CLOSE(unit=91)
