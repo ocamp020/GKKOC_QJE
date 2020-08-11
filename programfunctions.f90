@@ -119,7 +119,11 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)              :: Y_a, K, Pr
 
 		! Capital demand 
+		if (x_in.eq.1) then 
+		K   = (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))
+		else 
 		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		end
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
@@ -153,7 +157,11 @@ end Subroutine Asset_Grid_Threshold
 		real(DP) :: K, Pr, Y_a, tauW
 
 		! Capital demand 
+		if (x_in.eq.1) then 
+		K   = (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))
+		else 
 		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		end
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
@@ -165,7 +173,7 @@ end Subroutine Asset_Grid_Threshold
 		end if
 
 		! After tax marginal benefit of assets
-		if (K.lt.theta(z_in)*a_in) then 
+		if ((K.lt.theta(z_in)*a_in).or.(x_in.eq.1)) then 
 			MB_a = (1.0_dp*(1.0_dp-tauW) + R*(1.0_dp-tauK))
 		else 
 			MB_a = (1.0_dp*(1.0_dp-tauW) + R*(1.0_dp-tauK)) &
@@ -181,9 +189,13 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)			  :: MB_a_at, K
 
 		! Capital demand 
+		if (x_in.eq.1) then 
+		K   = (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))
+		else 
 		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		end
 		! Compute asset marginal benefit - subject to taxes
-		if (K.lt.theta(z_in)*a_in) then 
+		if ((K.lt.theta(z_in)*a_in).or.(x_in.eq.1)) then 
 			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK))
 		else 
 			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK)) &
@@ -199,9 +211,13 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)             :: MB_a_bt, K
 
 		! Capital demand 
+		if (x_in.eq.1) then 
+		K   = (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))
+		else 
 		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		end
 		! Compute asset marginal benefit - subject to taxes
-		if (K.lt.theta(z_in)*a_in) then 
+		if ((K.lt.theta(z_in)*a_in).or.(x_in.eq.1)) then 
 			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK))
 		else 
 			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK)) &
@@ -2137,12 +2153,21 @@ SUBROUTINE FIND_DBN_EQ()
 	    DO e1=1, ne
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
+	        	if (x1.eq.1) then 
 	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
 	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
 	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
 	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
+	            else
+	            DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,2)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
+	            endif 
 	        ENDDO
 	        ENDDO
 	    ENDDO
@@ -2163,12 +2188,21 @@ SUBROUTINE FIND_DBN_EQ()
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
+	        	if (x1.eq.1) then 
 	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
 	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
 	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
 	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
+	            else
+	            DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,2)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
+	            endif 
 	        ENDDO
 	        ENDDO
 	        
@@ -2201,12 +2235,21 @@ SUBROUTINE FIND_DBN_EQ()
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
+	        	if (x1.eq.1) then 
 	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
 	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
 	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
 	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
 	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
+	            else
+	            DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2)   =  &
+	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
+	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,2)   =  &
+	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,2) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
+	            endif 
 	        ENDDO
 	        ENDDO
 	        
@@ -6341,7 +6384,11 @@ Function K_Matrix(R_in,P_in)
 	do h=1,nx
 	do j=1,nz
 	do i=1,na 
+		if (h.eq.1) then 
+		K_Matrix(i,j,h) = (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu))
+		else 
 		K_Matrix(i,j,h) = min( theta(j)*agrid(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		endif 
 	enddo
 	enddo
 	enddo 
@@ -6359,7 +6406,11 @@ Function K_Matrix_t(R_in,P_in)
 	do h=1,nx
 	do j=1,nz
 	do i=1,na_t
+		if (h.eq.1) then 
+		K_Matrix_t(i,j,h) = (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu))
+		else 
 		K_Matrix_t(i,j,h) = min( theta(j)*agrid_t(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		endif 
 	enddo
 	enddo
 	enddo 
@@ -6919,31 +6970,38 @@ SUBROUTINE  INITIALIZE()
 		if (nx.gt.1) then
 			! print*, 'X probability '
 			xgrid = (/x_hi , x_lo , x_0/)
-			! Low z types stay in x=1 until retirement
-				pr_x(1,1,1:4,:) = 1.00_dp - p2_x
+			! Low z types do not go public - send to inactivity 
+				pr_x(1,1,1:4,:) = 0.00_dp
 				pr_x(1,2,1:4,:) = 0.00_dp 
-				pr_x(1,3,1:4,:) = p2_x
-			! High z types have 5% probability of going from x=1 to x=2
-				pr_x(1,1,5:nz,:) = 1.00_dp - p1_x - p2_x
-				pr_x(1,2,5:nz,:) = p1_x 
+				pr_x(1,3,1:4,:) = 1.00_dp
+			! Low z types do not go public - send to inactivity with probability p1_x
+				pr_x(2,1,1:4,:) = 0.00_dp
+				pr_x(2,2,1:4,:) = 1.00_dp - p1_x
+				pr_x(2,3,1:4,:) = p1_x
+			! High z types have probability p2_x of going from public to inactivity
+				pr_x(1,1,5:nz,:) = 1.00_dp - p2_x
+				pr_x(1,2,5:nz,:) = 0.00_dp 
 				pr_x(1,3,5:nz,:) = p2_x
-			! x=2 goes to x=3 with probability 3%
-				pr_x(2,1,:,:) = 0.00_dp 
-				pr_x(2,2,:,:) = 1.00_dp - p2_x
-				pr_x(2,3,:,:) = p2_x
-			! x=3 is an absorbing state
+			! High z types have probability p3_x of going public and probability p1_x of going to inactivity
+				pr_x(2,1,5:nz,:) = p3_x
+				pr_x(2,2,5:nz,:) = 1.00_dp - p1_x - p3_x
+				pr_x(2,3,5:nz,:) = p1_x
+			! x=3 is an absorbing state (inactivity)
 				pr_x(3,1,:,:) = 0.00_dp 
 				pr_x(3,2,:,:) = 0.00_dp 
 				pr_x(3,3,:,:) = 1.00_dp
 			! Gx is not used. So it is initialized to an arbitrary value
 				Gx(1,:,:) = 0.50_dp ; Gx(2,:,:) = 0.50_dp ; Gx(3,:,:) = 0.00_dp ;
 			! xz grid
-				xz_grid(1,:)   = exp(log(zgrid)*xgrid(1))
-				xz_grid(2,1:4) = xz_grid(1,1:4); xz_grid(2,5:) = exp(log(zgrid(5:))*xgrid(2));
-				xz_grid(3,:)   = 0.0_dp
+				! xz_grid(1,:)   = exp(log(zgrid)*xgrid(1))
+				! xz_grid(2,1:4) = xz_grid(1,1:4); xz_grid(2,5:) = exp(log(zgrid(5:))*xgrid(2));
+				! xz_grid(3,:)   = 0.0_dp
 				! xz_grid = spread(zgrid,1,nx)*spread(xgrid,2,nz)
 				! xz_grid(1,:)   = zgrid 	; xz_grid(2,1:3) = zgrid(1:3)	;	xz_grid(2,4:)  = zgrid(4)
 				! xz_grid(1,:) = zgrid; xz_grid(2,:) = 0.00_dp*zgrid
+				xz_grid(1,:) = zgrid 
+				xz_grid(2,:) = zgrid 
+				xz_grid(3,:) = 0.00_dp
 				! print*, ' xgrid', xgrid
 				! print*, ' zgrid', zgrid 
 				! do xi=1,nx

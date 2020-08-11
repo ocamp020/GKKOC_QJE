@@ -59,8 +59,8 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
-			compute_bench = .false.
+		Tax_Reform    = .true.
+			compute_bench = .true.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .true.
@@ -81,7 +81,7 @@ PROGRAM main
 
 		compute_exp_fixed_prices_and_taxes = .false.
 
-		Opt_Tax       = .true.
+		Opt_Tax       = .false.
 			Opt_Tax_KW    = .true. ! true=tau_K, false=tau_W
 
 		Opt_Threshold = .false.
@@ -156,6 +156,11 @@ PROGRAM main
 			! No bequest fees
 				bq_fee = 0.00_dp
 
+			! IPO variables 
+				p1_x = 0.03_dp ! Prob normal firm shuts down
+				p2_x = 0.03_dp ! Prob public firm shuts down
+				p3_x = 0.01_dp ! Prob going public 
+
 		else
 
 		! Corporate SEctor
@@ -218,23 +223,23 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1/'
+			Result_Folder = './Revision/Model_2.1_IPO_/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_PT/' 
+			Result_Folder = './Revision/Model_2.1_IPO_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_SU/' 
+			Result_Folder = './Revision/Model_2.1_IPO_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_IPO_PT_SU/' 
 		end if
 	else 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp/' 
+			Result_Folder = './Revision/Model_2.1_IPO_Corp/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_PT/' 
+			Result_Folder = './Revision/Model_2.1_IPO_Corp_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_SU/' 
+			Result_Folder = './Revision/Model_2.1_IPO_Corp_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_IPO_Corp_PT_SU/' 
 		end if
 	endif 
 
@@ -607,7 +612,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark

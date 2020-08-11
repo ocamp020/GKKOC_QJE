@@ -68,6 +68,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP) :: Top_Share_K_Inc(5), K_Inc_pct(5)
 	integer  :: pct_list_for_Top_Share(5)
+	real(dp) :: DBN_age_X(MaxAge,nx), Public_Share, Public_A_Share, Public_K_Share
 
 	allocate(DBN_vec(			size(DBN1)))
 	allocate(Firm_Wealth_vec(	size(DBN1)))
@@ -114,6 +115,9 @@ SUBROUTINE COMPUTE_STATS()
 		enddo 
 
 		DBN_ZX = sum(sum(sum(sum(DBN_bench,5),4),2),1) 
+
+
+
 		
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
@@ -326,8 +330,10 @@ SUBROUTINE COMPUTE_STATS()
 	! Income, Wealth, Returns to Capital
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
+
 		! print*, 'Test wealth'
 		! Sources of income
+
 		Pr_mat = Profit_Matrix(R,P)
 		K_mat  = K_Matrix(R,P)
 		do zi=1,nz
@@ -451,6 +457,7 @@ SUBROUTINE COMPUTE_STATS()
 		StdReturn       = VarReturn**0.5_DP
 		Std_AT_K_Return = Var_AT_K_Return**0.5_DP
 		Std_K_Return    = Var_K_Return**0.5_DP
+
 
 
 	!------------------------------------------------------------------------------------
@@ -1714,6 +1721,54 @@ SUBROUTINE COMPUTE_STATS()
 	! 	CLOSE(UNIT=1)
 	! 	CLOSE(UNIT=2)
 	! 	CLOSE(UNIT=3)
+
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+	! Public Firms 
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+
+		! Distribution of firms in life-cycle 
+		OPEN (UNIT=90, FILE=trim(Result_Folder)//'size_by_age_x.txt', STATUS='replace')   
+		WRITE  (UNIT=90, FMT=*)  'Age, x1, x2, x3'
+		do age=1,MaxAge 
+		do xi=1:nx
+			DBN_age_X(age,xi) = sum(DBN1(age,:,nz-3,:,:,xi))
+		enddo 
+			DBN_age_X(age,:) = DBN_age_X(age,:)/sum(DBN_age_X(age,:))
+			WRITE  (UNIT=90, FMT=*)  DBN_age_X(age,:) 
+		enddo 
+		CLOSE(unit=90)
+
+		! Share of public firms 
+		Public_Share   = sum(DBN1(:,:,:,:,:,1)) 
+		Public_A_Share = 0.0_dp 
+		Public_K_Share = 0.0_dp
+		K_mat  = K_Matrix(R,P)
+		do zi=1,nz
+		do ai=1,na 
+			Public_A_Share = Public_A_Share + agrid(ai)     *sum(DBN1(:,ai,zi,:,:,1))
+			Public_K_Share = Public_K_Share + K_mat(ai,zi,1)*sum(DBN1(:,ai,zi,:,:,1))
+		enddo 
+		enddo
+		Public_A_Share = Public_A_Share/MeanWealth
+		Public_K_Share = Public_K_Share/MeanWealth
+
+		OPEN (UNIT=90, FILE=trim(Result_Folder)//'Public_Share.txt', STATUS='replace') 
+		WRITE(UNIT=90) 'Public_Share=',Public_Share 
+		WRITE(UNIT=90) 'Public_A_Share=',Public_A_Share   
+		WRITE(UNIT=90) 'Public_K_Share=',Public_K_Share 
+		CLOSE(unit=90)
+
+		print*,' '; print*,'-----------------------------------------------------';
+		print*,'	Share of Public Firms '
+		print '(A,F7.3)',' Share of Firms   = ',Public_Share
+		print '(A,F7.3)',' Share of Assets  = ',Public_A_Share
+		print '(A,F7.3)',' Share of Capital = ',Public_K_Share
+		print*,'-----------------------------------------------------'; print*, ' '
+
+
+
 
 
 	print*, ' '; print*,' End of Compute_Stats'; print*, ' '
