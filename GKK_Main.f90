@@ -60,7 +60,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
+			compute_bench = .true.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .true.
@@ -218,23 +218,23 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1/'
-		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_PT/' 
-		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_SU/' 
-		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_PT_SU/' 
-		end if
-	else 
- 		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp/' 
+			Result_Folder = './Revision/Model_2.1_Corp/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './Revision/Model_2.1_Corp_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
 			Result_Folder = './Revision/Model_2.1_Corp_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
 			Result_Folder = './Revision/Model_2.1_Corp_PT_SU/' 
+		end if
+	else 
+ 		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
+			Result_Folder = './Revision/Model_2.1_Corp_Corp/' 
+		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
+			Result_Folder = './Revision/Model_2.1_Corp_Corp_PT/' 
+		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
+			Result_Folder = './Revision/Model_2.1_Corp_Corp_SU/' 
+		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
+			Result_Folder = './Revision/Model_2.1_Corp_Corp_PT_SU/' 
 		end if
 	endif 
 
@@ -607,7 +607,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark
@@ -2368,9 +2368,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
     	
-    	tau_grid_min  = -00
-    	tau_grid_max  = -45
-    	tau_grid_step = -1
+    	tau_grid_min  = 00
+    	tau_grid_max  = 40
+    	tau_grid_step = 1
 
     	! Set low psi
     	psi = 0.70_dp
@@ -2378,10 +2378,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
 		print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
 		print*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_2.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	
-    	tau_grid_min  = 40
-    	tau_grid_max  = 55
+    	tau_grid_min  = 00
+    	tau_grid_max  = 40
     	tau_grid_step = 1
 
     	! Set Y_a_threshold
@@ -2473,7 +2473,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	      	if (Opt_Tax_KW) then 
 	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
 	      	else 
-	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_2.txt', STATUS='old', POSITION='append')
+	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='old', POSITION='append')
 	      	endif 
 		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, (GBAR_K+GBAR_W)/(GBAR_bench +SSC_Payments_bench ), & 
 			      &  MeanWealth, QBAR, QBAR/MeanWealth,NBAR, &

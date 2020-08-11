@@ -8,7 +8,7 @@ MODULE parameters
 
     ! Switch for computing social security with benchmark earnings
     	! If KeepSSatBench=1 then E_bar is kept at E_bar_bench for experiments
-    INTEGER(I4B),  PARAMETER :: KeepSSatBench=0
+    INTEGER(I4B),  PARAMETER :: KeepSSatBench=1
 
 	! Labor efficiency shocks
 		! log(y)=  lambda + kappa + e 
@@ -26,10 +26,10 @@ MODULE parameters
 
     ! Entrepreneurial ability (z)
     REAL(DP)         	    :: rho_z, sigma_z_eps, mu_z
-    INTEGER(I4B), PARAMETER :: nz=9, nz_aux=11  ! Number of grid points
+    INTEGER(I4B), PARAMETER :: nz=1, nz_aux=1  ! Number of grid points
 
     ! Transitory entrepreneurial ablity (x)
-    INTEGER(I4B), PARAMETER :: nx=3
+    INTEGER(I4B), PARAMETER :: nx=1
     REAL(DP)                :: x_hi, x_lo, x_0, a_x, b_x
 
  
@@ -42,7 +42,7 @@ MODULE parameters
 		REAL(DP), PARAMETER  :: alpha=0.40_DP, Aprod=1.0_DP, alpha_C=alpha
 		REAL(DP)			 :: A_C
 		! Intermediate good (or home production)
-		REAL(DP), PARAMETER  :: mu=0.90_DP
+		REAL(DP), PARAMETER  :: mu=1.00_DP
 		! Depreciation rate
 		REAL(DP), PARAMETER  :: DepRate=0.05_DP
 		! Financial constraints

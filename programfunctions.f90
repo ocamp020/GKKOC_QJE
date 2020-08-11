@@ -119,7 +119,7 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)              :: Y_a, K, Pr
 
 		! Capital demand 
-		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = a_in ! min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
@@ -153,7 +153,7 @@ end Subroutine Asset_Grid_Threshold
 		real(DP) :: K, Pr, Y_a, tauW
 
 		! Capital demand 
-		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = a_in ! min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
@@ -165,12 +165,12 @@ end Subroutine Asset_Grid_Threshold
 		end if
 
 		! After tax marginal benefit of assets
-		if (K.lt.theta(z_in)*a_in) then 
+		if ((K.lt.theta(z_in)*a_in).or.(mu.eq.1.0_dp)) then 
 			MB_a = (1.0_dp*(1.0_dp-tauW) + R*(1.0_dp-tauK))
 		else 
 			MB_a = (1.0_dp*(1.0_dp-tauW) + R*(1.0_dp-tauK)) &
          	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
-		endif 
+		endif
 
 	END  FUNCTION MB_a
 
@@ -181,9 +181,9 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)			  :: MB_a_at, K
 
 		! Capital demand 
-		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = a_in ! min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
-		if (K.lt.theta(z_in)*a_in) then 
+		if ((K.lt.theta(z_in)*a_in).or.(mu.eq.1.0_dp)) then 
 			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK))
 		else 
 			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK)) &
@@ -199,9 +199,9 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)             :: MB_a_bt, K
 
 		! Capital demand 
-		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = a_in ! min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
-		if (K.lt.theta(z_in)*a_in) then 
+		if ((K.lt.theta(z_in)*a_in).or.(mu.eq.1.0_dp)) then 
 			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK))
 		else 
 			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK)) &
@@ -2250,7 +2250,11 @@ SUBROUTINE FIND_DBN_EQ()
 	        DO a1=1,na
 	        DO lambda1=1,nlambda
 	        DO e1=1, ne
+	        	if (mu.eq.1.0_dp) then 
+	        	 QBAR= QBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * agrid(a1)
+	        	else 
 	             QBAR= QBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
+	            endif 
 	             NBAR= NBAR+ DBN1(age1, a1, z1, lambda1, e1, x1) * eff_un(age1, lambda1, e1) * Hours(age1, a1, z1, lambda1,e1,x1)
 	        ENDDO
 	        ENDDO
@@ -2259,7 +2263,7 @@ SUBROUTINE FIND_DBN_EQ()
 	        ENDDO    
 	        ENDDO 
 	        !$omp barrier
-	        QBAR = ( QBAR)**(1.0_DP/mu)
+	        QBAR = ( QBAR )**(1.0_DP/mu)
 
 
 	        if (A_C.gt.0.0_dp) then 
@@ -2317,6 +2321,7 @@ SUBROUTINE FIND_DBN_EQ()
 		        Ebar = wage  * NBAR  * sum(pop)/sum(pop(1:RetAge-1))
 
 		    	! Solve for new R 
+		    	if (mu.lt.1.0_dp) then 
 		    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
 		    	if (sum(theta)/nz .gt. 1.0_DP) then
 		    		P = min(P,1.0_dp)
@@ -2324,6 +2329,9 @@ SUBROUTINE FIND_DBN_EQ()
 		        else
 		            R = 0.0_DP
 		        endif
+		        else
+		         	R = P - DepRate
+		        endif 
 
 	        endif 
 
@@ -4273,7 +4281,11 @@ SUBROUTINE FIND_DBN_Transition()
 	        DO a1=1,na
 	        DO lambda1=1,nlambda
 	        DO e1=1, ne
+	        	if (mu.lt.1.0_dp) then 
 	             QBAR2_tr(ti)= QBAR2_tr(ti)+ DBN_tr(age1,a1,z1,lambda1,e1,x1,ti) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
+	            else 
+	             QBAR2_tr(ti)= QBAR2_tr(ti)+ DBN_tr(age1,a1,z1,lambda1,e1,x1,ti) * agrid(a1)
+	            endif 
 	             NBAR2_tr(ti)= NBAR2_tr(ti)+ &
 	             			& DBN_tr(age1,a1,z1,lambda1,e1,x1,ti) * eff_un(age1,lambda1,e1) * Hours_tr(age1,a1,z1,lambda1,e1,x1,ti)
 	        ENDDO
@@ -4360,6 +4372,7 @@ SUBROUTINE FIND_DBN_Transition()
 		        Ebar_tr(ti)  = wage_tr(ti)  * NBAR_tr(ti) * sum(pop)/sum(pop(1:RetAge-1))
 
 		    	! Solve for new R (that clears market under new guess for prices)
+		    	if (mu.lt.1.0_dp) then 
 		    	! Update only every third period or in the first and last periods 
 		    	if ((ind_R.eq.3)) then ! .or.(ti.eq.T)
 			    		! Save old R for updating 
@@ -4410,6 +4423,15 @@ SUBROUTINE FIND_DBN_Transition()
 
 		        	! Update index
 	        		ind_R = 1 
+
+		        else
+		        	R_old     = R_tr(ti) 
+		        	R2_tr(ti) = P_tr(ti) - DepRate
+		        	! Get R_dist before dampening 
+		        	R_dist = max(R_dist,abs(R2_tr(ti)/R_tr(ti)-1))
+		        	! Update R
+		        	R_tr(ti) = R2_tr(ti)
+		        endif 
 
 		        else 
 		        	! Update by extrapolating from last update 
@@ -4532,7 +4554,11 @@ SUBROUTINE FIND_DBN_Transition()
 	        DO a1=1,na
 	        DO lambda1=1,nlambda
 	        DO e1=1, ne
+	        	if (mu.lt.1.0_dp) then 
 	             QBAR2_tr(T+1)= QBAR2_tr(T+1)+ DBN_tr(age1,a1,z1,lambda1,e1,x1,T+1) * ( xz_grid(x1,z1) * K_mat(a1,z1,x1) )**mu
+	             else 
+	             QBAR2_tr(T+1)= QBAR2_tr(T+1)+ DBN_tr(age1,a1,z1,lambda1,e1,x1,T+1) * agrid(a1)
+	             endif 
 	             NBAR2_tr(T+1)= NBAR2_tr(T+1)+ &
 	             			& DBN_tr(age1,a1,z1,lambda1,e1,x1,T+1) * eff_un(age1,lambda1,e1) * Hours_tr(age1,a1,z1,lambda1,e1,x1,T+1)
 	        ENDDO
@@ -4619,6 +4645,7 @@ SUBROUTINE FIND_DBN_Transition()
 		        Ebar_tr(T+1)  = wage_tr(T+1)  * NBAR_tr(T+1) * sum(pop)/sum(pop(1:RetAge-1))
 
 		    	! Solve for new R (that clears market under new guess for prices)
+		    	if (mu.lt.1.0_dp) then 
     				! Save old R for updating 
 		    		R_old = R_tr(T+1)
 		    	if (sum(theta)/nz .gt. 1.0_DP) then
@@ -4637,6 +4664,15 @@ SUBROUTINE FIND_DBN_Transition()
 
 	        	! Dampened Update of R
 	        	R_tr(T+1)  = Dampen*R_old + (1.0_dp-Dampen)*R2_tr(T+1)
+
+	        	else 
+		        	R_old     = R_tr(T+1) 
+		        	R2_tr(ti) = P_tr(T+1) - DepRate
+		        	! Get R_dist before dampening 
+		        	R_dist = max(R_dist,abs(R2_tr(T+1)/R_tr(T+1)-1))
+		        	! Update R
+		        	R_tr(T+1) = R2_tr(T+1)
+	        	endif 
 
 	        endif 
 
@@ -6341,7 +6377,11 @@ Function K_Matrix(R_in,P_in)
 	do h=1,nx
 	do j=1,nz
 	do i=1,na 
+		if (mu.lt.1.0_dp) then 
 		K_Matrix(i,j,h) = min( theta(j)*agrid(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		else 
+		K_Matrix(i,j,h) = agrid(i) 
+		endif 
 	enddo
 	enddo
 	enddo 
@@ -6359,7 +6399,11 @@ Function K_Matrix_t(R_in,P_in)
 	do h=1,nx
 	do j=1,nz
 	do i=1,na_t
+		if (mu.lt.1.0_dp) then 
 		K_Matrix_t(i,j,h) = min( theta(j)*agrid_t(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		else 
+		K_Matrix_t(i,j,h) = agrid_t(i)
+		endif 
 	enddo
 	enddo
 	enddo 
