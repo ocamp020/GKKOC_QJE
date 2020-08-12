@@ -6378,7 +6378,8 @@ Function K_Matrix(R_in,P_in)
 	do j=1,nz
 	do i=1,na 
 		if (mu.lt.1.0_dp) then 
-		K_Matrix(i,j,h) = min( theta(j)*agrid(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		! K_Matrix(i,j,h) = min( theta(j)*agrid(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		print*, ' mu<1 - need to uncomment this line'
 		else 
 		K_Matrix(i,j,h) = agrid(i) 
 		endif 
@@ -6400,7 +6401,8 @@ Function K_Matrix_t(R_in,P_in)
 	do j=1,nz
 	do i=1,na_t
 		if (mu.lt.1.0_dp) then 
-		K_Matrix_t(i,j,h) = min( theta(j)*agrid_t(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		! K_Matrix_t(i,j,h) = min( theta(j)*agrid_t(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		print*, ' mu<1 - need to uncomment this line'
 		else 
 		K_Matrix_t(i,j,h) = agrid_t(i)
 		endif 
