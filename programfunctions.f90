@@ -2229,7 +2229,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    ENDDO
 	    !$omp barrier
 	    
-	    DBN2 = 0.7_dp*DBN1 + 0.3_dp*DBN2
+	    ! DBN2 = 0.7_dp*DBN1 + 0.3_dp*DBN2
 	    DBN_dist = maxval(abs(DBN2-DBN1))
 	    ! print*, DBN_dist
 	    DBN1 = DBN2
