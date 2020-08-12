@@ -175,9 +175,10 @@ PROGRAM main
 			chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 		! Capital Market
-			do zi=1,nz
-			theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
-			enddo
+			! do zi=1,nz
+			! theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+			! enddo
+			theta = 1.50_dp
 
 		endif 
 
