@@ -220,23 +220,23 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp/'
+			Result_Folder = './Revision/Model_2.1_CKK/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_PT/' 
+			Result_Folder = './Revision/Model_2.1_CKK_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_SU/' 
+			Result_Folder = './Revision/Model_2.1_CKK_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_CKK_PT_SU/' 
 		end if
 	else 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_Corp/' 
+			Result_Folder = './Revision/Model_2.1_CKK_Corp/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_Corp_PT/' 
+			Result_Folder = './Revision/Model_2.1_CKK_Corp_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_Corp_SU/' 
+			Result_Folder = './Revision/Model_2.1_CKK_Corp_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_Corp_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_CKK_Corp_PT_SU/' 
 		end if
 	endif 
 
@@ -507,8 +507,8 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL INITIALIZE
 		
 	if (compute_bench) then
-		print*,"	Reading initial conditions from file"
-		CALL Write_Benchmark_Results(.false.)
+		! print*,"	Reading initial conditions from file"
+		! CALL Write_Benchmark_Results(.false.)
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
 		print*,"	Computing government spending"
