@@ -82,7 +82,7 @@ PROGRAM main
 		compute_exp_fixed_prices_and_taxes = .false.
 
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
+			Opt_Tax_KW    = .true. ! true=tau_K, false=tau_W
 
 		Opt_Threshold = .false.
 
