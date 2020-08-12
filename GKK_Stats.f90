@@ -205,39 +205,39 @@ SUBROUTINE COMPUTE_STATS()
 		enddo 
 		enddo 
 
-		! Composition by draft groups of top wealth groups
-		draft_group_share_top_wealth        = Draft_Table(Z_share_top_wealth,DBN_z,.true.)
-		draft_group_wealth_share_top_wealth = Draft_Table(A_share_top_wealth,DBN_z,.true.)
+		! ! Composition by draft groups of top wealth groups
+		! draft_group_share_top_wealth        = Draft_Table(Z_share_top_wealth,DBN_z,.true.)
+		! draft_group_wealth_share_top_wealth = Draft_Table(A_share_top_wealth,DBN_z,.true.)
 
-	    ! Write results in file
-	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_share_top_wealth.txt', STATUS='replace') 
-	    do age = 1,draft_age_category
-		    WRITE  (UNIT=81, FMT=*)  draft_group_share_top_wealth(age,:)
-		ENDDO
-		close(unit=81)
+	 !    ! Write results in file
+	 !    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_share_top_wealth.txt', STATUS='replace') 
+	 !    do age = 1,draft_age_category
+		!     WRITE  (UNIT=81, FMT=*)  draft_group_share_top_wealth(age,:)
+		! ENDDO
+		! close(unit=81)
 
-		OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_wealth_share_top_wealth.txt', STATUS='replace') 
-	    do age = 1,draft_age_category
-		    WRITE  (UNIT=81, FMT=*)  draft_group_wealth_share_top_wealth(age,:)
-		ENDDO
-		close(unit=81)
+		! OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_wealth_share_top_wealth.txt', STATUS='replace') 
+	 !    do age = 1,draft_age_category
+		!     WRITE  (UNIT=81, FMT=*)  draft_group_wealth_share_top_wealth(age,:)
+		! ENDDO
+		! close(unit=81)
 
-		! Composition by draft groups of top wealth groups
-		draft_group_share_top_wealth        = Draft_Table_X(Z_share_top_wealth_x,DBN_zx,.true.)
-		draft_group_wealth_share_top_wealth = Draft_Table_X(A_share_top_wealth_x,DBN_zx,.true.)
+		! ! Composition by draft groups of top wealth groups
+		! draft_group_share_top_wealth        = Draft_Table_X(Z_share_top_wealth_x,DBN_zx,.true.)
+		! draft_group_wealth_share_top_wealth = Draft_Table_X(A_share_top_wealth_x,DBN_zx,.true.)
 
-	    ! Write results in file
-	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_share_top_wealth_xz.txt', STATUS='replace') 
-	    do age = 1,draft_age_category
-		    WRITE  (UNIT=81, FMT=*)  draft_group_share_top_wealth(age,:)
-		ENDDO
-		close(unit=81)
+	 !    ! Write results in file
+	 !    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_share_top_wealth_xz.txt', STATUS='replace') 
+	 !    do age = 1,draft_age_category
+		!     WRITE  (UNIT=81, FMT=*)  draft_group_share_top_wealth(age,:)
+		! ENDDO
+		! close(unit=81)
 
-		OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_wealth_share_top_wealth_xz.txt', STATUS='replace') 
-	    do age = 1,draft_age_category
-		    WRITE  (UNIT=81, FMT=*)  draft_group_wealth_share_top_wealth(age,:)
-		ENDDO
-		close(unit=81)
+		! OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_wealth_share_top_wealth_xz.txt', STATUS='replace') 
+	 !    do age = 1,draft_age_category
+		!     WRITE  (UNIT=81, FMT=*)  draft_group_wealth_share_top_wealth(age,:)
+		! ENDDO
+		! close(unit=81)
 
 		! Find top 99.9 and top 99.99
 		! Top 99.9
@@ -1106,62 +1106,62 @@ SUBROUTINE COMPUTE_STATS()
 		! print*,'CDF_Z=',CDF_Z 
 		! print*,' '
 
-		! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		size_draft_group = Draft_Table(size_draft_group_z,DBN_z,.true.)
+		! ! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		! size_draft_group = Draft_Table(size_draft_group_z,DBN_z,.true.)
 
-		! Wealth of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		wealth_draft_group = Draft_Table(wealth_draft_group_z,DBN_z,.true.)
+		! ! Wealth of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		! wealth_draft_group = Draft_Table(wealth_draft_group_z,DBN_z,.true.)
 
-		! Capital of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		capital_draft_group = Draft_Table(capital_draft_group_z,DBN_z,.true.)
+		! ! Capital of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		! capital_draft_group = Draft_Table(capital_draft_group_z,DBN_z,.true.)
 
-		! Cons, Hours, Ap of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		 Cons_draft_group = Draft_Table(Cons_draft_group_z,DBN_z,.true.)*(EBAR_data/(EBAR_bench*0.727853584919652_dp))/size_draft_group
-		Hours_draft_group = Draft_Table( Hours_draft_group_z,DBN_z,.true.)/size_draft_group
-		   Ap_draft_group = Draft_Table(    Ap_draft_group_z,DBN_z,.true.)
+		! ! Cons, Hours, Ap of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+		!  Cons_draft_group = Draft_Table(Cons_draft_group_z,DBN_z,.true.)*(EBAR_data/(EBAR_bench*0.727853584919652_dp))/size_draft_group
+		! Hours_draft_group = Draft_Table( Hours_draft_group_z,DBN_z,.true.)/size_draft_group
+		!    Ap_draft_group = Draft_Table(    Ap_draft_group_z,DBN_z,.true.)
 
-		! Fix fractions
-	    av_wealth_draft_group        = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*wealth_draft_group/size_draft_group
-	    av_capital_draft_group       = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*capital_draft_group/size_draft_group
-	    av_Ap_draft_group            = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*Ap_draft_group/size_draft_group
-	    frac_wealth_draft_group      = 100.0_dp*wealth_draft_group/sum(wealth_draft_group(:,1:6))
-	    frac_capital_draft_group     = 100.0_dp*capital_draft_group/sum(capital_draft_group(:,1:6))
-	    frac_Ap_draft_group      	 = 100.0_dp*Ap_draft_group/sum(Ap_draft_group(:,1:6))
+		! ! Fix fractions
+	 !    av_wealth_draft_group        = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*wealth_draft_group/size_draft_group
+	 !    av_capital_draft_group       = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*capital_draft_group/size_draft_group
+	 !    av_Ap_draft_group            = (EBAR_data/(EBAR_bench*0.727853584919652_dp))*Ap_draft_group/size_draft_group
+	 !    frac_wealth_draft_group      = 100.0_dp*wealth_draft_group/sum(wealth_draft_group(:,1:6))
+	 !    frac_capital_draft_group     = 100.0_dp*capital_draft_group/sum(capital_draft_group(:,1:6))
+	 !    frac_Ap_draft_group      	 = 100.0_dp*Ap_draft_group/sum(Ap_draft_group(:,1:6))
 
 
-	    ! Write results in file
-	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size.txt'			, STATUS='replace') 
-	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_wealth.txt'		, STATUS='replace') 
-	    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_wealth_av.txt'	, STATUS='replace') 
-	    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_wealth_frac.txt'	, STATUS='replace') 
-	    OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_capital.txt'		, STATUS='replace') 
-	    OPEN (UNIT=87, FILE=trim(Result_Folder)//'draft_group_capital_av.txt'	, STATUS='replace') 
-	    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_capital_frac.txt'	, STATUS='replace') 
-	    OPEN (UNIT=89, FILE=trim(Result_Folder)//'draft_group_cons.txt'			, STATUS='replace') 
-	    OPEN (UNIT=91, FILE=trim(Result_Folder)//'draft_group_hours.txt'		, STATUS='replace') 
-	    OPEN (UNIT=92, FILE=trim(Result_Folder)//'draft_group_savings.txt'		, STATUS='replace') 
-	    OPEN (UNIT=93, FILE=trim(Result_Folder)//'draft_group_savings_av.txt'	, STATUS='replace') 
-	    OPEN (UNIT=94, FILE=trim(Result_Folder)//'draft_group_savings_frac.txt'	, STATUS='replace') 
-		do age = 1,draft_age_category
-		    WRITE  (UNIT=81, FMT=*)  size_draft_group(age,:)
+	 !    ! Write results in file
+	 !    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size.txt'			, STATUS='replace') 
+	 !    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_wealth.txt'		, STATUS='replace') 
+	 !    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_wealth_av.txt'	, STATUS='replace') 
+	 !    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_wealth_frac.txt'	, STATUS='replace') 
+	 !    OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_capital.txt'		, STATUS='replace') 
+	 !    OPEN (UNIT=87, FILE=trim(Result_Folder)//'draft_group_capital_av.txt'	, STATUS='replace') 
+	 !    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_capital_frac.txt'	, STATUS='replace') 
+	 !    OPEN (UNIT=89, FILE=trim(Result_Folder)//'draft_group_cons.txt'			, STATUS='replace') 
+	 !    OPEN (UNIT=91, FILE=trim(Result_Folder)//'draft_group_hours.txt'		, STATUS='replace') 
+	 !    OPEN (UNIT=92, FILE=trim(Result_Folder)//'draft_group_savings.txt'		, STATUS='replace') 
+	 !    OPEN (UNIT=93, FILE=trim(Result_Folder)//'draft_group_savings_av.txt'	, STATUS='replace') 
+	 !    OPEN (UNIT=94, FILE=trim(Result_Folder)//'draft_group_savings_frac.txt'	, STATUS='replace') 
+		! do age = 1,draft_age_category
+		!     WRITE  (UNIT=81, FMT=*)  size_draft_group(age,:)
 
-		    WRITE  (UNIT=83, FMT=*)  wealth_draft_group(age,:)
-		    WRITE  (UNIT=84, FMT=*)  av_wealth_draft_group(age,:)
-		    WRITE  (UNIT=85, FMT=*)  frac_wealth_draft_group(age,:)
-		    WRITE  (UNIT=86, FMT=*)  capital_draft_group(age,:)
-		    WRITE  (UNIT=87, FMT=*)  av_capital_draft_group(age,:)
-		    WRITE  (UNIT=88, FMT=*)  frac_capital_draft_group(age,:)
+		!     WRITE  (UNIT=83, FMT=*)  wealth_draft_group(age,:)
+		!     WRITE  (UNIT=84, FMT=*)  av_wealth_draft_group(age,:)
+		!     WRITE  (UNIT=85, FMT=*)  frac_wealth_draft_group(age,:)
+		!     WRITE  (UNIT=86, FMT=*)  capital_draft_group(age,:)
+		!     WRITE  (UNIT=87, FMT=*)  av_capital_draft_group(age,:)
+		!     WRITE  (UNIT=88, FMT=*)  frac_capital_draft_group(age,:)
 
-		    WRITE  (UNIT=89, FMT=*)  Cons_draft_group(age,:)
-		    WRITE  (UNIT=91, FMT=*)  Hours_draft_group(age,:)
-		    WRITE  (UNIT=92, FMT=*)  Ap_draft_group(age,:)
-		    WRITE  (UNIT=93, FMT=*)  av_Ap_draft_group(age,:)
-		    WRITE  (UNIT=94, FMT=*)  frac_Ap_draft_group(age,:)
+		!     WRITE  (UNIT=89, FMT=*)  Cons_draft_group(age,:)
+		!     WRITE  (UNIT=91, FMT=*)  Hours_draft_group(age,:)
+		!     WRITE  (UNIT=92, FMT=*)  Ap_draft_group(age,:)
+		!     WRITE  (UNIT=93, FMT=*)  av_Ap_draft_group(age,:)
+		!     WRITE  (UNIT=94, FMT=*)  frac_Ap_draft_group(age,:)
 
-		ENDDO
-		close(unit=81)
-		close(unit=83); close(unit=84); close(unit=85); close(unit=86); close(unit=87); close(unit=88);
-		close(unit=89); close(unit=91); close(unit=92); close(unit=93); close(unit=94);
+		! ENDDO
+		! close(unit=81)
+		! close(unit=83); close(unit=84); close(unit=85); close(unit=86); close(unit=87); close(unit=88);
+		! close(unit=89); close(unit=91); close(unit=92); close(unit=93); close(unit=94);
 
 
 	!------------------------------------------------------------------------------------
@@ -1269,112 +1269,112 @@ SUBROUTINE COMPUTE_STATS()
 		enddo
 		enddo
 
-		! Total Capital Tax adjusted by productivity group
-		K_Tax_draft_group = Draft_Table(K_Tax_draft_group_z,DBN_z,.true.)
+		! ! Total Capital Tax adjusted by productivity group
+		! K_Tax_draft_group = Draft_Table(K_Tax_draft_group_z,DBN_z,.true.)
 
-		! Total Labor Tax adjusted by productivity group
-		L_Tax_draft_group = Draft_Table(L_Tax_draft_group_z,DBN_z,.true.)
+		! ! Total Labor Tax adjusted by productivity group
+		! L_Tax_draft_group = Draft_Table(L_Tax_draft_group_z,DBN_z,.true.)
 
-		! Total Pre-Tax Income adjusted by productivity group
-		T_Inc_draft_group = Draft_Table(T_Inc_draft_group_z,DBN_z,.true.)
+		! ! Total Pre-Tax Income adjusted by productivity group
+		! T_Inc_draft_group = Draft_Table(T_Inc_draft_group_z,DBN_z,.true.)
 
-		! Total Pre-Tax Capital Income adjusted by productivity group
-		K_Inc_draft_group = Draft_Table(K_Inc_draft_group_z,DBN_z,.true.)
+		! ! Total Pre-Tax Capital Income adjusted by productivity group
+		! K_Inc_draft_group = Draft_Table(K_Inc_draft_group_z,DBN_z,.true.)
 
-		! Total Pre-Tax Labor Income adjusted by productivity group
-		L_Inc_draft_group = Draft_Table(L_Inc_draft_group_z,DBN_z,.true.)
+		! ! Total Pre-Tax Labor Income adjusted by productivity group
+		! L_Inc_draft_group = Draft_Table(L_Inc_draft_group_z,DBN_z,.true.)
 
 
-		! Get fraction of K or L income by group
-		frac_K_Tax_draft_group = 100.0_dp*K_Tax_draft_group/sum(K_Tax_draft_group(:,1:6))
-		frac_L_Tax_draft_group = 100.0_dp*L_Tax_draft_group/sum(L_Tax_draft_group(:,1:6))
-		frac_K_Inc_draft_group = 100.0_dp*K_Inc_draft_group/sum(K_Inc_draft_group(:,1:6))
-		frac_L_Inc_draft_group = 100.0_dp*L_Inc_draft_group/sum(L_Inc_draft_group(:,1:6))
+		! ! Get fraction of K or L income by group
+		! frac_K_Tax_draft_group = 100.0_dp*K_Tax_draft_group/sum(K_Tax_draft_group(:,1:6))
+		! frac_L_Tax_draft_group = 100.0_dp*L_Tax_draft_group/sum(L_Tax_draft_group(:,1:6))
+		! frac_K_Inc_draft_group = 100.0_dp*K_Inc_draft_group/sum(K_Inc_draft_group(:,1:6))
+		! frac_L_Inc_draft_group = 100.0_dp*L_Inc_draft_group/sum(L_Inc_draft_group(:,1:6))
 
-		! Get ratios to total income in group
-		K_Tax_draft_group = 100.0_dp*K_Tax_draft_group/T_Inc_draft_group
-		L_Tax_draft_group = 100.0_dp*L_Tax_draft_group/T_Inc_draft_group
-		K_Inc_draft_group = 100.0_dp*K_Inc_draft_group/T_Inc_draft_group
-		L_Inc_draft_group = 100.0_dp*L_Inc_draft_group/T_Inc_draft_group
+		! ! Get ratios to total income in group
+		! K_Tax_draft_group = 100.0_dp*K_Tax_draft_group/T_Inc_draft_group
+		! L_Tax_draft_group = 100.0_dp*L_Tax_draft_group/T_Inc_draft_group
+		! K_Inc_draft_group = 100.0_dp*K_Inc_draft_group/T_Inc_draft_group
+		! L_Inc_draft_group = 100.0_dp*L_Inc_draft_group/T_Inc_draft_group
 
-		! Divide by mass in group
-		K_Tax_Inc_draft_group_z  = 100.0_dp*K_Tax_Inc_draft_group_z/size_draft_group_z
-		L_Tax_Inc_draft_group_z  = 100.0_dp*L_Tax_Inc_draft_group_z/size_draft_group_z
-		av_K_Inc_draft_group_z 	 = 100.0_dp*av_K_Inc_draft_group_z/size_draft_group_z 
-		av_L_Inc_draft_group_z 	 = 100.0_dp*av_L_Inc_draft_group_z/size_draft_group_z 
+		! ! Divide by mass in group
+		! K_Tax_Inc_draft_group_z  = 100.0_dp*K_Tax_Inc_draft_group_z/size_draft_group_z
+		! L_Tax_Inc_draft_group_z  = 100.0_dp*L_Tax_Inc_draft_group_z/size_draft_group_z
+		! av_K_Inc_draft_group_z 	 = 100.0_dp*av_K_Inc_draft_group_z/size_draft_group_z 
+		! av_L_Inc_draft_group_z 	 = 100.0_dp*av_L_Inc_draft_group_z/size_draft_group_z 
 
-		! Average return by productivity group
-		Return_draft_group_z     = 100.0_dp*   Return_draft_group_z/size_draft_group_z
-		Return_AT_draft_group_z  = 100.0_dp*Return_AT_draft_group_z/size_draft_group_z 
+		! ! Average return by productivity group
+		! Return_draft_group_z     = 100.0_dp*   Return_draft_group_z/size_draft_group_z
+		! Return_AT_draft_group_z  = 100.0_dp*Return_AT_draft_group_z/size_draft_group_z 
 
-		! Average Capital Tax to income ratio adjusted by productivity group
-		K_Tax_Inc_draft_group = Draft_Table(K_Tax_Inc_draft_group_z,DBN_z,.false.)
+		! ! Average Capital Tax to income ratio adjusted by productivity group
+		! K_Tax_Inc_draft_group = Draft_Table(K_Tax_Inc_draft_group_z,DBN_z,.false.)
 
-		! Average Labor Tax to income ratio adjusted by productivity group
-		L_Tax_Inc_draft_group = Draft_Table(L_Tax_Inc_draft_group_z,DBN_z,.false.)
+		! ! Average Labor Tax to income ratio adjusted by productivity group
+		! L_Tax_Inc_draft_group = Draft_Table(L_Tax_Inc_draft_group_z,DBN_z,.false.)
 
-		! Capital Income Share Tax adjusted by productivity group
-		av_K_Inc_draft_group = Draft_Table(av_K_Inc_draft_group_z,DBN_z,.false.)
+		! ! Capital Income Share Tax adjusted by productivity group
+		! av_K_Inc_draft_group = Draft_Table(av_K_Inc_draft_group_z,DBN_z,.false.)
 
-		! Labor Income Share Tax adjusted by productivity group
-		av_L_Inc_draft_group = Draft_Table(av_L_Inc_draft_group_z,DBN_z,.false.)
+		! ! Labor Income Share Tax adjusted by productivity group
+		! av_L_Inc_draft_group = Draft_Table(av_L_Inc_draft_group_z,DBN_z,.false.)
 
-		! Average Return by productivity group
-		   Return_draft_group = Draft_Table(   Return_draft_group_z,DBN_z,.false.)
-		Return_AT_draft_group = Draft_Table(Return_AT_draft_group_z,DBN_z,.false.)
+		! ! Average Return by productivity group
+		!    Return_draft_group = Draft_Table(   Return_draft_group_z,DBN_z,.false.)
+		! Return_AT_draft_group = Draft_Table(Return_AT_draft_group_z,DBN_z,.false.)
 
-		! Frac. Entrepreneurs
-		Entrepreneur_10_draft_group = Draft_Table(Entrepreneur_10_draft_group_z,DBN_z,.true.)
-		Entrepreneur_50_draft_group = Draft_Table(Entrepreneur_50_draft_group_z,DBN_z,.true.)
-			! Fix fractions
-			Entrepreneur_10_draft_group = 100.0_dp*Entrepreneur_10_draft_group/size_draft_group
-			Entrepreneur_50_draft_group = 100.0_dp*Entrepreneur_50_draft_group/size_draft_group
+		! ! Frac. Entrepreneurs
+		! Entrepreneur_10_draft_group = Draft_Table(Entrepreneur_10_draft_group_z,DBN_z,.true.)
+		! Entrepreneur_50_draft_group = Draft_Table(Entrepreneur_50_draft_group_z,DBN_z,.true.)
+		! 	! Fix fractions
+		! 	Entrepreneur_10_draft_group = 100.0_dp*Entrepreneur_10_draft_group/size_draft_group
+		! 	Entrepreneur_50_draft_group = 100.0_dp*Entrepreneur_50_draft_group/size_draft_group
 
-		OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_Tax_K.txt', STATUS='replace') 
-	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_Tax_L.txt', STATUS='replace') 
-	    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_Tax_K_frac.txt', STATUS='replace') 
-	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_Tax_L_frac.txt', STATUS='replace') 
-	    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_Inc.txt', STATUS='replace') 
-	    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_Tax_K_Inc.txt', STATUS='replace') 
-	    OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_Tax_L_Inc.txt', STATUS='replace') 
-	    OPEN (UNIT=87, FILE=trim(Result_Folder)//'draft_group_K_Inc.txt', STATUS='replace') 
-	    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_L_Inc.txt', STATUS='replace') 
-	    OPEN (UNIT=89, FILE=trim(Result_Folder)//'draft_group_K_Inc_av.txt', STATUS='replace') 
-	    OPEN (UNIT=90, FILE=trim(Result_Folder)//'draft_group_L_Inc_av.txt', STATUS='replace') 
-	    OPEN (UNIT=91, FILE=trim(Result_Folder)//'draft_group_K_Inc_frac.txt', STATUS='replace') 
-	    OPEN (UNIT=92, FILE=trim(Result_Folder)//'draft_group_L_Inc_frac.txt', STATUS='replace') 
-	    OPEN (UNIT=93, FILE=trim(Result_Folder)//'draft_group_Return.txt', STATUS='replace') 
-	    OPEN (UNIT=94, FILE=trim(Result_Folder)//'draft_group_Return_AT.txt', STATUS='replace') 
-	    OPEN (UNIT=95, FILE=trim(Result_Folder)//'draft_group_Entrepreneur_10.txt', STATUS='replace') 
-	    OPEN (UNIT=96, FILE=trim(Result_Folder)//'draft_group_Entrepreneur_50.txt', STATUS='replace') 
-	    do age = 1,draft_age_category
-		    WRITE  (UNIT=80, FMT=*)  K_Tax_draft_group(age,:)
-		    WRITE  (UNIT=81, FMT=*)  L_Tax_draft_group(age,:)
-		    WRITE  (UNIT=82, FMT=*)  frac_K_Tax_draft_group(age,:)
-		    WRITE  (UNIT=83, FMT=*)  frac_L_Tax_draft_group(age,:)
-		    WRITE  (UNIT=84, FMT=*)  T_Inc_draft_group(age,:)
-		    WRITE  (UNIT=85, FMT=*)  K_Tax_Inc_draft_group(age,:)
-		    WRITE  (UNIT=86, FMT=*)  L_Tax_Inc_draft_group(age,:)
-		    WRITE  (UNIT=87, FMT=*)  K_Inc_draft_group(age,:)
-		    WRITE  (UNIT=88, FMT=*)  L_Inc_draft_group(age,:)
-		    WRITE  (UNIT=89, FMT=*)  av_K_Inc_draft_group(age,:)
-		    WRITE  (UNIT=90, FMT=*)  av_L_Inc_draft_group(age,:)
-		    WRITE  (UNIT=91, FMT=*)  frac_K_Inc_draft_group(age,:)
-		    WRITE  (UNIT=92, FMT=*)  frac_L_Inc_draft_group(age,:)
-		    WRITE  (UNIT=93, FMT=*)  Return_draft_group(age,:)
-		    WRITE  (UNIT=94, FMT=*)  Return_AT_draft_group(age,:)
-		    WRITE  (UNIT=95, FMT=*)  Entrepreneur_10_draft_group(age,:)
-		    WRITE  (UNIT=96, FMT=*)  Entrepreneur_50_draft_group(age,:)
-		ENDDO
-		close(unit=80); close(unit=81); close(unit=83); close(unit=84); close(unit=85)
-		close(unit=87); close(unit=88); close(unit=89); close(unit=90); close(unit=91); close(unit=92); 
-		close(unit=93); close(unit=94); close(unit=95); close(unit=96);
+		! OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_Tax_K.txt', STATUS='replace') 
+	 !    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_Tax_L.txt', STATUS='replace') 
+	 !    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_Tax_K_frac.txt', STATUS='replace') 
+	 !    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_Tax_L_frac.txt', STATUS='replace') 
+	 !    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_Inc.txt', STATUS='replace') 
+	 !    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_Tax_K_Inc.txt', STATUS='replace') 
+	 !    OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_Tax_L_Inc.txt', STATUS='replace') 
+	 !    OPEN (UNIT=87, FILE=trim(Result_Folder)//'draft_group_K_Inc.txt', STATUS='replace') 
+	 !    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_L_Inc.txt', STATUS='replace') 
+	 !    OPEN (UNIT=89, FILE=trim(Result_Folder)//'draft_group_K_Inc_av.txt', STATUS='replace') 
+	 !    OPEN (UNIT=90, FILE=trim(Result_Folder)//'draft_group_L_Inc_av.txt', STATUS='replace') 
+	 !    OPEN (UNIT=91, FILE=trim(Result_Folder)//'draft_group_K_Inc_frac.txt', STATUS='replace') 
+	 !    OPEN (UNIT=92, FILE=trim(Result_Folder)//'draft_group_L_Inc_frac.txt', STATUS='replace') 
+	 !    OPEN (UNIT=93, FILE=trim(Result_Folder)//'draft_group_Return.txt', STATUS='replace') 
+	 !    OPEN (UNIT=94, FILE=trim(Result_Folder)//'draft_group_Return_AT.txt', STATUS='replace') 
+	 !    OPEN (UNIT=95, FILE=trim(Result_Folder)//'draft_group_Entrepreneur_10.txt', STATUS='replace') 
+	 !    OPEN (UNIT=96, FILE=trim(Result_Folder)//'draft_group_Entrepreneur_50.txt', STATUS='replace') 
+	 !    do age = 1,draft_age_category
+		!     WRITE  (UNIT=80, FMT=*)  K_Tax_draft_group(age,:)
+		!     WRITE  (UNIT=81, FMT=*)  L_Tax_draft_group(age,:)
+		!     WRITE  (UNIT=82, FMT=*)  frac_K_Tax_draft_group(age,:)
+		!     WRITE  (UNIT=83, FMT=*)  frac_L_Tax_draft_group(age,:)
+		!     WRITE  (UNIT=84, FMT=*)  T_Inc_draft_group(age,:)
+		!     WRITE  (UNIT=85, FMT=*)  K_Tax_Inc_draft_group(age,:)
+		!     WRITE  (UNIT=86, FMT=*)  L_Tax_Inc_draft_group(age,:)
+		!     WRITE  (UNIT=87, FMT=*)  K_Inc_draft_group(age,:)
+		!     WRITE  (UNIT=88, FMT=*)  L_Inc_draft_group(age,:)
+		!     WRITE  (UNIT=89, FMT=*)  av_K_Inc_draft_group(age,:)
+		!     WRITE  (UNIT=90, FMT=*)  av_L_Inc_draft_group(age,:)
+		!     WRITE  (UNIT=91, FMT=*)  frac_K_Inc_draft_group(age,:)
+		!     WRITE  (UNIT=92, FMT=*)  frac_L_Inc_draft_group(age,:)
+		!     WRITE  (UNIT=93, FMT=*)  Return_draft_group(age,:)
+		!     WRITE  (UNIT=94, FMT=*)  Return_AT_draft_group(age,:)
+		!     WRITE  (UNIT=95, FMT=*)  Entrepreneur_10_draft_group(age,:)
+		!     WRITE  (UNIT=96, FMT=*)  Entrepreneur_50_draft_group(age,:)
+		! ENDDO
+		! close(unit=80); close(unit=81); close(unit=83); close(unit=84); close(unit=85)
+		! close(unit=87); close(unit=88); close(unit=89); close(unit=90); close(unit=91); close(unit=92); 
+		! close(unit=93); close(unit=94); close(unit=95); close(unit=96);
 
-		OPEN (UNIT=80, FILE=trim(Result_Folder)//'Entrepreneur_10_50.txt', STATUS='replace') 
-		WRITE  (UNIT=80, FMT=*)  'Share of entrepreneurs '
-		WRITE  (UNIT=80, FMT=*)  'Profits/Before_Tax_Income>10% ',100.0_dp*Entrepreneur_10
-		WRITE  (UNIT=80, FMT=*)  'Profits/Before_Tax_Income>50% ',100.0_dp*Entrepreneur_50
-		close(unit=80); 
+		! OPEN (UNIT=80, FILE=trim(Result_Folder)//'Entrepreneur_10_50.txt', STATUS='replace') 
+		! WRITE  (UNIT=80, FMT=*)  'Share of entrepreneurs '
+		! WRITE  (UNIT=80, FMT=*)  'Profits/Before_Tax_Income>10% ',100.0_dp*Entrepreneur_10
+		! WRITE  (UNIT=80, FMT=*)  'Profits/Before_Tax_Income>50% ',100.0_dp*Entrepreneur_50
+		! close(unit=80); 
 
 
 
@@ -1494,68 +1494,68 @@ SUBROUTINE COMPUTE_STATS()
 		enddo
 		enddo
 
-		! Frac. capital tax increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		Tax_Increase_tk_draft_group = Draft_Table(Tax_Increase_tk_draft_group_z,DBN_z,.true.)
-			! Fix fractions
-			Tax_Increase_tk_draft_group = 100.0_dp*Tax_Increase_tk_draft_group/size_draft_group
+	! 	! Frac. capital tax increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! 	Tax_Increase_tk_draft_group = Draft_Table(Tax_Increase_tk_draft_group_z,DBN_z,.true.)
+	! 		! Fix fractions
+	! 		Tax_Increase_tk_draft_group = 100.0_dp*Tax_Increase_tk_draft_group/size_draft_group
 
-		! Frac. labor tax increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		Tax_Increase_tl_draft_group = Draft_Table(Tax_Increase_tl_draft_group_z,DBN_z,.true.)
-			! Fix fractions
-			Tax_Increase_tl_draft_group = 100.0_dp*Tax_Increase_tl_draft_group/size_draft_group
+	! 	! Frac. labor tax increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! 	Tax_Increase_tl_draft_group = Draft_Table(Tax_Increase_tl_draft_group_z,DBN_z,.true.)
+	! 		! Fix fractions
+	! 		Tax_Increase_tl_draft_group = 100.0_dp*Tax_Increase_tl_draft_group/size_draft_group
 
-		! Frac. total tax increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		Tax_Increase_draft_group = Draft_Table(Tax_Increase_draft_group_z,DBN_z,.true.)
-			! Fix fractions
-			Tax_Increase_draft_group = 100.0_dp*Tax_Increase_draft_group/size_draft_group
+	! 	! Frac. total tax increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! 	Tax_Increase_draft_group = Draft_Table(Tax_Increase_draft_group_z,DBN_z,.true.)
+	! 		! Fix fractions
+	! 		Tax_Increase_draft_group = 100.0_dp*Tax_Increase_draft_group/size_draft_group
 
-		! Frac. capital tax rate increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		Tax_Rate_Increase_tk_draft_group = Draft_Table(Tax_Rate_Increase_tk_draft_group_z,DBN_z,.true.)
-			! Fix fractions
-			Tax_Rate_Increase_tk_draft_group = 100.0_dp*Tax_Rate_Increase_tk_draft_group/size_draft_group
+	! 	! Frac. capital tax rate increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! 	Tax_Rate_Increase_tk_draft_group = Draft_Table(Tax_Rate_Increase_tk_draft_group_z,DBN_z,.true.)
+	! 		! Fix fractions
+	! 		Tax_Rate_Increase_tk_draft_group = 100.0_dp*Tax_Rate_Increase_tk_draft_group/size_draft_group
 
-		! Frac. labor tax rate increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		Tax_Rate_Increase_tl_draft_group = Draft_Table(Tax_Rate_Increase_tl_draft_group_z,DBN_z,.true.)
-			! Fix fractions
-			Tax_Rate_Increase_tl_draft_group = 100.0_dp*Tax_Rate_Increase_tl_draft_group/size_draft_group
+	! 	! Frac. labor tax rate increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! 	Tax_Rate_Increase_tl_draft_group = Draft_Table(Tax_Rate_Increase_tl_draft_group_z,DBN_z,.true.)
+	! 		! Fix fractions
+	! 		Tax_Rate_Increase_tl_draft_group = 100.0_dp*Tax_Rate_Increase_tl_draft_group/size_draft_group
 
-		! Frac. total tax rate increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		Tax_Rate_Increase_draft_group = Draft_Table(Tax_Rate_Increase_draft_group_z,DBN_z,.true.)
-			! Fix fractions
-			Tax_Rate_Increase_draft_group = 100.0_dp*Tax_Rate_Increase_draft_group/size_draft_group
+	! 	! Frac. total tax rate increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! 	Tax_Rate_Increase_draft_group = Draft_Table(Tax_Rate_Increase_draft_group_z,DBN_z,.true.)
+	! 		! Fix fractions
+	! 		Tax_Rate_Increase_draft_group = 100.0_dp*Tax_Rate_Increase_draft_group/size_draft_group
 
-		! Frac. total income increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		Inc_Increase_draft_group   = Draft_Table(  Inc_Increase_draft_group_z,DBN_z,.true.)
-		K_Inc_Increase_draft_group = Draft_Table(K_Inc_Increase_draft_group_z,DBN_z,.true.)
-		L_Inc_Increase_draft_group = Draft_Table(L_Inc_Increase_draft_group_z,DBN_z,.true.)
-			! Fix fractions
-			  Inc_Increase_draft_group = 100.0_dp*  Inc_Increase_draft_group/size_draft_group
-			K_Inc_Increase_draft_group = 100.0_dp*K_Inc_Increase_draft_group/size_draft_group
-			L_Inc_Increase_draft_group = 100.0_dp*L_Inc_Increase_draft_group/size_draft_group
+	! 	! Frac. total income increase by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! 	Inc_Increase_draft_group   = Draft_Table(  Inc_Increase_draft_group_z,DBN_z,.true.)
+	! 	K_Inc_Increase_draft_group = Draft_Table(K_Inc_Increase_draft_group_z,DBN_z,.true.)
+	! 	L_Inc_Increase_draft_group = Draft_Table(L_Inc_Increase_draft_group_z,DBN_z,.true.)
+	! 		! Fix fractions
+	! 		  Inc_Increase_draft_group = 100.0_dp*  Inc_Increase_draft_group/size_draft_group
+	! 		K_Inc_Increase_draft_group = 100.0_dp*K_Inc_Increase_draft_group/size_draft_group
+	! 		L_Inc_Increase_draft_group = 100.0_dp*L_Inc_Increase_draft_group/size_draft_group
 
-		OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_frac_Tax_K.txt', STATUS='replace') 
-	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_frac_Tax_L.txt', STATUS='replace') 
-	    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_frac_Tax.txt', STATUS='replace') 
-	    OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate_K.txt', STATUS='replace') 
-	    OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate_L.txt', STATUS='replace') 
-	    OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate.txt', STATUS='replace') 
-	    OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_frac_Tot_Inc_Incr.txt', STATUS='replace') 
-	    OPEN (UNIT=87, FILE=trim(Result_Folder)//'draft_group_frac_K_Inc_Incr.txt', STATUS='replace') 
-	    OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_frac_L_Inc_Incr.txt', STATUS='replace') 
-		do age = 1,draft_age_category
-		    WRITE  (UNIT=80, FMT=*)  Tax_Increase_tk_draft_group(age,:)
-		    WRITE  (UNIT=81, FMT=*)  Tax_Increase_tl_draft_group(age,:)
-		    WRITE  (UNIT=82, FMT=*)  Tax_Increase_draft_group(age,:)
-		    WRITE  (UNIT=83, FMT=*)  Tax_Rate_Increase_tk_draft_group(age,:)
-		    WRITE  (UNIT=84, FMT=*)  Tax_Rate_Increase_tl_draft_group(age,:)
-		    WRITE  (UNIT=85, FMT=*)  Tax_Rate_Increase_draft_group(age,:)
-		    WRITE  (UNIT=86, FMT=*)  Inc_Increase_draft_group(age,:)
-		    WRITE  (UNIT=87, FMT=*)  K_Inc_Increase_draft_group(age,:)
-		    WRITE  (UNIT=88, FMT=*)  L_Inc_Increase_draft_group(age,:)
-		ENDDO
-		close(unit=80); close(unit=81); close(unit=82); close(unit=83); close(unit=84); close(unit=85)
-		close(unit=86); close(unit=87); close(unit=88);
-	endif 
+	! 	OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_frac_Tax_K.txt', STATUS='replace') 
+	!     OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_frac_Tax_L.txt', STATUS='replace') 
+	!     OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_frac_Tax.txt', STATUS='replace') 
+	!     OPEN (UNIT=83, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate_K.txt', STATUS='replace') 
+	!     OPEN (UNIT=84, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate_L.txt', STATUS='replace') 
+	!     OPEN (UNIT=85, FILE=trim(Result_Folder)//'draft_group_frac_Tax_Rate.txt', STATUS='replace') 
+	!     OPEN (UNIT=86, FILE=trim(Result_Folder)//'draft_group_frac_Tot_Inc_Incr.txt', STATUS='replace') 
+	!     OPEN (UNIT=87, FILE=trim(Result_Folder)//'draft_group_frac_K_Inc_Incr.txt', STATUS='replace') 
+	!     OPEN (UNIT=88, FILE=trim(Result_Folder)//'draft_group_frac_L_Inc_Incr.txt', STATUS='replace') 
+	! 	do age = 1,draft_age_category
+	! 	    WRITE  (UNIT=80, FMT=*)  Tax_Increase_tk_draft_group(age,:)
+	! 	    WRITE  (UNIT=81, FMT=*)  Tax_Increase_tl_draft_group(age,:)
+	! 	    WRITE  (UNIT=82, FMT=*)  Tax_Increase_draft_group(age,:)
+	! 	    WRITE  (UNIT=83, FMT=*)  Tax_Rate_Increase_tk_draft_group(age,:)
+	! 	    WRITE  (UNIT=84, FMT=*)  Tax_Rate_Increase_tl_draft_group(age,:)
+	! 	    WRITE  (UNIT=85, FMT=*)  Tax_Rate_Increase_draft_group(age,:)
+	! 	    WRITE  (UNIT=86, FMT=*)  Inc_Increase_draft_group(age,:)
+	! 	    WRITE  (UNIT=87, FMT=*)  K_Inc_Increase_draft_group(age,:)
+	! 	    WRITE  (UNIT=88, FMT=*)  L_Inc_Increase_draft_group(age,:)
+	! 	ENDDO
+	! 	close(unit=80); close(unit=81); close(unit=82); close(unit=83); close(unit=84); close(unit=85)
+	! 	close(unit=86); close(unit=87); close(unit=88);
+	! endif 
 
 
 	!------------------------------------------------------------------------------------
@@ -2061,26 +2061,26 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	! print*,'CDF_Z=',CDF_Z 
 	! print*,' '
 
-	! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-	size_draft_group = Draft_Table(size_draft_group_z,DBN_z,.true.)
+	! ! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! size_draft_group = Draft_Table(size_draft_group_z,DBN_z,.true.)
 
-	! CE of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-	CE_draft_group = Draft_Table(CE_draft_group_z,DBN_z,.false.)
+	! ! CE of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! CE_draft_group = Draft_Table(CE_draft_group_z,DBN_z,.false.)
 
-	! Frac. pos. welfare by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-	frac_pos_welfare_draft_group = Draft_Table(frac_pos_welfare_draft_group_z,DBN_z,.true.)
+	! ! Frac. pos. welfare by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! frac_pos_welfare_draft_group = Draft_Table(frac_pos_welfare_draft_group_z,DBN_z,.true.)
 
-	! Fix fractions
-	frac_pos_welfare_draft_group = 100.0_dp*frac_pos_welfare_draft_group/size_draft_group
+	! ! Fix fractions
+	! frac_pos_welfare_draft_group = 100.0_dp*frac_pos_welfare_draft_group/size_draft_group
     
-    OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE.txt', STATUS='replace') 
-    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_fpos_welfare.txt', STATUS='replace') 
-    do age = 1,draft_age_category
-	    WRITE  (UNIT=80, FMT=*)  CE_draft_group(age,:)
-	    WRITE  (UNIT=82, FMT=*)  frac_pos_welfare_draft_group(age,:)
-	ENDDO
-	close(unit=80)
-	close(unit=82)
+ !    OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE.txt', STATUS='replace') 
+ !    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_fpos_welfare.txt', STATUS='replace') 
+ !    do age = 1,draft_age_category
+	!     WRITE  (UNIT=80, FMT=*)  CE_draft_group(age,:)
+	!     WRITE  (UNIT=82, FMT=*)  frac_pos_welfare_draft_group(age,:)
+	! ENDDO
+	! close(unit=80)
+	! close(unit=82)
 	
 	! print*,' '
 	! print*,'CE_groups_z'
@@ -2140,29 +2140,29 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	enddo 
 
 
-	! CE of groups adjusting by x-z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-	CE_draft_group = Draft_Table_X(CE_draft_group_xz,DBN_xz,.false.)
+	! ! CE of groups adjusting by x-z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! CE_draft_group = Draft_Table_X(CE_draft_group_xz,DBN_xz,.false.)
 
-	! Size of groups adjusting by x-z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-	size_draft_group = Draft_Table_X(size_draft_group_xz,DBN_xz,.true.)
+	! ! Size of groups adjusting by x-z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! size_draft_group = Draft_Table_X(size_draft_group_xz,DBN_xz,.true.)
 
-	! Frac. pos. welfare by groups adjusting by x-z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-	frac_pos_welfare_draft_group = Draft_Table_X(frac_pos_welfare_draft_group_xz,DBN_xz,.true.)
+	! ! Frac. pos. welfare by groups adjusting by x-z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! frac_pos_welfare_draft_group = Draft_Table_X(frac_pos_welfare_draft_group_xz,DBN_xz,.true.)
 
-	! Fix fractions
-	frac_pos_welfare_draft_group = 100.0_dp*frac_pos_welfare_draft_group/size_draft_group
+	! ! Fix fractions
+	! frac_pos_welfare_draft_group = 100.0_dp*frac_pos_welfare_draft_group/size_draft_group
 
-    OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE_xz.txt', STATUS='replace') 
-    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size_xz.txt', STATUS='replace') 
-    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_fpos_welfare_xz.txt', STATUS='replace') 
-	do age = 1,draft_age_category
-	    WRITE  (UNIT=80, FMT=*)  CE_draft_group(age,:)
-	    WRITE  (UNIT=81, FMT=*)  size_draft_group(age,:)
-	    WRITE  (UNIT=82, FMT=*)  frac_pos_welfare_draft_group(age,:)
-	ENDDO
-	close(unit=80)
-	close(unit=81)
-	close(unit=82)
+ !    OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE_xz.txt', STATUS='replace') 
+ !    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size_xz.txt', STATUS='replace') 
+ !    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_fpos_welfare_xz.txt', STATUS='replace') 
+	! do age = 1,draft_age_category
+	!     WRITE  (UNIT=80, FMT=*)  CE_draft_group(age,:)
+	!     WRITE  (UNIT=81, FMT=*)  size_draft_group(age,:)
+	!     WRITE  (UNIT=82, FMT=*)  frac_pos_welfare_draft_group(age,:)
+	! ENDDO
+	! close(unit=80)
+	! close(unit=81)
+	! close(unit=82)
 
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	!! Draft Tables by xz producitivity groups by age-group
@@ -2856,26 +2856,26 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 
 	DBN_Z = sum(sum(sum(sum(sum(DBN_bench,6),5),4),2),1) 
 
-	! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-	size_draft_group = Draft_Table(size_draft_group_z,DBN_z,.true.)
+	! ! Size of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! size_draft_group = Draft_Table(size_draft_group_z,DBN_z,.true.)
 
-	! CE of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-	CE_draft_group = Draft_Table(CE_draft_group_z,DBN_z,.false.)
+	! ! CE of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! CE_draft_group = Draft_Table(CE_draft_group_z,DBN_z,.false.)
 
-	! Frac. pos. welfare by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-	frac_pos_welfare_draft_group = Draft_Table(frac_pos_welfare_draft_group_z,DBN_z,.true.)
-		! Fix fractions
-		frac_pos_welfare_draft_group = 100.0_dp*frac_pos_welfare_draft_group/size_draft_group
+	! ! Frac. pos. welfare by groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+	! frac_pos_welfare_draft_group = Draft_Table(frac_pos_welfare_draft_group_z,DBN_z,.true.)
+	! 	! Fix fractions
+	! 	frac_pos_welfare_draft_group = 100.0_dp*frac_pos_welfare_draft_group/size_draft_group
 
-    OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE_tr.txt', STATUS='replace') 
-    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size_tr.txt', STATUS='replace') 
-    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_fpos_welfare_tr.txt', STATUS='replace') 
-	do age = 1,draft_age_category
-	    WRITE  (UNIT=80, FMT=*)  CE_draft_group(age,:)
-	    WRITE  (UNIT=81, FMT=*)  size_draft_group(age,:)
-	    WRITE  (UNIT=82, FMT=*)  frac_pos_welfare_draft_group(age,:)
-	ENDDO
-	close(unit=80); close(unit=81); close(unit=82)
+ !    OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_CE_tr.txt', STATUS='replace') 
+ !    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_size_tr.txt', STATUS='replace') 
+ !    OPEN (UNIT=82, FILE=trim(Result_Folder)//'draft_group_fpos_welfare_tr.txt', STATUS='replace') 
+	! do age = 1,draft_age_category
+	!     WRITE  (UNIT=80, FMT=*)  CE_draft_group(age,:)
+	!     WRITE  (UNIT=81, FMT=*)  size_draft_group(age,:)
+	!     WRITE  (UNIT=82, FMT=*)  frac_pos_welfare_draft_group(age,:)
+	! ENDDO
+	! close(unit=80); close(unit=81); close(unit=82)
 
 
 END SUBROUTINE  COMPUTE_WELFARE_GAIN_TRANSITION
@@ -3466,52 +3466,52 @@ END SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 !========================================================================================
 
 
-Function Draft_Table(Table_az,DBN_z,Cum_flag)
-	implicit none
-	real(dp), dimension(draft_age_category,nz), intent(in)   :: Table_az
-	real(dp), dimension(nz), intent(in) :: DBN_z
-	real(dp), dimension(nz) 			:: CDF_z
-	logical, intent(in)					:: Cum_flag
-	integer  						    :: zi
-	real(dp), dimension(draft_age_category,draft_z_category) :: Draft_Table
+! Function Draft_Table(Table_az,DBN_z,Cum_flag)
+! 	implicit none
+! 	real(dp), dimension(draft_age_category,nz), intent(in)   :: Table_az
+! 	real(dp), dimension(nz), intent(in) :: DBN_z
+! 	real(dp), dimension(nz) 			:: CDF_z
+! 	logical, intent(in)					:: Cum_flag
+! 	integer  						    :: zi
+! 	real(dp), dimension(draft_age_category,draft_z_category) :: Draft_Table
 
 
-	! CDF
-	do zi=1,nz 
-		CDF_Z(zi) = sum(DBN_Z(1:zi))
-	enddo 
+! 	! CDF
+! 	do zi=1,nz 
+! 		CDF_Z(zi) = sum(DBN_Z(1:zi))
+! 	enddo 
 
-	if (Cum_flag) then
-	! Cumulative value of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		Draft_Table(:,1) = Table_az(:,1) + Table_az(:,2) + Table_az(:,3) & 
-								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*Table_az(:,4)
-		Draft_Table(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*Table_az(:,4)+((0.80_dp-CDF_Z(4))/DBN_Z(5))*Table_az(:,5)
-		Draft_Table(:,3) = (0.10_dp/DBN_Z(5))*Table_az(:,5)
-		Draft_Table(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*Table_az(:,5) + &
-							& ((0.99_dp-CDF_Z(5))/DBN_Z(6))*Table_az(:,6) 
-		Draft_Table(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*Table_az(:,6) + & 
-							& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*Table_az(:,7) 
-		Draft_Table(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Table_az(:,7) + Table_az(:,8) + Table_az(:,9) 
-		Draft_Table(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Table_az(:,7) + &
-								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*Table_az(:,8)
-		Draft_Table(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Table_az(:,8) + Table_az(:,9)
+! 	if (Cum_flag) then
+! 	! Cumulative value of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+! 		Draft_Table(:,1) = Table_az(:,1) + Table_az(:,2) + Table_az(:,3) & 
+! 								&  + ((0.40_dp-CDF_Z(3))/DBN_Z(4))*Table_az(:,4)
+! 		Draft_Table(:,2) = ((CDF_Z(4)-0.40_dp)/DBN_Z(4))*Table_az(:,4)+((0.80_dp-CDF_Z(4))/DBN_Z(5))*Table_az(:,5)
+! 		Draft_Table(:,3) = (0.10_dp/DBN_Z(5))*Table_az(:,5)
+! 		Draft_Table(:,4) = ((CDF_Z(5)-0.90_dp)/DBN_Z(5))*Table_az(:,5) + &
+! 							& ((0.99_dp-CDF_Z(5))/DBN_Z(6))*Table_az(:,6) 
+! 		Draft_Table(:,5) = ((CDF_Z(6)-0.99_dp)/DBN_Z(6))*Table_az(:,6) + & 
+! 							& ((0.999_dp-CDF_Z(6))/DBN_Z(7))*Table_az(:,7) 
+! 		Draft_Table(:,6) = ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Table_az(:,7) + Table_az(:,8) + Table_az(:,9) 
+! 		Draft_Table(:,7) =   ((CDF_Z(7)-0.999_dp)/DBN_Z(7))*Table_az(:,7) + &
+! 								& ((0.9999_dp-CDF_Z(7))/DBN_Z(8))*Table_az(:,8)
+! 		Draft_Table(:,8) = ((CDF_Z(8)-0.9999_dp)/DBN_Z(8))*Table_az(:,8) + Table_az(:,9)
 
-	else
-	! Average value of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-		Draft_Table(:,1) = ( DBN_Z(1)*Table_az(:,1) + DBN_Z(2)*Table_az(:,2) + & 
-								& DBN_Z(3)*Table_az(:,3) + (0.40_dp-CDF_Z(3))*Table_az(:,4) )/0.40_dp
-		Draft_Table(:,2) = ( (CDF_Z(4)-0.40_dp)*Table_az(:,4) + (0.80_dp-CDF_Z(4))*Table_az(:,5) )/0.40_dp
-		Draft_Table(:,3) = Table_az(:,5)
-		Draft_Table(:,4) = ( (CDF_Z(5)-0.90_dp)*Table_az(:,5) + (0.99_dp-CDF_Z(5))*Table_az(:,6) )/0.09_dp
-		Draft_Table(:,5) = ( (CDF_Z(6)-0.99_dp)*Table_az(:,6) + (0.999_dp-CDF_Z(6))*Table_az(:,7) )/0.009_dp
-		Draft_Table(:,6) = ( (CDF_Z(7)-0.999_dp)*Table_az(:,7) + &
-								&  DBN_Z(8)*Table_az(:,8) + DBN_Z(9)*Table_az(:,9) )/0.001_dp
-		Draft_Table(:,7) = ( (CDF_Z(7)-0.999_dp)*Table_az(:,7) + (0.9999_dp-CDF_Z(7))*Table_az(:,8) )/0.0009_dp
-		Draft_Table(:,8) = ( (CDF_Z(8)-0.9999_dp)*Table_az(:,8) + DBN_Z(9)*Table_az(:,9) )/0.0001_dp
+! 	else
+! 	! Average value of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+! 		Draft_Table(:,1) = ( DBN_Z(1)*Table_az(:,1) + DBN_Z(2)*Table_az(:,2) + & 
+! 								& DBN_Z(3)*Table_az(:,3) + (0.40_dp-CDF_Z(3))*Table_az(:,4) )/0.40_dp
+! 		Draft_Table(:,2) = ( (CDF_Z(4)-0.40_dp)*Table_az(:,4) + (0.80_dp-CDF_Z(4))*Table_az(:,5) )/0.40_dp
+! 		Draft_Table(:,3) = Table_az(:,5)
+! 		Draft_Table(:,4) = ( (CDF_Z(5)-0.90_dp)*Table_az(:,5) + (0.99_dp-CDF_Z(5))*Table_az(:,6) )/0.09_dp
+! 		Draft_Table(:,5) = ( (CDF_Z(6)-0.99_dp)*Table_az(:,6) + (0.999_dp-CDF_Z(6))*Table_az(:,7) )/0.009_dp
+! 		Draft_Table(:,6) = ( (CDF_Z(7)-0.999_dp)*Table_az(:,7) + &
+! 								&  DBN_Z(8)*Table_az(:,8) + DBN_Z(9)*Table_az(:,9) )/0.001_dp
+! 		Draft_Table(:,7) = ( (CDF_Z(7)-0.999_dp)*Table_az(:,7) + (0.9999_dp-CDF_Z(7))*Table_az(:,8) )/0.0009_dp
+! 		Draft_Table(:,8) = ( (CDF_Z(8)-0.9999_dp)*Table_az(:,8) + DBN_Z(9)*Table_az(:,9) )/0.0001_dp
 
-	endif 
+! 	endif 
 
-END Function Draft_Table
+! END Function Draft_Table
 
 
 !========================================================================================
@@ -3519,103 +3519,103 @@ END Function Draft_Table
 !========================================================================================
 
 
-Function Draft_Table_X(Table_axz,DBN_xz,Cum_flag)
-	implicit none
-	real(dp), dimension(draft_age_category,nz,nx), intent(in)   :: Table_axz
-	real(dp), dimension(nz,nx), intent(in) 	:: DBN_xz
-	real(dp)				   				:: CDF_xz, cdf_xz_low
-	logical, intent(in)						:: Cum_flag
-	real(dp), dimension(draft_age_category,draft_z_category) :: Draft_Table_X
+! Function Draft_Table_X(Table_axz,DBN_xz,Cum_flag)
+! 	implicit none
+! 	real(dp), dimension(draft_age_category,nz,nx), intent(in)   :: Table_axz
+! 	real(dp), dimension(nz,nx), intent(in) 	:: DBN_xz
+! 	real(dp)				   				:: CDF_xz, cdf_xz_low
+! 	logical, intent(in)						:: Cum_flag
+! 	real(dp), dimension(draft_age_category,draft_z_category) :: Draft_Table_X
 
-	! Groups based on cross sectional productivity, not age dependent 
-	    ! % 0%-40%     of Current Productivity
-	    !     % (z1,x3), (z2,x3), (z3,x3), (z4,x3), (z5,x3)
-	    ! % 40%-80%    of Current Productivity 
-	    !     % (z5,x3), (z6,x3), (z7,x3), (z8,x3), (z9,x3), (z1,x1), (z2,x1), (z3,x1), (z4,x1)
-	    ! % 80%-90%    of Current Productivity
-	    !     % (z4,x1), (z5,x2)
-	    ! % 90%-99%    of Current Productivity 
-	    !     % (z5,x2), (z6,x2), (z7,x2), (z8,x2), (z9,x2), (z5,x1), (z6,x1)
-	    ! % 99%-99.9%  of Current Productivity 
-	    !     % (z6,x1), (z7,x1)
-	    ! % 99.9%-100% of Current Productivity 
-	    !     % (z7,x1), (z8,x1), (z9,x1)
+! 	! Groups based on cross sectional productivity, not age dependent 
+! 	    ! % 0%-40%     of Current Productivity
+! 	    !     % (z1,x3), (z2,x3), (z3,x3), (z4,x3), (z5,x3)
+! 	    ! % 40%-80%    of Current Productivity 
+! 	    !     % (z5,x3), (z6,x3), (z7,x3), (z8,x3), (z9,x3), (z1,x1), (z2,x1), (z3,x1), (z4,x1)
+! 	    ! % 80%-90%    of Current Productivity
+! 	    !     % (z4,x1), (z5,x2)
+! 	    ! % 90%-99%    of Current Productivity 
+! 	    !     % (z5,x2), (z6,x2), (z7,x2), (z8,x2), (z9,x2), (z5,x1), (z6,x1)
+! 	    ! % 99%-99.9%  of Current Productivity 
+! 	    !     % (z6,x1), (z7,x1)
+! 	    ! % 99.9%-100% of Current Productivity 
+! 	    !     % (z7,x1), (z8,x1), (z9,x1)
 
-	if (Cum_flag) then
-	! Cumulative value of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-    	cdf_xz = sum(DBN_XZ(1:4,3))
-		Draft_Table_X(:,1)   = Table_axz(:,1,3) + Table_axz(:,2,3) + Table_axz(:,3,3) + Table_axz(:,4,3) + &
-							& (0.40_dp-cdf_xz)*Table_axz(:,5,3)/DBN_XZ(5,3) 
-			cdf_xz = cdf_xz + DBN_XZ(5,3)
-			cdf_xz_low = cdf_xz 
-			cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
-		Draft_Table_X(:,2)   = (cdf_xz_low-0.40_dp)*Table_axz(:,5,3)/DBN_XZ(5,3) + &
-						& Table_axz(:,6,3) + Table_axz(:,7,3) + Table_axz(:,8,3) + Table_axz(:,9,3) + &
-						& Table_axz(:,1,1) + Table_axz(:,2,1) + Table_axz(:,3,1) + &
-						& (0.80_dp-cdf_xz)*Table_axz(:,4,1)/DBN_XZ(4,1)
-			cdf_xz = cdf_xz + DBN_XZ(4,1)
-		Draft_Table_X(:,3)   = (cdf_xz-0.80_dp)*Table_axz(:,4,1)/DBN_XZ(4,1) + &
-						& (0.90_dp-cdf_xz)*Table_axz(:,5,2)/DBN_XZ(5,2)
-			cdf_xz = cdf_xz + DBN_XZ(5,2)
-			cdf_xz_low = cdf_xz 
-			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
-		Draft_Table_X(:,4)   = (cdf_xz_low-0.90_dp)*Table_axz(:,5,2)/DBN_XZ(5,2) + & 
-						& Table_axz(:,6,2) + Table_axz(:,7,2) + Table_axz(:,8,2) + Table_axz(:,9,2) + &
-						& Table_axz(:,5,1) + (0.99_dp-cdf_xz)*Table_axz(:,6,1)/DBN_XZ(6,1)
-			cdf_xz = cdf_xz + DBN_XZ(6,1)
-		Draft_Table_X(:,5)   = (cdf_xz-0.99_dp)*Table_axz(:,6,1)/DBN_XZ(6,1) + &
-						& (0.999_dp-cdf_xz)*Table_axz(:,7,1)/DBN_XZ(7,1)
-			cdf_xz = cdf_xz + DBN_XZ(7,1)
-		Draft_Table_X(:,6)   = (CDF_xz-0.999_dp)*Table_axz(:,7,1)/DBN_XZ(7,1) + Table_axz(:,8,1) + Table_axz(:,9,1)
-		Draft_Table_X(:,7)   = 0
-		Draft_Table_X(:,8)   = 0
+! 	if (Cum_flag) then
+! 	! Cumulative value of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+!     	cdf_xz = sum(DBN_XZ(1:4,3))
+! 		Draft_Table_X(:,1)   = Table_axz(:,1,3) + Table_axz(:,2,3) + Table_axz(:,3,3) + Table_axz(:,4,3) + &
+! 							& (0.40_dp-cdf_xz)*Table_axz(:,5,3)/DBN_XZ(5,3) 
+! 			cdf_xz = cdf_xz + DBN_XZ(5,3)
+! 			cdf_xz_low = cdf_xz 
+! 			cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
+! 		Draft_Table_X(:,2)   = (cdf_xz_low-0.40_dp)*Table_axz(:,5,3)/DBN_XZ(5,3) + &
+! 						& Table_axz(:,6,3) + Table_axz(:,7,3) + Table_axz(:,8,3) + Table_axz(:,9,3) + &
+! 						& Table_axz(:,1,1) + Table_axz(:,2,1) + Table_axz(:,3,1) + &
+! 						& (0.80_dp-cdf_xz)*Table_axz(:,4,1)/DBN_XZ(4,1)
+! 			cdf_xz = cdf_xz + DBN_XZ(4,1)
+! 		Draft_Table_X(:,3)   = (cdf_xz-0.80_dp)*Table_axz(:,4,1)/DBN_XZ(4,1) + &
+! 						& (0.90_dp-cdf_xz)*Table_axz(:,5,2)/DBN_XZ(5,2)
+! 			cdf_xz = cdf_xz + DBN_XZ(5,2)
+! 			cdf_xz_low = cdf_xz 
+! 			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
+! 		Draft_Table_X(:,4)   = (cdf_xz_low-0.90_dp)*Table_axz(:,5,2)/DBN_XZ(5,2) + & 
+! 						& Table_axz(:,6,2) + Table_axz(:,7,2) + Table_axz(:,8,2) + Table_axz(:,9,2) + &
+! 						& Table_axz(:,5,1) + (0.99_dp-cdf_xz)*Table_axz(:,6,1)/DBN_XZ(6,1)
+! 			cdf_xz = cdf_xz + DBN_XZ(6,1)
+! 		Draft_Table_X(:,5)   = (cdf_xz-0.99_dp)*Table_axz(:,6,1)/DBN_XZ(6,1) + &
+! 						& (0.999_dp-cdf_xz)*Table_axz(:,7,1)/DBN_XZ(7,1)
+! 			cdf_xz = cdf_xz + DBN_XZ(7,1)
+! 		Draft_Table_X(:,6)   = (CDF_xz-0.999_dp)*Table_axz(:,7,1)/DBN_XZ(7,1) + Table_axz(:,8,1) + Table_axz(:,9,1)
+! 		Draft_Table_X(:,7)   = 0
+! 		Draft_Table_X(:,8)   = 0
 
-	else
-	! Average value of groups adjusting by xz group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-    	cdf_xz = sum(DBN_XZ(1:4,3))
-		Draft_Table_X(:,1)   = ( DBN_XZ(1,3)*Table_axz(:,1,3) + DBN_XZ(2,3)*Table_axz(:,2,3) + &
-						&  DBN_XZ(3,3)*Table_axz(:,3,3) + DBN_XZ(4,3)*Table_axz(:,4,3) + &
-						& (0.40_dp-cdf_xz)*Table_axz(:,5,3) )/0.40_dp 
-			cdf_xz = cdf_xz + DBN_XZ(5,3)
-			cdf_xz_low = cdf_xz 
-			cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
-		Draft_Table_X(:,2)   = ( (cdf_xz_low-0.40_dp)*Table_axz(:,5,3) + &
-						& DBN_XZ(6,3)*Table_axz(:,6,3) + DBN_XZ(7,3)*Table_axz(:,7,3) + &
-						& DBN_XZ(8,3)*Table_axz(:,8,3) + DBN_XZ(9,3)*Table_axz(:,9,3) + &
-						& DBN_XZ(1,1)*Table_axz(:,1,1) + DBN_XZ(2,1)*Table_axz(:,2,1) + &
-						& DBN_XZ(3,1)*Table_axz(:,3,1) + (0.80_dp-cdf_xz)*Table_axz(:,4,1) )/0.40_dp
-			cdf_xz = cdf_xz + DBN_XZ(4,1)
-		Draft_Table_X(:,3)   = ( (cdf_xz-0.80_dp)*Table_axz(:,4,1) + (0.90_dp-cdf_xz)*Table_axz(:,5,2) )/0.10_dp
-			cdf_xz = cdf_xz + DBN_XZ(5,2)
-			cdf_xz_low = cdf_xz 
-			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
-		Draft_Table_X(:,4)   = ( (cdf_xz_low-0.90_dp)*Table_axz(:,5,2) + & 
-						& DBN_XZ(6,2)*Table_axz(:,6,2) + DBN_XZ(7,2)*Table_axz(:,7,2) + &
-						& DBN_XZ(8,2)*Table_axz(:,8,2) + DBN_XZ(9,2)*Table_axz(:,9,2) + &
-						& DBN_XZ(5,1)*Table_axz(:,5,1) + (0.99_dp-cdf_xz)*Table_axz(:,6,1) )/0.09_dp
-			cdf_xz = cdf_xz + DBN_XZ(6,1)
-		Draft_Table_X(:,5)   = ( (cdf_xz-0.99_dp)*Table_axz(:,6,1) + (0.999_dp-cdf_xz)*Table_axz(:,7,1) )/0.009_dp
-			cdf_xz = cdf_xz + DBN_XZ(7,1)
-		Draft_Table_X(:,6)   = ( (CDF_xz-0.999_dp)*Table_axz(:,7,1)+DBN_XZ(8,1)*Table_axz(:,8,1)+DBN_XZ(9,1)*Table_axz(:,9,1) )/0.001_dp
-		Draft_Table_X(:,7)   = 0
-		Draft_Table_X(:,8)   = 0
+! 	else
+! 	! Average value of groups adjusting by xz group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+!     	cdf_xz = sum(DBN_XZ(1:4,3))
+! 		Draft_Table_X(:,1)   = ( DBN_XZ(1,3)*Table_axz(:,1,3) + DBN_XZ(2,3)*Table_axz(:,2,3) + &
+! 						&  DBN_XZ(3,3)*Table_axz(:,3,3) + DBN_XZ(4,3)*Table_axz(:,4,3) + &
+! 						& (0.40_dp-cdf_xz)*Table_axz(:,5,3) )/0.40_dp 
+! 			cdf_xz = cdf_xz + DBN_XZ(5,3)
+! 			cdf_xz_low = cdf_xz 
+! 			cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
+! 		Draft_Table_X(:,2)   = ( (cdf_xz_low-0.40_dp)*Table_axz(:,5,3) + &
+! 						& DBN_XZ(6,3)*Table_axz(:,6,3) + DBN_XZ(7,3)*Table_axz(:,7,3) + &
+! 						& DBN_XZ(8,3)*Table_axz(:,8,3) + DBN_XZ(9,3)*Table_axz(:,9,3) + &
+! 						& DBN_XZ(1,1)*Table_axz(:,1,1) + DBN_XZ(2,1)*Table_axz(:,2,1) + &
+! 						& DBN_XZ(3,1)*Table_axz(:,3,1) + (0.80_dp-cdf_xz)*Table_axz(:,4,1) )/0.40_dp
+! 			cdf_xz = cdf_xz + DBN_XZ(4,1)
+! 		Draft_Table_X(:,3)   = ( (cdf_xz-0.80_dp)*Table_axz(:,4,1) + (0.90_dp-cdf_xz)*Table_axz(:,5,2) )/0.10_dp
+! 			cdf_xz = cdf_xz + DBN_XZ(5,2)
+! 			cdf_xz_low = cdf_xz 
+! 			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
+! 		Draft_Table_X(:,4)   = ( (cdf_xz_low-0.90_dp)*Table_axz(:,5,2) + & 
+! 						& DBN_XZ(6,2)*Table_axz(:,6,2) + DBN_XZ(7,2)*Table_axz(:,7,2) + &
+! 						& DBN_XZ(8,2)*Table_axz(:,8,2) + DBN_XZ(9,2)*Table_axz(:,9,2) + &
+! 						& DBN_XZ(5,1)*Table_axz(:,5,1) + (0.99_dp-cdf_xz)*Table_axz(:,6,1) )/0.09_dp
+! 			cdf_xz = cdf_xz + DBN_XZ(6,1)
+! 		Draft_Table_X(:,5)   = ( (cdf_xz-0.99_dp)*Table_axz(:,6,1) + (0.999_dp-cdf_xz)*Table_axz(:,7,1) )/0.009_dp
+! 			cdf_xz = cdf_xz + DBN_XZ(7,1)
+! 		Draft_Table_X(:,6)   = ( (CDF_xz-0.999_dp)*Table_axz(:,7,1)+DBN_XZ(8,1)*Table_axz(:,8,1)+DBN_XZ(9,1)*Table_axz(:,9,1) )/0.001_dp
+! 		Draft_Table_X(:,7)   = 0
+! 		Draft_Table_X(:,8)   = 0
 
-			! Adjustment for first age group
-			    ! % 40%-80%    of Current Productivity 
-			    !     % (z1,x1), (z2,x1), (z3,x1), (z4,x1)
-		    	Draft_Table_X(1,2)   = ( DBN_XZ(1,1)*Table_axz(1,1,1) + DBN_XZ(2,1)*Table_axz(1,2,1) + &
-							& DBN_XZ(3,1)*Table_axz(1,3,1) + DBN_XZ(4,1)*Table_axz(1,4,1) )/sum(DBN_XZ(1:4,1))
-			    ! % 80%-90%    of Current Productivity
-			    !     % (z4,x1)
-			    Draft_Table_X(1,3)   = Table_axz(1,4,1)
-			    ! % 90%-99%    of Current Productivity 
-			    !     % (z5,x1), (z6,x1)
-			    Draft_Table_X(1,4)   = ( DBN_XZ(5,1)*Table_axz(1,5,1) + DBN_XZ(6,1)*Table_axz(1,6,1) )/sum(DBN_XZ(5:6,1))
+! 			! Adjustment for first age group
+! 			    ! % 40%-80%    of Current Productivity 
+! 			    !     % (z1,x1), (z2,x1), (z3,x1), (z4,x1)
+! 		    	Draft_Table_X(1,2)   = ( DBN_XZ(1,1)*Table_axz(1,1,1) + DBN_XZ(2,1)*Table_axz(1,2,1) + &
+! 							& DBN_XZ(3,1)*Table_axz(1,3,1) + DBN_XZ(4,1)*Table_axz(1,4,1) )/sum(DBN_XZ(1:4,1))
+! 			    ! % 80%-90%    of Current Productivity
+! 			    !     % (z4,x1)
+! 			    Draft_Table_X(1,3)   = Table_axz(1,4,1)
+! 			    ! % 90%-99%    of Current Productivity 
+! 			    !     % (z5,x1), (z6,x1)
+! 			    Draft_Table_X(1,4)   = ( DBN_XZ(5,1)*Table_axz(1,5,1) + DBN_XZ(6,1)*Table_axz(1,6,1) )/sum(DBN_XZ(5:6,1))
 
 
-	endif 
+! 	endif 
 
-END Function Draft_Table_X
+! END Function Draft_Table_X
 
 
 !========================================================================================
