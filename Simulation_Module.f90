@@ -348,7 +348,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		  		!			&(mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 			 	!		assets_son(paneli) = panela(paneli) + assets_son(paneli)
 		 		!		return_son(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*k_igm)**mu - (R+DepRate)*k_igm +&
-		  		!    						&   R_z(panelz(paneli))*panela(paneli) )/panela(paneli) + return_son(paneli)
+		  		!    						&   R*panela(paneli) )/panela(paneli) + return_son(paneli)
 			 	!		if (panela(paneli) .ge. amax) then
 				! 	        tklo = na-1
 				! 	    elseif (panela(paneli) .lt. amin) then
@@ -419,7 +419,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     	! 				& (mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 			     ! 		assets_son_2(paneli) = panela(paneli) + assets_son_2(paneli)
 			     ! 		return_son_2(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*k_igm)**mu - (R+DepRate)*k_igm +&
-		     	! 							&   R_z(panelz(paneli))*panela(paneli) )/panela(paneli) + return_son_2(paneli)
+		     	! 							&   R*panela(paneli) )/panela(paneli) + return_son_2(paneli)
 			     ! 		if (panela(paneli) .ge. amax) then
 					   !      tklo = na-1
 					   !  elseif (panela(paneli) .lt. amin) then
@@ -473,15 +473,15 @@ SUBROUTINE  SIMULATION(bench_indx)
 		!   !    	K_aux = min(theta(panelz(paneli))*panela(paneli),&
 		!   !    			&(mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 	 !   !   		ret_aux(paneli)     = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
-	 !   !   								&   R_z(panelz(paneli))*panela(paneli) )/panela(paneli) + ret_aux(paneli)
+	 !   !   								&   R*panela(paneli) )/panela(paneli) + ret_aux(paneli)
 	 !   !   		ret_w_aux(paneli)   = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
-	 !   !   								&   R_z(panelz(paneli))*panela(paneli) ) + ret_w_aux(paneli)
+	 !   !   								&   R*panela(paneli) ) + ret_w_aux(paneli)
 	 !   !   		cum_assets(paneli)  = panela(paneli) + cum_assets(paneli)
 	 !   !   		if (panelx(paneli).lt.3) then 
 	 !   !   		ret_k_aux(paneli)   = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
-	 !   !   								&   R_z(panelz(paneli))*panela(paneli) )/K_aux + ret_k_aux(paneli)
+	 !   !   								&   R*panela(paneli) )/K_aux + ret_k_aux(paneli)
 	 !   !   		ret_k_w_aux(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*K_aux)**mu - (R+DepRate)*K_aux +&
-	 !   !   								&   R_z(panelz(paneli))*panela(paneli) ) + ret_k_w_aux(paneli)
+	 !   !   								&   R*panela(paneli) ) + ret_k_w_aux(paneli)
 	 !   !   		cum_K(paneli)       = K_aux + cum_K(paneli)
 	 !   !   		ind_K(paneli) 		= 1 + ind_K(paneli)
 	 !   !   		endif 
@@ -757,10 +757,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! !     endif 
 
 		! !     panelRet(paneli) 	= ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
-	 ! !     								&   R_z(panelz(paneli))*panela(paneli) )/panela(paneli)
+	 ! !     								&   R*panela(paneli) )/panela(paneli)
 		! !     if (panelx(paneli).lt.3) then 
 		! !     panelRet_K(paneli) 	= ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
-	 ! !     								&   R_z(panelz(paneli))f*panela(paneli) )/panelK(paneli)
+	 ! !     								&   R*panela(paneli) )/panelK(paneli)
 		! !     endif 
 	     	 
 		           
@@ -1806,10 +1806,10 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 
 	! Return 
 		Panel_r(i,1,i_z) = ( P*(xz_grid(Panel_x(i,1,i_z),i_z)*Panel_k(i,1,i_z))**mu - (R+DepRate)*Panel_k(i,1,i_z) +&
-	     								&   R_z(i_z)*Panel_a(i,1,i_z) )/Panel_a(i,1,i_z)
+	     								&   R*Panel_a(i,1,i_z) )/Panel_a(i,1,i_z)
 
 		Panel_r_at(i,1,i_z) = ( ( (P*(xz_grid(Panel_x(i,1,i_z),i_z)*Panel_k(i,1,i_z))**mu - (R+DepRate)*Panel_k(i,1,i_z)) &
-							& + R_z(i_z)*Panel_a(i,1,i_z))*(1.0_dp-tauK) )/Panel_a(i,1,i_z) - tauW_at
+							& + R*Panel_a(i,1,i_z))*(1.0_dp-tauK) )/Panel_a(i,1,i_z) - tauW_at
 
 	! Consumption and Labor
  		if (Panel_a(i,1,i_z) .ge. amax) then
@@ -1911,10 +1911,10 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 
 			! Return 
 				Panel_r(i,age,i_z) = ( P*(xz_grid(Panel_x(i,age,i_z),i_z)*Panel_k(i,age,i_z))**mu - (R+DepRate)*Panel_k(i,age,i_z) +&
-			     								&   R_z(i_z)*Panel_a(i,age,i_z) )/Panel_a(i,age,i_z)
+			     								&   R*Panel_a(i,age,i_z) )/Panel_a(i,age,i_z)
 
 				Panel_r_at(i,age,i_z) = ( ( (P*(xz_grid(Panel_x(i,age,i_z),i_z)*Panel_k(i,age,i_z))**mu - (R+DepRate)*Panel_k(i,age,i_z)) &
-									& + R_z(i_z)*Panel_a(i,age,i_z))*(1.0_dp-tauK) )/Panel_a(i,age,i_z) - tauW_at
+									& + R*Panel_a(i,age,i_z))*(1.0_dp-tauK) )/Panel_a(i,age,i_z) - tauW_at
 
 			! Consumption and Labor
 		 		if (Panel_a(i,age,i_z) .ge. amax) then
@@ -2028,10 +2028,10 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 
 			! Return 
 			Panel_r_ben(i,age,i_z) = ( P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - &
-								&   (R+DepRate)*Panel_k_ben(i,age,i_z) + R_z(i_z)*Panel_a_ben(i,age,i_z) )/Panel_a_ben(i,age,i_z)
+								&   (R+DepRate)*Panel_k_ben(i,age,i_z) + R*Panel_a_ben(i,age,i_z) )/Panel_a_ben(i,age,i_z)
 
 			Panel_r_at_ben(i,age,i_z) = ( ( ( (P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - &
-								& (R+DepRate)*Panel_k_ben(i,age,i_z)) + R_z(i_z)*Panel_a_ben(i,age,i_z))*(1.0_dp-tauK) &
+								& (R+DepRate)*Panel_k_ben(i,age,i_z)) + R*Panel_a_ben(i,age,i_z))*(1.0_dp-tauK) &
 								& ))/Panel_a_ben(i,age,i_z) - tauW_at	    
 
 			ENDDO ! paneli 		
@@ -2338,10 +2338,10 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 
 	! Return 
 		Panel_r(i,1)    = ( P*(xz_grid(Panel_x(i,1),i_z)*Panel_k(i,1))**mu - (R+DepRate)*Panel_k(i,1) +&
-	     								&   R_z(i_z)*Panel_a(i,1) )/Panel_a(i,1)
+	     								&   R*Panel_a(i,1) )/Panel_a(i,1)
 
 		Panel_r_at(i,1) = ( ( (P*(xz_grid(Panel_x(i,1),i_z)*Panel_k(i,1))**mu - (R+DepRate)*Panel_k(i,1)) &
-							& + R_z(i_z)*Panel_a(i,1))*(1.0_dp-tauK) )/Panel_a(i,1) - tauW_at
+							& + R*Panel_a(i,1))*(1.0_dp-tauK) )/Panel_a(i,1) - tauW_at
 
 	! Consumption and Labor
  		if (Panel_a(i,1) .ge. amax) then
@@ -2443,10 +2443,10 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 
 			! Return 
 				Panel_r(i,age) = ( P*(xz_grid(Panel_x(i,age),i_z)*Panel_k(i,age))**mu - (R+DepRate)*Panel_k(i,age) +&
-			     								&   R_z(i_z)*Panel_a(i,age) )/Panel_a(i,age)
+			     								&   R*Panel_a(i,age) )/Panel_a(i,age)
 
 				Panel_r_at(i,age) = ( ( (P*(xz_grid(Panel_x(i,age),i_z)*Panel_k(i,age))**mu - (R+DepRate)*Panel_k(i,age)) &
-									& + R_z(i_z)*Panel_a(i,age))*(1.0_dp-tauK) ) /Panel_a(i,age) - tauW_at
+									& + R*Panel_a(i,age))*(1.0_dp-tauK) ) /Panel_a(i,age) - tauW_at
 
 			! Consumption and Labor
 		 		if (Panel_a(i,age) .ge. amax) then
