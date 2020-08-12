@@ -2339,6 +2339,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	integer  :: tau_grid_min, tau_grid_max, tau_grid_step
 	logical  :: read_results, load_seed
 	real(dp) :: MeanCons_bench
+	character(100) :: folder_aux, folder_aux_2
 
 	! Set benchmark consumption
 		MeanCons_bench = MeanCons
@@ -2346,6 +2347,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
 		load_seed    = .false.
+
+	! Auxiliary folders 
+		folder_aux   = './Revision/Model_2.1_CKK/'
+		folder_aux_2 = Result_Folder
 
 
 	if (read_results.eqv..false.) then 
@@ -2409,6 +2414,12 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	print*,'	Optimal Tax Loop'
 	do tauindx = tau_grid_min,tau_grid_max,tau_grid_step
+
+		! Load benchmark results for stability 
+		Result_Folder = folder_aux 
+		CALL Write_Benchmark_Results(.false.)
+		Result_Folder = fodler_aux_2
+
 		if (Opt_Tax_KW) then 
 			tauK        = real(tauindx,8)/100_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
@@ -4192,7 +4203,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	implicit none 
 	logical, intent(in) :: budget_balance
 	real(dp)            :: tauW_at_0, tauW_bt_0
-	character(100)      :: folder_aux
+	character(100)      :: folder_aux_1
 	
 
 	! Set step for increments
