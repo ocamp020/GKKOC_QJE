@@ -3805,22 +3805,24 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 
 	K_mat  = K_Matrix(R,P)
 
-	TFPR_bar = 0.0_dp
-	K 		 = 0.0_dp 
-	do i_a = 1,na
-	do i_z = 1,nz 
-	do i_x = 1,2
-		TFPR_i(i_a,i_z,i_x) = P * xz_grid(i_x,i_z)** mu * K_mat(i_a,i_z,i_x)**(mu-1.0_dp)
-		TFPR_bar = TFPR_bar + sum(DBN1(:,i_a,i_z,:,:,i_x))/size * K_mat(i_a,i_z,i_x) / (alpha*QBAR**alpha*NBAR**(1.0_dp-alpha))
-		K 		 = K    	+ sum(DBN1(:,i_a,i_z,:,:,i_x))      * K_mat(i_a,i_z,i_x) 
-	enddo 
-	enddo 
-	enddo
-	TFPR_bar = 1.0_dp / TFPR_bar
-
 	if (mu.lt.0) then 
 	print*,'Uncomment this section'
 	STOP
+	
+	! TFPR_bar = 0.0_dp
+	! K 		 = 0.0_dp 
+	! do i_a = 1,na
+	! do i_z = 1,nz 
+	! do i_x = 1,2
+	! 	TFPR_i(i_a,i_z,i_x) = P * xz_grid(i_x,i_z)** mu * K_mat(i_a,i_z,i_x)**(mu-1.0_dp)
+	! 	TFPR_bar = TFPR_bar + sum(DBN1(:,i_a,i_z,:,:,i_x))/size * K_mat(i_a,i_z,i_x) / (alpha*QBAR**alpha*NBAR**(1.0_dp-alpha))
+	! 	K 		 = K    	+ sum(DBN1(:,i_a,i_z,:,:,i_x))      * K_mat(i_a,i_z,i_x) 
+	! enddo 
+	! enddo 
+	! enddo
+	! TFPR_bar = 1.0_dp / TFPR_bar
+
+	
 	! TFP 	 = 0.0_dp
 	! TFP_star = 0.0_dp
 	! do i_a = 1,na
