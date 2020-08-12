@@ -4203,7 +4203,7 @@ Subroutine Solve_Transition_Tax_Reform(budget_balance)
 	implicit none 
 	logical, intent(in) :: budget_balance
 	real(dp)            :: tauW_at_0, tauW_bt_0
-	character(100)      :: folder_aux_1
+	character(100)      :: folder_aux
 	
 
 	! Set step for increments
