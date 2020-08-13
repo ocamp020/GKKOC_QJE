@@ -1755,9 +1755,9 @@ SUBROUTINE COMPUTE_STATS()
 		Public_K_Share = Public_K_Share/MeanWealth
 
 		OPEN (UNIT=90, FILE=trim(Result_Folder)//'Public_Share.txt', STATUS='replace') 
-		WRITE(UNIT=90) 'Public_Share=',Public_Share 
-		WRITE(UNIT=90) 'Public_A_Share=',Public_A_Share   
-		WRITE(UNIT=90) 'Public_K_Share=',Public_K_Share 
+		WRITE(UNIT=90, FMT=*) 'Public_Share=',Public_Share 
+		WRITE(UNIT=90, FMT=*) 'Public_A_Share=',Public_A_Share   
+		WRITE(UNIT=90, FMT=*) 'Public_K_Share=',Public_K_Share 
 		CLOSE(unit=90)
 
 		print*,' '; print*,'-----------------------------------------------------';
