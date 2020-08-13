@@ -60,7 +60,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
+			compute_bench = .true.
 			compute_exp   = .true.
 			compute_exp_pf= .false.
 				Fixed_PF        = .true.
@@ -220,23 +220,23 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK/'
+			Result_Folder = './Revision/Model_2.1_CKK_test/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK_PT/' 
+			Result_Folder = './Revision/Model_2.1_CKK_test_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK_SU/' 
+			Result_Folder = './Revision/Model_2.1_CKK_test_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_CKK_test_PT_SU/' 
 		end if
 	else 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK_Corp/' 
+			Result_Folder = './Revision/Model_2.1_CKK_test_Corp/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK_Corp_PT/' 
+			Result_Folder = './Revision/Model_2.1_CKK_test_Corp_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK_Corp_SU/' 
+			Result_Folder = './Revision/Model_2.1_CKK_test_Corp_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK_Corp_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_CKK_test_Corp_PT_SU/' 
 		end if
 	endif 
 
@@ -496,7 +496,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		solving_bench=1
 
 	! Set taxes for benchmark economy
-		tauK = 0.25_DP
+		tauK = 0.20_DP
 		tauW_bt = 0.00_DP
 		tauW_at = 0.00_DP
 		Y_a_threshold = 0.00_DP
