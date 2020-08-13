@@ -158,7 +158,7 @@ PROGRAM main
 
 			! IPO variables 
 				p1_x = 0.05_dp ! Prob normal firm shuts down
-				p2_x = 0.03_dp ! Prob public firm shuts down
+				p2_x = 0.01_dp ! Prob public firm shuts down
 				p3_x = 0.001_dp ! Prob going public 
 
 		else
