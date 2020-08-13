@@ -1732,7 +1732,7 @@ SUBROUTINE COMPUTE_STATS()
 		OPEN (UNIT=90, FILE=trim(Result_Folder)//'size_by_age_x.txt', STATUS='replace')   
 		WRITE  (UNIT=90, FMT=*)  'Age, x1, x2, x3'
 		do age=1,MaxAge 
-		do xi=1:nx
+		do xi=1,nx
 			DBN_age_X(age,xi) = sum(DBN1(age,:,nz-3,:,:,xi))
 		enddo 
 			DBN_age_X(age,:) = DBN_age_X(age,:)/sum(DBN_age_X(age,:))
