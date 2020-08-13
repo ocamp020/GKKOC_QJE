@@ -68,7 +68,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP) :: Top_Share_K_Inc(5), K_Inc_pct(5)
 	integer  :: pct_list_for_Top_Share(5)
-	real(dp) :: DBN_age_X(MaxAge,nx), Public_Share, Public_A_Share, Public_K_Share
+	real(dp) :: DBN_age_X(MaxAge,nx), Public_Share, Public_A_Share, Public_K_Share, Public_Active_Share
 
 	allocate(DBN_vec(			size(DBN1)))
 	allocate(Firm_Wealth_vec(	size(DBN1)))
@@ -1741,7 +1741,8 @@ SUBROUTINE COMPUTE_STATS()
 		CLOSE(unit=90)
 
 		! Share of public firms 
-		Public_Share   = sum(DBN1(:,:,:,:,:,1)) 
+		Public_Share        = 100.0_dp*sum(DBN1(:,:,:,:,:,1)) 
+		Public_Active_Share = 100.0_dp*sum(DBN1(:,:,:,:,:,1))/sum(DBN1(:,:,:,:,:,1:2))
 		Public_A_Share = 0.0_dp 
 		Public_K_Share = 0.0_dp
 		K_mat  = K_Matrix(R,P)
@@ -1751,11 +1752,12 @@ SUBROUTINE COMPUTE_STATS()
 			Public_K_Share = Public_K_Share + K_mat(ai,zi,1)*sum(DBN1(:,ai,zi,:,:,1))
 		enddo 
 		enddo
-		Public_A_Share = Public_A_Share/MeanWealth
-		Public_K_Share = Public_K_Share/MeanWealth
+		Public_A_Share = 100.0_dp*Public_A_Share/MeanWealth
+		Public_K_Share = 100.0_dp*Public_K_Share/MeanWealth
 
 		OPEN (UNIT=90, FILE=trim(Result_Folder)//'Public_Share.txt', STATUS='replace') 
 		WRITE(UNIT=90, FMT=*) 'Public_Share=',Public_Share 
+		WRITE(UNIT=90, FMT=*) 'Public_Share=',Public_Active_Share 
 		WRITE(UNIT=90, FMT=*) 'Public_A_Share=',Public_A_Share   
 		WRITE(UNIT=90, FMT=*) 'Public_K_Share=',Public_K_Share 
 		CLOSE(unit=90)
@@ -1763,6 +1765,7 @@ SUBROUTINE COMPUTE_STATS()
 		print*,' '; print*,'-----------------------------------------------------';
 		print*,'	Share of Public Firms '
 		print '(A,F7.3)',' Share of Firms   = ',Public_Share
+		print '(A,F7.3)',' Share of Firms   = ',Public_Active_Share
 		print '(A,F7.3)',' Share of Assets  = ',Public_A_Share
 		print '(A,F7.3)',' Share of Capital = ',Public_K_Share
 		print*,'-----------------------------------------------------'; print*, ' '
