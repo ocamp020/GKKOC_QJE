@@ -123,7 +123,7 @@ end Subroutine Asset_Grid_Threshold
 		K   = (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))
 		else 
 		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-		end
+		endif
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
@@ -134,7 +134,7 @@ end Subroutine Asset_Grid_Threshold
 			Y_a = a_in* (1.0_dp-tauW_bt) + ( Pr + R*a_in ) *(1.0_DP-tauK)  
 		else
 			Y_a = Y_a_threshold*(1.0_dp-tauW_bt) + (a_in - Y_a_threshold) * (1.0_dp-tauW_at) + ( Pr + R*a_in ) *(1.0_DP-tauK)
-		end if
+		endif
 	END  FUNCTION Y_a
 
 
@@ -161,7 +161,7 @@ end Subroutine Asset_Grid_Threshold
 		K   = (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))
 		else 
 		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-		end
+		endif
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
@@ -170,7 +170,7 @@ end Subroutine Asset_Grid_Threshold
 			tauW = tauW_bt 
 		else
 			tauW = tauW_at 
-		end if
+		endif
 
 		! After tax marginal benefit of assets
 		if ((K.lt.theta(z_in)*a_in).or.(x_in.eq.1)) then 
@@ -193,7 +193,7 @@ end Subroutine Asset_Grid_Threshold
 		K   = (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))
 		else 
 		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-		end
+		endif
 		! Compute asset marginal benefit - subject to taxes
 		if ((K.lt.theta(z_in)*a_in).or.(x_in.eq.1)) then 
 			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK))
@@ -215,7 +215,7 @@ end Subroutine Asset_Grid_Threshold
 		K   = (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))
 		else 
 		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-		end
+		endif
 		! Compute asset marginal benefit - subject to taxes
 		if ((K.lt.theta(z_in)*a_in).or.(x_in.eq.1)) then 
 			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK))
@@ -267,7 +267,7 @@ end Subroutine Asset_Grid_Threshold
 		else 
 			! Separable Utility
 			euler_power = (-1.0_dp/sigma)
-		end if 
+		endif 
 
 		do xp_ind=1,nx
 		! Compute marginal benefit of next period at a' (given zi)
