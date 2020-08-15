@@ -82,7 +82,7 @@ PROGRAM main
 		compute_exp_fixed_prices_and_taxes = .false.
 
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .true. ! true=tau_K, false=tau_W
+			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
 
 		Opt_Threshold = .false.
 
@@ -220,23 +220,23 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK/'
+			Result_Folder = './Revision/Model_2.1_CKK_test/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK_PT/' 
+			Result_Folder = './Revision/Model_2.1_CKK_test_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK_SU/' 
+			Result_Folder = './Revision/Model_2.1_CKK_test_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_CKK_test_PT_SU/' 
 		end if
 	else 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK_Corp/' 
+			Result_Folder = './Revision/Model_2.1_CKK_test_Corp/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK_Corp_PT/' 
+			Result_Folder = './Revision/Model_2.1_CKK_test_Corp_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK_Corp_SU/' 
+			Result_Folder = './Revision/Model_2.1_CKK_test_Corp_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_CKK_Corp_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_CKK_test_Corp_PT_SU/' 
 		end if
 	endif 
 
