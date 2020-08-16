@@ -82,7 +82,7 @@ PROGRAM main
 		compute_exp_fixed_prices_and_taxes = .false.
 
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .true. ! true=tau_K, false=tau_W
+			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
 
 		Opt_Threshold = .false.
 
@@ -2591,11 +2591,11 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	else ! (Read_Results.eqv..true.)
 
 	! Read results from file 
-			Result_Folder   = './Revision/Model_2.1_CKK/Opt_Tax_W/'
+			! Result_Folder   = './Revision/Model_2.1_CKK/Opt_Tax_W/'
 		CALL Write_Experimental_Results(.false.)
-			tauK = tauW_at/R
-			tauW_at = 0.0_dp
-			Result_Folder   = folder_aux_2
+			! tauK = tauW_at/R
+			! tauW_at = 0.0_dp
+			! Result_Folder   = folder_aux_2
 			CALL FIND_DBN_EQ
 			CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
