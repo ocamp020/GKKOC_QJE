@@ -2380,15 +2380,15 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	tau_grid_step = 2
 
     	! Set low psi
-    	psi = 0.70_dp
+    	! psi = 0.70_dp
 	else
 		print*,''
 		print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_4.txt', STATUS='replace')
     	
-    	tau_grid_min  = 15
-    	tau_grid_max  = 30
+    	tau_grid_min  = 200
+    	tau_grid_max  = 220
     	tau_grid_step = 1
 
     	! Set Y_a_threshold
@@ -2425,7 +2425,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			tauK        = real(tauindx,8)/1000_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 		else 
-			tauw_at     = real(tauindx,8)/1000_DP
+			tauw_at     = real(tauindx,8)/10000_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 		endif 
 
