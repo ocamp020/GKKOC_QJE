@@ -1263,8 +1263,10 @@ SUBROUTINE COMPUTE_STATS()
         		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.10_dp) then 
         		Entrepreneur_10_draft_group_z(age,zi) = Entrepreneur_10_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_10 = Entrepreneur_10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		print*, 'Inside Entrepreneur_10',ai,prctile_ai_ind(90)
 	        		if     (ai.ge.prctile_ai_ind(90)) then 		
 	        		Entrepreneur_10_top10 = Entrepreneur_10_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		print*, 'Inside Entrepreneur_10_top10'
 	        		elseif (ai.ge.prctile_ai_ind(99)) then 		
 					Entrepreneur_10_top1  = Entrepreneur_10_top1 + DBN1(age2,ai,zi,lambdai,ei,xi)
 					elseif (ai.le.prctile_ai_ind(10)) then 		
