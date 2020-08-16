@@ -1266,10 +1266,12 @@ SUBROUTINE COMPUTE_STATS()
         		! print*, 'Inside Entrepreneur_10',ai,prctile_ai_ind(90)
 	        		if     (ai.ge.prctile_ai_ind(90)) then 		
 	        		Entrepreneur_10_top10 = Entrepreneur_10_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
-	        		print*, 'Inside Entrepreneur_10_top10', Entrepreneur_10_top10
-	        		elseif (ai.ge.prctile_ai_ind(99)) then 		
+	        		! print*, 'Inside Entrepreneur_10_top10', Entrepreneur_10_top10
+	        		endif 
+	        		if (ai.ge.prctile_ai_ind(99)) then 		
 					Entrepreneur_10_top1  = Entrepreneur_10_top1 + DBN1(age2,ai,zi,lambdai,ei,xi)
-					elseif (ai.le.prctile_ai_ind(10)) then 		
+					endif 
+					if (ai.le.prctile_ai_ind(10)) then 		
 					Entrepreneur_10_bot10 = Entrepreneur_10_bot10 + DBN1(age2,ai,zi,lambdai,ei,xi)
 	        		endif 
         		endif 
@@ -1278,9 +1280,11 @@ SUBROUTINE COMPUTE_STATS()
         		Entrepreneur_50 = Entrepreneur_50 + DBN1(age2,ai,zi,lambdai,ei,xi)
 	        		if     (ai.ge.prctile_ai_ind(90)) then 		
 	        		Entrepreneur_50_top10 = Entrepreneur_50_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
-	        		elseif (ai.ge.prctile_ai_ind(99)) then 		
+	        		endif 
+	        		if (ai.ge.prctile_ai_ind(99)) then 		
 					Entrepreneur_50_top1  = Entrepreneur_50_top1 + DBN1(age2,ai,zi,lambdai,ei,xi)
-					elseif (ai.le.prctile_ai_ind(10)) then 		
+					endif 
+					if (ai.le.prctile_ai_ind(10)) then 		
 					Entrepreneur_50_bot10 = Entrepreneur_50_bot10 + DBN1(age2,ai,zi,lambdai,ei,xi)
 	        		endif 
         		endif 
