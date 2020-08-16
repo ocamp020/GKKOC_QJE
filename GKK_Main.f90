@@ -2345,7 +2345,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		MeanCons_bench = MeanCons
 
 	! Set flag for reading results or computing optimal taxes
-		read_results = .false.
+		read_results = .true.
 		load_seed    = .false.
 
 	! Auxiliary folders 
@@ -2591,7 +2591,11 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	else ! (Read_Results.eqv..true.)
 
 	! Read results from file 
+		Result_Folder   = './Revision/Model_2.1_CKK/Opt_Tax_W/'
 		CALL Write_Experimental_Results(.false.)
+		tauK = tauW_at/R
+		tauW_at = 0.0_dp
+		Result_Folder   = folder_aux_2
 		CALL Asset_Grid_Threshold(Y_a_threshold,agrid_t,na_t)
 		K_mat  = K_Matrix(R,P)
 		Pr_mat = Profit_Matrix(R,P)
@@ -2599,7 +2603,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		CALL ComputeLaborUnits(EBAR,wage)
 		CALL GOVNT_BUDGET(.true.)
 		CALL Compute_After_Tax_Income
-		! CALL Write_Experimental_Results(.true.)
+		CALL Write_Experimental_Results(.true.)
 
 	! Aggregate variable in experimental economy
 		GBAR_exp  = GBAR
