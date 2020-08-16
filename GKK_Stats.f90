@@ -67,8 +67,10 @@ SUBROUTINE COMPUTE_STATS()
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP) :: Top_Share_K_Inc(5), K_Inc_pct(5), &
-				Entrepreneur_10_top10, Entrepreneur_50_top10, Entrepreneur_10_top1, Entrepreneur_50_top1, &
-				Entrepreneur_10_bot10, Entrepreneur_50_bot10
+				& Entrepreneur_10_top10, Entrepreneur_50_top10, Entrepreneur_10_top1, Entrepreneur_50_top1, &
+				& Entrepreneur_10_bot10, Entrepreneur_50_bot10, &
+				& Entrepreneur_10_A, Entrepreneur_50_A, &
+				& Entrepreneur_10_top10_A, Entrepreneur_50_top10_A, Entrepreneur_10_top1_A, Entrepreneur_50_top1_A
 	integer  :: pct_list_for_Top_Share(5)
 
 	allocate(DBN_vec(			size(DBN1)))
@@ -1196,6 +1198,12 @@ SUBROUTINE COMPUTE_STATS()
 		Entrepreneur_50_top1		= 0.0_dp
 		Entrepreneur_10_bot10		= 0.0_dp
 		Entrepreneur_50_bot10		= 0.0_dp
+		Entrepreneur_10_A			= 0.0_dp
+		Entrepreneur_50_A			= 0.0_dp
+		Entrepreneur_10_top10_A		= 0.0_dp
+		Entrepreneur_50_top10_A		= 0.0_dp
+		Entrepreneur_10_top1_A		= 0.0_dp
+		Entrepreneur_50_top1_A		= 0.0_dp
 
 		do zi  = 1,nz
 		do age = 1,draft_age_category
@@ -1263,13 +1271,16 @@ SUBROUTINE COMPUTE_STATS()
         		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.10_dp) then 
         		Entrepreneur_10_draft_group_z(age,zi) = Entrepreneur_10_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_10 = Entrepreneur_10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+				Entrepreneur_10_A = Entrepreneur_10_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
         		! print*, 'Inside Entrepreneur_10',ai,prctile_ai_ind(90)
 	        		if     (ai.ge.prctile_ai_ind(90)) then 		
-	        		Entrepreneur_10_top10 = Entrepreneur_10_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		Entrepreneur_10_top10   = Entrepreneur_10_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		Entrepreneur_10_top10_A = Entrepreneur_10_top10_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
 	        		! print*, 'Inside Entrepreneur_10_top10', Entrepreneur_10_top10
 	        		endif 
 	        		if (ai.ge.prctile_ai_ind(99)) then 		
-					Entrepreneur_10_top1  = Entrepreneur_10_top1 + DBN1(age2,ai,zi,lambdai,ei,xi)
+					Entrepreneur_10_top1    = Entrepreneur_10_top1 + DBN1(age2,ai,zi,lambdai,ei,xi)
+					Entrepreneur_10_top1_A  = Entrepreneur_10_top1_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
 					endif 
 					if (ai.le.prctile_ai_ind(10)) then 		
 					Entrepreneur_10_bot10 = Entrepreneur_10_bot10 + DBN1(age2,ai,zi,lambdai,ei,xi)
@@ -1278,11 +1289,14 @@ SUBROUTINE COMPUTE_STATS()
         		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.50_dp) then 
         		Entrepreneur_50_draft_group_z(age,zi) = Entrepreneur_50_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_50 = Entrepreneur_50 + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_50_A = Entrepreneur_50_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
 	        		if     (ai.ge.prctile_ai_ind(90)) then 		
-	        		Entrepreneur_50_top10 = Entrepreneur_50_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		Entrepreneur_50_top10   = Entrepreneur_50_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		Entrepreneur_50_top10_A = Entrepreneur_50_top10_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
 	        		endif 
 	        		if (ai.ge.prctile_ai_ind(99)) then 		
-					Entrepreneur_50_top1  = Entrepreneur_50_top1 + DBN1(age2,ai,zi,lambdai,ei,xi)
+					Entrepreneur_50_top1   = Entrepreneur_50_top1 + DBN1(age2,ai,zi,lambdai,ei,xi)
+					Entrepreneur_50_top1_A = Entrepreneur_50_top1_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
 					endif 
 					if (ai.le.prctile_ai_ind(10)) then 		
 					Entrepreneur_50_bot10 = Entrepreneur_50_bot10 + DBN1(age2,ai,zi,lambdai,ei,xi)
@@ -1405,6 +1419,13 @@ SUBROUTINE COMPUTE_STATS()
 		Entrepreneur_10_bot10 = 100.0_dp*Entrepreneur_10_bot10/0.10_dp 
 		Entrepreneur_50_bot10 = 100.0_dp*Entrepreneur_50_bot10/0.10_dp
 
+		Entrepreneur_10_A		= 100.0_dp*Entrepreneur_10_A		/MeanWealth
+		Entrepreneur_50_A		= 100.0_dp*Entrepreneur_50_A		/MeanWealth
+		Entrepreneur_10_top10_A	= 100.0_dp*Entrepreneur_10_top10_A /sum(pr_a_dbn(prctile_ai_ind(90):)*agrid(prctile_ai_ind(90):))
+		Entrepreneur_50_top10_A	= 100.0_dp*Entrepreneur_50_top10_A /sum(pr_a_dbn(prctile_ai_ind(90):)*agrid(prctile_ai_ind(90):))
+		Entrepreneur_10_top1_A	= 100.0_dp*Entrepreneur_10_top1_A  /sum(pr_a_dbn(prctile_ai_ind(99):)*agrid(prctile_ai_ind(99):))
+		Entrepreneur_50_top1_A	= 100.0_dp*Entrepreneur_50_top1_A  /sum(pr_a_dbn(prctile_ai_ind(99):)*agrid(prctile_ai_ind(99):))
+
 
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'Entrepreneur_10_50.txt', STATUS='replace') 
 		WRITE  (UNIT=80, FMT=*)  'Share of entrepreneurs '
@@ -1416,6 +1437,12 @@ SUBROUTINE COMPUTE_STATS()
 		WRITE  (UNIT=80, FMT=*)  'Top_01_Entrepreneur_50', Entrepreneur_50_top1
 		WRITE  (UNIT=80, FMT=*)  'Bottom_10_Entrepreneur_10', Entrepreneur_10_bot10
 		WRITE  (UNIT=80, FMT=*)  'Bottom_10_Entrepreneur_50', Entrepreneur_50_bot10
+		WRITE  (UNIT=80, FMT=*)  'Entreprenur_10_A_Share', Entrepreneur_10_A
+		WRITE  (UNIT=80, FMT=*)  'Entreprenur_10_A_Share', Entrepreneur_50_A
+		WRITE  (UNIT=80, FMT=*)  'Top10_Entreprenur_10_A_Share', Entrepreneur_10_top10_A
+		WRITE  (UNIT=80, FMT=*)  'Top10_Entreprenur_50_A_Share', Entrepreneur_50_top10_A
+		WRITE  (UNIT=80, FMT=*)  'Top1_Entreprenur_10_A_Share', Entrepreneur_10_top1_A
+		WRITE  (UNIT=80, FMT=*)  'Top1_Entreprenur_50_A_Share', Entrepreneur_50_top1_A
 		close(unit=80); 
 
 		print*,' '; print*,'-----------------------------------------------------';
@@ -1428,6 +1455,12 @@ SUBROUTINE COMPUTE_STATS()
 		print*, 'Top_01_Entrepreneur_50', Entrepreneur_50_top1
 		print*, 'Bottom_10_Entrepreneur_10', Entrepreneur_10_bot10
 		print*, 'Bottom_10_Entrepreneur_50', Entrepreneur_50_bot10
+		print*, 'Entreprenur_10_A_Share', Entrepreneur_10_A
+		print*, 'Entreprenur_10_A_Share', Entrepreneur_50_A
+		print*, 'Top10_Entreprenur_10_A_Share', Entrepreneur_10_top10_A
+		print*, 'Top10_Entreprenur_50_A_Share', Entrepreneur_50_top10_A
+		print*, 'Top1_Entreprenur_10_A_Share', Entrepreneur_10_top1_A
+		print*, 'Top1_Entreprenur_50_A_Share', Entrepreneur_50_top1_A
 		print*,'-----------------------------------------------------'; print*,' '
 
 
