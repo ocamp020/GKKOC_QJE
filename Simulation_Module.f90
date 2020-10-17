@@ -776,7 +776,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				! Get mean of assets and return
 				IGM_a_matrix  = IGM_a_matrix/real(21,8) 
 				IGM_r_matrix  = IGM_r_matrix/real(21,8) 
-				IGM_pv_matrix = IGM_pv_matrix/real(21,8) 
+				! IGM_pv_matrix = IGM_pv_matrix/real(21,8) 
 				! Get number of eligibles
 				n_eligible = count(IGM_a_matrix(1,:).gt.0.0_dp)
 				! Allocate variables
