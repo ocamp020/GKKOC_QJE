@@ -1137,7 +1137,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14)
 		close (unit=28); close (unit=27); close (unit=24); close (unit=25)!; close (unit=26); 
-		stop
+		
 
 		if (bench_indx==1) then
 			! OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_parents' 	, STATUS='replace')
@@ -1196,6 +1196,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			
 		endif
 
+		stop
 
 		if (bench_indx==1) then
 		print*,' '
