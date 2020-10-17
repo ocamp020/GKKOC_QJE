@@ -343,7 +343,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 						assets_dad(paneli) = 0.0_dp ; assets_son(paneli) = 0.0_dp
 						z_dad(paneli)      = 0      ; z_son(paneli)  	 = 0
 						return_dad(paneli) = 0.0_dp ; return_son(paneli) = 0.0_dp
-						PV_dad(paneli)     = 0.0_dp ; PV_son(paneli)     = 0.0_dp
+						! PV_dad(paneli)     = 0.0_dp ; PV_son(paneli)     = 0.0_dp
 			 		endif 
 		  			! Update age of current "son"
 		  				age_son(paneli)    = age
@@ -383,8 +383,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 				     		IGM_a_matrix(2,IGM_index)  = assets_son(paneli)
 				     		IGM_r_matrix(1,IGM_index)  = return_dad(paneli)
 				     		IGM_r_matrix(2,IGM_index)  = return_son(paneli)
-				     		IGM_pv_matrix(1,IGM_index) = PV_dad(paneli)
-				     		IGM_pv_matrix(2,IGM_index) = PV_son(paneli)
+				     		! IGM_pv_matrix(1,IGM_index) = PV_dad(paneli)
+				     		! IGM_pv_matrix(2,IGM_index) = PV_son(paneli)
 				     		IGM_z_matrix(1,IGM_index)  = z_dad(paneli)
 				     		IGM_z_matrix(2,IGM_index)  = z_son(paneli)
 				     		IGM_index = IGM_index + 1
@@ -394,11 +394,11 @@ SUBROUTINE  SIMULATION(bench_indx)
 			 			age_dad(paneli)    = 31
 			 			assets_dad(paneli) = assets_son(paneli)
 			 			return_dad(paneli) = return_son(paneli)
-			 			PV_dad(paneli)     = PV_son(paneli)
+			 			! PV_dad(paneli)     = PV_son(paneli)
 			 			z_dad(paneli)      = panelz(paneli)
 			 			assets_son(paneli) = 0.0_dp 
 			 			return_son(paneli) = 0.0_dp  
-			 			PV_son(paneli)     = 0.0_dp    		
+			 			! PV_son(paneli)     = 0.0_dp    		
 			 			z_son(paneli)      = 0
 		 			endif 
 		  		endif ! IGM_index.le.4000000
