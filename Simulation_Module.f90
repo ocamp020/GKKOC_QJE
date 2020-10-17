@@ -23,7 +23,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
 		INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
 		INTEGER , DIMENSION(:), allocatable :: panelage, panelz, panellambda, panele, panelx, panelz_old, panellambda_old
-		REAL(DP), DIMENSION(:), allocatable :: panela, panelK, panel_Y_L, panelRet, panelRet_K, !panelPV_a
+		REAL(DP), DIMENSION(:), allocatable :: panela, panelK, panel_Y_L, panelRet, panelRet_K!, panelPV_a
 
 		! Intergenerational statistics
 		! INTEGER , DIMENSION(:)      , allocatable :: eligible, death_count
