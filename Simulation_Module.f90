@@ -822,36 +822,36 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! ! 	! 	print*, 'n_eligible', n_eligible, 'mean_panel_dad', sum(panela_dad_2)/n_eligible, 'mean_panel_son', sum(panela_son_2)/n_eligible
 
 
-			! Mean of assets 
-				panela_parents = panela_parents/5.0_dp 
-				panela_sons    = panela_sons/5.0_dp 
+			! ! Mean of assets 
+			! 	panela_parents = panela_parents/5.0_dp 
+			! 	panela_sons    = panela_sons/5.0_dp 
 
-			! Clean eligibles 
-				where(death_count/=1) eligible = 0
-				where(panelage_sons.lt.25) eligible = 0
-				where(panelage_sons.gt.41) eligible = 0
-				where(panelage_parents.lt.25) eligible = 0
-				where(panelage_parents.gt.41) eligible = 0
+			! ! Clean eligibles 
+			! 	where(death_count/=1) eligible = 0
+			! 	where(panelage_sons.lt.25) eligible = 0
+			! 	where(panelage_sons.gt.41) eligible = 0
+			! 	where(panelage_parents.lt.25) eligible = 0
+			! 	where(panelage_parents.gt.41) eligible = 0
 
 
-			! Get data on intergenerational mobility
-				n_eligible = sum(eligible)
+			! ! Get data on intergenerational mobility
+			! 	n_eligible = sum(eligible)
 
-				allocate( eligible_panela_parents(n_eligible), eligible_panela_sons(n_eligible) )
+			! 	allocate( eligible_panela_parents(n_eligible), eligible_panela_sons(n_eligible) )
 
-				eligible_panela_parents 	= pack(panela_parents   , (eligible.eq.1) )
-				eligible_panela_sons    	= pack(panela_sons      , (eligible.eq.1) )
+			! 	eligible_panela_parents 	= pack(panela_parents   , (eligible.eq.1) )
+			! 	eligible_panela_sons    	= pack(panela_sons      , (eligible.eq.1) )
 
-				allocate( eligible_panelage_parents(n_eligible), eligible_panelage_sons(n_eligible) )
+			! 	allocate( eligible_panelage_parents(n_eligible), eligible_panelage_sons(n_eligible) )
 
-				eligible_panelage_parents 	= pack(panelage_parents , (eligible.eq.1) )
-				eligible_panelage_sons    	= pack(panelage_sons	, (eligible.eq.1) )	
+			! 	eligible_panelage_parents 	= pack(panelage_parents , (eligible.eq.1) )
+			! 	eligible_panelage_sons    	= pack(panelage_sons	, (eligible.eq.1) )	
 
-			print*, ' '
-			print*, 'n_eligible', sum(eligible)
-			print*, 'panela_parents', sum(eligible_panela_parents)/n_eligible, 'panela_sons', sum(eligible_panela_sons)/n_eligible
-			print*, 'panelage_parents', sum(eligible_panelage_parents)/n_eligible, 'panelage_sons', sum(eligible_panelage_sons)/n_eligible
-			print*, ' '
+			! print*, ' '
+			! print*, 'n_eligible', sum(eligible)
+			! print*, 'panela_parents', sum(eligible_panela_parents)/n_eligible, 'panela_sons', sum(eligible_panela_sons)/n_eligible
+			! print*, 'panelage_parents', sum(eligible_panelage_parents)/n_eligible, 'panelage_sons', sum(eligible_panelage_sons)/n_eligible
+			! print*, ' '
 
 		! ! 	print*, 'Start of std dev of return by age'
 		! ! 	! Std Dev of return by age
