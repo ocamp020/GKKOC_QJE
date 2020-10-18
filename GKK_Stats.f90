@@ -34,6 +34,7 @@ SUBROUTINE COMPUTE_STATS()
 	character(100) :: rowname
 	integer        :: age_limit(max_age_category+1), draft_age_limit(draft_age_category+1)
 	real(DP), dimension(MaxAge, nz) 		   :: size_by_age_z, leverage_age_z, constrained_firms_age_z 
+	real(DP), dimension(MaxAge)  			   :: Entrepreneur_10_age, Entrepreneur_25_age, Entrepreneur_50_age
 	real(DP), dimension(draft_age_category,nz) :: size_draft_group_z, wealth_draft_group_z, capital_draft_group_z, &
 		& Cons_draft_group_z, Hours_draft_group_z, Ap_draft_group_z, & 
 		& K_Tax_draft_group_z, L_Tax_draft_group_z, K_Tax_Inc_draft_group_z, L_Tax_Inc_draft_group_z, &
@@ -1192,6 +1193,7 @@ SUBROUTINE COMPUTE_STATS()
 		Entrepreneur_50_draft_group = 0.0_dp
 		Entrepreneur_10				= 0.0_dp
 		Entrepreneur_50				= 0.0_dp
+		Entrepreneur_25				= 0.0_dp
 		Entrepreneur_10_top10		= 0.0_dp
 		Entrepreneur_50_top10		= 0.0_dp
 		Entrepreneur_10_top1		= 0.0_dp
@@ -1204,6 +1206,9 @@ SUBROUTINE COMPUTE_STATS()
 		Entrepreneur_50_top10_A		= 0.0_dp
 		Entrepreneur_10_top1_A		= 0.0_dp
 		Entrepreneur_50_top1_A		= 0.0_dp
+		Entrepreneur_10_age			= 0.0_dp
+		Entrepreneur_50_age			= 0.0_dp
+		Entrepreneur_25_age			= 0.0_dp
 
 		do zi  = 1,nz
 		do age = 1,draft_age_category
@@ -1271,6 +1276,7 @@ SUBROUTINE COMPUTE_STATS()
         		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.10_dp) then 
         		Entrepreneur_10_draft_group_z(age,zi) = Entrepreneur_10_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_10 = Entrepreneur_10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_10_age(age2) = Entrepreneur_10_age(age2) + DBN1(age2,ai,zi,lambdai,ei,xi)
 				Entrepreneur_10_A = Entrepreneur_10_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
         		! print*, 'Inside Entrepreneur_10',ai,prctile_ai_ind(90)
 	        		if     (ai.ge.prctile_ai_ind(90)) then 		
@@ -1286,9 +1292,14 @@ SUBROUTINE COMPUTE_STATS()
 					Entrepreneur_10_bot10 = Entrepreneur_10_bot10 + DBN1(age2,ai,zi,lambdai,ei,xi)
 	        		endif 
         		endif 
+        		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.25_dp) then 
+        		Entrepreneur_25 = Entrepreneur_25 + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_25_age(age2) = Entrepreneur_25_age(age2) + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		endif 
         		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.50_dp) then 
         		Entrepreneur_50_draft_group_z(age,zi) = Entrepreneur_50_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_50 = Entrepreneur_50 + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_50_age(age2) = Entrepreneur_50_age(age2) + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_50_A = Entrepreneur_50_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
 	        		if     (ai.ge.prctile_ai_ind(90)) then 		
 	        		Entrepreneur_50_top10   = Entrepreneur_50_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
@@ -1463,7 +1474,14 @@ SUBROUTINE COMPUTE_STATS()
 		print*, 'Top1_Entreprenur_50_A_Share', Entrepreneur_50_top1_A
 		print*,'-----------------------------------------------------'; print*,' '
 
-
+		OPEN (UNIT=80, FILE=trim(Result_Folder)//'Entrepreneur_by_age.txt', STATUS='replace') 
+		WRITE  (UNIT=80, FMT=*)  'Eentrepreneurs_Cutoff ','Profits/Before_Tax_Income>10%','Profits/Before_Tax_Income>25%','Profits/Before_Tax_Income>50%'
+		WRITE  (UNIT=80, FMT=*)  'Total_Share ',100.0_dp*Entrepreneur_10,100.0_dp*Entrepreneur_25,100.0_dp*Entrepreneur_50
+		WRITE  (UNIT=80, FMT=*)  'By Age ',' '
+		do age=1,MaxAge 
+		WRITE  (UNIT=80, FMT=*)  age,100.0_dp*Entrepreneur_10_age(age),100.0_dp*Entrepreneur_25_age(age),100.0_dp*Entrepreneur_50_age(age)
+		enddo 
+		close(unit=80); 
 
 
 

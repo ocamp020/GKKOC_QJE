@@ -117,10 +117,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 		allocate( age_son(			totpop) )
 		allocate( z_dad(			totpop) )
 		allocate( z_son(			totpop) )
-		allocate( IGM_a_matrix(  2,10000000) )
-		allocate( IGM_r_matrix(  2,10000000) )
-		allocate( IGM_z_matrix(  2,10000000) )
-		! allocate( IGM_pv_matrix( 2,10000000) )
+		allocate( IGM_a_matrix(  2,5000000) )
+		allocate( IGM_r_matrix(  2,5000000) )
+		allocate( IGM_z_matrix(  2,5000000) )
+		! allocate( IGM_pv_matrix( 2,5000000) )
 		
 
 
@@ -334,7 +334,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     	ENDIF ! new age==1
 
 				! Inter-Generation Mobility 30-50
-				if (IGM_index.le.10000000) then
+				if (IGM_index.le.5000000) then
 		  			! Reset variables if son dies before 50
 			 		if ((age.eq.1).and.(age_son(paneli).lt.31)) then 
 						! !$omp critical
@@ -403,7 +403,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			 			! PV_son(paneli)     = 0.0_dp    		
 			 			z_son(paneli)      = 0
 		 			endif 
-		  		endif ! IGM_index.le.10000000
+		  		endif ! IGM_index.le.5000000
 
 		     	! Inter-Generation Mobility 40-60
 		     	! if (IGM_index_2.le.4000000) then
@@ -1155,13 +1155,13 @@ SUBROUTINE  SIMULATION(bench_indx)
 			call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/IGM_3050' )
 			OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panela_parents' , STATUS='replace')
 			OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panela_sons'     , STATUS='replace')
-			WRITE (UNIT=20, FMT='(F12.4)') panela_dad
-			WRITE (UNIT=21, FMT='(F12.4)') panela_son
+			WRITE (UNIT=20, FMT='(F12.6)') panela_dad
+			WRITE (UNIT=21, FMT='(F12.6)') panela_son
 			close (unit=20); close (unit=21); 
 			OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelr_parents' , STATUS='replace')
 			OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelr_sons'     , STATUS='replace')
-			WRITE (UNIT=20, FMT='(F12.4)') panelr_dad
-			WRITE (UNIT=21, FMT='(F12.4)') panelr_son
+			WRITE (UNIT=20, FMT='(F12.6)') panelr_dad
+			WRITE (UNIT=21, FMT='(F12.6)') panelr_son
 			close (unit=20); close (unit=21); 
 			! OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelpv_parents' , STATUS='replace')
 			! OPEN(UNIT=21, FILE=trim(Result_Folder)//'Simul/IGM_3050/panelpv_sons'     , STATUS='replace')
@@ -1198,7 +1198,6 @@ SUBROUTINE  SIMULATION(bench_indx)
 			
 		endif
 
-		stop
 
 		if (bench_indx==1) then
 		print*,' '
