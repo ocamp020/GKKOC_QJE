@@ -117,10 +117,11 @@ SUBROUTINE  SIMULATION(bench_indx)
 		allocate( age_son(			totpop) )
 		allocate( z_dad(			totpop) )
 		allocate( z_son(			totpop) )
-		allocate( IGM_a_matrix(  2,4000000) )
-		allocate( IGM_r_matrix(  2,4000000) )
-		! allocate( IGM_pv_matrix( 2,4000000) )
-		allocate( IGM_z_matrix(  2,4000000) )
+		allocate( IGM_a_matrix(  2,10000000) )
+		allocate( IGM_r_matrix(  2,10000000) )
+		allocate( IGM_z_matrix(  2,10000000) )
+		! allocate( IGM_pv_matrix( 2,10000000) )
+		
 
 
 
@@ -333,7 +334,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		     	ENDIF ! new age==1
 
 				! Inter-Generation Mobility 30-50
-				if (IGM_index.le.4000000) then
+				if (IGM_index.le.10000000) then
 		  			! Reset variables if son dies before 50
 			 		if ((age.eq.1).and.(age_son(paneli).lt.31)) then 
 						! !$omp critical
@@ -354,15 +355,16 @@ SUBROUTINE  SIMULATION(bench_indx)
 			 			assets_son(paneli) = panela(paneli) + assets_son(paneli)
 		 				return_son(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*k_igm)**mu - (R+DepRate)*k_igm +&
 		  		   						&   R*panela(paneli) )/panela(paneli) + return_son(paneli)
-			 			if (panela(paneli) .ge. amax) then
-					        tklo = na-1
-					    elseif (panela(paneli) .lt. amin) then
-				            tklo = 1
-				        else
-				            tklo = ((panela(paneli)- amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-					    endif    
-					    tkhi = tklo + 1        
 
+		 			 	! ! PV at current assets 
+						! if (panela(paneli) .ge. amax) then
+						! 	tklo = na-1
+						! elseif (panela(paneli) .lt. amin) then
+						! 	tklo = 1
+						! else
+						! 	tklo = ((panela(paneli)- amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+						! endif    
+						! tkhi = tklo + 1        
 					    ! PV_son(paneli)    = (    (agrid(tkhi) - panela(paneli)) * & 
 					    ! 					&		V_Pr(age,tklo,panelz(paneli),panellambda(paneli),panele(paneli), panelx(paneli))    &
 					    !                    	&  + (panela(paneli) - agrid(tklo)) * &
@@ -401,7 +403,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			 			! PV_son(paneli)     = 0.0_dp    		
 			 			z_son(paneli)      = 0
 		 			endif 
-		  		endif ! IGM_index.le.4000000
+		  		endif ! IGM_index.le.10000000
 
 		     	! Inter-Generation Mobility 40-60
 		     	! if (IGM_index_2.le.4000000) then
