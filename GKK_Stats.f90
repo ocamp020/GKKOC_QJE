@@ -1474,6 +1474,10 @@ SUBROUTINE COMPUTE_STATS()
 		print*, 'Top1_Entreprenur_50_A_Share', Entrepreneur_50_top1_A
 		print*,'-----------------------------------------------------'; print*,' '
 
+		Entrepreneur_10_age = Entrepreneur_10_age/sum(sum(sum(sum(sum(DBN1,6),5),4),3),2)
+		Entrepreneur_25_age = Entrepreneur_25_age/sum(sum(sum(sum(sum(DBN1,6),5),4),3),2)
+		Entrepreneur_50_age = Entrepreneur_50_age/sum(sum(sum(sum(sum(DBN1,6),5),4),3),2)
+
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'Entrepreneur_by_age.txt', STATUS='replace') 
 		WRITE  (UNIT=80, FMT=*)  'Eentrepreneurs_Cutoff ','Profits/Before_Tax_Income>10%',&
 			&'Profits/Before_Tax_Income>25%','Profits/Before_Tax_Income>50%'
@@ -1482,7 +1486,7 @@ SUBROUTINE COMPUTE_STATS()
 		WRITE  (UNIT=80, FMT=*)  'By Age ',' '
 		do age=1,MaxAge 
 		WRITE  (UNIT=80, FMT=*)  age,&
-		&100.0_dp*Entrepreneur_10_age(age),100.0_dp*Entrepreneur_25_age(age),100.0_dp*Entrepreneur_50_age(age)
+			&100.0_dp*Entrepreneur_10_age(age),100.0_dp*Entrepreneur_25_age(age),100.0_dp*Entrepreneur_50_age(age)
 		enddo 
 		close(unit=80); 
 
