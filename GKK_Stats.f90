@@ -1839,11 +1839,10 @@ SUBROUTINE COMPUTE_STATS()
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	TFP_star = 0.0_dp
-	do i_a = 1,na
-	do i_z = 1,nz 
-	do i_x = 1,2
-		TFP_star = TFP_star + sum(DBN1(:,i_a,i_z,:,:,i_x))/size*&
-					&	( xz_grid(i_x,i_z)  								)**(mu/(1.0_dp-mu))
+	do ai = 1,na
+	do zi = 1,nz 
+	do xi = 1,2
+		TFP_star = TFP_star + sum(DBN1(:,ai,zi,:,:,xi))*(xz_grid(xi,zi))**(mu/(1.0_dp-mu))
 	enddo 
 	enddo 
 	enddo
