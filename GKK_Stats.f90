@@ -1485,7 +1485,7 @@ SUBROUTINE COMPUTE_STATS()
 			&100.0_dp*Entrepreneur_10,100.0_dp*Entrepreneur_25,100.0_dp*Entrepreneur_50
 		WRITE  (UNIT=80, FMT=*)  'By Age ',' '
 		do age=1,MaxAge 
-		WRITE  (UNIT=80, FMT=*)  age,&
+		WRITE  (UNIT=80, FMT=*)  age+19,&
 			&100.0_dp*Entrepreneur_10_age(age),100.0_dp*Entrepreneur_25_age(age),100.0_dp*Entrepreneur_50_age(age)
 		enddo 
 		close(unit=80); 
