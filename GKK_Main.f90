@@ -158,7 +158,7 @@ PROGRAM main
 				bq_fee = 0.00_dp
 
 			! Interest Rate Wedge
-				RW     = 0.07_dp
+				RW     = 0.08_dp
 
 		else
 
