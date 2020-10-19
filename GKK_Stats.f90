@@ -1737,6 +1737,7 @@ SUBROUTINE COMPUTE_STATS()
     WRITE(UNIT=81, FMT=*)  'TFP',QBAR/MeanWealth
     WRITE(UNIT=81, FMT=*)  'TFP/TFP_Star',(QBAR/MeanWealth)/TFP_Star 
   close(unit=81)
+  
 
 
   print*, ' '; print*,' End of Compute_Stats'; print*, ' '
