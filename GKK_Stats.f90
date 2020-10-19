@@ -64,7 +64,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
-
+	real(DP) :: TFP_star 
 
 	allocate(DBN_vec(			size(DBN1)))
 	allocate(Firm_Wealth_vec(	size(DBN1)))
@@ -1602,6 +1602,28 @@ SUBROUTINE COMPUTE_STATS()
 	! 	CLOSE(UNIT=1)
 	! 	CLOSE(UNIT=2)
 	! 	CLOSE(UNIT=3)
+
+
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+	! TFP_Star (without constraints )
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+	TFP_star = 0.0_dp
+	do ai = 1,na
+	do zi = 1,nz 
+	do xi = 1,2
+	TFP_star = TFP_star + sum(DBN1(:,ai,zi,:,:,xi))*(xz_grid(xi,zi))**(mu/(1.0_dp-mu))
+	enddo 
+	enddo 
+	enddo
+	TFP_star = TFP_star ** ((1.0_dp-mu)/mu)
+	OPEN (UNIT=81, FILE=trim(Result_Folder)//'TFP_Star.txt', STATUS='replace') 
+	WRITE(UNIT=81, FMT=*)  'TFP Stats'
+	WRITE(UNIT=81, FMT=*)  'TFP_Star',TFP_star
+	WRITE(UNIT=81, FMT=*)  'TFP',QBAR/MeanWealth
+	WRITE(UNIT=81, FMT=*)  'TFP/TFP_Star',(QBAR/MeanWealth)/TFP_Star 
+	close(unit=81)
 
 
 	print*, ' '; print*,' End of Compute_Stats'; print*, ' '
