@@ -68,6 +68,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP) :: Top_Share_K_Inc(5), K_Inc_pct(5)
 	integer  :: pct_list_for_Top_Share(5)
+	real(DP) :: TFP_star 
 
 	allocate(DBN_vec(			size(DBN1)))
 	allocate(Firm_Wealth_vec(	size(DBN1)))
@@ -1716,7 +1717,29 @@ SUBROUTINE COMPUTE_STATS()
 	! 	CLOSE(UNIT=3)
 
 
-	print*, ' '; print*,' End of Compute_Stats'; print*, ' '
+  !------------------------------------------------------------------------------------
+  !------------------------------------------------------------------------------------
+  ! TFP_Star (without constraints )
+  !------------------------------------------------------------------------------------
+  !------------------------------------------------------------------------------------
+  TFP_star = 0.0_dp
+  do ai = 1,na
+  do zi = 1,nz 
+  do xi = 1,2
+    TFP_star = TFP_star + sum(DBN1(:,ai,zi,:,:,xi))*(xz_grid(xi,zi))**(mu/(1.0_dp-mu))
+  enddo 
+  enddo 
+  enddo
+  TFP_star = TFP_star ** ((1.0_dp-mu)/mu)
+  OPEN (UNIT=81, FILE=trim(Result_Folder)//'TFP_Star.txt', STATUS='replace') 
+    WRITE(UNIT=81, FMT=*)  'TFP Stats'
+    WRITE(UNIT=81, FMT=*)  'TFP_Star',TFP_star
+    WRITE(UNIT=81, FMT=*)  'TFP',QBAR/MeanWealth
+    WRITE(UNIT=81, FMT=*)  'TFP/TFP_Star',(QBAR/MeanWealth)/TFP_Star 
+  close(unit=81)
+
+
+  print*, ' '; print*,' End of Compute_Stats'; print*, ' '
 
 
 END SUBROUTINE COMPUTE_STATS
