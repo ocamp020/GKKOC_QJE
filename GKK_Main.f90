@@ -158,7 +158,7 @@ PROGRAM main
 				bq_fee = 0.00_dp
 
 			! Interest Rate Wedge
-				RW     = 0.06_dp
+				RW     = 0.07_dp
 
 		else
 
@@ -222,23 +222,23 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2/'
+			Result_Folder = './Revision/Model_2.1_RW/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2_PT/' 
+			Result_Folder = './Revision/Model_2.1_RW_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2_SU/' 
+			Result_Folder = './Revision/Model_2.1_RW_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_RW_PT_SU/' 
 		end if
 	else 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2_Corp/' 
+			Result_Folder = './Revision/Model_2.1_RW_Corp/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2_Corp_PT/' 
+			Result_Folder = './Revision/Model_2.1_RW_Corp_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2_Corp_SU/' 
+			Result_Folder = './Revision/Model_2.1_RW_Corp_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2_Corp_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_RW_Corp_PT_SU/' 
 		end if
 	endif 
 
@@ -611,7 +611,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark
