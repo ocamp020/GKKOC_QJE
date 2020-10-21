@@ -2008,7 +2008,7 @@ SUBROUTINE FIND_DBN_EQ()
 	IMPLICIT NONE
 	INTEGER  :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL   	 :: DBN_dist, DBN_criteria
-	REAL(DP) :: BBAR, Wealth, brent_value, R_old
+	REAL(DP) :: BBAR, Wealth, brent_value, R_old, K_demand, K_mat_aux(na,nz,nx)
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable ::  PrAprimelo, PrAprimehi, PrBqlo, PrBqhi, DBN2
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable ::  Aplo, Aphi, Bqlo, Bqhi
 	! Timing
@@ -2349,8 +2349,18 @@ SUBROUTINE FIND_DBN_EQ()
 		    		P = min(P,1.0_dp)
 		    		R_old = R 
 		            brent_value = brent(-0.1_DP,0.01_DP,10.00_DP,Agg_Debt, brent_tol,R)
-		            print*, ' K market: error=',brent_value,' Supply=',Wealth,&
-		            	& ' Demand=',sum(sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )*(K_matrix(R,P)))
+
+		            ! Compute aggregate demand 
+		            	K_mat_aux = K_matrix(R,P)
+		            	K_demand = 0.0_dp
+						do x1=1,nx
+						do z1=1,nz 
+						do a1=1,na
+							K_demand = K_demand + sum(DBN1(:,a1,z1,:,:,x1)*K_mat_aux(a1,z1,x1))
+						enddo 
+						enddo 
+						enddo 
+		            print*, ' K market: error=',brent_value,' Supply=',Wealth,' Demand=',K_demand
 		            ! R = 0.9*R_old + 0.1*R
 		        else
 		            R = 0.0_DP
@@ -2363,6 +2373,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    		& ' DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
 	    		& 'W=',wage,'R=',R,'P=',P,'Q=',QBAR, &
 	    		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'K_C=',K_C,'L_C=',L_C
+
     		12345 format &
     		&(A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X)
 	    	!!
