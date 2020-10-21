@@ -2008,7 +2008,7 @@ SUBROUTINE FIND_DBN_EQ()
 	IMPLICIT NONE
 	INTEGER  :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL   	 :: DBN_dist, DBN_criteria
-	REAL(DP) :: BBAR, Wealth, brent_value, R_old, K_demand, K_mat_aux(na,nz,nx)
+	REAL(DP) :: BBAR, Wealth, brent_value, R_old, K_demand, K_mat_aux(na,nz,nx), R_max, R_min, KD, KD_max, KD_min
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable ::  PrAprimelo, PrAprimehi, PrBqlo, PrBqhi, DBN2
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable ::  Aplo, Aphi, Bqlo, Bqhi
 	! Timing
@@ -2349,6 +2349,58 @@ SUBROUTINE FIND_DBN_EQ()
 		    		P = min(P,1.0_dp)
 		    		R_old = R 
 		            brent_value = brent(-0.1_DP,0.01_DP,10.00_DP,Agg_Debt, brent_tol,R)
+
+		            if (brent_value.gt.brent_tol) then 
+		            	R_max  =  0.10_dp 
+		            		K_mat_aux = K_matrix(R_max,P)
+		            		KD_max = 0.0_dp 
+		            		do x1=1,nx
+							do z1=1,nz 
+							do a1=1,na
+								KD_max = KD_max + sum(DBN1(:,a1,z1,:,:,x1)*K_mat_aux(a1,z1,x1))
+							enddo 
+							enddo 
+							enddo 
+		            	R_min  = -0.05_dp 
+		            		K_mat_aux = K_matrix(R_min,P)
+		            		KD_min = 0.0_dp 
+		            		do x1=1,nx
+							do z1=1,nz 
+							do a1=1,na
+								KD_min = KD_min + sum(DBN1(:,a1,z1,:,:,x1)*K_mat_aux(a1,z1,x1))
+							enddo 
+							enddo 
+							enddo 
+						if ((KD_max-Wealth)*(KD_min-Wealth).gt.0.0_dp) then 
+							print*, 'Error in capital market - Zero not bracketed'
+						else 
+							do while (abs(brent_value).gt.brent_tol) 
+								R = (R_max+R_min)/2.0_dp 
+								K_mat_aux = K_matrix(R,P)
+			            		KD = 0.0_dp 
+			            		do x1=1,nx
+								do z1=1,nz 
+								do a1=1,na
+									KD = KD + sum(DBN1(:,a1,z1,:,:,x1)*K_mat_aux(a1,z1,x1))
+								enddo 
+								enddo 
+								enddo 
+
+								brent_value = KD-Wealth 
+
+								if (brent_value.lt.0.0_dp) then 
+								R_max = R 
+								else 
+								R_min = R 
+								endif 
+
+								print*, 'R_min=',R_min,' R_max=',R_max,'Error=',brent_value
+							enddo 
+
+
+						endif 
+
+		            endif 
 
 		            ! Compute aggregate demand 
 		            	K_mat_aux = K_matrix(R,P)
