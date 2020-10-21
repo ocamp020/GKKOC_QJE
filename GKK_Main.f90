@@ -157,6 +157,9 @@ PROGRAM main
 			! No bequest fees
 				bq_fee = 0.00_dp
 
+			! Pr new borns are high state
+				px_nb = 0.05_dp 
+
 		else
 
 		! Corporate SEctor
