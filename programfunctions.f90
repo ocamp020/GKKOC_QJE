@@ -2349,6 +2349,8 @@ SUBROUTINE FIND_DBN_EQ()
 		    		P = min(P,1.0_dp)
 		    		R_old = R 
 		            brent_value = brent(-0.1_DP,0.01_DP,10.00_DP,Agg_Debt, brent_tol,R)
+		            print*, ' K market: error=',brent_value,' Supply=',Wealth,&
+		            	& ' Demand=',sum(sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )*(K_matrix(R,P)))
 		            ! R = 0.9*R_old + 0.1*R
 		        else
 		            R = 0.0_DP
