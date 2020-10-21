@@ -158,7 +158,7 @@ PROGRAM main
 				bq_fee = 0.00_dp
 
 			! Pr new borns are high state
-				px_nb = 0.01_dp 
+				px_nb = 0.00_dp 
 
 		else
 
