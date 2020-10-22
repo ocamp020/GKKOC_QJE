@@ -159,6 +159,7 @@ PROGRAM main
 
 			! Pr new borns are high state
 				px_nb = 1.00_dp 
+				p3_x  = 0.00_dp
 
 		else
 
