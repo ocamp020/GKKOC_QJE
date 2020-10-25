@@ -1041,7 +1041,7 @@ SUBROUTINE COMPUTE_STATS()
 
 		! Asset weighted leverage
 		DBN_azx2 = spread(spread(agrid,2,nz),3,2)
-		DBN_azx2 = DBN_azx/sum(DBN_azx2)
+		DBN_azx2 = DBN_azx2/sum(DBN_azx2)
 		DBN_azx2_vec = reshape(DBN_azx2,(/size(DBN_azx2)/)); 
 
 		! Compute bequest by percentile (percentiles for counter CDF)
@@ -1080,7 +1080,7 @@ SUBROUTINE COMPUTE_STATS()
 
 		! Asset weighted leverage
 		DBN_azx2 = K_mat(:,:,1:2)
-		DBN_azx2 = DBN_azx/sum(DBN_azx2)
+		DBN_azx2 = DBN_azx2/sum(DBN_azx2)
 		DBN_azx2_vec = reshape(DBN_azx2,(/size(DBN_azx2)/)); 
 
 		! Compute bequest by percentile (percentiles for counter CDF)
