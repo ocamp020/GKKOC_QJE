@@ -980,9 +980,9 @@ SUBROUTINE COMPUTE_STATS()
 
 		! Leverage by firm type - Average and percentiles 
 		leverage_azx = 0.0_dp 
-		do ai=1:na 
-		do zi=1:nz 
-		do xi=1:2 
+		do ai=1,na 
+		do zi=1,nz 
+		do xi=1,2 
 			leverage_azx(ai,zi,xi) = K_mat(ai,zi,xi)/agrid(ai)
 		enddo 
 		enddo  
