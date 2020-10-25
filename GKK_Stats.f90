@@ -1043,6 +1043,7 @@ SUBROUTINE COMPUTE_STATS()
 		DBN_azx2 = spread(spread(agrid,2,nz),3,2)
 		DBN_azx2 = DBN_azx2/sum(DBN_azx2)
 		DBN_azx2_vec = reshape(DBN_azx2,(/size(DBN_azx2)/)); 
+		ave_leverage = sum(leverage_azx*DBN_azx2) 
 
 		! Compute bequest by percentile (percentiles for counter CDF)
 		prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
@@ -1082,6 +1083,7 @@ SUBROUTINE COMPUTE_STATS()
 		DBN_azx2 = K_mat(:,:,1:2)
 		DBN_azx2 = DBN_azx2/sum(DBN_azx2)
 		DBN_azx2_vec = reshape(DBN_azx2,(/size(DBN_azx2)/)); 
+		ave_leverage = sum(leverage_azx*DBN_azx2) 
 
 		! Compute bequest by percentile (percentiles for counter CDF)
 		prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
