@@ -75,7 +75,7 @@ SUBROUTINE COMPUTE_STATS()
 	integer  :: pct_list_for_Top_Share(5)
 	real(DP) :: TFP_star 
 	real(dp) :: leverage_azx(na,nz,nx-1), DBN_azx2(na,nz,nx-1), &
-			& leverage_azx_vec(na*nz*(nx-1)), DBN_azx2_vec(na*nz*(nx-1)), ave_leverage
+			& leverage_vec(na*nz*(nx-1)), DBN_azx2_vec(na*nz*(nx-1)), ave_leverage
 
 	allocate(DBN_vec(			size(DBN1)))
 	allocate(Firm_Wealth_vec(	size(DBN1)))
