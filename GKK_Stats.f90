@@ -65,7 +65,9 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
-
+	real(dp) :: leverage_azx(na,nz,nx-1), DBN_azx2(na,nz,nx-1), &
+      & leverage_vec(na*nz*(nx-1)), DBN_azx2_vec(na*nz*(nx-1)), ave_leverage
+	real(DP) :: TFP_star      
 
 	allocate(DBN_vec(			size(DBN1)))
 	allocate(Firm_Wealth_vec(	size(DBN1)))
@@ -899,6 +901,150 @@ SUBROUTINE COMPUTE_STATS()
 
 			! deallocate(Firm_Output,Firm_Profit)
 
+
+    ! Leverage by firm type - Average and percentiles 
+    leverage_azx = 0.0_dp 
+    do ai=1,na 
+    do zi=1,nz 
+    do xi=1,2 
+      leverage_azx(ai,zi,xi) = max(K_mat(ai,zi,xi)-agrid(ai),0.0_dp)/K_mat(ai,zi,xi)
+    enddo 
+    enddo  
+    enddo
+
+    DBN_azx2 = DBN_azx(:,:,1:2)/sum(DBN_azx(:,:,1:2)) 
+
+    ave_leverage = sum(leverage_azx*DBN_azx2) 
+
+    ! Vectorizations
+    DBN_azx2_vec  = reshape(DBN_azx2     ,(/size(DBN_azx2)/)); 
+    leverage_vec  = reshape(leverage_azx ,(/size(DBN_azx2)/)); 
+
+    ! Compute bequest by percentile (percentiles for counter CDF)
+    prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+    a = minval(leverage_vec)
+    b = maxval(leverage_vec) 
+    c = a
+    do i=1,size(prctile_bq)
+      a = c
+      b = maxval(leverage_vec)
+      c = (a+b)/2.0_dp
+      CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+      !print*, ' '
+      !print*, 'Percentile', prctile_bq(i)
+      do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+        if (CCDF_c<prctile_bq(i)) then 
+          b = c 
+          c = (a+b)/2.0_dp
+          CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+        else 
+          a = c 
+          c = (a+b)/2.0_dp
+          CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+        endif
+        ! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+      enddo 
+      BQ_top_x(i) = c 
+    enddo 
+
+
+    if (solving_bench.eq.1) then
+      OPEN(UNIT=11, FILE=trim(Result_Folder)//'Leverage_pct_Bench.txt', STATUS='replace')
+    else
+      OPEN(UNIT=11, FILE=trim(Result_Folder)//'Leverage_pct_Exp.txt', STATUS='replace')
+    end if 
+    print*,' '
+    print*,'-----------------------------------------------------'
+    WRITE(UNIT=11, FMT=*) 'Leverage among active firms'
+    WRITE(UNIT=11, FMT=*) 'Weights p10 p50 p90 p95 p99 Average'
+    WRITE(UNIT=11, FMT=*)  'Unweighted',BQ_top_x, ave_leverage
+    
+    print*,' Leverage Percentiles and Average' 
+    print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
+      & 'Unweighted:  p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
+
+    ! Asset weighted leverage
+    DBN_azx2 = spread(spread(agrid,2,nz),3,2)
+    DBN_azx2 = DBN_azx2/sum(DBN_azx2)
+    DBN_azx2_vec = reshape(DBN_azx2,(/size(DBN_azx2)/)); 
+    ave_leverage = sum(leverage_azx*DBN_azx2) 
+
+    ! Compute bequest by percentile (percentiles for counter CDF)
+    prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+    a = minval(leverage_vec)
+    b = maxval(leverage_vec) 
+    c = a
+    do i=1,size(prctile_bq)
+      a = c
+      b = maxval(leverage_vec)
+      c = (a+b)/2.0_dp
+      CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+      !print*, ' '
+      !print*, 'Percentile', prctile_bq(i)
+      do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+        if (CCDF_c<prctile_bq(i)) then 
+          b = c 
+          c = (a+b)/2.0_dp
+          CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+        else 
+          a = c 
+          c = (a+b)/2.0_dp
+          CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+        endif
+        ! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+      enddo 
+      BQ_top_x(i) = c 
+    enddo 
+
+
+    WRITE(UNIT=11, FMT=*)  'Assets ',BQ_top_x, ave_leverage
+    
+    print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
+      & 'Assets-weighted:   p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
+
+
+    ! Asset weighted leverage
+    DBN_azx2 = K_mat(:,:,1:2)
+    DBN_azx2 = DBN_azx2/sum(DBN_azx2)
+    DBN_azx2_vec = reshape(DBN_azx2,(/size(DBN_azx2)/)); 
+    ave_leverage = sum(leverage_azx*DBN_azx2) 
+
+    ! Compute bequest by percentile (percentiles for counter CDF)
+    prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+    a = minval(leverage_vec)
+    b = maxval(leverage_vec) 
+    c = a
+    do i=1,size(prctile_bq)
+      a = c
+      b = maxval(leverage_vec)
+      c = (a+b)/2.0_dp
+      CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+      !print*, ' '
+      !print*, 'Percentile', prctile_bq(i)
+      do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+        if (CCDF_c<prctile_bq(i)) then 
+          b = c 
+          c = (a+b)/2.0_dp
+          CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+        else 
+          a = c 
+          c = (a+b)/2.0_dp
+          CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+        endif
+        ! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+      enddo 
+      BQ_top_x(i) = c 
+    enddo 
+
+
+    WRITE(UNIT=11, FMT=*)  'Capital ',BQ_top_x, ave_leverage
+    
+    print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
+      & 'Capital-weighted:  p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
+    print*,'-----------------------------------------------------'; print*, ' '
+
+    CLOSE(UNIT=11)
+
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Distribution of firm wealth
@@ -1647,8 +1793,29 @@ SUBROUTINE COMPUTE_STATS()
 	! 	CLOSE(UNIT=2)
 	! 	CLOSE(UNIT=3)
 
+	!------------------------------------------------------------------------------------
+  !------------------------------------------------------------------------------------
+  ! TFP_Star (without constraints )
+  !------------------------------------------------------------------------------------
+  !------------------------------------------------------------------------------------
+  TFP_star = 0.0_dp
+  do ai = 1,na
+  do zi = 1,nz 
+  do xi = 1,2
+    TFP_star = TFP_star + sum(DBN1(:,ai,zi,:,:,xi))*(xz_grid(xi,zi))**(mu/(1.0_dp-mu))
+  enddo 
+  enddo 
+  enddo
+  TFP_star = TFP_star ** ((1.0_dp-mu)/mu)
+  OPEN (UNIT=81, FILE=trim(Result_Folder)//'TFP_Star.txt', STATUS='replace') 
+    WRITE(UNIT=81, FMT=*)  'TFP Stats'
+    WRITE(UNIT=81, FMT=*)  'TFP_Star',TFP_star
+    WRITE(UNIT=81, FMT=*)  'TFP',QBAR/MeanWealth
+    WRITE(UNIT=81, FMT=*)  'TFP/TFP_Star',(QBAR/MeanWealth)/TFP_Star 
+  close(unit=81)
 
-	print*, ' '; print*,' End of Compute_Stats'; print*, ' '
+
+  print*, ' '; print*,' End of Compute_Stats'; print*, ' '
 
 
 END SUBROUTINE COMPUTE_STATS
