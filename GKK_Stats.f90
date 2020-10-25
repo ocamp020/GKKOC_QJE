@@ -983,7 +983,7 @@ SUBROUTINE COMPUTE_STATS()
 		do ai=1,na 
 		do zi=1,nz 
 		do xi=1,2 
-			leverage_azx(ai,zi,xi) = K_mat(ai,zi,xi)/agrid(ai)
+			leverage_azx(ai,zi,xi) = max(K_mat(ai,zi,xi)-agrid(ai),0.0_dp)/K_mat(ai,zi,xi)
 		enddo 
 		enddo  
 		enddo
