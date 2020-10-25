@@ -1037,7 +1037,8 @@ SUBROUTINE COMPUTE_STATS()
     
     print*,' Leverage Percentiles and Average' 
     print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
-      & 'Unweighted:  p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
+      & 'Unweighted:  p10',&
+      & BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
 
     ! Asset weighted leverage
     DBN_azx2 = spread(spread(agrid,2,nz),3,2)
@@ -1076,7 +1077,8 @@ SUBROUTINE COMPUTE_STATS()
     WRITE(UNIT=11, FMT=*)  'Assets ',BQ_top_x, ave_leverage
     
     print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
-      & 'Assets-weighted:   p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
+      & 'Assets-weighted:   p10',&
+      & BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
 
 
     ! Asset weighted leverage
@@ -1116,7 +1118,8 @@ SUBROUTINE COMPUTE_STATS()
     WRITE(UNIT=11, FMT=*)  'Capital ',BQ_top_x, ave_leverage
     
     print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
-      & 'Capital-weighted:  p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
+      & 'Capital-weighted:  p10',&
+      & BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
     print*,'-----------------------------------------------------'; print*, ' '
 
     CLOSE(UNIT=11)
