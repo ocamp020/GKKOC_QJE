@@ -2419,7 +2419,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		! Result_Folder = folder_aux 
 		! CALL Write_Benchmark_Results(.false.)
 		! Result_Folder = folder_aux_2
-		psi = psi_bench
+		! psi = psi_bench
 
 		if (Opt_Tax_KW) then 
 			tauK        = real(tauindx,8)/100_DP
