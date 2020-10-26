@@ -2346,7 +2346,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .false.
+		load_seed    = .true.
 
 	! Auxiliary folders 
 		folder_aux   = './Revision/Model_2.1_CKK_bequest/'
@@ -2373,10 +2373,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
 		print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
 		print*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='replace')
     	
-    	tau_grid_min  = 0
-    	tau_grid_max  = 40
+    	tau_grid_min  = 40
+    	tau_grid_max  = 55
     	tau_grid_step = 1
 
     	! Set low psi
@@ -2485,7 +2485,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	      	print*,'------------------------------------------------------------------------------';print*,' '
 
 	      	if (Opt_Tax_KW) then 
-	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
+	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='old', POSITION='append')
 	      	else 
 	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='old', POSITION='append')
 	      	endif 
