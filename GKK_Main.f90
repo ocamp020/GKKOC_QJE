@@ -136,7 +136,7 @@ PROGRAM main
 		
 		! Debt/Output = 1.5, lambda = 1.5, no bequest fee
 			! Main Parameters 
-				beta   	= 0.9600_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+				beta   	= 0.9700_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
 				sigma_z_eps      = 0.277_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 				sigma_lambda_eps = 0.282_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
 				gamma  	= 0.460_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
@@ -592,7 +592,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		print*,' '
 		print*,' Targets:'
 		print 12345, &
-			& " 	A/Y=",MeanWealth/YBAR,'BQ/A=',100.0_dp*Bequest_Wealth/MeanWealth ,'BQ/Inc=',Bq_Inc(3,1),&
+			& " 	A/Y=",MeanWealth/YBAR,'BQ/A=',100.0_dp*Bequest/MeanWealth ,'BQ/Inc=',Bq_Inc(3,1),&
 			& 'Top_1%=',100.0_dp*prct1_wealth,'L_C/N=',100.0_dp*L_C/NBAR,&
 			& 'stdEarn=',Std_Log_Earnings_25_60,'N',meanhours_25_60,'D/Y',External_Debt_GDP,&
 			& 'Luxury',(EBAR_data/(EBAR_bench*0.727853584919652_dp))*bq_0
