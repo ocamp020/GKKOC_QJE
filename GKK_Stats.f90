@@ -3994,7 +3994,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			! WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_40%'		, FW_top_x_share(1)
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Bequest'
-			WRITE(UNIT=19, FMT=*) 'Total_Bequest_Wealth'	, Bequest_Wealth/MeanWealth 
+			WRITE(UNIT=19, FMT=*) 'Total_Bequest_Wealth'	, Bequest/MeanWealth 
 			WRITE(UNIT=19, FMT=*) 'Mean_Bequest_Wealth'	    , Mean_Bequest/MeanWealth 
 			WRITE(UNIT=19, FMT=*) 'BQ/Inc_for_90th_pct' 	, Bq_Inc(3,:)
 			WRITE(UNIT=19, FMT=*) ' '
