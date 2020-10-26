@@ -131,6 +131,7 @@ end Subroutine Asset_Grid_Threshold
 		else
 			Y_a = Y_a_threshold*(1.0_dp-tauW_bt) + (a_in - Y_a_threshold) * (1.0_dp-tauW_at) + ( Pr + R*a_in ) *(1.0_DP-tauK)
 		end if
+
 	END  FUNCTION Y_a
 
 
@@ -267,7 +268,7 @@ end Subroutine Asset_Grid_Threshold
 		enddo 
 
 		! Evaluate square residual of Euler equation at current state (given by (ai,zi,lambdai,ei)) and savings given by a'
-		FOC_R	= ( (YGRID_t(a_in,z_in,x_in)+RetY_lambda_e(l_in,e_in)-aprimet)    &
+		FOC_R	= ( (YGRID_t(a_in,z_in,x_in)+RetY_lambda_e(l_in,e_in)+Bequest-aprimet)    &
 		    & - ( beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * cprime**(1.0_dp/euler_power) ) &
 		    &   + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)*chi_bq* &
 		    &                  ((1.0_dp-tau_bq)*aprimet+bq_0)**(1.0_dp/euler_power) )  &
@@ -318,7 +319,7 @@ end Subroutine Asset_Grid_Threshold
 		enddo 
 
 		! Evaluate square residual of Euler equation at current state (given by (ai,zi,lambdai,ei)) and savings given by a'
-		FOC_R_Transition	= ( (YGRID_t(a_in,z_in,x_in)+RetY_lambda_e(l_in,e_in)-aprimet)    &
+		FOC_R_Transition	= ( (YGRID_t(a_in,z_in,x_in)+RetY_lambda_e(l_in,e_in)+Bequest-aprimet)    &
 		        & - ( beta*survP(age_in) * sum( pr_x(x_in,:,z_in,age_in) * MB_aprime * cprime**(1.0_dp/euler_power) ) & 
 		        & + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)*chi_bq* &
 		        &				  ((1.0_dp-tau_bq)*aprimet+bq_0)**(1.0_dp/euler_power) ) &
@@ -394,7 +395,7 @@ FUNCTION FOC_WH(aprimet,state)
 			! 				brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp)  
 			! 			end if 
 	! Current consumption given ntemp
-		ctemp   = YGRID_t(a_in,z_in,x_in) + Y_h(ntemp,age_in,l_in,e_in,wage) - aprimet   
+		ctemp   = YGRID_t(a_in,z_in,x_in) + Y_h(ntemp,age_in,l_in,e_in,wage) + Bequest - aprimet   
 
 	if (NSU_Switch.eqv..true.) then
 		if (Progressive_Tax_Switch) then 
@@ -443,7 +444,7 @@ FUNCTION FOC_WH(aprimet,state)
 			end if 
 		else ! Linear Taxes 
 			ntemp = max(0.0_DP , gamma - (1.0_DP-gamma)*(YGRID_t(a_in,z_in,x_in) - aprimet)/(psi*yh(age_in,l_in,e_in)) )
-			ctemp = YGRID_t(a_in,z_in,x_in) + psi*yh(age_in,l_in,e_in) * ntemp - aprimet
+			ctemp = YGRID_t(a_in,z_in,x_in) + psi*yh(age_in,l_in,e_in) * ntemp  + Bequest - aprimet
 
 			do xp_ind=1,nx
 			DO ep_ind=1,ne
@@ -532,7 +533,7 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 			! 				brentvaluet = brent(H_min, 0.4_DP, 0.99_DP, FOC_HA, brent_tol, ntemp)  
 			! 			end if 
 	! Current consumption given ntemp
-		ctemp   = YGRID_t(a_in,z_in,x_in) + Y_h(ntemp,age_in,l_in,e_in,wage) - aprimet   
+		ctemp   = YGRID_t(a_in,z_in,x_in) + Y_h(ntemp,age_in,l_in,e_in,wage) + Bequest - aprimet   
 
 	if (NSU_Switch.eqv..true.) then
 		if (Progressive_Tax_Switch) then 
@@ -583,7 +584,7 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 			end if 
 		else ! Linear Taxes 
 			ntemp = max(0.0_DP , gamma - (1.0_DP-gamma)*(YGRID_t(a_in,z_in,x_in) - aprimet)/(psi*yh(age_in,l_in,e_in)) )
-			ctemp = YGRID_t(a_in,z_in,x_in) + psi*yh(age_in,l_in,e_in) * ntemp - aprimet
+			ctemp = YGRID_t(a_in,z_in,x_in) + psi*yh(age_in,l_in,e_in) * ntemp + Bequest - aprimet
 
 			do xp_ind=1,nx
 			DO ep_ind=1,ne
@@ -783,7 +784,7 @@ END  FUNCTION FOC_WH_Transition
 		ap_in  = par(7)
 
 		! Consumption given ain and hoursin
-			cons   = YGRID_t(a_in,z_in,x_in)+  Y_h(hoursin,age_in,l_in,e_in,wage) - ap_in
+			cons   = YGRID_t(a_in,z_in,x_in)+  Y_h(hoursin,age_in,l_in,e_in,wage) + Bequest - ap_in
 		if (NSU_Switch.eqv..true.) then
 			! Non-Separable Utility 
 			FOC_HA = ( cons - (gamma/(1.0_dp-gamma))*(1.0_dp-hoursin)*MB_h(hoursin,age_in,l_in,e_in,wage) )**2.0_DP 
@@ -849,11 +850,11 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
     DO ei=1,ne
     DO ai=1,na_t
     	if ((YGRID_t(ai,zi,xi) + RetY_lambda_e(lambdai,ei)).le.(bq_0/chi_aux) ) then 
-        Cons_t(age,ai,zi,lambdai,ei,xi)   =  YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei) 
+        Cons_t(age,ai,zi,lambdai,ei,xi)   =  YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)+Bequest
         else
-        Cons_t(age,ai,zi,lambdai,ei,xi)   = (YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)+bq_0)/(1.0_dp+chi_aux)
+        Cons_t(age,ai,zi,lambdai,ei,xi)   = (YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)+Bequest+bq_0)/(1.0_dp+chi_aux)
         endif
-        Aprime_t(age,ai,zi,lambdai,ei,xi) = YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)-Cons_t(age,ai,zi,lambdai,ei,xi)
+        Aprime_t(age,ai,zi,lambdai,ei,xi) = YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)+Bequest-Cons_t(age,ai,zi,lambdai,ei,xi)
 	ENDDO ! ai
     ENDDO ! ei
 	ENDDO ! lambdai
@@ -887,7 +888,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 				& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power))&
 				& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 		    	& * chi_bq*((1.0_dp-tau_bq)*agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
-	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
+	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei) - Bequest
 	        
 	        ! Consumption on endogenous grid and implied asset income under tauW_at
 	        do xp_ind = 1,nx 	
@@ -897,7 +898,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
     			& sum(pr_x(xi,:,zi,age)*MB_aprime_t*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) &
     			& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 		    	& * chi_bq*((1.0_dp-tau_bq)*agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
-	    	EndoYgrid(na_t+sw) = agrid_t(ai) +  EndoCons(na_t+sw) - RetY_lambda_e(lambdai,ei)
+	    	EndoYgrid(na_t+sw) = agrid_t(ai) +  EndoCons(na_t+sw) - RetY_lambda_e(lambdai,ei) - Bequest
 
 	  !   	print*, ' '
 			! print*, ' Threshold test - Retirement'
@@ -916,7 +917,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	    				& sum(pr_x(xi,:,zi,age)*MBGRID_t(ai,zi,:)*Cons_t(age+1,ai,zi,lambdai,ei,:)**(1.0_dp/euler_power)) &
 	    				& + (1.0_dp-survP(age))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 				    	& * chi_bq*((1.0_dp-tau_bq)*agrid_t(ai)+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) **euler_power
-	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei)
+	        EndoYgrid(ai) = agrid_t(ai) +  EndoCons(ai) - RetY_lambda_e(lambdai,ei) - Bequest
 	    end if 
 
 
@@ -966,11 +967,12 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 		DO ai=tempai,na_t              
 		    ! CONSUMPTION ON EXOGENOUS GRIDS 
 		    Cons_t(age,ai,zi,lambdai, ei,xi)  = Linear_Int(EndoYgrid(1:na_t+sw), EndoCons(1:na_t+sw),na_t+sw, YGRID_t(ai,zi,xi))
-		    Aprime_t(age,ai,zi,lambdai,ei,xi) = YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)-Cons_t(age, ai, zi, lambdai, ei,xi)
+		    Aprime_t(age,ai,zi,lambdai,ei,xi) = YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei)+Bequest-Cons_t(age, ai, zi, lambdai, ei,xi)
 		    
 		    If (Aprime_t(age,ai,zi,lambdai,ei,xi).lt.amin) then
 		    	Aprime_t(age,ai,zi,lambdai,ei,xi) = amin
-	            Cons_t(age,ai,zi,lambdai,ei,xi)   = YGRID_t(ai,zi,xi) + RetY_lambda_e(lambdai,ei) - Aprime_t(age,ai,zi,lambdai,ei,xi)
+	            Cons_t(age,ai,zi,lambdai,ei,xi)   = &
+	            	& YGRID_t(ai,zi,xi) + RetY_lambda_e(lambdai,ei) +  Bequest - Aprime_t(age,ai,zi,lambdai,ei,xi)
 				IF (Cons_t(age,ai,zi,lambdai,ei,xi) .le. 0.0_DP)  THEN
 				    print*,'r1: Cons(age, ai, zi, lambdai,ei)=',Cons_t(age, ai, zi, lambdai, ei,xi)
 				ENDIF                   
@@ -1013,7 +1015,8 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 			                & YGRID_t(ai,zi,xi)+RetY_lambda_e(lambdai,ei) *0.95_DP, &
 			                & FOC_R, brent_tol, Aprime_t(age, ai, zi, lambdai,ei,xi),state_FOC)
 			
-			Cons_t(age,ai,zi,lambdai,ei,xi) = YGRID_t(ai,zi,xi) + RetY_lambda_e(lambdai,ei) - Aprime_t(age,ai,zi,lambdai,ei,xi)
+			Cons_t(age,ai,zi,lambdai,ei,xi) = &
+				& YGRID_t(ai,zi,xi) + RetY_lambda_e(lambdai,ei) + Bequest - Aprime_t(age,ai,zi,lambdai,ei,xi)
 			
 			IF (Cons_t(age, ai, zi, lambdai, ei,xi) .le. 0.0_DP)  THEN
 			    print*,'r2: Cons(age, ai, zi, lambdai,ei,xi)=',Cons_t(age, ai, zi, lambdai,ei,xi)
@@ -1170,7 +1173,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 
 			! Savings 
 				Aprime_t(age, ai, zi, lambdai,ei,xi) = YGRID_t(ai,zi,xi)  + Y_h(Hours_t(age, ai, zi, lambdai,ei,xi),age,lambdai,ei,wage)  & 
-		                    					& - Cons_t(age, ai, zi, lambdai,ei,xi) 
+		                    					&  + Bequest - Cons_t(age, ai, zi, lambdai,ei,xi) 
 		                    
 		    If (Aprime_t(age, ai, zi, lambdai,ei,xi)  .lt. amin) then
 
@@ -1180,7 +1183,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 	           	! Compute hours
 		        if (NSU_Switch.and.(Progressive_Tax_Switch.eqv..false.)) then 
 		        	Hours_t(age, ai, zi, lambdai,ei,xi)  = max( 0.0_dp , &
-		        			&  gamma - (1.0_DP-gamma) *( YGRID_t(ai,zi,xi) - Aprime_t(age, ai, zi, lambdai,ei,xi)) / (psi*yh(age, lambdai,ei)) )
+	        			&  gamma - (1.0_DP-gamma)*(YGRID_t(ai,zi,xi)+Bequest-Aprime_t(age,ai,zi,lambdai,ei,xi))/(psi*yh(age, lambdai,ei)))
                 else               	        
                 	!compute  hours using FOC_HA                              
 		        	par_FOC(1:6) = (/age,ai,zi,lambdai,ei,xi/) 
@@ -1189,7 +1192,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
 		        end if  
 
 	            Cons_t(age,ai,zi,lambdai,ei,xi) = YGRID_t(ai,zi,xi)+  Y_h(Hours_t(age, ai, zi, lambdai,ei,xi),age,lambdai,ei,wage)  &
-		                            		  & - Aprime_t(age, ai, zi, lambdai,ei,xi)      
+		                            		  &  + Bequest - Aprime_t(age, ai, zi, lambdai,ei,xi)      
 
 				IF (Cons_t(age, ai, zi, lambdai,ei,xi) .le. 0.0_DP)  THEN
 					print*,'w1: Cons(age, ai, zi, lambdai,ei,xi)=',Cons_t(age, ai, zi, lambdai,ei,xi)
@@ -1233,14 +1236,14 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
         	! print*, ' Extrapolation between YGRID and EndoYgrid!!!!'
 	        ! Solve for the Euler equation directly
 	        state_FOC  = (/age,ai,zi,lambdai,ei,xi/)
-			brentvalue = brent_p( min(amin,YGRID_t(ai,zi,xi))   ,  (amin+YGRID_t(ai,zi,xi))/2.0_DP  ,  &
-                             	& YGRID_t(ai,zi,xi)  + psi * ( yh(age, lambdai,ei)*0.95_DP )**(1.0_DP-tauPL)  ,  &
-	                             & FOC_WH, brent_tol, Aprime_t(age, ai, zi, lambdai,ei,xi) , state_FOC )
+			brentvalue = brent_p( min(amin,YGRID_t(ai,zi,xi) + Bequest)   ,  (amin+YGRID_t(ai,zi,xi)+Bequest)/2.0_DP  ,  &
+                         	& YGRID_t(ai,zi,xi) + Bequest  + psi * ( yh(age, lambdai,ei)*0.95_DP )**(1.0_DP-tauPL)  ,  &
+                    	     & FOC_WH, brent_tol, Aprime_t(age, ai, zi, lambdai,ei,xi) , state_FOC )
 
 			! Compute hours
 	        if (NSU_Switch.and.(Progressive_Tax_Switch.eqv..false.)) then 
 	        	Hours_t(age, ai, zi, lambdai,ei,xi)  = max( 0.0_dp , &
-	        		&  gamma - (1.0_DP-gamma) *( YGRID_t(ai,zi,xi) - Aprime_t(age, ai, zi, lambdai,ei,xi)) / (psi*yh(age, lambdai,ei)) )
+	        		&  gamma - (1.0_DP-gamma)*( YGRID_t(ai,zi,xi)+Bequest-Aprime_t(age,ai,zi,lambdai,ei,xi))/(psi*yh(age,lambdai,ei)))
             else               	        
 				!compute  hours using FOC_HA                              
 				par_FOC(1:6) = (/age,ai,zi,lambdai,ei,xi/)
@@ -1249,7 +1252,7 @@ SUBROUTINE EGM_RETIREMENT_WORKING_PERIOD()
  			end if 
 
             Cons_t(age, ai, zi, lambdai,ei,xi)=  YGRID_t(ai,zi,xi) + Y_h(Hours_t(age, ai, zi, lambdai,ei,xi),age,lambdai,ei,wage)  &
-                           						 & - Aprime_t(age, ai, zi, lambdai,ei,xi)
+                           						 &  + Bequest - Aprime_t(age, ai, zi, lambdai,ei,xi)
            IF (Cons_t(age, ai, zi, lambdai,ei,xi) .le. 0.0_DP)  THEN
                 print*,'w2:',age,zi,lambdai,ei,ai,xi, 'Cons(age, ai, zi, lambdai,ei,xi)=',Cons_t(age, ai, zi, lambdai,ei,xi), &
                     & 'Aprime(age, ai, zi, lambdai,ei,xi)=',Aprime_t(age, ai, zi, lambdai,ei,xi), &
@@ -1482,7 +1485,7 @@ Subroutine EGM_Working_Period(MB_in,H_min,state_FOC,C_endo,H_endo,Y_endo)
 
 
 	! Endogenous grid for asset income
-	Y_endo = agrid_t(ai) + C_endo - Y_h(H_endo,age,lambdai,ei,wage)
+	Y_endo = agrid_t(ai) + C_endo - Y_h(H_endo,age,lambdai,ei,wage) - Bequest
 
 	! 		!$omp critical
 	! 		if ((zi.eq.1).and.(ai.eq.16)) then 
@@ -2008,22 +2011,19 @@ SUBROUTINE FIND_DBN_EQ()
 	IMPLICIT NONE
 	INTEGER  :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL   	 :: DBN_dist, DBN_criteria
-	REAL(DP) :: BBAR, Wealth, brent_value
-	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable ::  PrAprimelo, PrAprimehi, PrBqlo, PrBqhi, DBN2
-	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable ::  Aplo, Aphi, Bqlo, Bqhi
+	REAL(DP) :: BBAR, Wealth, brent_value, Bequest_old
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable ::  PrAprimelo, PrAprimehi, DBN2, DBN_death
+	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable ::  Aplo, Aphi
 	! Timing
 	real(kind=8)    :: t1, t2, elapsed_time
     integer(kind=8) :: tclock1, tclock2, clock_rate
 
 	allocate( DBN2(         MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( DBN_death(    MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( PrAprimelo(   MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( PrAprimehi(   MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Aplo(         MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Aphi(         MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( PrBqlo(   	MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( PrBqhi(   	MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( Bqlo(         MaxAge,na,nz,nlambda,ne,nx) )
-	allocate( BQhi(         MaxAge,na,nz,nlambda,ne,nx) )
 
 	!$ call omp_set_num_threads(nz)
 	DBN_criteria = 1.00E-07_DP
@@ -2046,6 +2046,13 @@ SUBROUTINE FIND_DBN_EQ()
 		! print*,'initial values:',Wealth,K_P,K_C,L_C,L_P,YBAR,YBAR_P,YBAR_C,P,R
 	endif ! If A_C=0 then all aggregates must be provided
 
+
+	! Bequest 
+	DO age=1,MaxAge
+	    DBN_death(age,:,:,:,:,:) = (1.0_DP-survP(age))*DBN1(age,:,:,:,:,:)
+  	ENDDO
+    Bequest     = (1.0_dp-tau_bq)*sum(sum(sum(sum(sum(sum(DBN_death,6),5),4),3),1)*agrid)
+	Bequest_old = Bequest +1
 
 	! Solve the model at current aggregate values
 		! Find the threshold for wealth taxes (a_bar)
@@ -2087,20 +2094,6 @@ SUBROUTINE FIND_DBN_EQ()
         PrAprimelo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
         PrAprimehi(age,ai,zi,lambdai,ei,xi) = ( Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
 
-        if ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
-            tklo =na-1
-        elseif ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .lt. amin) then
-            tklo = 1
-        else
-            tklo = (((1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi)-amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-        endif
-        tkhi = tklo + 1        
-        Bqlo(age,ai,zi,lambdai,ei,xi)  	= tklo
-        Bqhi(age,ai,zi,lambdai,ei,xi)  	= tkhi        
-        PrBqlo(age,ai,zi,lambdai,ei,xi) = &
-        	& ( agrid(tkhi) - (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
-        PrBqhi(age,ai,zi,lambdai,ei,xi) = &
-        	& ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
 	ENDDO
 	ENDDO
 	ENDDO
@@ -2112,8 +2105,6 @@ SUBROUTINE FIND_DBN_EQ()
 		PrAprimelo = min(PrAprimelo, 1.0_DP); PrAprimelo = max(PrAprimelo, 0.0_DP)
 		PrAprimehi = min(PrAprimehi, 1.0_DP); PrAprimehi = max(PrAprimehi, 0.0_DP)
 
-		PrBqlo = min(PrBqlo, 1.0_DP); PrBqlo = max(PrBqlo, 0.0_DP)
-		PrBqhi = min(PrBqhi, 1.0_DP); PrBqhi = max(PrBqhi, 0.0_DP)
 
 	! Compute distribution of assets by age and state
 		! Distribution is obtained by iterating over an initial distribution using policy functions
@@ -2137,12 +2128,9 @@ SUBROUTINE FIND_DBN_EQ()
 	    DO e1=1, ne
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
-	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
-	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
-	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, 1 ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, 1 ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2)
 	        ENDDO
 	        ENDDO
 	    ENDDO
@@ -2163,12 +2151,9 @@ SUBROUTINE FIND_DBN_EQ()
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
-	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
-	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
-	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, 1 ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, 1 ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2)
 	        ENDDO
 	        ENDDO
 	        
@@ -2201,12 +2186,9 @@ SUBROUTINE FIND_DBN_EQ()
 	        ! Those who die, switch to z2, lambda2 and start at ne/2+1
 	        DO z2=1,nz
 	        DO lambda2=1,nlambda
-	        	DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1)   =  &
-	           		& DBN2(1, Bqlo(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqlo(age1,a1,z1,lambda1,e1,x1)
-	            DBN2(1,Bqhi(age1,a1,z1,lambda1,e1,x1),z2,lambda2,ne/2+1,1)   =  &
-	           		& DBN2(1, Bqhi(age1,a1,z1,lambda1,e1,x1) ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) & 
-	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2) * PrBqhi(age1,a1,z1,lambda1,e1,x1)   
+	        	DBN2(1, 1 ,z2,lambda2,ne/2+1,1)   =  &
+	           		& DBN2(1, 1 ,z2,lambda2,ne/2+1,1) + DBN1(age1,a1,z1,lambda1,e1,x1) &
+	                & * (1.0_DP-survP(age1)) * pr_z(z1,z2) * pr_lambda(lambda1,lambda2)
 	        ENDDO
 	        ENDDO
 	        
@@ -2230,7 +2212,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    !$omp barrier
 	    
 	    ! DBN2 = 0.7_dp*DBN1 + 0.3_dp*DBN2
-	    DBN_dist = maxval(abs(DBN2-DBN1))
+	    DBN_dist = max(maxval(abs(DBN2-DBN1)),abs(Bequest/Bequest_old-1))
 	    ! print*, DBN_dist
 	    DBN1 = DBN2
 
@@ -2335,6 +2317,15 @@ SUBROUTINE FIND_DBN_EQ()
 
 	        endif 
 
+
+	        ! Bequest 
+	        Bequest_old = Bequest 
+			DO age=1,MaxAge
+			    DBN_death(age,:,:,:,:,:) = (1.0_DP-survP(age))*DBN1(age,:,:,:,:,:)
+		  	ENDDO
+		    Bequest     = (1.0_dp-tau_bq)*sum(sum(sum(sum(sum(sum(DBN_death,6),5),4),3),1)*agrid)
+
+
 	    	!!
 	    	print 12345, &
 	    		& ' DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
@@ -2386,21 +2377,6 @@ SUBROUTINE FIND_DBN_EQ()
 			        PrAprimehi(age,ai,zi,lambdai,ei,xi) = &
 			        	& ( Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
 
-			        if ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
-			            tklo =na-1
-			        elseif ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .lt. amin) then
-			            tklo = 1
-			        else
-			            tklo = (((1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi)-amin)/(amax-amin))&
-			            	&**(1.0_DP/a_theta)*(na-1)+1          
-			        endif
-			        tkhi = tklo + 1        
-			        Bqlo(age,ai,zi,lambdai,ei,xi)  	= tklo
-			        Bqhi(age,ai,zi,lambdai,ei,xi)  	= tkhi        
-			        PrBqlo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi)-(1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) )&
-			        									& / ( agrid(tkhi) -agrid(tklo) )
-			        PrBqhi(age,ai,zi,lambdai,ei,xi) = ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi)-agrid(tklo) )&
-			        									&  / ( agrid(tkhi) -agrid(tklo) )
 				ENDDO
 				ENDDO
 				ENDDO
@@ -2411,9 +2387,6 @@ SUBROUTINE FIND_DBN_EQ()
 				! Probablities are adjusted to lie in [0,1]
 					PrAprimelo = min(PrAprimelo, 1.0_DP); PrAprimelo = max(PrAprimelo, 0.0_DP)
 					PrAprimehi = min(PrAprimehi, 1.0_DP); PrAprimehi = max(PrAprimehi, 0.0_DP)
-
-					PrBqlo = min(PrBqlo, 1.0_DP); PrBqlo = max(PrBqlo, 0.0_DP)
-					PrBqhi = min(PrBqhi, 1.0_DP); PrBqhi = max(PrBqhi, 0.0_DP) 
 
 		    ! Reset counter for next update of policy functions
 	        iter_indx=0
@@ -2433,6 +2406,11 @@ SUBROUTINE FIND_DBN_EQ()
 	& (A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,I5)
 	print*,' '; print*,'-----------------------------------------------------------------------------'
 	print*,' '
+
+
+  	OPEN(UNIT=3, FILE='Bequest.txt', STATUS='replace')
+    WRITE(unit=3, FMT=*) Bequest
+    CLOSE (unit=3)
 
 
 	! Write

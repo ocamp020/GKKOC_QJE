@@ -193,6 +193,10 @@ MODULE global
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_t_pr, Hours_t_pr
 
 
+    ! Bequests 
+    real(DP) :: Bequest
+
+
 Contains 
 
 Subroutine Allocate_Variables
