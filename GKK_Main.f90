@@ -2346,7 +2346,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .true.
+		load_seed    = .false.
 
 	! Auxiliary folders 
 		folder_aux   = './Revision/Model_2.1_CKK_bequest/'
@@ -2419,7 +2419,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		! Result_Folder = folder_aux 
 		! CALL Write_Benchmark_Results(.false.)
 		! Result_Folder = folder_aux_2
-		! psi = psi_bench
+		psi = psi_bench
 
 		if (Opt_Tax_KW) then 
 			tauK        = real(tauindx,8)/100_DP
