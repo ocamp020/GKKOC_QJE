@@ -1,4 +1,3 @@
-false
 
 ! This program solves for the wealth taxation model of 
 ! Guvenen, Kuruscu, Kambourov and Chen
