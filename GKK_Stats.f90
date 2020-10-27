@@ -3230,103 +3230,103 @@ END Function Draft_Table
 !========================================================================================
 
 
-Function Draft_Table_X(Table_axz,DBN_xz,Cum_flag)
-	implicit none
-	real(dp), dimension(draft_age_category,nz,nx), intent(in)   :: Table_axz
-	real(dp), dimension(nz,nx), intent(in) 	:: DBN_xz
-	real(dp)				   				:: CDF_xz, cdf_xz_low
-	logical, intent(in)						:: Cum_flag
-	real(dp), dimension(draft_age_category,draft_z_category) :: Draft_Table_X
+! Function Draft_Table_X(Table_axz,DBN_xz,Cum_flag)
+! 	implicit none
+! 	real(dp), dimension(draft_age_category,nz,nx), intent(in)   :: Table_axz
+! 	real(dp), dimension(nz,nx), intent(in) 	:: DBN_xz
+! 	real(dp)				   				:: CDF_xz, cdf_xz_low
+! 	logical, intent(in)						:: Cum_flag
+! 	real(dp), dimension(draft_age_category,draft_z_category) :: Draft_Table_X
 
-	! Groups based on cross sectional productivity, not age dependent 
-	    ! % 0%-40%     of Current Productivity
-	    !     % (z1,x3), (z2,x3), (z3,x3), (z4,x3), (z5,x3)
-	    ! % 40%-80%    of Current Productivity 
-	    !     % (z5,x3), (z6,x3), (z7,x3), (z8,x3), (z9,x3), (z1,x1), (z2,x1), (z3,x1), (z4,x1)
-	    ! % 80%-90%    of Current Productivity
-	    !     % (z4,x1), (z5,x2)
-	    ! % 90%-99%    of Current Productivity 
-	    !     % (z5,x2), (z6,x2), (z7,x2), (z8,x2), (z9,x2), (z5,x1), (z6,x1)
-	    ! % 99%-99.9%  of Current Productivity 
-	    !     % (z6,x1), (z7,x1)
-	    ! % 99.9%-100% of Current Productivity 
-	    !     % (z7,x1), (z8,x1), (z9,x1)
+! 	! Groups based on cross sectional productivity, not age dependent 
+! 	    ! % 0%-40%     of Current Productivity
+! 	    !     % (z1,x3), (z2,x3), (z3,x3), (z4,x3), (z5,x3)
+! 	    ! % 40%-80%    of Current Productivity 
+! 	    !     % (z5,x3), (z6,x3), (z7,x3), (z8,x3), (z9,x3), (z1,x1), (z2,x1), (z3,x1), (z4,x1)
+! 	    ! % 80%-90%    of Current Productivity
+! 	    !     % (z4,x1), (z5,x2)
+! 	    ! % 90%-99%    of Current Productivity 
+! 	    !     % (z5,x2), (z6,x2), (z7,x2), (z8,x2), (z9,x2), (z5,x1), (z6,x1)
+! 	    ! % 99%-99.9%  of Current Productivity 
+! 	    !     % (z6,x1), (z7,x1)
+! 	    ! % 99.9%-100% of Current Productivity 
+! 	    !     % (z7,x1), (z8,x1), (z9,x1)
 
-	if (Cum_flag) then
-	! Cumulative value of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-    	cdf_xz = sum(DBN_XZ(1:4,3))
-		Draft_Table_X(:,1)   = Table_axz(:,1,3) + Table_axz(:,2,3) + Table_axz(:,3,3) + Table_axz(:,4,3) + &
-							& (0.40_dp-cdf_xz)*Table_axz(:,5,3)/DBN_XZ(5,3) 
-			cdf_xz = cdf_xz + DBN_XZ(5,3)
-			cdf_xz_low = cdf_xz 
-			cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
-		Draft_Table_X(:,2)   = (cdf_xz_low-0.40_dp)*Table_axz(:,5,3)/DBN_XZ(5,3) + &
-						& Table_axz(:,6,3) + Table_axz(:,7,3) + Table_axz(:,8,3) + Table_axz(:,9,3) + &
-						& Table_axz(:,1,1) + Table_axz(:,2,1) + Table_axz(:,3,1) + &
-						& (0.80_dp-cdf_xz)*Table_axz(:,4,1)/DBN_XZ(4,1)
-			cdf_xz = cdf_xz + DBN_XZ(4,1)
-		Draft_Table_X(:,3)   = (cdf_xz-0.80_dp)*Table_axz(:,4,1)/DBN_XZ(4,1) + &
-						& (0.90_dp-cdf_xz)*Table_axz(:,5,2)/DBN_XZ(5,2)
-			cdf_xz = cdf_xz + DBN_XZ(5,2)
-			cdf_xz_low = cdf_xz 
-			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
-		Draft_Table_X(:,4)   = (cdf_xz_low-0.90_dp)*Table_axz(:,5,2)/DBN_XZ(5,2) + & 
-						& Table_axz(:,6,2) + Table_axz(:,7,2) + Table_axz(:,8,2) + Table_axz(:,9,2) + &
-						& Table_axz(:,5,1) + (0.99_dp-cdf_xz)*Table_axz(:,6,1)/DBN_XZ(6,1)
-			cdf_xz = cdf_xz + DBN_XZ(6,1)
-		Draft_Table_X(:,5)   = (cdf_xz-0.99_dp)*Table_axz(:,6,1)/DBN_XZ(6,1) + &
-						& (0.999_dp-cdf_xz)*Table_axz(:,7,1)/DBN_XZ(7,1)
-			cdf_xz = cdf_xz + DBN_XZ(7,1)
-		Draft_Table_X(:,6)   = (CDF_xz-0.999_dp)*Table_axz(:,7,1)/DBN_XZ(7,1) + Table_axz(:,8,1) + Table_axz(:,9,1)
-		Draft_Table_X(:,7)   = 0
-		Draft_Table_X(:,8)   = 0
+! 	if (Cum_flag) then
+! 	! Cumulative value of groups adjusting by z group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+!     	cdf_xz = sum(DBN_XZ(1:4,3))
+! 		Draft_Table_X(:,1)   = Table_axz(:,1,3) + Table_axz(:,2,3) + Table_axz(:,3,3) + Table_axz(:,4,3) + &
+! 							& (0.40_dp-cdf_xz)*Table_axz(:,5,3)/DBN_XZ(5,3) 
+! 			cdf_xz = cdf_xz + DBN_XZ(5,3)
+! 			cdf_xz_low = cdf_xz 
+! 			cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
+! 		Draft_Table_X(:,2)   = (cdf_xz_low-0.40_dp)*Table_axz(:,5,3)/DBN_XZ(5,3) + &
+! 						& Table_axz(:,6,3) + Table_axz(:,7,3) + Table_axz(:,8,3) + Table_axz(:,9,3) + &
+! 						& Table_axz(:,1,1) + Table_axz(:,2,1) + Table_axz(:,3,1) + &
+! 						& (0.80_dp-cdf_xz)*Table_axz(:,4,1)/DBN_XZ(4,1)
+! 			cdf_xz = cdf_xz + DBN_XZ(4,1)
+! 		Draft_Table_X(:,3)   = (cdf_xz-0.80_dp)*Table_axz(:,4,1)/DBN_XZ(4,1) + &
+! 						& (0.90_dp-cdf_xz)*Table_axz(:,5,2)/DBN_XZ(5,2)
+! 			cdf_xz = cdf_xz + DBN_XZ(5,2)
+! 			cdf_xz_low = cdf_xz 
+! 			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
+! 		Draft_Table_X(:,4)   = (cdf_xz_low-0.90_dp)*Table_axz(:,5,2)/DBN_XZ(5,2) + & 
+! 						& Table_axz(:,6,2) + Table_axz(:,7,2) + Table_axz(:,8,2) + Table_axz(:,9,2) + &
+! 						& Table_axz(:,5,1) + (0.99_dp-cdf_xz)*Table_axz(:,6,1)/DBN_XZ(6,1)
+! 			cdf_xz = cdf_xz + DBN_XZ(6,1)
+! 		Draft_Table_X(:,5)   = (cdf_xz-0.99_dp)*Table_axz(:,6,1)/DBN_XZ(6,1) + &
+! 						& (0.999_dp-cdf_xz)*Table_axz(:,7,1)/DBN_XZ(7,1)
+! 			cdf_xz = cdf_xz + DBN_XZ(7,1)
+! 		Draft_Table_X(:,6)   = (CDF_xz-0.999_dp)*Table_axz(:,7,1)/DBN_XZ(7,1) + Table_axz(:,8,1) + Table_axz(:,9,1)
+! 		Draft_Table_X(:,7)   = 0
+! 		Draft_Table_X(:,8)   = 0
 
-	else
-	! Average value of groups adjusting by xz group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
-    	cdf_xz = sum(DBN_XZ(1:4,3))
-		Draft_Table_X(:,1)   = ( DBN_XZ(1,3)*Table_axz(:,1,3) + DBN_XZ(2,3)*Table_axz(:,2,3) + &
-						&  DBN_XZ(3,3)*Table_axz(:,3,3) + DBN_XZ(4,3)*Table_axz(:,4,3) + &
-						& (0.40_dp-cdf_xz)*Table_axz(:,5,3) )/0.40_dp 
-			cdf_xz = cdf_xz + DBN_XZ(5,3)
-			cdf_xz_low = cdf_xz 
-			cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
-		Draft_Table_X(:,2)   = ( (cdf_xz_low-0.40_dp)*Table_axz(:,5,3) + &
-						& DBN_XZ(6,3)*Table_axz(:,6,3) + DBN_XZ(7,3)*Table_axz(:,7,3) + &
-						& DBN_XZ(8,3)*Table_axz(:,8,3) + DBN_XZ(9,3)*Table_axz(:,9,3) + &
-						& DBN_XZ(1,1)*Table_axz(:,1,1) + DBN_XZ(2,1)*Table_axz(:,2,1) + &
-						& DBN_XZ(3,1)*Table_axz(:,3,1) + (0.80_dp-cdf_xz)*Table_axz(:,4,1) )/0.40_dp
-			cdf_xz = cdf_xz + DBN_XZ(4,1)
-		Draft_Table_X(:,3)   = ( (cdf_xz-0.80_dp)*Table_axz(:,4,1) + (0.90_dp-cdf_xz)*Table_axz(:,5,2) )/0.10_dp
-			cdf_xz = cdf_xz + DBN_XZ(5,2)
-			cdf_xz_low = cdf_xz 
-			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
-		Draft_Table_X(:,4)   = ( (cdf_xz_low-0.90_dp)*Table_axz(:,5,2) + & 
-						& DBN_XZ(6,2)*Table_axz(:,6,2) + DBN_XZ(7,2)*Table_axz(:,7,2) + &
-						& DBN_XZ(8,2)*Table_axz(:,8,2) + DBN_XZ(9,2)*Table_axz(:,9,2) + &
-						& DBN_XZ(5,1)*Table_axz(:,5,1) + (0.99_dp-cdf_xz)*Table_axz(:,6,1) )/0.09_dp
-			cdf_xz = cdf_xz + DBN_XZ(6,1)
-		Draft_Table_X(:,5)   = ( (cdf_xz-0.99_dp)*Table_axz(:,6,1) + (0.999_dp-cdf_xz)*Table_axz(:,7,1) )/0.009_dp
-			cdf_xz = cdf_xz + DBN_XZ(7,1)
-		Draft_Table_X(:,6)   = ( (CDF_xz-0.999_dp)*Table_axz(:,7,1)+DBN_XZ(8,1)*Table_axz(:,8,1)+DBN_XZ(9,1)*Table_axz(:,9,1) )/0.001_dp
-		Draft_Table_X(:,7)   = 0
-		Draft_Table_X(:,8)   = 0
+! 	else
+! 	! Average value of groups adjusting by xz group: 0%-40% - 40%-80% - 80%-90% - 90%-99% - 99%-99.9% - 99.9%-100% - (99.9%-99.99% - 99.99%-100%)
+!     	cdf_xz = sum(DBN_XZ(1:4,3))
+! 		Draft_Table_X(:,1)   = ( DBN_XZ(1,3)*Table_axz(:,1,3) + DBN_XZ(2,3)*Table_axz(:,2,3) + &
+! 						&  DBN_XZ(3,3)*Table_axz(:,3,3) + DBN_XZ(4,3)*Table_axz(:,4,3) + &
+! 						& (0.40_dp-cdf_xz)*Table_axz(:,5,3) )/0.40_dp 
+! 			cdf_xz = cdf_xz + DBN_XZ(5,3)
+! 			cdf_xz_low = cdf_xz 
+! 			cdf_xz = cdf_xz + sum(DBN_XZ(6:,3)) + sum(DBN_XZ(1:3,1))
+! 		Draft_Table_X(:,2)   = ( (cdf_xz_low-0.40_dp)*Table_axz(:,5,3) + &
+! 						& DBN_XZ(6,3)*Table_axz(:,6,3) + DBN_XZ(7,3)*Table_axz(:,7,3) + &
+! 						& DBN_XZ(8,3)*Table_axz(:,8,3) + DBN_XZ(9,3)*Table_axz(:,9,3) + &
+! 						& DBN_XZ(1,1)*Table_axz(:,1,1) + DBN_XZ(2,1)*Table_axz(:,2,1) + &
+! 						& DBN_XZ(3,1)*Table_axz(:,3,1) + (0.80_dp-cdf_xz)*Table_axz(:,4,1) )/0.40_dp
+! 			cdf_xz = cdf_xz + DBN_XZ(4,1)
+! 		Draft_Table_X(:,3)   = ( (cdf_xz-0.80_dp)*Table_axz(:,4,1) + (0.90_dp-cdf_xz)*Table_axz(:,5,2) )/0.10_dp
+! 			cdf_xz = cdf_xz + DBN_XZ(5,2)
+! 			cdf_xz_low = cdf_xz 
+! 			cdf_xz = cdf_xz + sum(DBN_XZ(6:,2)) + DBN_XZ(5,1)
+! 		Draft_Table_X(:,4)   = ( (cdf_xz_low-0.90_dp)*Table_axz(:,5,2) + & 
+! 						& DBN_XZ(6,2)*Table_axz(:,6,2) + DBN_XZ(7,2)*Table_axz(:,7,2) + &
+! 						& DBN_XZ(8,2)*Table_axz(:,8,2) + DBN_XZ(9,2)*Table_axz(:,9,2) + &
+! 						& DBN_XZ(5,1)*Table_axz(:,5,1) + (0.99_dp-cdf_xz)*Table_axz(:,6,1) )/0.09_dp
+! 			cdf_xz = cdf_xz + DBN_XZ(6,1)
+! 		Draft_Table_X(:,5)   = ( (cdf_xz-0.99_dp)*Table_axz(:,6,1) + (0.999_dp-cdf_xz)*Table_axz(:,7,1) )/0.009_dp
+! 			cdf_xz = cdf_xz + DBN_XZ(7,1)
+! 		Draft_Table_X(:,6)   = ( (CDF_xz-0.999_dp)*Table_axz(:,7,1)+DBN_XZ(8,1)*Table_axz(:,8,1)+DBN_XZ(9,1)*Table_axz(:,9,1) )/0.001_dp
+! 		Draft_Table_X(:,7)   = 0
+! 		Draft_Table_X(:,8)   = 0
 
-			! Adjustment for first age group
-			    ! % 40%-80%    of Current Productivity 
-			    !     % (z1,x1), (z2,x1), (z3,x1), (z4,x1)
-		    	Draft_Table_X(1,2)   = ( DBN_XZ(1,1)*Table_axz(1,1,1) + DBN_XZ(2,1)*Table_axz(1,2,1) + &
-							& DBN_XZ(3,1)*Table_axz(1,3,1) + DBN_XZ(4,1)*Table_axz(1,4,1) )/sum(DBN_XZ(1:4,1))
-			    ! % 80%-90%    of Current Productivity
-			    !     % (z4,x1)
-			    Draft_Table_X(1,3)   = Table_axz(1,4,1)
-			    ! % 90%-99%    of Current Productivity 
-			    !     % (z5,x1), (z6,x1)
-			    Draft_Table_X(1,4)   = ( DBN_XZ(5,1)*Table_axz(1,5,1) + DBN_XZ(6,1)*Table_axz(1,6,1) )/sum(DBN_XZ(5:6,1))
+! 			! Adjustment for first age group
+! 			    ! % 40%-80%    of Current Productivity 
+! 			    !     % (z1,x1), (z2,x1), (z3,x1), (z4,x1)
+! 		    	Draft_Table_X(1,2)   = ( DBN_XZ(1,1)*Table_axz(1,1,1) + DBN_XZ(2,1)*Table_axz(1,2,1) + &
+! 							& DBN_XZ(3,1)*Table_axz(1,3,1) + DBN_XZ(4,1)*Table_axz(1,4,1) )/sum(DBN_XZ(1:4,1))
+! 			    ! % 80%-90%    of Current Productivity
+! 			    !     % (z4,x1)
+! 			    Draft_Table_X(1,3)   = Table_axz(1,4,1)
+! 			    ! % 90%-99%    of Current Productivity 
+! 			    !     % (z5,x1), (z6,x1)
+! 			    Draft_Table_X(1,4)   = ( DBN_XZ(5,1)*Table_axz(1,5,1) + DBN_XZ(6,1)*Table_axz(1,6,1) )/sum(DBN_XZ(5:6,1))
 
 
-	endif 
+! 	endif 
 
-END Function Draft_Table_X
+! END Function Draft_Table_X
 
 
 !========================================================================================
