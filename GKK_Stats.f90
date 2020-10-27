@@ -3510,94 +3510,94 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	real(dp) :: TFP, TFP_star, TFPR_bar, size, K, theta_aux(nz),YBAR_aux,QBAR_aux,K_aux,NBAR_aux
 	integer  :: i_a, i_z, i_x, i_theta
 
-	size = 1.0_dp ! sum(DBN1(:,:,:,:,:,1:2))
+	! size = 1.0_dp ! sum(DBN1(:,:,:,:,:,1:2))
 
-	K_mat  = K_Matrix(R,P)
+	! K_mat  = K_Matrix(R,P)
 
-	TFPR_bar = 0.0_dp
-	K 		 = 0.0_dp 
-	do i_a = 1,na
-	do i_z = 1,nz 
-	do i_x = 1,2
-		TFPR_i(i_a,i_z,i_x) = P * xz_grid(i_x,i_z)** mu * K_mat(i_a,i_z,i_x)**(mu-1.0_dp)
-		TFPR_bar = TFPR_bar + sum(DBN1(:,i_a,i_z,:,:,i_x))/size * K_mat(i_a,i_z,i_x) / (alpha*QBAR**alpha*NBAR**(1.0_dp-alpha))
-		K 		 = K    	+ sum(DBN1(:,i_a,i_z,:,:,i_x))      * K_mat(i_a,i_z,i_x) 
-	enddo 
-	enddo 
-	enddo
-	TFPR_bar = 1.0_dp / TFPR_bar
+	! TFPR_bar = 0.0_dp
+	! K 		 = 0.0_dp 
+	! do i_a = 1,na
+	! do i_z = 1,nz 
+	! do i_x = 1,2
+	! 	TFPR_i(i_a,i_z,i_x) = P * xz_grid(i_x,i_z)** mu * K_mat(i_a,i_z,i_x)**(mu-1.0_dp)
+	! 	TFPR_bar = TFPR_bar + sum(DBN1(:,i_a,i_z,:,:,i_x))/size * K_mat(i_a,i_z,i_x) / (alpha*QBAR**alpha*NBAR**(1.0_dp-alpha))
+	! 	K 		 = K    	+ sum(DBN1(:,i_a,i_z,:,:,i_x))      * K_mat(i_a,i_z,i_x) 
+	! enddo 
+	! enddo 
+	! enddo
+	! TFPR_bar = 1.0_dp / TFPR_bar
 
-	TFP 	 = 0.0_dp
-	TFP_star = 0.0_dp
-	do i_a = 1,na
-	do i_z = 1,nz 
-	do i_x = 1,2
-		TFP      = TFP      + sum(DBN1(:,i_a,i_z,:,:,i_x))/size*&
-					&	( xz_grid(i_x,i_z) * TFPR_bar / TFPR_i(i_a,i_z,i_x) )**(mu/(1.0_dp-mu))
-		TFP_star = TFP_star + sum(DBN1(:,i_a,i_z,:,:,i_x))/size*&
-					&	( xz_grid(i_x,i_z)  								)**(mu/(1.0_dp-mu))
-	enddo 
-	enddo 
-	enddo
-	TFP 	 = TFP ** (alpha*(1.0_dp-mu)/mu)
-	TFP_star = TFP_star ** (alpha*(1.0_dp-mu)/mu)
+	! TFP 	 = 0.0_dp
+	! TFP_star = 0.0_dp
+	! do i_a = 1,na
+	! do i_z = 1,nz 
+	! do i_x = 1,2
+	! 	TFP      = TFP      + sum(DBN1(:,i_a,i_z,:,:,i_x))/size*&
+	! 				&	( xz_grid(i_x,i_z) * TFPR_bar / TFPR_i(i_a,i_z,i_x) )**(mu/(1.0_dp-mu))
+	! 	TFP_star = TFP_star + sum(DBN1(:,i_a,i_z,:,:,i_x))/size*&
+	! 				&	( xz_grid(i_x,i_z)  								)**(mu/(1.0_dp-mu))
+	! enddo 
+	! enddo 
+	! enddo
+	! TFP 	 = TFP ** (alpha*(1.0_dp-mu)/mu)
+	! TFP_star = TFP_star ** (alpha*(1.0_dp-mu)/mu)
 
-	! ! Compute output without distortions
-	theta_aux = theta
-	YBAR_aux  = YBAR
-	QBAR_aux  = QBAR 
-	NBAR_aux  = NBAR 
-	K_aux     = K
-	do i_theta = 1,10000,1
-	theta     = 4.0_dp + real(i_theta,8)/10.0_dp; print*, ' '; print*, 'theta= ',theta(1); print*, ' '
-	CALL FIND_DBN_EQ
-	enddo 
-	theta     = big_p ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
-	CALL FIND_DBN_EQ
-	theta     = theta_aux 
-	K         = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
+	! ! ! Compute output without distortions
+	! theta_aux = theta
+	! YBAR_aux  = YBAR
+	! QBAR_aux  = QBAR 
+	! NBAR_aux  = NBAR 
+	! K_aux     = K
+	! do i_theta = 1,10000,1
+	! theta     = 4.0_dp + real(i_theta,8)/10.0_dp; print*, ' '; print*, 'theta= ',theta(1); print*, ' '
+	! CALL FIND_DBN_EQ
+	! enddo 
+	! theta     = big_p ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
+	! CALL FIND_DBN_EQ
+	! theta     = theta_aux 
+	! K         = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
 		
 
 
-	if (bench_indx.eq.1) then
-	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Hsieh_Klenow_Efficiency_bench.txt', STATUS='replace')
-	else
-	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Hsieh_Klenow_Efficiency_exp.txt'  , STATUS='replace')
-	endif 
+	! if (bench_indx.eq.1) then
+	! OPEN(UNIT=10, FILE=trim(Result_Folder)//'Hsieh_Klenow_Efficiency_bench.txt', STATUS='replace')
+	! else
+	! OPEN(UNIT=10, FILE=trim(Result_Folder)//'Hsieh_Klenow_Efficiency_exp.txt'  , STATUS='replace')
+	! endif 
 
-	WRITE(UNIT=10, FMT=*) ' '
-	WRITE(UNIT=10, FMT=*) 'Variable ','Distorted_Equilibrium ','Frictionless_Equilibrium ','Gain '
-	WRITE(UNIT=10, FMT=*) 'TFP ', TFP , TFP_star, TFP_star/TFP 
-	WRITE(UNIT=10, FMT=*) 'Y '  , YBAR_aux , YBAR, YBAR/YBAR_aux
-	WRITE(UNIT=10, FMT=*) 'Q '  , QBAR_aux , QBAR, QBAR/QBAR_aux
-	WRITE(UNIT=10, FMT=*) 'K '  , K_aux    , K   , K   /K_aux
-	WRITE(UNIT=10, FMT=*) 'N '  , NBAR_aux , NBAR, NBAR/NBAR_aux
-	WRITE(UNIT=10, FMT=*) 'Check'
-	WRITE(UNIT=10, FMT=*) 'YBAR ','TFP*K^a*N^(1-a) ','Q ',' TFP*K ','MeanWealth ','K '
-	WRITE(UNIT=10, FMT=*)  YBAR_aux , TFP*K_aux**alpha*NBAR_aux**(1.0_DP-alpha),QBAR_aux,TFP**(1.0_dp/alpha)*K_aux,MeanWealth,K_aux
+	! WRITE(UNIT=10, FMT=*) ' '
+	! WRITE(UNIT=10, FMT=*) 'Variable ','Distorted_Equilibrium ','Frictionless_Equilibrium ','Gain '
+	! WRITE(UNIT=10, FMT=*) 'TFP ', TFP , TFP_star, TFP_star/TFP 
+	! WRITE(UNIT=10, FMT=*) 'Y '  , YBAR_aux , YBAR, YBAR/YBAR_aux
+	! WRITE(UNIT=10, FMT=*) 'Q '  , QBAR_aux , QBAR, QBAR/QBAR_aux
+	! WRITE(UNIT=10, FMT=*) 'K '  , K_aux    , K   , K   /K_aux
+	! WRITE(UNIT=10, FMT=*) 'N '  , NBAR_aux , NBAR, NBAR/NBAR_aux
+	! WRITE(UNIT=10, FMT=*) 'Check'
+	! WRITE(UNIT=10, FMT=*) 'YBAR ','TFP*K^a*N^(1-a) ','Q ',' TFP*K ','MeanWealth ','K '
+	! WRITE(UNIT=10, FMT=*)  YBAR_aux , TFP*K_aux**alpha*NBAR_aux**(1.0_DP-alpha),QBAR_aux,TFP**(1.0_dp/alpha)*K_aux,MeanWealth,K_aux
 
-	CLOSE(UNIT=10)
+	! CLOSE(UNIT=10)
 
-	if (bench_indx.eq.1) then
-	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Bench_Files/TFPR_bench', STATUS='replace')
-	else
-	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Exp_Files/TFPR_exp'  , STATUS='replace')
-	endif 
+	! if (bench_indx.eq.1) then
+	! OPEN(UNIT=10, FILE=trim(Result_Folder)//'Bench_Files/TFPR_bench', STATUS='replace')
+	! else
+	! OPEN(UNIT=10, FILE=trim(Result_Folder)//'Exp_Files/TFPR_exp'  , STATUS='replace')
+	! endif 
 
-	WRITE(UNIT=10, FMT=*)  TFPR_i
+	! WRITE(UNIT=10, FMT=*)  TFPR_i
 
-	CLOSE(UNIT=10)
+	! CLOSE(UNIT=10)
 
-	print*, ' '
-	print*, 'Variable ','Distorted_Equilibrium ','Frictionless_Equilibrium ','Gain '
-	print*, 'TFP ', TFP , TFP_star, TFP_star/TFP 
-	print*, 'Y '  , YBAR_aux , YBAR, YBAR/YBAR_aux
-	print*, 'Q '  , QBAR_aux , QBAR, QBAR/QBAR_aux
-	print*, 'K '  , K_aux    , K   , K   /K_aux
-	print*, 'N '  , NBAR_aux , NBAR, NBAR/NBAR_aux
-	print*, 'Check'
-	print*, 'YBAR ','TFP*K^a*N^(1-a) ','Q ',' TFP*K ','MeanWealth ','K '
-	print*,  YBAR_aux , TFP*K_aux**alpha*NBAR_aux**(1.0_DP-alpha),QBAR_aux,TFP**(1.0_dp/alpha)*K_aux,MeanWealth,K_aux
+	! print*, ' '
+	! print*, 'Variable ','Distorted_Equilibrium ','Frictionless_Equilibrium ','Gain '
+	! print*, 'TFP ', TFP , TFP_star, TFP_star/TFP 
+	! print*, 'Y '  , YBAR_aux , YBAR, YBAR/YBAR_aux
+	! print*, 'Q '  , QBAR_aux , QBAR, QBAR/QBAR_aux
+	! print*, 'K '  , K_aux    , K   , K   /K_aux
+	! print*, 'N '  , NBAR_aux , NBAR, NBAR/NBAR_aux
+	! print*, 'Check'
+	! print*, 'YBAR ','TFP*K^a*N^(1-a) ','Q ',' TFP*K ','MeanWealth ','K '
+	! print*,  YBAR_aux , TFP*K_aux**alpha*NBAR_aux**(1.0_DP-alpha),QBAR_aux,TFP**(1.0_dp/alpha)*K_aux,MeanWealth,K_aux
 
 
 
