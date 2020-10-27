@@ -967,8 +967,7 @@ SUBROUTINE COMPUTE_STATS()
 		do zi=1,nz
 			WRITE(UNIT=11, FMT=*) zi, & 
 				100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
-				100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &
-				100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
+				100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &!100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
 				(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) , & 
 				(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
 		enddo 	
@@ -983,7 +982,7 @@ SUBROUTINE COMPUTE_STATS()
 		leverage_azx = 0.0_dp 
 		do ai=1,na 
 		do zi=1,nz 
-		do xi=1 
+		do xi=1,nx
 			leverage_azx(ai,zi,xi) = max(K_mat(ai,zi,xi)-agrid(ai),0.0_dp)/K_mat(ai,zi,xi)
 		enddo 
 		enddo  
@@ -1081,7 +1080,7 @@ SUBROUTINE COMPUTE_STATS()
 
 
 		! Asset weighted leverage
-		DBN_azx2 = K_mat(:,:,1:2)
+		DBN_azx2 = K_mat(:,:,1)
 		DBN_azx2 = DBN_azx2/sum(DBN_azx2)
 		DBN_azx2_vec = reshape(DBN_azx2,(/size(DBN_azx2)/)); 
 		ave_leverage = sum(leverage_azx*DBN_azx2) 
@@ -1844,10 +1843,8 @@ SUBROUTINE COMPUTE_STATS()
 	do zi=1,nz
 		print 12345, zi, & 
 			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
-			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &
-			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
-			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) , & 
-			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
+			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &!100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
+			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) , & !(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
 	enddo 
 	12345 format (I3,X,X,F7.2,X,X,F7.2,X,X,F7.2,X,X,E12.4,X,X,E12.4)
 	print '(A,F7.3)', 'Total Constrained', 100.0_dp*sum(constrained_firm_ind*DBN1)
@@ -1988,7 +1985,7 @@ SUBROUTINE COMPUTE_STATS()
 	TFP_star = 0.0_dp
 	do ai = 1,na
 	do zi = 1,nz 
-	do xi = 1
+	do xi = 1,nx
 		TFP_star = TFP_star + sum(DBN1(:,ai,zi,:,:,xi))*(xz_grid(xi,zi))**(mu/(1.0_dp-mu))
 	enddo 
 	enddo 
