@@ -2010,7 +2010,7 @@ SUBROUTINE COMPUTE_STATS()
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	do age=1,MaxAge 
-		Wealth_age(age) = sum(agrid*sum(sum(sum(sum(DBN1(age,:,:,:,:,:),6),5),4),2))/sum(DBN1(age,:,:,:,:,:))
+		Wealth_age(age) = sum(agrid*sum(sum(sum(sum(DBN1(age,:,:,:,:,:),5),4),3),1))/sum(DBN1(age,:,:,:,:,:))
 		K_Inc_age(age)  = 0.0_dp
 		do xi=1,nx 
 		do zi=1,nz
