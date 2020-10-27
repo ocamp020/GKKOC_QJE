@@ -982,13 +982,13 @@ SUBROUTINE COMPUTE_STATS()
 		leverage_azx = 0.0_dp 
 		do ai=1,na 
 		do zi=1,nz 
-		do xi=1,nx
-			leverage_azx(ai,zi,xi) = max(K_mat(ai,zi,xi)-agrid(ai),0.0_dp)/K_mat(ai,zi,xi)
-		enddo 
+		!do xi=1,nx
+			leverage_azx(ai,zi) = max(K_mat(ai,zi)-agrid(ai),0.0_dp)/K_mat(ai,zi)
+		!enddo 
 		enddo  
 		enddo
 
-		DBN_azx2 = DBN_azx(:,:,1)/sum(DBN_azx(:,:,1)) 
+		DBN_azx2 = DBN_azx(:,:)/sum(DBN_azx 
 
 		ave_leverage = sum(leverage_azx*DBN_azx2) 
 
@@ -1040,7 +1040,7 @@ SUBROUTINE COMPUTE_STATS()
 			& 'Unweighted: 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
 
 		! Asset weighted leverage
-		DBN_azx2 = spread(spread(agrid,2,nz),3,2)
+		DBN_azx2 = spread(agrid,2,nz)
 		DBN_azx2 = DBN_azx2/sum(DBN_azx2)
 		DBN_azx2_vec = reshape(DBN_azx2,(/size(DBN_azx2)/)); 
 		ave_leverage = sum(leverage_azx*DBN_azx2) 
@@ -1080,7 +1080,7 @@ SUBROUTINE COMPUTE_STATS()
 
 
 		! Asset weighted leverage
-		DBN_azx2 = K_mat(:,:,1)
+		DBN_azx2 = K_mat(:,:)
 		DBN_azx2 = DBN_azx2/sum(DBN_azx2)
 		DBN_azx2_vec = reshape(DBN_azx2,(/size(DBN_azx2)/)); 
 		ave_leverage = sum(leverage_azx*DBN_azx2) 
