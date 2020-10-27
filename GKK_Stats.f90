@@ -2010,7 +2010,7 @@ SUBROUTINE COMPUTE_STATS()
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	do age=1,MaxAge 
-		Wealth_age(age) = sum(agrid*sum(sum(sum(sum(DBN1(age,:,:,:,:,:),6),5),4),2))/sum(sum(sum(sum(sum(DBN1(age,:,:,:,:,:),6),5),4),2))
+		Wealth_age(age) = sum(agrid*sum(sum(sum(sum(DBN1(age,:,:,:,:,:),6),5),4),2))/sum(DBN1(age,:,:,:,:,:))
 		K_Inc_age(age)  = 0.0_dp
 		do xi=1,nx 
 		do zi=1,nz
@@ -2019,7 +2019,7 @@ SUBROUTINE COMPUTE_STATS()
 		enddo 
 		enddo 
 		enddo 
-		K_Inc_age(age)  = K_Inc_age(age)/sum(sum(sum(sum(sum(DBN1(age,:,:,:,:,:),6),5),4),2))
+		K_Inc_age(age)  = K_Inc_age(age)/sum(DBN1(age,:,:,:,:,:))
 	enddo 
 
 	OPEN (UNIT=81, FILE=trim(Result_Folder)//'Wealth_K_Inc_by_age.txt', STATUS='replace') 
