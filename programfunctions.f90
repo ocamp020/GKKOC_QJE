@@ -6917,40 +6917,41 @@ SUBROUTINE  INITIALIZE()
 
 	! Transitory investment productivity x
 		if (nx.gt.1) then
-			! print*, 'X probability '
-			xgrid = (/x_hi , x_lo , x_0/)
-			! Low z types stay in x=1 until retirement
-				pr_x(1,1,1:4,:) = 1.00_dp - p2_x
-				pr_x(1,2,1:4,:) = 0.00_dp 
-				pr_x(1,3,1:4,:) = p2_x
-			! High z types have 5% probability of going from x=1 to x=2
-				pr_x(1,1,5:nz,:) = 1.00_dp - p1_x - p2_x
-				pr_x(1,2,5:nz,:) = p1_x 
-				pr_x(1,3,5:nz,:) = p2_x
-			! x=2 goes to x=3 with probability 3%
-				pr_x(2,1,:,:) = 0.00_dp 
-				pr_x(2,2,:,:) = 1.00_dp - p2_x
-				pr_x(2,3,:,:) = p2_x
-			! x=3 is an absorbing state
-				pr_x(3,1,:,:) = 0.00_dp 
-				pr_x(3,2,:,:) = 0.00_dp 
-				pr_x(3,3,:,:) = 1.00_dp
-			! Gx is not used. So it is initialized to an arbitrary value
-				Gx(1,:,:) = 0.50_dp ; Gx(2,:,:) = 0.50_dp ; Gx(3,:,:) = 0.00_dp ;
-			! xz grid
-				xz_grid(1,:)   = exp(log(zgrid)*xgrid(1))
-				xz_grid(2,1:4) = xz_grid(1,1:4); xz_grid(2,5:) = exp(log(zgrid(5:))*xgrid(2));
-				xz_grid(3,:)   = 0.0_dp
-				! xz_grid = spread(zgrid,1,nx)*spread(xgrid,2,nz)
-				! xz_grid(1,:)   = zgrid 	; xz_grid(2,1:3) = zgrid(1:3)	;	xz_grid(2,4:)  = zgrid(4)
-				! xz_grid(1,:) = zgrid; xz_grid(2,:) = 0.00_dp*zgrid
-				! print*, ' xgrid', xgrid
-				! print*, ' zgrid', zgrid 
-				! do xi=1,nx
-				! print*, 'xzgrid', xz_grid(xi,:)
-				! enddo
-				! print*, 'xgrid error'
-				! STOP 
+			! ! print*, 'X probability '
+			! xgrid = (/x_hi , x_lo , x_0/)
+			! ! Low z types stay in x=1 until retirement
+			! 	pr_x(1,1,1:4,:) = 1.00_dp - p2_x
+			! 	pr_x(1,2,1:4,:) = 0.00_dp 
+			! 	pr_x(1,3,1:4,:) = p2_x
+			! ! High z types have 5% probability of going from x=1 to x=2
+			! 	pr_x(1,1,5:nz,:) = 1.00_dp - p1_x - p2_x
+			! 	pr_x(1,2,5:nz,:) = p1_x 
+			! 	pr_x(1,3,5:nz,:) = p2_x
+			! ! x=2 goes to x=3 with probability 3%
+			! 	pr_x(2,1,:,:) = 0.00_dp 
+			! 	pr_x(2,2,:,:) = 1.00_dp - p2_x
+			! 	pr_x(2,3,:,:) = p2_x
+			! ! x=3 is an absorbing state
+			! 	pr_x(3,1,:,:) = 0.00_dp 
+			! 	pr_x(3,2,:,:) = 0.00_dp 
+			! 	pr_x(3,3,:,:) = 1.00_dp
+			! ! Gx is not used. So it is initialized to an arbitrary value
+			! 	Gx(1,:,:) = 0.50_dp ; Gx(2,:,:) = 0.50_dp ; Gx(3,:,:) = 0.00_dp ;
+			! ! xz grid
+			! 	xz_grid(1,:)   = exp(log(zgrid)*xgrid(1))
+			! 	xz_grid(2,1:4) = xz_grid(1,1:4); xz_grid(2,5:) = exp(log(zgrid(5:))*xgrid(2));
+			! 	xz_grid(3,:)   = 0.0_dp
+			! 	! xz_grid = spread(zgrid,1,nx)*spread(xgrid,2,nz)
+			! 	! xz_grid(1,:)   = zgrid 	; xz_grid(2,1:3) = zgrid(1:3)	;	xz_grid(2,4:)  = zgrid(4)
+			! 	! xz_grid(1,:) = zgrid; xz_grid(2,:) = 0.00_dp*zgrid
+			! 	! print*, ' xgrid', xgrid
+			! 	! print*, ' zgrid', zgrid 
+			! 	! do xi=1,nx
+			! 	! print*, 'xzgrid', xz_grid(xi,:)
+			! 	! enddo
+			! 	! print*, 'xgrid error'
+			! 	! STOP 
+			STOP
 		else 
 			xgrid = 1.0_dp
 			xz_grid(1,:) = zgrid 
