@@ -988,7 +988,7 @@ SUBROUTINE COMPUTE_STATS()
 		enddo  
 		enddo
 
-		DBN_azx2 = DBN_azx(:,:)/sum(DBN_azx 
+		DBN_azx2 = DBN_azx(:,:)/sum(DBN_azx) 
 
 		ave_leverage = sum(leverage_azx*DBN_azx2) 
 
