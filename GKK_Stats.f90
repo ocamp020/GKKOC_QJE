@@ -915,211 +915,211 @@ SUBROUTINE COMPUTE_STATS()
 		S_Rate_Y_AZ  = (Ap_AZ-A_AZ)/Y_AZ
 		S_Rate_Y_W   = (Ap_W-A_W)/Y_W
 
-	!------------------------------------------------------------------------------------
-	!------------------------------------------------------------------------------------
-	! Leverage Ratio and fraction of constrainted firms 
-	!------------------------------------------------------------------------------------
-	!------------------------------------------------------------------------------------
-		! print*, 'Test Leverage'
-		leverage_age_z = 0.0_dp 
-		size_by_age_z  = 0.0_dp 
-		constrained_firms_age_z = 0.0_dp
-		constrained_firm_ind = 0
-		do xi=1,nx
-		do age = 1,MaxAge 
-		do zi  = 1,nz 
-	        DO lambdai=1,nlambda
-	        DO ei=1,ne
-	        DO ai=1,na
-	        	size_by_age(age)       = size_by_age(age)       + DBN1(age,ai,zi,lambdai,ei,xi)
-				size_by_age_z(age,zi)  = size_by_age_z(age,zi)  + DBN1(age,ai,zi,lambdai,ei,xi)
-				leverage_age_z(age,zi) = leverage_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*K_mat(ai,zi,xi)/agrid(ai)
-				if (K_mat(ai,zi,xi).ge.(theta(zi)*agrid(ai))) then 
-					constrained_firms_age(age)      = constrained_firms_age(age)      + DBN1(age,ai,zi,lambdai,ei,xi)
-					constrained_firms_age_z(age,zi) = constrained_firms_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
-					constrained_firm_ind(age,ai,zi,lambdai,ei,xi) = 1
-				endif 
-				! Firm_Output(age,ai,zi,lambdai,ei,xi) = xz_grid(xi,zi)*K_mat(ai,zi,xi)
-				! Firm_Profit(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi)
-			enddo
-			enddo 
-			enddo 
-		enddo 
-		enddo 
-		enddo 
-		leverage_age_z = leverage_age_z/size_by_age_z
-		constrained_firms_age_z = constrained_firms_age_z/size_by_age_z 
-		constrained_firms_age   = constrained_firms_age/size_by_age 
+	! !------------------------------------------------------------------------------------
+	! !------------------------------------------------------------------------------------
+	! ! Leverage Ratio and fraction of constrainted firms 
+	! !------------------------------------------------------------------------------------
+	! !------------------------------------------------------------------------------------
+	! 	! print*, 'Test Leverage'
+	! 	leverage_age_z = 0.0_dp 
+	! 	size_by_age_z  = 0.0_dp 
+	! 	constrained_firms_age_z = 0.0_dp
+	! 	constrained_firm_ind = 0
+	! 	do xi=1,nx
+	! 	do age = 1,MaxAge 
+	! 	do zi  = 1,nz 
+	!         DO lambdai=1,nlambda
+	!         DO ei=1,ne
+	!         DO ai=1,na
+	!         	size_by_age(age)       = size_by_age(age)       + DBN1(age,ai,zi,lambdai,ei,xi)
+	! 			size_by_age_z(age,zi)  = size_by_age_z(age,zi)  + DBN1(age,ai,zi,lambdai,ei,xi)
+	! 			leverage_age_z(age,zi) = leverage_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*K_mat(ai,zi,xi)/agrid(ai)
+	! 			if (K_mat(ai,zi,xi).ge.(theta(zi)*agrid(ai))) then 
+	! 				constrained_firms_age(age)      = constrained_firms_age(age)      + DBN1(age,ai,zi,lambdai,ei,xi)
+	! 				constrained_firms_age_z(age,zi) = constrained_firms_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
+	! 				constrained_firm_ind(age,ai,zi,lambdai,ei,xi) = 1
+	! 			endif 
+	! 			! Firm_Output(age,ai,zi,lambdai,ei,xi) = xz_grid(xi,zi)*K_mat(ai,zi,xi)
+	! 			! Firm_Profit(age,ai,zi,lambdai,ei,xi) = Pr_mat(ai,zi,xi)
+	! 		enddo
+	! 		enddo 
+	! 		enddo 
+	! 	enddo 
+	! 	enddo 
+	! 	enddo 
+	! 	leverage_age_z = leverage_age_z/size_by_age_z
+	! 	constrained_firms_age_z = constrained_firms_age_z/size_by_age_z 
+	! 	constrained_firms_age   = constrained_firms_age/size_by_age 
 
 
-		if (solving_bench.eq.1) then
-			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats.txt', STATUS='replace')
-			WRITE(UNIT=11, FMT=*) ' '
-			WRITE(UNIT=11, FMT=*) 'Z ','Const_firms_by_z: ','Const_firms_z_x1 ','Const_firms_z_x1 ','Opt_K_x_1 ','Opt_K_x2 '
-			WRITE(UNIT=11, FMT=*) 'Benchmark'
-		else
-			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats_exp.txt', STATUS='replace') 
-			WRITE(UNIT=11, FMT=*) ' '
-			WRITE(UNIT=11, FMT=*) 'Z ','Const_firms_by_z: ','Const_firms_z_x1 ','Const_firms_z_x1 ','Opt_K_x_1 ','Opt_K_x2 '
-			WRITE(UNIT=11, FMT=*) 'Tax_Reform'
-		end if 
-			WRITE(UNIT=11, FMT=*) ' '
-		do zi=1,nz
-			WRITE(UNIT=11, FMT=*) zi, & 
-				100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
-				100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &!100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
-				(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) !, & 
-				!(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
-		enddo 	
-			WRITE(UNIT=11, FMT=*) 'Total', 100.0_dp*sum(constrained_firm_ind*DBN1)
+	! 	if (solving_bench.eq.1) then
+	! 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats.txt', STATUS='replace')
+	! 		WRITE(UNIT=11, FMT=*) ' '
+	! 		WRITE(UNIT=11, FMT=*) 'Z ','Const_firms_by_z: ','Const_firms_z_x1 ','Const_firms_z_x1 ','Opt_K_x_1 ','Opt_K_x2 '
+	! 		WRITE(UNIT=11, FMT=*) 'Benchmark'
+	! 	else
+	! 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Constrained_firms_stats_exp.txt', STATUS='replace') 
+	! 		WRITE(UNIT=11, FMT=*) ' '
+	! 		WRITE(UNIT=11, FMT=*) 'Z ','Const_firms_by_z: ','Const_firms_z_x1 ','Const_firms_z_x1 ','Opt_K_x_1 ','Opt_K_x2 '
+	! 		WRITE(UNIT=11, FMT=*) 'Tax_Reform'
+	! 	end if 
+	! 		WRITE(UNIT=11, FMT=*) ' '
+	! 	do zi=1,nz
+	! 		WRITE(UNIT=11, FMT=*) zi, & 
+	! 			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,:)*DBN1(:,:,zi,:,:,:))/sum(DBN1(:,:,zi,:,:,:)), &
+	! 			100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,1)*DBN1(:,:,zi,:,:,1))/sum(DBN1(:,:,zi,:,:,1)), &!100.0_dp*sum(constrained_firm_ind(:,:,zi,:,:,2)*DBN1(:,:,zi,:,:,2))/sum(DBN1(:,:,zi,:,:,2)), &
+	! 			(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(1,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) !, & 
+	! 			!(EBAR_data/(EBAR*0.727853584919652_dp))*(mu*P*xz_grid(2,zi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu))  
+	! 	enddo 	
+	! 		WRITE(UNIT=11, FMT=*) 'Total', 100.0_dp*sum(constrained_firm_ind*DBN1)
 
-			CLOSE(UNIT=11)
+	! 		CLOSE(UNIT=11)
 
-			! deallocate(Firm_Output,Firm_Profit)
-
-
-		! Leverage by firm type - Average and percentiles 
-		leverage_azx = 0.0_dp 
-		do ai=1,na 
-		do zi=1,nz 
-		!do xi=1,nx
-			leverage_azx(ai,zi) = max(K_mat(ai,zi)-agrid(ai),0.0_dp)/K_mat(ai,zi)
-		!enddo 
-		enddo  
-		enddo
-
-		DBN_azx2 = DBN_azx(:,:)/sum(DBN_azx) 
-
-		ave_leverage = sum(leverage_azx*DBN_azx2) 
-
-		! Vectorizations
-		DBN_azx2_vec  = reshape(DBN_azx2     ,(/size(DBN_azx2)/)); 
-		leverage_vec  = reshape(leverage_azx ,(/size(DBN_azx2)/)); 
-
-		! Compute bequest by percentile (percentiles for counter CDF)
-		prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
-		a = minval(leverage_vec)
-		b = maxval(leverage_vec) 
-		c = a
-		do i=1,size(prctile_bq)
-			a = c
-			b = maxval(leverage_vec)
-			c = (a+b)/2.0_dp
-			CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
-			!print*, ' '
-			!print*, 'Percentile', prctile_bq(i)
-			do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
-				if (CCDF_c<prctile_bq(i)) then 
-					b = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
-				else 
-					a = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
-				endif
-				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
-			enddo 
-			BQ_top_x(i) = c 
-		enddo 
+	! 		! deallocate(Firm_Output,Firm_Profit)
 
 
-		if (solving_bench.eq.1) then
-			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Leverage_Bench.txt', STATUS='replace')
-		else
-			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Leverage_Exp.txt', STATUS='replace')
-		end if 
-		print*,' '
-		print*,'-----------------------------------------------------'
-		WRITE(UNIT=11, FMT=*) 'Leverage among active firms'
-		WRITE(UNIT=11, FMT=*) 'Weights p10 p50 p90 p95 p99 Average'
-		WRITE(UNIT=11, FMT=*)  'Unweighted',BQ_top_x, ave_leverage
+	! 	! Leverage by firm type - Average and percentiles 
+	! 	leverage_azx = 0.0_dp 
+	! 	do ai=1,na 
+	! 	do zi=1,nz 
+	! 	!do xi=1,nx
+	! 		leverage_azx(ai,zi) = max(K_mat(ai,zi)-agrid(ai),0.0_dp)/K_mat(ai,zi)
+	! 	!enddo 
+	! 	enddo  
+	! 	enddo
+
+	! 	DBN_azx2 = DBN_azx(:,:)/sum(DBN_azx) 
+
+	! 	ave_leverage = sum(leverage_azx*DBN_azx2) 
+
+	! 	! Vectorizations
+	! 	DBN_azx2_vec  = reshape(DBN_azx2     ,(/size(DBN_azx2)/)); 
+	! 	leverage_vec  = reshape(leverage_azx ,(/size(DBN_azx2)/)); 
+
+	! 	! Compute bequest by percentile (percentiles for counter CDF)
+	! 	prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+	! 	a = minval(leverage_vec)
+	! 	b = maxval(leverage_vec) 
+	! 	c = a
+	! 	do i=1,size(prctile_bq)
+	! 		a = c
+	! 		b = maxval(leverage_vec)
+	! 		c = (a+b)/2.0_dp
+	! 		CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+	! 		!print*, ' '
+	! 		!print*, 'Percentile', prctile_bq(i)
+	! 		do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+	! 			if (CCDF_c<prctile_bq(i)) then 
+	! 				b = c 
+	! 				c = (a+b)/2.0_dp
+	! 				CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+	! 			else 
+	! 				a = c 
+	! 				c = (a+b)/2.0_dp
+	! 				CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+	! 			endif
+	! 			! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+	! 		enddo 
+	! 		BQ_top_x(i) = c 
+	! 	enddo 
+
+
+	! 	if (solving_bench.eq.1) then
+	! 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Leverage_Bench.txt', STATUS='replace')
+	! 	else
+	! 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Leverage_Exp.txt', STATUS='replace')
+	! 	end if 
+	! 	print*,' '
+	! 	print*,'-----------------------------------------------------'
+	! 	WRITE(UNIT=11, FMT=*) 'Leverage among active firms'
+	! 	WRITE(UNIT=11, FMT=*) 'Weights p10 p50 p90 p95 p99 Average'
+	! 	WRITE(UNIT=11, FMT=*)  'Unweighted',BQ_top_x, ave_leverage
 		
-		print*,' Leverage Percentiles and Average' 
-		print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
-			& 'Unweighted: 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
+	! 	print*,' Leverage Percentiles and Average' 
+	! 	print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
+	! 		& 'Unweighted: 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
 
-		! Asset weighted leverage
-		DBN_azx2 = spread(agrid,2,nz)
-		DBN_azx2 = DBN_azx2/sum(DBN_azx2)
-		DBN_azx2_vec = reshape(DBN_azx2,(/size(DBN_azx2)/)); 
-		ave_leverage = sum(leverage_azx*DBN_azx2) 
+	! 	! Asset weighted leverage
+	! 	DBN_azx2 = spread(agrid,2,nz)
+	! 	DBN_azx2 = DBN_azx2/sum(DBN_azx2)
+	! 	DBN_azx2_vec = reshape(DBN_azx2,(/size(DBN_azx2)/)); 
+	! 	ave_leverage = sum(leverage_azx*DBN_azx2) 
 
-		! Compute bequest by percentile (percentiles for counter CDF)
-		prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
-		a = minval(leverage_vec)
-		b = maxval(leverage_vec) 
-		c = a
-		do i=1,size(prctile_bq)
-			a = c
-			b = maxval(leverage_vec)
-			c = (a+b)/2.0_dp
-			CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
-			!print*, ' '
-			!print*, 'Percentile', prctile_bq(i)
-			do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
-				if (CCDF_c<prctile_bq(i)) then 
-					b = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
-				else 
-					a = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
-				endif
-				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
-			enddo 
-			BQ_top_x(i) = c 
-		enddo 
+	! 	! Compute bequest by percentile (percentiles for counter CDF)
+	! 	prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+	! 	a = minval(leverage_vec)
+	! 	b = maxval(leverage_vec) 
+	! 	c = a
+	! 	do i=1,size(prctile_bq)
+	! 		a = c
+	! 		b = maxval(leverage_vec)
+	! 		c = (a+b)/2.0_dp
+	! 		CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+	! 		!print*, ' '
+	! 		!print*, 'Percentile', prctile_bq(i)
+	! 		do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+	! 			if (CCDF_c<prctile_bq(i)) then 
+	! 				b = c 
+	! 				c = (a+b)/2.0_dp
+	! 				CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+	! 			else 
+	! 				a = c 
+	! 				c = (a+b)/2.0_dp
+	! 				CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+	! 			endif
+	! 			! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+	! 		enddo 
+	! 		BQ_top_x(i) = c 
+	! 	enddo 
 
 
-		WRITE(UNIT=11, FMT=*)  'Assets ',BQ_top_x, ave_leverage
+	! 	WRITE(UNIT=11, FMT=*)  'Assets ',BQ_top_x, ave_leverage
 		
-		print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
-			& 'Assets-weighted: 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
+	! 	print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
+	! 		& 'Assets-weighted: 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
 
 
-		! Asset weighted leverage
-		DBN_azx2 = K_mat(:,:)
-		DBN_azx2 = DBN_azx2/sum(DBN_azx2)
-		DBN_azx2_vec = reshape(DBN_azx2,(/size(DBN_azx2)/)); 
-		ave_leverage = sum(leverage_azx*DBN_azx2) 
+	! 	! Asset weighted leverage
+	! 	DBN_azx2 = K_mat(:,:)
+	! 	DBN_azx2 = DBN_azx2/sum(DBN_azx2)
+	! 	DBN_azx2_vec = reshape(DBN_azx2,(/size(DBN_azx2)/)); 
+	! 	ave_leverage = sum(leverage_azx*DBN_azx2) 
 
-		! Compute bequest by percentile (percentiles for counter CDF)
-		prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
-		a = minval(leverage_vec)
-		b = maxval(leverage_vec) 
-		c = a
-		do i=1,size(prctile_bq)
-			a = c
-			b = maxval(leverage_vec)
-			c = (a+b)/2.0_dp
-			CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
-			!print*, ' '
-			!print*, 'Percentile', prctile_bq(i)
-			do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
-				if (CCDF_c<prctile_bq(i)) then 
-					b = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
-				else 
-					a = c 
-					c = (a+b)/2.0_dp
-					CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
-				endif
-				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
-			enddo 
-			BQ_top_x(i) = c 
-		enddo 
+	! 	! Compute bequest by percentile (percentiles for counter CDF)
+	! 	prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+	! 	a = minval(leverage_vec)
+	! 	b = maxval(leverage_vec) 
+	! 	c = a
+	! 	do i=1,size(prctile_bq)
+	! 		a = c
+	! 		b = maxval(leverage_vec)
+	! 		c = (a+b)/2.0_dp
+	! 		CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+	! 		!print*, ' '
+	! 		!print*, 'Percentile', prctile_bq(i)
+	! 		do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+	! 			if (CCDF_c<prctile_bq(i)) then 
+	! 				b = c 
+	! 				c = (a+b)/2.0_dp
+	! 				CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+	! 			else 
+	! 				a = c 
+	! 				c = (a+b)/2.0_dp
+	! 				CCDF_c = sum(DBN_azx2_vec,leverage_vec>=c)
+	! 			endif
+	! 			! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+	! 		enddo 
+	! 		BQ_top_x(i) = c 
+	! 	enddo 
 
 
-		WRITE(UNIT=11, FMT=*)  'Capital ',BQ_top_x, ave_leverage
+	! 	WRITE(UNIT=11, FMT=*)  'Capital ',BQ_top_x, ave_leverage
 		
-		print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
-			& 'Capital-weighted: 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
-		print*,'-----------------------------------------------------'; print*, ' '
+	! 	print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
+	! 		& 'Capital-weighted: 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
+	! 	print*,'-----------------------------------------------------'; print*, ' '
 
-		CLOSE(UNIT=11)
+	! 	CLOSE(UNIT=11)
 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
