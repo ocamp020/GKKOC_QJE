@@ -74,8 +74,9 @@ SUBROUTINE COMPUTE_STATS()
 				& Entrepreneur_10_top10_A, Entrepreneur_50_top10_A, Entrepreneur_10_top1_A, Entrepreneur_50_top1_A
 	integer  :: pct_list_for_Top_Share(5)
 	real(DP) :: TFP_star 
-	real(dp) :: leverage_azx(na,nz,nx-1), DBN_azx2(na,nz,nx-1), &
+	real(DP) :: leverage_azx(na,nz,nx-1), DBN_azx2(na,nz,nx-1), &
 			& leverage_vec(na*nz*(nx-1)), DBN_azx2_vec(na*nz*(nx-1)), ave_leverage
+	real(DP) :: Wealth_age(MaxAge), K_Inc_age(MaxAge)
 
 	allocate(DBN_vec(			size(DBN1)))
 	allocate(Firm_Wealth_vec(	size(DBN1)))
@@ -2002,6 +2003,31 @@ SUBROUTINE COMPUTE_STATS()
 
 
 	print*, ' '; print*,' End of Compute_Stats'; print*, ' '
+
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+	! Wealth and capital income by age 
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+	do age=1,MaxAge 
+		Wealth_age(age) = sum(agrid*sum(sum(sum(sum(DBN1(age,:,:,:,:,:),6),5),4),2))/sum(sum(sum(sum(sum(DBN1(age,:,:,:,:,:),6),5),4),2))
+		K_Inc_age(age)  = 0.0_dp
+		do xi=1,nx 
+		do zi=1,nz
+		do ai=1,na 
+			K_Inc_age(age)    = K_Inc_age(age) + (R*agrid(ai)+Pr_mat(ai,zi,xi))*sum( DBN1(age,ai,zi,:,:,xi) )
+		enddo 
+		enddo 
+		enddo 
+		K_Inc_age(age)  = K_Inc_age(age)/sum(sum(sum(sum(sum(DBN1(age,:,:,:,:,:),6),5),4),2))
+	enddo 
+
+	OPEN (UNIT=81, FILE=trim(Result_Folder)//'Wealth_K_Inc_by_age.txt', STATUS='replace') 
+    WRITE(UNIT=81, FMT=*)  'Age Wealth K_Inc'
+    do age=1,MaxAge 
+    WRITE(UNIT=81, FMT=*)  age,Wealth_age(age),K_Inc_age(age)
+    enddo 
+	close(unit=81)
 
 
 END SUBROUTINE COMPUTE_STATS
