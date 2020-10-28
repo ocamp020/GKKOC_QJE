@@ -82,7 +82,7 @@ PROGRAM main
 		compute_exp_fixed_prices_and_taxes = .false.
 
 		Opt_Tax       = .true.
-			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
+			Opt_Tax_KW    = .true. ! true=tau_K, false=tau_W
 
 		Opt_Threshold = .false.
 
@@ -2343,7 +2343,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .true.
+		load_seed    = .false.
 
 
 	if (read_results.eqv..false.) then 
@@ -2368,9 +2368,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
     	
-    	tau_grid_min  = -39
-    	tau_grid_max  =  50
-    	tau_grid_step =  1
+    	tau_grid_min  = -30
+    	tau_grid_max  =  30
+    	tau_grid_step =  2
 
     	! Set low psi
     	psi = 0.70_dp
