@@ -59,7 +59,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -81,7 +81,7 @@ PROGRAM main
 
 		compute_exp_fixed_prices_and_taxes = .false.
 
-		Opt_Tax       = .false.
+		Opt_Tax       = .true.
 			Opt_Tax_KW    = .true. ! true=tau_K, false=tau_W
 
 		Opt_Threshold = .false.
@@ -370,10 +370,14 @@ PROGRAM main
 
 			folder_aux = Result_Folder
 			if (Opt_Tax_KW) then 
-				Result_Folder = trim(folder_aux)//'Opt_Tax_K_wide_grid/'
+				if (KeepSSatBench .eq. 1) then 
+				Result_Folder = trim(folder_aux)//'Opt_Tax_K/'
+				else 
+				Result_Folder = trim(folder_aux)//'Opt_Tax_K_SS/'
+				endif 
 			else 
 				if (KeepSSatBench .eq. 1) then 
-				Result_Folder = trim(folder_aux)//'Opt_Tax_W_wide_grid/'
+				Result_Folder = trim(folder_aux)//'Opt_Tax_W/'
 				else 
 				Result_Folder = trim(folder_aux)//'Opt_Tax_W_SS/'
 				endif 
@@ -2343,7 +2347,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .true.
+		load_seed    = .false.
 
 
 	if (read_results.eqv..false.) then 
@@ -2366,11 +2370,11 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
 		print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
 		print*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
     	
-    	tau_grid_min  = -39
-    	tau_grid_max  =  50
-    	tau_grid_step =  1
+    	tau_grid_min  =  10
+    	tau_grid_max  = -30
+    	tau_grid_step = -1
 
     	! Set low psi
     	psi = 0.70_dp
@@ -2471,7 +2475,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	      	print*,'------------------------------------------------------------------------------';print*,' '
 
 	      	if (Opt_Tax_KW) then 
-	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='old', POSITION='append')
+	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
 	      	else 
 	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='old', POSITION='append')
 	      	endif 
