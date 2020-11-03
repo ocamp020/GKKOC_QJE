@@ -1162,7 +1162,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		WRITE  (UNIT=28, FMT=*) panelx
 		WRITE  (UNIT=24, FMT='(F12.6)') panel_Y_L
 		WRITE  (UNIT=25, FMT='(F12.6)') panelRet
-		WRITE  (UNIT=31, FMT='(F12.1)') panel_Pareto(1:Pareto_ind)
+		WRITE  (UNIT=31, FMT='(F20.1)') panel_Pareto(1:Pareto_ind)
 		WRITE  (UNIT=32, FMT=*) Pareto_samples
 
 		close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14)
