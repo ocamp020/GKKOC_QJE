@@ -82,7 +82,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		! Pareto Sample
 		INTEGER  :: Pareto_ind=0, Pareto_numel, i_Pareto=1, Pareto_samples(200)=0
-		REAL(DP) :: Model2Dollar=(EBAR_data/(EBAR_bench*0.727853584919652_dp)), Pareto_Min=1000000/Model2Dollar
+		REAL(DP) :: Model2Dollar=(EBAR_data/(EBAR*0.727853584919652_dp)), Pareto_Min=1000000/Model2Dollar
 		INTEGER, DIMENSION(:), allocatable :: panel_Pareto
 		allocate( panel_Pareto(2*totpop) )
 
