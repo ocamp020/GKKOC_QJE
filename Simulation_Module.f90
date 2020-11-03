@@ -80,6 +80,14 @@ SUBROUTINE  SIMULATION(bench_indx)
 		REAL(DP)      :: top_A(80), A_cut, A_hi, A_low
 		character(10) :: top_folder
 
+		! Pareto Sample
+	    INTEGER  :: Pareto_ind=0, Pareto_numel, i_Pareto=1, Pareto_samples(200)=0
+	    REAL(DP) :: Model2Dollar, Pareto_Min
+	    REAL(DP), DIMENSION(:), allocatable :: panel_Pareto
+	    allocate( panel_Pareto(2*totpop) )
+	    Model2Dollar = (EBAR_data/(EBAR*0.727853584919652_dp))
+	    Pareto_Min   = 1000000/Model2Dollar
+
 		print*,'test 1'
 
 		! Allocate variables
@@ -707,6 +715,20 @@ SUBROUTINE  SIMULATION(bench_indx)
 			!     	where(panelage==1) eligible = 0 
 		 	!	endif 
 
+
+ 		        ! Save assets of top agents for Pareto tail 
+		        if ((simutime.ge.(MaxSimuTime-500)).and.(Pareto_ind.lt.(1.9*totpop)).and.(modulo(simutime,10).eq.0))  then 
+
+		          print*, ' Inside Pareto: simutime=',simutime,'i_Pareto=',i_Pareto,'Pareto_ind=',Pareto_ind 
+
+		          Pareto_numel = count((panela.ge.Pareto_Min))
+		          panel_Pareto(Pareto_ind+1:Pareto_ind+Pareto_Numel) = Model2Dollar*pack(panela,(panela.ge.Pareto_Min))
+		          Pareto_ind   = Pareto_ind+Pareto_Numel
+		          Pareto_samples(i_Pareto) = Pareto_Numel
+		          i_Pareto     = i_Pareto + 1 
+
+		        endif 
+
 		 		
 		 		print*, "Simulation period", simutime
 
@@ -1112,6 +1134,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 			OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
 			OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_bench'    	, STATUS='replace')
 			OPEN(UNIT=25, FILE=trim(Result_Folder)//'Simul/panel_Ret_a_bench'   , STATUS='replace')
+			OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_Pareto'      , STATUS='replace')
+    		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Pareto_samples'    , STATUS='replace')
 		else 
 			OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
 			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_exp'		, STATUS='replace')
@@ -1123,6 +1147,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 			OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_exp'	        , STATUS='replace')
 			OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_exp'    	, STATUS='replace')
 			OPEN(UNIT=25, FILE=trim(Result_Folder)//'Simul/panel_Ret_a_exp'   	, STATUS='replace')
+			OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_Pareto_exp'   , STATUS='replace')
+    		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Pareto_samples_exp' , STATUS='replace')
 		endif 
 
 
@@ -1136,9 +1162,12 @@ SUBROUTINE  SIMULATION(bench_indx)
 		WRITE  (UNIT=28, FMT=*) panelx
 		WRITE  (UNIT=24, FMT='(F12.6)') panel_Y_L
 		WRITE  (UNIT=25, FMT='(F12.6)') panelRet
+		WRITE  (UNIT=31, FMT='(F20.1)') panel_Pareto(1:Pareto_ind)
+		WRITE  (UNIT=32, FMT=*) Pareto_samples
 
 		close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14)
 		close (unit=28); close (unit=27); close (unit=24); close (unit=25)!; close (unit=26); 
+		close (unit=31); close (unit=32);
 		
 
 		if (bench_indx==1) then
