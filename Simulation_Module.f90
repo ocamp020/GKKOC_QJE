@@ -720,7 +720,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		 	! Save assets of top agents for Pareto tail 
 		 		if ((simutime.ge.(MaxSimuTime-500)).and.(Pareto_ind.lt.(1.9*totpop)).and.(modulo(simutime,10).eq.0))  then 
 
-		 			print*, 'Inside Pareto: simutime=',simutime,'i_Pareto=',i_Pareto,'Pareto_ind=',Pareto_ind 
+		 			print*, '	Inside Pareto: simutime=',simutime,'i_Pareto=',i_Pareto,'Pareto_ind=',Pareto_ind 
 
 		 			Pareto_numel = count((panela.ge.Pareto_Min))
 		 			panel_Pareto(Pareto_ind+1:Pareto_ind+Pareto_Numel) = Model2Dollar*pack(panela,(panela.ge.Pareto_Min))
@@ -1147,8 +1147,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 			OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_exp'	        , STATUS='replace')
 			OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_exp'    	, STATUS='replace')
 			OPEN(UNIT=25, FILE=trim(Result_Folder)//'Simul/panel_Ret_a_exp'   	, STATUS='replace')
-			OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_Pareto'   		, STATUS='replace')
-			OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Pareto_samples'   	, STATUS='replace')
+			OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_Pareto_exp'   		, STATUS='replace')
+			OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Pareto_samples_exp'   	, STATUS='replace')
 		endif 
 
 
