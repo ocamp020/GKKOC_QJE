@@ -83,7 +83,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! Pareto Sample
 		INTEGER  :: Pareto_ind=0, Pareto_numel, i_Pareto=1, Pareto_samples(200)=0
 		REAL(DP) :: Model2Dollar, Pareto_Min
-		INTEGER, DIMENSION(:), allocatable :: panel_Pareto
+		REAL(DP), DIMENSION(:), allocatable :: panel_Pareto
 		allocate( panel_Pareto(2*totpop) )
 		Model2Dollar = (EBAR_data/(EBAR*0.727853584919652_dp))
 		Pareto_Min   = 1000000/Model2Dollar
@@ -718,7 +718,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 
 		 	! Save assets of top agents for Pareto tail 
-		 		if ((simutime.ge.(MaxSimuTime-500)).and.(Pareto_ind.lt.totpop).and.(modulo(simutime,5).eq.0))  then 
+		 		if ((simutime.ge.(MaxSimuTime-500)).and.(Pareto_ind.lt.(1.9*totpop)).and.(modulo(simutime,10).eq.0))  then 
 
 		 			print*, 'Inside Pareto: simutime=',simutime,'i_Pareto=',i_Pareto,'Pareto_ind=',Pareto_ind 
 
