@@ -74,6 +74,11 @@ SUBROUTINE  SIMULATION(bench_indx)
 		
 		REAL :: k_igm
 
+
+		! 10 Year Ave. Returns by Percentile of wealth
+		INTEGER , DIMENSION(:), allocatable :: panel_age_0
+		REAL(DP), DIMENSION(:), allocatable :: panel_a_0, panel_Ret
+
 		! Top Agents 
 		INTEGER       :: top_ind(80), top_ind_aux(80), n_top
 		INTEGER, DIMENSION(:), allocatable :: panel_top_ind
@@ -88,9 +93,6 @@ SUBROUTINE  SIMULATION(bench_indx)
 		Model2Dollar = (EBAR_data/(EBAR*0.727853584919652_dp))
 		Pareto_Min   = 1000000/Model2Dollar
 
-		! 10 Year Ave. Returns by Percentile of wealth
-		INTEGER , DIMENSION(:), allocatable :: panel_age_0
-		REAL(DP), DIMENSION(:), allocatable :: panel_a_0, panel_Ret
 
 		print*,'test 1'
 
