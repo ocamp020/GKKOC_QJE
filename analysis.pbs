@@ -17,7 +17,7 @@
 	#PBS -m abe
 	#PBS -M ocamp020@umn.edu
 	#PBS -j oe
-	#PBS -N batch_Model_21_OTW
+	#PBS -N batch_Model_21_Simul
 	#PBS -S /bin/tcsh
 	#PBS -e analysis.err
 
@@ -26,5 +26,5 @@
 	module load gcc/8.2.0
 	cd RA_Guvenen/GKKC_Code/
 	make clean
-	rm -f log_Model_21_OTW.txt
-	make GKK_Main > log_Model_21_OTW.txt
+	rm -f log_Model_21_Simul.txt
+	make GKK_Main > log_Model_21_Simul.txt
