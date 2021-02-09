@@ -59,7 +59,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -84,7 +84,7 @@ PROGRAM main
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
 
-		Opt_Threshold = .false.
+		Opt_Threshold = .true.
 
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
@@ -97,7 +97,7 @@ PROGRAM main
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 		
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 
@@ -414,20 +414,20 @@ PROGRAM main
 				call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 			! Optimal taxes when threshold = 1
-				print*, "Solving for optimal wealth tax with threshold factor of 1"
-				! Solve Benchmark 
-				call Solve_Benchmark(compute_bench,Simul_Switch)
-				! Set up folder and flags 
-				Opt_Tax_KW    = .false. 
-				Simul_Switch  = .false. 
-				folder_aux    = Result_Folder
-				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold_1/'
-				call system( 'mkdir -p ' // trim(Result_Folder) )
-				! Set up threshold 
-				Threshold_Factor = 1.0_dp 
-				print*, ' Threshold_Factor=',Threshold_Factor
-				! Solve for optimal taxes 
-				call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
+				! print*, "Solving for optimal wealth tax with threshold factor of 1"
+				! ! Solve Benchmark 
+				! call Solve_Benchmark(compute_bench,Simul_Switch)
+				! ! Set up folder and flags 
+				! Opt_Tax_KW    = .false. 
+				! Simul_Switch  = .false. 
+				! folder_aux    = Result_Folder
+				! Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold_1/'
+				! call system( 'mkdir -p ' // trim(Result_Folder) )
+				! ! Set up threshold 
+				! Threshold_Factor = 1.0_dp 
+				! print*, ' Threshold_Factor=',Threshold_Factor
+				! ! Solve for optimal taxes 
+				! call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 		endif 
 
@@ -646,7 +646,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		STOP
+		! STOP
 		
 
 end Subroutine Solve_Benchmark
@@ -2382,7 +2382,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .false.
+		load_seed    = .true.
 
 
 	if (read_results.eqv..false.) then 
@@ -2419,8 +2419,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	
-    	tau_grid_min  = 30
-    	tau_grid_max  = 50
+    	tau_grid_min  = 27
+    	tau_grid_max  = 42
     	tau_grid_step = 1
 
     	! Set Y_a_threshold
@@ -2429,7 +2429,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			Wealth_factor = Y_a_threshold/W_bench
 
 		! Set high psi
-		psi = 0.825_dp
+		psi = 0.80_dp
 	endif 
     	WRITE(UNIT=77, FMT=*) 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
 		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ', &
