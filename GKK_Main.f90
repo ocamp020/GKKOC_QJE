@@ -398,36 +398,36 @@ PROGRAM main
 				! call Solve_Opt_Threshold
 
 			! Optimal taxes when threshold = 2 
-				print*, "Solving for optimal wealth tax with threshold factor of 2"
-				! Solve Benchmark 
-				call Solve_Benchmark(compute_bench,Simul_Switch)
-				! Set up folder and flags 
-				Opt_Tax_KW    = .false. 
-				Simul_Switch  = .false. 
-				folder_aux    = Result_Folder
-				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold_2/'
-				call system( 'mkdir -p ' // trim(Result_Folder) )
-				! Set up threshold 
-				Threshold_Factor = 2.0_dp 
-				print*, ' Threshold_Factor=',Threshold_Factor
-				! Solve for optimal taxes 
-				call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
-
-			! Optimal taxes when threshold = 1
-				! print*, "Solving for optimal wealth tax with threshold factor of 1"
+				! print*, "Solving for optimal wealth tax with threshold factor of 2"
 				! ! Solve Benchmark 
 				! call Solve_Benchmark(compute_bench,Simul_Switch)
 				! ! Set up folder and flags 
 				! Opt_Tax_KW    = .false. 
 				! Simul_Switch  = .false. 
 				! folder_aux    = Result_Folder
-				! Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold_1/'
+				! Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold_2/'
 				! call system( 'mkdir -p ' // trim(Result_Folder) )
 				! ! Set up threshold 
-				! Threshold_Factor = 1.0_dp 
+				! Threshold_Factor = 2.0_dp 
 				! print*, ' Threshold_Factor=',Threshold_Factor
 				! ! Solve for optimal taxes 
 				! call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
+
+			! Optimal taxes when threshold = 1
+				print*, "Solving for optimal wealth tax with threshold factor of 1"
+				! Solve Benchmark 
+				call Solve_Benchmark(compute_bench,Simul_Switch)
+				! Set up folder and flags 
+				Opt_Tax_KW    = .false. 
+				Simul_Switch  = .false. 
+				folder_aux    = Result_Folder
+				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold_1/'
+				call system( 'mkdir -p ' // trim(Result_Folder) )
+				! Set up threshold 
+				Threshold_Factor = 1.0_dp 
+				print*, ' Threshold_Factor=',Threshold_Factor
+				! Solve for optimal taxes 
+				call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 		endif 
 
@@ -2382,7 +2382,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .true.
+		load_seed    = .false.
 
 
 	if (read_results.eqv..false.) then 
@@ -2420,7 +2420,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	
     	tau_grid_min  = 27
-    	tau_grid_max  = 42
+    	tau_grid_max  = 38
     	tau_grid_step = 1
 
     	! Set Y_a_threshold
