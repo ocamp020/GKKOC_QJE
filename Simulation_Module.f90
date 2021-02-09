@@ -23,7 +23,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
 		INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
 		INTEGER , DIMENSION(:), allocatable :: panelage, panelz, panellambda, panele, panelx, panelz_old, panellambda_old
-		REAL(DP), DIMENSION(:), allocatable :: panela! , panelPV_a, panelK, panel_Y_L, panelRet, panelRet_K
+		REAL(DP), DIMENSION(:), allocatable :: panela, panelK, panelRet! , panelPV_a, panel_Y_L, panelRet_K
 
 		! Intergenerational statistics
 		! INTEGER , DIMENSION(:)      , allocatable :: eligible, death_count
@@ -95,9 +95,9 @@ SUBROUTINE  SIMULATION(bench_indx)
 		allocate( panellambda_old(	totpop) )
 		allocate( panela(			totpop) )
 		! allocate( panelPV_a(		totpop) )
-		! allocate( panelK(			totpop) )
+		allocate( panelK(			totpop) )
 		! allocate( panel_Y_L(		totpop) )
-		! allocate( panelRet(			totpop) )
+		allocate( panelRet(			totpop) )
 		! allocate( panelRet_K(		totpop) )
 		allocate( panel_top_ind(	totpop) )
 
@@ -736,61 +736,61 @@ SUBROUTINE  SIMULATION(bench_indx)
 			print*, sum(panelage)/real(totpop,8), sum(panelz)/real(totpop,8), sum(panele)/real(totpop,8), sum(panela)/real(totpop,8)
 
 
-		! print*, ' '
-		! print*, 'Compute variables for final cross-section'
-		! ! !$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi,h_i)
-		! ! DO paneli=1,totpop
-		! !     currenta 		= panela(paneli)
-		! !     age 			= panelage(paneli)
-		! !     currentzi 		= panelz(paneli)
-		! !     currentlambdai 	= panellambda(paneli) 
-		! !     currentei 		= panele(paneli)
-		! !     currentxi 		= panelx(paneli)
+		print*, ' '
+		print*, 'Compute variables for final cross-section'
+		!$omp parallel do private(currenta,age,currentzi,currentlambdai,currentei,tklo,tkhi,h_i,k_igm)
+		DO paneli=1,totpop
+		    currenta 		= panela(paneli)
+		    age 			= panelage(paneli)
+		    currentzi 		= panelz(paneli)
+		    currentlambdai 	= panellambda(paneli) 
+		    currentei 		= panele(paneli)
+		    currentxi 		= panelx(paneli)
 
-		! !     if (currenta .ge. amax) then
-		! !         tklo = na-1
-		! !     elseif (currenta .lt. amin) then
-	 ! !            tklo = 1
-	 ! !        else
-	 ! !            tklo = ((currenta - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-		! !     endif    
-		! !     tkhi = tklo + 1   
+		    if (currenta .ge. amax) then
+		        tklo = na-1
+		    elseif (currenta .lt. amin) then
+	            tklo = 1
+	        else
+	            tklo = ((currenta - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+		    endif    
+		    tkhi = tklo + 1   
 
-		! !     panelK(paneli)    = min(theta(currentzi)*currenta,&
-		! !     		& (mu*P*xz_grid(currentxi,currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		    panelK(paneli)    = min(theta(currentzi)*currenta,&
+		    		& (mu*P*xz_grid(currentxi,currentzi)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
-		! ! 	if (age.lt.RetAge) then 
-		! !         h_i  = ((agrid(tkhi) - currenta)*hours(age,tklo,currentzi,currentlambdai,currentei,currentxi) &
-		! !            &  + (currenta - agrid(tklo))*hours(age,tkhi,currentzi,currentlambdai,currentei,currentxi) ) &
-		! !                                 &  / ( agrid(tkhi) - agrid(tklo) )  
+			! if (age.lt.RetAge) then 
+		 !        h_i  = ((agrid(tkhi) - currenta)*hours(age,tklo,currentzi,currentlambdai,currentei,currentxi) &
+		 !           &  + (currenta - agrid(tklo))*hours(age,tkhi,currentzi,currentlambdai,currentei,currentxi) ) &
+		 !                                &  / ( agrid(tkhi) - agrid(tklo) )  
 
-		! ! 		panel_Y_L(paneli) = psi*( Wage*eff_un(age,currentlambdai,currentei)*h_i)**(1.0_dp-tauPL)
-		! ! 	else 
-		! ! 		panel_Y_L(paneli) = RetY_lambda_e(currentlambdai,currentei)
-		! ! 	endif 
+			! 	panel_Y_L(paneli) = psi*( Wage*eff_un(age,currentlambdai,currentei)*h_i)**(1.0_dp-tauPL)
+			! else 
+			! 	panel_Y_L(paneli) = RetY_lambda_e(currentlambdai,currentei)
+			! endif 
 
-		! ! 	if (age.eq.1) then 
-		! ! 		currentzi = panelz_old(paneli)
-		! ! 		currentlambdai = panellambda_old(paneli)
-		! ! 		panelPV_a(paneli) = (   (agrid(tkhi) - currenta) * V_Pr_nb(tklo,currentzi,currentlambdai)  &
-		! !                        &  + (currenta - agrid(tklo)) * V_Pr_nb(tkhi,currentzi,currentlambdai)) &
-		! !                        &  / ( agrid(tkhi) - agrid(tklo) )
-		! !     else 
+			! if (age.eq.1) then 
+			! 	currentzi = panelz_old(paneli)
+			! 	currentlambdai = panellambda_old(paneli)
+			! 	panelPV_a(paneli) = (   (agrid(tkhi) - currenta) * V_Pr_nb(tklo,currentzi,currentlambdai)  &
+		 !                       &  + (currenta - agrid(tklo)) * V_Pr_nb(tkhi,currentzi,currentlambdai)) &
+		 !                       &  / ( agrid(tkhi) - agrid(tklo) )
+		 !    else 
 		    	
-		! !     	panelPV_a(paneli) = (   (agrid(tkhi) - currenta) * V_Pr(age,tklo,currentzi,currentlambdai, currentei, currentxi)  &
-		! !                        &  + (currenta - agrid(tklo)) * V_Pr(age,tkhi,currentzi,currentlambdai, currentei, currentxi)) &
-		! !                        &  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*currenta 
-		! !     endif 
+		 !    	panelPV_a(paneli) = (   (agrid(tkhi) - currenta) * V_Pr(age,tklo,currentzi,currentlambdai, currentei, currentxi)  &
+		 !                       &  + (currenta - agrid(tklo)) * V_Pr(age,tkhi,currentzi,currentlambdai, currentei, currentxi)) &
+		 !                       &  / ( agrid(tkhi) - agrid(tklo) )  + (1.0_dp+R)*currenta 
+		 !    endif 
 
-		! !     panelRet(paneli) 	= ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
-	 ! !     								&   R*panela(paneli) )/panela(paneli)
-		! !     if (panelx(paneli).lt.3) then 
-		! !     panelRet_K(paneli) 	= ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
-	 ! !     								&   R*panela(paneli) )/panelK(paneli)
-		! !     endif 
+		    panelRet(paneli) 	= ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
+	     								&   R*panela(paneli) )/panela(paneli)
+		    ! if (panelx(paneli).lt.3) then 
+		    ! panelRet_K(paneli) 	= ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
+	     ! 								&   R*panela(paneli) )/panelK(paneli)
+		    ! endif 
 	     	 
 		           
-		! ! ENDDO ! paneli
+		ENDDO ! paneli
 
 
 
@@ -1126,6 +1126,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/panelz_bench'		, STATUS='replace')
 			OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/panellambda_bench'   , STATUS='replace')
 			OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_bench'        , STATUS='replace')
+			OPEN(UNIT=25, FILE=trim(Result_Folder)//'Simul/panel_Ret_a_bench'   , STATUS='replace')
 			! OPEN(UNIT=26, FILE=trim(Result_Folder)//'Simul/panelPV_a_bench'     , STATUS='replace')
 			! OPEN(UNIT=27, FILE=trim(Result_Folder)//'Simul/panelK_bench'        , STATUS='replace')
 			OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_bench'        , STATUS='replace')
@@ -1148,13 +1149,14 @@ SUBROUTINE  SIMULATION(bench_indx)
 		WRITE  (UNIT=12, FMT=*) panelz 
 		WRITE  (UNIT=13, FMT=*) panellambda 
 		WRITE  (UNIT=14, FMT=*) panele 
+		WRITE  (UNIT=25, FMT='(F12.6)') panelRet
 		! WRITE  (UNIT=26, FMT='(F12.4)') panelPV_a
 		! WRITE  (UNIT=27, FMT='(F12.4)') panelK
 		WRITE  (UNIT=28, FMT=*) panelx
 		! WRITE  (UNIT=24, FMT='(F12.4)') panel_Y_L
 
 		close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14)
-		close (unit=28); ! close (unit=26); close (unit=27); close (unit=24) 
+		close (unit=28); close (unit=25); ! close (unit=26); close (unit=27); close (unit=24) 
 
 		! ! if (bench_indx==1) then
 		! ! 	OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_parents' 	, STATUS='replace')
