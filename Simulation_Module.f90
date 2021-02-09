@@ -679,8 +679,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 				! Save return for the last 10 periods
 				if (simutime.ge.(MaxSimuTime-9)) then 
+					k_igm     = min(theta(panelz(paneli))*panela(paneli),&
+		    					& (mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 					panel_Ret(paneli) = panel_Ret(paneli) + & 
-										& ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
+										& ( P*(xz_grid(panelx(paneli),panelz(paneli))*k_igm)**mu - (R+DepRate)*panelK(paneli) +&
 	     								&   R*panela(paneli) )/(10.0_dp*panela(paneli))
 				endif 
 
