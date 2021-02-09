@@ -393,7 +393,21 @@ PROGRAM main
 		if (Opt_Threshold) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
 
-			call Solve_Opt_Threshold
+			! Solve for optmal threshold 
+				! call Solve_Opt_Threshold
+
+			! Optimal taxes when threshold = 2 
+				! Set up folder and flags 
+				Opt_Tax_KW    = .false. 
+				Simul_Switch  = .false. 
+				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold_2/'
+				call system( 'mkdir -p ' // trim(Result_Folder) )
+				! Set up threshold 
+				Threshold_Factor = 2.0_dp 
+				print*, ' Threshold_Factor=',Threshold_Factor
+				! Solve for optimal taxes 
+				call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
+
 		endif 
 
 		if (Opt_Tau_C) then 
@@ -2384,7 +2398,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	
-    	tau_grid_min  = -50
+    	tau_grid_min  = 30
     	tau_grid_max  = 50
     	tau_grid_step = 1
 
@@ -2394,7 +2408,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			Wealth_factor = Y_a_threshold/W_bench
 
 		! Set high psi
-		! psi = 0.87_dp
+		psi = 0.825_dp
 	endif 
     	WRITE(UNIT=77, FMT=*) 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
 		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ', &

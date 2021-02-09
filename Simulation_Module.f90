@@ -741,14 +741,14 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 
 	 		! Save Age, assets and Return for all agents in the last 10 years
-				if (simutime.eq.MaxSimuTime-9) then 
+				if (simutime.eq.(MaxSimuTime-9)) then 
 					panel_age_0 = panelage
 					panel_a_0   = panela
 					panel_Ret   = 0.0_dp 
 				endif 
 
-				if (simutime.ge.MaxSimuTime-9) then 
-					!$omp parallel do
+				if (simutime.ge.(MaxSimuTime-9)) then 
+					! $omp parallel do
 					do paneli=1,totpop
 					panel_Ret(paneli) = panel_Ret(paneli) + & 
 										& ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
@@ -1264,6 +1264,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 			CLOSE(unit=33); CLOSE(unit=34); CLOSE(unit=35);
 
 		endif
+
+		STOP
 
 
 		if (bench_indx==1) then
