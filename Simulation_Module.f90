@@ -79,6 +79,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 		REAL(DP)      :: top_A(80), A_cut, A_hi, A_low
 		character(10) :: top_folder
 
+	    ! 10 Year Ave. Returns by Percentile of wealth
+	    REAL(DP), DIMENSION(:), allocatable :: panel_a_10, panel_Ret
+
+
 		print*,'test 1'
 
 		! Allocate variables
@@ -118,6 +122,11 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! allocate( IGM_pv_matrix( 2,4000000) )
 		! allocate( IGM_z_matrix(  2,4000000) )
 			! panelRet_K = 0.0_sp
+
+		! 10 Year Ave. Returns by Percentile of wealth
+	    allocate( panel_a_10( totpop) )
+	    allocate( panel_Ret(  totpop) ); panel_Ret   = 0.0_dp 
+
 
 		print*, 'Starting Simulation Module'
 
@@ -654,6 +663,17 @@ SUBROUTINE  SIMULATION(bench_indx)
   !   !  			endif 
 		! 		! endif 
 
+
+		        ! Save return for the last 10 periods
+		        if (simutime.ge.(MaxSimuTime-9)) then 
+		          k_igm     = min(theta(panelz(paneli))*panela(paneli),&
+		                  & (mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		          panel_Ret(paneli) = panel_Ret(paneli) + & 
+		                    & ( P*(xz_grid(panelx(paneli),panelz(paneli))*k_igm)**mu - (R+DepRate)*panelK(paneli) +&
+		                      &   R*panela(paneli) )/(10.0_dp*panela(paneli))
+        		endif 
+
+
 			ENDDO ! paneli
 			
 
@@ -699,6 +719,12 @@ SUBROUTINE  SIMULATION(bench_indx)
 			!     	panelage_sons = panelage 
 			!     	where(panelage==1) eligible = 0 
 		 	!	endif 
+
+ 		    	! Save assets for all agents in the last 10 years
+		        if (simutime.eq.(MaxSimuTime-9)) then 
+		          panel_a_10 = panela
+		        endif 
+
 
 		 		
 		 		print*, "Simulation period", simutime
@@ -1186,6 +1212,15 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! ! 	! close (unit=20); close (unit=21); 
 			
 		! ! endif
+
+        ! Returns for the last 10 years of simulation
+	    OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/panel_a_10'    , STATUS='replace')
+	    OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/panel_ret_10'    , STATUS='replace')
+	    WRITE(UNIT=34, FMT='(F20.6)') panel_a_10
+	    WRITE(UNIT=35, FMT='(F12.6)') panel_Ret
+	    CLOSE(unit=33); CLOSE(unit=34); CLOSE(unit=35);
+
+	    STOP
 
 
 		if (bench_indx==1) then
