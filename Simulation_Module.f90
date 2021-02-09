@@ -748,7 +748,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 	 		! Save assets for all agents in the last 10 years
 				if (simutime.eq.(MaxSimuTime-9)) then 
-					panel_a_0   = panela
+					panel_a_10 = panela
 				endif 
 
 
