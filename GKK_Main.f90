@@ -398,11 +398,13 @@ PROGRAM main
 				! call Solve_Opt_Threshold
 
 			! Optimal taxes when threshold = 2 
+				print*, "Solving for optimal wealth tax with threshold factor of 2"
 				! Solve Benchmark 
 				call Solve_Benchmark(compute_bench,Simul_Switch)
 				! Set up folder and flags 
 				Opt_Tax_KW    = .false. 
 				Simul_Switch  = .false. 
+				folder_aux    = Result_Folder
 				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold_2/'
 				call system( 'mkdir -p ' // trim(Result_Folder) )
 				! Set up threshold 
@@ -412,11 +414,13 @@ PROGRAM main
 				call Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 			! Optimal taxes when threshold = 1
+				print*, "Solving for optimal wealth tax with threshold factor of 1"
 				! Solve Benchmark 
 				call Solve_Benchmark(compute_bench,Simul_Switch)
 				! Set up folder and flags 
 				Opt_Tax_KW    = .false. 
 				Simul_Switch  = .false. 
+				folder_aux    = Result_Folder
 				Result_Folder = trim(folder_aux)//'Opt_Tax_W_Threshold_1/'
 				call system( 'mkdir -p ' // trim(Result_Folder) )
 				! Set up threshold 
