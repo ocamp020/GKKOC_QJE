@@ -59,7 +59,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
+		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -84,7 +84,7 @@ PROGRAM main
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
 
-		Opt_Threshold = .true.
+		Opt_Threshold = .false.
 
 		Opt_Tax_K_and_W = .false.
 		Tax_Reform_KW   = .false.
@@ -646,7 +646,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark
