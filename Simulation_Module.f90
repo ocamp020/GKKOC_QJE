@@ -76,8 +76,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 
 		! 10 Year Ave. Returns by Percentile of wealth
-		INTEGER , DIMENSION(:), allocatable :: panel_age_0
-		REAL(DP), DIMENSION(:), allocatable :: panel_a_0, panel_Ret
+		REAL(DP), DIMENSION(:), allocatable :: panel_a_10, panel_Ret
 
 		! Top Agents 
 		INTEGER       :: top_ind(80), top_ind_aux(80), n_top
@@ -137,9 +136,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		! allocate( IGM_pv_matrix( 2,5000000) )
 		
 		! 10 Year Ave. Returns by Percentile of wealth
-		allocate( panel_age_0(totpop) ) 
-		allocate( panel_a_0(  totpop) )
-		allocate( panel_Ret(  totpop) )
+		allocate( panel_a_10( totpop) )
+		allocate( panel_Ret(  totpop) ); panel_Ret   = 0.0_dp 
 
 
 		print*, 'Starting Simulation Module'
@@ -678,6 +676,14 @@ SUBROUTINE  SIMULATION(bench_indx)
   !   !  			endif 
 		! 		! endif 
 
+
+				! Save return for the last 10 periods
+				if (simutime.ge.(MaxSimuTime-9)) then 
+					panel_Ret(paneli) = panel_Ret(paneli) + & 
+										& ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
+	     								&   R*panela(paneli) )/(10.0_dp*panela(paneli))
+				endif 
+
 			ENDDO ! paneli
 			
 
@@ -740,23 +746,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 		 		endif 
 
 
-	 		! Save Age, assets and Return for all agents in the last 10 years
+	 		! Save assets for all agents in the last 10 years
 				if (simutime.eq.(MaxSimuTime-9)) then 
-					panel_age_0 = panelage
 					panel_a_0   = panela
-					panel_Ret   = 0.0_dp 
 				endif 
-
-				if (simutime.ge.(MaxSimuTime-9)) then 
-					! $omp parallel do
-					do paneli=1,totpop
-					panel_Ret(paneli) = panel_Ret(paneli) + & 
-										& ( P*(xz_grid(panelx(paneli),panelz(paneli))*panelK(paneli))**mu - (R+DepRate)*panelK(paneli) +&
-	     								&   R*panela(paneli) )/panela(paneli)
-					enddo 
-				endif 
-				panel_Ret = panel_Ret/10.0_dp
-
 
 
 		 		print*, "Simulation period", simutime
@@ -1259,7 +1252,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/panel_a_10'   	, STATUS='replace')
 			OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/panel_ret_10'   	, STATUS='replace')
 			WRITE(UNIT=33, FMT=*) 		  panel_age_0
-			WRITE(UNIT=34, FMT='(F12.6)') panel_a_0
+			WRITE(UNIT=34, FMT='(F20.6)') panel_a_0
 			WRITE(UNIT=35, FMT='(F12.6)') panel_Ret
 			CLOSE(unit=33); CLOSE(unit=34); CLOSE(unit=35);
 
