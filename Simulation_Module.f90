@@ -1248,11 +1248,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 			! close (unit=20); close (unit=21); 
 
 
-			OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/panel_age_10'    , STATUS='replace')
+			! Returns for the last 10 years of simulation
 			OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/panel_a_10'   	, STATUS='replace')
 			OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/panel_ret_10'   	, STATUS='replace')
-			WRITE(UNIT=33, FMT=*) 		  panel_age_0
-			WRITE(UNIT=34, FMT='(F20.6)') panel_a_0
+			WRITE(UNIT=34, FMT='(F20.6)') panel_a_10
 			WRITE(UNIT=35, FMT='(F12.6)') panel_Ret
 			CLOSE(unit=33); CLOSE(unit=34); CLOSE(unit=35);
 
