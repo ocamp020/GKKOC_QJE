@@ -60,8 +60,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
-			compute_exp   = .false.
+			compute_bench = .true.
+			compute_exp   = .true.
 			compute_exp_pf= .false.
 				Fixed_PF        = .true.
 				Fixed_PF_interp = .true.
@@ -222,23 +222,23 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2/'
+			Result_Folder = './Revision/Model_2.1_RW_Debt_1.5/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2_PT/' 
+			Result_Folder = './Revision/Model_2.1_RW_Debt_1.5_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2_SU/' 
+			Result_Folder = './Revision/Model_2.1_RW_Debt_1.5_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_RW_Debt_1.5_PT_SU/' 
 		end if
 	else 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2_Corp/' 
+			Result_Folder = './Revision/Model_2.1_RW_Debt_1.5_Corp/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2_Corp_PT/' 
+			Result_Folder = './Revision/Model_2.1_RW_Debt_1.5_Corp_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2_Corp_SU/' 
+			Result_Folder = './Revision/Model_2.1_RW_Debt_1.5_Corp_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_RW_Debt_2_Corp_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_RW_Debt_1.5_Corp_PT_SU/' 
 		end if
 	endif 
 
@@ -611,7 +611,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark
