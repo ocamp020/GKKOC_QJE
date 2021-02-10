@@ -183,7 +183,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		   ENDDO
 
 		! X   
-		   xi=1
+		   xi=2
 		 
 		! LAMBDA  
 		   tempnolambda = omp_ran1() ! ran1(newiseed) 
@@ -294,7 +294,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 					ENDDO
 
 					! X     
-			       	xi = 1
+			       	xi = 2
 		       
 					! LAMBDA  
 					tempnolambda = omp_ran1() ! ran1(newiseed) 
