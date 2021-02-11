@@ -1259,7 +1259,6 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		endif
 
-		STOP
 
 
 		if (bench_indx==1) then
@@ -2529,15 +2528,41 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	 		
 	ENDDO ! age
 
-	!=============================================================================
-	!
-	! Get Averages
-	!
-	!=============================================================================
 
+	!=============================================================================
+	!
+	! Cut observations if wealth is low or return is high/low
+	! We use panel_Death to idicate that an observation should not be taken into account
+	!
+	!=============================================================================
 	print*, ' '
-	print*, 'Computing Averages'
+	print*, 'Selecting Sample (cutoffs by age and return outliers)'
+		! Replace Death=0 if wealth is too low (a<=500 USD)
+		where (Panel_a<=(500*((EBAR_bench*0.727853584919652_dp)/EBAR_data))
+			Panel_Death = 0
+		end where
+
+		! Replace Death = 0 if returns are too high (higher than top 0.5 pct)
+		DO age = 1,MaxAge 
+			! Compute percentile on restricted sample 
+			r_top = Percentile(0.995,sum(Panel_Death(:,age)),pack(Panel_r(:,age), (Panel_Death(:,age).gt.0))
+
+			! Replace Death=0 if panel_r > r_top 
+			where (Panel_r(:,age)>r_top)
+				Panel_Death(:,age) = 0
+			end where
+		ENDDO
+
+
+	!=============================================================================
+	!
+	! Get averages and demean observations by age fixed effects 
+	!
+	!=============================================================================
+	print*, ' '
+	print*, 'Computing Averages by Age and Demeaning for Age FE'
 	DO age = 1,MaxAge 
+		! Averages 
 		Mean_a(age) 	 = sum(Panel_a(:,age)*Panel_Death(:,age))/sum(Panel_Death(:,age)) 
 		Mean_c(age) 	 = sum(Panel_c(:,age)*Panel_Death(:,age))/sum(Panel_Death(:,age)) 
 		Mean_k(age) 	 = sum(Panel_k(:,age)*Panel_Death(:,age))/sum(Panel_Death(:,age)) 
@@ -2549,6 +2574,10 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		Mean_r_at_w(age) = sum(Panel_r_at(:,age)*Panel_a(:,age)*Panel_Death(:,age)) & 
 								& /sum(Panel_a(:,age)*Panel_Death(:,age)) 
 		Mean_Death(age)  = sum(Panel_Death(:,age)) 
+
+		! Demeaning 
+		Panel_r(:,age)     = Panel_r(:,age)    - Mean_r(age) 
+		Panel_r_at(:,age)  = Panel_r_at(:,age) - Mean_r_at(age)
 	ENDDO
 
 	!$omp parallel do 
@@ -2616,10 +2645,10 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 
 	do i_pct=1,10
 		print*, 'Ret prc=', prctile_ret(i_pct)
-		prc_Av_Return(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,Av_Return)
-		prc_Av_Return_at(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at)
-		prc_Av_Return_W(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W)
-		prc_Av_Return_at_W(i_pct) = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W)
+		prc_Av_Return(i_pct)      	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return)
+		prc_Av_Return_at(i_pct)   	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at)
+		prc_Av_Return_W(i_pct)    	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W)
+		prc_Av_Return_at_W(i_pct) 	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W)
 
 		prc_Av_Return_2024(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,Av_Return_2024)
 		prc_Av_Return_at_2024(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_2024)

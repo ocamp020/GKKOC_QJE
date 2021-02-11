@@ -617,7 +617,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL WRITE_VARIABLES(1)
 		if (Simul_Switch) then 
 			print*,"	Simulation"
-			CALL SIMULATION(solving_bench)
+			! CALL SIMULATION(solving_bench)
 			! CALL Simulation_Life_Cycle_Patterns(solving_bench)
 			CALL Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
 		endif
