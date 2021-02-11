@@ -4109,7 +4109,7 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	IMPLICIT NONE
 	integer, intent(in) :: bench_indx
 	real(dp), dimension(na,nz,nx) :: K_Mat, TFPR_i=0.0_dp
-	real(dp) :: TFP, TFP_star, TFPR_bar, size, K, theta_aux(nz),YBAR_aux,QBAR_aux,K_aux,NBAR_aux
+	real(dp) :: TFP, TFP_star, TFPR_bar, size, K, theta_aux,YBAR_aux,QBAR_aux,K_aux,NBAR_aux
 	integer  :: i_a, i_z, i_x, i_theta
 
 	size = 1.0_dp ! sum(DBN1(:,:,:,:,:,1:2))
@@ -4151,10 +4151,10 @@ SUBROUTINE Hsieh_Klenow_Efficiency(bench_indx)
 	NBAR_aux  = NBAR 
 	K_aux     = K
 	do i_theta = 1,10000,1
-	theta     = 4.0_dp + real(i_theta,8)/10.0_dp; print*, ' '; print*, 'theta= ',theta(1); print*, ' '
+	theta     = 4.0_dp + real(i_theta,8)/10.0_dp; print*, ' '; print*, 'theta= ',theta; print*, ' '
 	CALL FIND_DBN_EQ
 	enddo 
-	theta     = big_p ; print*, ' ';print*, 'theta= ',theta(1); print*, ' '
+	theta     = big_p ; print*, ' ';print*, 'theta= ',theta; print*, ' '
 	CALL FIND_DBN_EQ
 	theta     = theta_aux 
 	K         = sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid )
