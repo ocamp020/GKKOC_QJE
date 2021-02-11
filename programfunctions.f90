@@ -119,7 +119,8 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)              :: Y_a, K, Pr
 
 		! Capital demand 
-		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( a_in + theta*(xz_grid(x_in,z_in)*a_in)**mu , & 
+				& (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
@@ -153,7 +154,8 @@ end Subroutine Asset_Grid_Threshold
 		real(DP) :: K, Pr, Y_a, tauW
 
 		! Capital demand 
-		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( a_in + theta*(xz_grid(x_in,z_in)*a_in)**mu , &
+			& (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
@@ -165,11 +167,11 @@ end Subroutine Asset_Grid_Threshold
 		end if
 
 		! After tax marginal benefit of assets
-		if (K.lt.theta(z_in)*a_in) then 
+		if (K.lt.(a_in + theta*(xz_grid(x_in,z_in)*a_in)**mu)) then 
 			MB_a = (1.0_dp*(1.0_dp-tauW) + R*(1.0_dp-tauK))
 		else 
-			MB_a = (1.0_dp*(1.0_dp-tauW) + R*(1.0_dp-tauK)) &
-         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
+         	MB_a = ( (1.0_dp-tauW) + R*(1.0_dp-tauK)) &
+         	& + ( (P*mu*K**(mu-1.0_dp)-(R+DepRate))*(1.0_dp + mu*theta*xz_grid(x_in,z_in)**mu*a_in**(mu-1.0_DP)))*(1.0_dp-tauK)
 		endif 
 
 	END  FUNCTION MB_a
@@ -181,13 +183,14 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)			  :: MB_a_at, K
 
 		! Capital demand 
-		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( a_in + theta*(xz_grid(x_in,z_in)*a_in)**mu , &
+			& (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
-		if (K.lt.theta(z_in)*a_in) then 
+		if (K.lt.(a_in + theta*(xz_grid(x_in,z_in)*a_in)**mu)) then 
 			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK))
 		else 
 			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK)) &
-         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
+         	& + ( (P*mu*K**(mu-1.0_dp)-(R+DepRate))*(1.0_dp + mu*theta*xz_grid(x_in,z_in)**mu*a_in**(mu-1.0_DP)))*(1.0_dp-tauK)
 		endif 
 
 	END  FUNCTION MB_a_at
@@ -199,13 +202,14 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)             :: MB_a_bt, K
 
 		! Capital demand 
-		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( a_in + theta*(xz_grid(x_in,z_in)*a_in)**mu , &
+			& (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
-		if (K.lt.theta(z_in)*a_in) then 
+		if (K.lt.(a_in + theta*(xz_grid(x_in,z_in)*a_in)**mu)) then 
 			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK))
 		else 
 			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK)) &
-         	& + (P*mu*((theta(z_in)*xz_grid(x_in,z_in))**mu)*a_in**(mu-1.0_DP)-(R+DepRate)*theta(z_in))*(1.0_dp-tauK)
+         	& + ( (P*mu*K**(mu-1.0_dp)-(R+DepRate))*(1.0_dp + mu*theta*xz_grid(x_in,z_in)**mu*a_in**(mu-1.0_DP)))*(1.0_dp-tauK)
 		endif 
 
 	END  FUNCTION MB_a_bt
@@ -2318,7 +2322,7 @@ SUBROUTINE FIND_DBN_EQ()
 
 		    	! Solve for new R 
 		    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
-		    	if (sum(theta)/nz .gt. 1.0_DP) then
+		    	if (theta .gt. 0.0_DP) then
 		    		P = min(P,1.0_dp)
 		            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R)
 		        else
@@ -3290,7 +3294,7 @@ SUBROUTINE FIND_DBN_EQ_PF_Prices()
 
 		    	! Solve for new R 
 		    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
-		    	if (sum(theta)/nz .gt. 1.0_DP) then
+		    	if (theta .gt. 0.0_DP) then
 		    		P = min(P,1.0_dp)
 		            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R)
 		        else
@@ -3691,7 +3695,7 @@ SUBROUTINE FIND_DBN_EQ_Prices(Fixed_W,Fixed_P,Fixed_R)
 		        if (Fixed_R.eqv..false.) then 
 		    	! Solve for new R 
 		    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
-		    	if (sum(theta)/nz .gt. 1.0_DP) then
+		    	if (theta .gt. 0.0_DP) then
 		    		P = min(P,1.0_dp)
 		           brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R)
 	            else
@@ -4364,7 +4368,7 @@ SUBROUTINE FIND_DBN_Transition()
 		    	if ((ind_R.eq.3)) then ! .or.(ti.eq.T)
 			    		! Save old R for updating 
 			    		R_old = R_tr(ti)
-			    	if (sum(theta)/nz .gt. 1.0_DP) then
+			    	if (theta .gt. 0.0_DP) then
 			    		! Set price 
 			    		P = min(P_tr(ti),1.0_dp)
 			    		! Solve for R using brent
@@ -4621,7 +4625,7 @@ SUBROUTINE FIND_DBN_Transition()
 		    	! Solve for new R (that clears market under new guess for prices)
     				! Save old R for updating 
 		    		R_old = R_tr(T+1)
-		    	if (sum(theta)/nz .gt. 1.0_DP) then
+		    	if (theta .gt. 0.0_DP) then
 		    		P = min(P_tr(T+1),1.0_dp)
 		            brent_value = brent(-0.05_DP,R_old,0.15_DP,Agg_Debt_Tr,0.000001_DP,R2_tr(T+1))
 		            	! Usually brent_tol=0.00000001_DP
@@ -6336,12 +6340,12 @@ Function K_Matrix(R_in,P_in)
 	real(dp), dimension(na,nz,nx) :: K_Matrix
 	integer :: i,j,h
 
-	! K_Matrix = min( theta*spread(agrid,2,nz) , (mu*P_in*spread(zgrid,1,na)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-
+	
 	do h=1,nx
 	do j=1,nz
 	do i=1,na 
-		K_Matrix(i,j,h) = min( theta(j)*agrid(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K_Matrix(i,j,h) = min( agrid(i) + theta*(xz_grid(h,j)*agrid(i))**mu , &
+				& (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 	enddo
 	enddo
 	enddo 
@@ -6359,7 +6363,8 @@ Function K_Matrix_t(R_in,P_in)
 	do h=1,nx
 	do j=1,nz
 	do i=1,na_t
-		K_Matrix_t(i,j,h) = min( theta(j)*agrid_t(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K_Matrix_t(i,j,h) = min( agrid(i) + theta*(xz_grid(h,j)*agrid(i))**mu , & 
+			(mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 	enddo
 	enddo
 	enddo 

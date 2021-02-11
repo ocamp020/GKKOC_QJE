@@ -934,7 +934,7 @@ SUBROUTINE COMPUTE_STATS()
 	        	size_by_age(age)       = size_by_age(age)       + DBN1(age,ai,zi,lambdai,ei,xi)
 				size_by_age_z(age,zi)  = size_by_age_z(age,zi)  + DBN1(age,ai,zi,lambdai,ei,xi)
 				leverage_age_z(age,zi) = leverage_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)*K_mat(ai,zi,xi)/agrid(ai)
-				if (K_mat(ai,zi,xi).ge.(theta(zi)*agrid(ai))) then 
+				if (K_mat(ai,zi,xi).ge.(agrid(ai) + theta*(xz_grid(xi,zi)*agrid(ai))**mu)) then 
 					constrained_firms_age(age)      = constrained_firms_age(age)      + DBN1(age,ai,zi,lambdai,ei,xi)
 					constrained_firms_age_z(age,zi) = constrained_firms_age_z(age,zi) + DBN1(age,ai,zi,lambdai,ei,xi)
 					constrained_firm_ind(age,ai,zi,lambdai,ei,xi) = 1
