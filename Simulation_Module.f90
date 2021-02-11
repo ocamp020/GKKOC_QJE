@@ -2597,31 +2597,31 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 
 	!$omp parallel do 
 	DO i = 1, sample_size
-		Sample(i)               = sum(Panel_Death(i,:))
+		Select(i)               = sum(Panel_Death(i,:))
 		Av_Return(i) 			= sum(panel_r(i,:)   *Panel_Death(i,:))/sum(Panel_Death(i,:))
 		Av_Return_at(i) 		= sum(panel_r_at(i,:)*Panel_Death(i,:))/sum(Panel_Death(i,:))
 		Av_Return_W(i) 	  		= sum(panel_r(i,:)   *Panel_a(i,:)*Panel_Death(i,:))/sum(Panel_a(i,:)*Panel_Death(i,:))
 		Av_Return_at_W(i) 		= sum(panel_r_at(i,:)*Panel_a(i,:)*Panel_Death(i,:))/sum(Panel_a(i,:)*Panel_Death(i,:))
 
-		Sample_2024(i)          = sum(Panel_Death(i,1:5))
+		Select_2024(i)          = sum(Panel_Death(i,1:5))
 		Av_Return_2024(i) 		= sum(panel_r(i,1:5)   *Panel_Death(i,1:5))/sum(Panel_Death(i,1:5))
 		Av_Return_at_2024(i) 	= sum(panel_r_at(i,1:5)*Panel_Death(i,1:5))/sum(Panel_Death(i,1:5))
 		Av_Return_W_2024(i) 	= sum(panel_r(i,1:5)   *Panel_a(i,1:5)*Panel_Death(i,1:5))/sum(Panel_a(i,1:5)*Panel_Death(i,1:5))
 		Av_Return_at_W_2024(i) 	= sum(panel_r_at(i,1:5)*Panel_a(i,1:5)*Panel_Death(i,1:5))/sum(Panel_a(i,1:5)*Panel_Death(i,1:5))
 
-		Sample_2565(i)          = sum(Panel_Death(i,6:))
+		Select_2565(i)          = sum(Panel_Death(i,6:))
 		Av_Return_2565(i) 		= sum(panel_r(i,6:)   *Panel_Death(i,6:))/sum(Panel_Death(i,6:))
 		Av_Return_at_2565(i) 	= sum(panel_r_at(i,6:)*Panel_Death(i,6:))/sum(Panel_Death(i,6:))
 		Av_Return_W_2565(i) 	= sum(panel_r(i,6:)   *Panel_a(i,6:)*Panel_Death(i,6:))/sum(Panel_a(i,6:)*Panel_Death(i,6:))
 		Av_Return_at_W_2565(i) 	= sum(panel_r_at(i,6:)*Panel_a(i,6:)*Panel_Death(i,6:))/sum(Panel_a(i,6:)*Panel_Death(i,6:))
 
-		Sample_2029(i)          = sum(Panel_Death(i,1:10))
+		Select_2029(i)          = sum(Panel_Death(i,1:10))
 		Av_Return_2029(i) 		= sum(panel_r(i,1:10)   *Panel_Death(i,1:10))/sum(Panel_Death(i,1:10))
 		Av_Return_at_2029(i) 	= sum(panel_r_at(i,1:10)*Panel_Death(i,1:10))/sum(Panel_Death(i,1:10))
 		Av_Return_W_2029(i) 	= sum(panel_r(i,1:10)   *Panel_a(i,1:10)*Panel_Death(i,1:10))/sum(Panel_a(i,1:10)*Panel_Death(i,1:10))
 		Av_Return_at_W_2029(i) 	= sum(panel_r_at(i,1:10)*Panel_a(i,1:10)*Panel_Death(i,1:10))/sum(Panel_a(i,1:10)*Panel_Death(i,1:10))
 
-		Sample_3065(i)          = sum(Panel_Death(i,11:))
+		Select_3065(i)          = sum(Panel_Death(i,11:))
 		Av_Return_3065(i) 		= sum(panel_r(i,11:)   *Panel_Death(i,11:))/sum(Panel_Death(i,11:))
 		Av_Return_at_3065(i) 	= sum(panel_r_at(i,11:)*Panel_Death(i,11:))/sum(Panel_Death(i,11:))
 		Av_Return_W_3065(i) 	= sum(panel_r(i,11:)   *Panel_a(i,11:)*Panel_Death(i,11:))/sum(Panel_a(i,11:)*Panel_Death(i,11:))
