@@ -2672,27 +2672,31 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		prc_Av_Return_at_2565(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_2565)
 		prc_Av_Return_W_2565(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W_2565)
 		prc_Av_Return_at_W_2565(i_pct) = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W_2565)
+		print*,'test 4'
 
 		prc_Av_Return_2029(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,Av_Return_2029)
 		prc_Av_Return_at_2029(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_2029)
 		prc_Av_Return_W_2029(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W_2029)
 		prc_Av_Return_at_W_2029(i_pct) = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W_2029)
+		print*,'test 5'
 
 		prc_Av_Return_3065(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,Av_Return_3065)
 		prc_Av_Return_at_3065(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_3065)
 		prc_Av_Return_W_3065(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W_3065)
 		prc_Av_Return_at_W_3065(i_pct) = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W_3065)
+		print*,'test 6'
 
-		prc_R_Av_Return(i_pct)      	= Percentile(prctile_ret(i_pct),sample_size,R_Av_Return)
-		prc_R_Av_Return_at(i_pct)   	= Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at)
-		prc_R_Av_Return_2024(i_pct)     = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_2024)
-		prc_R_Av_Return_at_2024(i_pct)  = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at_2024)
-		prc_R_Av_Return_2565(i_pct)     = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_2565)
-		prc_R_Av_Return_at_2565(i_pct)  = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at_2565)
-		prc_R_Av_Return_2029(i_pct)     = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_2029)
-		prc_R_Av_Return_at_2029(i_pct)  = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at_2029)
-		prc_R_Av_Return_3065(i_pct)     = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_3065)
-		prc_R_Av_Return_at_3065(i_pct)  = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at_3065)
+		prc_R_Av_Return(i_pct)         = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return)
+		prc_R_Av_Return_at(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at)
+		prc_R_Av_Return_2024(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_2024)
+		prc_R_Av_Return_at_2024(i_pct) = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at_2024)
+		prc_R_Av_Return_2565(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_2565)
+		prc_R_Av_Return_at_2565(i_pct) = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at_2565)
+		prc_R_Av_Return_2029(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_2029)
+		prc_R_Av_Return_at_2029(i_pct) = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at_2029)
+		prc_R_Av_Return_3065(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_3065)
+		prc_R_Av_Return_at_3065(i_pct) = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at_3065)
+		print*,'test 7'
 	enddo 
 		prc_Av_Return(11)       	= sum(Av_Return)/sample_size
 		prc_Av_Return_at(11)   		= sum(Av_Return_at)/sample_size
