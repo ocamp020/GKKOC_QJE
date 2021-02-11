@@ -2665,89 +2665,107 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 
 	do i_pct=1,10
 		print*, 'Return prc=', prctile_ret(i_pct)
-		prc_Av_Return(i_pct)      	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return)
-		prc_Av_Return_at(i_pct)   	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at)
-		prc_Av_Return_W(i_pct)    	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W)
-		prc_Av_Return_at_W(i_pct) 	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W)
+		prc_Av_Return(i_pct)      	   = & 
+				& Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(Av_Return     		 ,(Select.ge.2)))
+		prc_Av_Return_at(i_pct)   	   = & 
+				& Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(Av_Return_at  		 ,(Select.ge.2)))
+		prc_Av_Return_W(i_pct)    	   = & 
+				& Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(Av_Return_W   		 ,(Select.ge.2)))
+		prc_Av_Return_at_W(i_pct) 	   = & 
+				& Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(Av_Return_at_W 	 ,(Select.ge.2)))
 
-		prc_Av_Return_2024(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,Av_Return_2024)
-		prc_Av_Return_at_2024(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_2024)
-		prc_Av_Return_W_2024(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W_2024)
-		prc_Av_Return_at_W_2024(i_pct) = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W_2024)
+		prc_Av_Return_2024(i_pct)      = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(Av_Return_2024      ,(Select_2024.ge.2)))
+		prc_Av_Return_at_2024(i_pct)   = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(Av_Return_at_2024   ,(Select_2024.ge.2)))
+		prc_Av_Return_W_2024(i_pct)    = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(Av_Return_W_2024    ,(Select_2024.ge.2)))
+		prc_Av_Return_at_W_2024(i_pct) = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(Av_Return_at_W_2024 ,(Select_2024.ge.2)))
 
-		prc_Av_Return_2565(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,Av_Return_2565)
-		prc_Av_Return_at_2565(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_2565)
-		prc_Av_Return_W_2565(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W_2565)
-		prc_Av_Return_at_W_2565(i_pct) = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W_2565)
+		prc_Av_Return_2565(i_pct)      = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(Av_Return_2565		 ,(Select_2565.ge.2)))
+		prc_Av_Return_at_2565(i_pct)   = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(Av_Return_at_2565	 ,(Select_2565.ge.2)))
+		prc_Av_Return_W_2565(i_pct)    = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(Av_Return_W_2565	 ,(Select_2565.ge.2)))
+		prc_Av_Return_at_W_2565(i_pct) = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(Av_Return_at_W_2565 ,(Select_2565.ge.2)))
 
-		prc_Av_Return_2029(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,Av_Return_2029)
-		prc_Av_Return_at_2029(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_2029)
-		prc_Av_Return_W_2029(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W_2029)
-		prc_Av_Return_at_W_2029(i_pct) = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W_2029)
+		prc_Av_Return_2029(i_pct)      = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(Av_Return_2029 	 ,(Select_2029.ge.2)))
+		prc_Av_Return_at_2029(i_pct)   = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(Av_Return_at_2029	 ,(Select_2029.ge.2)))
+		prc_Av_Return_W_2029(i_pct)    = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(Av_Return_W_2029	 ,(Select_2029.ge.2)))
+		prc_Av_Return_at_W_2029(i_pct) = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(Av_Return_at_W_2029 ,(Select_2029.ge.2)))
 
-		prc_Av_Return_3065(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,Av_Return_3065)
-		prc_Av_Return_at_3065(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_3065)
-		prc_Av_Return_W_3065(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W_3065)
-		prc_Av_Return_at_W_3065(i_pct) = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W_3065)
-		print*,'test 6'
+		prc_Av_Return_3065(i_pct)      = & 
+				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(Av_Return_3065 	 ,(Select_3065.ge.2)))
+		prc_Av_Return_at_3065(i_pct)   = & 
+				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(Av_Return_at_3065 	 ,(Select_3065.ge.2)))
+		prc_Av_Return_W_3065(i_pct)    = & 
+				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(Av_Return_W_3065 	 ,(Select_3065.ge.2)))
+		prc_Av_Return_at_W_3065(i_pct) = & 
+				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(Av_Return_at_W_3065 ,(Select_3065.ge.2)))
 
 		prc_R_Av_Return(i_pct)         = & 
-				& Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(R_Av_Return        ,(Select.ge.2)     ))
+				& Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(R_Av_Return         ,(Select.ge.2)     ))
 		prc_R_Av_Return_at(i_pct)      = & 
-				& Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(R_Av_Return_at     ,(Select.ge.2)     ))
+				& Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(R_Av_Return_at      ,(Select.ge.2)     ))
 		prc_R_Av_Return_2024(i_pct)    = & 
-				& Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(R_Av_Return_2024   ,(Select_2024.ge.2)))
+				& Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(R_Av_Return_2024    ,(Select_2024.ge.2)))
 		prc_R_Av_Return_at_2024(i_pct) = & 
-				& Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(R_Av_Return_at_2024,(Select_2024.ge.2)))
+				& Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(R_Av_Return_at_2024 ,(Select_2024.ge.2)))
 		prc_R_Av_Return_2565(i_pct)    = & 
-				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(R_Av_Return_2565   ,(Select_2565.ge.2)))
+				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(R_Av_Return_2565    ,(Select_2565.ge.2)))
 		prc_R_Av_Return_at_2565(i_pct) = & 
-				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(R_Av_Return_at_2565,(Select_2565.ge.2)))
+				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(R_Av_Return_at_2565 ,(Select_2565.ge.2)))
 		prc_R_Av_Return_2029(i_pct)    = & 
-				& Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(R_Av_Return_2029   ,(Select_2029.ge.2)))
+				& Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(R_Av_Return_2029    ,(Select_2029.ge.2)))
 		prc_R_Av_Return_at_2029(i_pct) = & 
-				& Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(R_Av_Return_at_2029,(Select_2029.ge.2)))
+				& Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(R_Av_Return_at_2029 ,(Select_2029.ge.2)))
 		prc_R_Av_Return_3065(i_pct)    = & 
-				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(R_Av_Return_3065   ,(Select_3065.ge.2)))
+				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(R_Av_Return_3065    ,(Select_3065.ge.2)))
 		prc_R_Av_Return_at_3065(i_pct) = & 
-				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(R_Av_Return_at_3065,(Select_3065.ge.2)))
-		print*,'test 7'
+				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(R_Av_Return_at_3065 ,(Select_3065.ge.2)))
 	enddo 
-		prc_Av_Return(11)       	= sum(Av_Return)/sample_size
-		prc_Av_Return_at(11)   		= sum(Av_Return_at)/sample_size
-		prc_Av_Return_W(11)    		= sum(Av_Return_W)/sample_size
-		prc_Av_Return_at_W(11) 		= sum(Av_Return_at_W)/sample_size
+		prc_Av_Return(11)       	= sum(pack(Av_Return,(Select.ge.2)))/count(Select.ge.2)
+		prc_Av_Return_at(11)   		= sum(pack(Av_Return_at,(Select.ge.2)))/count(Select.ge.2)
+		prc_Av_Return_W(11)    		= sum(pack(Av_Return_W,(Select.ge.2)))/count(Select.ge.2)
+		prc_Av_Return_at_W(11) 		= sum(pack(Av_Return_at_W,(Select.ge.2)))/count(Select.ge.2)
 
-		prc_Av_Return_2024(11)      = sum(Av_Return_2024)/sample_size
-		prc_Av_Return_at_2024(11)   = sum(Av_Return_at_2024)/sample_size
-		prc_Av_Return_W_2024(11)    = sum(Av_Return_W_2024)/sample_size
-		prc_Av_Return_at_W_2024(11) = sum(Av_Return_at_W_2024)/sample_size
+		prc_Av_Return_2024(11)      = sum(pack(Av_Return_2024,(Select_2024.ge.2)))/count(Select_2024.ge.2)
+		prc_Av_Return_at_2024(11)   = sum(pack(Av_Return_at_2024,(Select_2024.ge.2)))/count(Select_2024.ge.2)
+		prc_Av_Return_W_2024(11)    = sum(pack(Av_Return_W_2024,(Select_2024.ge.2)))/count(Select_2024.ge.2)
+		prc_Av_Return_at_W_2024(11) = sum(pack(Av_Return_at_W_2024,(Select_2024.ge.2)))/count(Select_2024.ge.2)
 
-		prc_Av_Return_2565(11)      = sum(Av_Return_2565)/sample_size
-		prc_Av_Return_at_2565(11)   = sum(Av_Return_at_2565)/sample_size
-		prc_Av_Return_W_2565(11)    = sum(Av_Return_W_2565)/sample_size
-		prc_Av_Return_at_W_2565(11) = sum(Av_Return_at_W_2565)/sample_size
+		prc_Av_Return_2565(11)      = sum(pack(Av_Return_2565,(Select_2565.ge.2)))/count(Select_2565.ge.2)
+		prc_Av_Return_at_2565(11)   = sum(pack(Av_Return_at_2565,(Select_2565.ge.2)))/count(Select_2565.ge.2)
+		prc_Av_Return_W_2565(11)    = sum(pack(Av_Return_W_2565,(Select_2565.ge.2)))/count(Select_2565.ge.2)
+		prc_Av_Return_at_W_2565(11) = sum(pack(Av_Return_at_W_2565,(Select_2565.ge.2)))/count(Select_2565.ge.2)
 
-		prc_Av_Return_2029(11)      = sum(Av_Return_2029)/sample_size
-		prc_Av_Return_at_2029(11)   = sum(Av_Return_at_2029)/sample_size
-		prc_Av_Return_W_2029(11)    = sum(Av_Return_W_2029)/sample_size
-		prc_Av_Return_at_W_2029(11) = sum(Av_Return_at_W_2029)/sample_size
+		prc_Av_Return_2029(11)      = sum(pack(Av_Return_2029,(Select_2029.ge.2)))/count(Select_2029.ge.2)
+		prc_Av_Return_at_2029(11)   = sum(pack(Av_Return_at_2029,(Select_2029.ge.2)))/count(Select_2029.ge.2)
+		prc_Av_Return_W_2029(11)    = sum(pack(Av_Return_W_2029,(Select_2029.ge.2)))/count(Select_2029.ge.2)
+		prc_Av_Return_at_W_2029(11) = sum(pack(Av_Return_at_W_2029,(Select_2029.ge.2)))/count(Select_2029.ge.2)
 
-		prc_Av_Return_3065(11)      = sum(Av_Return_3065)/sample_size
-		prc_Av_Return_at_3065(11)   = sum(Av_Return_at_3065)/sample_size
-		prc_Av_Return_W_3065(11)    = sum(Av_Return_W_3065)/sample_size
-		prc_Av_Return_at_W_3065(11) = sum(Av_Return_at_W_3065)/sample_size
+		prc_Av_Return_3065(11)      = sum(pack(Av_Return_3065,(Select_3065.ge.2)))/count(Select_3065.ge.2)
+		prc_Av_Return_at_3065(11)   = sum(pack(Av_Return_at_3065,(Select_3065.ge.2)))/count(Select_3065.ge.2)
+		prc_Av_Return_W_3065(11)    = sum(pack(Av_Return_W_3065,(Select_3065.ge.2)))/count(Select_3065.ge.2)
+		prc_Av_Return_at_W_3065(11) = sum(pack(Av_Return_at_W_3065,(Select_3065.ge.2)))/count(Select_3065.ge.2)
 
-		prc_R_Av_Return(11)      	= sum(R_Av_Return)/sample_size
-		prc_R_Av_Return_at(11)   	= sum(R_Av_Return_at)/sample_size
-		prc_R_Av_Return_2024(11)    = sum(R_Av_Return_2024)/sample_size
-		prc_R_Av_Return_at_2024(11) = sum(R_Av_Return_at_2024)/sample_size
-		prc_R_Av_Return_2565(11)    = sum(R_Av_Return_2565)/sample_size
-		prc_R_Av_Return_at_2565(11) = sum(R_Av_Return_at_2565)/sample_size
-		prc_R_Av_Return_2029(11)    = sum(R_Av_Return_2029)/sample_size
-		prc_R_Av_Return_at_2029(11) = sum(R_Av_Return_at_2029)/sample_size
-		prc_R_Av_Return_3065(11)    = sum(R_Av_Return_3065)/sample_size
-		prc_R_Av_Return_at_3065(11) = sum(R_Av_Return_at_3065)/sample_size
+		prc_R_Av_Return(11)      	= sum(pack(R_Av_Return,(Select.ge.2)))/count(Select.ge.2)
+		prc_R_Av_Return_at(11)   	= sum(pack(R_Av_Return_at,(Select.ge.2)))/count(Select.ge.2)
+		prc_R_Av_Return_2024(11)    = sum(pack(R_Av_Return_2024,(Select_2024.ge.2)))/count(Select_2024.ge.2)
+		prc_R_Av_Return_at_2024(11) = sum(pack(R_Av_Return_at_2024,(Select_2024.ge.2)))/count(Select_2024.ge.2)
+		prc_R_Av_Return_2565(11)    = sum(pack(R_Av_Return_2565,(Select_2565.ge.2)))/count(Select_2565.ge.2)
+		prc_R_Av_Return_at_2565(11) = sum(pack(R_Av_Return_at_2565,(Select_2565.ge.2)))/count(Select_2565.ge.2)
+		prc_R_Av_Return_2029(11)    = sum(pack(R_Av_Return_2029,(Select_2029.ge.2)))/count(Select_2029.ge.2)
+		prc_R_Av_Return_at_2029(11) = sum(pack(R_Av_Return_at_2029,(Select_2029.ge.2)))/count(Select_2029.ge.2)
+		prc_R_Av_Return_3065(11)    = sum(pack(R_Av_Return_3065,(Select_3065.ge.2)))/count(Select_3065.ge.2)
+		prc_R_Av_Return_at_3065(11) = sum(pack(R_Av_Return_at_3065,(Select_3065.ge.2)))/count(Select_3065.ge.2)
 	print*, 'End of prc of return'
 
 	!=============================================================================
@@ -2818,7 +2836,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 
 	close (unit=10);
 
-	
+
 	! print*, ' '
 	! print*, 'Saving panel from simulation results'
 
