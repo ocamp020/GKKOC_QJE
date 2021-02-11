@@ -1802,7 +1802,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	! Result Storage
 	integer , parameter :: sample_size = 100000
 	integer  :: i, i_z, i_x, tklo, tkhi 
-	real(dp) :: initial_assets
+	real(dp) :: initial_assets, r_top
 	integer , dimension(sample_size,nz)        :: Panel_l
 	integer , dimension(sample_size,MaxAge,nz) :: Panel_e, Panel_x, Panel_Death, Panel_x_ben, Panel_d_ben
 	real(DP), dimension(sample_size,MaxAge,nz) :: Panel_a, Panel_c, Panel_k, Panel_h, Panel_r, Panel_r_at
@@ -2538,7 +2538,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	print*, ' '
 	print*, 'Selecting Sample (cutoffs by age and return outliers)'
 		! Replace Death=0 if wealth is too low (a<=500 USD)
-		where (Panel_a<=(500*((EBAR_bench*0.727853584919652_dp)/EBAR_data))
+		where ( Panel_a<=(500*((EBAR_bench*0.727853584919652_dp)/EBAR_data)) )
 			Panel_Death = 0
 		end where
 
