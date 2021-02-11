@@ -2691,16 +2691,26 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		prc_Av_Return_at_W_3065(i_pct) = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W_3065)
 		print*,'test 6'
 
-		prc_R_Av_Return(i_pct)         = Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(R_Av_Return        ,(Select.ge.2)     ))
-		prc_R_Av_Return_at(i_pct)      = Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(R_Av_Return_at     ,(Select.ge.2)     ))
-		prc_R_Av_Return_2024(i_pct)    = Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(R_Av_Return_2024   ,(Select_2024.ge.2)))
-		prc_R_Av_Return_at_2024(i_pct) = Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(R_Av_Return_at_2024,(Select_2024.ge.2)))
-		prc_R_Av_Return_2565(i_pct)    = Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(R_Av_Return_2565   ,(Select_2565.ge.2)))
-		prc_R_Av_Return_at_2565(i_pct) = Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(R_Av_Return_at_2565,(Select_2565.ge.2)))
-		prc_R_Av_Return_2029(i_pct)    = Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(R_Av_Return_2029   ,(Select_2029.ge.2)))
-		prc_R_Av_Return_at_2029(i_pct) = Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(R_Av_Return_at_2029,(Select_2029.ge.2)))
-		prc_R_Av_Return_3065(i_pct)    = Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(R_Av_Return_3065   ,(Select_3065.ge.2)))
-		prc_R_Av_Return_at_3065(i_pct) = Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(R_Av_Return_at_3065,(Select_3065.ge.2)))
+		prc_R_Av_Return(i_pct)         = & 
+				& Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(R_Av_Return        ,(Select.ge.2)     ))
+		prc_R_Av_Return_at(i_pct)      = & 
+				& Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(R_Av_Return_at     ,(Select.ge.2)     ))
+		prc_R_Av_Return_2024(i_pct)    = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(R_Av_Return_2024   ,(Select_2024.ge.2)))
+		prc_R_Av_Return_at_2024(i_pct) = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(R_Av_Return_at_2024,(Select_2024.ge.2)))
+		prc_R_Av_Return_2565(i_pct)    = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(R_Av_Return_2565   ,(Select_2565.ge.2)))
+		prc_R_Av_Return_at_2565(i_pct) = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(R_Av_Return_at_2565,(Select_2565.ge.2)))
+		prc_R_Av_Return_2029(i_pct)    = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(R_Av_Return_2029   ,(Select_2029.ge.2)))
+		prc_R_Av_Return_at_2029(i_pct) = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(R_Av_Return_at_2029,(Select_2029.ge.2)))
+		prc_R_Av_Return_3065(i_pct)    = & 
+				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(R_Av_Return_3065   ,(Select_3065.ge.2)))
+		prc_R_Av_Return_at_3065(i_pct) = & 
+				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(R_Av_Return_at_3065,(Select_3065.ge.2)))
 		print*,'test 7'
 	enddo 
 		prc_Av_Return(11)       	= sum(Av_Return)/sample_size
