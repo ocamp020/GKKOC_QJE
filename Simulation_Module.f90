@@ -2818,45 +2818,45 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 
 	close (unit=10);
 
+	
+	! print*, ' '
+	! print*, 'Saving panel from simulation results'
 
-	print*, ' '
-	print*, 'Saving panel from simulation results'
+	! if (bench_indx.eq.1) then
+	! 	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_a_ben.txt', STATUS='replace')
+	! 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_r_ben.txt', STATUS='replace')
+	! 	OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_r_at_ben.txt', STATUS='replace')
+	! 	OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_k_ben.txt', STATUS='replace')
+	! 	OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_c_ben.txt', STATUS='replace')
+	! 	OPEN(UNIT=15, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_h_ben.txt', STATUS='replace')
+	! 	OPEN(UNIT=16, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_Death_ben.txt', STATUS='replace')
 
-	if (bench_indx.eq.1) then
-		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_a_ben.txt', STATUS='replace')
-		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_r_ben.txt', STATUS='replace')
-		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_r_at_ben.txt', STATUS='replace')
-		OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_k_ben.txt', STATUS='replace')
-		OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_c_ben.txt', STATUS='replace')
-		OPEN(UNIT=15, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_h_ben.txt', STATUS='replace')
-		OPEN(UNIT=16, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_Death_ben.txt', STATUS='replace')
+	! 	WRITE  (UNIT=10, FMT='(F12.4)') Panel_a
+	! 	WRITE  (UNIT=11, FMT='(F12.4)') Panel_r
+	! 	WRITE  (UNIT=12, FMT='(F12.4)') Panel_r_at 
+	! 	WRITE  (UNIT=13, FMT='(F12.4)') Panel_k
+	! 	WRITE  (UNIT=14, FMT='(F12.4)') Panel_c 
+	! 	WRITE  (UNIT=15, FMT='(F12.4)') Panel_h
+	! 	WRITE  (UNIT=16, FMT=*) Panel_Death
+	! 	close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14); close (unit=15);
+	! 	close (unit=16);
 
-		WRITE  (UNIT=10, FMT='(F12.4)') Panel_a
-		WRITE  (UNIT=11, FMT='(F12.4)') Panel_r
-		WRITE  (UNIT=12, FMT='(F12.4)') Panel_r_at 
-		WRITE  (UNIT=13, FMT='(F12.4)') Panel_k
-		WRITE  (UNIT=14, FMT='(F12.4)') Panel_c 
-		WRITE  (UNIT=15, FMT='(F12.4)') Panel_h
-		WRITE  (UNIT=16, FMT=*) Panel_Death
-		close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14); close (unit=15);
-		close (unit=16);
+	! else 
+	! 	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_a_exp.txt', STATUS='replace')
+	! 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_r_exp.txt', STATUS='replace')
+	! 	OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_r_at_exp.txt', STATUS='replace')
+	! 	OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_k_exp.txt', STATUS='replace')
+	! 	OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_c_exp.txt', STATUS='replace')
+	! 	OPEN(UNIT=15, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_h_exp.txt', STATUS='replace')
 
-	else 
-		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_a_exp.txt', STATUS='replace')
-		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_r_exp.txt', STATUS='replace')
-		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_r_at_exp.txt', STATUS='replace')
-		OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_k_exp.txt', STATUS='replace')
-		OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_c_exp.txt', STATUS='replace')
-		OPEN(UNIT=15, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/Panel_h_exp.txt', STATUS='replace')
-
-		WRITE  (UNIT=10, FMT='(F12.4)') Panel_a
-		WRITE  (UNIT=11, FMT='(F12.4)') Panel_r
-		WRITE  (UNIT=12, FMT='(F12.4)') Panel_r_at 
-		WRITE  (UNIT=13, FMT='(F12.4)') Panel_k
-		WRITE  (UNIT=14, FMT='(F12.4)') Panel_c 
-		WRITE  (UNIT=15, FMT='(F12.4)') Panel_h
-		close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14); close (unit=15);		
-	endif 
+	! 	WRITE  (UNIT=10, FMT='(F12.4)') Panel_a
+	! 	WRITE  (UNIT=11, FMT='(F12.4)') Panel_r
+	! 	WRITE  (UNIT=12, FMT='(F12.4)') Panel_r_at 
+	! 	WRITE  (UNIT=13, FMT='(F12.4)') Panel_k
+	! 	WRITE  (UNIT=14, FMT='(F12.4)') Panel_c 
+	! 	WRITE  (UNIT=15, FMT='(F12.4)') Panel_h
+	! 	close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14); close (unit=15);		
+	! endif 
 
 
 END SUBROUTINE Simulation_Life_Cycle_Asset_Return_Panel
