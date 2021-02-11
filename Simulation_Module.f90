@@ -2835,6 +2835,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	WRITE(UNIT=10, FMT=*) "W_AT_Returns_3065", prc_Av_Return_at_W_3065
 
 	close (unit=10);
+	print*,'Writing of summary table completed '
 
 
 	! print*, ' '
