@@ -2542,12 +2542,14 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		where ( Panel_a<=(500*((EBAR_bench*0.727853584919652_dp)/EBAR_data)) )
 			Panel_Death = 0
 		end where
+		print*, 'Test 0'
 
 		! Replace Death = 0 if returns are too high (higher than top 0.5 pct)
 		DO age = 1,MaxAge 
+			print*, 'Test 1 age=',age
 			! Compute percentile on restricted sample 
 			r_top = Percentile( 0.995_dp , sum(Panel_Death(:,age)) , pack(Panel_r(:,age), (Panel_Death(:,age).gt.0)) )
-
+			print*, 'Test 2 age=',age
 			! Replace Death=0 if panel_r > r_top 
 			where (Panel_r(:,age)>r_top)
 				Panel_Death(:,age) = 0
