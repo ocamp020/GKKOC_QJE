@@ -145,11 +145,11 @@ PROGRAM main
 
 			! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 				bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
-				chi_u  = 01.50_dp ! Scaling 03.55_dp (value without estate tax)
+				chi_u  = 01.30_dp ! Scaling 03.55_dp (value without estate tax)
 				chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 			! Capital Market
-				theta = 0.89_dp 
+				theta = 0.91_dp 
 
 			! No bequest fees
 				bq_fee = 0.00_dp
