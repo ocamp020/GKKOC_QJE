@@ -2544,7 +2544,8 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 			Panel_Death = 0
 		end where
 		print*, 'Total number of observations:',RetAge*sample_size,&
-			& 'Number after wealth cut=',sum(Panel_Death),'Ratio=',sum(Panel_Death)/(RetAge*sample_size)
+				& 'Number after wealth cut=',sum(Panel_Death),& 
+				& 'Ratio=',real(sum(Panel_Death),8)/real(RetAge*sample_size,8)
 		print*,' '
 
 		! Replace Death = 0 if returns are too high (higher than top 0.5 pct)
@@ -2559,7 +2560,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 			end where
 
 			! Print Result 
-			print*,'Age=',age,'r_top=',r_top,'Percentage Left',sum(Panel_Death(:,age))/aux_size
+			print*,'Age=',age,'r_top=',r_top,'Percentage Left',real(sum(Panel_Death(:,age)),8)/real(aux_size,8)
 		ENDDO
 
 
