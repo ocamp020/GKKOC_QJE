@@ -2393,7 +2393,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	    Panel_l(i) = lambdai
 
    ! Capital
-   		Panel_k(i,1)    = min(Panel_a(i,1)+theta*(Panel_x(i,1),i_z)*Panel_a(i,1))**mu , &
+   		Panel_k(i,1)    = min(Panel_a(i,1)+theta*(xz_grid(Panel_x(i,1),i_z)*Panel_a(i,1))**mu , &
 	     					&(mu*P*xz_grid(Panel_x(i,1),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
 	! Return 
