@@ -1625,7 +1625,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
      		!$omp parallel do private(tklo,tkhi,h_i)
      		do ii=1,80   
      		panelk_top(age_top,ii)  = min( &
-     			& panela_top(age_top,ii)+theta*(xz_grid(panelx_top(age_top,ii)*panela_top(age_top,ii))**mu ,&
+     			& panela_top(age_top,ii)+theta*(xz_grid(panelx_top(age_top,ii),panelz_top(age_top,ii))*panela_top(age_top,ii))**mu ,&
      			& (mu*P*xz_grid(panelx_top(age_top,ii),panelz_top(age_top,ii))**mu & 
      				& /(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
@@ -1967,7 +1967,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	      	ENDIF
 
       	    ! Capital
-		   		Panel_k(i,age,i_z) = min(Panel_a(i,age,i_z)+theta(xz_grid(Panel_x(i,age,i_z),i_z)*Panel_a(i,age,i_z))**mu , &
+		   		Panel_k(i,age,i_z) = min(Panel_a(i,age,i_z)+theta*(xz_grid(Panel_x(i,age,i_z),i_z)*Panel_a(i,age,i_z))**mu , &
 			     					&(mu*P*xz_grid(Panel_x(i,age,i_z),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
 			! Return 
@@ -2080,7 +2080,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 		   	DO i=1,sample_size
 		     
       	    ! Capital
-	   		Panel_k_ben(i,age,i_z) = min(Panel_a_ben(i,age,i_z)+theta(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_a_ben(i,age,i_z))**mu , &
+	   		Panel_k_ben(i,age,i_z) = min(Panel_a_ben(i,age,i_z)+theta*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_a_ben(i,age,i_z))**mu , &
 		     					&(mu*P*xz_grid(Panel_x_ben(i,age,i_z),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
 			! Return 
@@ -2393,7 +2393,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	    Panel_l(i) = lambdai
 
    ! Capital
-   		Panel_k(i,1)    = min(Panel_a(i,1)+theta(Panel_x(i,1),i_z)*Panel_a(i,1))**mu , &
+   		Panel_k(i,1)    = min(Panel_a(i,1)+theta*(Panel_x(i,1),i_z)*Panel_a(i,1))**mu , &
 	     					&(mu*P*xz_grid(Panel_x(i,1),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
 	! Return 
@@ -2494,7 +2494,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	      	ENDIF
 
       	    ! Capital
-		   		Panel_k(i,age) = min(Panel_a(i,age)+theta(xz_grid(Panel_x(i,age),i_z)*Panel_a(i,age))**mu , &
+		   		Panel_k(i,age) = min(Panel_a(i,age)+theta*(xz_grid(Panel_x(i,age),i_z)*Panel_a(i,age))**mu , &
 			     					&(mu*P*xz_grid(Panel_x(i,age),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 
 			! Return 
