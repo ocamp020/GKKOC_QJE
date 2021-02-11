@@ -2238,7 +2238,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	! Result Storage
 	integer , parameter :: sample_size = 1000000
 	integer  :: i, i_z, i_x, tklo, tkhi, i_pct
-	integer , dimension(:), allocatable 	:: Panel_l, Panel_z
+	integer , dimension(:), allocatable 	:: Panel_l, Panel_z, Select, Select_2024, Select_2565, Select_2029, Select_3065
 	integer , dimension(:,:), allocatable 	:: Panel_e, Panel_x, Panel_Death, Panel_x_ben, Panel_d_ben
 	real(dp), dimension(:,:), allocatable 	:: Panel_a, Panel_c, Panel_k, Panel_h, Panel_r, Panel_r_at
 	real(dp), dimension(RetAge)             :: Mean_a, Mean_c, Mean_k, Mean_h, Mean_r, Mean_r_at, Mean_r_w, Mean_r_at_w
@@ -2274,6 +2274,11 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	print*,' 	Allocating variables'
 	allocate(Panel_l(				sample_size) ) ;
 	allocate(Panel_z(				sample_size) ) ;
+	allocate(Select(				sample_size) ) ;
+	allocate(Select_2024(			sample_size) ) ;
+	allocate(Select_2565(			sample_size) ) ;
+	allocate(Select_2029(			sample_size) ) ;
+	allocate(Select_3065(			sample_size) ) ;
 
 	allocate(Panel_e( 				sample_size,RetAge) ) ;
 	allocate(Panel_x( 				sample_size,RetAge) ) ;
@@ -2592,26 +2597,31 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 
 	!$omp parallel do 
 	DO i = 1, sample_size
+		Sample(i)               = sum(Panel_Death(i,:))
 		Av_Return(i) 			= sum(panel_r(i,:)   *Panel_Death(i,:))/sum(Panel_Death(i,:))
 		Av_Return_at(i) 		= sum(panel_r_at(i,:)*Panel_Death(i,:))/sum(Panel_Death(i,:))
 		Av_Return_W(i) 	  		= sum(panel_r(i,:)   *Panel_a(i,:)*Panel_Death(i,:))/sum(Panel_a(i,:)*Panel_Death(i,:))
 		Av_Return_at_W(i) 		= sum(panel_r_at(i,:)*Panel_a(i,:)*Panel_Death(i,:))/sum(Panel_a(i,:)*Panel_Death(i,:))
 
+		Sample_2024(i)          = sum(Panel_Death(i,1:5))
 		Av_Return_2024(i) 		= sum(panel_r(i,1:5)   *Panel_Death(i,1:5))/sum(Panel_Death(i,1:5))
 		Av_Return_at_2024(i) 	= sum(panel_r_at(i,1:5)*Panel_Death(i,1:5))/sum(Panel_Death(i,1:5))
 		Av_Return_W_2024(i) 	= sum(panel_r(i,1:5)   *Panel_a(i,1:5)*Panel_Death(i,1:5))/sum(Panel_a(i,1:5)*Panel_Death(i,1:5))
 		Av_Return_at_W_2024(i) 	= sum(panel_r_at(i,1:5)*Panel_a(i,1:5)*Panel_Death(i,1:5))/sum(Panel_a(i,1:5)*Panel_Death(i,1:5))
 
+		Sample_2565(i)          = sum(Panel_Death(i,6:))
 		Av_Return_2565(i) 		= sum(panel_r(i,6:)   *Panel_Death(i,6:))/sum(Panel_Death(i,6:))
 		Av_Return_at_2565(i) 	= sum(panel_r_at(i,6:)*Panel_Death(i,6:))/sum(Panel_Death(i,6:))
 		Av_Return_W_2565(i) 	= sum(panel_r(i,6:)   *Panel_a(i,6:)*Panel_Death(i,6:))/sum(Panel_a(i,6:)*Panel_Death(i,6:))
 		Av_Return_at_W_2565(i) 	= sum(panel_r_at(i,6:)*Panel_a(i,6:)*Panel_Death(i,6:))/sum(Panel_a(i,6:)*Panel_Death(i,6:))
 
+		Sample_2029(i)          = sum(Panel_Death(i,1:10))
 		Av_Return_2029(i) 		= sum(panel_r(i,1:10)   *Panel_Death(i,1:10))/sum(Panel_Death(i,1:10))
 		Av_Return_at_2029(i) 	= sum(panel_r_at(i,1:10)*Panel_Death(i,1:10))/sum(Panel_Death(i,1:10))
 		Av_Return_W_2029(i) 	= sum(panel_r(i,1:10)   *Panel_a(i,1:10)*Panel_Death(i,1:10))/sum(Panel_a(i,1:10)*Panel_Death(i,1:10))
 		Av_Return_at_W_2029(i) 	= sum(panel_r_at(i,1:10)*Panel_a(i,1:10)*Panel_Death(i,1:10))/sum(Panel_a(i,1:10)*Panel_Death(i,1:10))
 
+		Sample_3065(i)          = sum(Panel_Death(i,11:))
 		Av_Return_3065(i) 		= sum(panel_r(i,11:)   *Panel_Death(i,11:))/sum(Panel_Death(i,11:))
 		Av_Return_at_3065(i) 	= sum(panel_r_at(i,11:)*Panel_Death(i,11:))/sum(Panel_Death(i,11:))
 		Av_Return_W_3065(i) 	= sum(panel_r(i,11:)   *Panel_a(i,11:)*Panel_Death(i,11:))/sum(Panel_a(i,11:)*Panel_Death(i,11:))
@@ -2656,29 +2666,24 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	do i_pct=1,10
 		print*, 'Return prc=', prctile_ret(i_pct)
 		prc_Av_Return(i_pct)      	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return)
-		print*,'test 1 ',prc_Av_Return(i_pct)
 		prc_Av_Return_at(i_pct)   	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at)
 		prc_Av_Return_W(i_pct)    	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W)
 		prc_Av_Return_at_W(i_pct) 	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W)
-		print*,'test 2'
 
 		prc_Av_Return_2024(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,Av_Return_2024)
 		prc_Av_Return_at_2024(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_2024)
 		prc_Av_Return_W_2024(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W_2024)
 		prc_Av_Return_at_W_2024(i_pct) = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W_2024)
-		print*,'test 3'
 
 		prc_Av_Return_2565(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,Av_Return_2565)
 		prc_Av_Return_at_2565(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_2565)
 		prc_Av_Return_W_2565(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W_2565)
 		prc_Av_Return_at_W_2565(i_pct) = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W_2565)
-		print*,'test 4'
 
 		prc_Av_Return_2029(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,Av_Return_2029)
 		prc_Av_Return_at_2029(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_2029)
 		prc_Av_Return_W_2029(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W_2029)
 		prc_Av_Return_at_W_2029(i_pct) = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W_2029)
-		print*,'test 5'
 
 		prc_Av_Return_3065(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,Av_Return_3065)
 		prc_Av_Return_at_3065(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_3065)
@@ -2686,16 +2691,16 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		prc_Av_Return_at_W_3065(i_pct) = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W_3065)
 		print*,'test 6'
 
-		prc_R_Av_Return(i_pct)         = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return)
-		prc_R_Av_Return_at(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at)
-		prc_R_Av_Return_2024(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_2024)
-		prc_R_Av_Return_at_2024(i_pct) = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at_2024)
-		prc_R_Av_Return_2565(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_2565)
-		prc_R_Av_Return_at_2565(i_pct) = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at_2565)
-		prc_R_Av_Return_2029(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_2029)
-		prc_R_Av_Return_at_2029(i_pct) = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at_2029)
-		prc_R_Av_Return_3065(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_3065)
-		prc_R_Av_Return_at_3065(i_pct) = Percentile(prctile_ret(i_pct),sample_size,R_Av_Return_at_3065)
+		prc_R_Av_Return(i_pct)         = Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(R_Av_Return        ,(Select.ge.2)     ))
+		prc_R_Av_Return_at(i_pct)      = Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(R_Av_Return_at     ,(Select.ge.2)     ))
+		prc_R_Av_Return_2024(i_pct)    = Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(R_Av_Return_2024   ,(Select_2024.ge.2)))
+		prc_R_Av_Return_at_2024(i_pct) = Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(R_Av_Return_at_2024,(Select_2024.ge.2)))
+		prc_R_Av_Return_2565(i_pct)    = Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(R_Av_Return_2565   ,(Select_2565.ge.2)))
+		prc_R_Av_Return_at_2565(i_pct) = Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(R_Av_Return_at_2565,(Select_2565.ge.2)))
+		prc_R_Av_Return_2029(i_pct)    = Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(R_Av_Return_2029   ,(Select_2029.ge.2)))
+		prc_R_Av_Return_at_2029(i_pct) = Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(R_Av_Return_at_2029,(Select_2029.ge.2)))
+		prc_R_Av_Return_3065(i_pct)    = Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(R_Av_Return_3065   ,(Select_3065.ge.2)))
+		prc_R_Av_Return_at_3065(i_pct) = Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(R_Av_Return_at_3065,(Select_3065.ge.2)))
 		print*,'test 7'
 	enddo 
 		prc_Av_Return(11)       	= sum(Av_Return)/sample_size
