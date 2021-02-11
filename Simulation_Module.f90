@@ -1802,7 +1802,7 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	! Result Storage
 	integer , parameter :: sample_size = 100000
 	integer  :: i, i_z, i_x, tklo, tkhi 
-	real(dp) :: initial_assets, r_top
+	real(dp) :: initial_assets
 	integer , dimension(sample_size,nz)        :: Panel_l
 	integer , dimension(sample_size,MaxAge,nz) :: Panel_e, Panel_x, Panel_Death, Panel_x_ben, Panel_d_ben
 	real(DP), dimension(sample_size,MaxAge,nz) :: Panel_a, Panel_c, Panel_k, Panel_h, Panel_r, Panel_r_at
@@ -2265,6 +2265,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	real(dp), dimension(11) :: prc_R_Av_Return_2565, prc_R_Av_Return_at_2565
 	real(dp), dimension(11) :: prc_R_Av_Return_2029, prc_R_Av_Return_at_2029
 	real(dp), dimension(11) :: prc_R_Av_Return_3065, prc_R_Av_Return_at_3065
+	real(dp) 				:: r_top
 
 	print*,' '; print*,'----------------------------------------------------------------------------'
 	print*, ' Begin Simulation: Life Cycle Return Panel'
@@ -2545,7 +2546,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		! Replace Death = 0 if returns are too high (higher than top 0.5 pct)
 		DO age = 1,MaxAge 
 			! Compute percentile on restricted sample 
-			r_top = Percentile(0.995,sum(Panel_Death(:,age)),pack(Panel_r(:,age), (Panel_Death(:,age).gt.0))
+			r_top = Percentile( 0.995 , sum(Panel_Death(:,age)) , pack(Panel_r(:,age), (Panel_Death(:,age).gt.0)) )
 
 			! Replace Death=0 if panel_r > r_top 
 			where (Panel_r(:,age)>r_top)
