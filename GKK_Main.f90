@@ -149,7 +149,7 @@ PROGRAM main
 				chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 			! Capital Market
-				theta = 1.0_dp 
+				theta = 0.80_dp 
 
 			! No bequest fees
 				bq_fee = 0.00_dp
