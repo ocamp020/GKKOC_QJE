@@ -2650,20 +2650,23 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	!=============================================================================
 
 	print*, ' '
-	print*, 'Computing Averages'
+	print*, 'Computing percentiles'
 	prctile_ret = (/0.999_dp, 0.99_dp, 0.95_dp, 0.90_dp, 0.80_dp, 0.75_dp, 0.50_dp, 0.25_dp, 0.20_dp, 0.10_dp/)
 
 	do i_pct=1,10
-		print*, 'Ret prc=', prctile_ret(i_pct)
+		print*, 'Return prc=', prctile_ret(i_pct)
 		prc_Av_Return(i_pct)      	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return)
+		print*,'test 1 ',prc_Av_Return(i_pct)
 		prc_Av_Return_at(i_pct)   	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at)
 		prc_Av_Return_W(i_pct)    	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W)
 		prc_Av_Return_at_W(i_pct) 	   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W)
+		print*,'test 2'
 
 		prc_Av_Return_2024(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,Av_Return_2024)
 		prc_Av_Return_at_2024(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_2024)
 		prc_Av_Return_W_2024(i_pct)    = Percentile(prctile_ret(i_pct),sample_size,Av_Return_W_2024)
 		prc_Av_Return_at_W_2024(i_pct) = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_W_2024)
+		print*,'test 3'
 
 		prc_Av_Return_2565(i_pct)      = Percentile(prctile_ret(i_pct),sample_size,Av_Return_2565)
 		prc_Av_Return_at_2565(i_pct)   = Percentile(prctile_ret(i_pct),sample_size,Av_Return_at_2565)
