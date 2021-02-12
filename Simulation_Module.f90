@@ -2278,7 +2278,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	allocate(Select_2024(			sample_size) ) ;
 	allocate(Select_2575(			sample_size) ) ;
 	allocate(Select_2029(			sample_size) ) ;
-	allocate(Select_3065(			sample_size) ) ;
+	allocate(Select_3075(			sample_size) ) ;
 
 	allocate(Panel_e( 				sample_size,RetAge+10) ) ;
 	allocate(Panel_x( 				sample_size,RetAge+10) ) ;
