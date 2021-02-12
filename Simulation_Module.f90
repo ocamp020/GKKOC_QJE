@@ -2241,30 +2241,30 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	integer , dimension(:), allocatable 	:: Panel_l, Panel_z, Select, Select_2024, Select_2565, Select_2029, Select_3065
 	integer , dimension(:,:), allocatable 	:: Panel_e, Panel_x, Panel_Death, Panel_x_ben, Panel_d_ben
 	real(dp), dimension(:,:), allocatable 	:: Panel_a, Panel_c, Panel_k, Panel_h, Panel_r, Panel_r_at
-	real(dp), dimension(RetAge)             :: Mean_a, Mean_c, Mean_k, Mean_h, Mean_r, Mean_r_at, Mean_r_w, Mean_r_at_w
-	real(dp), dimension(RetAge)             :: Mean_k_ben, Mean_r_ben, Mean_r_at_ben, Mean_r_w_ben, Mean_r_at_w_ben
-	integer , dimension(RetAge)             :: Mean_Death
+	real(dp), dimension(RetAge+10)          :: Mean_a, Mean_c, Mean_k, Mean_h, Mean_r, Mean_r_at, Mean_r_w, Mean_r_at_w
+	real(dp), dimension(RetAge+10)          :: Mean_k_ben, Mean_r_ben, Mean_r_at_ben, Mean_r_w_ben, Mean_r_at_w_ben
+	integer , dimension(RetAge+10)          :: Mean_Death
 	real(dp)				                :: DBN_A_nb(na), DBN_Z(nz), CDF_A_nb(na), CDF_Z(nz)
 	real(dp), dimension(:), allocatable 	:: Av_Return,	Av_Return_at, Av_Return_W, Av_Return_at_W , R_Av_Return, R_Av_Return_at
 	real(dp), dimension(:), allocatable 	:: Av_Return_2024,	Av_Return_at_2024, Av_Return_W_2024, Av_Return_at_W_2024
 	real(dp), dimension(:), allocatable 	:: R_Av_Return_2024,	R_Av_Return_at_2024 
-	real(dp), dimension(:), allocatable 	:: Av_Return_2565,	Av_Return_at_2565, Av_Return_W_2565, Av_Return_at_W_2565
-	real(dp), dimension(:), allocatable 	:: R_Av_Return_2565,	R_Av_Return_at_2565 
+	real(dp), dimension(:), allocatable 	:: Av_Return_2575,	Av_Return_at_2575, Av_Return_W_2575, Av_Return_at_W_2575
+	real(dp), dimension(:), allocatable 	:: R_Av_Return_2575,	R_Av_Return_at_2575 
 	real(dp), dimension(:), allocatable 	:: Av_Return_2029,	Av_Return_at_2029, Av_Return_W_2029, Av_Return_at_W_2029
 	real(dp), dimension(:), allocatable 	:: R_Av_Return_2029,	R_Av_Return_at_2029 
-	real(dp), dimension(:), allocatable 	:: Av_Return_3065,	Av_Return_at_3065, Av_Return_W_3065, Av_Return_at_W_3065
-	real(dp), dimension(:), allocatable 	:: R_Av_Return_3065,	R_Av_Return_at_3065
+	real(dp), dimension(:), allocatable 	:: Av_Return_3075,	Av_Return_at_3075, Av_Return_W_3075, Av_Return_at_W_3075
+	real(dp), dimension(:), allocatable 	:: R_Av_Return_3075,	R_Av_Return_at_3075
 	real(dp), dimension(10) :: prctile_ret
 	real(dp), dimension(11) :: prc_Av_Return, prc_Av_Return_at, prc_Av_Return_W, prc_Av_Return_at_W
 	real(dp), dimension(11) :: prc_Av_Return_2024, prc_Av_Return_at_2024, prc_Av_Return_W_2024, prc_Av_Return_at_W_2024 
-	real(dp), dimension(11) :: prc_Av_Return_2565, prc_Av_Return_at_2565, prc_Av_Return_W_2565, prc_Av_Return_at_W_2565
+	real(dp), dimension(11) :: prc_Av_Return_2575, prc_Av_Return_at_2575, prc_Av_Return_W_2575, prc_Av_Return_at_W_2575
 	real(dp), dimension(11) :: prc_Av_Return_2029, prc_Av_Return_at_2029, prc_Av_Return_W_2029, prc_Av_Return_at_W_2029
-	real(dp), dimension(11) :: prc_Av_Return_3065, prc_Av_Return_at_3065, prc_Av_Return_W_3065, prc_Av_Return_at_W_3065
+	real(dp), dimension(11) :: prc_Av_Return_3075, prc_Av_Return_at_3075, prc_Av_Return_W_3075, prc_Av_Return_at_W_3075
 	real(dp), dimension(11) :: prc_R_Av_Return, prc_R_Av_Return_at
 	real(dp), dimension(11) :: prc_R_Av_Return_2024, prc_R_Av_Return_at_2024
-	real(dp), dimension(11) :: prc_R_Av_Return_2565, prc_R_Av_Return_at_2565
+	real(dp), dimension(11) :: prc_R_Av_Return_2575, prc_R_Av_Return_at_2575
 	real(dp), dimension(11) :: prc_R_Av_Return_2029, prc_R_Av_Return_at_2029
-	real(dp), dimension(11) :: prc_R_Av_Return_3065, prc_R_Av_Return_at_3065
+	real(dp), dimension(11) :: prc_R_Av_Return_3075, prc_R_Av_Return_at_3075
 	real(dp) 				:: r_top
 	integer                 :: aux_size
 
@@ -2276,21 +2276,21 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	allocate(Panel_z(				sample_size) ) ;
 	allocate(Select(				sample_size) ) ;
 	allocate(Select_2024(			sample_size) ) ;
-	allocate(Select_2565(			sample_size) ) ;
+	allocate(Select_2575(			sample_size) ) ;
 	allocate(Select_2029(			sample_size) ) ;
 	allocate(Select_3065(			sample_size) ) ;
 
-	allocate(Panel_e( 				sample_size,RetAge) ) ;
-	allocate(Panel_x( 				sample_size,RetAge) ) ;
-	allocate(Panel_Death( 			sample_size,RetAge) ) ;
-	allocate(Panel_x_ben( 			sample_size,RetAge) ) ;
-	allocate(Panel_d_ben( 			sample_size,RetAge) ) ;
-	allocate(Panel_a( 				sample_size,RetAge) ) ;
-	allocate(Panel_c( 				sample_size,RetAge) ) ;
-	allocate(Panel_k( 				sample_size,RetAge) ) ;
-	allocate(Panel_h( 				sample_size,RetAge) ) ;
-	allocate(Panel_r( 				sample_size,RetAge) ) ;
-	allocate(Panel_r_at( 			sample_size,RetAge) ) ;
+	allocate(Panel_e( 				sample_size,RetAge+10) ) ;
+	allocate(Panel_x( 				sample_size,RetAge+10) ) ;
+	allocate(Panel_Death( 			sample_size,RetAge+10) ) ;
+	allocate(Panel_x_ben( 			sample_size,RetAge+10) ) ;
+	allocate(Panel_d_ben( 			sample_size,RetAge+10) ) ;
+	allocate(Panel_a( 				sample_size,RetAge+10) ) ;
+	allocate(Panel_c( 				sample_size,RetAge+10) ) ;
+	allocate(Panel_k( 				sample_size,RetAge+10) ) ;
+	allocate(Panel_h( 				sample_size,RetAge+10) ) ;
+	allocate(Panel_r( 				sample_size,RetAge+10) ) ;
+	allocate(Panel_r_at( 			sample_size,RetAge+10) ) ;
 
 	allocate(Av_Return(				sample_size) ) ;
 	allocate(Av_Return_at(			sample_size) ) ;
@@ -2304,24 +2304,24 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	allocate(Av_Return_at_W_2024(	sample_size) ) ;
 	allocate(R_Av_Return_2024(		sample_size) ) ;
 	allocate(R_Av_Return_at_2024(	sample_size) ) ; 
-	allocate(Av_Return_2565(		sample_size) ) ;
-	allocate(Av_Return_at_2565(		sample_size) ) ;
-	allocate(Av_Return_W_2565(		sample_size) ) ;
-	allocate(Av_Return_at_W_2565(	sample_size) ) ;
-	allocate(R_Av_Return_2565(		sample_size) ) ;
-	allocate(R_Av_Return_at_2565(	sample_size) ) ;  
+	allocate(Av_Return_2575(		sample_size) ) ;
+	allocate(Av_Return_at_2575(		sample_size) ) ;
+	allocate(Av_Return_W_2575(		sample_size) ) ;
+	allocate(Av_Return_at_W_2575(	sample_size) ) ;
+	allocate(R_Av_Return_2575(		sample_size) ) ;
+	allocate(R_Av_Return_at_2575(	sample_size) ) ;  
 	allocate(Av_Return_2029(		sample_size) ) ;
 	allocate(Av_Return_at_2029(		sample_size) ) ;
 	allocate(Av_Return_W_2029(		sample_size) ) ;
 	allocate(Av_Return_at_W_2029(	sample_size) ) ;
 	allocate(R_Av_Return_2029(		sample_size) ) ;
 	allocate(R_Av_Return_at_2029(	sample_size) ) ;  
-	allocate(Av_Return_3065(		sample_size) ) ;
-	allocate(Av_Return_at_3065(		sample_size) ) ;
-	allocate(Av_Return_W_3065(		sample_size) ) ;
-	allocate(Av_Return_at_W_3065(	sample_size) ) ;
-	allocate(R_Av_Return_3065(		sample_size) ) ;
-	allocate(R_Av_Return_at_3065(	sample_size) ) ;
+	allocate(Av_Return_3075(		sample_size) ) ;
+	allocate(Av_Return_at_3075(		sample_size) ) ;
+	allocate(Av_Return_W_3075(		sample_size) ) ;
+	allocate(Av_Return_at_W_3075(	sample_size) ) ;
+	allocate(R_Av_Return_3075(		sample_size) ) ;
+	allocate(R_Av_Return_at_3075(	sample_size) ) ;
 
 
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/Asset_Return_Panel/' )
@@ -2436,7 +2436,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	!=============================================================================
 	
 	print*, 'Starting Simutime loop'
-	DO age=2,RetAge
+	DO age=2,RetAge+10
 		!$omp parallel do private(tempnoage,ei,xi,tklo,tkhi,tempno,i_z)
 	   	DO i=1,sample_size
 	        i_z = Panel_z(i)
@@ -2548,13 +2548,13 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		where ( Panel_a<=(500*((EBAR_bench*0.727853584919652_dp)/EBAR_data)) )
 			Panel_Death = 0
 		end where
-		print*, 'Total number of observations:',RetAge*sample_size,&
+		print*, 'Total number of observations:',(RetAge+10)*sample_size,&
 				& 'Number after wealth cut=',sum(Panel_Death),& 
-				& 'Ratio=',real(sum(Panel_Death),8)/real(RetAge*sample_size,8)
+				& 'Ratio=',real(sum(Panel_Death),8)/real((RetAge+10)*sample_size,8)
 		print*,' '
 
 		! Replace Death = 0 if returns are too high (higher than top 0.5 pct)
-		DO age = 1,RetAge
+		DO age = 1,RetAge+10
 			! Compute percentile on restricted sample 
 			r_top = Percentile( 0.995_dp , sum(Panel_Death(:,age)) , pack(Panel_r(:,age), (Panel_Death(:,age).gt.0)) )
 
@@ -2576,7 +2576,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	!=============================================================================
 	print*, ' '
 	print*, 'Computing Averages by Age and Demeaning for Age FE'
-	DO age = 1,MaxAge 
+	DO age = 1,RetAge+10
 		! Averages 
 		Mean_a(age) 	 = sum(Panel_a(:,age)*Panel_Death(:,age))/sum(Panel_Death(:,age)) 
 		Mean_c(age) 	 = sum(Panel_c(:,age)*Panel_Death(:,age))/sum(Panel_Death(:,age)) 
@@ -2609,11 +2609,11 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		Av_Return_W_2024(i) 	= sum(panel_r(i,1:5)   *Panel_a(i,1:5)*Panel_Death(i,1:5))/sum(Panel_a(i,1:5)*Panel_Death(i,1:5))
 		Av_Return_at_W_2024(i) 	= sum(panel_r_at(i,1:5)*Panel_a(i,1:5)*Panel_Death(i,1:5))/sum(Panel_a(i,1:5)*Panel_Death(i,1:5))
 
-		Select_2565(i)          = sum(Panel_Death(i,6:))
-		Av_Return_2565(i) 		= sum(panel_r(i,6:)   *Panel_Death(i,6:))/sum(Panel_Death(i,6:))
-		Av_Return_at_2565(i) 	= sum(panel_r_at(i,6:)*Panel_Death(i,6:))/sum(Panel_Death(i,6:))
-		Av_Return_W_2565(i) 	= sum(panel_r(i,6:)   *Panel_a(i,6:)*Panel_Death(i,6:))/sum(Panel_a(i,6:)*Panel_Death(i,6:))
-		Av_Return_at_W_2565(i) 	= sum(panel_r_at(i,6:)*Panel_a(i,6:)*Panel_Death(i,6:))/sum(Panel_a(i,6:)*Panel_Death(i,6:))
+		Select_2575(i)          = sum(Panel_Death(i,6:))
+		Av_Return_2575(i) 		= sum(panel_r(i,6:)   *Panel_Death(i,6:))/sum(Panel_Death(i,6:))
+		Av_Return_at_2575(i) 	= sum(panel_r_at(i,6:)*Panel_Death(i,6:))/sum(Panel_Death(i,6:))
+		Av_Return_W_2575(i) 	= sum(panel_r(i,6:)   *Panel_a(i,6:)*Panel_Death(i,6:))/sum(Panel_a(i,6:)*Panel_Death(i,6:))
+		Av_Return_at_W_2575(i) 	= sum(panel_r_at(i,6:)*Panel_a(i,6:)*Panel_Death(i,6:))/sum(Panel_a(i,6:)*Panel_Death(i,6:))
 
 		Select_2029(i)          = sum(Panel_Death(i,1:10))
 		Av_Return_2029(i) 		= sum(panel_r(i,1:10)   *Panel_Death(i,1:10))/sum(Panel_Death(i,1:10))
@@ -2621,11 +2621,11 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		Av_Return_W_2029(i) 	= sum(panel_r(i,1:10)   *Panel_a(i,1:10)*Panel_Death(i,1:10))/sum(Panel_a(i,1:10)*Panel_Death(i,1:10))
 		Av_Return_at_W_2029(i) 	= sum(panel_r_at(i,1:10)*Panel_a(i,1:10)*Panel_Death(i,1:10))/sum(Panel_a(i,1:10)*Panel_Death(i,1:10))
 
-		Select_3065(i)          = sum(Panel_Death(i,11:))
-		Av_Return_3065(i) 		= sum(panel_r(i,11:)   *Panel_Death(i,11:))/sum(Panel_Death(i,11:))
-		Av_Return_at_3065(i) 	= sum(panel_r_at(i,11:)*Panel_Death(i,11:))/sum(Panel_Death(i,11:))
-		Av_Return_W_3065(i) 	= sum(panel_r(i,11:)   *Panel_a(i,11:)*Panel_Death(i,11:))/sum(Panel_a(i,11:)*Panel_Death(i,11:))
-		Av_Return_at_W_3065(i) 	= sum(panel_r_at(i,11:)*Panel_a(i,11:)*Panel_Death(i,11:))/sum(Panel_a(i,11:)*Panel_Death(i,11:))
+		Select_3075(i)          = sum(Panel_Death(i,11:))
+		Av_Return_3075(i) 		= sum(panel_r(i,11:)   *Panel_Death(i,11:))/sum(Panel_Death(i,11:))
+		Av_Return_at_3075(i) 	= sum(panel_r_at(i,11:)*Panel_Death(i,11:))/sum(Panel_Death(i,11:))
+		Av_Return_W_3075(i) 	= sum(panel_r(i,11:)   *Panel_a(i,11:)*Panel_Death(i,11:))/sum(Panel_a(i,11:)*Panel_Death(i,11:))
+		Av_Return_at_W_3075(i) 	= sum(panel_r_at(i,11:)*Panel_a(i,11:)*Panel_Death(i,11:))/sum(Panel_a(i,11:)*Panel_Death(i,11:))
 
 		! Robust means - excluding highest return
 		R_Av_Return(i) 			= (sum(panel_r(i,:)   *Panel_Death(i,:))-maxval(panel_r(i,:)   *Panel_Death(i,:)))/&
@@ -2638,9 +2638,9 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		R_Av_Return_at_2024(i)  = (sum(panel_r_at(i,1:5)*Panel_Death(i,1:5))-maxval(panel_r(i,1:5)*Panel_Death(i,1:5)))/&
 									& (sum(Panel_Death(i,1:5))-1.0_dp)
 
-		R_Av_Return_2565(i) 	= (sum(panel_r(i,6:)   *Panel_Death(i,6:))-maxval(panel_r(i,6:)*Panel_Death(i,6:)))/&
+		R_Av_Return_2575(i) 	= (sum(panel_r(i,6:)   *Panel_Death(i,6:))-maxval(panel_r(i,6:)*Panel_Death(i,6:)))/&
 									& (sum(Panel_Death(i,6:))-1.0_dp)
-		R_Av_Return_at_2565(i) 	= (sum(panel_r_at(i,6:)*Panel_Death(i,6:))-maxval(panel_r(i,6:)*Panel_Death(i,6:)))/& 
+		R_Av_Return_at_2575(i) 	= (sum(panel_r_at(i,6:)*Panel_Death(i,6:))-maxval(panel_r(i,6:)*Panel_Death(i,6:)))/& 
 									& (sum(Panel_Death(i,6:))-1.0_dp)
 
 		R_Av_Return_2029(i) 	= (sum(panel_r(i,1:10)   *Panel_Death(i,1:10))-maxval(panel_r(i,1:10)*Panel_Death(i,1:10)))/&
@@ -2648,9 +2648,9 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		R_Av_Return_at_2029(i) 	= (sum(panel_r_at(i,1:10)*Panel_Death(i,1:10))-maxval(panel_r(i,1:10)*Panel_Death(i,1:10)))/&
 									& (sum(Panel_Death(i,1:10))-1.0_dp)
 
-		R_Av_Return_3065(i) 	= (sum(panel_r(i,11:)   *Panel_Death(i,11:))-maxval(panel_r(i,11:)*Panel_Death(i,11:)))/&
+		R_Av_Return_3075(i) 	= (sum(panel_r(i,11:)   *Panel_Death(i,11:))-maxval(panel_r(i,11:)*Panel_Death(i,11:)))/&
 									& (sum(Panel_Death(i,11:))-1.0_dp)
-		R_Av_Return_at_3065(i) 	= (sum(panel_r_at(i,11:)*Panel_Death(i,11:))-maxval(panel_r(i,11:)*Panel_Death(i,11:)))/&
+		R_Av_Return_at_3075(i) 	= (sum(panel_r_at(i,11:)*Panel_Death(i,11:))-maxval(panel_r(i,11:)*Panel_Death(i,11:)))/&
 									& (sum(Panel_Death(i,11:))-1.0_dp)
 	ENDDO
 
@@ -2683,14 +2683,14 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		prc_Av_Return_at_W_2024(i_pct) = & 
 				& Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(Av_Return_at_W_2024 ,(Select_2024.ge.2)))
 
-		prc_Av_Return_2565(i_pct)      = & 
-				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(Av_Return_2565		 ,(Select_2565.ge.2)))
-		prc_Av_Return_at_2565(i_pct)   = & 
-				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(Av_Return_at_2565	 ,(Select_2565.ge.2)))
-		prc_Av_Return_W_2565(i_pct)    = & 
-				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(Av_Return_W_2565	 ,(Select_2565.ge.2)))
-		prc_Av_Return_at_W_2565(i_pct) = & 
-				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(Av_Return_at_W_2565 ,(Select_2565.ge.2)))
+		prc_Av_Return_2575(i_pct)      = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2575.ge.2),pack(Av_Return_2575		 ,(Select_2575.ge.2)))
+		prc_Av_Return_at_2575(i_pct)   = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2575.ge.2),pack(Av_Return_at_2575	 ,(Select_2575.ge.2)))
+		prc_Av_Return_W_2575(i_pct)    = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2575.ge.2),pack(Av_Return_W_2575	 ,(Select_2575.ge.2)))
+		prc_Av_Return_at_W_2575(i_pct) = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2575.ge.2),pack(Av_Return_at_W_2575 ,(Select_2575.ge.2)))
 
 		prc_Av_Return_2029(i_pct)      = & 
 				& Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(Av_Return_2029 	 ,(Select_2029.ge.2)))
@@ -2701,14 +2701,14 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		prc_Av_Return_at_W_2029(i_pct) = & 
 				& Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(Av_Return_at_W_2029 ,(Select_2029.ge.2)))
 
-		prc_Av_Return_3065(i_pct)      = & 
-				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(Av_Return_3065 	 ,(Select_3065.ge.2)))
-		prc_Av_Return_at_3065(i_pct)   = & 
-				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(Av_Return_at_3065 	 ,(Select_3065.ge.2)))
-		prc_Av_Return_W_3065(i_pct)    = & 
-				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(Av_Return_W_3065 	 ,(Select_3065.ge.2)))
-		prc_Av_Return_at_W_3065(i_pct) = & 
-				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(Av_Return_at_W_3065 ,(Select_3065.ge.2)))
+		prc_Av_Return_3075(i_pct)      = & 
+				& Percentile(prctile_ret(i_pct),count(Select_3075.ge.2),pack(Av_Return_3075 	 ,(Select_3075.ge.2)))
+		prc_Av_Return_at_3075(i_pct)   = & 
+				& Percentile(prctile_ret(i_pct),count(Select_3075.ge.2),pack(Av_Return_at_3075 	 ,(Select_3075.ge.2)))
+		prc_Av_Return_W_3075(i_pct)    = & 
+				& Percentile(prctile_ret(i_pct),count(Select_3075.ge.2),pack(Av_Return_W_3075 	 ,(Select_3075.ge.2)))
+		prc_Av_Return_at_W_3075(i_pct) = & 
+				& Percentile(prctile_ret(i_pct),count(Select_3075.ge.2),pack(Av_Return_at_W_3075 ,(Select_3075.ge.2)))
 
 		prc_R_Av_Return(i_pct)         = & 
 				& Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(R_Av_Return         ,(Select.ge.2)     ))
@@ -2718,18 +2718,18 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 				& Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(R_Av_Return_2024    ,(Select_2024.ge.2)))
 		prc_R_Av_Return_at_2024(i_pct) = & 
 				& Percentile(prctile_ret(i_pct),count(Select_2024.ge.2),pack(R_Av_Return_at_2024 ,(Select_2024.ge.2)))
-		prc_R_Av_Return_2565(i_pct)    = & 
-				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(R_Av_Return_2565    ,(Select_2565.ge.2)))
-		prc_R_Av_Return_at_2565(i_pct) = & 
-				& Percentile(prctile_ret(i_pct),count(Select_2565.ge.2),pack(R_Av_Return_at_2565 ,(Select_2565.ge.2)))
+		prc_R_Av_Return_2575(i_pct)    = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2575.ge.2),pack(R_Av_Return_2575    ,(Select_2575.ge.2)))
+		prc_R_Av_Return_at_2575(i_pct) = & 
+				& Percentile(prctile_ret(i_pct),count(Select_2575.ge.2),pack(R_Av_Return_at_2575 ,(Select_2575.ge.2)))
 		prc_R_Av_Return_2029(i_pct)    = & 
 				& Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(R_Av_Return_2029    ,(Select_2029.ge.2)))
 		prc_R_Av_Return_at_2029(i_pct) = & 
 				& Percentile(prctile_ret(i_pct),count(Select_2029.ge.2),pack(R_Av_Return_at_2029 ,(Select_2029.ge.2)))
-		prc_R_Av_Return_3065(i_pct)    = & 
-				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(R_Av_Return_3065    ,(Select_3065.ge.2)))
-		prc_R_Av_Return_at_3065(i_pct) = & 
-				& Percentile(prctile_ret(i_pct),count(Select_3065.ge.2),pack(R_Av_Return_at_3065 ,(Select_3065.ge.2)))
+		prc_R_Av_Return_3075(i_pct)    = & 
+				& Percentile(prctile_ret(i_pct),count(Select_3075.ge.2),pack(R_Av_Return_3075    ,(Select_3075.ge.2)))
+		prc_R_Av_Return_at_3075(i_pct) = & 
+				& Percentile(prctile_ret(i_pct),count(Select_3075.ge.2),pack(R_Av_Return_at_3075 ,(Select_3075.ge.2)))
 	enddo 
 		prc_Av_Return(11)       	= sum(pack(Av_Return,(Select.ge.2)))/count(Select.ge.2)
 		prc_Av_Return_at(11)   		= sum(pack(Av_Return_at,(Select.ge.2)))/count(Select.ge.2)
@@ -2741,31 +2741,31 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		prc_Av_Return_W_2024(11)    = sum(pack(Av_Return_W_2024,(Select_2024.ge.2)))/count(Select_2024.ge.2)
 		prc_Av_Return_at_W_2024(11) = sum(pack(Av_Return_at_W_2024,(Select_2024.ge.2)))/count(Select_2024.ge.2)
 
-		prc_Av_Return_2565(11)      = sum(pack(Av_Return_2565,(Select_2565.ge.2)))/count(Select_2565.ge.2)
-		prc_Av_Return_at_2565(11)   = sum(pack(Av_Return_at_2565,(Select_2565.ge.2)))/count(Select_2565.ge.2)
-		prc_Av_Return_W_2565(11)    = sum(pack(Av_Return_W_2565,(Select_2565.ge.2)))/count(Select_2565.ge.2)
-		prc_Av_Return_at_W_2565(11) = sum(pack(Av_Return_at_W_2565,(Select_2565.ge.2)))/count(Select_2565.ge.2)
+		prc_Av_Return_2575(11)      = sum(pack(Av_Return_2575,(Select_2575.ge.2)))/count(Select_2575.ge.2)
+		prc_Av_Return_at_2575(11)   = sum(pack(Av_Return_at_2575,(Select_2575.ge.2)))/count(Select_2575.ge.2)
+		prc_Av_Return_W_2575(11)    = sum(pack(Av_Return_W_2575,(Select_2575.ge.2)))/count(Select_2575.ge.2)
+		prc_Av_Return_at_W_2575(11) = sum(pack(Av_Return_at_W_2575,(Select_2575.ge.2)))/count(Select_2575.ge.2)
 
 		prc_Av_Return_2029(11)      = sum(pack(Av_Return_2029,(Select_2029.ge.2)))/count(Select_2029.ge.2)
 		prc_Av_Return_at_2029(11)   = sum(pack(Av_Return_at_2029,(Select_2029.ge.2)))/count(Select_2029.ge.2)
 		prc_Av_Return_W_2029(11)    = sum(pack(Av_Return_W_2029,(Select_2029.ge.2)))/count(Select_2029.ge.2)
 		prc_Av_Return_at_W_2029(11) = sum(pack(Av_Return_at_W_2029,(Select_2029.ge.2)))/count(Select_2029.ge.2)
 
-		prc_Av_Return_3065(11)      = sum(pack(Av_Return_3065,(Select_3065.ge.2)))/count(Select_3065.ge.2)
-		prc_Av_Return_at_3065(11)   = sum(pack(Av_Return_at_3065,(Select_3065.ge.2)))/count(Select_3065.ge.2)
-		prc_Av_Return_W_3065(11)    = sum(pack(Av_Return_W_3065,(Select_3065.ge.2)))/count(Select_3065.ge.2)
-		prc_Av_Return_at_W_3065(11) = sum(pack(Av_Return_at_W_3065,(Select_3065.ge.2)))/count(Select_3065.ge.2)
+		prc_Av_Return_3075(11)      = sum(pack(Av_Return_3075,(Select_3075.ge.2)))/count(Select_3075.ge.2)
+		prc_Av_Return_at_3075(11)   = sum(pack(Av_Return_at_3075,(Select_3075.ge.2)))/count(Select_3075.ge.2)
+		prc_Av_Return_W_3075(11)    = sum(pack(Av_Return_W_3075,(Select_3075.ge.2)))/count(Select_3075.ge.2)
+		prc_Av_Return_at_W_3075(11) = sum(pack(Av_Return_at_W_3075,(Select_3075.ge.2)))/count(Select_3075.ge.2)
 
 		prc_R_Av_Return(11)      	= sum(pack(R_Av_Return,(Select.ge.2)))/count(Select.ge.2)
 		prc_R_Av_Return_at(11)   	= sum(pack(R_Av_Return_at,(Select.ge.2)))/count(Select.ge.2)
 		prc_R_Av_Return_2024(11)    = sum(pack(R_Av_Return_2024,(Select_2024.ge.2)))/count(Select_2024.ge.2)
 		prc_R_Av_Return_at_2024(11) = sum(pack(R_Av_Return_at_2024,(Select_2024.ge.2)))/count(Select_2024.ge.2)
-		prc_R_Av_Return_2565(11)    = sum(pack(R_Av_Return_2565,(Select_2565.ge.2)))/count(Select_2565.ge.2)
-		prc_R_Av_Return_at_2565(11) = sum(pack(R_Av_Return_at_2565,(Select_2565.ge.2)))/count(Select_2565.ge.2)
+		prc_R_Av_Return_2575(11)    = sum(pack(R_Av_Return_2575,(Select_2575.ge.2)))/count(Select_2575.ge.2)
+		prc_R_Av_Return_at_2575(11) = sum(pack(R_Av_Return_at_2575,(Select_2575.ge.2)))/count(Select_2575.ge.2)
 		prc_R_Av_Return_2029(11)    = sum(pack(R_Av_Return_2029,(Select_2029.ge.2)))/count(Select_2029.ge.2)
 		prc_R_Av_Return_at_2029(11) = sum(pack(R_Av_Return_at_2029,(Select_2029.ge.2)))/count(Select_2029.ge.2)
-		prc_R_Av_Return_3065(11)    = sum(pack(R_Av_Return_3065,(Select_3065.ge.2)))/count(Select_3065.ge.2)
-		prc_R_Av_Return_at_3065(11) = sum(pack(R_Av_Return_at_3065,(Select_3065.ge.2)))/count(Select_3065.ge.2)
+		prc_R_Av_Return_3075(11)    = sum(pack(R_Av_Return_3075,(Select_3075.ge.2)))/count(Select_3075.ge.2)
+		prc_R_Av_Return_at_3075(11) = sum(pack(R_Av_Return_at_3075,(Select_3075.ge.2)))/count(Select_3075.ge.2)
 	print*, 'End of prc of return'
 
 	!=============================================================================
@@ -2788,25 +2788,25 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
 	WRITE(UNIT=10, FMT=*) "Returns",      prc_Av_Return
 	WRITE(UNIT=10, FMT=*) "Returns_2024", prc_Av_Return_2024
-	WRITE(UNIT=10, FMT=*) "Returns_2565", prc_Av_Return_2565
+	WRITE(UNIT=10, FMT=*) "Returns_2575", prc_Av_Return_2575
 	WRITE(UNIT=10, FMT=*) "Returns_2029", prc_Av_Return_2029
-	WRITE(UNIT=10, FMT=*) "Returns_3065", prc_Av_Return_3065
+	WRITE(UNIT=10, FMT=*) "Returns_3075", prc_Av_Return_3075
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for Robust Returns (Removing Max Return)"
 	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
 	WRITE(UNIT=10, FMT=*) "R_Returns",      prc_R_Av_Return
 	WRITE(UNIT=10, FMT=*) "R_Returns_2024", prc_R_Av_Return_2024
-	WRITE(UNIT=10, FMT=*) "R_Returns_2565", prc_R_Av_Return_2565
+	WRITE(UNIT=10, FMT=*) "R_Returns_2575", prc_R_Av_Return_2575
 	WRITE(UNIT=10, FMT=*) "R_Returns_2029", prc_R_Av_Return_2029
-	WRITE(UNIT=10, FMT=*) "R_Returns_3065", prc_R_Av_Return_3065
+	WRITE(UNIT=10, FMT=*) "R_Returns_3075", prc_R_Av_Return_3075
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for Weighted Returns (Weighted by assets across age - unweighted across individuals)"
 	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
 	WRITE(UNIT=10, FMT=*) "W_Returns",      prc_Av_Return_W
 	WRITE(UNIT=10, FMT=*) "W_Returns_2024", prc_Av_Return_W_2024
-	WRITE(UNIT=10, FMT=*) "W_Returns_2565", prc_Av_Return_W_2565
+	WRITE(UNIT=10, FMT=*) "W_Returns_2575", prc_Av_Return_W_2575
 	WRITE(UNIT=10, FMT=*) "W_Returns_2029", prc_Av_Return_W_2029
-	WRITE(UNIT=10, FMT=*) "W_Returns_3065", prc_Av_Return_W_3065
+	WRITE(UNIT=10, FMT=*) "W_Returns_3075", prc_Av_Return_W_3075
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) " "
@@ -2814,25 +2814,25 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
 	WRITE(UNIT=10, FMT=*) "AT_Returns",      prc_Av_Return_at
 	WRITE(UNIT=10, FMT=*) "AT_Returns_2024", prc_Av_Return_at_2024
-	WRITE(UNIT=10, FMT=*) "AT_Returns_2565", prc_Av_Return_at_2565
+	WRITE(UNIT=10, FMT=*) "AT_Returns_2575", prc_Av_Return_at_2575
 	WRITE(UNIT=10, FMT=*) "AT_Returns_2029", prc_Av_Return_at_2029
-	WRITE(UNIT=10, FMT=*) "AT_Returns_3065", prc_Av_Return_at_3065
+	WRITE(UNIT=10, FMT=*) "AT_Returns_3075", prc_Av_Return_at_3075
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for Robust After Tax Returns (Removing Max Return)"
 	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
 	WRITE(UNIT=10, FMT=*) "R_AT_Returns",      prc_R_Av_Return_at
 	WRITE(UNIT=10, FMT=*) "R_AT_Returns_2024", prc_R_Av_Return_at_2024
-	WRITE(UNIT=10, FMT=*) "R_AT_Returns_2565", prc_R_Av_Return_at_2565
+	WRITE(UNIT=10, FMT=*) "R_AT_Returns_2575", prc_R_Av_Return_at_2575
 	WRITE(UNIT=10, FMT=*) "R_AT_Returns_2029", prc_R_Av_Return_at_2029
-	WRITE(UNIT=10, FMT=*) "R_AT_Returns_3065", prc_R_Av_Return_at_3065
+	WRITE(UNIT=10, FMT=*) "R_AT_Returns_3075", prc_R_Av_Return_at_3075
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for Weighted After Tax Returns (Weighted by assets across age - unweighted across individuals)"
 	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
 	WRITE(UNIT=10, FMT=*) "W_AT_Returns",      prc_Av_Return_at_W
 	WRITE(UNIT=10, FMT=*) "W_AT_Returns_2024", prc_Av_Return_at_W_2024
-	WRITE(UNIT=10, FMT=*) "W_AT_Returns_2565", prc_Av_Return_at_W_2565
+	WRITE(UNIT=10, FMT=*) "W_AT_Returns_2575", prc_Av_Return_at_W_2575
 	WRITE(UNIT=10, FMT=*) "W_AT_Returns_2029", prc_Av_Return_at_W_2029
-	WRITE(UNIT=10, FMT=*) "W_AT_Returns_3065", prc_Av_Return_at_W_3065
+	WRITE(UNIT=10, FMT=*) "W_AT_Returns_3075", prc_Av_Return_at_W_3075
 
 	close (unit=10);
 	print*,'Writing of summary table completed '
