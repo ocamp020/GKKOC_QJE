@@ -2435,7 +2435,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	!
 	!=============================================================================
 	
-	print*, 'Starting Simutime loop'
+	print*, 'Starting Simutime loop for Lifetime Returns'
 	DO age=2,RetAge+10
 		!$omp parallel do private(tempnoage,ei,xi,tklo,tkhi,tempno,i_z)
 	   	DO i=1,sample_size
@@ -2530,7 +2530,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		ENDDO ! paneli
 		
 
-	 		print*, "Panel Simultaion: Age", age, "Complete"
+	 		! print*, "Panel Simultaion: Age", age, "Complete"
 
 	 		
 	ENDDO ! age
@@ -2565,7 +2565,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 			end where
 
 			! Print Result 
-			print*,'Age=',age,'r_top=',r_top,'Percentage Left',real(sum(Panel_Death(:,age)),8)/real(aux_size,8)
+			! print*,'Age=',age,'r_top=',r_top,'Percentage Left',real(sum(Panel_Death(:,age)),8)/real(aux_size,8)
 		ENDDO
 
 
@@ -2664,7 +2664,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	prctile_ret = (/0.999_dp, 0.99_dp, 0.95_dp, 0.90_dp, 0.80_dp, 0.75_dp, 0.50_dp, 0.25_dp, 0.20_dp, 0.10_dp/)
 
 	do i_pct=1,10
-		print*, 'Return prc=', prctile_ret(i_pct)
+		! print*, 'Return prc=', prctile_ret(i_pct)
 		prc_Av_Return(i_pct)      	   = & 
 				& Percentile(prctile_ret(i_pct),count(Select.ge.2)     ,pack(Av_Return     		 ,(Select.ge.2)))
 		prc_Av_Return_at(i_pct)   	   = & 
