@@ -2593,6 +2593,9 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		! Demeaning 
 		Panel_r(:,age)     = Panel_r(:,age)    - Mean_r(age) 
 		Panel_r_at(:,age)  = Panel_r_at(:,age) - Mean_r_at(age)
+
+		! Print results 
+		print*,'Age=',age,'Mean Return=',Mean_r(age) 
 	ENDDO
 
 	!$omp parallel do 
