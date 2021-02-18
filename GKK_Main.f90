@@ -138,7 +138,7 @@ PROGRAM main
 			! Main Parameters 
 				beta   	= 0.9530_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
 				sigma_z_eps      = 0.063_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
-				sigma_lambda_eps = 0.245_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
+				sigma_lambda_eps = 0.240_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
 				gamma  	= 0.4790_dp !  0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
 				sigma  	= 4.0_dp
 				x_hi	= 1.50_dp
@@ -150,7 +150,7 @@ PROGRAM main
 
 			! Capital Market
 				do zi=1,nz
-				theta(zi)    = 1.00_dp+(3.44_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+				theta(zi)    = 1.00_dp+(3.45_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 				enddo
 
 			! No bequest fees
