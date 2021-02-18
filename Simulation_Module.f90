@@ -2841,8 +2841,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	print*,'-----------------------------------------------------'
 	print*,' Weighted returns relative to median'
 	print*, "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
-	print 12345,'Age 25-75',100.0_dp*(prc_Av_Return_W_2575-prc_Av_Return_W_2575(7))
-	12345 format (A,X,X,F5.2,F5.2,F5.2,F5.2,F5.2,F5.2,F5.2)
+	print*,'Age 25-75',100.0_dp*(prc_Av_Return_W_2575-prc_Av_Return_W_2575(7))
 	print*,'-----------------------------------------------------'
 
 
