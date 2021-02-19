@@ -2586,7 +2586,8 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	WRITE  (UNIT=10, FMT=*) 'ID,Age,In_Sample,Return,Z,Assets'
 	DO i = 1, sample_size
 	DO age = 1,
-	WRITE  (UNIT=10, FMT='(I6,A,I2,A,I1,A,F12.4,A,I1,A,F12.4)') i,',',age+19,',',Panel_Death(i,age),',',panel_r(i,age),',',panel_z(i,age),',',panel_a(i,age)
+	WRITE  (UNIT=10, FMT='(I7,A,I2,A,I1,A,F12.4,A,I1,A,F12.4)') &
+		& i,',',age+19,',',Panel_Death(i,age),',',panel_r(i,age),',',panel_z(i,age),',',panel_a(i,age)
 	ENDDO
 	ENDDO
 	CLOSE(UNIT=10)
