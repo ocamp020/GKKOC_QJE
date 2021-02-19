@@ -2845,13 +2845,13 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	print*,'-----------------------------------------------------'
 	print*,' Shares of productivity types'
 	print*, "Stat ","Z-1 ","Z-2 ","Z-3 ","Z-4 ","Z-5 ","Z-6 ","Z-7 ","Z-8 ","Z-9 "
-	print 12345,'Sample',100.0_dp*count(panel_z.eq.1)/sample_size,100.0_dp*count(panel_z.eq.2)/sample_size,&
+	print 12344,'Sample',100.0_dp*count(panel_z.eq.1)/sample_size,100.0_dp*count(panel_z.eq.2)/sample_size,&
 					&    100.0_dp*count(panel_z.eq.3)/sample_size,100.0_dp*count(panel_z.eq.3)/sample_size,& 
 					&    100.0_dp*count(panel_z.eq.5)/sample_size,100.0_dp*count(panel_z.eq.6)/sample_size,& 
 					&    100.0_dp*count(panel_z.eq.7)/sample_size,100.0_dp*count(panel_z.eq.8)/sample_size,& 
 					&    100.0_dp*count(panel_z.eq.9)/sample_size
-	print 12345,'CDF',100.0_dp*Gz
-	12345 format (A,X,X,F8.6,X,X,F5.3,X,X,F5.3,X,X,F5.3,X,X,F5.3,X,X,F5.3,X,X,F8.6,X,X,F8.6,X,X,F8.6)
+	print 12344,'CDF',100.0_dp*Gz
+	12344 format (A,X,X,F8.6,X,X,F5.3,X,X,F5.3,X,X,F5.3,X,X,F5.3,X,X,F5.3,X,X,F8.6,X,X,F8.6,X,X,F8.6)
 	print*,'-----------------------------------------------------'
 
 
