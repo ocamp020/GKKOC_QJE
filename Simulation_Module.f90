@@ -2556,13 +2556,15 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		! Replace Death = 0 if returns are too high (higher than top 0.5 pct)
 
 		! Trim top returns across all population 
-		! 	! Compute percentile on restricted sample 
-		! 	r_top = Percentile( 0.995_dp , sum(Panel_Death) , pack(Panel_r, (Panel_Death.gt.0)) )
-		! 	! Replace Death=0 if panel_r > r_top 
-		! 	aux_size = sum(Panel_Death
-		! 	where (Panel_r>r_top)
-		! 		Panel_Death = 0
-		! 	end where
+			! Compute percentile on restricted sample 
+			r_top = Percentile( 0.995_dp , sum(Panel_Death) , pack(Panel_r, (Panel_Death.gt.0)) )
+			! Replace Death=0 if panel_r > r_top 
+			aux_size = sum(Panel_Death)
+			where (Panel_r>r_top)
+				Panel_Death = 0
+			end where
+			! Print Result
+				print*,'r_top=',r_top,'Percentage Left',real(sum(Panel_Death),8)/real(aux_size,8)
 
 
 		! ! Trim age specific top returns 
