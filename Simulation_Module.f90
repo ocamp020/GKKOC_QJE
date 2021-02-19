@@ -2556,32 +2556,40 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		! Replace Death = 0 if returns are too high (higher than top 0.5 pct)
 
 		! Trim top returns across all population 
+			! ! Compute percentile on restricted sample 
+			! r_top = Percentile( 0.995_dp , sum(Panel_Death) , pack(Panel_r, (Panel_Death.gt.0)) )
+			! ! Replace Death=0 if panel_r > r_top 
+			! aux_size = sum(Panel_Death)
+			! where (Panel_r>r_top)
+			! 	Panel_Death = 0
+			! end where
+			! ! Print Result
+			! print*,'r_top=',r_top,'Percentage Left',real(sum(Panel_Death),8)/real(aux_size,8)
+		! Trim age specific top returns 
+		DO age = 1,RetAge+10
 			! Compute percentile on restricted sample 
-			r_top = Percentile( 0.995_dp , sum(Panel_Death) , pack(Panel_r, (Panel_Death.gt.0)) )
+			r_top = Percentile( 0.995_dp , sum(Panel_Death(:,age)) , pack(Panel_r(:,age), (Panel_Death(:,age).gt.0)) )
+
 			! Replace Death=0 if panel_r > r_top 
-			aux_size = sum(Panel_Death)
-			where (Panel_r>r_top)
-				Panel_Death = 0
+			aux_size = sum(Panel_Death(:,age))
+			where (Panel_r(:,age)>r_top)
+				Panel_Death(:,age) = 0
 			end where
-			! Print Result
-				print*,'r_top=',r_top,'Percentage Left',real(sum(Panel_Death),8)/real(aux_size,8)
 
+			! Print Result 
+			print*,'Age=',age,'r_top=',r_top,'Percentage Left',real(sum(Panel_Death(:,age)),8)/real(aux_size,8)
+		ENDDO
 
-		! ! Trim age specific top returns 
-		! DO age = 1,RetAge+10
-		! 	! Compute percentile on restricted sample 
-		! 	r_top = Percentile( 0.995_dp , sum(Panel_Death(:,age)) , pack(Panel_r(:,age), (Panel_Death(:,age).gt.0)) )
-
-		! 	! Replace Death=0 if panel_r > r_top 
-		! 	aux_size = sum(Panel_Death(:,age))
-		! 	where (Panel_r(:,age)>r_top)
-		! 		Panel_Death(:,age) = 0
-		! 	end where
-
-		! 	! Print Result 
-		! 	print*,'Age=',age,'r_top=',r_top,'Percentage Left',real(sum(Panel_Death(:,age)),8)/real(aux_size,8)
-		! ENDDO
-
+	print*, ' '
+	print*,'Save CSV file for STATA'
+	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/STATA_Panel.csv', STATUS='replace')
+	WRITE  (UNIT=10, FMT=*) 'ID,Age,In_Sample,Return,Z,Assets'
+	DO i = 1, sample_size
+	DO age = 1,
+	WRITE  (UNIT=10, FMT='(I6,A,I2,A,I1,A,F12.4,A,I1,A,F12.4)') i,',',age+19,',',Panel_Death(i,age),',',panel_r(i,age),',',panel_z(i,age),',',panel_a(i,age)
+	ENDDO
+	ENDDO
+	CLOSE(UNIT=10)
 
 	!=============================================================================
 	!
@@ -2861,6 +2869,8 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	print 12345,'Age 25-75',100.0_dp*prc_Av_Return_2575 
 	12345 format (A,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2)
 	print*,'-----------------------------------------------------'
+
+
 
 
 	! print*, ' '
