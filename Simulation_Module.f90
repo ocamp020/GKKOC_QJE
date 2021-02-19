@@ -2236,7 +2236,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	real(dp) :: tempno, tempnoage
 	real(dp) :: start_timet, finish_timet
 	! Result Storage
-	integer , parameter :: sample_size = 2000000
+	integer , parameter :: sample_size = 1000000
 	integer  :: i, i_z, i_x, tklo, tkhi, i_pct
 	integer , dimension(:), allocatable 	:: Panel_l, Panel_z, Select, Select_2024, Select_2575, Select_2029, Select_3075
 	integer , dimension(:,:), allocatable 	:: Panel_e, Panel_x, Panel_Death, Panel_x_ben, Panel_d_ben
