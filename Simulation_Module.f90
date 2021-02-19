@@ -2593,6 +2593,9 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		! Demeaning 
 		Panel_r(:,age)     = Panel_r(:,age)    - Mean_r(age) 
 		Panel_r_at(:,age)  = Panel_r_at(:,age) - Mean_r_at(age)
+
+		! Report average returns 
+		print*,' Age=',age,'Av.Return=',Mean_r(age)
 	ENDDO
 
 	!$omp parallel do 
@@ -2839,9 +2842,9 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 
 	print*,' '
 	print*,'-----------------------------------------------------'
-	print*,' Weighted returns relative to median'
+	print*,' Average returns'
 	print*, "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
-	print 12345,'Age 25-75',100.0_dp*(prc_Av_Return_W_2575(1:10)-prc_Av_Return_W_2575(7)),100.0_dp*prc_Av_Return_W_2575(11)
+	print 12345,'Age 25-75',100.0_dp*prc_Av_Return_2575 
 	12345 format (A,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2)
 	print*,'-----------------------------------------------------'
 
