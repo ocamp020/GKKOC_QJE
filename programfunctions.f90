@@ -6907,6 +6907,10 @@ SUBROUTINE  INITIALIZE()
 		CALL tauchen(mtauchen,rho_e,sigma_e_eps,ne,egrid,pr_e,Ge)
 		CALL tauchen(mtauchen,rho_lambda,sigma_lambda_eps,nlambda,lambdagrid,pr_lambda,Glambda)
 
+		! Modify zgrid to increase (right) kurtosis
+		! zgrid_aux(9) = (zgrid_aux(8)+zgrid(9))/2.0_dp
+
+
 		! Tauchen gives grids for the log of the variables. Exponentiate to adjust
 		zgrid_aux  = exp(zgrid_aux) + mu_z
 		egrid      = exp(egrid)
