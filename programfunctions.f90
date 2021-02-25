@@ -6921,7 +6921,7 @@ SUBROUTINE  INITIALIZE()
 		zgrid(8) = 0.50_dp*zgrid_alt(7)+0.50_dp*zgrid_alt(8)
 		zgrid(7) = 0.80_dp*zgrid_alt(6)+0.20_dp*zgrid_alt(7)
 		zgrid(6) = 0.99_dp*zgrid_alt(5)+0.01_dp*zgrid_alt(6)
-		zgrid(5) = 0.50_dp*zgrid_alt(4)+0.50_dp*zgrid_alt(5)
+		zgrid(5) = 0.20_dp*zgrid_alt(4)+0.80_dp*zgrid_alt(5)
 
 	! Transitory investment productivity x
 		if (nx.gt.1) then

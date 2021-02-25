@@ -2866,10 +2866,11 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	print*,' '
 	print*,'-----------------------------------------------------'
 	print*,' Average returns'
-	print*, "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
+	print 12344,'Stat     ',"p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
 	print 12345,'Age 25-75',100.0_dp*prc_Av_Return_2575 
-	print 12345,'Targets  ',19.3_dp,9.1_dp,0,3.5_dp,0,1.5_dp,-0.6_dp,1.8_dp,0,-2.9,0
+	print*     ,'Targets  ',19.3,9.1,0,3.5,0,1.5,-0.6,1.8,0,-2.9,0
 	12345 format (A,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2)
+	12344 format (A,X,X,A,X,X,A,X,X,A,X,X,A,X,X,A,X,X,A,X,X,A,X,X,A,X,X,A,X,X,A,X,X,A)
 	print*,'-----------------------------------------------------'
 
 
