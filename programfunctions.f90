@@ -6893,7 +6893,7 @@ SUBROUTINE  INITIALIZE()
 
 	!integer::  lambdai
 	REAL(DP) :: lambdaBAR, tempno 
-	REAL(DP) :: m, Rh, start_timet, finish_timet
+	REAL(DP) :: m, Rh, start_timet, finish_timet, zgrid_alt(nz_aux)
 	INTEGER  :: ee0, ee1, ee2, zindx1, zindx2, lambdaindx1, lambdaindx2, diff_array, eindx1, eindx2, zi
 	INTEGER, DIMENSION(RetAge) :: agevec
 	! Entrepreneurial ability
@@ -6908,7 +6908,9 @@ SUBROUTINE  INITIALIZE()
 		CALL tauchen(mtauchen,rho_lambda,sigma_lambda_eps,nlambda,lambdagrid,pr_lambda,Glambda)
 
 		! Modify zgrid to increase (right) kurtosis
-		zgrid_aux(8) = 0.8_dp*zgrid_aux(7)+0.2_dp*zgrid_aux(8)
+		zgrid_alt = zgrid_aux
+		zgrid_aux(8) = 0.8_dp*zgrid_alt(7)+0.2_dp*zgrid_alt(8)
+		zgrid_aux(7) = 0.5_dp*zgrid_alt(6)+0.5_dp*zgrid_alt(7)
 
 
 		! Tauchen gives grids for the log of the variables. Exponentiate to adjust
