@@ -6909,8 +6909,9 @@ SUBROUTINE  INITIALIZE()
 
 		! Modify zgrid to increase (right) kurtosis
 		zgrid_alt = zgrid_aux
-		zgrid_aux(8) = 0.8_dp*zgrid_alt(7)+0.2_dp*zgrid_alt(8)
-		zgrid_aux(7) = 0.5_dp*zgrid_alt(6)+0.5_dp*zgrid_alt(7)
+		zgrid_aux(9) = 0.50_dp*zgrid_alt(8)+0.50_dp*zgrid_alt(9)
+		zgrid_aux(8) = 0.95_dp*zgrid_alt(7)+0.05_dp*zgrid_alt(8)
+		zgrid_aux(7) = 0.50_dp*zgrid_alt(6)+0.50_dp*zgrid_alt(7)
 
 
 		! Tauchen gives grids for the log of the variables. Exponentiate to adjust
