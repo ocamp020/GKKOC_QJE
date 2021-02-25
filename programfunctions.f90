@@ -6923,6 +6923,8 @@ SUBROUTINE  INITIALIZE()
 		zgrid(6) = 0.80_dp*zgrid_alt(5)+0.20_dp*zgrid_alt(4)
 		zgrid(5) = 0.50_dp*zgrid_alt(4)+0.50_dp*zgrid_alt(5)
 
+		zgrid(3) = 0.50_dp*zgrid_alt(3)+0.50_dp*zgrid_alt(4)
+
 	! Transitory investment productivity x
 		if (nx.gt.1) then
 			! print*, 'X probability '
