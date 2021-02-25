@@ -6919,7 +6919,7 @@ SUBROUTINE  INITIALIZE()
 		! Modify zgrid to increase (right) kurtosis
 		zgrid_alt = zgrid
 		! zgrid(8) = 0.00_dp*zgrid_alt(7)+1.00_dp*zgrid_alt(8)
-		zgrid(7) = 0.90_dp*zgrid_alt(6)+0.10_dp*zgrid_alt(7)
+		zgrid(7) = 1.00_dp*zgrid_alt(6)+0.00_dp*zgrid_alt(7)
 		zgrid(6) = 0.50_dp*zgrid_alt(5)+0.50_dp*zgrid_alt(4)
 		zgrid(5) = 0.90_dp*zgrid_alt(4)+0.10_dp*zgrid_alt(5)
 		zgrid(3) = 0.10_dp*zgrid_alt(3)+0.90_dp*zgrid_alt(4)
