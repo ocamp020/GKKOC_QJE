@@ -6893,7 +6893,7 @@ SUBROUTINE  INITIALIZE()
 
 	!integer::  lambdai
 	REAL(DP) :: lambdaBAR, tempno 
-	REAL(DP) :: m, Rh, start_timet, finish_timet, zgrid_alt(nz_aux)
+	REAL(DP) :: m, Rh, start_timet, finish_timet, zgrid_alt(nz)
 	INTEGER  :: ee0, ee1, ee2, zindx1, zindx2, lambdaindx1, lambdaindx2, diff_array, eindx1, eindx2, zi
 	INTEGER, DIMENSION(RetAge) :: agevec
 	! Entrepreneurial ability
@@ -6907,12 +6907,6 @@ SUBROUTINE  INITIALIZE()
 		CALL tauchen(mtauchen,rho_e,sigma_e_eps,ne,egrid,pr_e,Ge)
 		CALL tauchen(mtauchen,rho_lambda,sigma_lambda_eps,nlambda,lambdagrid,pr_lambda,Glambda)
 
-		! Modify zgrid to increase (right) kurtosis
-		zgrid_alt = zgrid_aux
-		zgrid_aux(9) = 0.80_dp*zgrid_alt(8)+0.20_dp*zgrid_alt(9)
-		zgrid_aux(8) = 0.99_dp*zgrid_alt(7)+0.01_dp*zgrid_alt(8)
-		zgrid_aux(7) = 0.50_dp*zgrid_alt(6)+0.50_dp*zgrid_alt(7)
-
 
 		! Tauchen gives grids for the log of the variables. Exponentiate to adjust
 		zgrid_aux  = exp(zgrid_aux) + mu_z
@@ -6921,6 +6915,13 @@ SUBROUTINE  INITIALIZE()
 
 		! Cut bottom elements of zgrid 
 		CALL Markov_Cut(nz_aux,zgrid_aux,pr_z_aux,Gz_aux,nz_aux-nz,zgrid,pr_z,Gz)
+
+		! Modify zgrid to increase (right) kurtosis
+		zgrid_alt = zgrid
+		zgrid(8) = 0.50_dp*zgrid_alt(7)+0.50_dp*zgrid_alt(8)
+		zgrid(7) = 0.80_dp*zgrid_alt(6)+0.20_dp*zgrid_alt(7)
+		zgrid(6) = 0.99_dp*zgrid_alt(5)+0.01_dp*zgrid_alt(6)
+		zgrid(5) = 0.50_dp*zgrid_alt(4)+0.50_dp*zgrid_alt(5)
 
 	! Transitory investment productivity x
 		if (nx.gt.1) then
