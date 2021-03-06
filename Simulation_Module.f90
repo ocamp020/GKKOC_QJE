@@ -2580,17 +2580,17 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 			print*,'Age=',age,'r_top=',r_top,'Percentage Left',real(sum(Panel_Death(:,age)),8)/real(aux_size,8)
 		ENDDO
 
-	print*, ' '
-	print*,'Save CSV file for STATA'
-	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/STATA_Panel.csv', STATUS='replace')
-	WRITE  (UNIT=10, FMT=*) 'ID,Age,In_Sample,Return,Z,Assets'
-	DO i = 1, sample_size
-	DO age = 1, RetAge+10
-	WRITE  (UNIT=10, FMT='(I7,A,I2,A,I1,A,F12.4,A,I1,A,F12.4)') &
-		& i,',',age+19,',',Panel_Death(i,age),',',panel_r(i,age),',',panel_z(i),',',panel_a(i,age)
-	ENDDO
-	ENDDO
-	CLOSE(UNIT=10)
+	! print*, ' '
+	! print*,'Save CSV file for STATA'
+	! OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Asset_Return_Panel/STATA_Panel.csv', STATUS='replace')
+	! WRITE  (UNIT=10, FMT=*) 'ID,Age,In_Sample,Return,Z,Assets'
+	! DO i = 1, sample_size
+	! DO age = 1, RetAge+10
+	! WRITE  (UNIT=10, FMT='(I7,A,I2,A,I1,A,F12.4,A,I1,A,F12.4)') &
+	! 	& i,',',age+19,',',Panel_Death(i,age),',',panel_r(i,age),',',panel_z(i),',',panel_a(i,age)
+	! ENDDO
+	! ENDDO
+	! CLOSE(UNIT=10)
 
 	!=============================================================================
 	!
