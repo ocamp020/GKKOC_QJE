@@ -2255,16 +2255,16 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	real(dp), dimension(:), allocatable 	:: Av_Return_3075,	Av_Return_at_3075, Av_Return_W_3075, Av_Return_at_W_3075
 	real(dp), dimension(:), allocatable 	:: R_Av_Return_3075,	R_Av_Return_at_3075
 	real(dp), dimension(10) :: prctile_ret
-	real(dp), dimension(11) :: prc_Av_Return, prc_Av_Return_at, prc_Av_Return_W, prc_Av_Return_at_W
-	real(dp), dimension(11) :: prc_Av_Return_2024, prc_Av_Return_at_2024, prc_Av_Return_W_2024, prc_Av_Return_at_W_2024 
-	real(dp), dimension(11) :: prc_Av_Return_2575, prc_Av_Return_at_2575, prc_Av_Return_W_2575, prc_Av_Return_at_W_2575
-	real(dp), dimension(11) :: prc_Av_Return_2029, prc_Av_Return_at_2029, prc_Av_Return_W_2029, prc_Av_Return_at_W_2029
-	real(dp), dimension(11) :: prc_Av_Return_3075, prc_Av_Return_at_3075, prc_Av_Return_W_3075, prc_Av_Return_at_W_3075
-	real(dp), dimension(11) :: prc_R_Av_Return, prc_R_Av_Return_at
-	real(dp), dimension(11) :: prc_R_Av_Return_2024, prc_R_Av_Return_at_2024
-	real(dp), dimension(11) :: prc_R_Av_Return_2575, prc_R_Av_Return_at_2575
-	real(dp), dimension(11) :: prc_R_Av_Return_2029, prc_R_Av_Return_at_2029
-	real(dp), dimension(11) :: prc_R_Av_Return_3075, prc_R_Av_Return_at_3075
+	real(dp), dimension(12) :: prc_Av_Return, prc_Av_Return_at, prc_Av_Return_W, prc_Av_Return_at_W
+	real(dp), dimension(12) :: prc_Av_Return_2024, prc_Av_Return_at_2024, prc_Av_Return_W_2024, prc_Av_Return_at_W_2024 
+	real(dp), dimension(12) :: prc_Av_Return_2575, prc_Av_Return_at_2575, prc_Av_Return_W_2575, prc_Av_Return_at_W_2575
+	real(dp), dimension(12) :: prc_Av_Return_2029, prc_Av_Return_at_2029, prc_Av_Return_W_2029, prc_Av_Return_at_W_2029
+	real(dp), dimension(12) :: prc_Av_Return_3075, prc_Av_Return_at_3075, prc_Av_Return_W_3075, prc_Av_Return_at_W_3075
+	real(dp), dimension(12) :: prc_R_Av_Return, prc_R_Av_Return_at
+	real(dp), dimension(12) :: prc_R_Av_Return_2024, prc_R_Av_Return_at_2024
+	real(dp), dimension(12) :: prc_R_Av_Return_2575, prc_R_Av_Return_at_2575
+	real(dp), dimension(12) :: prc_R_Av_Return_2029, prc_R_Av_Return_at_2029
+	real(dp), dimension(12) :: prc_R_Av_Return_3075, prc_R_Av_Return_at_3075
 	real(dp) 				:: r_top
 	integer                 :: aux_size
 
@@ -2808,41 +2808,71 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 
 	print*, ' '
 	print*, 'Computing Standard Deviation'
-		prc_Av_Return(12)       	= sqrt(sum(pack((Av_Return 	        -prc_Av_Return(11)          )**2,(Select.ge.2)))/count(Select.ge.2))
-		prc_Av_Return_at(12)   		= sqrt(sum(pack((Av_Return_at       -prc_Av_Return_at(11)       )**2,(Select.ge.2)))/count(Select.ge.2))
-		prc_Av_Return_W(12)    		= sqrt(sum(pack((Av_Return_W        -prc_Av_Return_W(11)        )**2,(Select.ge.2)))/count(Select.ge.2))
-		prc_Av_Return_at_W(12) 		= sqrt(sum(pack((Av_Return_at_W     -prc_Av_Return_at_W(11)     )**2,(Select.ge.2)))/count(Select.ge.2))
+		prc_Av_Return(12)       	= & 
+			& sqrt(sum(pack((Av_Return 	        -prc_Av_Return(11)          )**2,(Select.ge.2)))/count(Select.ge.2))
+		prc_Av_Return_at(12)   		= & 
+			& sqrt(sum(pack((Av_Return_at       -prc_Av_Return_at(11)       )**2,(Select.ge.2)))/count(Select.ge.2))
+		prc_Av_Return_W(12)    		= & 
+			& sqrt(sum(pack((Av_Return_W        -prc_Av_Return_W(11)        )**2,(Select.ge.2)))/count(Select.ge.2))
+		prc_Av_Return_at_W(12) 		= & 
+			& sqrt(sum(pack((Av_Return_at_W     -prc_Av_Return_at_W(11)     )**2,(Select.ge.2)))/count(Select.ge.2))
 		
-		prc_Av_Return_2024(12)      = sqrt(sum(pack((Av_Return_2024     -prc_Av_Return_2024(11)     )**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
-		prc_Av_Return_at_2024(12)   = sqrt(sum(pack((Av_Return_at_2024  -prc_Av_Return_at_2024(11)  )**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
-		prc_Av_Return_W_2024(12)    = sqrt(sum(pack((Av_Return_W_2024   -prc_Av_Return_W_2024(11)   )**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
-		prc_Av_Return_at_W_2024(12) = sqrt(sum(pack((Av_Return_at_W_2024-prc_Av_Return_at_W_2024(11))**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
+		prc_Av_Return_2024(12)      = & 
+			& sqrt(sum(pack((Av_Return_2024     -prc_Av_Return_2024(11)     )**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
+		prc_Av_Return_at_2024(12)   = & 
+			& sqrt(sum(pack((Av_Return_at_2024  -prc_Av_Return_at_2024(11)  )**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
+		prc_Av_Return_W_2024(12)    = & 
+			& sqrt(sum(pack((Av_Return_W_2024   -prc_Av_Return_W_2024(11)   )**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
+		prc_Av_Return_at_W_2024(12) = & 
+			& sqrt(sum(pack((Av_Return_at_W_2024-prc_Av_Return_at_W_2024(11))**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
 
-		prc_Av_Return_2575(12)      = sqrt(sum(pack((Av_Return_2575     -prc_Av_Return_2575(11)     )**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
-		prc_Av_Return_at_2575(12)   = sqrt(sum(pack((Av_Return_at_2575  -prc_Av_Return_at_2575(11)  )**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
-		prc_Av_Return_W_2575(12)    = sqrt(sum(pack((Av_Return_W_2575   -prc_Av_Return_W_2575(11)   )**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
-		prc_Av_Return_at_W_2575(12) = sqrt(sum(pack((Av_Return_at_W_2575-prc_Av_Return_at_W_2575(11))**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
+		prc_Av_Return_2575(12)      = & 
+			& sqrt(sum(pack((Av_Return_2575     -prc_Av_Return_2575(11)     )**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
+		prc_Av_Return_at_2575(12)   = & 
+			& sqrt(sum(pack((Av_Return_at_2575  -prc_Av_Return_at_2575(11)  )**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
+		prc_Av_Return_W_2575(12)    = & 
+			& sqrt(sum(pack((Av_Return_W_2575   -prc_Av_Return_W_2575(11)   )**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
+		prc_Av_Return_at_W_2575(12) = & 
+			& sqrt(sum(pack((Av_Return_at_W_2575-prc_Av_Return_at_W_2575(11))**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
 
-		prc_Av_Return_2029(12)      = sqrt(sum(pack((Av_Return_2029     -prc_Av_Return_2029(11)     )**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
-		prc_Av_Return_at_2029(12)   = sqrt(sum(pack((Av_Return_at_2029  -prc_Av_Return_at_2029(11)  )**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
-		prc_Av_Return_W_2029(12)    = sqrt(sum(pack((Av_Return_W_2029   -prc_Av_Return_W_2029(11)   )**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
-		prc_Av_Return_at_W_2029(12) = sqrt(sum(pack((Av_Return_at_W_2029-prc_Av_Return_at_W_2029(11))**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
+		prc_Av_Return_2029(12)      = & 
+			& sqrt(sum(pack((Av_Return_2029     -prc_Av_Return_2029(11)     )**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
+		prc_Av_Return_at_2029(12)   = & 
+			& sqrt(sum(pack((Av_Return_at_2029  -prc_Av_Return_at_2029(11)  )**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
+		prc_Av_Return_W_2029(12)    = & 
+			& sqrt(sum(pack((Av_Return_W_2029   -prc_Av_Return_W_2029(11)   )**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
+		prc_Av_Return_at_W_2029(12) = & 
+			& sqrt(sum(pack((Av_Return_at_W_2029-prc_Av_Return_at_W_2029(11))**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
 
-		prc_Av_Return_3075(12)      = sqrt(sum(pack((Av_Return_3075     -prc_Av_Return_3075(11)     )**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
-		prc_Av_Return_at_3075(12)   = sqrt(sum(pack((Av_Return_at_3075  -prc_Av_Return_at_3075(11)  )**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
-		prc_Av_Return_W_3075(12)    = sqrt(sum(pack((Av_Return_W_3075   -prc_Av_Return_W_3075(11)   )**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
-		prc_Av_Return_at_W_3075(12) = sqrt(sum(pack((Av_Return_at_W_3075-prc_Av_Return_at_W_3075(11))**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
+		prc_Av_Return_3075(12)      = & 
+			& sqrt(sum(pack((Av_Return_3075     -prc_Av_Return_3075(11)     )**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
+		prc_Av_Return_at_3075(12)   = & 
+			& sqrt(sum(pack((Av_Return_at_3075  -prc_Av_Return_at_3075(11)  )**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
+		prc_Av_Return_W_3075(12)    = & 
+			& sqrt(sum(pack((Av_Return_W_3075   -prc_Av_Return_W_3075(11)   )**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
+		prc_Av_Return_at_W_3075(12) = & 
+			& sqrt(sum(pack((Av_Return_at_W_3075-prc_Av_Return_at_W_3075(11))**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
 
-		prc_R_Av_Return(12)      	= sqrt(sum(pack((R_Av_Return        -prc_R_Av_Return(11)        )**2,(Select.ge.2)))/count(Select.ge.2))
-		prc_R_Av_Return_at(12)   	= sqrt(sum(pack((R_Av_Return_at     -prc_R_Av_Return_at(11)     )**2,(Select.ge.2)))/count(Select.ge.2))
-		prc_R_Av_Return_2024(12)    = sqrt(sum(pack((R_Av_Return_2024   -prc_R_Av_Return_2024(11)   )**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
-		prc_R_Av_Return_at_2024(12) = sqrt(sum(pack((R_Av_Return_at_2024-prc_R_Av_Return_at_2024(11))**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
-		prc_R_Av_Return_2575(12)    = sqrt(sum(pack((R_Av_Return_2575   -prc_R_Av_Return_2575(11)   )**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
-		prc_R_Av_Return_at_2575(12) = sqrt(sum(pack((R_Av_Return_at_2575-prc_R_Av_Return_at_2575(11))**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
-		prc_R_Av_Return_2029(12)    = sqrt(sum(pack((R_Av_Return_2029   -prc_R_Av_Return_2029(11)   )**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
-		prc_R_Av_Return_at_2029(12) = sqrt(sum(pack((R_Av_Return_at_2029-prc_R_Av_Return_at_2029(11))**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
-		prc_R_Av_Return_3075(12)    = sqrt(sum(pack((R_Av_Return_3075   -prc_R_Av_Return_3075(11)   )**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
-		prc_R_Av_Return_at_3075(12) = sqrt(sum(pack((R_Av_Return_at_3075-prc_R_Av_Return_at_3075(11))**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
+		prc_R_Av_Return(12)      	= & 
+			& sqrt(sum(pack((R_Av_Return        -prc_R_Av_Return(11)        )**2,(Select.ge.2)))/count(Select.ge.2))
+		prc_R_Av_Return_at(12)   	= & 
+			& sqrt(sum(pack((R_Av_Return_at     -prc_R_Av_Return_at(11)     )**2,(Select.ge.2)))/count(Select.ge.2))
+		prc_R_Av_Return_2024(12)    = & 
+			& sqrt(sum(pack((R_Av_Return_2024   -prc_R_Av_Return_2024(11)   )**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
+		prc_R_Av_Return_at_2024(12) = & 
+			& sqrt(sum(pack((R_Av_Return_at_2024-prc_R_Av_Return_at_2024(11))**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
+		prc_R_Av_Return_2575(12)    = & 
+			& sqrt(sum(pack((R_Av_Return_2575   -prc_R_Av_Return_2575(11)   )**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
+		prc_R_Av_Return_at_2575(12) = & 
+			& sqrt(sum(pack((R_Av_Return_at_2575-prc_R_Av_Return_at_2575(11))**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
+		prc_R_Av_Return_2029(12)    = & 
+			& sqrt(sum(pack((R_Av_Return_2029   -prc_R_Av_Return_2029(11)   )**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
+		prc_R_Av_Return_at_2029(12) = & 
+			& sqrt(sum(pack((R_Av_Return_at_2029-prc_R_Av_Return_at_2029(11))**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
+		prc_R_Av_Return_3075(12)    = & 
+			& sqrt(sum(pack((R_Av_Return_3075   -prc_R_Av_Return_3075(11)   )**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
+		prc_R_Av_Return_at_3075(12) = & 
+			& sqrt(sum(pack((R_Av_Return_at_3075-prc_R_Av_Return_at_3075(11))**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
 
 
 
