@@ -97,7 +97,7 @@ PROGRAM main
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 		
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 
@@ -2419,8 +2419,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	
-    	tau_grid_min  = 25
-    	tau_grid_max  = 40
+    	tau_grid_min  = 15
+    	tau_grid_max  = 30
     	tau_grid_step = 1
 
     	! Set Y_a_threshold
@@ -2429,7 +2429,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			Wealth_factor = Y_a_threshold/W_bench
 
 		! Set high psi
-		psi = 0.80_dp
+		! psi = 0.80_dp
 	endif 
     	WRITE(UNIT=77, FMT=*) 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
 		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ', &
