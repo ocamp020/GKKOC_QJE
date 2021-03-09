@@ -59,7 +59,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .false.
+		Tax_Reform    = .true.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -81,7 +81,7 @@ PROGRAM main
 
 		compute_exp_fixed_prices_and_taxes = .false.
 
-		Opt_Tax       = .true.
+		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
 
 		Opt_Threshold = .false.
@@ -97,7 +97,7 @@ PROGRAM main
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 		
-		Simul_Switch  = .false.
+		Simul_Switch  = .true.
 
 
 
@@ -617,7 +617,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL WRITE_VARIABLES(1)
 		if (Simul_Switch) then 
 			print*,"	Simulation"
-			CALL SIMULATION(solving_bench)
+			! CALL SIMULATION(solving_bench)
 			! CALL Simulation_Life_Cycle_Patterns(solving_bench)
 			CALL Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
 		endif
@@ -646,7 +646,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark

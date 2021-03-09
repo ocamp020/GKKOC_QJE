@@ -2757,6 +2757,14 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		prc_R_Av_Return_at_3075(i_pct) = & 
 				& Percentile(prctile_ret(i_pct),count(Select_3075.ge.2),pack(R_Av_Return_at_3075 ,(Select_3075.ge.2)))
 	enddo 
+
+	!=============================================================================
+	!
+	! Get Mean
+	!=============================================================================
+
+	print*, ' '
+	print*, 'Computing Mean'
 		prc_Av_Return(11)       	= sum(pack(Av_Return,(Select.ge.2)))/count(Select.ge.2)
 		prc_Av_Return_at(11)   		= sum(pack(Av_Return_at,(Select.ge.2)))/count(Select.ge.2)
 		prc_Av_Return_W(11)    		= sum(pack(Av_Return_W,(Select.ge.2)))/count(Select.ge.2)
@@ -2792,7 +2800,51 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 		prc_R_Av_Return_at_2029(11) = sum(pack(R_Av_Return_at_2029,(Select_2029.ge.2)))/count(Select_2029.ge.2)
 		prc_R_Av_Return_3075(11)    = sum(pack(R_Av_Return_3075,(Select_3075.ge.2)))/count(Select_3075.ge.2)
 		prc_R_Av_Return_at_3075(11) = sum(pack(R_Av_Return_at_3075,(Select_3075.ge.2)))/count(Select_3075.ge.2)
-	print*, 'End of prc of return'
+
+	!=============================================================================
+	!
+	! Get Standard Deviation
+	!=============================================================================
+
+	print*, ' '
+	print*, 'Computing Standard Deviation'
+		prc_Av_Return(12)       	= sqrt(sum(pack((Av_Return 	        -prc_Av_Return(11)          )**2,(Select.ge.2)))/count(Select.ge.2))
+		prc_Av_Return_at(12)   		= sqrt(sum(pack((Av_Return_at       -prc_Av_Return_at(11)       )**2,(Select.ge.2)))/count(Select.ge.2))
+		prc_Av_Return_W(12)    		= sqrt(sum(pack((Av_Return_W        -prc_Av_Return_W(11)        )**2,(Select.ge.2)))/count(Select.ge.2))
+		prc_Av_Return_at_W(12) 		= sqrt(sum(pack((Av_Return_at_W     -prc_Av_Return_at_W(11)     )**2,(Select.ge.2)))/count(Select.ge.2))
+		
+		prc_Av_Return_2024(12)      = sqrt(sum(pack((Av_Return_2024     -prc_Av_Return_2024(11)     )**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
+		prc_Av_Return_at_2024(12)   = sqrt(sum(pack((Av_Return_at_2024  -prc_Av_Return_at_2024(11)  )**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
+		prc_Av_Return_W_2024(12)    = sqrt(sum(pack((Av_Return_W_2024   -prc_Av_Return_W_2024(11)   )**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
+		prc_Av_Return_at_W_2024(12) = sqrt(sum(pack((Av_Return_at_W_2024-prc_Av_Return_at_W_2024(11))**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
+
+		prc_Av_Return_2575(12)      = sqrt(sum(pack((Av_Return_2575     -prc_Av_Return_2575(11)     )**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
+		prc_Av_Return_at_2575(12)   = sqrt(sum(pack((Av_Return_at_2575  -prc_Av_Return_at_2575(11)  )**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
+		prc_Av_Return_W_2575(12)    = sqrt(sum(pack((Av_Return_W_2575   -prc_Av_Return_W_2575(11)   )**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
+		prc_Av_Return_at_W_2575(12) = sqrt(sum(pack((Av_Return_at_W_2575-prc_Av_Return_at_W_2575(11))**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
+
+		prc_Av_Return_2029(12)      = sqrt(sum(pack((Av_Return_2029     -prc_Av_Return_2029(11)     )**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
+		prc_Av_Return_at_2029(12)   = sqrt(sum(pack((Av_Return_at_2029  -prc_Av_Return_at_2029(11)  )**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
+		prc_Av_Return_W_2029(12)    = sqrt(sum(pack((Av_Return_W_2029   -prc_Av_Return_W_2029(11)   )**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
+		prc_Av_Return_at_W_2029(12) = sqrt(sum(pack((Av_Return_at_W_2029-prc_Av_Return_at_W_2029(11))**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
+
+		prc_Av_Return_3075(12)      = sqrt(sum(pack((Av_Return_3075     -prc_Av_Return_3075(11)     )**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
+		prc_Av_Return_at_3075(12)   = sqrt(sum(pack((Av_Return_at_3075  -prc_Av_Return_at_3075(11)  )**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
+		prc_Av_Return_W_3075(12)    = sqrt(sum(pack((Av_Return_W_3075   -prc_Av_Return_W_3075(11)   )**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
+		prc_Av_Return_at_W_3075(12) = sqrt(sum(pack((Av_Return_at_W_3075-prc_Av_Return_at_W_3075(11))**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
+
+		prc_R_Av_Return(12)      	= sqrt(sum(pack((R_Av_Return        -prc_R_Av_Return(11)        )**2,(Select.ge.2)))/count(Select.ge.2))
+		prc_R_Av_Return_at(12)   	= sqrt(sum(pack((R_Av_Return_at     -prc_R_Av_Return_at(11)     )**2,(Select.ge.2)))/count(Select.ge.2))
+		prc_R_Av_Return_2024(12)    = sqrt(sum(pack((R_Av_Return_2024   -prc_R_Av_Return_2024(11)   )**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
+		prc_R_Av_Return_at_2024(12) = sqrt(sum(pack((R_Av_Return_at_2024-prc_R_Av_Return_at_2024(11))**2,(Select_2024.ge.2)))/count(Select_2024.ge.2))
+		prc_R_Av_Return_2575(12)    = sqrt(sum(pack((R_Av_Return_2575   -prc_R_Av_Return_2575(11)   )**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
+		prc_R_Av_Return_at_2575(12) = sqrt(sum(pack((R_Av_Return_at_2575-prc_R_Av_Return_at_2575(11))**2,(Select_2575.ge.2)))/count(Select_2575.ge.2))
+		prc_R_Av_Return_2029(12)    = sqrt(sum(pack((R_Av_Return_2029   -prc_R_Av_Return_2029(11)   )**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
+		prc_R_Av_Return_at_2029(12) = sqrt(sum(pack((R_Av_Return_at_2029-prc_R_Av_Return_at_2029(11))**2,(Select_2029.ge.2)))/count(Select_2029.ge.2))
+		prc_R_Av_Return_3075(12)    = sqrt(sum(pack((R_Av_Return_3075   -prc_R_Av_Return_3075(11)   )**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
+		prc_R_Av_Return_at_3075(12) = sqrt(sum(pack((R_Av_Return_at_3075-prc_R_Av_Return_at_3075(11))**2,(Select_3075.ge.2)))/count(Select_3075.ge.2))
+
+
 
 	!=============================================================================
 	!
@@ -2811,7 +2863,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for Returns"
-	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
+	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean","Std"
 	WRITE(UNIT=10, FMT=*) "Returns",      prc_Av_Return
 	WRITE(UNIT=10, FMT=*) "Returns_2024", prc_Av_Return_2024
 	WRITE(UNIT=10, FMT=*) "Returns_2575", prc_Av_Return_2575
@@ -2819,7 +2871,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	WRITE(UNIT=10, FMT=*) "Returns_3075", prc_Av_Return_3075
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for Robust Returns (Removing Max Return)"
-	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
+	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean","Std"
 	WRITE(UNIT=10, FMT=*) "R_Returns",      prc_R_Av_Return
 	WRITE(UNIT=10, FMT=*) "R_Returns_2024", prc_R_Av_Return_2024
 	WRITE(UNIT=10, FMT=*) "R_Returns_2575", prc_R_Av_Return_2575
@@ -2827,7 +2879,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	WRITE(UNIT=10, FMT=*) "R_Returns_3075", prc_R_Av_Return_3075
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for Weighted Returns (Weighted by assets across age - unweighted across individuals)"
-	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
+	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean","Std"
 	WRITE(UNIT=10, FMT=*) "W_Returns",      prc_Av_Return_W
 	WRITE(UNIT=10, FMT=*) "W_Returns_2024", prc_Av_Return_W_2024
 	WRITE(UNIT=10, FMT=*) "W_Returns_2575", prc_Av_Return_W_2575
@@ -2837,7 +2889,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for After Tax Returns"
-	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
+	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean","Std"
 	WRITE(UNIT=10, FMT=*) "AT_Returns",      prc_Av_Return_at
 	WRITE(UNIT=10, FMT=*) "AT_Returns_2024", prc_Av_Return_at_2024
 	WRITE(UNIT=10, FMT=*) "AT_Returns_2575", prc_Av_Return_at_2575
@@ -2845,7 +2897,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	WRITE(UNIT=10, FMT=*) "AT_Returns_3075", prc_Av_Return_at_3075
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for Robust After Tax Returns (Removing Max Return)"
-	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
+	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean","Std"
 	WRITE(UNIT=10, FMT=*) "R_AT_Returns",      prc_R_Av_Return_at
 	WRITE(UNIT=10, FMT=*) "R_AT_Returns_2024", prc_R_Av_Return_at_2024
 	WRITE(UNIT=10, FMT=*) "R_AT_Returns_2575", prc_R_Av_Return_at_2575
@@ -2853,7 +2905,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	WRITE(UNIT=10, FMT=*) "R_AT_Returns_3075", prc_R_Av_Return_at_3075
 	WRITE(UNIT=10, FMT=*) " "
 	WRITE(UNIT=10, FMT=*) "Stats for Weighted After Tax Returns (Weighted by assets across age - unweighted across individuals)"
-	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean"
+	WRITE(UNIT=10, FMT=*) "Stat ","p99.9 ","p99 ","p95 ","p90 ","p80 ","p75 ","p50 ","p25 ","p20 ","p10 ","Mean","Std"
 	WRITE(UNIT=10, FMT=*) "W_AT_Returns",      prc_Av_Return_at_W
 	WRITE(UNIT=10, FMT=*) "W_AT_Returns_2024", prc_Av_Return_at_W_2024
 	WRITE(UNIT=10, FMT=*) "W_AT_Returns_2575", prc_Av_Return_at_W_2575
@@ -2863,13 +2915,14 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	close (unit=10);
 	print*,'Writing of summary table completed '
 
+
 	print*,' '
 	print*,'-----------------------------------------------------'
 	print*,' Average returns'
-	print 12344,'Stat     ',"p99.9 ","p99  ","p95  ","p90  ","p80  ","p75  ","p50  ","p25  ","p20  ","p10  ","Mean"
+	print 12344,'Stat     ',"p99.9 ","p99  ","p95  ","p90  ","p80  ","p75  ","p50  ","p25  ","p20  ","p10  ","Mean","Std"
 	print 12345,'Age 25-75',100.0_dp*prc_Av_Return_2575 
-	print 12345,'Targets  ',19.3,9.1,0.0,3.5,0.0,1.5,-0.6,1.8,0.0,-2.9,0.0
-	12345 format (A,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2)
+	print 12345,'Targets  ',19.3,9.1,0.0,3.5,0.0,1.5,-0.6,1.8,0.0,-2.9,0.0,0.0
+	12345 format (A,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2,X,X,F5.2)
 	12344 format (A,X,X,A,X,X,A,X,X,A,X,X,A,X,X,A,X,X,A,X,X,A,X,X,A,X,X,A,X,X,A,X,X,A)
 	print*,'-----------------------------------------------------'
 
