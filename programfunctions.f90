@@ -272,6 +272,7 @@ end Subroutine Asset_Grid_Threshold
 		    &   + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)*chi_bq* &
 		    &                  ((1.0_dp-tau_bq)*aprimet+bq_0)**(1.0_dp/euler_power) )  &
 		    & **euler_power) ** 2.0_DP
+			! Note: with log-utility the term (1+tauC) drops as expected
 
 	END  FUNCTION FOC_R
 
@@ -429,7 +430,7 @@ FUNCTION FOC_WH(aprimet,state)
 							par_FOC(7) = cp 
 							brentvaluet = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, hp, par_FOC ) 
 						end if 
-				    MU_cp(ep_ind) = cp*((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hp)**((1.0_dp-sigma)*(1.0_dp-gamma))
+				    MU_cp(ep_ind) = cp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hp)**((1.0_dp-sigma)*(1.0_dp-gamma))
 				END DO
 				! Compute the expected value of 1/c' conditional on current ei
 				E_MU_cp(xp_ind) = SUM( pr_e(e_in,:) * MU_cp )
@@ -455,7 +456,7 @@ FUNCTION FOC_WH(aprimet,state)
 					& *((1.0_DP-nprime)**((1.0_DP-gamma)*(1.0_DP-sigma))))
 			enddo 
 
-			FOC_WH = ((ctemp**(gamma*(1.0_DP-sigma)-1))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
+			FOC_WH = ((ctemp**(gamma*(1.0_DP-sigma)-1.0_DP))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
 					& - (beta*survP(age_in)* sum( pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp ) & 
 					&  + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 					&  *chi_bq*((1.0_dp-tau_bq)*aprimet+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) )**2.0_DP
@@ -568,7 +569,7 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 							par_FOC(7) = cp 
 							brentvaluet = brent_p(H_min, 0.4_DP, 0.99_DP, FOC_H, brent_tol, hp, par_FOC ) 
 						end if 
-				    MU_cp(ep_ind) = cp*((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hp)**((1.0_dp-sigma)*(1.0_dp-gamma))
+				    MU_cp(ep_ind) = cp**((1.0_dp-sigma)*gamma-1.0_dp) * (1.0_dp-hp)**((1.0_dp-sigma)*(1.0_dp-gamma))
 				END DO
 				! Compute the expected value of 1/c' conditional on current ei
 				E_MU_cp(xp_ind) = SUM( pr_e(e_in,:) * MU_cp )
@@ -596,7 +597,7 @@ FUNCTION FOC_WH_Transition(aprimet,state)
 					& *((1.0_DP-nprime)**((1.0_DP-gamma)*(1.0_DP-sigma))))
 			enddo 
 
-			FOC_WH_Transition = ((ctemp**(gamma*(1.0_DP-sigma)-1))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
+			FOC_WH_Transition = ((ctemp**(gamma*(1.0_DP-sigma)-1.0_DP))*((1.0_DP-ntemp)**((1.0_DP-gamma)*(1.0_DP-sigma))) &
 					& - (beta*survP(age_in)* sum( pr_x(x_in,:,z_in,age_in)*MB_aprime*E_MU_cp ) &
 				    &  + (1.0_dp-survP(age_in))*(1.0_dp+tauC)**((1.0_dp-sigma)*gamma)&
 				    & *chi_bq*((1.0_dp-tau_bq)*aprimet+bq_0)**((1.0_dp-sigma)*gamma-1.0_dp) ) )**2.0_DP

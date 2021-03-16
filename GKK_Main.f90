@@ -109,7 +109,7 @@ PROGRAM main
 	! Switch for log utility 
 		! If Log_Switch==.true. then utility is log
 		! If Log_Switch==.false. then utility is not log
-		Log_Switch = .false.
+		Log_Switch = .true.
 
 	! Switch for labor taxes
 		! If Progressive_Tax_Switch==.true. then use progressive taxes
