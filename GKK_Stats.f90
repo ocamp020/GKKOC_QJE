@@ -2038,7 +2038,8 @@ END SUBROUTINE COMPUTE_STATS
 
 SUBROUTINE COMPUTE_WELFARE_GAIN()
 	IMPLICIT NONE
-	real(DP), dimension(MaxAge):: CumDiscountF
+	REAL(DP) :: size_nb
+	REAL(DP), dimension(MaxAge):: CumDiscountF
 	! REAL(DP), dimension(MaxAge, na, nz, nlambda, ne) ::  Cons_Eq_Welfare ! ValueFunction_Bench, ValueFunction_Exp,
 	REAL(DP), dimension(nz) ::  temp_ce_by_z
 	REAL(DP), dimension(MaxAge, nz) :: frac_pos_welfare_by_age_z, size_pos_welfare_by_age_z, size_by_age_z
@@ -2070,6 +2071,9 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		ENDDO
 		!print*,CumDiscountF
 		!PAUSE
+
+	! Size of new borns 
+		size_nb     = sum(DBN_bench(1,:,:,:,:,:))
 
 	! Solve for the benchmark economy 
 		solving_bench = 1
@@ -2148,6 +2152,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	! Compute Average Utility - CE2
+		if (Log_Switch.eqv..false.) then
 		Av_Util_NB  =  100.0_dp*(( (sum(ValueFunction_exp(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:)) - &
 	    					&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
 	                        &  sum((ValueFunction_Bench(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
@@ -2156,6 +2161,14 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		Av_Util_Pop = 100.0_dp*(( (sum(ValueFunction_exp*DBN1)-sum(Bq_Value_Bench*DBN_bench)) / &
 	    					& sum((ValueFunction_Bench-Bq_Value_Bench)*DBN_bench)  ) &
 	                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+		else 
+		Av_Util_NB  =  100.0_dp*(exp( ( sum(ValueFunction_exp(1,:,:,:,:,:)  *DBN1(1,:,:,:,:,:)     ) - &
+	                        &           sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  )/ &
+							& 	 (CumDiscountF(1)*size_nb) ) - 1.0_DP )
+
+		Av_Util_Pop = 100.0_dp*(exp( ( sum(ValueFunction_exp*DBN1) - sum(ValueFunction_Bench*DBN_bench) )/ &
+							& 	 sum( CumDiscountF*sum(sum(sum(sum(sum(DBN_bench,6),5),4),3),2) ) ) - 1.0_DP )
+		endif 
 	    print*,' '
 	    print*,'---------------------------'
 	    print*, ' CE 2 Computation'
@@ -2197,6 +2210,8 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	    WRITE  (UNIT=50, FMT=*) 'Av Utility  (exp)     =',sum(ValueFunction_exp(:,:,:,:,:,:)*DBN1(:,:,:,:,:,:))
 	    WRITE  (UNIT=50, FMT=*) 'Av BQ Utility NB (bench) =',sum(BQ_Value_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  
 	    WRITE  (UNIT=50, FMT=*) 'Av BQ Utility  (bench)   =',sum(BQ_Value_Bench(:,:,:,:,:,:)*DBN_bench(:,:,:,:,:,:))  
+	    WRITE  (UNIT=50, FMT=*) ' '
+	    WRITE  (UNIT=50, FMT=*) 'NOTE: These numbers only make sense if sigma>1 (not for log-utility)'
 	    close (unit=50)	
 
 
@@ -3096,11 +3111,20 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 
 	! Consumption Equivalent Welfare: CE 2
 	print*,'	 Consumption Equivalent: CE 2'
+		if (Log_Switch.eqv..false.) then 
 		CE2_nb_tr  = 100.0_dp * (( sum((Value_mat(1,:,:,:,:,:)-BQ_Value_mat(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:)) / &
 				&               sum((ValueFunction_Bench(1,:,:,:,:,:)-BQ_Value_mat(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:)) ) &
 				& ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 		CE2_pop_tr = 100.0_dp*(( sum((Value_mat-BQ_Value_mat)*DBN_bench) / sum((ValueFunction_Bench-BQ_Value_mat)*DBN_bench)  ) &
 		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+		else 
+		CE2_nb_tr  = 100.0_dp*(exp( ( sum( (Value_mat(1,:,:,:,:,:)-ValueFunction_Bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:)) / &
+							& 	 (CumDiscountF(1)*sum(DBN_bench(1,:,:,:,:,:))) ) - 1.0_DP )
+		
+		CE2_pop_tr = 100.0_dp*(exp( ( sum( (Value_mat-ValueFunction_Bench)*DBN_bench )  )/ &
+		                    & 	 sum( CumDiscountF*sum(sum(sum(sum(sum(DBN_bench,6),5),4),3),2) ) ) - 1.0_DP )
+		endif 
+
 
 	! Write Aggregate Results
 		OPEN (UNIT=50, FILE=trim(Result_Folder)//'CE_Transition.txt', STATUS='replace') 
@@ -3199,6 +3223,7 @@ END SUBROUTINE  COMPUTE_WELFARE_GAIN_TRANSITION
 SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 	IMPLICIT NONE
 	REAL(dp) :: size_nb
+	REAL(DP), DIMENSION(MaxAge):: CumDiscountF
 	REAL(dp) :: C_bench, C_exp, C_nb_bench, C_nb_exp, H_bench, H_exp, H_NB_bench, H_NB_exp, BQ_bench, BQ_exp, BQ_NB_bench, BQ_NB_exp
 	REAL(dp) :: CE1_nb, CE1_nb_c, CE1_nb_cl, CE1_nb_cd, CE1_nb_h, CE1_nb_hl, CE1_nb_hd, CE1_nb_b, CE1_nb_bl, CE1_nb_bd
 	REAL(dp) :: CE1_pop, CE1_pop_c, CE1_pop_cl, CE1_pop_cd, CE1_pop_h, CE1_pop_hl, CE1_pop_hd, CE1_pop_b, CE1_pop_bl, CE1_pop_bd
@@ -3219,6 +3244,12 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 
 	! Size of new borns 
 	size_nb     = sum(DBN_bench(1,:,:,:,:,:))
+
+	! Discount factor
+	CumDiscountF(MaxAge)=1.0_DP
+	DO age=MaxAge-1,1,-1
+	    CumDiscountF(age)   = 1.0_DP + beta * survP(age) *CumDiscountF(age+1) 
+	ENDDO
 	
 	! Define benchmark and experiment variales
 	C_bench 	= sum(Cons_bench*DBN_bench)
@@ -3250,21 +3281,42 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			Value_aux = Value_aux - Bq_Value_aux + Bq_Value_bench
 
 	! CE1 Measures 
+		if (Log_Switch.eqv..false.) then
 		CE1_mat =((ValueFunction_exp  -Bq_Value_bench)/&
 				& (ValueFunction_Bench-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+		else 
+		do age=1:MaxAge
+		CE1_mat(age,:,:,:,:,:) = & 
+				& exp( ( ValueFunction_exp(age,:,:,:,:,:)-ValueFunction_Bench(age,:,:,:,:,:) )/CumDiscountF(age) )-1.0_DP
+		enddo 
+		endif 
 
 		! Decomposition: Consumption
 			! Total
+			if (Log_Switch.eqv..false.) then
 			CE1_c_mat  =((ValueFunction      -Bq_Value_bench)/&
 					   & (ValueFunction_Bench-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+			else 
+			do age=1:MaxAge
+			CE1_c_mat(age,:,:,:,:,:) = & 
+					& exp( ( ValueFunction(age,:,:,:,:,:)-ValueFunction_Bench(age,:,:,:,:,:) )/CumDiscountF(age) )-1.0_DP
+			enddo 
+			endif 
 			! Level
 			CE1_pop_cl = 100.0_dp*( C_exp/C_bench-1.0_dp )
 			CE1_nb_cl  = 100.0_dp*( C_exp/C_bench-1.0_dp )! 100.0_dp*( C_nb_exp/C_nb_bench-1.0_dp )
 
 		! Decomposition: Leisure
 			! Total
+			if (Log_Switch.eqv..false.) then
 			CE1_h_mat  =((Value_aux    -Bq_Value_bench)/&
 					   & (ValueFunction-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+			else 
+			do age=1:MaxAge
+			CE1_h_mat(age,:,:,:,:,:) = & 
+					& exp( ( Value_aux(age,:,:,:,:,:)-ValueFunction(age,:,:,:,:,:) )/CumDiscountF(age) )-1.0_DP
+			enddo 
+			endif 
 			! Level
 			CE1_pop_hl = 100.0_dp*( ((1.0_dp-H_exp   )/(1.0_dp-H_bench   ))**((1.0_dp-gamma)/gamma) -1.0_dp )
 			CE1_nb_hl  = 100.0_dp*( ((1.0_dp-H_exp   )/(1.0_dp-H_bench   ))**((1.0_dp-gamma)/gamma) -1.0_dp ) ! 100.0_dp*( ((1.0_dp-H_nb_exp)/(1.0_dp-H_nb_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
@@ -3273,14 +3325,28 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			! Total
 			CE1_b_mat  =((ValueFunction_exp-Bq_Value_bench)/&
 					   & (Value_aux        -Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+			if (Log_Switch.eqv..false.) then
+			CE1_b_mat = ((ValueFunction_exp-Bq_Value_bench)/&
+					   & (Value_aux        -Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
+			else 
+			do age=1:MaxAge
+			CE1_b_mat(age,:,:,:,:,:) = & 
+					& exp( ( ValueFunction_exp(age,:,:,:,:,:)-Value_aux(age,:,:,:,:,:) )/CumDiscountF(age) )-1.0_DP
+			enddo 
 			! Level
 			CE1_pop_bl = 100.0_dp*( BQ_exp/BQ_bench-1.0_dp )
 			CE1_nb_bl  = 100.0_dp*( BQ_exp/BQ_bench-1.0_dp ) ! 100.0_dp*( BQ_nb_exp/BQ_nb_bench-1.0_dp )
 
 		! Decomposition: Consumption and Leisure
+			! Total
+			if (Log_Switch.eqv..false.) then
 			CE1_ch_mat = ((Value_aux    -Bq_Value_bench)/&
 					   & (ValueFunction_Bench-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
-
+			else 
+			do age=1:MaxAge
+			CE1_ch_mat(age,:,:,:,:,:) = & 
+					& exp( ( Value_aux(age,:,:,:,:,:)-ValueFunction_Bench(age,:,:,:,:,:) )/CumDiscountF(age) )-1.0_DP
+			enddo 
 			! Level
 			CE1_pop_chl = 100.0_dp*( C_exp/C_bench*((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
 			CE1_nb_chl  = 100.0_dp*( C_exp/C_bench*((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) -1.0_dp ) ! 100.0_dp*( C_nb_exp/C_nb_bench*((1.0_dp-H_nb_exp)/(1.0_dp-H_nb_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
@@ -3309,6 +3375,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 
 
 	! CE2 Measures 
+		if (Log_Switch.eqv..false.) then
 		CE2_nb  =  100.0_dp*(( (sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
 	    					&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
 	                        &  sum((ValueFunction_Bench(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
@@ -3317,17 +3384,35 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		CE2_pop = 100.0_dp*(( (sum(ValueFunction_exp*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
 	    					& sum((ValueFunction_Bench-Bq_Value_Bench)*DBN_bench)  ) &
 	                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+		else 
+		CE2_nb  =  100.0_dp*(exp( ( sum(ValueFunction_exp(1,:,:,:,:,:)  *DBN_exp(1,:,:,:,:,:)     ) - &
+	                        &           sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  )/ &
+							& 	 (CumDiscountF(1)*size_nb) ) - 1.0_DP )
+
+		CE2_pop = 100.0_dp*(exp( ( sum(ValueFunction_exp*DBN1) - sum(ValueFunction_Bench*DBN_bench) )/ &
+							& 	 sum( CumDiscountF*sum(sum(sum(sum(sum(DBN_bench,6),5),4),3),2) ) ) - 1.0_DP )
+		endif 
+
 
 		! Decomposition: Consumption
 			! Total (note that auxiliary value functions are weighted with benchmark distribution)
-			CE2_nb_c   =  100.0_dp*(( (sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
-	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
-	                        	&  sum((ValueFunction_Bench(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
-	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+			if (Log_Switch.eqv..false.) then
+			CE2_nb_c  =  100.0_dp*(( (sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
+		    					&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
+		                        &  sum((ValueFunction_Bench(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
+		                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 
-			CE2_pop_c  = 100.0_dp*(( (sum(ValueFunction*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
-	    						& sum((ValueFunction_Bench-Bq_Value_Bench)*DBN_bench)  ) &
-	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+			CE2_pop_c = 100.0_dp*(( (sum(ValueFunction*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
+		    					& sum((ValueFunction_Bench-Bq_Value_Bench)*DBN_bench)  ) &
+		                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+			else 
+			CE2_nb_c  =  100.0_dp*(exp( ( sum(ValueFunction(1,:,:,:,:,:)  *DBN_exp(1,:,:,:,:,:)     ) - &
+		                        &           sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  )/ &
+								& 	 (CumDiscountF(1)*size_nb) ) - 1.0_DP )
+
+			CE2_pop_c = 100.0_dp*(exp( ( sum(ValueFunction*DBN_exp) - sum(ValueFunction_Bench*DBN_bench) )/ &
+								& 	 sum( CumDiscountF*sum(sum(sum(sum(sum(DBN_bench,6),5),4),3),2) ) ) - 1.0_DP )
+			endif 
 			! Level
 			CE2_nb_cl  = 100.0_dp*( C_exp/C_bench-1.0_dp ) ! 100.0_dp*( C_nb_exp/C_nb_bench-1.0_dp )
 			CE2_pop_cl = 100.0_dp*( C_exp/C_bench-1.0_dp )
@@ -3337,15 +3422,24 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 
 		! Decomposition: Leisure
 			! Total (note that auxiliary value functions are weighted with benchmark distribution)
-			CE2_nb_h   =  100.0_dp*(( (sum(Value_aux(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
-	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
-	                        	&  (sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
+			if (Log_Switch.eqv..false.) then
+			CE2_nb_h  =  100.0_dp*(( (sum(Value_aux(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
+		    					&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
+		                        &  (sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
 	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))  ) &
-	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+		                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 
-			CE2_pop_h  = 100.0_dp*(( (sum(Value_aux*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
-	    						& (sum(ValueFunction*DBN_exp)-sum(Bq_Value_Bench*DBN_bench))  ) &
-	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+			CE2_pop_h = 100.0_dp*(( (sum(Value_aux*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
+		    					& (sum(ValueFunction*DBN_exp)-sum(Bq_Value_Bench*DBN_bench))  ) &
+		                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+			else 
+			CE2_nb_h  =  100.0_dp*(exp( ( sum(Value_aux(1,:,:,:,:,:)  *DBN_exp(1,:,:,:,:,:)     ) - &
+		                        &           sum(ValueFunction(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))  )/ &
+								& 	 (CumDiscountF(1)*size_nb) ) - 1.0_DP )
+
+			CE2_pop_h = 100.0_dp*(exp( ( sum(Value_aux*DBN_exp) - sum(ValueFunction*DBN_exp) )/ &
+								& 	 sum( CumDiscountF*sum(sum(sum(sum(sum(DBN_bench,6),5),4),3),2) ) ) - 1.0_DP )
+			endif 
 			! Level
 			CE2_nb_hl  = 100.0_dp*( ((1.0_dp-H_exp   )/(1.0_dp-H_bench   ))**((1.0_dp-gamma)/gamma) -1.0_dp ) ! 100.0_dp*( ((1.0_dp-H_nb_exp)/(1.0_dp-H_nb_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
 			CE2_pop_hl = 100.0_dp*( ((1.0_dp-H_exp   )/(1.0_dp-H_bench   ))**((1.0_dp-gamma)/gamma) -1.0_dp )
@@ -3355,16 +3449,24 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 
 		! Decomposition: Bequests
 			! Total (note that auxiliary value functions are weighted with experiment distribution)
-			CE2_nb_b   =  100.0_dp*(( (sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
-	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
-	                        	&  (sum(Value_aux(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
+			if (Log_Switch.eqv..false.) then
+			CE2_nb_b  =  100.0_dp*(( (sum(ValueFunction_exp(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
+		    					&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
+		                        &  (sum(Value_aux(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
 	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:)))  ) &
-	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+		                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 
-			CE2_pop_b  = 100.0_dp*(( (sum(ValueFunction_exp*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
-	    						& (sum(Value_aux*DBN_exp)-sum(Bq_Value_Bench*DBN_bench))  ) &
-	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+			CE2_pop_b = 100.0_dp*(( (sum(ValueFunction_exp*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
+		    					& (sum(Value_aux*DBN_exp)-sum(Bq_Value_Bench*DBN_bench))  ) &
+		                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+			else 
+			CE2_nb_b  =  100.0_dp*(exp( ( sum(ValueFunction_exp(1,:,:,:,:,:)  *DBN_exp(1,:,:,:,:,:)     ) - &
+		                        &           sum(Value_aux(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:))  )/ &
+								& 	 (CumDiscountF(1)*size_nb) ) - 1.0_DP )
 
+			CE2_pop_b = 100.0_dp*(exp( ( sum(ValueFunction_exp*DBN_exp) - sum(Value_aux*DBN_exp) )/ &
+								& 	 sum( CumDiscountF*sum(sum(sum(sum(sum(DBN_bench,6),5),4),3),2) ) ) - 1.0_DP )
+			endif 
 			! Level
 			CE2_nb_bl  = 100.0_dp*( BQ_exp/BQ_bench-1.0_dp ) ! 100.0_dp*( BQ_nb_exp/BQ_nb_bench-1.0_dp )
 			CE2_pop_bl = 100.0_dp*( BQ_exp/BQ_bench-1.0_dp )
@@ -3374,14 +3476,23 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 
 		! Decomposition: Consumption and Leisure
 			! Total (note that auxiliary value functions are weighted with benchmark distribution)
-			CE2_nb_ch   =  100.0_dp*(( (sum(Value_aux(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
-	    						&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
-	                        	&  sum((ValueFunction_Bench(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
-	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+			if (Log_Switch.eqv..false.) then
+			CE2_nb_ch  =  100.0_dp*(( (sum(Value_aux(1,:,:,:,:,:)*DBN_exp(1,:,:,:,:,:)) - &
+		    					&  sum(Bq_Value_bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))) / &
+		                        &  sum((ValueFunction_Bench(1,:,:,:,:,:)-Bq_Value_bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:))  ) &
+		                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 
-			CE2_pop_ch  = 100.0_dp*(( (sum(Value_aux*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
-	    						& sum((ValueFunction_Bench-Bq_Value_Bench)*DBN_bench)  ) &
-	                        	&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+			CE2_pop_ch = 100.0_dp*(( (sum(Value_aux*DBN_exp)-sum(Bq_Value_Bench*DBN_bench)) / &
+		    					& sum((ValueFunction_Bench-Bq_Value_Bench)*DBN_bench)  ) &
+		                        &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
+			else 
+			CE2_nb_ch  =  100.0_dp*(exp( ( sum(Value_aux(1,:,:,:,:,:)  *DBN_exp(1,:,:,:,:,:)     ) - &
+		                        &           sum(ValueFunction_Bench(1,:,:,:,:,:)*DBN_bench(1,:,:,:,:,:))  )/ &
+								& 	 (CumDiscountF(1)*size_nb) ) - 1.0_DP )
+
+			CE2_pop_ch = 100.0_dp*(exp( ( sum(Value_aux*DBN_exp) - sum(ValueFunction_Bench*DBN_bench) )/ &
+								& 	 sum( CumDiscountF*sum(sum(sum(sum(sum(DBN_bench,6),5),4),3),2) ) ) - 1.0_DP )
+			endif 
 			! Level
 			CE2_pop_chl = 100.0_dp*( C_exp/C_bench*((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
 			CE2_nb_chl  = 100.0_dp*( C_exp/C_bench*((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) -1.0_dp ) ! 100.0_dp*( C_nb_exp/C_nb_bench*((1.0_dp-H_nb_exp)/(1.0_dp-H_nb_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
@@ -3511,7 +3622,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 
 !========================================================================================
 !========================================================================================
-
+if (Log_Switch.eqv..false.) then
 	! Auxiliary Value Functions
 		! Note: we are keeping Aprime at bench values, which affects bequest and expected values trhough 
 		!		changes in states. An alternative is to use Aprime_exp and adjust net out the value of 
@@ -3766,7 +3877,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		print*, '-----------------------------------------------------------------------------------'
 		print*, ' '
 
-
+end 
 
 
 END SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION

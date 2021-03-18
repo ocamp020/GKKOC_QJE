@@ -1556,7 +1556,11 @@ end Subroutine EGM_Working_Period
 		real(DP)             :: v_bq
 
 		if (chi_bq.gt.0.0_dp) then 
-		v_bq = chi_u*((1.0_dp-tau_bq)*a+bq_0)**(gamma*(1.0_dp-sigma))/(1.0_dp-sigma) 
+			if ((Log_Switch.eqv..true.).or.(sigma.eq.1.0_dp)) then
+				v_bq = chi_u*log((1.0_dp-tau_bq)*a+bq_0)
+			else 
+				v_bq = chi_u*((1.0_dp-tau_bq)*a+bq_0)**(gamma*(1.0_dp-sigma))/(1.0_dp-sigma) 
+			end if 
 		else 
 		v_bq = 0.0_dp 
 		endif 
