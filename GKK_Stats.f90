@@ -3118,7 +3118,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN_TRANSITION()
 		CE2_pop_tr = 100.0_dp*(( sum((Value_mat-BQ_Value_mat)*DBN_bench) / sum((ValueFunction_Bench-BQ_Value_mat)*DBN_bench)  ) &
 		                                &  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP)
 		else 
-		CE2_nb_tr  = 100.0_dp*(exp( ( sum( (Value_mat(1,:,:,:,:,:)-ValueFunction_Bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:)) / &
+		CE2_nb_tr  = 100.0_dp*(exp( sum( (Value_mat(1,:,:,:,:,:)-ValueFunction_Bench(1,:,:,:,:,:))*DBN_bench(1,:,:,:,:,:)) / &
 							& 	 (CumDiscountF(1)*sum(DBN_bench(1,:,:,:,:,:))) ) - 1.0_DP )
 		
 		CE2_pop_tr = 100.0_dp*(exp( ( sum( (Value_mat-ValueFunction_Bench)*DBN_bench )  )/ &
@@ -3285,7 +3285,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		CE1_mat =((ValueFunction_exp  -Bq_Value_bench)/&
 				& (ValueFunction_Bench-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
 		else 
-		do age=1:MaxAge
+		do age=1,MaxAge
 		CE1_mat(age,:,:,:,:,:) = & 
 				& exp( ( ValueFunction_exp(age,:,:,:,:,:)-ValueFunction_Bench(age,:,:,:,:,:) )/CumDiscountF(age) )-1.0_DP
 		enddo 
@@ -3297,7 +3297,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			CE1_c_mat  =((ValueFunction      -Bq_Value_bench)/&
 					   & (ValueFunction_Bench-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
 			else 
-			do age=1:MaxAge
+			do age=1,MaxAge
 			CE1_c_mat(age,:,:,:,:,:) = & 
 					& exp( ( ValueFunction(age,:,:,:,:,:)-ValueFunction_Bench(age,:,:,:,:,:) )/CumDiscountF(age) )-1.0_DP
 			enddo 
@@ -3312,7 +3312,7 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			CE1_h_mat  =((Value_aux    -Bq_Value_bench)/&
 					   & (ValueFunction-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
 			else 
-			do age=1:MaxAge
+			do age=1,MaxAge
 			CE1_h_mat(age,:,:,:,:,:) = & 
 					& exp( ( Value_aux(age,:,:,:,:,:)-ValueFunction(age,:,:,:,:,:) )/CumDiscountF(age) )-1.0_DP
 			enddo 
@@ -3329,10 +3329,11 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			CE1_b_mat = ((ValueFunction_exp-Bq_Value_bench)/&
 					   & (Value_aux        -Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
 			else 
-			do age=1:MaxAge
+			do age=1,MaxAge
 			CE1_b_mat(age,:,:,:,:,:) = & 
 					& exp( ( ValueFunction_exp(age,:,:,:,:,:)-Value_aux(age,:,:,:,:,:) )/CumDiscountF(age) )-1.0_DP
 			enddo 
+			endif 
 			! Level
 			CE1_pop_bl = 100.0_dp*( BQ_exp/BQ_bench-1.0_dp )
 			CE1_nb_bl  = 100.0_dp*( BQ_exp/BQ_bench-1.0_dp ) ! 100.0_dp*( BQ_nb_exp/BQ_nb_bench-1.0_dp )
@@ -3343,10 +3344,11 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 			CE1_ch_mat = ((Value_aux    -Bq_Value_bench)/&
 					   & (ValueFunction_Bench-Bq_Value_bench) )**( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
 			else 
-			do age=1:MaxAge
+			do age=1,MaxAge
 			CE1_ch_mat(age,:,:,:,:,:) = & 
 					& exp( ( Value_aux(age,:,:,:,:,:)-ValueFunction_Bench(age,:,:,:,:,:) )/CumDiscountF(age) )-1.0_DP
 			enddo 
+			endif 
 			! Level
 			CE1_pop_chl = 100.0_dp*( C_exp/C_bench*((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
 			CE1_nb_chl  = 100.0_dp*( C_exp/C_bench*((1.0_dp-H_exp)/(1.0_dp-H_bench))**((1.0_dp-gamma)/gamma) -1.0_dp ) ! 100.0_dp*( C_nb_exp/C_nb_bench*((1.0_dp-H_nb_exp)/(1.0_dp-H_nb_bench))**((1.0_dp-gamma)/gamma) -1.0_dp )
@@ -3877,7 +3879,7 @@ if (Log_Switch.eqv..false.) then
 		print*, '-----------------------------------------------------------------------------------'
 		print*, ' '
 
-end 
+endif 
 
 
 END SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION

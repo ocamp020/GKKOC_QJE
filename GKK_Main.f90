@@ -140,7 +140,7 @@ PROGRAM main
 				sigma_z_eps      = 0.296_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 				sigma_lambda_eps = 0.309_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
 				gamma  	= 0.4450_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
-				sigma  	= 2.0_dp
+				sigma  	= 1.0_dp
 				x_hi	= 1.50_dp
 
 			! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
