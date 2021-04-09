@@ -4542,7 +4542,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		tauK_0 = tauK 
 		tauW_0 = tauW_at
 
-	Use_Transition_Seed = .false.
+	Use_Transition_Seed = .true.
 
 		
 	if (budget_balance) then 
