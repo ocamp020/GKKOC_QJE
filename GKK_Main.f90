@@ -4583,7 +4583,7 @@ Subroutine Solve_Transition_Opt_Taxes(Opt_Tax_KW,budget_balance,balance_tau_L)
 		if (read_results.eqv..false.) then 
 		! Solve for the optimal tax for iterative loops of Debt_Absorption
 
-		DO Debt_Absorption_iter=6,10,2
+		DO Debt_Absorption_iter=10,10,2
 
 			! Set Debt_Absorption
 			Debt_Absorption = real(Debt_Absorption_iter,8)/10.0_dp
