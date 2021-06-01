@@ -2008,7 +2008,7 @@ SUBROUTINE FIND_DBN_EQ()
 	IMPLICIT NONE
 	INTEGER  :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
 	REAL   	 :: DBN_dist, DBN_criteria
-	REAL(DP) :: BBAR, Wealth, brent_value
+	REAL(DP) :: BBAR, Wealth, brent_value, R_old
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable ::  PrAprimelo, PrAprimehi, PrBqlo, PrBqhi, DBN2
 	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable ::  Aplo, Aphi, Bqlo, Bqhi
 	! Timing
@@ -2229,7 +2229,7 @@ SUBROUTINE FIND_DBN_EQ()
 	    ENDDO
 	    !$omp barrier
 	    
-	    DBN2 = 0.7_dp*DBN1 + 0.3_dp*DBN2
+	    DBN2 = 0.8_dp*DBN1 + 0.2_dp*DBN2
 	    DBN_dist = maxval(abs(DBN2-DBN1))
 	    ! print*, DBN_dist
 	    DBN1 = DBN2
@@ -2324,8 +2324,13 @@ SUBROUTINE FIND_DBN_EQ()
 		    	if (mu.lt.1.0_dp) then 
 		    	! R = zbrent(Agg_Debt,0.1_dp,1.00_dp,brent_tol) 
 		    	if (sum(theta)/nz .gt. 1.0_DP) then
-		    		P = min(P,1.0_dp)
-		            brent_value = brent(-0.1_DP,0.01_DP,10.0_DP,Agg_Debt, brent_tol,R)
+		    		P 			= min(P,1.0_dp)
+		    		R_old       = R 
+		            brent_value = brent(-0.01_DP,0.03_DP,1.0_DP,Agg_Debt, brent_tol,R)
+		            if (brent_value.gt.brent_tol) then 
+		            	print*, '	brent failed at clearing market, leaving R unchanged '
+		            	R = R_old 
+		            endif 
 		        else
 		            R = 0.0_DP
 		        endif
