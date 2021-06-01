@@ -374,21 +374,21 @@ SUBROUTINE COMPUTE_STATS()
 		    Capital_by_z(zi) = Capital_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)
 
 
-		    if (mu.lt.1.0_dp) then 
+		    ! if (mu.lt.1.0_dp) then 
 
-		    MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)* agrid(ai)
-		    if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
-		     MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)    
-		     MeanReturn_by_z(zi)  = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * &
-		    							& (R*agrid(ai) + Pr_mat(ai,zi,xi)) 
-		    else
-		     MeanReturn = MeanReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
-		      			& ( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) 
-      	     MeanReturn_by_z(zi)  = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai) * & 
-		      			& ( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) 
-		    endif      
+		    ! MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)* agrid(ai)
+		    ! if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
+		    !  MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)    
+		    !  MeanReturn_by_z(zi)  = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * &
+		    ! 							& (R*agrid(ai) + Pr_mat(ai,zi,xi)) 
+		    ! else
+		    !  MeanReturn = MeanReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai) * & 
+		    !   			& ( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) 
+      ! 	     MeanReturn_by_z(zi)  = MeanReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai) * & 
+		    !   			& ( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) 
+		    ! endif      
 
-		    else 
+		    ! else 
 
 		    MeanReturn           = MeanReturn          + DBN1(age, ai, zi, lambdai, ei, xi) * &
 		    							& (R*agrid(ai) + Pr_mat(ai,zi,xi))
@@ -398,7 +398,7 @@ SUBROUTINE COMPUTE_STATS()
 		    MeanATReturn           = MeanATReturn          + DBN1(age, ai, zi, lambdai, ei, xi) * (YGRID(ai,zi,xi)-agrid(ai))
 		    MeanATReturn_by_z(zi)  = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * (YGRID(ai,zi,xi)-agrid(ai))
 
-		    endif 
+		    ! endif 
 
 		    
 		ENDDO
@@ -432,19 +432,19 @@ SUBROUTINE COMPUTE_STATS()
 		DO ei=1, ne  
 
 
-			if (mu.lt.1.0_dp) then 
+			! if (mu.lt.1.0_dp) then 
 
-			VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
-		    				& ((MBGRID(ai,zi)-1.0_DP)-MeanATReturn)**2.0_dp
+			! VarATReturn = VarATReturn + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * &
+		 !    				& ((MBGRID(ai,zi)-1.0_DP)-MeanATReturn)**2.0_dp
 
-		    if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
-			   VarReturn = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * (R-MeanReturn)**2.0_dp
-		   	else
-				VarReturn = VarReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * & 
-							& (( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) -MeanReturn)**2.0_dp
-		   	endif  
+		 !    if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
+			!    VarReturn = VarReturn   + DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * (R-MeanReturn)**2.0_dp
+		 !   	else
+			! 	VarReturn = VarReturn+ DBN1(age, ai, zi, lambdai, ei) * agrid(ai)/MeanWealth * & 
+			! 				& (( R + (P*mu*((theta*zgrid(zi))**mu)*(agrid(ai))**(mu-1.0_DP)-(R+DepRate)*theta)) -MeanReturn)**2.0_dp
+		 !   	endif  
 
-		   	else 
+		 !   	else 
 
 		    VarReturn    = VarReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
 		    				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/agrid(ai)-MeanReturn)**2.0_dp
@@ -452,7 +452,7 @@ SUBROUTINE COMPUTE_STATS()
 			VarATReturn  = VarATReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
 		    				& ((YGRID(ai,zi,xi)-agrid(ai))/agrid(ai)-MeanATReturn)**2.0_dp 
 
-		    endif 
+		    ! endif 
 
 		    Var_K_Return = Var_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
 		    				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp
