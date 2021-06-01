@@ -119,7 +119,7 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)              :: Y_a, K, Pr
 
 		! Capital demand 
-		K   = a_in ! min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
@@ -153,7 +153,7 @@ end Subroutine Asset_Grid_Threshold
 		real(DP) :: K, Pr, Y_a, tauW
 
 		! Capital demand 
-		K   = a_in ! min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Profits 
 		Pr  = P*(xz_grid(x_in,z_in)*K)**mu - (R+DepRate)*K
 		! Before tax wealth
@@ -181,7 +181,7 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)			  :: MB_a_at, K
 
 		! Capital demand 
-		K   = a_in ! min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
 		if ((K.lt.theta(z_in)*a_in).or.(mu.eq.1.0_dp)) then 
 			MB_a_at = (1.0_dp*(1.0_dp-tauW_at) + R*(1.0_dp-tauK))
@@ -199,7 +199,7 @@ end Subroutine Asset_Grid_Threshold
 		real(DP)             :: MB_a_bt, K
 
 		! Capital demand 
-		K   = a_in ! min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		K   = min( theta(z_in)*a_in , (mu*P*xz_grid(x_in,z_in)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		! Compute asset marginal benefit - subject to taxes
 		if ((K.lt.theta(z_in)*a_in).or.(mu.eq.1.0_dp)) then 
 			MB_a_bt = (1.0_dp*(1.0_dp-tauW_bt) + R*(1.0_dp-tauK))
@@ -6378,8 +6378,8 @@ Function K_Matrix(R_in,P_in)
 	do j=1,nz
 	do i=1,na 
 		if (mu.lt.1.0_dp) then 
-		! K_Matrix(i,j,h) = min( theta(j)*agrid(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-		print*, ' mu<1 - need to uncomment this line'
+		K_Matrix(i,j,h) = min( theta(j)*agrid(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		! print*, ' mu<1 - need to uncomment this line'
 		else 
 		K_Matrix(i,j,h) = agrid(i) 
 		endif 
@@ -6401,8 +6401,8 @@ Function K_Matrix_t(R_in,P_in)
 	do j=1,nz
 	do i=1,na_t
 		if (mu.lt.1.0_dp) then 
-		! K_Matrix_t(i,j,h) = min( theta(j)*agrid_t(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-		print*, ' mu<1 - need to uncomment this line'
+		K_Matrix_t(i,j,h) = min( theta(j)*agrid_t(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+		! print*, ' mu<1 - need to uncomment this line'
 		else 
 		K_Matrix_t(i,j,h) = agrid_t(i)
 		endif 
