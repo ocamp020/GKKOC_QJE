@@ -59,9 +59,9 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
-			compute_bench = .true.
-			compute_exp   = .true.
+		Tax_Reform    = .false.
+			compute_bench = .false.
+			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .true.
 				Fixed_PF_interp = .true.
@@ -81,7 +81,7 @@ PROGRAM main
 
 		compute_exp_fixed_prices_and_taxes = .false.
 
-		Opt_Tax       = .false.
+		Opt_Tax       = .true.
 			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
 
 		Opt_Threshold = .false.
@@ -2373,10 +2373,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
 		print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
 		print*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_5.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
     	
-    	tau_grid_min  = 250
-    	tau_grid_max  = 290
+    	tau_grid_min  = 150
+    	tau_grid_max  = 300
     	tau_grid_step = 1
 
     	! Set low psi
@@ -2385,10 +2385,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
 		print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
 		print*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_4.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	
-    	tau_grid_min  = 200
-    	tau_grid_max  = 220
+    	tau_grid_min  = 100
+    	tau_grid_max  = 260
     	tau_grid_step = 1
 
     	! Set Y_a_threshold
@@ -2485,9 +2485,9 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	      	print*,'------------------------------------------------------------------------------';print*,' '
 
 	      	if (Opt_Tax_KW) then 
-	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_5.txt', STATUS='old', POSITION='append')
+	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
 	      	else 
-	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_4.txt', STATUS='old', POSITION='append')
+	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='old', POSITION='append')
 	      	endif 
 		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, (GBAR_K+GBAR_W)/(GBAR_bench +SSC_Payments_bench ), & 
 			      &  MeanWealth, QBAR, QBAR/MeanWealth,NBAR, &
