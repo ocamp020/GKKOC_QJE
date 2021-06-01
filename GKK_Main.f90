@@ -2375,8 +2375,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
     	
-    	tau_grid_min  = 150
-    	tau_grid_max  = 300
+    	tau_grid_min  = 15
+    	tau_grid_max  = 30
     	tau_grid_step = 1
 
     	! Set low psi
@@ -2387,8 +2387,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	
-    	tau_grid_min  = 100
-    	tau_grid_max  = 260
+    	tau_grid_min  = 10
+    	tau_grid_max  = 26
     	tau_grid_step = 1
 
     	! Set Y_a_threshold
@@ -2422,10 +2422,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		psi = psi_bench
 
 		if (Opt_Tax_KW) then 
-			tauK        = real(tauindx,8)/1000_DP
+			tauK        = real(tauindx,8)/100_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 		else 
-			tauw_at     = real(tauindx,8)/10000_DP
+			tauw_at     = real(tauindx,8)/1000_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 		endif 
 
