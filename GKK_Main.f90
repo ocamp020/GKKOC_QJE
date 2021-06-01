@@ -152,7 +152,7 @@ PROGRAM main
 				! do zi=1,nz
 				! theta(zi)    = 1.00_dp+(2.80_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 				! enddo
-				theta = 1.50_dp 
+				theta = 1.55_dp 
 
 			! No bequest fees
 				bq_fee = 0.00_dp
