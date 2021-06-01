@@ -136,7 +136,7 @@ PROGRAM main
 		
 		! Debt/Output = 1.5, lambda = 1.5, no bequest fee
 			! Main Parameters 
-				beta   	= 0.962_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+				beta   	= 0.9615_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
 				sigma_z_eps      = 0.277_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 				sigma_lambda_eps = 0.282_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
 				gamma  	= 0.460_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
@@ -152,7 +152,7 @@ PROGRAM main
 				! do zi=1,nz
 				! theta(zi)    = 1.00_dp+(2.80_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 				! enddo
-				theta = 3.49_dp 
+				theta = 3.48_dp 
 
 			! No bequest fees
 				bq_fee = 0.00_dp
