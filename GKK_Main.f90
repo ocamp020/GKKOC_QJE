@@ -60,7 +60,7 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .false.
-			compute_bench = .false.
+			compute_bench = .true.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
 				Fixed_PF        = .true.
@@ -2373,10 +2373,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
 		print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
 		print*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_3.txt', STATUS='replace')
     	
     	tau_grid_min  = 25
-    	tau_grid_max  = 15
+    	tau_grid_max  = 10
     	tau_grid_step = -1
 
     	! Set low psi
@@ -2485,7 +2485,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	      	print*,'------------------------------------------------------------------------------';print*,' '
 
 	      	if (Opt_Tax_KW) then 
-	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='old', POSITION='append')
+	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_3.txt', STATUS='old', POSITION='append')
 	      	else 
 	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_2.txt', STATUS='old', POSITION='append')
 	      	endif 
