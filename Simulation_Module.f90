@@ -6,6 +6,801 @@ Module Simulation_Module
 	    
 	Contains
 
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+SUBROUTINE  SIMULATION_Infinite_Horizon(bench_indx)
+	use parameters
+	use global
+	use omp_lib
+	IMPLICIT NONE	
+	integer, intent(in) :: bench_indx
+	! Break for comment
+		integer  :: currentzi, currentlambdai, currentei, currentxi, thread_num
+		REAL(DP) :: tempnoage, tempnoz, tempnolambda, tempnoe, tempnox, tempno, currenta, currentY
+		REAL(DP) :: start_timet, finish_timet, h_i
+		INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
+		INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
+		INTEGER , DIMENSION(:), allocatable :: panelage, panelz, panellambda, panele, panelx, panelz_old, panellambda_old
+		REAL(DP), DIMENSION(:), allocatable :: panela! , panelPV_a, panelK, panel_Y_L, panelRet, panelRet_K
+		REAL(DP)  							 :: K_aux, prctile_ret(9)
+		INTEGER 							 :: i_pct
+		
+		REAL :: k_igm
+
+		! Top Agents 
+		INTEGER       :: top_ind(80), top_ind_aux(80), n_top
+		INTEGER, DIMENSION(:), allocatable :: panel_top_ind
+		REAL(DP)      :: top_A(80), A_cut, A_hi, A_low
+		character(10) :: top_folder
+
+		print*,'test 1'
+
+		! Allocate variables
+		allocate( panelage(   		totpop) )
+		! allocate( panelz(     		totpop) )
+		! allocate( panellambda(		totpop) )
+		allocate( panele(     		totpop) )
+		! allocate( panelx(     		totpop) )
+		! allocate( panelz_old(     	totpop) )
+		! allocate( panellambda_old(	totpop) )
+		allocate( panela(			totpop) )
+		! allocate( panelPV_a(		totpop) )
+		! allocate( panelK(			totpop) )
+		! allocate( panel_Y_L(		totpop) )
+		! allocate( panelRet(			totpop) )
+		! allocate( panelRet_K(		totpop) )
+		allocate( panel_top_ind(	totpop) )
+
+
+		print*,' '; print*, 'Starting Simulation Module - Infinite Horizon'; print*, ' ';
+
+
+		call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
+
+		!$ call omp_set_num_threads(4)
+
+			! Set Seeds for each thread
+		!$OMP parallel
+	    !$OMP critical
+			thread_num = omp_get_thread_num()
+			newiseed   = -5 - thread_num
+			tempno     = omp_ran1(newiseed)
+	       	! write(*,'("inside critical myt=",i4,f12.8)') thread_num,tempno,newiseed
+	    !$OMP end critical
+	    !$OMP end parallel
+
+		print*,'SIMULATION STARTED'
+
+	    
+		!=====================================================================
+		!                     GENERATE   INITIAL   PANEL
+		!=====================================================================
+
+
+		newiseed=-1
+		print*, 'Starting simulation loop'
+		! AGE (all the panel starts from age 1)
+			print*, ' Initial age set at 1'
+		    panelage		= 1
+
+		! Labor Efficiency from stationary distribution 			   
+			!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi)
+			DO paneli=1,totpop
+				   tempnoe = omp_ran1() ! ran1(newiseed)   
+				   ei=1
+				   DO WHILE (tempnoe .gt. cdf_Ge(ei))
+				       ei=ei+1
+				   ENDDO
+				   panele(paneli)		= ei
+			ENDDO
+			print*, sum(panelage)/real(totpop,8), sum(panele)/real(totpop,8)
+
+		! SET INITIAL ASSET DISTRIBUTION
+			print*, ' Initial assets set at 1.0_DP'
+			panela            = 1.0_DP
+
+		!=============================================================================
+		!
+		! SIMULATE FROM THE SECOND PERIOD SHOCKS AND UPDATE NEW DISTRIBUTIONS
+		!
+		!=============================================================================
+
+		!call cpu_time(start_timet) 
+
+		
+		print*, 'Starting Asset Simutime loop'
+		DO simutime=1, MaxSimuTime
+			!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi, &
+			!$omp& currenta,currentzi,currentlambdai,currentei,currentxi,tklo,tkhi,tempno,k_igm,&
+			!$omp& K_aux)
+		   	DO paneli=1,totpop
+		    
+		       	currenta  		= panela(paneli)
+		       	age       		= panelage(paneli)
+		       	currentei 		= panele(paneli)
+		       	
+				!  COMPUTE NEXT PERIOD'S ASSET
+				! do linear interpolation here to find aprime. calling the function takes much more time
+		            if (currenta .ge. amax) then
+	                	tklo = na-1
+	                elseif (currenta .lt. amin) then
+	                    tklo = 1
+	                else
+	                    tklo = ((currenta - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+		            endif 
+		            tkhi = tklo + 1        
+
+		            panela(paneli) = ((agrid(tkhi) - currenta)*Aprime_ih(tklo,currentei) 		&
+		                           	&  + (currenta - agrid(tklo))*Aprime_ih(tkhi, currentei)) &
+		                            &  / ( agrid(tkhi) - agrid(tklo) )    
+		            
+		            if (panela(paneli)  .ge. amax) then
+		                panela(paneli) = min(panela(paneli), amax) 
+		            endif      
+		            if (panela(paneli)  .lt. amin) then
+		                panela(paneli) = max(panela(paneli), amin) 
+		            endif      
+				!  NEXT PERIOD'S ASSET HAS BEEN COMPUTED
+
+		             
+				! DRAW NEXT PERIOD'S AGE DBN
+				tempnoage = omp_ran1() ! ran1(newiseed)  
+				IF (tempnoage .gt. survP(currentei)) THEN
+					panelage(paneli)   = 1
+					! Bequest Taxes 
+					panela(paneli) = (1.0_dp-tau_bq)*panela(paneli)
+				ELSE
+					panelage(paneli)   = age+1
+				ENDIF
+		    	age = panelage(paneli)   
+
+				! DRAW NEXT PERIOD'S EFFICIENCY UNITS e
+		    	currentei = panele(paneli)   
+	            tempno 	  = omp_ran1() ! ran1(newiseed)   
+	            ei 		  = 1
+		     	IF (age .eq. 1) THEN   ! New borns draw from Ge
+					DO WHILE (tempno .gt. cdf_Ge(ei))
+		               ei = ei+1
+		            ENDDO            
+	       		ELSE ! Survivors draw from pr_e
+		            DO WHILE (tempno .gt. cdf_pr_e(currentei,ei))
+		               ei = ei+1
+		            ENDDO            
+		     	ENDIF ! new age==1
+		     	panele(paneli)=ei 
+
+				
+
+			ENDDO ! paneli
+			
+
+			! ! Save data on assets for the last periods
+			! ! Agents are eligible if:
+			! 	! 1) They don't die during the first two recording periods
+			! 	! 2) They they die between the third recording period and the recording periods for the next generation
+			! 	! 3) They don't die again
+			! 	if (simutime.eq.(MaxSimuTime-54)) then 
+			!     	panela_parents   = panela
+			!     	! panelage_parents = panelage
+		 	!	endif 
+		 	!	if ((simutime.ge.(MaxSimuTime-(5+53))).and.(simutime.le.(MaxSimuTime-(5+51)))) then 
+			!     	panela_parents   = panela_parents  + panela
+			!     	! panelage_parents = panelage
+			!     	where(panelage==1) eligible = 0 
+		 	!	endif 
+		 	!	if (simutime.eq.(MaxSimuTime-(5+50))) then 
+			!     	panela_parents   = panela_parents   + panela
+			!     	panelage_parents = panelage
+			!     	where(panelage==1) eligible = 0 
+		 	!	endif 
+		 	!	if ((simutime.ge.(MaxSimuTime-(5+49))).and.(simutime.le.(MaxSimuTime-4))) then
+		 	!		where(panelage==1) death_count = death_count + 1
+		 	!	endif
+		 	!	if (simutime.eq.(MaxSimuTime-4)) then 
+			!     	panela_sons   = panela
+			!     	! panelage_sons = panelage 
+		 	!	endif 
+		 	!	if ((simutime.ge.(MaxSimuTime-3)).and.(simutime.le.(MaxSimuTime-1))) then 
+			!     	panela_sons   = panela_sons   + panela
+			!     	! panelage_sons = panelage 
+			!     	where(panelage==1) eligible = 0 
+		 	!	endif 
+		 	!	if (simutime.eq.(MaxSimuTime)) then 
+			!     	! panela_sons   = panela_sons   + panela
+			!     	panelage_sons = panelage 
+			!     	where(panelage==1) eligible = 0 
+		 	!	endif 
+
+		 		
+		 		print*, "Simulation period", simutime
+
+		 		if (modulo(simutime,1000).eq.0) then 
+		 		print*, '	Sleeping for 3min'
+				call sleep(180)
+				endif 
+
+		 		
+			ENDDO ! simutime
+			print*,' '
+			print*,'Averages'
+			print*, sum(panelage)/real(totpop,8), sum(panele)/real(totpop,8), sum(panela)/real(totpop,8)
+
+		! print*, ' Sleeping for 3min before writing results'
+		! call sleep(180)
+
+		print*, ' '
+		print*, 'Writing simulation results'
+
+		if (bench_indx.eq.1) then
+			OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_bench'		, STATUS='replace')
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_bench'	  	, STATUS='replace')
+			OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_bench'        , STATUS='replace')
+		else 
+			OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_exp'		, STATUS='replace')
+			OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/panele_exp'        	, STATUS='replace')
+		endif 
+
+
+		WRITE  (UNIT=10, FMT='(F16.6)') panela
+		WRITE  (UNIT=11, FMT=*) panelage 
+		WRITE  (UNIT=14, FMT=*) panele 
+		
+		close (unit=10); close (unit=11); close (unit=14)
+
+
+
+
+		! ==================================================
+		! ==================================================
+		! ==================================================
+		print*, ' Sleeping for 3min before identying top agents'
+		call sleep(180)
+
+		if (bench_indx==1) then
+		print*,' '
+		print*, 'Identifying top agents'
+		! Top Agents - Assets
+			n_top = totpop 
+			A_hi  = maxval(panela)
+			A_low = minval(panela)
+			A_cut = (A_hi+A_low)/2.0_dp 
+			do while (n_top.ne.80)
+				n_top = count(panela.ge.A_cut)
+				if (n_top.gt.80) then
+					A_low = A_cut 
+				endif 
+				if (n_top.lt.80) then
+					A_hi  = A_cut 
+				endif 
+				A_cut = (A_hi+A_low)/2.0_dp 
+				print*, A_cut, n_top, count(panela.ge.A_cut) 
+			enddo 
+			print*,' '
+			print*,'A_cut final:'
+			print*, A_cut, n_top, count(panela.ge.A_cut) 
+
+			do paneli=1,totpop
+			panel_top_ind(paneli) = paneli 
+			enddo 
+			! panel_top_ind = (/(paneli, paneli=1,totpop, 1)/)
+			top_ind = pack(panel_top_ind  , (panela.ge.A_cut) )
+			top_A   = pack(panela         , (panela.gt.A_cut) )
+			! Sort by assets
+			call Sort(80,top_A,top_A,top_ind_aux)
+			top_ind = top_ind(top_ind_aux)
+			! Test print
+			print*,' '
+			print*,'Top Agents and Top Assets'
+			do paneli=1,80
+				print*, top_ind(paneli),top_A(paneli)
+			enddo
+			print*,'Max(A)', maxval(panela)
+
+			top_folder = 'Top_A/'
+			call SIMULATION_TOP_Infinite_Horizon(bench_indx,top_ind,top_folder)
+
+		endif 
+
+
+
+END SUBROUTINE SIMULATION_Infinite_Horizon
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+SUBROUTINE  SIMULATION_TOP_Infinite_Horizon(bench_indx,top_ind,folder)
+	use parameters
+	use global
+	use omp_lib
+	IMPLICIT NONE
+	integer      , intent(in) :: bench_indx, top_ind(80)
+	character(10), intent(in) :: folder
+	integer  :: currentzi, currentlambdai, currentei, currentxi
+	REAL(DP) :: tempnoage, tempnoz, tempnolambda, tempnoe, tempnox, tempno, currenta, currentY
+	REAL(DP) :: start_timet, finish_timet, h_i
+	INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
+	INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
+
+	INTEGER , DIMENSION(:), allocatable :: panelage, panelz, panellambda, panele, panelx, panelz_old, panellambda_old
+	REAL(SP), DIMENSION(:), allocatable :: panela, panelPV_a, panelK 
+	
+	INTEGER , DIMENSION(150,80) :: panelage_top, panelz_top, panelx_top, panel_lambda_top, panele_top
+	REAL(SP), DIMENSION(150,80) :: panela_top, panelK_top, panel_YL_top, panel_PV_top
+	REAL(SP), DIMENSION(150,80) :: prc_all_top, prc_cohort_top, prc_PV_all_top, prc_PV_cohort_top
+	REAL(SP), DIMENSION(80)		:: panela_top_nb
+	REAL(DP) 					:: Share_Self_Made_100, Share_Self_Made_1000, Share_Self_Made_250
+	INTEGER 				    :: ii, age_top, thread_num
+
+	allocate( panelage(   		totpop) )
+	allocate( panele(     		totpop) )
+	allocate( panela(			totpop) )
+	
+	!$ call omp_set_num_threads(4)
+	!$OMP parallel
+    !$OMP critical
+		thread_num = omp_get_thread_num()
+		newiseed   = -5 - thread_num
+		tempno     = omp_ran1(newiseed)
+       	! write(*,'("inside critical myt=",i4,f12.8)') thread_num,tempno,newiseed
+    !$OMP end critical
+    !$OMP end parallel
+
+
+	print*,'SIMULATION STARTED (for top agents)'
+
+
+	!=====================================================================
+	!                     GENERATE   INITIAL   PANEL
+	!=====================================================================
+
+
+	newiseed=-1
+
+	! AGE (all the panel starts from age 1)
+		print*, ' Initial age set at 1'
+	    panelage		= 1
+
+	! Labor Efficiency from stationary distribution 			   
+		!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi)
+		DO paneli=1,totpop
+			   tempnoe = omp_ran1() ! ran1(newiseed)   
+			   ei=1
+			   DO WHILE (tempnoe .gt. cdf_Ge(ei))
+			       ei=ei+1
+			   ENDDO
+			   panele(paneli)		= ei
+		ENDDO
+		print*, sum(panelage)/real(totpop,8), sum(panele)/real(totpop,8)
+
+
+	print*, ' Initial states ready'
+
+	! SET INITIAL ASSET DISTRIBUTION
+	panela            = 1.0_DP
+
+	!=============================================================================
+	!
+	! SIMULATE FROM THE SECOND PERIOD SHOCKS AND UPDATE NEW DISTRIBUTIONS
+	!
+	!=============================================================================
+
+	!call cpu_time(start_timet) 
+
+	DO simutime=1, MaxSimuTime
+		!$omp parallel do private(tempnoage,age,tempnoz,zi,xi,tempnolambda,lambdai,tempnoe,ei, &
+		!$omp& currenta,currentzi,currentlambdai,currentei,currentxi,tklo,tkhi,tempno)
+	    DO paneli=1,totpop
+	    
+	       	currenta  		= panela(paneli)
+	       	age       		= panelage(paneli)
+	       	currentei 		= panele(paneli)
+	       	
+			!  COMPUTE NEXT PERIOD'S ASSET
+			! do linear interpolation here to find aprime. calling the function takes much more time
+	            if (currenta .ge. amax) then
+                	tklo = na-1
+                elseif (currenta .lt. amin) then
+                    tklo = 1
+                else
+                    tklo = ((currenta - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+	            endif 
+	            tkhi = tklo + 1        
+
+	            panela(paneli) = ((agrid(tkhi) - currenta)*Aprime_ih(tklo,currentei) 		&
+	                           	&  + (currenta - agrid(tklo))*Aprime_ih(tkhi, currentei)) &
+	                            &  / ( agrid(tkhi) - agrid(tklo) )    
+	            
+	            if (panela(paneli)  .ge. amax) then
+	                panela(paneli) = min(panela(paneli), amax) 
+	            endif      
+	            if (panela(paneli)  .lt. amin) then
+	                panela(paneli) = max(panela(paneli), amin) 
+	            endif      
+			!  NEXT PERIOD'S ASSET HAS BEEN COMPUTED
+
+	             
+			! DRAW NEXT PERIOD'S AGE DBN
+				tempnoage = omp_ran1() ! ran1(newiseed)  
+				IF (tempnoage .gt. survP(currentei)) THEN
+					panelage(paneli)   = 1
+					! Bequest Taxes 
+					panela(paneli) = (1.0_dp-tau_bq)*panela(paneli)
+				ELSE
+					panelage(paneli)   = age+1
+				ENDIF
+		    	age = panelage(paneli)   
+
+			! DRAW NEXT PERIOD'S EFFICIENCY UNITS e
+		    	currentei = panele(paneli)   
+	            tempno 	  = omp_ran1() ! ran1(newiseed)   
+	            ei 		  = 1
+		     	IF (age .eq. 1) THEN   ! New borns draw from Ge
+					DO WHILE (tempno .gt. cdf_Ge(ei))
+		               ei = ei+1
+		            ENDDO            
+	       		ELSE ! Survivors draw from pr_e
+		            DO WHILE (tempno .gt. cdf_pr_e(currentei,ei))
+		               ei = ei+1
+		            ENDDO            
+		     	ENDIF ! new age==1
+		     	panele(paneli)=ei 
+
+
+		ENDDO ! paneli
+
+
+
+	    ! Record data of top agents
+     	if (simutime.ge.(MaxSimuTime-149)) then 
+
+     		age_top = simutime-MaxSimuTime+150
+
+
+     		! print*, "Selecting top agents - Period", age_top
+     		panelage_top(age_top,:) = panelage(top_ind)
+     		panela_top(age_top,:)   = panela(top_ind)
+     		panele_top(age_top,:)   = panele(top_ind)
+     		
+     		!$omp parallel do private(tklo,tkhi,h_i)
+     		do ii=1,80 
+     		
+			prc_all_top(age_top,ii)    = 100.0_dp*real(count(panela.le.panela_top(age_top,ii)),8)/real(totpop,8)
+     		prc_cohort_top(age_top,ii) = 100.0_dp* &
+     							& real(count((panela.le.panela_top(age_top,ii)).and.(panelage.eq.panelage_top(age_top,ii))),8) &
+     							& /real(count(panelage.eq.panelage_top(age_top,ii)),8)
+
+			
+			if (panele_top(age_top,ii).lt.ne) then 
+
+     			if (panela_top(age_top,ii) .ge. amax) then
+		            tklo = na-1
+		        else if (panela_top(age_top,ii) .lt. amin) then
+		            tklo = 1
+		        else
+		            tklo = ((panela_top(age_top,ii) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+		        endif 
+		        
+		        tkhi = tklo + 1     
+
+		        h_i  = ( (agrid(tkhi) - panela_top(age_top,ii)) * Hours_ih(tklo,panele_top(age_top,ii)) &
+		            &  + (panela_top(age_top,ii) - agrid(tklo)) * Hours_ih(tkhi,panele_top(age_top,ii))  ) &
+		                            &  / ( agrid(tkhi) - agrid(tklo) )  
+
+				panel_YL_top(age_top,ii) = psi*( Wage * egrid(panele_top(age_top,ii)) * h_i )**(1.0_dp-tauPL)
+			else 
+				panel_YL_top(age_top,ii) = RetY_lambda_e(1,panele_top(age_top,ii))
+			endif 
+
+			enddo 
+
+     	endif
+	    print*, "Simulation period (Top Agents)", simutime
+
+	 		if (modulo(simutime,1000).eq.0) then 
+	 		print*, '	Sleeping for 3min'
+			call sleep(180)
+			endif 
+
+	ENDDO ! simutime
+	print*,' '
+	print*,'Averages'
+	print*, sum(panelage)/real(totpop,8), sum(panele)/real(totpop,8), sum(panela)/real(totpop,8)
+
+
+	! print*, '	Sleeping for 3min before writing results'
+	! 	call sleep(180)
+	print*, ' '
+	print*, 'Writing simulation results for top agents'
+	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' // trim(folder) )
+
+
+	! Get wealth when newborn
+	Share_Self_Made_100  = 0.0_dp
+	Share_Self_Made_1000 = 0.0_dp
+	Share_Self_Made_250  = 0.0_dp
+	if (bench_indx.eq.1) then
+	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'Self_Made_Stats_bench.txt', STATUS='replace')
+	else
+	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'Self_Made_Stats_exp.txt', STATUS='replace')
+	endif 
+	WRITE(UNIT=10,FMT=*) "Self Made Stats for Top Agents"  
+	WRITE(UNIT=10,FMT=*) "Agent Age Initial_Assets Final_Assets Asset_Growth"
+	do ii=1,80
+		panela_top_nb(ii) = panela_top(150-panelage_top(150,ii)+1 , ii)
+		if (panela_top(150,ii)/panela_top_nb(ii).gt.100) then
+		Share_Self_Made_100 = Share_Self_Made_100 + 1.0_dp
+		endif 
+		if (panela_top(150,ii)/panela_top_nb(ii).gt.1000) then
+		Share_Self_Made_1000 = Share_Self_Made_1000 + 1.0_dp
+		endif 
+		if ((EBAR_data/(EBAR_bench*0.727853584919652_dp)*panela_top_nb(ii)).lt.250000) then
+		Share_Self_Made_250 = Share_Self_Made_250 + 1.0_dp
+		endif 
+		WRITE(UNIT=10,FMT=*) ii,panelage_top(150,ii),&
+							& (EBAR_data/(EBAR_bench*0.727853584919652_dp))*panela_top_nb(ii),&
+							& (EBAR_data/(EBAR_bench*0.727853584919652_dp))*panela_top(150,ii),&
+							& 100.0_dp*(panela_top(150,ii)/panela_top_nb(ii)-1.0_dp)
+	enddo
+	Share_Self_Made_100  = 100.0_dp*(Share_Self_Made_100 /80.0_dp)
+	Share_Self_Made_250  = 100.0_dp*(Share_Self_Made_250/80.0_dp)
+	WRITE(UNIT=10,FMT=*) " "  
+	WRITE(UNIT=10,FMT=*) "---------------------------------------"  
+	WRITE(UNIT=10,FMT=*) " "  
+	WRITE(UNIT=10,FMT=*) "Self_Made_100",Share_Self_Made_100
+	WRITE(UNIT=10,FMT=*) "Self_Made_1000",Share_Self_Made_1000 
+	WRITE(UNIT=10,FMT=*) "Self_Made_250",Share_Self_Made_250
+	WRITE(UNIT=10,FMT=*) " "  
+	WRITE(UNIT=10,FMT=*) "---------------------------------------"  
+	CLOSE(UNIT=10)
+
+	print*,' '
+	print*,'----------------------------------'
+	print*,'Self Made Stats'
+	print*," 	Self_Made_100",Share_Self_Made_100
+	print*,"	Self_Made_1000",Share_Self_Made_1000 
+	print*,"	Self_Made_250",Share_Self_Made_250
+	print*,'----------------------------------'
+	print*,' '
+
+
+	if (bench_indx.eq.1) then
+		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panela_top_bench'			, STATUS='replace')
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panelage_top_bench'		, STATUS='replace')
+		OPEN(UNIT=29, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panele_top_bench'    		, STATUS='replace')
+		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panel_YL_top_bench'	    , STATUS='replace')
+		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'prc_all_top_bench'			, STATUS='replace')
+		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'prc_cohort_top_bench'	    , STATUS='replace')
+	else 
+		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panela_top_exp'			, STATUS='replace')
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panelage_top_exp'		    , STATUS='replace')
+		OPEN(UNIT=29, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panele_top_exp'    		, STATUS='replace')
+		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'panel_YL_top_exp'	        , STATUS='replace')
+		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'prc_all_top_exp'			, STATUS='replace')
+		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/'//trim(folder)//'prc_cohort_top_exp'		, STATUS='replace')
+	endif 
+
+
+	WRITE  (UNIT=10, FMT='(F12.4)') panela_top
+	WRITE  (UNIT=11, FMT=*) panelage_top  
+	WRITE  (UNIT=29, FMT=*) panele_top
+	WRITE  (UNIT=31, FMT='(F12.4)') panel_YL_top
+	WRITE  (UNIT=32, FMT='(F12.4)') prc_all_top
+	WRITE  (UNIT=33, FMT='(F12.4)') prc_cohort_top
+	
+	close (unit=10); close (unit=11); close (unit=29); 
+	close (unit=31); close (unit=32); close (unit=33);
+
+
+END SUBROUTINE SIMULATION_TOP_Infinite_Horizon
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+SUBROUTINE  SIMULATION_Infinite_Horizon_Dynasties(bench_indx)
+	use parameters
+	use global
+	use omp_lib
+	IMPLICIT NONE	
+	integer, intent(in) :: bench_indx
+	! Break for comment
+		integer  :: currentzi, currentlambdai, currentei, currentxi, thread_num
+		REAL(DP) :: tempnoage, tempnoz, tempnolambda, tempnoe, tempnox, tempno, currenta, currentY
+		REAL(DP) :: start_timet, finish_timet, h_i
+		INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
+		INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
+		INTEGER , DIMENSION(:,:), allocatable :: panelage, panelz, panellambda, panele, panelx, panelz_old, panellambda_old
+		REAL(DP), DIMENSION(:,:), allocatable :: panela! , panelPV_a, panelK, panel_Y_L, panelRet, panelRet_K
+		REAL(DP)  							 :: K_aux, prctile_ret(9)
+		INTEGER 							 :: i_pct, N_dynasties = 100000, T_dynasties = 1000 
+		
+		REAL :: k_igm
+
+		! Top Agents 
+		INTEGER       :: top_ind(80), top_ind_aux(80), n_top
+		INTEGER, DIMENSION(:), allocatable :: panel_top_ind
+		REAL(DP)      :: top_A(80), A_cut, A_hi, A_low
+		character(10) :: top_folder
+
+		
+		! Allocate variables
+		allocate( panelage( T_dynasties, N_dynasties ) )
+		allocate( panele(   T_dynasties, N_dynasties ) )
+		allocate( panela(	T_dynasties, N_dynasties ) )
+		
+
+		print*,' '; print*, 'Starting Simulation Dynasties - Infinite Horizon'; print*, ' ';
+
+
+		call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/Dynasties/' )
+
+		!$ call omp_set_num_threads(4)
+
+			! Set Seeds for each thread
+		!$OMP parallel
+	    !$OMP critical
+			thread_num = omp_get_thread_num()
+			newiseed   = -5 - thread_num
+			tempno     = omp_ran1(newiseed)
+	       	! write(*,'("inside critical myt=",i4,f12.8)') thread_num,tempno,newiseed
+	    !$OMP end critical
+	    !$OMP end parallel
+
+		print*,'SIMULATION STARTED'
+
+	    
+		!=====================================================================
+		!                     GENERATE   INITIAL   PANEL
+		!=====================================================================
+
+
+		newiseed=-1
+		print*, 'Starting simulation loop'
+
+		! AGE (all the panel starts from age 1)
+			print*, ' Initial age set at 1'
+		    panelage(1,:)		= 1
+
+		! Labor Efficiency from stationary distribution 			   
+		!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi)
+		DO paneli=1,N_dynasties
+			   tempnoe = omp_ran1() ! ran1(newiseed)   
+			   ei=1
+			   DO WHILE (tempnoe .gt. cdf_Ge(ei))
+			       ei=ei+1
+			   ENDDO
+			   panele(1,paneli)		= ei
+		ENDDO
+		print*, sum(panelage(1,:))/real(N_dynasties,8), sum(panele(1,:))/real(N_dynasties,8)
+
+
+		! SET INITIAL ASSET DISTRIBUTION
+			print*, ' Initial assets set at 100k USD'
+			panela(1,:) = 100000 / ( EBAR_data/(EBAR_bench*0.727853584919652_dp) )
+
+		!=============================================================================
+		!
+		! SIMULATE FROM THE SECOND PERIOD SHOCKS AND UPDATE NEW DISTRIBUTIONS
+		!
+		!=============================================================================
+
+		!call cpu_time(start_timet) 
+
+		
+		print*, 'Starting Asset Simutime loop'
+		DO simutime=2, T_dynasties
+			!$omp parallel do private(tempnoage,age,tempnoz,zi,tempnolambda,lambdai,tempnoe,ei,xi, &
+			!$omp& currenta,currentzi,currentlambdai,currentei,currentxi,tklo,tkhi,tempno,k_igm,&
+			!$omp& K_aux)
+		   	DO paneli=1,N_dynasties
+		    
+		       	currenta  		= panela(   simutime-1 , paneli )
+		       	age       		= panelage( simutime-1 , paneli )
+		       	currentei 		= panele(   simutime-1 , paneli )
+		       	
+				!  COMPUTE NEXT PERIOD'S ASSET
+				! do linear interpolation here to find aprime. calling the function takes much more time
+		            if (currenta .ge. amax) then
+	                	tklo = na-1
+	                elseif (currenta .lt. amin) then
+	                    tklo = 1
+	                else
+	                    tklo = ((currenta - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+		            endif 
+		            tkhi = tklo + 1        
+
+		            panela(simutime,paneli) = ((agrid(tkhi) - currenta)*Aprime_ih(tklo,currentei) 		&
+		                           	&  + (currenta - agrid(tklo))*Aprime_ih(tkhi, currentei)) &
+		                            &  / ( agrid(tkhi) - agrid(tklo) )    
+		            
+		            if (panela(simutime,paneli)  .ge. amax) then
+		                panela(simutime,paneli) = min(panela(simutime,paneli), amax) 
+		            endif      
+		            if (panela(simutime,paneli)  .lt. amin) then
+		                panela(simutime,paneli) = max(panela(simutime,paneli), amin) 
+		            endif      
+				!  NEXT PERIOD'S ASSET HAS BEEN COMPUTED
+
+		             
+				! DRAW NEXT PERIOD'S AGE DBN
+				tempnoage = omp_ran1() ! ran1(newiseed)  
+				IF (tempnoage .gt. survP(currentei)) THEN
+					panelage(simutime,paneli)   = 1
+					! Bequest Taxes 
+					panela(simutime,paneli) = (1.0_dp-tau_bq)*panela(simutime,paneli)
+				ELSE
+					panelage(simutime,paneli)   = age+1
+				ENDIF
+		    	age = panelage(simutime,paneli)   
+
+				! DRAW NEXT PERIOD'S EFFICIENCY UNITS e
+	            tempno 	  = omp_ran1() ! ran1(newiseed)   
+	            ei 		  = 1
+		     	IF (age .eq. 1) THEN   ! New borns draw from Ge
+					DO WHILE (tempno .gt. cdf_Ge(ei))
+		               ei = ei+1
+		            ENDDO            
+	       		ELSE ! Survivors draw from pr_e
+		            DO WHILE (tempno .gt. cdf_pr_e(currentei,ei))
+		               ei = ei+1
+		            ENDDO            
+		     	ENDIF ! new age==1
+		     	panele(simutime,paneli)=ei 
+
+				
+			ENDDO ! paneli
+
+		 		
+		 		print*, "Simulation period for Dynasties", simutime
+
+		 		if (modulo(simutime,1000).eq.0) then 
+		 		print*, '	Sleeping for 3min '
+				call sleep(180)
+				endif 
+
+		 		
+			ENDDO ! simutime
+			print*,' '
+			print*,'Averages'
+			print*, sum(panelage(T_dynasties,:))/real(N_dynasties,8), &
+				& sum(panele(T_dynasties,:))/real(N_dynasties,8), sum(panela(T_dynasties,:))/real(N_dynasties,8)
+
+
+ 		! print*, '	Sleeping for 3min before writing results'
+		! call sleep(180)
+		print*, ' '
+		print*, 'Writing simulation results'
+
+		if (bench_indx.eq.1) then
+			OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Dynasties/panela_dynasties'	, STATUS='replace')
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Dynasties/panelage_dynasties', STATUS='replace')
+			OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/Dynasties/panele_dynasties'  , STATUS='replace')
+		else 
+			OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Dynasties/panela_exp'	, STATUS='replace')
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Dynasties/panelage_exp'	, STATUS='replace')
+			OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/Dynasties/panele_exp'    , STATUS='replace')
+		endif 
+
+
+		WRITE  (UNIT=10, FMT='(F16.2)') ( EBAR_data/(EBAR_bench*0.727853584919652_dp) ) * panela ! In USD
+		WRITE  (UNIT=11, FMT=*) panelage 
+		WRITE  (UNIT=14, FMT=*) panele 
+		
+		close (unit=10); close (unit=11); close (unit=14)
+
+
+
+END SUBROUTINE SIMULATION_Infinite_Horizon_Dynasties
+
+
+
 !========================================================================================
 !========================================================================================
 !========================================================================================
@@ -124,7 +919,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 
 		call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
 
-		!$ call omp_set_num_threads(20)
+		!$ call omp_set_num_threads(4)
 
 			! Set Seeds for each thread
 		!$OMP parallel
@@ -1314,7 +2109,7 @@ SUBROUTINE  SIMULATION_TOP(bench_indx,top_ind,folder)
 	allocate( panelPV_a(		totpop) )
 	allocate( panelK(			totpop) )
 
-	!$ call omp_set_num_threads(20)
+	!$ call omp_set_num_threads(4)
 	!$OMP parallel
     !$OMP critical
 		thread_num = omp_get_thread_num()
@@ -1744,421 +2539,423 @@ SUBROUTINE  Simulation_Life_Cycle_Patterns(bench_indx)
 	real(DP), dimension(MaxAge,nx) 			   :: Mean_a_x, Mean_c_x, Mean_k_x, Mean_h_x, Mean_r_x, Mean_r_at_x, Mean_r_w_x, Mean_r_at_w_x
 	real(DP), dimension(na,nz)                 :: DBN_AZ
 
-	! Set initial assets
-	initial_assets = EBAR_bench
+	! ! Set initial assets
+	! initial_assets = EBAR_bench
 
 
-	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
+	! call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/' )
 
-	!$ call omp_set_num_threads(20)
+	! !$ call omp_set_num_threads(4)
 
-		! Set Seeds for each thread
-	!$OMP parallel
-    !$OMP critical
-		thread_num = omp_get_thread_num()
-		newiseed   = -5 - thread_num
-		tempno     = omp_ran1(newiseed)
-       	! write(*,'("inside critical myt=",i4,f12.8)') thread_num,tempno,newiseed
-    !$OMP end critical
-    !$OMP end parallel
+	! 	! Set Seeds for each thread
+	! !$OMP parallel
+ !    !$OMP critical
+	! 	thread_num = omp_get_thread_num()
+	! 	newiseed   = -5 - thread_num
+	! 	tempno     = omp_ran1(newiseed)
+ !       	! write(*,'("inside critical myt=",i4,f12.8)') thread_num,tempno,newiseed
+ !    !$OMP end critical
+ !    !$OMP end parallel
 
-	print*,'SIMULATION STARTED'
-
-
-	!=====================================================================
-	!                     GENERATE   INITIAL   PANEL
-	!=====================================================================
+	! print*,'SIMULATION STARTED'
 
 
-	newiseed=-1
-		! Initial x and e are predetermined
-		Panel_x(:,1,:) = 1 
-		Panel_e(:,1,:) = ne/2+1 ! ALL NEWBORN START FROM THE MEDIAN E  but if too many people died and started from median E, draw a new E for them
-		! Initial Assets are given
-			! Panel_a(:,1,:) = initial_assets
-			DBN_AZ = sum(sum(sum(sum(DBN_bench,6),5),4),1)
-		do i_z=1,nz 
-			Panel_a(:,1,i_z) = sum( DBN_AZ(:,i_z)*agrid ) / sum( DBN_AZ(:,i_z) )
-		enddo 
-		! All individuals are alive
-		Panel_Death(:,1,:) = 1 
+	! !=====================================================================
+	! !                     GENERATE   INITIAL   PANEL
+	! !=====================================================================
 
-	DO i_z=1,nz 
-	!$omp parallel do private(tempno,lambdai,tklo,tkhi)
-	DO i=1,sample_size
+
+	! newiseed=-1
+	! 	! Initial x and e are predetermined
+	! 	Panel_x(:,1,:) = 1 
+	! 	Panel_e(:,1,:) = ne/2+1 ! ALL NEWBORN START FROM THE MEDIAN E  but if too many people died and started from median E, draw a new E for them
+	! 	! Initial Assets are given
+	! 		! Panel_a(:,1,:) = initial_assets
+	! 		DBN_AZ = sum(sum(sum(sum(DBN_bench,6),5),4),1)
+	! 	do i_z=1,nz 
+	! 		Panel_a(:,1,i_z) = sum( DBN_AZ(:,i_z)*agrid ) / sum( DBN_AZ(:,i_z) )
+	! 	enddo 
+	! 	! All individuals are alive
+	! 	Panel_Death(:,1,:) = 1 
+
+	! DO i_z=1,nz 
+	! !$omp parallel do private(tempno,lambdai,tklo,tkhi)
+	! DO i=1,sample_size
 	 
-	! LAMBDA  
-	    tempno = omp_ran1() ! ran1(newiseed) 
-	    lambdai=1
-	    DO WHILE (tempno .gt. cdf_Glambda(lambdai))
-	       lambdai=lambdai+1
-	    ENDDO
+	! ! LAMBDA  
+	!     tempno = omp_ran1() ! ran1(newiseed) 
+	!     lambdai=1
+	!     DO WHILE (tempno .gt. cdf_Glambda(lambdai))
+	!        lambdai=lambdai+1
+	!     ENDDO
 
-	    Panel_l(i,i_z) = lambdai
+	!     Panel_l(i,i_z) = lambdai
 
-   ! Capital
-   		if (mu.lt.1.0_dp) then 
-   		! Panel_k(i,1,i_z) = min(theta(i_z)*Panel_a(i,1,i_z) , &
-	    !  					&(mu*P*xz_grid(Panel_x(i,1,i_z),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-		else
-		Panel_k(i,1,i_z) = Panel_a(i,1,i_z)
-		endif 
+ !   ! Capital
+ !   		if (mu.lt.1.0_dp) then 
+ !   		! Panel_k(i,1,i_z) = min(theta(i_z)*Panel_a(i,1,i_z) , &
+	!     !  					&(mu*P*xz_grid(Panel_x(i,1,i_z),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+	! 	else
+	! 	Panel_k(i,1,i_z) = Panel_a(i,1,i_z)
+	! 	endif 
 
-	! Return 
-		Panel_r(i,1,i_z) = ( P*(xz_grid(Panel_x(i,1,i_z),i_z)*Panel_k(i,1,i_z))**mu - (R+DepRate)*Panel_k(i,1,i_z) +&
-	     								&   R*Panel_a(i,1,i_z) )/Panel_a(i,1,i_z)
+	! ! Return 
+	! 	Panel_r(i,1,i_z) = ( P*(xz_grid(Panel_x(i,1,i_z),i_z)*Panel_k(i,1,i_z))**mu - (R+DepRate)*Panel_k(i,1,i_z) +&
+	!      								&   R*Panel_a(i,1,i_z) )/Panel_a(i,1,i_z)
 
-		Panel_r_at(i,1,i_z) = ( ( (P*(xz_grid(Panel_x(i,1,i_z),i_z)*Panel_k(i,1,i_z))**mu - (R+DepRate)*Panel_k(i,1,i_z)) &
-							& + R*Panel_a(i,1,i_z))*(1.0_dp-tauK) )/Panel_a(i,1,i_z) - tauW_at
+	! 	Panel_r_at(i,1,i_z) = ( ( (P*(xz_grid(Panel_x(i,1,i_z),i_z)*Panel_k(i,1,i_z))**mu - (R+DepRate)*Panel_k(i,1,i_z)) &
+	! 						& + R*Panel_a(i,1,i_z))*(1.0_dp-tauK) )/Panel_a(i,1,i_z) - tauW_at
 
-	! Consumption and Labor
- 		if (Panel_a(i,1,i_z) .ge. amax) then
-	        tklo = na-1
-	    elseif (Panel_a(i,1,i_z) .lt. amin) then
-            tklo = 1
-        else
-            tklo = ((Panel_a(i,1,i_z)- amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-	    endif    
-	    tkhi = tklo + 1        
+	! ! Consumption and Labor
+ ! 		if (Panel_a(i,1,i_z) .ge. amax) then
+	!         tklo = na-1
+	!     elseif (Panel_a(i,1,i_z) .lt. amin) then
+ !            tklo = 1
+ !        else
+ !            tklo = ((Panel_a(i,1,i_z)- amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+	!     endif    
+	!     tkhi = tklo + 1        
 
-	    Panel_c(i,1,i_z) = (    (agrid(tkhi) - Panel_a(i,1,i_z)) * & 
-	    					&		Cons(1,tklo,i_z,Panel_l(i,i_z),Panel_e(i,1,i_z),Panel_x(i,1,i_z))    &
-	                       	& + (Panel_a(i,1,i_z) - agrid(tklo)) * &
-	                       	&		Cons(1,tkhi,i_z,Panel_l(i,i_z),Panel_e(i,1,i_z),Panel_x(i,1,i_z)) )  &
-	                       	&  / ( agrid(tkhi) - agrid(tklo) )  
+	!     Panel_c(i,1,i_z) = (    (agrid(tkhi) - Panel_a(i,1,i_z)) * & 
+	!     					&		Cons(1,tklo,i_z,Panel_l(i,i_z),Panel_e(i,1,i_z),Panel_x(i,1,i_z))    &
+	!                        	& + (Panel_a(i,1,i_z) - agrid(tklo)) * &
+	!                        	&		Cons(1,tkhi,i_z,Panel_l(i,i_z),Panel_e(i,1,i_z),Panel_x(i,1,i_z)) )  &
+	!                        	&  / ( agrid(tkhi) - agrid(tklo) )  
 
-       	Panel_h(i,1,i_z) = (    (agrid(tkhi) - Panel_a(i,1,i_z)) * & 
-	    					&		Hours(1,tklo,i_z,Panel_l(i,i_z),Panel_e(i,1,i_z),Panel_x(i,1,i_z))    &
-	                       	& + (Panel_a(i,1,i_z) - agrid(tklo)) * &
-	                       	&		Hours(1,tkhi,i_z,Panel_l(i,i_z),Panel_e(i,1,i_z),Panel_x(i,1,i_z)) )  &
-	                       	&  / ( agrid(tkhi) - agrid(tklo) )  
+ !       	Panel_h(i,1,i_z) = (    (agrid(tkhi) - Panel_a(i,1,i_z)) * & 
+	!     					&		Hours(1,tklo,i_z,Panel_l(i,i_z),Panel_e(i,1,i_z),Panel_x(i,1,i_z))    &
+	!                        	& + (Panel_a(i,1,i_z) - agrid(tklo)) * &
+	!                        	&		Hours(1,tkhi,i_z,Panel_l(i,i_z),Panel_e(i,1,i_z),Panel_x(i,1,i_z)) )  &
+	!                        	&  / ( agrid(tkhi) - agrid(tklo) )  
 
 	   
-	ENDDO
-	ENDDO 
+	! ENDDO
+	! ENDDO 
 
 
-	!=============================================================================
-	!
-	! SIMULATE FROM THE SECOND PERIOD SHOCKS AND UPDATE NEW DISTRIBUTIONS
-	!
-	!=============================================================================
+	! !=============================================================================
+	! !
+	! ! SIMULATE FROM THE SECOND PERIOD SHOCKS AND UPDATE NEW DISTRIBUTIONS
+	! !
+	! !=============================================================================
 	
-	print*, 'Starting Simutime loop'
-	DO i_z=1,nz
-	DO age=2,MaxAge
-		!$omp parallel do private(tempnoage,ei,xi,tklo,tkhi,tempno)
-	   	DO i=1,sample_size
+	! print*, 'Starting Simutime loop'
+	! DO i_z=1,nz
+	! DO age=2,MaxAge
+	! 	!$omp parallel do private(tempnoage,ei,xi,tklo,tkhi,tempno)
+	!    	DO i=1,sample_size
 	        
-			!  Compute Assets from previous period savings
-	            ! do linear interpolation here to find aprime. calling the function takes much more time
-	            if (Panel_a(i,age-1,i_z) .ge. amax) then
-			        tklo = na-1
-			    elseif (Panel_a(i,age-1,i_z) .lt. amin) then
-		            tklo = 1
-		        else
-		            tklo = ((Panel_a(i,age-1,i_z)- amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-			    endif    
-			    tkhi = tklo + 1        
+	! 		!  Compute Assets from previous period savings
+	!             ! do linear interpolation here to find aprime. calling the function takes much more time
+	!             if (Panel_a(i,age-1,i_z) .ge. amax) then
+	! 		        tklo = na-1
+	! 		    elseif (Panel_a(i,age-1,i_z) .lt. amin) then
+	! 	            tklo = 1
+	! 	        else
+	! 	            tklo = ((Panel_a(i,age-1,i_z)- amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+	! 		    endif    
+	! 		    tkhi = tklo + 1        
 
-	            Panel_a(i,age,i_z) = max( amin, min( amax , ((agrid(tkhi) - Panel_a(i,age-1,i_z))* &
-	            				& 	Aprime(age-1,tklo,i_z,Panel_l(i,i_z),Panel_e(i,age-1,i_z),Panel_x(i,age-1,i_z))  &
-	                           	&  +  (Panel_a(i,age-1,i_z) - agrid(tklo))* &
-                           		& 	Aprime(age-1,tkhi,i_z,Panel_l(i,i_z),Panel_e(i,age-1,i_z),Panel_x(i,age-1,i_z))) &
-	                            &  / ( agrid(tkhi) - agrid(tklo) )  ) )
-			!  NEXT PERIOD'S ASSET HAS BEEN COMPUTED
+	!             Panel_a(i,age,i_z) = max( amin, min( amax , ((agrid(tkhi) - Panel_a(i,age-1,i_z))* &
+	!             				& 	Aprime(age-1,tklo,i_z,Panel_l(i,i_z),Panel_e(i,age-1,i_z),Panel_x(i,age-1,i_z))  &
+	!                            	&  +  (Panel_a(i,age-1,i_z) - agrid(tklo))* &
+ !                           		& 	Aprime(age-1,tkhi,i_z,Panel_l(i,i_z),Panel_e(i,age-1,i_z),Panel_x(i,age-1,i_z))) &
+	!                             &  / ( agrid(tkhi) - agrid(tklo) )  ) )
+	! 		!  NEXT PERIOD'S ASSET HAS BEEN COMPUTED
 
 	             
-			! DRAW NEXT PERIOD'S AGE DBN
-	      	tempnoage = omp_ran1() ! ran1(newiseed)  
+	! 		! DRAW NEXT PERIOD'S AGE DBN
+	!       	tempnoage = omp_ran1() ! ran1(newiseed)  
 	  
-	      	IF (tempnoage .gt. survP(age)) THEN
-	      		! Agent Dies
-				Panel_Death(i,age,i_z) = 0
-				Panel_x(i,age,i_z)     = 1
-				Panel_e(i,age,i_z)	   = ne/2+1
-				Panel_a(i,age,i_z)     = (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Panel_a(i,age,i_z)
-			ELSE
-				! Agent Survives
-				Panel_Death(i,age,i_z) = 1
-				! !$omp critical
-       			tempno 	  = omp_ran1() ! ran1(newiseed)   
-	            xi 		  = 1
-	            DO WHILE (tempno .gt. cdf_pr_x(Panel_x(i,age-1,i_z),xi,i_z,age-1))
-	               xi = xi+1
-	            ENDDO            
-	            Panel_x(i,age,i_z) = xi          
-	            IF (age.lt.RetAge) THEN
-		            tempno 	  = omp_ran1() ! ran1(newiseed)   
-		            ei 		  = 1
-		            DO WHILE (tempno .gt. cdf_pr_e(Panel_e(i,age-1,i_z) ,ei))
-		               ei = ei+1
-		            ENDDO            
-		            Panel_e(i,age,i_z) = ei 
-	            ELSE 
-	            	Panel_e(i,age,i_z) = Panel_e(i,age-1,i_z)
-	            ENDIF 
-	            ! !$omp end critical   
-	      	ENDIF
+	!       	IF (tempnoage .gt. survP(age)) THEN
+	!       		! Agent Dies
+	! 			Panel_Death(i,age,i_z) = 0
+	! 			Panel_x(i,age,i_z)     = 1
+	! 			Panel_e(i,age,i_z)	   = ne/2+1
+	! 			Panel_a(i,age,i_z)     = (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Panel_a(i,age,i_z)
+	! 		ELSE
+	! 			! Agent Survives
+	! 			Panel_Death(i,age,i_z) = 1
+	! 			! !$omp critical
+ !       			tempno 	  = omp_ran1() ! ran1(newiseed)   
+	!             xi 		  = 1
+	!             DO WHILE (tempno .gt. cdf_pr_x(Panel_x(i,age-1,i_z),xi,i_z,age-1))
+	!                xi = xi+1
+	!             ENDDO            
+	!             Panel_x(i,age,i_z) = xi          
+	!             IF (age.lt.RetAge) THEN
+	! 	            tempno 	  = omp_ran1() ! ran1(newiseed)   
+	! 	            ei 		  = 1
+	! 	            DO WHILE (tempno .gt. cdf_pr_e(Panel_e(i,age-1,i_z) ,ei))
+	! 	               ei = ei+1
+	! 	            ENDDO            
+	! 	            Panel_e(i,age,i_z) = ei 
+	!             ELSE 
+	!             	Panel_e(i,age,i_z) = Panel_e(i,age-1,i_z)
+	!             ENDIF 
+	!             ! !$omp end critical   
+	!       	ENDIF
 
-      	    ! Capital
-      	    	if (mu.lt.1.0_dp) then 
-		   		! Panel_k(i,age,i_z) = min(theta(i_z)*Panel_a(i,age,i_z) , &
-			    !  					&(mu*P*xz_grid(Panel_x(i,age,i_z),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-		   		else
-		   		Panel_k(i,age,i_z) = Panel_a(i,age,i_z)
-	   			endif 
+ !      	    ! Capital
+ !      	    	if (mu.lt.1.0_dp) then 
+	! 	   		! Panel_k(i,age,i_z) = min(theta(i_z)*Panel_a(i,age,i_z) , &
+	! 		    !  					&(mu*P*xz_grid(Panel_x(i,age,i_z),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+	! 	   		else
+	! 	   		Panel_k(i,age,i_z) = Panel_a(i,age,i_z)
+	!    			endif 
 
-			! Return 
-				Panel_r(i,age,i_z) = ( P*(xz_grid(Panel_x(i,age,i_z),i_z)*Panel_k(i,age,i_z))**mu - (R+DepRate)*Panel_k(i,age,i_z) +&
-			     								&   R*Panel_a(i,age,i_z) )/Panel_a(i,age,i_z)
+	! 		! Return 
+	! 			Panel_r(i,age,i_z) = ( P*(xz_grid(Panel_x(i,age,i_z),i_z)*Panel_k(i,age,i_z))**mu - (R+DepRate)*Panel_k(i,age,i_z) +&
+	! 		     								&   R*Panel_a(i,age,i_z) )/Panel_a(i,age,i_z)
 
-				Panel_r_at(i,age,i_z) = ( ( (P*(xz_grid(Panel_x(i,age,i_z),i_z)*Panel_k(i,age,i_z))**mu - (R+DepRate)*Panel_k(i,age,i_z)) &
-									& + R*Panel_a(i,age,i_z))*(1.0_dp-tauK) )/Panel_a(i,age,i_z) - tauW_at
+	! 			Panel_r_at(i,age,i_z) = ( ( (P*(xz_grid(Panel_x(i,age,i_z),i_z)*Panel_k(i,age,i_z))**mu - (R+DepRate)*Panel_k(i,age,i_z)) &
+	! 								& + R*Panel_a(i,age,i_z))*(1.0_dp-tauK) )/Panel_a(i,age,i_z) - tauW_at
 
-			! Consumption and Labor
-		 		if (Panel_a(i,age,i_z) .ge. amax) then
-			        tklo = na-1
-			    elseif (Panel_a(i,age,i_z) .lt. amin) then
-		            tklo = 1
-		        else
-		            tklo = ((Panel_a(i,age,i_z)- amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
-			    endif    
-			    tkhi = tklo + 1        
+	! 		! Consumption and Labor
+	! 	 		if (Panel_a(i,age,i_z) .ge. amax) then
+	! 		        tklo = na-1
+	! 		    elseif (Panel_a(i,age,i_z) .lt. amin) then
+	! 	            tklo = 1
+	! 	        else
+	! 	            tklo = ((Panel_a(i,age,i_z)- amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+	! 		    endif    
+	! 		    tkhi = tklo + 1        
 
-			    Panel_c(i,age,i_z) = (    (agrid(tkhi) - Panel_a(i,age,i_z)) * & 
-			    					&		Cons(age,tklo,i_z,Panel_l(i,i_z),Panel_e(i,age,i_z),Panel_x(i,age,i_z))    &
-			                       	& + (Panel_a(i,age,i_z) - agrid(tklo)) * &
-			                       	&		Cons(age,tkhi,i_z,Panel_l(i,i_z),Panel_e(i,age,i_z),Panel_x(i,age,i_z)) )  &
-			                       	&  / ( agrid(tkhi) - agrid(tklo) )  
+	! 		    Panel_c(i,age,i_z) = (    (agrid(tkhi) - Panel_a(i,age,i_z)) * & 
+	! 		    					&		Cons(age,tklo,i_z,Panel_l(i,i_z),Panel_e(i,age,i_z),Panel_x(i,age,i_z))    &
+	! 		                       	& + (Panel_a(i,age,i_z) - agrid(tklo)) * &
+	! 		                       	&		Cons(age,tkhi,i_z,Panel_l(i,i_z),Panel_e(i,age,i_z),Panel_x(i,age,i_z)) )  &
+	! 		                       	&  / ( agrid(tkhi) - agrid(tklo) )  
 
-		       	Panel_h(i,age,i_z) = (    (agrid(tkhi) - Panel_a(i,age,i_z)) * & 
-			    					&		Hours(age,tklo,i_z,Panel_l(i,i_z),Panel_e(i,age,i_z),Panel_x(i,age,i_z))    &
-			                       	& + (Panel_a(i,age,i_z) - agrid(tklo)) * &
-			                       	&		Hours(age,tkhi,i_z,Panel_l(i,i_z),Panel_e(i,age,i_z),Panel_x(i,age,i_z)) )  &
-			                       	&  / ( agrid(tkhi) - agrid(tklo) )  
+	! 	       	Panel_h(i,age,i_z) = (    (agrid(tkhi) - Panel_a(i,age,i_z)) * & 
+	! 		    					&		Hours(age,tklo,i_z,Panel_l(i,i_z),Panel_e(i,age,i_z),Panel_x(i,age,i_z))    &
+	! 		                       	& + (Panel_a(i,age,i_z) - agrid(tklo)) * &
+	! 		                       	&		Hours(age,tkhi,i_z,Panel_l(i,i_z),Panel_e(i,age,i_z),Panel_x(i,age,i_z)) )  &
+	! 		                       	&  / ( agrid(tkhi) - agrid(tklo) )  
 			    
 
-		ENDDO ! paneli
+	! 	ENDDO ! paneli
 		
 
-	 		! print*, "Age", age, "Z", i_z
+	!  		! print*, "Age", age, "Z", i_z
 
 	 		
-	ENDDO ! age
-		print*, "Z", i_z
-	ENDDO ! z
+	! ENDDO ! age
+	! 	print*, "Z", i_z
+	! ENDDO ! z
 
-	!=============================================================================
-	!
-	! Get Averages
-	!
-	!=============================================================================
+	! !=============================================================================
+	! !
+	! ! Get Averages
+	! !
+	! !=============================================================================
 
-	print*, ' '
-	print*, 'Computing Averages'
-	DO i_z = 1,nz 
-	DO age = 1,MaxAge 
-		Mean_a(age,i_z) 	 = sum(Panel_a(:,age,i_z)*Panel_Death(:,age,i_z))/sum(Panel_Death(:,age,i_z)) 
-		Mean_c(age,i_z) 	 = sum(Panel_c(:,age,i_z)*Panel_Death(:,age,i_z))/sum(Panel_Death(:,age,i_z)) 
-		Mean_k(age,i_z) 	 = sum(Panel_k(:,age,i_z)*Panel_Death(:,age,i_z))/sum(Panel_Death(:,age,i_z)) 
-		Mean_h(age,i_z) 	 = sum(Panel_h(:,age,i_z)*Panel_Death(:,age,i_z))/sum(Panel_Death(:,age,i_z)) 
-		Mean_r(age,i_z) 	 = sum(Panel_r(:,age,i_z)*Panel_Death(:,age,i_z))/sum(Panel_Death(:,age,i_z)) 
-		Mean_r_at(age,i_z)   = sum(Panel_r_at(:,age,i_z)*Panel_Death(:,age,i_z))/sum(Panel_Death(:,age,i_z)) 
-		Mean_r_w(age,i_z) 	 = sum(Panel_r(:,age,i_z)*Panel_a(:,age,i_z)*Panel_Death(:,age,i_z)) & 
-								& /sum(Panel_a(:,age,i_z)*Panel_Death(:,age,i_z)) 
-		Mean_r_at_w(age,i_z) = sum(Panel_r_at(:,age,i_z)*Panel_a(:,age,i_z)*Panel_Death(:,age,i_z)) & 
-								& /sum(Panel_a(:,age,i_z)*Panel_Death(:,age,i_z)) 
-		Mean_Death(age,i_z)  = sum(Panel_Death(:,age,i_z)) 
-	ENDDO 
-	ENDDO
-
-	! DO i_x = 1,nx
+	! print*, ' '
+	! print*, 'Computing Averages'
+	! DO i_z = 1,nz 
 	! DO age = 1,MaxAge 
-	! 	Mean_a_x(age,i_x) 	 = sum(pack(Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))&
-	! 							& /sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
-	! 	Mean_c_x(age,i_x) 	 = sum(pack(Panel_c(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
-	! 							& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
-	! 	Mean_k_x(age,i_x) 	 = sum(pack(Panel_k(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
-	! 							& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
-	! 	Mean_h_x(age,i_x) 	 = sum(pack(Panel_h(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
-	! 							& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
-	! 	Mean_r_x(age,i_x) 	 = sum(pack(Panel_r(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
-	! 							& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
-	! 	Mean_r_at_x(age,i_x) = sum(pack(Panel_r_at(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
-	! 							& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
-	! 	Mean_r_w_x(age,i_x)  = sum(pack(Panel_r(:,age,9)*Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) & 
-	! 							& /sum(pack(Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
-	! 	Mean_r_at_w_x(age,i_x) = sum(pack(Panel_r_at(:,age,9)*Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) & 
-	! 							& /sum(pack(Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+	! 	Mean_a(age,i_z) 	 = sum(Panel_a(:,age,i_z)*Panel_Death(:,age,i_z))/sum(Panel_Death(:,age,i_z)) 
+	! 	Mean_c(age,i_z) 	 = sum(Panel_c(:,age,i_z)*Panel_Death(:,age,i_z))/sum(Panel_Death(:,age,i_z)) 
+	! 	Mean_k(age,i_z) 	 = sum(Panel_k(:,age,i_z)*Panel_Death(:,age,i_z))/sum(Panel_Death(:,age,i_z)) 
+	! 	Mean_h(age,i_z) 	 = sum(Panel_h(:,age,i_z)*Panel_Death(:,age,i_z))/sum(Panel_Death(:,age,i_z)) 
+	! 	Mean_r(age,i_z) 	 = sum(Panel_r(:,age,i_z)*Panel_Death(:,age,i_z))/sum(Panel_Death(:,age,i_z)) 
+	! 	Mean_r_at(age,i_z)   = sum(Panel_r_at(:,age,i_z)*Panel_Death(:,age,i_z))/sum(Panel_Death(:,age,i_z)) 
+	! 	Mean_r_w(age,i_z) 	 = sum(Panel_r(:,age,i_z)*Panel_a(:,age,i_z)*Panel_Death(:,age,i_z)) & 
+	! 							& /sum(Panel_a(:,age,i_z)*Panel_Death(:,age,i_z)) 
+	! 	Mean_r_at_w(age,i_z) = sum(Panel_r_at(:,age,i_z)*Panel_a(:,age,i_z)*Panel_Death(:,age,i_z)) & 
+	! 							& /sum(Panel_a(:,age,i_z)*Panel_Death(:,age,i_z)) 
+	! 	Mean_Death(age,i_z)  = sum(Panel_Death(:,age,i_z)) 
 	! ENDDO 
 	! ENDDO
 
-	!=============================================================================
-	!
-	! Counterfactual returns with benchmark wealth distribution
-	!
-	!=============================================================================
-	if (bench_indx.eq.0) then 
-		! Read panel for assets, x and death from benchmark simulation
-		OPEN (UNIT=1,  FILE=trim(Bench_Simul_Folder)//'Life_Cycle_a_panel_bench.txt'  , STATUS='old', ACTION='read')
-		OPEN (UNIT=2,  FILE=trim(Bench_Simul_Folder)//'Life_Cycle_x_panel_bench.txt'  , STATUS='old', ACTION='read')
-		OPEN (UNIT=3,  FILE=trim(Bench_Simul_Folder)//'Life_Cycle_d_panel_bench.txt'  , STATUS='old', ACTION='read')
-			READ (UNIT=1,  FMT=*) Panel_a_ben
-			READ (UNIT=2,  FMT=*) Panel_x_ben 
-			READ (UNIT=3,  FMT=*) Panel_d_ben 
-		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
+	! ! DO i_x = 1,nx
+	! ! DO age = 1,MaxAge 
+	! ! 	Mean_a_x(age,i_x) 	 = sum(pack(Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))&
+	! ! 							& /sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+	! ! 	Mean_c_x(age,i_x) 	 = sum(pack(Panel_c(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
+	! ! 							& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+	! ! 	Mean_k_x(age,i_x) 	 = sum(pack(Panel_k(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
+	! ! 							& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+	! ! 	Mean_h_x(age,i_x) 	 = sum(pack(Panel_h(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
+	! ! 							& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+	! ! 	Mean_r_x(age,i_x) 	 = sum(pack(Panel_r(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
+	! ! 							& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+	! ! 	Mean_r_at_x(age,i_x) = sum(pack(Panel_r_at(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x))/ &
+	! ! 							& sum(pack(Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+	! ! 	Mean_r_w_x(age,i_x)  = sum(pack(Panel_r(:,age,9)*Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) & 
+	! ! 							& /sum(pack(Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+	! ! 	Mean_r_at_w_x(age,i_x) = sum(pack(Panel_r_at(:,age,9)*Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) & 
+	! ! 							& /sum(pack(Panel_a(:,age,9)*Panel_Death(:,age,9),Panel_x(:,age,9).eq.i_x)) 
+	! ! ENDDO 
+	! ! ENDDO
 
-		print*, 'Starting Simutime loop for benchmark counterfactual'
-		DO i_z=1,nz
-		DO age=1,MaxAge
-			! print*, 'Age',age,'Mean Assets',sum(Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z))/sum(Panel_d_ben(:,age,i_z)),&
-			! 		& 'Population', sum(Panel_d_ben(:,age,i_z))
+	! !=============================================================================
+	! !
+	! ! Counterfactual returns with benchmark wealth distribution
+	! !
+	! !=============================================================================
+	! if (bench_indx.eq.0) then 
+	! 	! Read panel for assets, x and death from benchmark simulation
+	! 	OPEN (UNIT=1,  FILE=trim(Bench_Simul_Folder)//'Life_Cycle_a_panel_bench.txt'  , STATUS='old', ACTION='read')
+	! 	OPEN (UNIT=2,  FILE=trim(Bench_Simul_Folder)//'Life_Cycle_x_panel_bench.txt'  , STATUS='old', ACTION='read')
+	! 	OPEN (UNIT=3,  FILE=trim(Bench_Simul_Folder)//'Life_Cycle_d_panel_bench.txt'  , STATUS='old', ACTION='read')
+	! 		READ (UNIT=1,  FMT=*) Panel_a_ben
+	! 		READ (UNIT=2,  FMT=*) Panel_x_ben 
+	! 		READ (UNIT=3,  FMT=*) Panel_d_ben 
+	! 	CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); 
+
+	! 	print*, 'Starting Simutime loop for benchmark counterfactual'
+	! 	DO i_z=1,nz
+	! 	DO age=1,MaxAge
+	! 		! print*, 'Age',age,'Mean Assets',sum(Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z))/sum(Panel_d_ben(:,age,i_z)),&
+	! 		! 		& 'Population', sum(Panel_d_ben(:,age,i_z))
 			
-			!$omp parallel do private(tempnoage,ei,xi,tklo,tkhi,tempno)
-		   	DO i=1,sample_size
+	! 		!$omp parallel do private(tempnoage,ei,xi,tklo,tkhi,tempno)
+	! 	   	DO i=1,sample_size
 		     
-      	    ! Capital
-      	    if (mu.lt.1.0_dp) then 
-	   		! Panel_k_ben(i,age,i_z) = min(theta(i_z)*Panel_a_ben(i,age,i_z) , &
-		    !  					&(mu*P*xz_grid(Panel_x_ben(i,age,i_z),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
-	   		else 
-	   		Panel_k_ben(i,age,i_z) = Panel_a_ben(i,age,i_z)
-	   		endif 
+ !      	    ! Capital
+ !      	    if (mu.lt.1.0_dp) then 
+	!    		! Panel_k_ben(i,age,i_z) = min(theta(i_z)*Panel_a_ben(i,age,i_z) , &
+	! 	    !  					&(mu*P*xz_grid(Panel_x_ben(i,age,i_z),i_z)**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+	!    		else 
+	!    		Panel_k_ben(i,age,i_z) = Panel_a_ben(i,age,i_z)
+	!    		endif 
 
-			! Return 
-			Panel_r_ben(i,age,i_z) = ( P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - &
-								&   (R+DepRate)*Panel_k_ben(i,age,i_z) + R*Panel_a_ben(i,age,i_z) )/Panel_a_ben(i,age,i_z)
+	! 		! Return 
+	! 		Panel_r_ben(i,age,i_z) = ( P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - &
+	! 							&   (R+DepRate)*Panel_k_ben(i,age,i_z) + R*Panel_a_ben(i,age,i_z) )/Panel_a_ben(i,age,i_z)
 
-			Panel_r_at_ben(i,age,i_z) = ( ( ( (P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - &
-								& (R+DepRate)*Panel_k_ben(i,age,i_z)) + R*Panel_a_ben(i,age,i_z))*(1.0_dp-tauK) &
-								& ))/Panel_a_ben(i,age,i_z) - tauW_at	    
+	! 		Panel_r_at_ben(i,age,i_z) = ( ( ( (P*(xz_grid(Panel_x_ben(i,age,i_z),i_z)*Panel_k_ben(i,age,i_z))**mu - &
+	! 							& (R+DepRate)*Panel_k_ben(i,age,i_z)) + R*Panel_a_ben(i,age,i_z))*(1.0_dp-tauK) &
+	! 							& ))/Panel_a_ben(i,age,i_z) - tauW_at	    
 
-			ENDDO ! paneli 		
-		ENDDO ! age
-			print*, "Z", i_z
-		ENDDO ! z
+	! 		ENDDO ! paneli 		
+	! 	ENDDO ! age
+	! 		print*, "Z", i_z
+	! 	ENDDO ! z
 
-		print*, ' '
-		print*, 'Computing Averages'
-		DO i_z = 1,nz 
-		DO age = 1,MaxAge 
-			Mean_k_ben(age,i_z) 	 = sum(Panel_k_ben(:,age,i_z)*Panel_d_ben(:,age,i_z))/sum(Panel_d_ben(:,age,i_z)) 
-			Mean_r_ben(age,i_z) 	 = sum(Panel_r_ben(:,age,i_z)*Panel_d_ben(:,age,i_z))/sum(Panel_d_ben(:,age,i_z)) 
-			Mean_r_at_ben(age,i_z)   = sum(Panel_r_at_ben(:,age,i_z)*Panel_d_ben(:,age,i_z))/sum(Panel_d_ben(:,age,i_z)) 
-			Mean_r_w_ben(age,i_z) 	 = sum(Panel_r_ben(:,age,i_z)*Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z)) & 
-										& /sum(Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z)) 
-			Mean_r_at_w_ben(age,i_z) = sum(Panel_r_at_ben(:,age,i_z)*Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z)) & 
-										& /sum(Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z)) 
-		ENDDO 
-		ENDDO
+	! 	print*, ' '
+	! 	print*, 'Computing Averages'
+	! 	DO i_z = 1,nz 
+	! 	DO age = 1,MaxAge 
+	! 		Mean_k_ben(age,i_z) 	 = sum(Panel_k_ben(:,age,i_z)*Panel_d_ben(:,age,i_z))/sum(Panel_d_ben(:,age,i_z)) 
+	! 		Mean_r_ben(age,i_z) 	 = sum(Panel_r_ben(:,age,i_z)*Panel_d_ben(:,age,i_z))/sum(Panel_d_ben(:,age,i_z)) 
+	! 		Mean_r_at_ben(age,i_z)   = sum(Panel_r_at_ben(:,age,i_z)*Panel_d_ben(:,age,i_z))/sum(Panel_d_ben(:,age,i_z)) 
+	! 		Mean_r_w_ben(age,i_z) 	 = sum(Panel_r_ben(:,age,i_z)*Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z)) & 
+	! 									& /sum(Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z)) 
+	! 		Mean_r_at_w_ben(age,i_z) = sum(Panel_r_at_ben(:,age,i_z)*Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z)) & 
+	! 									& /sum(Panel_a_ben(:,age,i_z)*Panel_d_ben(:,age,i_z)) 
+	! 	ENDDO 
+	! 	ENDDO
 
-	endif 
-	!=============================================================================
-	!
-	! Write Results
-	!
-	!=============================================================================
+	! endif 
+	! !=============================================================================
+	! !
+	! ! Write Results
+	! !
+	! !=============================================================================
 
 
-	print*, ' '
-	print*, 'Writing simulation results'
+	! print*, ' '
+	! print*, 'Writing simulation results'
 
-	if (bench_indx.eq.1) then
-		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_bench.txt'		, STATUS='replace')
-		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Life_Cycle_c_bench.txt'	  	, STATUS='replace')
-		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/Life_Cycle_k_bench.txt'		, STATUS='replace')
-		OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/Life_Cycle_h_bench.txt'   	, STATUS='replace')
-		OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_bench.txt'      , STATUS='replace')
-		OPEN(UNIT=15, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_bench.txt'   , STATUS='replace')
-		OPEN(UNIT=16, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_bench.txt'    , STATUS='replace')
-		OPEN(UNIT=17, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_bench.txt' , STATUS='replace')
-		OPEN(UNIT=18, FILE=trim(Result_Folder)//'Simul/Life_Cycle_Sample_Size.txt'  , STATUS='replace')
+	! if (bench_indx.eq.1) then
+	! 	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_bench.txt'		, STATUS='replace')
+	! 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Life_Cycle_c_bench.txt'	  	, STATUS='replace')
+	! 	OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/Life_Cycle_k_bench.txt'		, STATUS='replace')
+	! 	OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/Life_Cycle_h_bench.txt'   	, STATUS='replace')
+	! 	OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_bench.txt'      , STATUS='replace')
+	! 	OPEN(UNIT=15, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_bench.txt'   , STATUS='replace')
+	! 	OPEN(UNIT=16, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_bench.txt'    , STATUS='replace')
+	! 	OPEN(UNIT=17, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_bench.txt' , STATUS='replace')
+	! 	OPEN(UNIT=18, FILE=trim(Result_Folder)//'Simul/Life_Cycle_Sample_Size.txt'  , STATUS='replace')
 
-		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_x_bench.txt'	, STATUS='replace')
-		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/Life_Cycle_c_x_bench.txt'	, STATUS='replace')
-		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Life_Cycle_k_x_bench.txt'	, STATUS='replace')
-		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/Life_Cycle_h_x_bench.txt'   	, STATUS='replace')
-		OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_x_bench.txt'    , STATUS='replace')
-		OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_x_bench.txt' , STATUS='replace')
-		OPEN(UNIT=36, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_x_bench.txt'  , STATUS='replace')
-		OPEN(UNIT=37, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_x_bench.txt' , STATUS='replace')
+	! 	OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_x_bench.txt'	, STATUS='replace')
+	! 	OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/Life_Cycle_c_x_bench.txt'	, STATUS='replace')
+	! 	OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Life_Cycle_k_x_bench.txt'	, STATUS='replace')
+	! 	OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/Life_Cycle_h_x_bench.txt'   	, STATUS='replace')
+	! 	OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_x_bench.txt'    , STATUS='replace')
+	! 	OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_x_bench.txt' , STATUS='replace')
+	! 	OPEN(UNIT=36, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_x_bench.txt'  , STATUS='replace')
+	! 	OPEN(UNIT=37, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_x_bench.txt' , STATUS='replace')
 
-		OPEN(UNIT=50, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_panel_bench.txt', STATUS='replace')
-		OPEN(UNIT=51, FILE=trim(Result_Folder)//'Simul/Life_Cycle_x_panel_bench.txt', STATUS='replace')
-		OPEN(UNIT=52, FILE=trim(Result_Folder)//'Simul/Life_Cycle_d_panel_bench.txt', STATUS='replace')
-			WRITE  (UNIT=50, FMT=*) Panel_a
-			WRITE  (UNIT=51, FMT=*) Panel_x
-			WRITE  (UNIT=52, FMT=*) Panel_Death
-		close (unit=50); close (unit=51); close (unit=52);
+	! 	OPEN(UNIT=50, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_panel_bench.txt', STATUS='replace')
+	! 	OPEN(UNIT=51, FILE=trim(Result_Folder)//'Simul/Life_Cycle_x_panel_bench.txt', STATUS='replace')
+	! 	OPEN(UNIT=52, FILE=trim(Result_Folder)//'Simul/Life_Cycle_d_panel_bench.txt', STATUS='replace')
+	! 		WRITE  (UNIT=50, FMT=*) Panel_a
+	! 		WRITE  (UNIT=51, FMT=*) Panel_x
+	! 		WRITE  (UNIT=52, FMT=*) Panel_Death
+	! 	close (unit=50); close (unit=51); close (unit=52);
 
-	else 
-		OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_exp.txt'		, STATUS='replace')
-		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Life_Cycle_c_exp.txt'		, STATUS='replace')
-		OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/Life_Cycle_k_exp.txt'		, STATUS='replace')
-		OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/Life_Cycle_h_exp.txt'   		, STATUS='replace')
-		OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_exp.txt'        , STATUS='replace')
-		OPEN(UNIT=15, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_exp.txt'     , STATUS='replace')
-		OPEN(UNIT=16, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_exp.txt' 	    , STATUS='replace')
-		OPEN(UNIT=17, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_exp.txt'	, STATUS='replace')
+	! else 
+	! 	OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_exp.txt'		, STATUS='replace')
+	! 	OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/Life_Cycle_c_exp.txt'		, STATUS='replace')
+	! 	OPEN(UNIT=12, FILE=trim(Result_Folder)//'Simul/Life_Cycle_k_exp.txt'		, STATUS='replace')
+	! 	OPEN(UNIT=13, FILE=trim(Result_Folder)//'Simul/Life_Cycle_h_exp.txt'   		, STATUS='replace')
+	! 	OPEN(UNIT=14, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_exp.txt'        , STATUS='replace')
+	! 	OPEN(UNIT=15, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_exp.txt'     , STATUS='replace')
+	! 	OPEN(UNIT=16, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_exp.txt' 	    , STATUS='replace')
+	! 	OPEN(UNIT=17, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_exp.txt'	, STATUS='replace')
 
-		OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_x_exp.txt'		, STATUS='replace')
-		OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/Life_Cycle_c_x_exp.txt'		, STATUS='replace')
-		OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Life_Cycle_k_x_exp.txt'		, STATUS='replace')
-		OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/Life_Cycle_h_x_exp.txt'   	, STATUS='replace')
-		OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_x_exp.txt'      , STATUS='replace')
-		OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_x_exp.txt'   , STATUS='replace')
-		OPEN(UNIT=36, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_x_exp.txt' 	, STATUS='replace')
-		OPEN(UNIT=37, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_x_exp.txt'	, STATUS='replace')
+	! 	OPEN(UNIT=30, FILE=trim(Result_Folder)//'Simul/Life_Cycle_a_x_exp.txt'		, STATUS='replace')
+	! 	OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/Life_Cycle_c_x_exp.txt'		, STATUS='replace')
+	! 	OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Life_Cycle_k_x_exp.txt'		, STATUS='replace')
+	! 	OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/Life_Cycle_h_x_exp.txt'   	, STATUS='replace')
+	! 	OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_x_exp.txt'      , STATUS='replace')
+	! 	OPEN(UNIT=35, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_x_exp.txt'   , STATUS='replace')
+	! 	OPEN(UNIT=36, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_x_exp.txt' 	, STATUS='replace')
+	! 	OPEN(UNIT=37, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_x_exp.txt'	, STATUS='replace')
 
-		OPEN(UNIT=50, FILE=trim(Result_Folder)//'Simul/Life_Cycle_k_exp_a_ben.txt'		, STATUS='replace')
-		OPEN(UNIT=51, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_exp_a_ben.txt'      , STATUS='replace')
-		OPEN(UNIT=52, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_exp_a_ben.txt'   , STATUS='replace')
-		OPEN(UNIT=53, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_exp_a_ben.txt'    , STATUS='replace')
-		OPEN(UNIT=54, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_exp_a_ben.txt'	, STATUS='replace')
+	! 	OPEN(UNIT=50, FILE=trim(Result_Folder)//'Simul/Life_Cycle_k_exp_a_ben.txt'		, STATUS='replace')
+	! 	OPEN(UNIT=51, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_exp_a_ben.txt'      , STATUS='replace')
+	! 	OPEN(UNIT=52, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_exp_a_ben.txt'   , STATUS='replace')
+	! 	OPEN(UNIT=53, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_w_exp_a_ben.txt'    , STATUS='replace')
+	! 	OPEN(UNIT=54, FILE=trim(Result_Folder)//'Simul/Life_Cycle_r_at_w_exp_a_ben.txt'	, STATUS='replace')
 			
 		
-	endif 
+	! endif 
 
-	DO age = 1,MaxAge-1 
-		! print*,  Mean_a(age,:)
-		WRITE  (UNIT=10, FMT=*) Mean_a(age,:)
-		WRITE  (UNIT=11, FMT=*) Mean_c(age,:)
-		WRITE  (UNIT=12, FMT=*) Mean_k(age,:) 
-		WRITE  (UNIT=13, FMT=*) Mean_h(age,:)
-		WRITE  (UNIT=14, FMT=*) Mean_r(age,:)
-		WRITE  (UNIT=15, FMT=*) Mean_r_at(age,:)
-		WRITE  (UNIT=16, FMT=*) Mean_r_w(age,:)
-		WRITE  (UNIT=17, FMT=*) Mean_r_at_w(age,:) 
-		WRITE  (UNIT=18, FMT=*) Mean_Death(age,:) 
+	! DO age = 1,MaxAge-1 
+	! 	! print*,  Mean_a(age,:)
+	! 	WRITE  (UNIT=10, FMT=*) Mean_a(age,:)
+	! 	WRITE  (UNIT=11, FMT=*) Mean_c(age,:)
+	! 	WRITE  (UNIT=12, FMT=*) Mean_k(age,:) 
+	! 	WRITE  (UNIT=13, FMT=*) Mean_h(age,:)
+	! 	WRITE  (UNIT=14, FMT=*) Mean_r(age,:)
+	! 	WRITE  (UNIT=15, FMT=*) Mean_r_at(age,:)
+	! 	WRITE  (UNIT=16, FMT=*) Mean_r_w(age,:)
+	! 	WRITE  (UNIT=17, FMT=*) Mean_r_at_w(age,:) 
+	! 	WRITE  (UNIT=18, FMT=*) Mean_Death(age,:) 
 
-		WRITE  (UNIT=30, FMT=*) Mean_a_x(age,:)
-		WRITE  (UNIT=31, FMT=*) Mean_c_x(age,:)
-		WRITE  (UNIT=32, FMT=*) Mean_k_x(age,:) 
-		WRITE  (UNIT=33, FMT=*) Mean_h_x(age,:)
-		WRITE  (UNIT=34, FMT=*) Mean_r_x(age,:)
-		WRITE  (UNIT=35, FMT=*) Mean_r_at_x(age,:)
-		WRITE  (UNIT=36, FMT=*) Mean_r_w_x(age,:)
-		WRITE  (UNIT=37, FMT=*) Mean_r_at_w_x(age,:) 
+	! 	WRITE  (UNIT=30, FMT=*) Mean_a_x(age,:)
+	! 	WRITE  (UNIT=31, FMT=*) Mean_c_x(age,:)
+	! 	WRITE  (UNIT=32, FMT=*) Mean_k_x(age,:) 
+	! 	WRITE  (UNIT=33, FMT=*) Mean_h_x(age,:)
+	! 	WRITE  (UNIT=34, FMT=*) Mean_r_x(age,:)
+	! 	WRITE  (UNIT=35, FMT=*) Mean_r_at_x(age,:)
+	! 	WRITE  (UNIT=36, FMT=*) Mean_r_w_x(age,:)
+	! 	WRITE  (UNIT=37, FMT=*) Mean_r_at_w_x(age,:) 
 
-		if (bench_indx.eq.0) then 
-			WRITE  (UNIT=50, FMT=*) Mean_k_ben(age,:)
-			WRITE  (UNIT=51, FMT=*) Mean_r_ben(age,:)
-			WRITE  (UNIT=52, FMT=*) Mean_r_at_ben(age,:)
-			WRITE  (UNIT=53, FMT=*) Mean_r_w_ben(age,:)
-			WRITE  (UNIT=54, FMT=*) Mean_r_at_w_ben(age,:)
-		endif 
-	ENDDO
+	! 	if (bench_indx.eq.0) then 
+	! 		WRITE  (UNIT=50, FMT=*) Mean_k_ben(age,:)
+	! 		WRITE  (UNIT=51, FMT=*) Mean_r_ben(age,:)
+	! 		WRITE  (UNIT=52, FMT=*) Mean_r_at_ben(age,:)
+	! 		WRITE  (UNIT=53, FMT=*) Mean_r_w_ben(age,:)
+	! 		WRITE  (UNIT=54, FMT=*) Mean_r_at_w_ben(age,:)
+	! 	endif 
+	! ENDDO
 
-	close (unit=10); close (unit=11); close (unit=12); close (unit=13); 
-	close (unit=14); close (unit=15); close (unit=16); close (unit=17); close (unit=18);
+	! close (unit=10); close (unit=11); close (unit=12); close (unit=13); 
+	! close (unit=14); close (unit=15); close (unit=16); close (unit=17); close (unit=18);
 
-	close (unit=30); close (unit=31); close (unit=32); close (unit=33); 
-	close (unit=34); close (unit=35); close (unit=36); close (unit=37);
+	! close (unit=30); close (unit=31); close (unit=32); close (unit=33); 
+	! close (unit=34); close (unit=35); close (unit=36); close (unit=37);
 
-	if (bench_indx.eq.0) then 
-		close (unit=50); close (unit=51); close (unit=52); close (unit=53); close (unit=54);
-	endif 
+	! if (bench_indx.eq.0) then 
+	! 	close (unit=50); close (unit=51); close (unit=52); close (unit=53); close (unit=54);
+	! endif 
+
+	STOP
 
 END SUBROUTINE Simulation_Life_Cycle_Patterns
 
@@ -2262,7 +3059,7 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 
 	call system( 'mkdir -p ' // trim(Result_Folder) // 'Simul/Asset_Return_Panel/' )
 
-	!$ call omp_set_num_threads(20)
+	!$ call omp_set_num_threads(4)
 
 		! Set Seeds for each thread
 	!$OMP parallel

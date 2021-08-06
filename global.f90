@@ -15,7 +15,8 @@ MODULE global
     real(DP) , dimension(6)     :: params
 
     ! Population size (pop) and survival probability by age (survP)
-    REAL(DP), DIMENSION(MaxAge) :: pop, survP          
+    REAL(DP), DIMENSION(MaxAge) :: pop
+    REAL(DP), DIMENSION(ne)     :: survP          
 	
     ! Labor efficiency shocks: 
     	! Lyfe cycle component (by age)
@@ -25,7 +26,7 @@ MODULE global
 			! grid (egrid), invariant distribution (Ge), CDF of invariant distribution (cdf_Ge)
 			REAL(DP), DIMENSION(ne)        :: egrid, Ge, cdf_Ge
 			! transition matrix (pr_e), CDF of transition matrix (by row) (cdf_pr_e)
-			REAL(DP), DIMENSION(ne,ne)     :: pr_e, cdf_pr_e
+			REAL(DP), DIMENSION(ne,ne)     :: pr_e, cdf_pr_e, pr_ep 
 			! distribution or "e" by age. This is constructed with pr_e and the assumption that in the first period, everyone starts at median "e"
    			REAL(DP), DIMENSION(MaxAge,ne) :: Ge_byage, cdf_Ge_byage
 
@@ -59,13 +60,15 @@ MODULE global
 
 	! Policy function and value function (defined on the exogenous grid)
     REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons, Hours, Aprime, Income_AT
-    REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_bench, Hours_bench, Aprime_bench, Cons_exp, Hours_exp, Aprime_exp 
-    REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: ValueFunction, ValueFunction_bench, ValueFunction_exp
+    REAL(DP), DIMENSION(na,ne) :: Cons_bench, Hours_bench, Aprime_bench, Cons_exp, Hours_exp, Aprime_exp 
+    REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: ValueFunction
+    REAL(DP), DIMENSION(na,ne):: ValueFunction_bench, ValueFunction_exp
     REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Bq_Value, Bq_Value_bench, Bq_Value_exp
     REAL(DP), dimension(:,:,:,:,:,:), allocatable :: Cons_Eq_Welfare
 	! Policy function and value function (defined on the adjusted grid for breakpoints)
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_t, Hours_t, Aprime_t
 	!REAL(DP), DIMENSION(MaxAge,na+nz,nz,nlambda,ne) :: Cons_t, Hours_t, Aprime_t
+	REAL(DP), DIMENSION(na,ne) :: Cons_ih, Hours_ih, Aprime_ih, DBN_ih
  
  	! Aggregate variables
 	 	! Benchmark values of Q, N, E, Wage, R, G, Y
@@ -114,7 +117,7 @@ MODULE global
 	! 1-psi controls the level of tax, and tauPL controls progressivity
 		REAL(DP) :: tauPL, psi
     ! Estate Tax
-        REAL(DP) :: tau_bq=0.40_DP, bq_fee=0.20_dp
+        REAL(DP) :: tau_bq=0.00_DP, bq_fee=0.00_dp
 
 
     ! Auxiliary variables to find wealth tax that balances the budget in experiment economy
@@ -125,7 +128,8 @@ MODULE global
     INTEGER :: age, lambdai, zi, ai, ei, xi    
 
     ! Distribution of population by age, a, z, lambda, e
-    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) ::DBN1, DBN_bench, DBN_exp
+    REAL(DP), DIMENSION(MaxAge, na, nz, nlambda, ne, nx) :: DBN1
+    REAL(DP), DIMENSION(na,ne) :: DBN_bench, DBN_exp
 
     ! Stats and distribution in equilibrium
 	    ! Distribution of assets
@@ -201,15 +205,15 @@ Subroutine Allocate_Variables
     allocate( Hours(              MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Aprime(             MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Income_AT(          MaxAge,na,nz,nlambda,ne,nx) )
-    allocate( Cons_bench(         MaxAge,na,nz,nlambda,ne,nx) )
-    allocate( Hours_bench(        MaxAge,na,nz,nlambda,ne,nx) )
-    allocate( Aprime_bench(       MaxAge,na,nz,nlambda,ne,nx) )
-    allocate( Cons_exp(           MaxAge,na,nz,nlambda,ne,nx) )
-    allocate( Hours_exp(          MaxAge,na,nz,nlambda,ne,nx) )
-    allocate( Aprime_exp(         MaxAge,na,nz,nlambda,ne,nx) )
+    ! allocate( Cons_bench(         MaxAge,na,nz,nlambda,ne,nx) )
+    ! allocate( Hours_bench(        MaxAge,na,nz,nlambda,ne,nx) )
+    ! allocate( Aprime_bench(       MaxAge,na,nz,nlambda,ne,nx) )
+    ! allocate( Cons_exp(           MaxAge,na,nz,nlambda,ne,nx) )
+    ! allocate( Hours_exp(          MaxAge,na,nz,nlambda,ne,nx) )
+    ! allocate( Aprime_exp(         MaxAge,na,nz,nlambda,ne,nx) )
     allocate( ValueFunction(      MaxAge,na,nz,nlambda,ne,nx) )
-    allocate( ValueFunction_bench(MaxAge,na,nz,nlambda,ne,nx) )
-    allocate( ValueFunction_exp(  MaxAge,na,nz,nlambda,ne,nx) )
+    ! allocate( ValueFunction_bench(MaxAge,na,nz,nlambda,ne,nx) )
+    ! allocate( ValueFunction_exp(  MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Bq_Value(           MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Bq_Value_bench(     MaxAge,na,nz,nlambda,ne,nx) )
     allocate( Bq_Value_exp(       MaxAge,na,nz,nlambda,ne,nx) )

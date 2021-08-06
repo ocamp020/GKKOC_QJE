@@ -18,11 +18,12 @@ MODULE parameters
     ! Permanent labor earnings componenet (lambda)
     REAL(DP)	, PARAMETER :: rho_lambda=0.5_DP 
     REAL(DP)             	:: sigma_lambda_eps
-    INTEGER(I4B), PARAMETER :: nlambda=5         ! Number of grid points
+    INTEGER(I4B), PARAMETER :: nlambda=1         ! Number of grid points
 
     ! Transitory labor earnings componenet (e)
-    REAL(DP), PARAMETER  	:: rho_e=0.9_DP, sigma_e_eps=0.20_DP
+    REAL(DP)			 	:: rho_e=0.9_DP, sigma_e_eps=0.20_DP
     INTEGER(I4B), PARAMETER :: ne=5              ! Number of grid points
+
 
     ! Entrepreneurial ability (z)
     REAL(DP)         	    :: rho_z, sigma_z_eps, mu_z
@@ -32,6 +33,8 @@ MODULE parameters
     INTEGER(I4B), PARAMETER :: nx=1
     REAL(DP)                :: x_hi, x_lo, x_0, a_x, b_x
 
+    ! Survival probability and intergenerational corraltion of incomee
+    REAL(DP) 				:: death_pr = 0.066_dp, pr_e_ig = 0.969_dp , pr_e_lc = 0.525_dp, ret_pr = 0.0222_dp, omega_ret, awesome_level
  
 
     ! Utility: Discount factor (beta) utility parameters sigma and gamma
@@ -50,7 +53,7 @@ MODULE parameters
 	
 
 	! Life cycle: retirement age, maximum age
-	INTEGER(I4B), PARAMETER  :: MaxAge=81, RetAge=45, totpop=20000000
+	INTEGER(I4B), PARAMETER  :: MaxAge=5001, RetAge=MaxAge
 
 
 	! Asset grid: nodes (na,fine_na), min (amin), max (amax), curvature (a_curv) 
@@ -61,9 +64,9 @@ MODULE parameters
 
 	! Control for updates on stationary distribution
 		! Every "update_period" iterations policy functions are updated
-	INTEGER(I4B), PARAMETER :: update_period=5 !Normal value is 5
+	INTEGER(I4B), PARAMETER :: update_period=20 !Normal value is 5
 		! The distribution is iterated until convergence or until "MaxSimuTime" iterations
-	INTEGER(I4B), PARAMETER :: MaxSimuTime=5000 
+	INTEGER(I4B), PARAMETER :: MaxSimuTime=5000 , totpop=5000000
 		! Age categories are established
 	INTEGER(I4B), PARAMETER :: max_age_category=7, draft_age_category = 5, draft_z_category = 8
 
