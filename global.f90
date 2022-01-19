@@ -170,7 +170,8 @@ MODULE global
     REAL(DP) ::  GBAR_K,  GBAR_W, GBAR_L, GBAR_C, GBAR_BQ, Tot_Lab_Inc, Tot_Cap_Inc
 
     ! Entrepreneurs
-    REAL(DP) :: Entrepreneur_10, Entrepreneur_50, Entrepreneur_25
+    REAL(DP) :: Entrepreneur_10, Entrepreneur_50, Entrepreneur_25, Entrepreneur_90, &
+    			& Entrepreneur_a10, Entrepreneur_a50, Entrepreneur_a20
 
     ! Transition 
     LOGICAL :: Use_Transition_Seed

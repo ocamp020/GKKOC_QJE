@@ -34,7 +34,8 @@ SUBROUTINE COMPUTE_STATS()
 	character(100) :: rowname
 	integer        :: age_limit(max_age_category+1), draft_age_limit(draft_age_category+1)
 	real(DP), dimension(MaxAge, nz) 		   :: size_by_age_z, leverage_age_z, constrained_firms_age_z 
-	real(DP), dimension(MaxAge)  			   :: Entrepreneur_10_age, Entrepreneur_25_age, Entrepreneur_50_age
+	real(DP), dimension(MaxAge)  			   :: Entrepreneur_10_age, Entrepreneur_25_age, Entrepreneur_50_age, Entrepreneur_90_age, &
+												& Entrepreneur_a10_age, Entrepreneur_a20_age, Entrepreneur_a50_age
 	real(DP), dimension(draft_age_category,nz) :: size_draft_group_z, wealth_draft_group_z, capital_draft_group_z, &
 		& Cons_draft_group_z, Hours_draft_group_z, Ap_draft_group_z, & 
 		& K_Tax_draft_group_z, L_Tax_draft_group_z, K_Tax_Inc_draft_group_z, L_Tax_Inc_draft_group_z, &
@@ -43,7 +44,8 @@ SUBROUTINE COMPUTE_STATS()
 		& Tax_Rate_Increase_tk_draft_group_z, Tax_Rate_Increase_tl_draft_group_z, Tax_Rate_Increase_draft_group_z, & 
 		& Inc_Increase_draft_group_z, K_Inc_Increase_draft_group_z, L_Inc_Increase_draft_group_z, &
 		& Return_draft_group_z, Return_AT_draft_group_z, &
-		& Entrepreneur_10_draft_group_z, Entrepreneur_50_draft_group_z
+		& Entrepreneur_10_draft_group_z, Entrepreneur_50_draft_group_z, Entrepreneur_90_draft_group_z, &
+		& Entrepreneur_a10_draft_group_z, Entrepreneur_a20_draft_group_z, Entrepreneur_a50_draft_group_z
 	real(DP), dimension(draft_age_category,draft_z_category) :: size_draft_group, &
 		& wealth_draft_group,  av_wealth_draft_group, frac_wealth_draft_group, & 
 		& capital_draft_group,  av_capital_draft_group, frac_capital_draft_group, &
@@ -55,7 +57,8 @@ SUBROUTINE COMPUTE_STATS()
 		& Tax_Rate_Increase_tk_draft_group, Tax_Rate_Increase_tl_draft_group, Tax_Rate_Increase_draft_group, &
 		& Inc_Increase_draft_group, K_Inc_Increase_draft_group, L_Inc_Increase_draft_group, &
 		& Return_draft_group, Return_AT_draft_group, &
-		& Entrepreneur_10_draft_group, Entrepreneur_50_draft_group
+		& Entrepreneur_10_draft_group, Entrepreneur_50_draft_group, Entrepreneur_90_draft_group, &
+		& Entrepreneur_a10_draft_group, Entrepreneur_a20_draft_group, Entrepreneur_a50_draft_group
 	real(DP) :: DBN_az(na,nz)
 	real(DP) :: Z_share_top_wealth(draft_age_category,nz), draft_group_share_top_wealth(draft_age_category,draft_z_category), &
 			&	A_share_top_wealth(draft_age_category,nz), draft_group_wealth_share_top_wealth(draft_age_category,draft_z_category) 
@@ -67,11 +70,19 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
-	real(DP) :: Top_Share_K_Inc(5), K_Inc_pct(5), &
-				& Entrepreneur_10_top10, Entrepreneur_50_top10, Entrepreneur_10_top1, Entrepreneur_50_top1, &
-				& Entrepreneur_10_bot10, Entrepreneur_50_bot10, &
-				& Entrepreneur_10_A, Entrepreneur_50_A, &
-				& Entrepreneur_10_top10_A, Entrepreneur_50_top10_A, Entrepreneur_10_top1_A, Entrepreneur_50_top1_A
+	real(DP) :: Top_Share_K_Inc(5), K_Inc_pct(5), Total_Private_Equity, &
+				& Entrepreneur_10_top10 , Entrepreneur_10_bot10   , Entrepreneur_10_top1   , &
+				& Entrepreneur_10_A     , Entrepreneur_10_top10_A , Entrepreneur_10_top1_A , Entrepreneur_10_Eq,&
+				& Entrepreneur_50_top10 , Entrepreneur_50_bot10   , Entrepreneur_50_top1   , & 
+				& Entrepreneur_50_A     , Entrepreneur_50_top10_A , Entrepreneur_50_top1_A , Entrepreneur_50_Eq,&
+				& Entrepreneur_90_top10 , Entrepreneur_90_bot10   , Entrepreneur_90_top1   , &
+				& Entrepreneur_90_A     , Entrepreneur_90_top10_A , Entrepreneur_90_top1_A , Entrepreneur_90_Eq,&
+				& Entrepreneur_a10_top10, Entrepreneur_a10_bot10  , Entrepreneur_a10_top1  , &
+				& Entrepreneur_a10_A    , Entrepreneur_a10_top10_A, Entrepreneur_a10_top1_A, Entrepreneur_a10_Eq,&
+				& Entrepreneur_a20_top10, Entrepreneur_a20_bot10  , Entrepreneur_a20_top1  , & 
+				& Entrepreneur_a20_A    , Entrepreneur_a20_top10_A, Entrepreneur_a20_top1_A, Entrepreneur_a20_Eq,&
+				& Entrepreneur_a50_top10, Entrepreneur_a50_bot10  , Entrepreneur_a50_top1  , &
+				& Entrepreneur_a50_A    , Entrepreneur_a50_top10_A, Entrepreneur_a50_top1_A, Entrepreneur_a50_Eq
 	integer  :: pct_list_for_Top_Share(5)
 	real(DP) :: TFP_star 
 	real(DP) :: leverage_azx(na,nz,nx-1), DBN_azx2(na,nz,nx-1), &
@@ -99,6 +110,7 @@ SUBROUTINE COMPUTE_STATS()
 	
 	! Age Brackets
 		draft_age_limit = [0, 1, 15, 30, 45, MaxAge ] 
+		age_limit       = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
 
 
 
@@ -846,8 +858,8 @@ SUBROUTINE COMPUTE_STATS()
 		Y_AZ  	 = 0.0_dp 
 		Y_W   	 = 0.0_dp
 		DO age=1,MaxAge 
-
-		    DO while (age.gt.age_limit(group+1))
+			print*, group, age, age_limit
+		    DO while (age.gt.draft_age_limit(group+1))
 		        group = group+1
 		    ENDDO    
 		 
@@ -1341,24 +1353,44 @@ SUBROUTINE COMPUTE_STATS()
 		Return_AT_draft_group_z     = 0.0_dp
 		Entrepreneur_10_draft_group = 0.0_dp
 		Entrepreneur_50_draft_group = 0.0_dp
+		Entrepreneur_90_draft_group = 0.0_dp
 		Entrepreneur_10				= 0.0_dp
 		Entrepreneur_50				= 0.0_dp
+		Entrepreneur_90				= 0.0_dp
 		Entrepreneur_25				= 0.0_dp
 		Entrepreneur_10_top10		= 0.0_dp
 		Entrepreneur_50_top10		= 0.0_dp
+		Entrepreneur_90_top10		= 0.0_dp
 		Entrepreneur_10_top1		= 0.0_dp
 		Entrepreneur_50_top1		= 0.0_dp
+		Entrepreneur_90_top1		= 0.0_dp
 		Entrepreneur_10_bot10		= 0.0_dp
 		Entrepreneur_50_bot10		= 0.0_dp
+		Entrepreneur_90_bot10		= 0.0_dp
 		Entrepreneur_10_A			= 0.0_dp
 		Entrepreneur_50_A			= 0.0_dp
+		Entrepreneur_90_A			= 0.0_dp
 		Entrepreneur_10_top10_A		= 0.0_dp
 		Entrepreneur_50_top10_A		= 0.0_dp
+		Entrepreneur_90_top10_A		= 0.0_dp
 		Entrepreneur_10_top1_A		= 0.0_dp
 		Entrepreneur_50_top1_A		= 0.0_dp
-		Entrepreneur_10_age			= 0.0_dp
-		Entrepreneur_50_age			= 0.0_dp
-		Entrepreneur_25_age			= 0.0_dp
+		Entrepreneur_90_top1_A		= 0.0_dp
+		Entrepreneur_10_Eq			= 0.0_dp; Entrepreneur_50_Eq			= 0.0_dp; Entrepreneur_90_Eq			= 0.0_dp;
+		
+		Entrepreneur_10_age	= 0.0_dp; Entrepreneur_50_age = 0.0_dp; Entrepreneur_90_age = 0.0_dp; Entrepreneur_25_age = 0.0_dp; 
+
+		Entrepreneur_a10_draft_group = 0.0_dp; Entrepreneur_a20_draft_group = 0.0_dp; Entrepreneur_a50_draft_group = 0.0_dp;
+		Entrepreneur_a10			 = 0.0_dp; Entrepreneur_a20			    = 0.0_dp; Entrepreneur_a50			   = 0.0_dp;
+		Entrepreneur_a10_top10		 = 0.0_dp; Entrepreneur_a20_top10		= 0.0_dp; Entrepreneur_a50_top10	   = 0.0_dp; 
+		Entrepreneur_a10_top1		 = 0.0_dp; Entrepreneur_a20_top1		= 0.0_dp; Entrepreneur_a50_top1		   = 0.0_dp; 
+		Entrepreneur_a10_bot10		 = 0.0_dp; Entrepreneur_a20_bot10		= 0.0_dp; Entrepreneur_a50_bot10	   = 0.0_dp; 
+		Entrepreneur_a10_A			 = 0.0_dp; Entrepreneur_a20_A			= 0.0_dp; Entrepreneur_a50_A		   = 0.0_dp; 
+		Entrepreneur_a10_top10_A	 = 0.0_dp; Entrepreneur_a20_top10_A	    = 0.0_dp; Entrepreneur_a50_top10_A	   = 0.0_dp; 
+		Entrepreneur_a10_top1_A		 = 0.0_dp; Entrepreneur_a20_top1_A		= 0.0_dp; Entrepreneur_a50_top1_A	   = 0.0_dp; 
+		Entrepreneur_a10_age		 = 0.0_dp; Entrepreneur_a20_age		    = 0.0_dp; Entrepreneur_a50_age		   = 0.0_dp;
+
+		Total_Private_Equity         = 0.0_dp ;
 
 		do zi  = 1,nz
 		do age = 1,draft_age_category
@@ -1367,6 +1399,8 @@ SUBROUTINE COMPUTE_STATS()
 		    do lambdai=1,nlambda
 		    do ai=1,na
 		    do age2=draft_age_limit(age)+1,draft_age_limit(age+1)
+
+		    	Total_Private_Equity = Total_Private_Equity + min(agrid(ai),K_mat(ai,zi,xi))*DBN1(age2,ai,zi,lambdai,ei,xi)
 
 		    	! Income for each agent 
 		    	if (age2.lt.RetAge) then
@@ -1421,13 +1455,15 @@ SUBROUTINE COMPUTE_STATS()
         		Return_AT_draft_group_z(age,zi) = Return_AT_draft_group_z(age,zi) + &
 	        		& (YGRID(ai,zi,xi)-agrid(ai))/agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
 
+        		
         		! Share of entrepreneurs
 
         		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.10_dp) then 
         		Entrepreneur_10_draft_group_z(age,zi) = Entrepreneur_10_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_10 = Entrepreneur_10 + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_10_age(age2) = Entrepreneur_10_age(age2) + DBN1(age2,ai,zi,lambdai,ei,xi)
-				Entrepreneur_10_A = Entrepreneur_10_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
+				Entrepreneur_10_A  = Entrepreneur_10_A  + agrid(ai)                     *DBN1(age2,ai,zi,lambdai,ei,xi)
+				Entrepreneur_10_Eq = Entrepreneur_10_Eq + min(agrid(ai),K_mat(ai,zi,xi))*DBN1(age2,ai,zi,lambdai,ei,xi)
         		! print*, 'Inside Entrepreneur_10',ai,prctile_ai_ind(90)
 	        		if     (ai.ge.prctile_ai_ind(90)) then 		
 	        		Entrepreneur_10_top10   = Entrepreneur_10_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
@@ -1442,15 +1478,18 @@ SUBROUTINE COMPUTE_STATS()
 					Entrepreneur_10_bot10 = Entrepreneur_10_bot10 + DBN1(age2,ai,zi,lambdai,ei,xi)
 	        		endif 
         		endif 
+        		
         		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.25_dp) then 
         		Entrepreneur_25 = Entrepreneur_25 + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_25_age(age2) = Entrepreneur_25_age(age2) + DBN1(age2,ai,zi,lambdai,ei,xi)
         		endif 
+        		
         		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.50_dp) then 
         		Entrepreneur_50_draft_group_z(age,zi) = Entrepreneur_50_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_50 = Entrepreneur_50 + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_50_age(age2) = Entrepreneur_50_age(age2) + DBN1(age2,ai,zi,lambdai,ei,xi)
-        		Entrepreneur_50_A = Entrepreneur_50_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_50_A  = Entrepreneur_50_A  + agrid(ai)                     *DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_50_Eq = Entrepreneur_50_Eq + min(agrid(ai),K_mat(ai,zi,xi))*DBN1(age2,ai,zi,lambdai,ei,xi)
 	        		if     (ai.ge.prctile_ai_ind(90)) then 		
 	        		Entrepreneur_50_top10   = Entrepreneur_50_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
 	        		Entrepreneur_50_top10_A = Entrepreneur_50_top10_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
@@ -1461,6 +1500,86 @@ SUBROUTINE COMPUTE_STATS()
 					endif 
 					if (ai.le.prctile_ai_ind(10)) then 		
 					Entrepreneur_50_bot10 = Entrepreneur_50_bot10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		endif 
+        		endif 
+
+        		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.90_dp) then 
+        		Entrepreneur_90_draft_group_z(age,zi) = Entrepreneur_90_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_90 = Entrepreneur_90 + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_90_age(age2) = Entrepreneur_90_age(age2) + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_90_A  = Entrepreneur_90_A  + agrid(ai)                     *DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_90_Eq = Entrepreneur_90_Eq + min(agrid(ai),K_mat(ai,zi,xi))*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		if     (ai.ge.prctile_ai_ind(90)) then 		
+	        		Entrepreneur_90_top10   = Entrepreneur_90_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		Entrepreneur_90_top10_A = Entrepreneur_90_top10_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		endif 
+	        		if (ai.ge.prctile_ai_ind(99)) then 		
+					Entrepreneur_90_top1   = Entrepreneur_90_top1 + DBN1(age2,ai,zi,lambdai,ei,xi)
+					Entrepreneur_90_top1_A = Entrepreneur_90_top1_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
+					endif 
+					if (ai.le.prctile_ai_ind(10)) then 		
+					Entrepreneur_90_bot10 = Entrepreneur_90_bot10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		endif 
+        		endif 
+
+
+        		!=======================================
+        		! Entrepreneurship by Assets Used
+
+        		if (min(agrid(ai),K_mat(ai,zi,xi)).gt.10000/((EBAR_data/(EBAR*0.727853584919652_dp)))) then 
+        		Entrepreneur_a10_draft_group_z(age,zi) = Entrepreneur_a10_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_a10 = Entrepreneur_a10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_a10_age(age2) = Entrepreneur_a10_age(age2) + DBN1(age2,ai,zi,lambdai,ei,xi)
+				Entrepreneur_a10_A  = Entrepreneur_a10_A  +     agrid(ai)                 *DBN1(age2,ai,zi,lambdai,ei,xi)
+				Entrepreneur_a10_Eq = Entrepreneur_a10_Eq + min(agrid(ai),K_mat(ai,zi,xi))*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		if     (ai.ge.prctile_ai_ind(90)) then 		
+	        		Entrepreneur_a10_top10   = Entrepreneur_a10_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		Entrepreneur_a10_top10_A = Entrepreneur_a10_top10_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		endif 
+	        		if (ai.ge.prctile_ai_ind(99)) then 		
+					Entrepreneur_a10_top1    = Entrepreneur_a10_top1 + DBN1(age2,ai,zi,lambdai,ei,xi)
+					Entrepreneur_a10_top1_A  = Entrepreneur_a10_top1_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
+					endif 
+					if (ai.le.prctile_ai_ind(10)) then 		
+					Entrepreneur_a10_bot10 = Entrepreneur_a10_bot10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		endif 
+        		endif 
+
+        		if (min(agrid(ai),K_mat(ai,zi,xi)).gt.20000/((EBAR_data/(EBAR*0.727853584919652_dp)))) then 
+        		Entrepreneur_a20_draft_group_z(age,zi) = Entrepreneur_a20_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_a20 = Entrepreneur_a20 + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_a20_age(age2) = Entrepreneur_a20_age(age2) + DBN1(age2,ai,zi,lambdai,ei,xi)
+				Entrepreneur_a20_A  = Entrepreneur_a20_A  + agrid(ai)  					  *DBN1(age2,ai,zi,lambdai,ei,xi)
+				Entrepreneur_a20_Eq = Entrepreneur_a20_Eq + min(agrid(ai),K_mat(ai,zi,xi))*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		if     (ai.ge.prctile_ai_ind(90)) then 		
+	        		Entrepreneur_a20_top10   = Entrepreneur_a20_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		Entrepreneur_a20_top10_A = Entrepreneur_a20_top10_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		endif 
+	        		if (ai.ge.prctile_ai_ind(99)) then 		
+					Entrepreneur_a20_top1    = Entrepreneur_a20_top1 + DBN1(age2,ai,zi,lambdai,ei,xi)
+					Entrepreneur_a20_top1_A  = Entrepreneur_a20_top1_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
+					endif 
+					if (ai.le.prctile_ai_ind(10)) then 		
+					Entrepreneur_a20_bot10 = Entrepreneur_a20_bot10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		endif 
+        		endif 
+
+        		if (min(agrid(ai),K_mat(ai,zi,xi)).gt.50000/((EBAR_data/(EBAR*0.727853584919652_dp)))) then 
+        		Entrepreneur_a50_draft_group_z(age,zi) = Entrepreneur_a50_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_a50 = Entrepreneur_a50 + DBN1(age2,ai,zi,lambdai,ei,xi)
+        		Entrepreneur_a50_age(age2) = Entrepreneur_a50_age(age2) + DBN1(age2,ai,zi,lambdai,ei,xi)
+				Entrepreneur_a50_A  = Entrepreneur_a50_A  + agrid(ai) 					  *DBN1(age2,ai,zi,lambdai,ei,xi)
+				Entrepreneur_a50_Eq = Entrepreneur_a50_Eq + min(agrid(ai),K_mat(ai,zi,xi))*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		if     (ai.ge.prctile_ai_ind(90)) then 		
+	        		Entrepreneur_a50_top10   = Entrepreneur_a50_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		Entrepreneur_a50_top10_A = Entrepreneur_a50_top10_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
+	        		endif 
+	        		if (ai.ge.prctile_ai_ind(99)) then 		
+					Entrepreneur_a50_top1    = Entrepreneur_a50_top1 + DBN1(age2,ai,zi,lambdai,ei,xi)
+					Entrepreneur_a50_top1_A  = Entrepreneur_a50_top1_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
+					endif 
+					if (ai.le.prctile_ai_ind(10)) then 		
+					Entrepreneur_a50_bot10 = Entrepreneur_a50_bot10 + DBN1(age2,ai,zi,lambdai,ei,xi)
 	        		endif 
         		endif 
 
@@ -1529,9 +1648,20 @@ SUBROUTINE COMPUTE_STATS()
 		! Frac. Entrepreneurs
 		Entrepreneur_10_draft_group = Draft_Table(Entrepreneur_10_draft_group_z,DBN_z,.true.)
 		Entrepreneur_50_draft_group = Draft_Table(Entrepreneur_50_draft_group_z,DBN_z,.true.)
+		Entrepreneur_90_draft_group = Draft_Table(Entrepreneur_90_draft_group_z,DBN_z,.true.)
 			! Fix fractions
 			Entrepreneur_10_draft_group = 100.0_dp*Entrepreneur_10_draft_group/size_draft_group
 			Entrepreneur_50_draft_group = 100.0_dp*Entrepreneur_50_draft_group/size_draft_group
+			Entrepreneur_90_draft_group = 100.0_dp*Entrepreneur_90_draft_group/size_draft_group
+
+		! Frac. Entrepreneurs by assets used 
+		Entrepreneur_a10_draft_group = Draft_Table(Entrepreneur_a10_draft_group_z,DBN_z,.true.)
+		Entrepreneur_a20_draft_group = Draft_Table(Entrepreneur_a20_draft_group_z,DBN_z,.true.)
+		Entrepreneur_a50_draft_group = Draft_Table(Entrepreneur_a50_draft_group_z,DBN_z,.true.)
+			! Fix fractions
+			Entrepreneur_a10_draft_group = 100.0_dp*Entrepreneur_a10_draft_group/size_draft_group
+			Entrepreneur_a20_draft_group = 100.0_dp*Entrepreneur_a20_draft_group/size_draft_group
+			Entrepreneur_a50_draft_group = 100.0_dp*Entrepreneur_a50_draft_group/size_draft_group
 
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'draft_group_Tax_K.txt', STATUS='replace') 
 	    OPEN (UNIT=81, FILE=trim(Result_Folder)//'draft_group_Tax_L.txt', STATUS='replace') 
@@ -1550,6 +1680,10 @@ SUBROUTINE COMPUTE_STATS()
 	    OPEN (UNIT=94, FILE=trim(Result_Folder)//'draft_group_Return_AT.txt', STATUS='replace') 
 	    OPEN (UNIT=95, FILE=trim(Result_Folder)//'draft_group_Entrepreneur_10.txt', STATUS='replace') 
 	    OPEN (UNIT=96, FILE=trim(Result_Folder)//'draft_group_Entrepreneur_50.txt', STATUS='replace') 
+	    OPEN (UNIT=97, FILE=trim(Result_Folder)//'draft_group_Entrepreneur_90.txt', STATUS='replace') 
+	    OPEN (UNIT=75, FILE=trim(Result_Folder)//'draft_group_Entrepreneur_a10.txt', STATUS='replace') 
+	    OPEN (UNIT=76, FILE=trim(Result_Folder)//'draft_group_Entrepreneur_a20.txt', STATUS='replace') 
+	    OPEN (UNIT=77, FILE=trim(Result_Folder)//'draft_group_Entrepreneur_a50.txt', STATUS='replace') 
 	    do age = 1,draft_age_category
 		    WRITE  (UNIT=80, FMT=*)  K_Tax_draft_group(age,:)
 		    WRITE  (UNIT=81, FMT=*)  L_Tax_draft_group(age,:)
@@ -1568,75 +1702,169 @@ SUBROUTINE COMPUTE_STATS()
 		    WRITE  (UNIT=94, FMT=*)  Return_AT_draft_group(age,:)
 		    WRITE  (UNIT=95, FMT=*)  Entrepreneur_10_draft_group(age,:)
 		    WRITE  (UNIT=96, FMT=*)  Entrepreneur_50_draft_group(age,:)
+		    WRITE  (UNIT=97, FMT=*)  Entrepreneur_90_draft_group(age,:)
+		    WRITE  (UNIT=75, FMT=*)  Entrepreneur_a10_draft_group(age,:)
+		    WRITE  (UNIT=76, FMT=*)  Entrepreneur_a20_draft_group(age,:)
+		    WRITE  (UNIT=77, FMT=*)  Entrepreneur_a50_draft_group(age,:)
 		ENDDO
 		close(unit=80); close(unit=81); close(unit=83); close(unit=84); close(unit=85)
 		close(unit=87); close(unit=88); close(unit=89); close(unit=90); close(unit=91); close(unit=92); 
-		close(unit=93); close(unit=94); close(unit=95); close(unit=96);
+		close(unit=93); close(unit=94); close(unit=95); close(unit=96); close(unit=97);
+		close(unit=75); close(unit=76); close(unit=77);
 
 		Entrepreneur_10_top10 = 100.0_dp*Entrepreneur_10_top10/0.10_dp 
 		Entrepreneur_50_top10 = 100.0_dp*Entrepreneur_50_top10/0.10_dp 
+		Entrepreneur_90_top10 = 100.0_dp*Entrepreneur_90_top10/0.10_dp 
 		Entrepreneur_10_top1  = 100.0_dp*Entrepreneur_10_top1/0.01_dp 
 		Entrepreneur_50_top1  = 100.0_dp*Entrepreneur_50_top1/0.01_dp 
+		Entrepreneur_90_top1  = 100.0_dp*Entrepreneur_90_top1/0.01_dp 
 		Entrepreneur_10_bot10 = 100.0_dp*Entrepreneur_10_bot10/0.10_dp 
 		Entrepreneur_50_bot10 = 100.0_dp*Entrepreneur_50_bot10/0.10_dp
+		Entrepreneur_90_bot10 = 100.0_dp*Entrepreneur_90_bot10/0.10_dp
 
 		Entrepreneur_10_A		= 100.0_dp*Entrepreneur_10_A		/MeanWealth
 		Entrepreneur_50_A		= 100.0_dp*Entrepreneur_50_A		/MeanWealth
+		Entrepreneur_90_A		= 100.0_dp*Entrepreneur_90_A		/MeanWealth
 		Entrepreneur_10_top10_A	= 100.0_dp*Entrepreneur_10_top10_A /sum(pr_a_dbn(prctile_ai_ind(90):)*agrid(prctile_ai_ind(90):))
 		Entrepreneur_50_top10_A	= 100.0_dp*Entrepreneur_50_top10_A /sum(pr_a_dbn(prctile_ai_ind(90):)*agrid(prctile_ai_ind(90):))
+		Entrepreneur_90_top10_A	= 100.0_dp*Entrepreneur_90_top10_A /sum(pr_a_dbn(prctile_ai_ind(90):)*agrid(prctile_ai_ind(90):))
 		Entrepreneur_10_top1_A	= 100.0_dp*Entrepreneur_10_top1_A  /sum(pr_a_dbn(prctile_ai_ind(99):)*agrid(prctile_ai_ind(99):))
 		Entrepreneur_50_top1_A	= 100.0_dp*Entrepreneur_50_top1_A  /sum(pr_a_dbn(prctile_ai_ind(99):)*agrid(prctile_ai_ind(99):))
+		Entrepreneur_90_top1_A	= 100.0_dp*Entrepreneur_90_top1_A  /sum(pr_a_dbn(prctile_ai_ind(99):)*agrid(prctile_ai_ind(99):))
+		Entrepreneur_10_Eq		= 100.0_dp*Entrepreneur_10_Eq		/Total_Private_Equity
+		Entrepreneur_50_Eq		= 100.0_dp*Entrepreneur_50_Eq		/Total_Private_Equity
+		Entrepreneur_90_Eq		= 100.0_dp*Entrepreneur_90_Eq		/Total_Private_Equity
+
+
+		Entrepreneur_a10_top10 = 100.0_dp*Entrepreneur_a10_top10/0.10_dp 
+		Entrepreneur_a20_top10 = 100.0_dp*Entrepreneur_a20_top10/0.10_dp 
+		Entrepreneur_a50_top10 = 100.0_dp*Entrepreneur_a50_top10/0.10_dp 
+		Entrepreneur_a10_top1  = 100.0_dp*Entrepreneur_a10_top1/0.01_dp 
+		Entrepreneur_a20_top1  = 100.0_dp*Entrepreneur_a20_top1/0.01_dp 
+		Entrepreneur_a50_top1  = 100.0_dp*Entrepreneur_a50_top1/0.01_dp 
+		Entrepreneur_a10_bot10 = 100.0_dp*Entrepreneur_a10_bot10/0.10_dp 
+		Entrepreneur_a20_bot10 = 100.0_dp*Entrepreneur_a20_bot10/0.10_dp
+		Entrepreneur_a50_bot10 = 100.0_dp*Entrepreneur_a50_bot10/0.10_dp
+
+		Entrepreneur_a10_A		 = 100.0_dp*Entrepreneur_a10_A		 /MeanWealth
+		Entrepreneur_a20_A		 = 100.0_dp*Entrepreneur_a20_A		 /MeanWealth
+		Entrepreneur_a50_A		 = 100.0_dp*Entrepreneur_a50_A		 /MeanWealth
+		Entrepreneur_a10_top10_A = 100.0_dp*Entrepreneur_a10_top10_A /sum(pr_a_dbn(prctile_ai_ind(90):)*agrid(prctile_ai_ind(90):))
+		Entrepreneur_a20_top10_A = 100.0_dp*Entrepreneur_a20_top10_A /sum(pr_a_dbn(prctile_ai_ind(90):)*agrid(prctile_ai_ind(90):))
+		Entrepreneur_a50_top10_A = 100.0_dp*Entrepreneur_a50_top10_A /sum(pr_a_dbn(prctile_ai_ind(90):)*agrid(prctile_ai_ind(90):))
+		Entrepreneur_a10_top1_A	 = 100.0_dp*Entrepreneur_a10_top1_A  /sum(pr_a_dbn(prctile_ai_ind(99):)*agrid(prctile_ai_ind(99):))
+		Entrepreneur_a20_top1_A	 = 100.0_dp*Entrepreneur_a20_top1_A  /sum(pr_a_dbn(prctile_ai_ind(99):)*agrid(prctile_ai_ind(99):))
+		Entrepreneur_a50_top1_A	 = 100.0_dp*Entrepreneur_a50_top1_A  /sum(pr_a_dbn(prctile_ai_ind(99):)*agrid(prctile_ai_ind(99):))
+		Entrepreneur_a10_Eq		 = 100.0_dp*Entrepreneur_a10_Eq		 /Total_Private_Equity
+		Entrepreneur_a20_Eq		 = 100.0_dp*Entrepreneur_a20_Eq		 /Total_Private_Equity
+		Entrepreneur_a50_Eq		 = 100.0_dp*Entrepreneur_a50_Eq		 /Total_Private_Equity
 
 
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'Entrepreneur_10_50.txt', STATUS='replace') 
 		WRITE  (UNIT=80, FMT=*)  'Share of entrepreneurs '
 		WRITE  (UNIT=80, FMT=*)  'Profits/Before_Tax_Income>10% ',100.0_dp*Entrepreneur_10
 		WRITE  (UNIT=80, FMT=*)  'Profits/Before_Tax_Income>50% ',100.0_dp*Entrepreneur_50
+		WRITE  (UNIT=80, FMT=*)  'Profits/Before_Tax_Income>90% ',100.0_dp*Entrepreneur_90
+		WRITE  (UNIT=80, FMT=*)  'Own-Assets>$10.000% ',100.0_dp*Entrepreneur_a10
+		WRITE  (UNIT=80, FMT=*)  'Own-Assets>$20.000% ',100.0_dp*Entrepreneur_a20
+		WRITE  (UNIT=80, FMT=*)  'Own-Assets>$50.000% ',100.0_dp*Entrepreneur_a50
+
 		WRITE  (UNIT=80, FMT=*)  'Top_10_Entrepreneur_10', Entrepreneur_10_top10
 		WRITE  (UNIT=80, FMT=*)  'Top_10_Entrepreneur_50', Entrepreneur_50_top10
+		WRITE  (UNIT=80, FMT=*)  'Top_10_Entrepreneur_90', Entrepreneur_90_top10
+		WRITE  (UNIT=80, FMT=*)  'Top_10_Entrepreneur_a10', Entrepreneur_a10_top10
+		WRITE  (UNIT=80, FMT=*)  'Top_10_Entrepreneur_a50', Entrepreneur_a20_top10
+		WRITE  (UNIT=80, FMT=*)  'Top_10_Entrepreneur_a90', Entrepreneur_a50_top10
+
 		WRITE  (UNIT=80, FMT=*)  'Top_01_Entrepreneur_10', Entrepreneur_10_top1
 		WRITE  (UNIT=80, FMT=*)  'Top_01_Entrepreneur_50', Entrepreneur_50_top1
+		WRITE  (UNIT=80, FMT=*)  'Top_01_Entrepreneur_90', Entrepreneur_90_top1
+		WRITE  (UNIT=80, FMT=*)  'Top_01_Entrepreneur_a10', Entrepreneur_a10_top1
+		WRITE  (UNIT=80, FMT=*)  'Top_01_Entrepreneur_a20', Entrepreneur_a20_top1
+		WRITE  (UNIT=80, FMT=*)  'Top_01_Entrepreneur_a50', Entrepreneur_a50_top1
+
 		WRITE  (UNIT=80, FMT=*)  'Bottom_10_Entrepreneur_10', Entrepreneur_10_bot10
 		WRITE  (UNIT=80, FMT=*)  'Bottom_10_Entrepreneur_50', Entrepreneur_50_bot10
+		WRITE  (UNIT=80, FMT=*)  'Bottom_10_Entrepreneur_90', Entrepreneur_90_bot10
+		WRITE  (UNIT=80, FMT=*)  'Bottom_10_Entrepreneur_a10', Entrepreneur_a10_bot10
+		WRITE  (UNIT=80, FMT=*)  'Bottom_10_Entrepreneur_a20', Entrepreneur_a20_bot10
+		WRITE  (UNIT=80, FMT=*)  'Bottom_10_Entrepreneur_a50', Entrepreneur_a50_bot10
+
 		WRITE  (UNIT=80, FMT=*)  'Entreprenur_10_A_Share', Entrepreneur_10_A
-		WRITE  (UNIT=80, FMT=*)  'Entreprenur_10_A_Share', Entrepreneur_50_A
+		WRITE  (UNIT=80, FMT=*)  'Entreprenur_50_A_Share', Entrepreneur_50_A
+		WRITE  (UNIT=80, FMT=*)  'Entreprenur_90_A_Share', Entrepreneur_90_A
+		WRITE  (UNIT=80, FMT=*)  'Entreprenur_a10_A_Share', Entrepreneur_a10_A
+		WRITE  (UNIT=80, FMT=*)  'Entreprenur_a20_A_Share', Entrepreneur_a20_A
+		WRITE  (UNIT=80, FMT=*)  'Entreprenur_a50_A_Share', Entrepreneur_a50_A
+
 		WRITE  (UNIT=80, FMT=*)  'Top10_Entreprenur_10_A_Share', Entrepreneur_10_top10_A
 		WRITE  (UNIT=80, FMT=*)  'Top10_Entreprenur_50_A_Share', Entrepreneur_50_top10_A
+		WRITE  (UNIT=80, FMT=*)  'Top10_Entreprenur_90_A_Share', Entrepreneur_90_top10_A
+		WRITE  (UNIT=80, FMT=*)  'Top10_Entreprenur_a10_A_Share', Entrepreneur_a10_top10_A
+		WRITE  (UNIT=80, FMT=*)  'Top10_Entreprenur_a20_A_Share', Entrepreneur_a20_top10_A
+		WRITE  (UNIT=80, FMT=*)  'Top10_Entreprenur_a50_A_Share', Entrepreneur_a50_top10_A
+
 		WRITE  (UNIT=80, FMT=*)  'Top1_Entreprenur_10_A_Share', Entrepreneur_10_top1_A
 		WRITE  (UNIT=80, FMT=*)  'Top1_Entreprenur_50_A_Share', Entrepreneur_50_top1_A
+		WRITE  (UNIT=80, FMT=*)  'Top1_Entreprenur_90_A_Share', Entrepreneur_90_top1_A
+		WRITE  (UNIT=80, FMT=*)  'Top1_Entreprenur_a10_A_Share', Entrepreneur_a10_top1_A
+		WRITE  (UNIT=80, FMT=*)  'Top1_Entreprenur_a20_A_Share', Entrepreneur_a20_top1_A
+		WRITE  (UNIT=80, FMT=*)  'Top1_Entreprenur_a50_A_Share', Entrepreneur_a50_top1_A
+
+		WRITE  (UNIT=80, FMT=*)  'Entreprenur_10_Eq_Share', Entrepreneur_10_Eq
+		WRITE  (UNIT=80, FMT=*)  'Entreprenur_50_Eq_Share', Entrepreneur_50_Eq
+		WRITE  (UNIT=80, FMT=*)  'Entreprenur_90_Eq_Share', Entrepreneur_90_Eq
+		WRITE  (UNIT=80, FMT=*)  'Entreprenur_a10_Eq_Share', Entrepreneur_a10_Eq
+		WRITE  (UNIT=80, FMT=*)  'Entreprenur_a20_Eq_Share', Entrepreneur_a20_Eq
+		WRITE  (UNIT=80, FMT=*)  'Entreprenur_a50_Eq_Share', Entrepreneur_a50_Eq
 		close(unit=80); 
 
 		print*,' '; print*,'-----------------------------------------------------';
 		print*, 'Share of entrepreneurs '
 		print*, 'Profits/Before_Tax_Income>10% ',100.0_dp*Entrepreneur_10
 		print*, 'Profits/Before_Tax_Income>50% ',100.0_dp*Entrepreneur_50
+		print*, 'Profits/Before_Tax_Income>90% ',100.0_dp*Entrepreneur_90
 		print*, 'Top_10_Entrepreneur_10', Entrepreneur_10_top10
 		print*, 'Top_10_Entrepreneur_50', Entrepreneur_50_top10
+		print*, 'Top_10_Entrepreneur_90', Entrepreneur_50_top10
 		print*, 'Top_01_Entrepreneur_10', Entrepreneur_10_top1
 		print*, 'Top_01_Entrepreneur_50', Entrepreneur_50_top1
+		print*, 'Top_01_Entrepreneur_90', Entrepreneur_90_top1
 		print*, 'Bottom_10_Entrepreneur_10', Entrepreneur_10_bot10
 		print*, 'Bottom_10_Entrepreneur_50', Entrepreneur_50_bot10
+		print*, 'Bottom_10_Entrepreneur_90', Entrepreneur_90_bot10
 		print*, 'Entreprenur_10_A_Share', Entrepreneur_10_A
-		print*, 'Entreprenur_10_A_Share', Entrepreneur_50_A
+		print*, 'Entreprenur_50_A_Share', Entrepreneur_50_A
+		print*, 'Entreprenur_90_A_Share', Entrepreneur_90_A
 		print*, 'Top10_Entreprenur_10_A_Share', Entrepreneur_10_top10_A
 		print*, 'Top10_Entreprenur_50_A_Share', Entrepreneur_50_top10_A
+		print*, 'Top10_Entreprenur_90_A_Share', Entrepreneur_90_top10_A
 		print*, 'Top1_Entreprenur_10_A_Share', Entrepreneur_10_top1_A
 		print*, 'Top1_Entreprenur_50_A_Share', Entrepreneur_50_top1_A
+		print*, 'Top1_Entreprenur_90_A_Share', Entrepreneur_90_top1_A
 		print*,'-----------------------------------------------------'; print*,' '
 
 		Entrepreneur_10_age = Entrepreneur_10_age/sum(sum(sum(sum(sum(DBN1,6),5),4),3),2)
 		Entrepreneur_25_age = Entrepreneur_25_age/sum(sum(sum(sum(sum(DBN1,6),5),4),3),2)
 		Entrepreneur_50_age = Entrepreneur_50_age/sum(sum(sum(sum(sum(DBN1,6),5),4),3),2)
+		Entrepreneur_90_age = Entrepreneur_90_age/sum(sum(sum(sum(sum(DBN1,6),5),4),3),2)
+		Entrepreneur_a10_age = Entrepreneur_a10_age/sum(sum(sum(sum(sum(DBN1,6),5),4),3),2)
+		Entrepreneur_a20_age = Entrepreneur_a20_age/sum(sum(sum(sum(sum(DBN1,6),5),4),3),2)
+		Entrepreneur_a50_age = Entrepreneur_a50_age/sum(sum(sum(sum(sum(DBN1,6),5),4),3),2)
 
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'Entrepreneur_by_age.txt', STATUS='replace') 
 		WRITE  (UNIT=80, FMT=*)  'Eentrepreneurs_Cutoff ','Profits/Before_Tax_Income>10%',&
-			&'Profits/Before_Tax_Income>25%','Profits/Before_Tax_Income>50%'
+			&'Profits/Before_Tax_Income>25%','Profits/Before_Tax_Income>50%','Profits/Before_Tax_Income>90%',&
+			&'Own-Assets>$10.000% ','Own-Assets>$20.000% ','Own-Assets>$50.000% '
 		WRITE  (UNIT=80, FMT=*)  'Total_Share ',&
-			&100.0_dp*Entrepreneur_10,100.0_dp*Entrepreneur_25,100.0_dp*Entrepreneur_50
+			&100.0_dp*Entrepreneur_10,100.0_dp*Entrepreneur_25,100.0_dp*Entrepreneur_50,100.0_dp*Entrepreneur_90,&
+			&100.0_dp*Entrepreneur_a10,100.0_dp*Entrepreneur_a20,100.0_dp*Entrepreneur_a50
 		WRITE  (UNIT=80, FMT=*)  'By Age ',' '
 		do age=1,MaxAge 
 		WRITE  (UNIT=80, FMT=*)  age+19,&
-			&100.0_dp*Entrepreneur_10_age(age),100.0_dp*Entrepreneur_25_age(age),100.0_dp*Entrepreneur_50_age(age)
+			&100.0_dp*Entrepreneur_10_age(age),100.0_dp*Entrepreneur_25_age(age),& 
+			&100.0_dp*Entrepreneur_50_age(age),100.0_dp*Entrepreneur_90_age(age),&
+			&100.0_dp*Entrepreneur_a10_age(age),100.0_dp*Entrepreneur_a20_age(age),100.0_dp*Entrepreneur_a50_age(age)
 		enddo 
 		close(unit=80); 
 
