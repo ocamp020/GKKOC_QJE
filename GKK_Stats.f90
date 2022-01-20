@@ -66,6 +66,7 @@ SUBROUTINE COMPUTE_STATS()
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP), dimension(100) :: K_Inc_pct, Av_K_Tax_Rate_by_pct, Mg_K_Tax_Rate_by_pct
+	character(len=5) :: eta_char
 
 	allocate(DBN_vec(			size(DBN1)))
 	allocate(Firm_Wealth_vec(	size(DBN1)))
@@ -87,6 +88,7 @@ SUBROUTINE COMPUTE_STATS()
 	! print*, ' '; print*,' Entering Compute_Stats'; print*, ' '; 
 	
 	! Age Brackets
+		age_limit       = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
 		draft_age_limit = [0, 1, 15, 30, 45, MaxAge ] 
 
 	!------------------------------------------------------------------------------------
@@ -527,13 +529,14 @@ SUBROUTINE COMPUTE_STATS()
 		Mg_K_Tax_Rate_by_pct = 1.0_dp - (1-eta_K)*(1.0_dp-tauK)*(K_Inc_pct)**(-eta_K)
 
 		! Print Results 
-		OPEN(UNIT=11, FILE=trim(Result_Folder)//'K_Tax_Rates_by_pct_Wealth.txt', STATUS='replace')
+		write(eta_char,'(i0)') int(1000.0_dp*eta_K)
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'K_Tax_Rates_by_pct_Wealth_eta_'//trim(eta_char)//'.txt', STATUS='replace')
 		WRITE(UNIT=11, FMT=*) 'Percentile K_Inc Av_Tax Mg_Tax'
 		do i=1,100
 		WRITE(UNIT=11, FMT=*) i,(EBAR_data/(EBAR_bench*0.727853584919652_dp))*K_Inc_pct(i),Av_K_Tax_Rate_by_pct(i),Mg_K_Tax_Rate_by_pct(i)
 		enddo 
 		CLOSE(UNIT=11)
-
+		
 
 	! By Percentiles of Capital Income 
 		! Capital Income Vectorization
@@ -570,7 +573,7 @@ SUBROUTINE COMPUTE_STATS()
 		Mg_K_Tax_Rate_by_pct = 1.0_dp - (1-eta_K)*(1.0_dp-tauK)*(K_Inc_pct)**(-eta_K)
 
 		! Print Results 
-		OPEN(UNIT=11, FILE=trim(Result_Folder)//'K_Tax_Rates_by_pct_K_Inc.txt', STATUS='replace')
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'K_Tax_Rates_by_pct_K_Inc_eta_'//trim(eta_char)//'.txt', STATUS='replace')
 		WRITE(UNIT=11, FMT=*) 'Percentile K_Inc Av_Tax Mg_Tax'
 		do i=1,100
 		WRITE(UNIT=11, FMT=*) i,(EBAR_data/(EBAR_bench*0.727853584919652_dp))*K_Inc_pct(i),Av_K_Tax_Rate_by_pct(i),Mg_K_Tax_Rate_by_pct(i)

@@ -95,7 +95,7 @@ PROGRAM main
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 
 		Opt_NLKT = .true.  ! Solve for nonlinear capital income taxes 
-			Opt_Tax_tL = .true. ! If false set curvature and balance budget with level. If true balance with labor income taxes 
+			Opt_Tax_tL = .false. ! If false set curvature and balance budget with level. If true balance with labor income taxes 
 		
 		Simul_Switch  = .false.
 
@@ -218,7 +218,7 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_NLKT/'
+			Result_Folder = './Revision/Model_2.1_Local/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './Revision/Model_2.1_NLKT_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
@@ -573,7 +573,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		K_P_bench    = K_P
 
 		print*,"	Computing satitics"
-		CALL COMPUTE_STATS
+		! CALL COMPUTE_STATS
 		print*,"	Writing variables"
 		CALL WRITE_VARIABLES(1)
 		if (Simul_Switch) then 
@@ -2568,7 +2568,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	! Set flag for reading results or computing optimal taxes
-		read_results = .true.
+		read_results = .false.
 		load_seed    = .true.
 
 	! Set benchmark consumption
@@ -2630,12 +2630,12 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
     	tau_grid_max  = 0
     	tau_grid_step = 1
 
-    	eta_grid_min  = 00
-    	eta_grid_max  = 10
-    	eta_grid_step = 1
+    	eta_grid_min  = -14
+    	eta_grid_max  = -50
+    	eta_grid_step = -05
 
     	! Set initial tauK
-    	tauK = tauK_bench
+    	! tauK = tauK_bench
 
 	endif 
 
@@ -2649,6 +2649,8 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 	print*,' ';print*,'------------------------------------------------------------------'
 	print*,'	Optimal Tax Loop - eta_K'; print*, ' '
 	do eta_ind = eta_grid_min,eta_grid_max,eta_grid_step
+		
+		! Set value for eta in NLKT 
 		eta_K = real(eta_ind,8)/100.0_DP
 
 		print*,' ';print*,'------------------------------------------------------------------'
