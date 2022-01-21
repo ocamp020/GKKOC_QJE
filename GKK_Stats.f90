@@ -92,6 +92,7 @@ SUBROUTINE COMPUTE_STATS()
 	! print*, ' '; print*,' Entering Compute_Stats'; print*, ' '; 
 	
 	! Age Brackets
+		age_limit       = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
 		draft_age_limit = [0, 1, 15, 30, 45, MaxAge ] 
 
 	!------------------------------------------------------------------------------------
