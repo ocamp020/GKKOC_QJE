@@ -95,7 +95,7 @@ PROGRAM main
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 
 		Opt_NLKT = .true.  ! Solve for nonlinear capital income taxes 
-			Opt_Tax_tL = .false. ! If false set curvature and balance budget with level. If true balance with labor income taxes 
+			Opt_Tax_tL = .true. ! If false set curvature and balance budget with level. If true balance with labor income taxes 
 		
 		Simul_Switch  = .false.
 
@@ -2596,7 +2596,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 		print*,''
 		print*,'--------------- OPTIMAL CAPITAL TAXES - changing labor taxes -----------------'
 		print*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt_tl_progressive_2.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt_tl_progressive_zoom.txt', STATUS='replace')
     	WRITE(UNIT=77, FMT=*) 'eta_K ', 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
 		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ', &
 		      & 'Wealth_Output ', 'prct1_wealth ' , 'prct10_wealth ', 'Std_Log_Earnings ', 'mean_hours ', &
@@ -2604,12 +2604,12 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 	      	  & 'Av_Util_Pop ', 'Av_Util_NB ', 'brentvaluet '
     	CLOSE (unit=77) 
     	
-    	tau_grid_min  = -20
-    	tau_grid_max  = -36
-    	tau_grid_step = -2
+    	tau_grid_min  = -14
+    	tau_grid_max  = -26
+    	tau_grid_step = -1
 
-    	eta_grid_min  = 01
-    	eta_grid_max  = 03
+    	eta_grid_min  = 00
+    	eta_grid_max  = 15
     	eta_grid_step = 1
 
     	! Set initial psi
@@ -2630,12 +2630,12 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
     	tau_grid_max  = 0
     	tau_grid_step = 1
 
-    	eta_grid_min  = -14
-    	eta_grid_max  = -50
-    	eta_grid_step = -05
+    	eta_grid_min  = -10
+    	eta_grid_max  = -30
+    	eta_grid_step = -01
 
     	! Set initial tauK
-    	! tauK = tauK_bench
+    	tauK = tauK_bench
 
 	endif 
 
@@ -2651,7 +2651,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 	do eta_ind = eta_grid_min,eta_grid_max,eta_grid_step
 		
 		! Set value for eta in NLKT 
-		eta_K = real(eta_ind,8)/100.0_DP
+		eta_K = real(eta_ind,8)/1000.0_DP
 
 		print*,' ';print*,'------------------------------------------------------------------'
 		print*,'		Optimal Tax Loop - tau_K'; print*,' '
@@ -2721,7 +2721,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 		      	print*,'------------------------------------------------------------------------------';print*,' '
 
 		      	if (Opt_Tax_tL) then 
-		      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt_tl.txt', STATUS='old', POSITION='append')
+		      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt_tl_progressive_zoom.txt', STATUS='old', POSITION='append')
 		      	else 
 		      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_nlkt.txt', STATUS='old', POSITION='append')
 		      	endif 
