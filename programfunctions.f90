@@ -6385,7 +6385,10 @@ Function K_Matrix(R_in,P_in)
 	do j=1,nz
 	do i=1,na 
 		if (h.eq.1) then 
-		K_Matrix(i,j,h) = (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu))
+		! No Constraint 
+		! K_Matrix(i,j,h) = (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu))
+		! IPO Constraint
+		K_Matrix(i,j,h) = min( IPO_theta*agrid(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		else 
 		K_Matrix(i,j,h) = min( theta(j)*agrid(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		endif 
@@ -6407,7 +6410,10 @@ Function K_Matrix_t(R_in,P_in)
 	do j=1,nz
 	do i=1,na_t
 		if (h.eq.1) then 
-		K_Matrix_t(i,j,h) = (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu))
+		! No Constraint
+		! K_Matrix_t(i,j,h) = (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu))
+		! IPO Constraint
+		K_Matrix_t(i,j,h) = min( IPO_theta*agrid_t(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		else 
 		K_Matrix_t(i,j,h) = min( theta(j)*agrid_t(i) , (mu*P_in*xz_grid(h,j)**mu/(R_in+DepRate))**(1.0_dp/(1.0_dp-mu)) )
 		endif 
