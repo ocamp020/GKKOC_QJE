@@ -63,11 +63,11 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: Z_share_top_wealth(draft_age_category,nz), draft_group_share_top_wealth(draft_age_category,draft_z_category), &
 			&	A_share_top_wealth(draft_age_category,nz), draft_group_wealth_share_top_wealth(draft_age_category,draft_z_category) 
 	real(DP) :: Z_share_top_wealth_x(draft_age_category,nz,nx), A_share_top_wealth_x(draft_age_category,nz,nx)
-	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), K_Inc_mat(na,nz,nx),&
-		&  DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx), K_Inc_vec(na*nz*nx)
+	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), K_Inc_mat(na,nz,nx), MG_Return(na,nz,nx), Return_aux(na,nz,nx),&
+		&  DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx), K_Inc_vec(na*nz*nx), MG_Return_vec(na*nz*nx), Return_aux_vec(na,nz,nx)
 	integer  :: ind_lo, ind_hi, prctile_ai_ind_age(14)
 	real(DP) :: pct_graph_lim(14), ret_by_wealth(draft_age_category+1,13), pct_graph_wealth(draft_age_category+1,13)
-	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
+	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income, Ave_Return, Mrg_Return ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP) :: Top_Share_K_Inc(5), K_Inc_pct(5), Total_Private_Equity, &
@@ -83,7 +83,7 @@ SUBROUTINE COMPUTE_STATS()
 				& Entrepreneur_a20_A    , Entrepreneur_a20_top10_A, Entrepreneur_a20_top1_A, Entrepreneur_a20_Eq,&
 				& Entrepreneur_a50_top10, Entrepreneur_a50_bot10  , Entrepreneur_a50_top1  , &
 				& Entrepreneur_a50_A    , Entrepreneur_a50_top10_A, Entrepreneur_a50_top1_A, Entrepreneur_a50_Eq
-	integer  :: pct_list_for_Top_Share(5)
+	integer  :: pct_list_for_Top_Share(6)
 	real(DP) :: TFP_star 
 	real(DP) :: leverage_azx(na,nz,nx-1), DBN_azx2(na,nz,nx-1), &
 			& leverage_vec(na*nz*(nx-1)), DBN_azx2_vec(na*nz*(nx-1)), ave_leverage
@@ -487,15 +487,22 @@ SUBROUTINE COMPUTE_STATS()
 		do ai=1,na 
 			K_Inc_mat(ai,zi,xi)    = R*agrid(ai)+Pr_mat(ai,zi,xi)
 			BT_Return(ai,zi,xi)    = 100.0_dp*(R+Pr_mat(ai,zi,xi)/agrid(ai))
+			if (K_mat(ai,zi,xi).lt.theta(zi)*agrid(ai)) then 
+			MG_Return(ai,zi,xi)    = 100.0_dp*R
+			else 
+			MG_Return(ai,zi,xi)    = 100.0_dp*(R+mu*P*((xz_grid(xi,zi)*theta(zi))**mu)*(agrid(ai)**(mu-1.0_dp)) &
+										& - (R+DepRate)*theta(zi))
+			endif 
 		enddo 
 		enddo 
 		enddo 
 
 		! Vectorizations
-		DBN_azx_vec = reshape(DBN_azx   ,(/size(DBN_azx)/)); 
-		Return_vec  = reshape(BT_Return ,(/size(DBN_azx)/)); 
+		DBN_azx_vec    = reshape(DBN_azx   ,(/size(DBN_azx)/)); 
+		Return_vec     = reshape(BT_Return ,(/size(DBN_azx)/)); 
+		MG_Return_vec  = reshape(MG_Return ,(/size(DBN_azx)/)); 
 
-		! Compute bequest by percentile (percentiles for counter CDF)
+		! Compute ave. returns by percentile (percentiles for counter CDF)
 		prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
 		a = minval(Return_vec)
 		b = maxval(Return_vec) 
@@ -542,16 +549,67 @@ SUBROUTINE COMPUTE_STATS()
 			& ' 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5)
 		print*,'-----------------------------------------------------'; print*, ' '
 
+
+		! Compute mrg. returns by percentile (percentiles for counter CDF)
+		prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+		a = minval(MG_Return_vec)
+		b = maxval(MG_Return_vec) 
+		c = a
+		do i=1,size(prctile_bq)
+			a = c
+			b = maxval(MG_Return_vec)
+			c = (a+b)/2.0_dp
+			CCDF_c = sum(DBN_azx_vec,MG_Return_vec>=c)
+			!print*, ' '
+			!print*, 'Percentile', prctile_bq(i)
+			do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+				if (CCDF_c<prctile_bq(i)) then 
+					b = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_vec,MG_Return_vec>=c)
+				else 
+					a = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_vec,MG_Return_vec>=c)
+				endif
+				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+			enddo 
+			BQ_top_x(i) = c 
+		enddo 
+		if (solving_bench.eq.1) then
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Mg_Return_Pct_Bench.txt', STATUS='replace')
+		else
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Mg_Return_Pct_Exp.txt', STATUS='replace')
+		end if 
+		print*,' '
+		print*,'-----------------------------------------------------'
+		WRITE(UNIT=11, FMT=*) 'Marginal Return Percentiles'
+		WRITE(UNIT=11, FMT=*) 'Tax p10 p50 p90 p95 p99'
+		WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x
+		if (solving_bench.eq.1) then 
+		WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x*(1.0_dp-tauK)
+		else
+		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x-100.0_dp*tauW_at
+		endif 
+		CLOSE(UNIT=11)
+		print*,' Marginal Return Percentiles'
+		print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
+			& ' 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5)
+		print*,'-----------------------------------------------------'; print*, ' '
+
+
+
+
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Capital Income Taxes Top Shares (By Distribution of Assets and of Capital Income)
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
 	! Percentile list 
-		pct_list_for_Top_Share = (/99,95,90,75,50/)
+		pct_list_for_Top_Share = (/99,95,90,75,50,10/)
 
-	! By Percentiles of Assets 
-		do i=1,5
+	! Capital Income Taxes Top Shares By Percentiles of Assets 
+		do i=1,6
 		 	ai = prctile_ai_ind(pct_list_for_Top_Share(i))
 			Top_Share_K_Inc(i) = 100.0_dp*sum(K_Inc_mat(ai:,:,:)*DBN_azx(ai:,:,:))/sum(K_Inc_mat*DBN_azx)
 		enddo 
@@ -559,14 +617,14 @@ SUBROUTINE COMPUTE_STATS()
 		! Print Results 
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Top_Shares_K_Inc_by_Assets.txt', STATUS='replace')
 		WRITE(UNIT=11, FMT=*) 'Percentile Assets K_Inc_Share'
-		do i=1,5
+		do i=1,6
 		ai = prctile_ai_ind(pct_list_for_Top_Share(i))
 		WRITE(UNIT=11, FMT=*) pct_list_for_Top_Share(i),(EBAR_data/(EBAR_bench*0.727853584919652_dp))*agrid(ai),Top_Share_K_Inc(i)
 		enddo 
 		CLOSE(UNIT=11)
 
 
-	! By Percentiles of Capital Income 
+	! Capital Income Taxes Top Shares By Percentiles of Capital Income 
 		! Capital Income Vectorization
 		K_Inc_vec  = reshape(K_Inc_mat ,(/size(DBN_azx)/)); 
 
@@ -574,7 +632,7 @@ SUBROUTINE COMPUTE_STATS()
 		a = minval(K_Inc_vec)
 		b = maxval(K_Inc_vec) 
 		c = a
-		do i=1,5
+		do i=1,6
 			a = minval(K_Inc_vec)
 			b = maxval(K_Inc_vec)
 			c = (a+b)/2.0_dp
@@ -601,10 +659,11 @@ SUBROUTINE COMPUTE_STATS()
 		! Print Results 
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Top_Shares_K_Inc_by_K_Inc.txt', STATUS='replace')
 		WRITE(UNIT=11, FMT=*) 'Percentile K_Inc K_Inc_Share'
-		do i=1,5
+		do i=1,6
 		WRITE(UNIT=11, FMT=*) pct_list_for_Top_Share(i),(EBAR_data/(EBAR_bench*0.727853584919652_dp))*K_Inc_pct(i),Top_Share_K_Inc(i)
 		enddo 
 		CLOSE(UNIT=11)
+
 
 
 	!------------------------------------------------------------------------------------
