@@ -68,7 +68,8 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
 	real(DP) :: Top_Share_K_Inc(5), K_Inc_pct(5)
 	integer  :: pct_list_for_Top_Share(5)
-	real(dp) :: DBN_age_X(MaxAge,nx), Public_Share, Public_A_Share, Public_K_Share, Public_Active_Share
+	real(dp) :: DBN_age_X(MaxAge,nx), Public_Share, Public_A_Share, Public_K_Share, Public_Active_Share, &
+					& Public_Q_Inc_Share, Public_D_Share, Public_Q_Share
 	real(dp) :: leverage_azx(na,nz,nx-1), DBN_azx2(na,nz,nx-1), &
       & leverage_vec(na*nz*(nx-1)), DBN_azx2_vec(na*nz*(nx-1)), ave_leverage
     real(dp) :: TFP_star
@@ -1895,29 +1896,44 @@ SUBROUTINE COMPUTE_STATS()
 		Public_Active_Share = 100.0_dp*sum(DBN1(:,:,:,:,:,1))/sum(DBN1(:,:,:,:,:,1:2))
 		Public_A_Share = 0.0_dp 
 		Public_K_Share = 0.0_dp
+		Public_Q_Share = 0.0_dp
+		Public_Q_Inc_Share = 0.0_dp
+		Public_D_Share = 0.0_dp
 		K_mat  = K_Matrix(R,P)
 		do zi=1,nz
 		do ai=1,na 
 			Public_A_Share = Public_A_Share + agrid(ai)     *sum(DBN1(:,ai,zi,:,:,1))
 			Public_K_Share = Public_K_Share + K_mat(ai,zi,1)*sum(DBN1(:,ai,zi,:,:,1))
+			Public_Q_Share = Public_Q_Share + (QBAR**(1.0_dp-mu))*(xz_grid(1,zi)*K_mat(ai,zi,1))**mu*sum(DBN1(:,ai,zi,:,:,1))
+			Public_Q_Inc_Share = Public_Q_Inc_Share + P*(xz_grid(1,zi)*K_mat(ai,zi,1))**mu*sum(DBN1(:,ai,zi,:,:,1))
+			Public_D_Share = Public_D_Share +  (K_mat(ai,zi,1)-agrid(ai))*sum(DBN1(:,ai,zi,:,:,1))
 		enddo 
 		enddo
 		Public_A_Share = 100.0_dp*Public_A_Share/MeanWealth
 		Public_K_Share = 100.0_dp*Public_K_Share/MeanWealth
+		Public_Q_Share = 100.0_dp*Public_Q_Share/QBAR
+		Public_Q_Inc_Share = 100.0_dp*Public_Q_Inc_Share/(alpha*YBAR)
+		Public_D_Share = 100.0_dp*Public_D_Share/(External_Debt_GDP*YBAR)
 
 		OPEN (UNIT=90, FILE=trim(Result_Folder)//'Public_Share.txt', STATUS='replace') 
-		WRITE(UNIT=90, FMT=*) 'Public_Share=',Public_Share 
-		WRITE(UNIT=90, FMT=*) 'Public_Share=',Public_Active_Share 
-		WRITE(UNIT=90, FMT=*) 'Public_A_Share=',Public_A_Share   
-		WRITE(UNIT=90, FMT=*) 'Public_K_Share=',Public_K_Share 
+		WRITE(UNIT=90, FMT=*) 'Public Owners/Pop(%)=',Public_Share 
+		WRITE(UNIT=90, FMT=*) 'Public_Firms/Firms(z>0)(%)=',Public_Active_Share 
+		WRITE(UNIT=90, FMT=*) 'Public_A_Share(%)=',Public_A_Share   
+		WRITE(UNIT=90, FMT=*) 'Public_K_Share(%)=',Public_K_Share 
+		WRITE(UNIT=90, FMT=*) 'Public_Q_Share(%)=',Public_Q_Share 
+		WRITE(UNIT=90, FMT=*) 'Public_Q_Inc_Share(%)=',Public_Q_Inc_Share
+		WRITE(UNIT=90, FMT=*) 'Public_Debt_Share(%)=',Public_D_Share 
 		CLOSE(unit=90)
 
 		print*,' '; print*,'-----------------------------------------------------';
 		print*,'	Share of Public Firms '
-		print '(A,F7.3)',' Share of Firms   = ',Public_Share
-		print '(A,F7.3)',' Share of Firms   = ',Public_Active_Share
-		print '(A,F7.3)',' Share of Assets  = ',Public_A_Share
-		print '(A,F7.3)',' Share of Capital = ',Public_K_Share
+		print '(A,F7.3)',' Public Owners/Pop       = ',Public_Share
+		print '(A,F7.3)',' Public_Firms/Firms(z>0) = ',Public_Active_Share
+		print '(A,F7.3)',' Share of Assets	= ',Public_A_Share
+		print '(A,F7.3)',' Share of Capital 	= ',Public_K_Share
+		print '(A,F7.3)',' Share of Q 		= ',Public_Q_Share
+		print '(A,F7.3)',' Share of Q Inc. 	= ',Public_Q_Inc_Share
+		print '(A,F7.3)',' Share of Debt 		= ',Public_D_Share
 		print*,'-----------------------------------------------------'; print*, ' '
 
 

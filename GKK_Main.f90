@@ -61,7 +61,7 @@ PROGRAM main
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
 			compute_bench = .true.
-			compute_exp   = .false.
+			compute_exp   = .true.
 			compute_exp_pf= .false.
 				Fixed_PF        = .true.
 				Fixed_PF_interp = .true.
@@ -136,8 +136,8 @@ PROGRAM main
 		
 		! Debt/Output = 1.5, lambda = 1.5, no bequest fee
 			! Main Parameters 
-				beta   	= 0.9605_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
-				sigma_z_eps      = 0.395_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+				beta   	= 0.9595_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+				sigma_z_eps      = 0.491_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 				sigma_lambda_eps = 0.3135_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
 				gamma  	= 0.4410_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
 				sigma  	= 4.0_dp
@@ -160,7 +160,7 @@ PROGRAM main
 			! IPO variables 
 				p1_x = 0.05_dp ! Prob normal firm shuts down
 				p2_x = 0.01_dp ! Prob public firm shuts down
-				p3_x = 0.00005_dp ! Prob going public 
+				p3_x = 0.00033_dp ! Prob going public 
 
 		else
 
@@ -613,7 +613,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		STOP
+		! STOP
 		
 
 end Subroutine Solve_Benchmark
