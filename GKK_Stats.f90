@@ -1,4 +1,3 @@
-
 Module GKK_Stats
 	use parameters
 	use global
@@ -70,7 +69,7 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income, Ave_Return, Mrg_Return ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
-	real(DP) :: Top_Share_K_Inc(5), K_Inc_pct(5), Total_Private_Equity, &
+	real(DP) :: Top_Share_K_Inc(6), K_Inc_pct(6), Total_Private_Equity, &
 				& Entrepreneur_10_top10 , Entrepreneur_10_bot10   , Entrepreneur_10_top1   , &
 				& Entrepreneur_10_A     , Entrepreneur_10_top10_A , Entrepreneur_10_top1_A , Entrepreneur_10_Eq,&
 				& Entrepreneur_50_top10 , Entrepreneur_50_bot10   , Entrepreneur_50_top1   , & 
@@ -87,7 +86,11 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: TFP_star 
 	real(DP) :: leverage_azx(na,nz,nx-1), DBN_azx2(na,nz,nx-1), &
 			& leverage_vec(na*nz*(nx-1)), DBN_azx2_vec(na*nz*(nx-1)), ave_leverage
-	real(DP) :: Wealth_age(MaxAge), K_Inc_age(MaxAge)
+	real(DP), dimension(MaxAge) :: Wealth_age, K_Inc_age, &
+								&  FT_Entrepreneur_y10, FT_Entrepreneur_y50, FT_Entrepreneur_y90, & 
+								&  FT_Entrepreneur_a10, FT_Entrepreneur_a20, FT_Entrepreneur_a50, &
+								&  N_Entrepreneur_y10, N_Entrepreneur_y50, N_Entrepreneur_y90, & 
+								&  N_Entrepreneur_a10, N_Entrepreneur_a20, N_Entrepreneur_a50
 
 	allocate(DBN_vec(			size(DBN1)))
 	allocate(Firm_Wealth_vec(	size(DBN1)))
@@ -917,7 +920,7 @@ SUBROUTINE COMPUTE_STATS()
 		Y_AZ  	 = 0.0_dp 
 		Y_W   	 = 0.0_dp
 		DO age=1,MaxAge 
-			print*, group, age, age_limit
+			! print*, group, age, age_limit
 		    DO while (age.gt.draft_age_limit(group+1))
 		        group = group+1
 		    ENDDO    
@@ -1928,6 +1931,31 @@ SUBROUTINE COMPUTE_STATS()
 		close(unit=80); 
 
 
+
+		! Life Cycle of Entrepreneurship (entry or first time entrepreneurs by age)
+		call COMPUTE_ENTREPRENEUR_LIFE_CYCLE(.true. ,0.1_dp    ,FT_Entrepreneur_y10,N_Entrepreneur_y10)
+		call COMPUTE_ENTREPRENEUR_LIFE_CYCLE(.true. ,0.5_dp    ,FT_Entrepreneur_y50,N_Entrepreneur_y50)
+		call COMPUTE_ENTREPRENEUR_LIFE_CYCLE(.true. ,0.9_dp    ,FT_Entrepreneur_y90,N_Entrepreneur_y90)
+		call COMPUTE_ENTREPRENEUR_LIFE_CYCLE(.false.,10000.0_dp,FT_Entrepreneur_a10,N_Entrepreneur_a10)
+		call COMPUTE_ENTREPRENEUR_LIFE_CYCLE(.false.,20000.0_dp,FT_Entrepreneur_a20,N_Entrepreneur_a20)
+		call COMPUTE_ENTREPRENEUR_LIFE_CYCLE(.false.,50000.0_dp,FT_Entrepreneur_a50,N_Entrepreneur_a50)
+
+		OPEN (UNIT=80, FILE=trim(Result_Folder)//'Entrepreneur_Life_Cycle.txt', STATUS='replace') 
+		WRITE  (UNIT=80, FMT=*)  'Share of entrepreneurs (first time entrepreneurs)'
+		WRITE  (UNIT=80, FMT=*)  'Age','Pr/Inc>10%','Pr/Inc>50%','Pr/Inc>90%','Own-Assets>10k','Own-Assets>20k','Own-Assets>50k'
+		do age=1,MaxAge 
+		WRITE  (UNIT=80, FMT=*)  age+19,FT_Entrepreneur_y10(age),FT_Entrepreneur_y50(age),FT_Entrepreneur_y90(age),&
+								&	    FT_Entrepreneur_a10(age),FT_Entrepreneur_a20(age),FT_Entrepreneur_a50(age)
+		enddo 
+		WRITE  (UNIT=80, FMT=*)  ' '
+		WRITE  (UNIT=80, FMT=*)  ' '
+		WRITE  (UNIT=80, FMT=*)  'Share of never entrepreneurs'
+		WRITE  (UNIT=80, FMT=*)  'Age','Pr/Inc>10%','Pr/Inc>50%','Pr/Inc>90%','Own-Assets>10k','Own-Assets>20k','Own-Assets>50k'
+		do age=1,MaxAge 
+		WRITE  (UNIT=80, FMT=*)  age+19,N_Entrepreneur_y10(age),N_Entrepreneur_y50(age),N_Entrepreneur_y90(age),&
+								&	    N_Entrepreneur_a10(age),N_Entrepreneur_a20(age),N_Entrepreneur_a50(age)
+		enddo 
+		close(unit=80);
 
 
 	!------------------------------------------------------------------------------------
@@ -4214,6 +4242,246 @@ Function Draft_Table_X(Table_axz,DBN_xz,Cum_flag)
 	endif 
 
 END Function Draft_Table_X
+
+
+
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+
+
+
+SUBROUTINE COMPUTE_ENTREPRENEUR_LIFE_CYCLE(E_type_inc_switch,E_Cutoff,FT_Entrepreneur,N_Entrepreneur)
+	use omp_lib
+	IMPLICIT NONE
+	logical, intent(in)   :: E_type_inc_switch
+	REAL(DP), intent(in)  :: E_Cutoff
+	REAL(DP), intent(out) :: FT_Entrepreneur(MaxAge), N_Entrepreneur(MaxAge) 
+	! Variables for histogram method
+	INTEGER  :: tklo, tkhi, age1, age2, z1, z2, a1, a2, lambda1, lambda2, e1, e2, DBN_iter, simutime, iter_indx, x1, x2
+	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable ::  PrAprimelo, PrAprimehi, PrBqlo, PrBqhi, DBN2
+	INTEGER , DIMENSION(:,:,:,:,:,:), allocatable ::  Aplo, Aphi, Bqlo, Bqhi, Entrepreneur_mat
+	! Variables for entrepreneurial definition 
+	REAL(DP) :: L_inc, K_inc
+
+	
+	allocate( DBN2(         MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrAprimelo(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrAprimehi(   MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Aplo(         MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Aphi(         MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrBqlo(   	MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( PrBqhi(   	MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( Bqlo(         MaxAge,na,nz,nlambda,ne,nx) )
+	allocate( BQhi(         MaxAge,na,nz,nlambda,ne,nx) )
+
+	allocate( Entrepreneur_mat(MaxAge,na,nz,nlambda,ne,nx) )
+
+	!$ call omp_set_num_threads(nz)
+
+
+	if (E_type_inc_switch) then 
+	print*,'	Computing life cycle of entrepreneurship defined by income, ',E_Cutoff
+	else 
+	print*,'	Computing life cycle of entrepreneurship defined by assets, ',E_Cutoff
+	endif
+
+	! Discretize policy function for assets (a')
+		! For each age and state vector bracket optimal a' between two grid points
+		! When at that age and state the optimal decision is approximated by selecting one the grid points
+		! The grid points are selected with probability proportional to their distance to the optimal a'
+		print*,'		Discretizing Policy Functions'
+	DO age=1,MaxAge
+	!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
+	DO zi=1,nz
+	!$omp parallel do private(lambdai,ei,ai,tklo,tkhi)
+	DO xi=1,nx
+	DO ai=1,na
+	DO lambdai=1,nlambda
+	DO ei=1, ne
+        if ( Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
+            tklo =na-1
+        elseif (Aprime(age,ai,zi,lambdai, ei,xi) .lt. amin) then
+            tklo = 1
+        else
+            tklo = ((Aprime(age,ai,zi,lambdai, ei,xi) - amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+        endif
+        tkhi = tklo + 1        
+        Aplo(age,ai,zi,lambdai,ei,xi)  		= tklo
+        Aphi(age,ai,zi,lambdai,ei,xi)  		= tkhi        
+        PrAprimelo(age,ai,zi,lambdai,ei,xi) = ( agrid(tkhi) - Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
+        PrAprimehi(age,ai,zi,lambdai,ei,xi) = ( Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+
+        if ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .ge. amax) then
+            tklo =na-1
+        elseif ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) .lt. amin) then
+            tklo = 1
+        else
+            tklo = (((1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi)-amin)/(amax-amin))**(1.0_DP/a_theta)*(na-1)+1          
+        endif
+        tkhi = tklo + 1        
+        Bqlo(age,ai,zi,lambdai,ei,xi)  	= tklo
+        Bqhi(age,ai,zi,lambdai,ei,xi)  	= tkhi        
+        PrBqlo(age,ai,zi,lambdai,ei,xi) = &
+        	& ( agrid(tkhi) - (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) ) / ( agrid(tkhi) -agrid(tklo) )
+        PrBqhi(age,ai,zi,lambdai,ei,xi) = &
+        	& ( (1.0_dp-tau_bq)*(1.0_dp-bq_fee)*Aprime(age,ai,zi,lambdai,ei,xi) - agrid(tklo) ) / ( agrid(tkhi) -agrid(tklo) )
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+	ENDDO
+
+	! Probablities are adjusted to lie in [0,1]
+		PrAprimelo = min(PrAprimelo, 1.0_DP); PrAprimelo = max(PrAprimelo, 0.0_DP)
+		PrAprimehi = min(PrAprimehi, 1.0_DP); PrAprimehi = max(PrAprimehi, 0.0_DP)
+
+		PrBqlo = min(PrBqlo, 1.0_DP); PrBqlo = max(PrBqlo, 0.0_DP)
+		PrBqhi = min(PrBqhi, 1.0_DP); PrBqhi = max(PrBqhi, 0.0_DP)
+
+
+	print*,'		Filling Entrepreneurship Matrix'
+	! Sources of income
+	Pr_mat = Profit_Matrix(R,P)
+	K_mat  = K_Matrix(R,P)
+	CALL ComputeLaborUnits(EBAR,wage)
+
+	! Entrepreneurs by age
+	Entrepreneur_mat  = 0; 
+	DO age=1,MaxAge
+		!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
+		DO zi=1,nz
+		DO xi=1,nx
+		DO ai=1,na
+		DO lambdai=1,nlambda
+		DO ei=1, ne
+
+
+		! Entrepreneurs defined by income 
+		if (E_type_inc_switch) then 
+
+			! Income for each agent 
+		    	if (age.lt.RetAge) then
+		    	L_Inc   = yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)
+		    	! if (solving_bench.ne.1) then 
+		    	! print*, L_Inc_aux,yh(age2,lambdai,ei),Hours(age2,ai,zi,lambdai,ei,xi)
+		    	! endif 
+		    	else
+		    	L_Inc   = RetY_lambda_e(lambdai,ei) 
+		    	endif 
+		    	K_Inc   = R*agrid(ai) + Pr_mat(ai,zi,xi)
+
+	    		! Fill entrepreneurial categories 
+		    	if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc + L_Inc)).gt.E_Cutoff) then 
+		    		Entrepreneur_mat(age,ai,zi,lambdai,ei,xi) = 1
+	    		endif 
+	    	
+    	else ! Entrepreneurs defined by assets 
+
+    			! Fill entrepreneurial categories
+		    	if (min(agrid(ai),K_mat(ai,zi,xi)).gt.E_Cutoff/((EBAR_data/(EBAR*0.727853584919652_dp)))) then 
+		    		Entrepreneur_mat(age,ai,zi,lambdai,ei,xi)= 1 
+				endif 
+
+		endif 
+
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+	ENDDO
+
+
+	! First-time entrepreneurs by age
+	print*,'		Following distribution with histogram method'
+	DBN2 = 0.0_dp
+
+	! Select first time entrepreneurs out of new borns, and the never entrepreneurs as residual 
+	FT_Entrepreneur(1)  = sum( Entrepreneur_mat(1,:,:,:,:,:)*DBN1(1,:,:,:,:,:) )/sum(DBN1(1,:,:,:,:,:))
+	N_Entrepreneur(1)   = 1.0_dp - FT_Entrepreneur(1)
+ 	
+	! Select non-entrepreneurs to follow with DBN2
+	DBN2(1,:,:,:,:,:) = (1-Entrepreneur_mat(1,:,:,:,:,:))*(DBN1(1,:,:,:,:,:)/sum(DBN1(1,:,:,:,:,:)))/N_Entrepreneur(1) 
+	DBN2(1,:,:,:,:,:) = DBN2(1,:,:,:,:,:)/sum(DBN2(1,:,:,:,:,:))
+	
+	print*,'age=',0,'sum(DBN2)=',sum(DBN2(1,:,:,:,:,:)),'FT(age)=',FT_Entrepreneur(1),'Never(age)',N_Entrepreneur(1)
+	
+	DO age1=1,MaxAge-1	
+
+		! Update distribution for non-entrepreneurs (only those who survive)
+	    ! $omp parallel do reduction(+:DBN2) private(x1,a1,lambda1,e1,z2,lambda2,x2,e2)
+	    DO z1=1,nz
+	    DO x1=1,nx
+	    DO a1=1,na
+	    DO lambda1=1,nlambda
+	    DO e1=1, ne
+
+    	! Retirees 
+    	if (age1.gt.RetAge-1) then 
+	        ! Those who live stay at z1, lambda1, and also e1 since they are retired
+	        !e2=e1
+	        DO x2=1,nx
+		        DBN2(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) =  &
+		        	& DBN2(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) + DBN2(age1, a1, z1, lambda1, e1,x1) &
+		            & * survP(age1) * PrAprimelo(age1, a1, z1, lambda1, e1,x1) * pr_x(x1,x2,z1,age1)     
+		        DBN2(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) =  &
+		          	& DBN2(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e1,x2) + DBN2(age1, a1, z1, lambda1, e1,x1) &
+		            & * survP(age1) * PrAprimehi(age1, a1, z1, lambda1, e1,x1) * pr_x(x1,x2,z1,age1)  
+	        ENDDO
+        else 
+        ! Working Age 
+	        DO x2=1,nx
+	        DO e2=1,ne
+				DBN2(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) =  &
+	          		& DBN2(age1+1, Aplo(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) + DBN2(age1, a1, z1, lambda1, e1,x1) &
+	                & * survP(age1) * pr_e(e1,e2) * pr_x(x1,x2,z1,age1) * PrAprimelo(age1, a1, z1, lambda1, e1,x1)     
+	            DBN2(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) =  &
+	          		& DBN2(age1+1, Aphi(age1, a1, z1, lambda1, e1,x1), z1,lambda1,e2,x2) + DBN2(age1, a1, z1, lambda1, e1,x1) &
+	                & * survP(age1) * pr_e(e1,e2) * pr_x(x1,x2,z1,age1) * PrAprimehi(age1, a1, z1, lambda1, e1,x1) 
+	        ENDDO
+	        ENDDO
+        endif 
+
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		ENDDO
+		!$omp barrier
+
+		! Adjust DBN2 to take into account random death 
+		DBN2(age1+1,:,:,:,:,:) = DBN2(age1+1,:,:,:,:,:)/survP(age1)
+
+		print*,'age=',age1,'sum(DBN2)=',sum(DBN2(age1+1,:,:,:,:,:)),'FT(age)=',FT_Entrepreneur(age1),'Never(age)',N_Entrepreneur(age1)
+
+		! Select new entrepreneurs 
+			! DBN2(age1+1) has those who were not entrepreneurs up to "age1". DBN2 sums to 1.
+			! Then, select the entreprenuers at age1+1 and integrate. 
+			! Result is mass of those never entrepreneurs up to age1 that become entrepreneurs at age1+1.
+			! To get the share of FT entrepreneurs out of all age1+1 agents,
+			! multiply by share of never entrepreneurs up to age1 
+		FT_Entrepreneur(age1+1) = sum( Entrepreneur_mat(age1+1,:,:,:,:,:)*DBN2(age1+1,:,:,:,:,:) ) * N_Entrepreneur(age1)
+
+		! Select never entrepreneurs up to age1+1
+			! N_Entrepreneur(age1) - FT_Entrepreneur(age1+1)
+			! Cumulative probability of not being entrepreneur, so prob. in age1+1 time the probability of never before age1+1
+		N_Entrepreneur(age1+1)  = sum( (1-Entrepreneur_mat(age1+1,:,:,:,:,:))*DBN2(age1+1,:,:,:,:,:) )* N_Entrepreneur(age1) 
+
+		! Select never-entrepreneurs to follow with DBN2 
+			! DBN2(age1+1) has those who were not entrepreneurs up to "age1". DBN2 sums to 1.
+			! Then, select those not entreprenuers at age1+1 and condition on their mass. 
+			! Result is distribution conditional on not having been entrepreneurs up until age1+1.
+		DBN2(age1+1,:,:,:,:,:) =   (1-Entrepreneur_mat(age1+1,:,:,:,:,:))*DBN2(age1+1,:,:,:,:,:)/&
+							& sum( (1-Entrepreneur_mat(age1+1,:,:,:,:,:))*DBN2(age1+1,:,:,:,:,:) )
+	ENDDO
+
+
+
+END SUBROUTINE COMPUTE_ENTREPRENEUR_LIFE_CYCLE
 
 
 !========================================================================================
