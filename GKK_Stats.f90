@@ -63,7 +63,8 @@ SUBROUTINE COMPUTE_STATS()
 			&	A_share_top_wealth(draft_age_category,nz), draft_group_wealth_share_top_wealth(draft_age_category,draft_z_category) 
 	real(DP) :: Z_share_top_wealth_x(draft_age_category,nz,nx), A_share_top_wealth_x(draft_age_category,nz,nx)
 	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), K_Inc_mat(na,nz,nx), MG_Return(na,nz,nx), Return_aux(na,nz,nx),&
-		&  DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx), K_Inc_vec(na*nz*nx), MG_Return_vec(na*nz*nx), Return_aux_vec(na,nz,nx)
+		&  DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx), K_Inc_vec(na*nz*nx), MG_Return_vec(na*nz*nx), Return_aux_vec(na,nz,nx), &
+		&  DBN_azx_W(na,nz,nx), DBN_azx_W_vec(na*nz*nx)
 	integer  :: ind_lo, ind_hi, prctile_ai_ind_age(14)
 	real(DP) :: pct_graph_lim(14), ret_by_wealth(draft_age_category+1,13), pct_graph_wealth(draft_age_category+1,13)
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income, Ave_Return, Mrg_Return ! , Firm_Output, Firm_Profit
@@ -365,11 +366,12 @@ SUBROUTINE COMPUTE_STATS()
 		enddo
 		CALL ComputeLaborUnits(Ebar, wage) 
 
-		MeanWealth 	 = 0.0_dp
-		MeanATReturn = 0.0_DP
-		MeanReturn 	 = 0.0_DP
-		MeanCons  	 = 0.0_DP
-		Mean_Capital = 0.0_DP
+		MeanWealth 	  = 0.0_dp
+		MeanATReturn  = 0.0_DP
+		MeanReturn 	  = 0.0_DP
+		MeanCons  	  = 0.0_DP
+		Mean_Capital  = 0.0_DP
+		MeanReturn_UW = 0.0_DP
 		
 		MeanATReturn_by_z     = 0.0_DP
 		MeanReturn_by_z       = 0.0_DP
@@ -408,6 +410,8 @@ SUBROUTINE COMPUTE_STATS()
 		    MeanATReturn_by_z(zi)  = MeanATReturn_by_z(zi) + DBN1(age, ai, zi, lambdai, ei, xi) * (YGRID(ai,zi,xi)-agrid(ai))
 		    
 
+		    MeanReturn_UW        = MeanReturn_UW       + DBN1(age, ai, zi, lambdai, ei, xi) * &
+		    							& (R + Pr_mat(ai,zi,xi)/agrid(ai))
 		    !MeanATReturn = MeanATReturn + DBN1(age, ai, zi, lambdai, ei) * (MBGRID(ai,zi)-1.0_DP)* agrid(ai)
 		    !if (K_mat(ai,zi) .lt. (theta*agrid(ai)) ) then
 		    !  MeanReturn   = MeanReturn   + DBN1(age, ai, zi, lambdai, ei) * R * agrid(ai)    
@@ -435,7 +439,9 @@ SUBROUTINE COMPUTE_STATS()
 
 
 		VarATReturn = 0.0_DP
-		VarReturn 	= 0.0_DP
+		VarReturn 	= 0.0_DP ; VarReturn_UW = 0.0_DP
+		SkwReturn 	= 0.0_DP ; SkwReturn_UW = 0.0_DP
+		KrtReturn 	= 0.0_DP ; KrtReturn_UW = 0.0_DP
 		Var_AT_K_Return = 0.0_DP
 		Var_K_Return 	= 0.0_DP
 		DO xi=1,nx
@@ -446,7 +452,22 @@ SUBROUTINE COMPUTE_STATS()
 		DO ei=1, ne  
 
 		    VarReturn    = VarReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
-		    				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/agrid(ai)-MeanReturn)**2.0_dp
+		    				& ((R + Pr_mat(ai,zi,xi)/agrid(ai))-MeanReturn   )**2.0_dp
+
+			VarReturn_UW = VarReturn_UW +  DBN1(age, ai, zi, lambdai, ei, xi) * &
+		    				& ((R + Pr_mat(ai,zi,xi)/agrid(ai))-MeanReturn_UW)**2.0_dp
+
+			SkwReturn    = SkwReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
+		    				& ((R + Pr_mat(ai,zi,xi)/agrid(ai))-MeanReturn   )**3.0_dp
+
+			SkwReturn_UW = SkwReturn_UW +  DBN1(age, ai, zi, lambdai, ei, xi) * &
+		    				& ((R + Pr_mat(ai,zi,xi)/agrid(ai))-MeanReturn_UW)**3.0_dp
+
+			KrtReturn    = KrtReturn +  DBN1(age, ai, zi, lambdai, ei, xi) * agrid(ai)/MeanWealth * &
+		    				& ((R + Pr_mat(ai,zi,xi)/agrid(ai))-MeanReturn   )**4.0_dp
+
+			KrtReturn_UW = KrtReturn_UW +  DBN1(age, ai, zi, lambdai, ei, xi) * &
+		    				& ((R + Pr_mat(ai,zi,xi)/agrid(ai))-MeanReturn_UW)**4.0_dp
 
 		    Var_K_Return = Var_K_Return +  DBN1(age, ai, zi, lambdai, ei, xi) * K_mat(ai,zi,xi)/MeanWealth * &
 		    				& ((R*agrid(ai) + Pr_mat(ai,zi,xi))/K_mat(ai,zi,xi)-MeanATReturn)**2.0_dp
@@ -475,8 +496,13 @@ SUBROUTINE COMPUTE_STATS()
 		ENDDO  
 		StdATReturn     = VarATReturn**0.5_DP
 		StdReturn       = VarReturn**0.5_DP
+		StdReturn_UW    = VarReturn_UW**0.5_DP
 		Std_AT_K_Return = Var_AT_K_Return**0.5_DP
 		Std_K_Return    = Var_K_Return**0.5_DP
+		SkwReturn 		= SkwReturn/(StdReturn**3.0_DP)
+		SkwReturn_UW 	= SkwReturn_UW/(StdReturn_UW**3.0_DP)
+		KrtReturn 		= KrtReturn/(StdReturn**4.0_DP)
+		KrtReturn_UW 	= KrtReturn_UW/(StdReturn_UW**4.0_DP)
 
 
 	!------------------------------------------------------------------------------------
@@ -484,7 +510,8 @@ SUBROUTINE COMPUTE_STATS()
 	! Distribution of Returns (this recycles bequest variables)
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------ 
-		DBN_azx = sum(sum(sum(DBN1,5),4),1) 
+		DBN_azx   = sum(sum(sum(DBN1,5),4),1) 
+		DBN_azx_W = 0.0_dp
 		do xi=1,nx 
 		do zi=1,nz
 		do ai=1,na 
@@ -496,12 +523,15 @@ SUBROUTINE COMPUTE_STATS()
 			MG_Return(ai,zi,xi)    = 100.0_dp*(R+mu*P*((xz_grid(xi,zi)*theta(zi))**mu)*(agrid(ai)**(mu-1.0_dp)) &
 										& - (R+DepRate)*theta(zi))
 			endif 
+			DBN_azx_W(ai,zi,xi)    = agrid(ai)*DBN_azx(ai,zi,xi)
 		enddo 
 		enddo 
 		enddo 
+		DBN_azx_W = DBN_azx_W/sum(DBN_azx_W)
 
 		! Vectorizations
 		DBN_azx_vec    = reshape(DBN_azx   ,(/size(DBN_azx)/)); 
+		DBN_azx_W_vec  = reshape(DBN_azx_W ,(/size(DBN_azx)/)); 
 		Return_vec     = reshape(BT_Return ,(/size(DBN_azx)/)); 
 		MG_Return_vec  = reshape(MG_Return ,(/size(DBN_azx)/)); 
 
@@ -542,7 +572,7 @@ SUBROUTINE COMPUTE_STATS()
 		WRITE(UNIT=11, FMT=*) 'Tax p10 p50 p90 p95 p99'
 		WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x
 		if (solving_bench.eq.1) then 
-		WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x*(1.0_dp-tauK)
+		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x*(1.0_dp-tauK)
 		else
 		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x-100.0_dp*tauW_at
 		endif 
@@ -590,12 +620,110 @@ SUBROUTINE COMPUTE_STATS()
 		WRITE(UNIT=11, FMT=*) 'Tax p10 p50 p90 p95 p99'
 		WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x
 		if (solving_bench.eq.1) then 
-		WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x*(1.0_dp-tauK)
+		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x*(1.0_dp-tauK)
 		else
 		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x-100.0_dp*tauW_at
 		endif 
 		CLOSE(UNIT=11)
 		print*,' Marginal Return Percentiles'
+		print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
+			& ' 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5)
+		print*,'-----------------------------------------------------'; print*, ' '
+
+
+
+
+		! Weighted Returns: Compute ave. returns by percentile (percentiles for counter CDF)
+		prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+		a = minval(Return_vec)
+		b = maxval(Return_vec) 
+		c = a
+		do i=1,size(prctile_bq)
+			a = c
+			b = maxval(Return_vec)
+			c = (a+b)/2.0_dp
+			CCDF_c = sum(DBN_azx_W_vec,Return_vec>=c)
+			!print*, ' '
+			!print*, 'Percentile', prctile_bq(i)
+			do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+				if (CCDF_c<prctile_bq(i)) then 
+					b = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_W_vec,Return_vec>=c)
+				else 
+					a = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_W_vec,Return_vec>=c)
+				endif
+				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+			enddo 
+			BQ_top_x(i) = c 
+		enddo 
+		if (solving_bench.eq.1) then
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Return_W_Pct_Bench.txt', STATUS='replace')
+		else
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Return_W_Pct_Exp.txt', STATUS='replace')
+		end if 
+		print*,' '
+		print*,'-----------------------------------------------------'
+		WRITE(UNIT=11, FMT=*) 'Weighted Return Percentiles'
+		WRITE(UNIT=11, FMT=*) 'Tax p10 p50 p90 p95 p99'
+		WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x
+		if (solving_bench.eq.1) then 
+		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x*(1.0_dp-tauK)
+		else
+		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x-100.0_dp*tauW_at
+		endif 
+		CLOSE(UNIT=11)
+		print*,' Weighted Return Percentiles'
+		print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
+			& ' 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5)
+		print*,'-----------------------------------------------------'; print*, ' '
+
+
+		! Weighted Returns: Compute mrg. returns by percentile (percentiles for counter CDF)
+		prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+		a = minval(MG_Return_vec)
+		b = maxval(MG_Return_vec) 
+		c = a
+		do i=1,size(prctile_bq)
+			a = c
+			b = maxval(MG_Return_vec)
+			c = (a+b)/2.0_dp
+			CCDF_c = sum(DBN_azx_W_vec,MG_Return_vec>=c)
+			!print*, ' '
+			!print*, 'Percentile', prctile_bq(i)
+			do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+				if (CCDF_c<prctile_bq(i)) then 
+					b = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_W_vec,MG_Return_vec>=c)
+				else 
+					a = c 
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_W_vec,MG_Return_vec>=c)
+				endif
+				! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+			enddo 
+			BQ_top_x(i) = c 
+		enddo 
+		if (solving_bench.eq.1) then
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Mg_Return_W_Pct_Bench.txt', STATUS='replace')
+		else
+			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Mg_Return_W_Pct_Exp.txt', STATUS='replace')
+		end if 
+		print*,' '
+		print*,'-----------------------------------------------------'
+		WRITE(UNIT=11, FMT=*) 'Marginal Weighted Return Percentiles'
+		WRITE(UNIT=11, FMT=*) 'Tax p10 p50 p90 p95 p99'
+		WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x
+		if (solving_bench.eq.1) then 
+		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x*(1.0_dp-tauK)
+		else
+		WRITE(UNIT=11, FMT=*) 'After_Tax',BQ_top_x-100.0_dp*tauW_at
+		endif 
+		CLOSE(UNIT=11)
+		print*,' Marginal Weighted Return Percentiles'
 		print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
 			& ' 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5)
 		print*,'-----------------------------------------------------'; print*, ' '
@@ -2192,9 +2320,11 @@ SUBROUTINE COMPUTE_STATS()
 		WRITE(UNIT=19, FMT=*) ' '
 	! Return
 		WRITE(UNIT=19, FMT=*) 'Return Stats'
-		WRITE(UNIT=19, FMT=*) ' ', 'Assets', 'Capital'
-		WRITE(UNIT=19, FMT=*) 'Mean_Return', MeanReturn, MeanReturn
-		WRITE(UNIT=19, FMT=*) 'Std_Return', StdReturn, Std_K_Return
+		WRITE(UNIT=19, FMT=*) '            ','Assets ','Assets UW ','Capital '
+		WRITE(UNIT=19, FMT=*) 'Mean_Return ', MeanReturn, MeanReturn_UW, MeanReturn
+		WRITE(UNIT=19, FMT=*) 'Std_Return  ', StdReturn , StdReturn_UW , Std_K_Return 
+		WRITE(UNIT=19, FMT=*) 'Skw_Return  ', SkwReturn , SkwReturn_UW
+		WRITE(UNIT=19, FMT=*) 'Krt_Return  ', KrtReturn , KrtReturn_UW
 		do zi=1,nz
 			write(rowname,*) zi 
 			rowname = 'Mean_Return_z'//trim(rowname)
