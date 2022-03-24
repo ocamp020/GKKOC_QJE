@@ -391,9 +391,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 			 	    	! !$omp end critical
 			 		endif 
 			 		! Generation change and Save results 
-			 	  if (age.eq.31) then 
+			 		!$omp critical
+			 	  	if (age.eq.31) then 
 			 	    	z_son(paneli) = panelz(paneli)
-			 	    	!$omp critical
+			 	    	
 			 	    	!print*, ' Son is 50:', IGM_index, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli)
 			 	    	if ((age_dad(paneli).eq.31).and.(simutime.gt.1800)) then  
 				     		IGM_a_matrix(1,IGM_index)  = assets_dad(paneli)
@@ -407,7 +408,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 				     		IGM_index = IGM_index + 1
 				     		! print*, ' Save result', IGM_index-1
 			 			endif 
-			 			!$omp end critical
+			 			
 			 			age_dad(paneli)    = 31
 			 			assets_dad(paneli) = assets_son(paneli)
 			 			return_dad(paneli) = return_son(paneli)
@@ -418,6 +419,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			 			! PV_son(paneli)     = 0.0_dp    		
 			 			z_son(paneli)      = 0
 		 			endif 
+		 			!$omp end critical
 		  		endif ! IGM_index.le.5000000
 
 		     	! Inter-Generation Mobility 40-60
