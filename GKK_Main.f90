@@ -97,7 +97,7 @@ PROGRAM main
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 		
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 
@@ -839,7 +839,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	! 	CALL SIMULATION(solving_bench)
 	! endif
 	! Call Simulation_Life_Cycle_Patterns(solving_bench)
-	! Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
+	Call Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
 
 	print*,'---------------------------'
 	print*,''
