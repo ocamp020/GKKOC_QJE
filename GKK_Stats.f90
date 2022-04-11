@@ -34,7 +34,6 @@ SUBROUTINE COMPUTE_STATS()
 	character(100) :: rowname
 	integer        :: age_limit(max_age_category+1), draft_age_limit(draft_age_category+1)
 	real(DP), dimension(MaxAge, nz) 		   :: size_by_age_z, leverage_age_z, constrained_firms_age_z 
-	real(DP), dimension(MaxAge)  			   :: Entrepreneur_10_age, Entrepreneur_25_age, Entrepreneur_50_age
 	real(DP), dimension(draft_age_category,nz) :: size_draft_group_z, wealth_draft_group_z, capital_draft_group_z, &
 		& Cons_draft_group_z, Hours_draft_group_z, Ap_draft_group_z, & 
 		& K_Tax_draft_group_z, L_Tax_draft_group_z, K_Tax_Inc_draft_group_z, L_Tax_Inc_draft_group_z, &
@@ -67,17 +66,13 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
-	real(DP) :: Top_Share_K_Inc(5), K_Inc_pct(5), &
-				& Entrepreneur_10_top10, Entrepreneur_50_top10, Entrepreneur_10_top1, Entrepreneur_50_top1, &
-				& Entrepreneur_10_bot10, Entrepreneur_50_bot10, &
-				& Entrepreneur_10_A, Entrepreneur_50_A, &
-				& Entrepreneur_10_top10_A, Entrepreneur_50_top10_A, Entrepreneur_10_top1_A, Entrepreneur_50_top1_A
+	real(DP) :: Top_Share_K_Inc(5), K_Inc_pct(5)
 	integer  :: pct_list_for_Top_Share(5)
-	real(DP) :: TFP_star 
-    real(dp) :: leverage_azx(na,nz,nx-1), DBN_azx2(na,nz,nx-1), &
+	real(dp) :: DBN_age_X(MaxAge,nx), Public_Share, Public_A_Share, Public_K_Share, Public_Active_Share, &
+					& Public_Q_Inc_Share, Public_D_Share, Public_Q_Share
+	real(dp) :: leverage_azx(na,nz,nx-1), DBN_azx2(na,nz,nx-1), &
       & leverage_vec(na*nz*(nx-1)), DBN_azx2_vec(na*nz*(nx-1)), ave_leverage
-   
-
+    real(dp) :: TFP_star
 	allocate(DBN_vec(			size(DBN1)))
 	allocate(Firm_Wealth_vec(	size(DBN1)))
 	allocate(CDF_Firm_Wealth(	size(DBN1)))
@@ -98,9 +93,8 @@ SUBROUTINE COMPUTE_STATS()
 	! print*, ' '; print*,' Entering Compute_Stats'; print*, ' '; 
 	
 	! Age Brackets
+		age_limit       = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
 		draft_age_limit = [0, 1, 15, 30, 45, MaxAge ] 
-
-
 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
@@ -125,6 +119,9 @@ SUBROUTINE COMPUTE_STATS()
 		enddo 
 
 		DBN_ZX = sum(sum(sum(sum(DBN_bench,5),4),2),1) 
+
+
+
 		
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
@@ -337,8 +334,10 @@ SUBROUTINE COMPUTE_STATS()
 	! Income, Wealth, Returns to Capital
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
+
 		! print*, 'Test wealth'
 		! Sources of income
+
 		Pr_mat = Profit_Matrix(R,P)
 		K_mat  = K_Matrix(R,P)
 		do zi=1,nz
@@ -462,6 +461,7 @@ SUBROUTINE COMPUTE_STATS()
 		StdReturn       = VarReturn**0.5_DP
 		Std_AT_K_Return = Var_AT_K_Return**0.5_DP
 		Std_K_Return    = Var_K_Return**0.5_DP
+
 
 
 	!------------------------------------------------------------------------------------
@@ -978,6 +978,7 @@ SUBROUTINE COMPUTE_STATS()
 
 			! deallocate(Firm_Output,Firm_Profit)
 
+
     ! Leverage by firm type - Average and percentiles 
     leverage_azx = 0.0_dp 
     do ai=1,na 
@@ -1025,9 +1026,9 @@ SUBROUTINE COMPUTE_STATS()
 
 
     if (solving_bench.eq.1) then
-      OPEN(UNIT=11, FILE=trim(Result_Folder)//'Leverage_Bench.txt', STATUS='replace')
+      OPEN(UNIT=11, FILE=trim(Result_Folder)//'Leverage_pct_Bench.txt', STATUS='replace')
     else
-      OPEN(UNIT=11, FILE=trim(Result_Folder)//'Leverage_Exp.txt', STATUS='replace')
+      OPEN(UNIT=11, FILE=trim(Result_Folder)//'Leverage_pct_Exp.txt', STATUS='replace')
     end if 
     print*,' '
     print*,'-----------------------------------------------------'
@@ -1038,7 +1039,7 @@ SUBROUTINE COMPUTE_STATS()
     print*,' Leverage Percentiles and Average' 
     print '(A,X,X,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3)',&
       & 'Unweighted:  p10',&
-      & BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
+      &BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
 
     ! Asset weighted leverage
     DBN_azx2 = spread(spread(agrid,2,nz),3,2)
@@ -1345,22 +1346,6 @@ SUBROUTINE COMPUTE_STATS()
 		Entrepreneur_50_draft_group = 0.0_dp
 		Entrepreneur_10				= 0.0_dp
 		Entrepreneur_50				= 0.0_dp
-		Entrepreneur_25				= 0.0_dp
-		Entrepreneur_10_top10		= 0.0_dp
-		Entrepreneur_50_top10		= 0.0_dp
-		Entrepreneur_10_top1		= 0.0_dp
-		Entrepreneur_50_top1		= 0.0_dp
-		Entrepreneur_10_bot10		= 0.0_dp
-		Entrepreneur_50_bot10		= 0.0_dp
-		Entrepreneur_10_A			= 0.0_dp
-		Entrepreneur_50_A			= 0.0_dp
-		Entrepreneur_10_top10_A		= 0.0_dp
-		Entrepreneur_50_top10_A		= 0.0_dp
-		Entrepreneur_10_top1_A		= 0.0_dp
-		Entrepreneur_50_top1_A		= 0.0_dp
-		Entrepreneur_10_age			= 0.0_dp
-		Entrepreneur_50_age			= 0.0_dp
-		Entrepreneur_25_age			= 0.0_dp
 
 		do zi  = 1,nz
 		do age = 1,draft_age_category
@@ -1428,42 +1413,10 @@ SUBROUTINE COMPUTE_STATS()
         		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.10_dp) then 
         		Entrepreneur_10_draft_group_z(age,zi) = Entrepreneur_10_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_10 = Entrepreneur_10 + DBN1(age2,ai,zi,lambdai,ei,xi)
-        		Entrepreneur_10_age(age2) = Entrepreneur_10_age(age2) + DBN1(age2,ai,zi,lambdai,ei,xi)
-				Entrepreneur_10_A = Entrepreneur_10_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
-        		! print*, 'Inside Entrepreneur_10',ai,prctile_ai_ind(90)
-	        		if     (ai.ge.prctile_ai_ind(90)) then 		
-	        		Entrepreneur_10_top10   = Entrepreneur_10_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
-	        		Entrepreneur_10_top10_A = Entrepreneur_10_top10_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
-	        		! print*, 'Inside Entrepreneur_10_top10', Entrepreneur_10_top10
-	        		endif 
-	        		if (ai.ge.prctile_ai_ind(99)) then 		
-					Entrepreneur_10_top1    = Entrepreneur_10_top1 + DBN1(age2,ai,zi,lambdai,ei,xi)
-					Entrepreneur_10_top1_A  = Entrepreneur_10_top1_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
-					endif 
-					if (ai.le.prctile_ai_ind(10)) then 		
-					Entrepreneur_10_bot10 = Entrepreneur_10_bot10 + DBN1(age2,ai,zi,lambdai,ei,xi)
-	        		endif 
-        		endif 
-        		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.25_dp) then 
-        		Entrepreneur_25 = Entrepreneur_25 + DBN1(age2,ai,zi,lambdai,ei,xi)
-        		Entrepreneur_25_age(age2) = Entrepreneur_25_age(age2) + DBN1(age2,ai,zi,lambdai,ei,xi)
         		endif 
         		if ((R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.50_dp) then 
         		Entrepreneur_50_draft_group_z(age,zi) = Entrepreneur_50_draft_group_z(age,zi) + DBN1(age2,ai,zi,lambdai,ei,xi)
         		Entrepreneur_50 = Entrepreneur_50 + DBN1(age2,ai,zi,lambdai,ei,xi)
-        		Entrepreneur_50_age(age2) = Entrepreneur_50_age(age2) + DBN1(age2,ai,zi,lambdai,ei,xi)
-        		Entrepreneur_50_A = Entrepreneur_50_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
-	        		if     (ai.ge.prctile_ai_ind(90)) then 		
-	        		Entrepreneur_50_top10   = Entrepreneur_50_top10 + DBN1(age2,ai,zi,lambdai,ei,xi)
-	        		Entrepreneur_50_top10_A = Entrepreneur_50_top10_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
-	        		endif 
-	        		if (ai.ge.prctile_ai_ind(99)) then 		
-					Entrepreneur_50_top1   = Entrepreneur_50_top1 + DBN1(age2,ai,zi,lambdai,ei,xi)
-					Entrepreneur_50_top1_A = Entrepreneur_50_top1_A + agrid(ai)*DBN1(age2,ai,zi,lambdai,ei,xi)
-					endif 
-					if (ai.le.prctile_ai_ind(10)) then 		
-					Entrepreneur_50_bot10 = Entrepreneur_50_bot10 + DBN1(age2,ai,zi,lambdai,ei,xi)
-	        		endif 
         		endif 
 
 	    	enddo 
@@ -1575,71 +1528,10 @@ SUBROUTINE COMPUTE_STATS()
 		close(unit=87); close(unit=88); close(unit=89); close(unit=90); close(unit=91); close(unit=92); 
 		close(unit=93); close(unit=94); close(unit=95); close(unit=96);
 
-		Entrepreneur_10_top10 = 100.0_dp*Entrepreneur_10_top10/0.10_dp 
-		Entrepreneur_50_top10 = 100.0_dp*Entrepreneur_50_top10/0.10_dp 
-		Entrepreneur_10_top1  = 100.0_dp*Entrepreneur_10_top1/0.01_dp 
-		Entrepreneur_50_top1  = 100.0_dp*Entrepreneur_50_top1/0.01_dp 
-		Entrepreneur_10_bot10 = 100.0_dp*Entrepreneur_10_bot10/0.10_dp 
-		Entrepreneur_50_bot10 = 100.0_dp*Entrepreneur_50_bot10/0.10_dp
-
-		Entrepreneur_10_A		= 100.0_dp*Entrepreneur_10_A		/MeanWealth
-		Entrepreneur_50_A		= 100.0_dp*Entrepreneur_50_A		/MeanWealth
-		Entrepreneur_10_top10_A	= 100.0_dp*Entrepreneur_10_top10_A /sum(pr_a_dbn(prctile_ai_ind(90):)*agrid(prctile_ai_ind(90):))
-		Entrepreneur_50_top10_A	= 100.0_dp*Entrepreneur_50_top10_A /sum(pr_a_dbn(prctile_ai_ind(90):)*agrid(prctile_ai_ind(90):))
-		Entrepreneur_10_top1_A	= 100.0_dp*Entrepreneur_10_top1_A  /sum(pr_a_dbn(prctile_ai_ind(99):)*agrid(prctile_ai_ind(99):))
-		Entrepreneur_50_top1_A	= 100.0_dp*Entrepreneur_50_top1_A  /sum(pr_a_dbn(prctile_ai_ind(99):)*agrid(prctile_ai_ind(99):))
-
-
 		OPEN (UNIT=80, FILE=trim(Result_Folder)//'Entrepreneur_10_50.txt', STATUS='replace') 
 		WRITE  (UNIT=80, FMT=*)  'Share of entrepreneurs '
 		WRITE  (UNIT=80, FMT=*)  'Profits/Before_Tax_Income>10% ',100.0_dp*Entrepreneur_10
 		WRITE  (UNIT=80, FMT=*)  'Profits/Before_Tax_Income>50% ',100.0_dp*Entrepreneur_50
-		WRITE  (UNIT=80, FMT=*)  'Top_10_Entrepreneur_10', Entrepreneur_10_top10
-		WRITE  (UNIT=80, FMT=*)  'Top_10_Entrepreneur_50', Entrepreneur_50_top10
-		WRITE  (UNIT=80, FMT=*)  'Top_01_Entrepreneur_10', Entrepreneur_10_top1
-		WRITE  (UNIT=80, FMT=*)  'Top_01_Entrepreneur_50', Entrepreneur_50_top1
-		WRITE  (UNIT=80, FMT=*)  'Bottom_10_Entrepreneur_10', Entrepreneur_10_bot10
-		WRITE  (UNIT=80, FMT=*)  'Bottom_10_Entrepreneur_50', Entrepreneur_50_bot10
-		WRITE  (UNIT=80, FMT=*)  'Entreprenur_10_A_Share', Entrepreneur_10_A
-		WRITE  (UNIT=80, FMT=*)  'Entreprenur_10_A_Share', Entrepreneur_50_A
-		WRITE  (UNIT=80, FMT=*)  'Top10_Entreprenur_10_A_Share', Entrepreneur_10_top10_A
-		WRITE  (UNIT=80, FMT=*)  'Top10_Entreprenur_50_A_Share', Entrepreneur_50_top10_A
-		WRITE  (UNIT=80, FMT=*)  'Top1_Entreprenur_10_A_Share', Entrepreneur_10_top1_A
-		WRITE  (UNIT=80, FMT=*)  'Top1_Entreprenur_50_A_Share', Entrepreneur_50_top1_A
-		close(unit=80); 
-
-		print*,' '; print*,'-----------------------------------------------------';
-		print*, 'Share of entrepreneurs '
-		print*, 'Profits/Before_Tax_Income>10% ',100.0_dp*Entrepreneur_10
-		print*, 'Profits/Before_Tax_Income>50% ',100.0_dp*Entrepreneur_50
-		print*, 'Top_10_Entrepreneur_10', Entrepreneur_10_top10
-		print*, 'Top_10_Entrepreneur_50', Entrepreneur_50_top10
-		print*, 'Top_01_Entrepreneur_10', Entrepreneur_10_top1
-		print*, 'Top_01_Entrepreneur_50', Entrepreneur_50_top1
-		print*, 'Bottom_10_Entrepreneur_10', Entrepreneur_10_bot10
-		print*, 'Bottom_10_Entrepreneur_50', Entrepreneur_50_bot10
-		print*, 'Entreprenur_10_A_Share', Entrepreneur_10_A
-		print*, 'Entreprenur_10_A_Share', Entrepreneur_50_A
-		print*, 'Top10_Entreprenur_10_A_Share', Entrepreneur_10_top10_A
-		print*, 'Top10_Entreprenur_50_A_Share', Entrepreneur_50_top10_A
-		print*, 'Top1_Entreprenur_10_A_Share', Entrepreneur_10_top1_A
-		print*, 'Top1_Entreprenur_50_A_Share', Entrepreneur_50_top1_A
-		print*,'-----------------------------------------------------'; print*,' '
-
-		Entrepreneur_10_age = Entrepreneur_10_age/sum(sum(sum(sum(sum(DBN1,6),5),4),3),2)
-		Entrepreneur_25_age = Entrepreneur_25_age/sum(sum(sum(sum(sum(DBN1,6),5),4),3),2)
-		Entrepreneur_50_age = Entrepreneur_50_age/sum(sum(sum(sum(sum(DBN1,6),5),4),3),2)
-
-		OPEN (UNIT=80, FILE=trim(Result_Folder)//'Entrepreneur_by_age.txt', STATUS='replace') 
-		WRITE  (UNIT=80, FMT=*)  'Eentrepreneurs_Cutoff ','Profits/Before_Tax_Income>10%',&
-			&'Profits/Before_Tax_Income>25%','Profits/Before_Tax_Income>50%'
-		WRITE  (UNIT=80, FMT=*)  'Total_Share ',&
-			&100.0_dp*Entrepreneur_10,100.0_dp*Entrepreneur_25,100.0_dp*Entrepreneur_50
-		WRITE  (UNIT=80, FMT=*)  'By Age ',' '
-		do age=1,MaxAge 
-		WRITE  (UNIT=80, FMT=*)  age+19,&
-			&100.0_dp*Entrepreneur_10_age(age),100.0_dp*Entrepreneur_25_age(age),100.0_dp*Entrepreneur_50_age(age)
-		enddo 
 		close(unit=80); 
 
 
@@ -1981,30 +1873,96 @@ SUBROUTINE COMPUTE_STATS()
 	! 	CLOSE(UNIT=2)
 	! 	CLOSE(UNIT=3)
 
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+	! Public Firms 
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
 
-	!------------------------------------------------------------------------------------
-	!------------------------------------------------------------------------------------
-	! TFP_Star (without constraints )
-	!------------------------------------------------------------------------------------
-	!------------------------------------------------------------------------------------
-	TFP_star = 0.0_dp
-	do ai = 1,na
-	do zi = 1,nz 
-	do xi = 1,2
-		TFP_star = TFP_star + sum(DBN1(:,ai,zi,:,:,xi))*(xz_grid(xi,zi))**(mu/(1.0_dp-mu))
-	enddo 
-	enddo 
-	enddo
-	TFP_star = TFP_star ** ((1.0_dp-mu)/mu)
-	OPEN (UNIT=81, FILE=trim(Result_Folder)//'TFP_Star.txt', STATUS='replace') 
+		! Distribution of firms in life-cycle 
+		OPEN (UNIT=90, FILE=trim(Result_Folder)//'size_by_age_x.txt', STATUS='replace')   
+		WRITE  (UNIT=90, FMT=*)  'Age, x1, x2, x3'
+		do age=1,MaxAge 
+		do xi=1,nx
+			DBN_age_X(age,xi) = sum(DBN1(age,:,nz-3,:,:,xi))
+		enddo 
+			DBN_age_X(age,:) = DBN_age_X(age,:)/sum(DBN_age_X(age,:))
+			WRITE  (UNIT=90, FMT=*)  DBN_age_X(age,:) 
+		enddo 
+		CLOSE(unit=90)
+
+		! Share of public firms 
+		Public_Share        = 100.0_dp*sum(DBN1(:,:,:,:,:,1)) 
+		Public_Active_Share = 100.0_dp*sum(DBN1(:,:,:,:,:,1))/sum(DBN1(:,:,:,:,:,1:2))
+		Public_A_Share = 0.0_dp 
+		Public_K_Share = 0.0_dp
+		Public_Q_Share = 0.0_dp
+		Public_Q_Inc_Share = 0.0_dp
+		Public_D_Share = 0.0_dp
+		K_mat  = K_Matrix(R,P)
+		do zi=1,nz
+		do ai=1,na 
+			Public_A_Share = Public_A_Share + agrid(ai)     *sum(DBN1(:,ai,zi,:,:,1))
+			Public_K_Share = Public_K_Share + K_mat(ai,zi,1)*sum(DBN1(:,ai,zi,:,:,1))
+			Public_Q_Share = Public_Q_Share + (QBAR**(1.0_dp-mu))*(xz_grid(1,zi)*K_mat(ai,zi,1))**mu*sum(DBN1(:,ai,zi,:,:,1))
+			Public_Q_Inc_Share = Public_Q_Inc_Share + P*(xz_grid(1,zi)*K_mat(ai,zi,1))**mu*sum(DBN1(:,ai,zi,:,:,1))
+			Public_D_Share = Public_D_Share +  (K_mat(ai,zi,1)-agrid(ai))*sum(DBN1(:,ai,zi,:,:,1))
+		enddo 
+		enddo
+		Public_A_Share = 100.0_dp*Public_A_Share/MeanWealth
+		Public_K_Share = 100.0_dp*Public_K_Share/MeanWealth
+		Public_Q_Share = 100.0_dp*Public_Q_Share/QBAR
+		Public_Q_Inc_Share = 100.0_dp*Public_Q_Inc_Share/(alpha*YBAR)
+		Public_D_Share = 100.0_dp*Public_D_Share/(External_Debt_GDP*YBAR)
+
+		OPEN (UNIT=90, FILE=trim(Result_Folder)//'Public_Share.txt', STATUS='replace') 
+		WRITE(UNIT=90, FMT=*) 'Public Owners/Pop(%)=',Public_Share 
+		WRITE(UNIT=90, FMT=*) 'Public_Firms/Firms(z>0)(%)=',Public_Active_Share 
+		WRITE(UNIT=90, FMT=*) 'Public_A_Share(%)=',Public_A_Share   
+		WRITE(UNIT=90, FMT=*) 'Public_K_Share(%)=',Public_K_Share 
+		WRITE(UNIT=90, FMT=*) 'Public_Q_Share(%)=',Public_Q_Share 
+		WRITE(UNIT=90, FMT=*) 'Public_Q_Inc_Share(%)=',Public_Q_Inc_Share
+		WRITE(UNIT=90, FMT=*) 'Public_Debt_Share(%)=',Public_D_Share 
+		CLOSE(unit=90)
+
+		print*,' '; print*,'-----------------------------------------------------';
+		print*,'	Share of Public Firms '
+		print '(A,F7.3)',' Public Owners/Pop       = ',Public_Share
+		print '(A,F7.3)',' Public_Firms/Firms(z>0) = ',Public_Active_Share
+		print '(A,F7.3)',' Share of Assets	= ',Public_A_Share
+		print '(A,F7.3)',' Share of Capital 	= ',Public_K_Share
+		print '(A,F7.3)',' Share of Q 		= ',Public_Q_Share
+		print '(A,F7.3)',' Share of Q Inc. 	= ',Public_Q_Inc_Share
+		print '(A,F7.3)',' Share of Debt 		= ',Public_D_Share
+		print*,'-----------------------------------------------------'; print*, ' '
+
+
+
+
+
+  !------------------------------------------------------------------------------------
+  !------------------------------------------------------------------------------------
+  ! TFP_Star (without constraints )
+  !------------------------------------------------------------------------------------
+  !------------------------------------------------------------------------------------
+  TFP_star = 0.0_dp
+  do ai = 1,na
+  do zi = 1,nz 
+  do xi = 1,2
+    TFP_star = TFP_star + sum(DBN1(:,ai,zi,:,:,xi))*(xz_grid(xi,zi))**(mu/(1.0_dp-mu))
+  enddo 
+  enddo 
+  enddo
+  TFP_star = TFP_star ** ((1.0_dp-mu)/mu)
+  OPEN (UNIT=81, FILE=trim(Result_Folder)//'TFP_Star.txt', STATUS='replace') 
     WRITE(UNIT=81, FMT=*)  'TFP Stats'
     WRITE(UNIT=81, FMT=*)  'TFP_Star',TFP_star
     WRITE(UNIT=81, FMT=*)  'TFP',QBAR/MeanWealth
     WRITE(UNIT=81, FMT=*)  'TFP/TFP_Star',(QBAR/MeanWealth)/TFP_Star 
-	close(unit=81)
+  close(unit=81)
 
 
-	print*, ' '; print*,' End of Compute_Stats'; print*, ' '
+  print*, ' '; print*,' End of Compute_Stats'; print*, ' '
 
 
 END SUBROUTINE COMPUTE_STATS

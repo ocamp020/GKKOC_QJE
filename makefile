@@ -9,9 +9,8 @@ simple: Sergio_Simple.a
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
-
 # Folders to place objects, modules and executables
-Folder       = ./Compiled_Files
+Folder       = ./Compiled_Files_Baseline
 GO_Folder    = ./Global_Opt
 Objects_Main    = $(Folder)/NRTYPE.o $(Folder)/NRUTIL.o $(Folder)/Toolbox.o \
                   $(Folder)/parameters.o $(Folder)/global.o $(Folder)/programfunctions.o $(Folder)/Simulation_Module.o \
@@ -21,8 +20,8 @@ Objects_GO      = $(Folder)/GKK_Calibration.o \
                   $(Folder)/stateControl.o $(Folder)/genericParams.o $(Folder)/utilities.o \
                   $(Folder)/simplex.o $(Folder)/objective.o $(Folder)/minimize.o
 
-Flags    =  -mcmodel=large 
-	#-fbounds-check -finline-functions
+Flags    =  -fbounds-check
+	#-mcmodel=large -fbounds-check -finline-functions
 omp_flag = -fopenmp
 #----------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------
