@@ -136,8 +136,8 @@ PROGRAM main
 		
 		! Debt/Output = 1.5, lambda = 1.5, no bequest fee
 			! Main Parameters 
-				beta   	= 0.9595_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
-				sigma_z_eps      = 0.491_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+				beta   	= 0.9452_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+				sigma_z_eps      = 0.3121_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 				sigma_lambda_eps = 0.3135_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
 				gamma  	= 0.4410_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
 				sigma  	= 4.0_dp
@@ -145,7 +145,7 @@ PROGRAM main
 
 			! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 				bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
-				chi_u  = 00.10_dp ! Scaling 03.55_dp (value without estate tax)
+				chi_u  = 02.57_dp ! Scaling 03.55_dp (value without estate tax)
 				chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 			! Capital Market
@@ -158,9 +158,9 @@ PROGRAM main
 				bq_fee = 0.00_dp
 
 			! IPO variables 
-				p1_x = 0.05_dp ! Prob normal firm shuts down
-				p2_x = 0.01_dp ! Prob public firm shuts down
-				p3_x = 0.00033_dp ! Prob going public 
+				p1_x = 0.10_dp ! Prob normal firm shuts down
+				p2_x = 0.05_dp ! Prob public firm shuts down
+				p3_x = 0.00087_dp ! Prob going public 
 
 		else
 
@@ -224,7 +224,7 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_IPO_Local/'
+			Result_Folder = './Revision/Model_2.1_IPO_High_Entry/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './Revision/Model_2.1_IPO_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
@@ -2349,7 +2349,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .true.
+		load_seed    = .false.
 
 
 	if (read_results.eqv..false.) then 
@@ -2384,11 +2384,11 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
 		print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
 		print*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_2.txt', STATUS='replace')
     	
-    	tau_grid_min  = 400
-    	tau_grid_max  = 550
-    	tau_grid_step = 5
+    	tau_grid_min  = 150
+    	tau_grid_max  = 350
+    	tau_grid_step = 10
 
     	! Set Y_a_threshold
 			call Find_TauW_Threshold(DBN_bench,W_bench)  
@@ -2396,7 +2396,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			Wealth_factor = Y_a_threshold/W_bench
 
 		! Set high psi
-		psi = 0.87_dp
+		! psi = 0.87_dp
 	endif 
     	WRITE(UNIT=77, FMT=*) 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
 		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ', &
@@ -2479,7 +2479,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	      	if (Opt_Tax_KW) then 
 	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
 	      	else 
-	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='old', POSITION='append')
+	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w_2.txt', STATUS='old', POSITION='append')
 	      	endif 
 		    WRITE  (UNIT=77, FMT=*) tauK, tauW_at, psi, (GBAR_K+GBAR_W)/(GBAR_bench+SSC_Payments_bench), & 
 			      &  MeanWealth, QBAR, QBAR/MeanWealth,NBAR, &
