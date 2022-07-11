@@ -129,8 +129,8 @@ PROGRAM main
 
 
 		! Corporate Sector
-			A_C    = 0.0_dp ! 
-			! A_C    = 0.9590_dp ! for Corp model ! 0.9409_dp (value without estate tax)
+			! A_C    = 0.0_dp ! 
+			A_C    = 1.0_dp ! for Corp model ! 0.9409_dp (value without estate tax)
 
 		if (A_C.eq.0.0_dp) then
 		
@@ -142,6 +142,7 @@ PROGRAM main
 				gamma  	= 0.4450_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
 				sigma  	= 4.0_dp
 				x_hi	= 1.50_dp
+				
 
 			! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 				bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
@@ -158,24 +159,24 @@ PROGRAM main
 
 		else
 
-		! Corporate SEctor
+		! Corporate Sector
 
 		! Main Parameters 
-			beta   	= 0.9581_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
-			sigma_z_eps      = 0.09333_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
-			sigma_lambda_eps = 0.314_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
-			gamma  	=  0.4400_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+			beta   	= 0.9610_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+			sigma_z_eps      = 0.369_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+			sigma_lambda_eps = 0.312_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
+			gamma  	= 0.4420_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
 			sigma  	= 4.0_dp
-			x_hi	= 5.00_dp
+			x_hi	= 1.50_dp
 		
 		! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
 			bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
-			chi_u  = 00.10_dp ! Scaling 03.55_dp (value without estate tax)
+			chi_u  = 00.20_dp ! Scaling 03.55_dp (value without estate tax)
 			chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
 		! Capital Market
 			do zi=1,nz
-			theta(zi)    = 1.00_dp+(2.50_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+			theta(zi)    = 1.00_dp+(2.80_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 			enddo
 
 		endif 
@@ -228,13 +229,13 @@ PROGRAM main
 		end if
 	else 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp/' 
+			Result_Folder = './Revision/Model_2.1_Corp_CD/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_PT/' 
+			Result_Folder = './Revision/Model_2.1_Corp_CD_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_SU/' 
+			Result_Folder = './Revision/Model_2.1_Corp_CD_SU/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..false.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_PT_SU/' 
+			Result_Folder = './Revision/Model_2.1_Corp_CD_PT_SU/' 
 		end if
 	endif 
 
@@ -267,8 +268,9 @@ PROGRAM main
 		R     =  0.05_dp
 		P     =  4.906133597851297E-002_dp
 		wage  =  1.97429920063330 
-		Ebar  =  1.82928004963637  
+		Ebar  =  0.92928004963637  
 		Ebar_bench = Ebar
+		P_P   =  1.0_dp
 		 
 
 		! ------- DO NOT REMOVE THE LINES ABOVE
@@ -688,10 +690,10 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		tauWmin_bt=0.00_DP
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
 		tauWmin_at=0.010_DP
-		tauWinc_at=0.0005_DP ! Minimum tax above threshold and increments
+		tauWinc_at=0.001_DP ! Minimum tax above threshold and increments
 		if (KeepSSatBench .eq. 0) then
 		tauWmin_at = tauW_at
-		tauWinc_at = 0.0005_dp
+		tauWinc_at = 0.001_dp
 		endif 
 
 	if (compute_exp) then 
@@ -2419,8 +2421,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	
-    	tau_grid_min  = 27
-    	tau_grid_max  = 38
+    	tau_grid_min  = 25
+    	tau_grid_max  = 45
     	tau_grid_step = 1
 
     	! Set Y_a_threshold
@@ -2429,7 +2431,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			Wealth_factor = Y_a_threshold/W_bench
 
 		! Set high psi
-		psi = 0.80_dp
+		psi = 0.82_dp
 	endif 
     	WRITE(UNIT=77, FMT=*) 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
 		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ', &

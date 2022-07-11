@@ -139,8 +139,14 @@ SUBROUTINE COMPUTE_STATS()
 		do zi=1,nz 
 			CDF_Z(zi) = sum(DBN_Z(1:zi))
 		enddo 
+			OPEN  (UNIT=90, FILE=trim(Result_Folder)//'DBN_Z.txt', STATUS='replace')   
+			WRITE (UNIT=90, FMT=*)  DBN_Z 
+			CLOSE (unit=90)
 
 		DBN_ZX = sum(sum(sum(sum(DBN_bench,5),4),2),1) 
+			OPEN  (UNIT=90, FILE=trim(Result_Folder)//'DBN_ZX.txt', STATUS='replace')   
+			WRITE (UNIT=90, FMT=*)  DBN_ZX 
+			CLOSE (unit=90)
 		
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
@@ -1322,7 +1328,20 @@ SUBROUTINE COMPUTE_STATS()
 			& 'Capital-weighted: 	p10',BQ_top_x(1),'p50',BQ_top_x(2),'p90',BQ_top_x(3),'p95',BQ_top_x(4),'p99',BQ_top_x(5),'Ave',ave_leverage
 		print*,'-----------------------------------------------------'; print*, ' '
 
+		
 		CLOSE(UNIT=11)
+
+		
+
+		!! Debt to Capital ratio for active firms 
+		print*,'-----------------------------------------------------'; print*, ' '
+		print*, 'Debt2Capial_Active ', & 
+								& sum( DBN_azx(:,:,1:2)*(leverage_azx(:,:,1:2)*K_Mat(:,:,1:2)) )/sum( DBN_azx(:,:,1:2)*K_Mat(:,:,1:2))
+		print*,'-----------------------------------------------------'; print*, ' '
+
+		
+
+
 
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------
@@ -2442,8 +2461,8 @@ SUBROUTINE COMPUTE_STATS()
 	OPEN (UNIT=81, FILE=trim(Result_Folder)//'TFP_Star.txt', STATUS='replace') 
     WRITE(UNIT=81, FMT=*)  'TFP Stats'
     WRITE(UNIT=81, FMT=*)  'TFP_Star',TFP_star
-    WRITE(UNIT=81, FMT=*)  'TFP',QBAR/MeanWealth
-    WRITE(UNIT=81, FMT=*)  'TFP/TFP_Star',(QBAR/MeanWealth)/TFP_Star 
+    WRITE(UNIT=81, FMT=*)  'TFP',QBAR/K_P
+    WRITE(UNIT=81, FMT=*)  'TFP/TFP_Star',(QBAR/K_P)/TFP_Star 
 	close(unit=81)
 
 
@@ -4538,7 +4557,7 @@ SUBROUTINE COMPUTE_ENTREPRENEUR_LIFE_CYCLE(E_type_inc_switch,E_Cutoff,FT_Entrepr
 	DBN2(1,:,:,:,:,:) = (1-Entrepreneur_mat(1,:,:,:,:,:))*(DBN1(1,:,:,:,:,:)/sum(DBN1(1,:,:,:,:,:)))/N_Entrepreneur(1) 
 	DBN2(1,:,:,:,:,:) = DBN2(1,:,:,:,:,:)/sum(DBN2(1,:,:,:,:,:))
 	
-	print*,'age=',0,'sum(DBN2)=',sum(DBN2(1,:,:,:,:,:)),'FT(age)=',FT_Entrepreneur(1),'Never(age)',N_Entrepreneur(1)
+	! print*,'age=',0,'sum(DBN2)=',sum(DBN2(1,:,:,:,:,:)),'FT(age)=',FT_Entrepreneur(1),'Never(age)',N_Entrepreneur(1)
 	
 	DO age1=1,MaxAge-1	
 
@@ -4586,7 +4605,7 @@ SUBROUTINE COMPUTE_ENTREPRENEUR_LIFE_CYCLE(E_type_inc_switch,E_Cutoff,FT_Entrepr
 		! Adjust DBN2 to take into account random death 
 		DBN2(age1+1,:,:,:,:,:) = DBN2(age1+1,:,:,:,:,:)/survP(age1)
 
-		print*,'age=',age1,'sum(DBN2)=',sum(DBN2(age1+1,:,:,:,:,:)),'FT(age)=',FT_Entrepreneur(age1),'Never(age)',N_Entrepreneur(age1)
+		! print*,'age=',age1,'sum(DBN2)=',sum(DBN2(age1+1,:,:,:,:,:)),'FT(age)=',FT_Entrepreneur(age1),'Never(age)',N_Entrepreneur(age1)
 
 		! Select new entrepreneurs 
 			! DBN2(age1+1) has those who were not entrepreneurs up to "age1". DBN2 sums to 1.
