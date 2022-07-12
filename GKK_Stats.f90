@@ -64,7 +64,10 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: Z_share_top_wealth_x(draft_age_category,nz,nx), A_share_top_wealth_x(draft_age_category,nz,nx)
 	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), K_Inc_mat(na,nz,nx), MG_Return(na,nz,nx), Return_aux(na,nz,nx),&
 		&  DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx), K_Inc_vec(na*nz*nx), MG_Return_vec(na*nz*nx), Return_aux_vec(na,nz,nx), &
-		&  DBN_azx_W(na,nz,nx), DBN_azx_W_vec(na*nz*nx)
+		&  DBN_azx_W(na,nz,nx), DBN_azx_W_vec(na*nz*nx), DBN_azx_W_K(na,nz,nx), DBN_azx_W_K_vec(na*nz*nx), & 
+		&  DBN_azx_aux(na,nz,nx-1), DBN_azx_aux_vec(na*nz*(nx-1)), DBN_azx_W_aux(na,nz,nx-1), DBN_azx_W_aux_vec(na*nz*(nx-1)), &
+		&  MG_Return_aux(na,nz,nx-1), MG_Return_aux_vec(na*nz*(nx-1)), &
+		&  Av_Mg_Ret_K, SD_Mg_Ret_K, Av_Mg_Ret_K_W, SD_Mg_Ret_K_W
 	integer  :: ind_lo, ind_hi, prctile_ai_ind_age(14)
 	real(DP) :: pct_graph_lim(14), ret_by_wealth(draft_age_category+1,13), pct_graph_wealth(draft_age_category+1,13)
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income, Ave_Return, Mrg_Return ! , Firm_Output, Firm_Profit
@@ -510,8 +513,9 @@ SUBROUTINE COMPUTE_STATS()
 	! Distribution of Returns (this recycles bequest variables)
 	!------------------------------------------------------------------------------------
 	!------------------------------------------------------------------------------------ 
-		DBN_azx   = sum(sum(sum(DBN1,5),4),1) 
-		DBN_azx_W = 0.0_dp
+		DBN_azx     = sum(sum(sum(DBN1,5),4),1) 
+		DBN_azx_W   = 0.0_dp
+		DBN_azx_W_K = 0.0_dp
 		do xi=1,nx 
 		do zi=1,nz
 		do ai=1,na 
@@ -524,16 +528,19 @@ SUBROUTINE COMPUTE_STATS()
 										& - (R+DepRate)*theta(zi))
 			endif 
 			DBN_azx_W(ai,zi,xi)    = agrid(ai)*DBN_azx(ai,zi,xi)
+			DBN_azx_W_K(ai,zi,xi)  = K_mat(ai,zi,xi)*DBN_azx(ai,zi,xi)
 		enddo 
 		enddo 
 		enddo 
-		DBN_azx_W = DBN_azx_W/sum(DBN_azx_W)
+		DBN_azx_W   = DBN_azx_W  /sum(DBN_azx_W  )
+		DBN_azx_W_K = DBN_azx_W_K/sum(DBN_azx_W_K)
 
 		! Vectorizations
-		DBN_azx_vec    = reshape(DBN_azx   ,(/size(DBN_azx)/)); 
-		DBN_azx_W_vec  = reshape(DBN_azx_W ,(/size(DBN_azx)/)); 
-		Return_vec     = reshape(BT_Return ,(/size(DBN_azx)/)); 
-		MG_Return_vec  = reshape(MG_Return ,(/size(DBN_azx)/)); 
+		DBN_azx_vec    = reshape(DBN_azx     ,(/size(DBN_azx)/)); 
+		DBN_azx_W_vec  = reshape(DBN_azx_W   ,(/size(DBN_azx)/)); 
+		DBN_azx_W_K_vec= reshape(DBN_azx_W_K ,(/size(DBN_azx)/)); 
+		Return_vec     = reshape(BT_Return   ,(/size(DBN_azx)/)); 
+		MG_Return_vec  = reshape(MG_Return   ,(/size(DBN_azx)/)); 
 
 		! Compute ave. returns by percentile (percentiles for counter CDF)
 		prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
@@ -729,6 +736,236 @@ SUBROUTINE COMPUTE_STATS()
 		print*,'-----------------------------------------------------'; print*, ' '
 
 
+
+
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------
+	! Marginal Return of Capital
+	!------------------------------------------------------------------------------------
+	!------------------------------------------------------------------------------------ 
+
+
+		! We already have the marginal return of assets in Mg_Return and Mg_Return_vec
+		! We get the return of capital by netting out the interest rate R
+		
+		OPEN(UNIT=11, FILE=trim(Result_Folder)//'Mg_Return_Capital.txt', STATUS='replace')
+		WRITE(UNIT=11, FMT=*) ' '
+		WRITE(UNIT=11, FMT=*) 'Marginal Return on Capital - Stats'
+		WRITE(UNIT=11, FMT=*) ' '
+		WRITE(UNIT=11, FMT=*) ' '
+		
+		!-------------------------------
+		!! All active agents (z>0)
+
+			!! Unweighted 
+			MG_return_aux     = Mg_Return(:,:,1:2)-100.0_dp*R
+			DBN_azx_aux       = DBN_azx(:,:,1:2)/sum(DBN_azx(:,:,1:2))
+			DBN_azx_aux_vec   = reshape(DBN_azx_aux   , (/size(DBN_azx_aux)/) ); 
+			MG_Return_aux_vec = reshape(MG_Return_aux , (/size(DBN_azx_aux)/) ); 
+
+			Av_Mg_Ret_K = sum(Mg_Return_aux*DBN_azx_aux)
+			SD_Mg_Ret_K = sqrt( sum( ((Mg_Return_aux - Av_Mg_Ret_K)**2.0_dp)*DBN_azx_aux ) )
+
+			prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+			a = minval(MG_Return_aux_vec)
+			b = maxval(MG_Return_aux_vec) 
+			c = a
+			do i=1,size(prctile_bq)
+				a = c
+				b = maxval(MG_Return_aux_vec)
+				c = (a+b)/2.0_dp
+				CCDF_c = sum(DBN_azx_aux_vec,MG_Return_aux_vec>=c)
+				!print*, ' '
+				!print*, 'Percentile', prctile_bq(i)
+				do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+					if (CCDF_c<prctile_bq(i)) then 
+						b = c 
+						c = (a+b)/2.0_dp
+						CCDF_c = sum(DBN_azx_aux_vec,MG_Return_aux_vec>=c)
+					else 
+						a = c 
+						c = (a+b)/2.0_dp
+						CCDF_c = sum(DBN_azx_aux_vec,MG_Return_aux_vec>=c)
+					endif
+					! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+				enddo 
+				BQ_top_x(i) = c 
+			enddo 
+			BQ_top_x = BQ_top_x
+
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'Active Agents (K>0) - Unweighted'
+			WRITE(UNIT=11, FMT=*) 'Av_Ret_pp', Av_Mg_Ret_K
+			WRITE(UNIT=11, FMT=*) 'SD_Ret_pp', SD_Mg_Ret_K
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'Pcts: p10 p50 p90 p95 p99'
+			WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x
+			WRITE(UNIT=11, FMT=*) ' '
+			
+			!! Weighted 
+			Av_Mg_Ret_K_W = sum((Mg_Return-100.0_dp*R)*DBN_azx_W_K)
+			SD_Mg_Ret_K_W = sqrt( sum( ((Mg_Return-100.0_dp*R - Av_Mg_Ret_K_W)**2.0_dp)*DBN_azx_W_K ) )
+
+			prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+			a = minval(MG_Return_vec)
+			b = maxval(MG_Return_vec) 
+			c = a
+			do i=1,size(prctile_bq)
+				a = c
+				b = maxval(MG_Return_vec)
+				c = (a+b)/2.0_dp
+				CCDF_c = sum(DBN_azx_W_K_vec,MG_Return_vec>=c)
+				!print*, ' '
+				!print*, 'Percentile', prctile_bq(i)
+				do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+					if (CCDF_c<prctile_bq(i)) then 
+						b = c 
+						c = (a+b)/2.0_dp
+						CCDF_c = sum(DBN_azx_W_K_vec,MG_Return_vec>=c)
+					else 
+						a = c 
+						c = (a+b)/2.0_dp
+						CCDF_c = sum(DBN_azx_W_K_vec,MG_Return_vec>=c)
+					endif
+					! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+				enddo 
+				BQ_top_x(i) = c 
+			enddo 
+			BQ_top_x = BQ_top_x - 100.0_dp*R
+
+
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'Active Agents (K>0) - Weighted by K'
+			WRITE(UNIT=11, FMT=*) 'Av_Ret_pp', Av_Mg_Ret_K_W
+			WRITE(UNIT=11, FMT=*) 'SD_Ret_pp', SD_Mg_Ret_K_W
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'Pcts: p10 p50 p90 p95 p99'
+			WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x
+			WRITE(UNIT=11, FMT=*) ' '
+
+
+
+		!-------------------------------
+		!! Entrepreneurs (business income/total income > 50%)
+
+			DBN_azx_aux   = 0.0_dp 
+			DBN_azx_W_aux = 0.0_dp 
+			do xi = 1,nx-1
+			do zi = 1,nz
+			do ai = 1,na
+				do ei      = 1,ne
+				do lambdai = 1,nlambda
+				do age     = 1,MaxAge
+
+				! Income for each agent 
+			    	if (age.lt.RetAge) then
+			    	L_Inc_aux   = yh(age,lambdai,ei)*Hours(age,ai,zi,lambdai,ei,xi)
+			    	else
+			    	L_Inc_aux   = RetY_lambda_e(lambdai,ei) 
+			    	endif 
+			    	K_Inc_aux   = R*agrid(ai) + Pr_mat(ai,zi,xi)
+
+		    	! Save mass of entrepreneurs 
+					if ( (R*min(agrid(ai),K_mat(ai,zi,xi))+Pr_mat(ai,zi,xi)/(K_Inc_aux + L_Inc_aux)).gt.0.50_dp ) then
+					DBN_azx_aux(ai,zi,xi)   = DBN_azx_aux(ai,zi,xi)   +                 DBN1(age,ai,zi,lambdai,ei,xi)
+					DBN_azx_W_aux(ai,zi,xi) = DBN_azx_W_aux(ai,zi,xi) + K_mat(ai,zi,xi)*DBN1(age,ai,zi,lambdai,ei,xi)
+					endif
+
+				enddo
+				enddo
+				enddo
+			enddo 
+			enddo 
+			enddo
+			DBN_azx_aux   = DBN_azx_aux  /sum(DBN_azx_aux  )
+			DBN_azx_W_aux = DBN_azx_W_aux/sum(DBN_azx_W_aux)
+
+			DBN_azx_aux_vec   = reshape(DBN_azx_aux     , (/size(DBN_azx_aux)/) ); 
+			DBN_azx_W_aux_vec = reshape(DBN_azx_W_aux   , (/size(DBN_azx_aux)/) ); 
+			
+
+			!! Unweighted 
+			Av_Mg_Ret_K = sum(Mg_Return_aux*DBN_azx_aux)
+			SD_Mg_Ret_K = sqrt( sum( ((Mg_Return_aux - Av_Mg_Ret_K)**2.0_dp)*DBN_azx_aux ) )
+
+			prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+			a = minval(MG_Return_aux_vec)
+			b = maxval(MG_Return_aux_vec) 
+			c = a
+			do i=1,size(prctile_bq)
+				a = c
+				b = maxval(MG_Return_aux_vec)
+				c = (a+b)/2.0_dp
+				CCDF_c = sum(DBN_azx_aux_vec,MG_Return_aux_vec>=c)
+				!print*, ' '
+				!print*, 'Percentile', prctile_bq(i)
+				do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+					if (CCDF_c<prctile_bq(i)) then 
+						b = c 
+						c = (a+b)/2.0_dp
+						CCDF_c = sum(DBN_azx_aux_vec,MG_Return_aux_vec>=c)
+					else 
+						a = c 
+						c = (a+b)/2.0_dp
+						CCDF_c = sum(DBN_azx_aux_vec,MG_Return_aux_vec>=c)
+					endif
+					! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+				enddo 
+				BQ_top_x(i) = c 
+			enddo 
+
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'Entrepreneurs (50%) - Unweighted'
+			WRITE(UNIT=11, FMT=*) 'Av_Ret_pp', Av_Mg_Ret_K
+			WRITE(UNIT=11, FMT=*) 'SD_Ret_pp', SD_Mg_Ret_K
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'Pcts: p10 p50 p90 p95 p99'
+			WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x
+			WRITE(UNIT=11, FMT=*) ' '
+			
+			
+			!! Weighted 
+			Av_Mg_Ret_K_W = sum(Mg_Return_aux*DBN_azx_W_aux)
+			SD_Mg_Ret_K_W = sqrt( sum( ((Mg_Return_aux - Av_Mg_Ret_K_W)**2.0_dp)*DBN_azx_W_aux ) )
+
+			prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
+			a = minval(MG_Return_aux_vec)
+			b = maxval(MG_Return_aux_vec) 
+			c = a
+			do i=1,size(prctile_bq)
+				a = c
+				b = maxval(MG_Return_aux_vec)
+				c = (a+b)/2.0_dp
+				CCDF_c = sum(DBN_azx_W_aux_vec,MG_Return_aux_vec>=c)
+				!print*, ' '
+				!print*, 'Percentile', prctile_bq(i)
+				do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+					if (CCDF_c<prctile_bq(i)) then 
+						b = c 
+						c = (a+b)/2.0_dp
+						CCDF_c = sum(DBN_azx_W_aux_vec,MG_Return_aux_vec>=c)
+					else 
+						a = c 
+						c = (a+b)/2.0_dp
+						CCDF_c = sum(DBN_azx_W_aux_vec,MG_Return_aux_vec>=c)
+					endif
+					! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+				enddo 
+				BQ_top_x(i) = c 
+			enddo 
+
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'Entrepreneurs (50%) - Weighted by K'
+			WRITE(UNIT=11, FMT=*) 'Av_Ret_pp', Av_Mg_Ret_K_W
+			WRITE(UNIT=11, FMT=*) 'SD_Ret_pp', SD_Mg_Ret_K_W
+			WRITE(UNIT=11, FMT=*) ' '
+			WRITE(UNIT=11, FMT=*) 'Pcts: p10 p50 p90 p95 p99'
+			WRITE(UNIT=11, FMT=*) 'Before_Tax',BQ_top_x
+			WRITE(UNIT=11, FMT=*) ' '
+
+
+
+		CLOSE(UNIT=11)
 
 
 	!------------------------------------------------------------------------------------
