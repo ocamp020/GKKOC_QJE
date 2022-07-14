@@ -66,7 +66,8 @@ SUBROUTINE COMPUTE_STATS()
 		&  DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx), K_Inc_vec(na*nz*nx), MG_Return_vec(na*nz*nx), Return_aux_vec(na,nz,nx), &
 		&  DBN_azx_W(na,nz,nx), DBN_azx_W_vec(na*nz*nx), DBN_azx_W_K(na,nz,nx), DBN_azx_W_K_vec(na*nz*nx), & 
 		&  DBN_azx_aux(na,nz,nx-1), DBN_azx_aux_vec(na*nz*(nx-1)), DBN_azx_W_aux(na,nz,nx-1), DBN_azx_W_aux_vec(na*nz*(nx-1)), &
-		&  MgPr_K_mat(na,nz,nx-1), RMPK_mat(na,nz,nx-1),  TFPq_mat(na,nz,nx-1), MgPr_K_vec(na*nz*(nx-1)), &
+		&  MgPr_K_mat(na,nz,nx-1)  , MRPK_mat(na,nz,nx-1)  , TFPq_mat(na,nz,nx-1)  , &
+		&  MgPr_K_vec(na*nz*(nx-1)), MRPK_vec(na*nz*(nx-1)), TFPq_vec(na*nz*(nx-1)), &
 		&  Av_Mg_Ret_K, SD_Mg_Ret_K, Av_Mg_Ret_K_W, SD_Mg_Ret_K_W
 	integer  :: ind_lo, ind_hi, prctile_ai_ind_age(14)
 	real(DP) :: pct_graph_lim(14), ret_by_wealth(draft_age_category+1,13), pct_graph_wealth(draft_age_category+1,13)
@@ -533,7 +534,7 @@ SUBROUTINE COMPUTE_STATS()
 			! Marginal product of capital
 			if (xi.lt.nx) then 
 			MgPr_K_mat(ai,zi,xi)    =      mu*P*xz_grid(xi,zi)**mu*K_mat(ai,zi,xi)**(mu-1.0_dp)-(R+DepRate)
-			RMPK_mat(ai,zi,xi)      = log( mu*P*xz_grid(xi,zi)**mu*K_mat(ai,zi,xi)**(mu-1.0_dp) )
+			MRPK_mat(ai,zi,xi)      = log( mu*P*xz_grid(xi,zi)**mu*K_mat(ai,zi,xi)**(mu-1.0_dp) )
 			TFPq_mat(ai,zi,xi)      = log(      xz_grid(xi,zi) )
 			endif 
 		enddo 
@@ -550,6 +551,8 @@ SUBROUTINE COMPUTE_STATS()
 		MG_Return_vec  = reshape(MG_Return   ,(/size(DBN_azx)/)); 
 
 		MgPr_K_vec = reshape(MgPr_K_mat , (/size(DBN_azx_aux)/) ); 
+		MRPK_vec   = reshape(MRPK_mat   , (/size(DBN_azx_aux)/) ); 
+		TFPq_vec   = reshape(TFPq_mat   , (/size(DBN_azx_aux)/) ); 
 
 		! Compute ave. returns by percentile (percentiles for counter CDF)
 		prctile_bq = (/0.9_dp, 0.50_dp, 0.10_dp, 0.05_dp, 0.01_dp/)
@@ -809,22 +812,83 @@ SUBROUTINE COMPUTE_STATS()
 			WRITE(UNIT=11, FMT=*) ' '
 			
 				! TFPR 
-				Av_Mg_Ret_K = sum(RMPK_mat*DBN_azx_aux)
-				SD_Mg_Ret_K = sqrt( sum( ((RMPK_mat - Av_Mg_Ret_K)**2.0_dp)*DBN_azx_aux ) )
+				Av_Mg_Ret_K = sum(MRPK_mat*DBN_azx_aux)
+				SD_Mg_Ret_K = sqrt( sum( ((MRPK_mat - Av_Mg_Ret_K)**2.0_dp)*DBN_azx_aux ) )
+
+				prctile_bq = (/0.9_dp, 0.75_dp, 0.50_dp, 0.25_dp, 0.10_dp/)
+				a = minval(MRPK_vec)
+				b = maxval(MRPK_vec) 
+				c = a
+				do i=1,size(prctile_bq)
+					a = c
+					b = maxval(MRPK_vec)
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_aux_vec,MRPK_vec>=c)
+					!print*, ' '
+					!print*, 'Percentile', prctile_bq(i)
+					do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+						if (CCDF_c<prctile_bq(i)) then 
+							b = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_aux_vec,MRPK_vec>=c)
+						else 
+							a = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_aux_vec,MRPK_vec>=c)
+						endif
+						! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+					enddo 
+					BQ_top_x(i) = c 
+				enddo 
 				WRITE(UNIT=11, FMT=*) ' '
 				WRITE(UNIT=11, FMT=*) 'AV_log(TFPR)', Av_Mg_Ret_K
 				WRITE(UNIT=11, FMT=*) 'SD_log(TFPR)', SD_Mg_Ret_K
+				WRITE(UNIT=11, FMT=*) ' '
+				WRITE(UNIT=11, FMT=*) 'Pcts: p10 p25 p50 p75 p90'
+				WRITE(UNIT=11, FMT=*) 'log(TFPR)',BQ_top_x
 				WRITE(UNIT=11, FMT=*) ' '
 				WRITE(UNIT=11, FMT=*) ' '
 
 				! TFPQ
 				Av_Mg_Ret_K = sum(TFPq_mat*DBN_azx_aux)
 				SD_Mg_Ret_K = sqrt( sum( ((TFPq_mat - Av_Mg_Ret_K)**2.0_dp)*DBN_azx_aux ) )
+
+				prctile_bq = (/0.9_dp, 0.75_dp, 0.50_dp, 0.25_dp, 0.10_dp/)
+				a = minval(TFPq_vec)
+				b = maxval(TFPq_vec) 
+				c = a
+				do i=1,size(prctile_bq)
+					a = c
+					b = maxval(TFPq_vec)
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_aux_vec,TFPq_vec>=c)
+					!print*, ' '
+					!print*, 'Percentile', prctile_bq(i)
+					do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+						if (CCDF_c<prctile_bq(i)) then 
+							b = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_aux_vec,TFPq_vec>=c)
+						else 
+							a = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_aux_vec,TFPq_vec>=c)
+						endif
+						! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+					enddo 
+					BQ_top_x(i) = c 
+				enddo 
+				
 				WRITE(UNIT=11, FMT=*) ' '
 				WRITE(UNIT=11, FMT=*) 'AV_log(TFPq)', Av_Mg_Ret_K
 				WRITE(UNIT=11, FMT=*) 'SD_log(TFPq)', SD_Mg_Ret_K
 				WRITE(UNIT=11, FMT=*) ' '
+				WRITE(UNIT=11, FMT=*) 'Pcts: p10 p25 p50 p75 p90'
+				WRITE(UNIT=11, FMT=*) 'log(TFPq)',BQ_top_x
 				WRITE(UNIT=11, FMT=*) ' '
+				WRITE(UNIT=11, FMT=*) ' '
+
+
 			
 			!! Weighted 
 			DBN_azx_aux     = DBN_azx_W_K(:,:,1:2)/sum(DBN_azx_W_K(:,:,1:2))
@@ -871,20 +935,78 @@ SUBROUTINE COMPUTE_STATS()
 
 
 				! TFPR 
-				Av_Mg_Ret_K = sum(RMPK_mat*DBN_azx_aux)
-				SD_Mg_Ret_K = sqrt( sum( ((RMPK_mat - Av_Mg_Ret_K)**2.0_dp)*DBN_azx_aux ) )
+				Av_Mg_Ret_K = sum(MRPK_mat*DBN_azx_aux)
+				SD_Mg_Ret_K = sqrt( sum( ((MRPK_mat - Av_Mg_Ret_K)**2.0_dp)*DBN_azx_aux ) )
+			
+				prctile_bq = (/0.9_dp, 0.75_dp, 0.50_dp, 0.25_dp, 0.10_dp/)
+				a = minval(MRPK_vec)
+				b = maxval(MRPK_vec) 
+				c = a
+				do i=1,size(prctile_bq)
+					a = c
+					b = maxval(MRPK_vec)
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_aux_vec,MRPK_vec>=c)
+					!print*, ' '
+					!print*, 'Percentile', prctile_bq(i)
+					do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+						if (CCDF_c<prctile_bq(i)) then 
+							b = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_aux_vec,MRPK_vec>=c)
+						else 
+							a = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_aux_vec,MRPK_vec>=c)
+						endif
+						! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+					enddo 
+					BQ_top_x(i) = c 
+				enddo 
 				WRITE(UNIT=11, FMT=*) ' '
 				WRITE(UNIT=11, FMT=*) 'AV_log(TFPR)', Av_Mg_Ret_K
 				WRITE(UNIT=11, FMT=*) 'SD_log(TFPR)', SD_Mg_Ret_K
 				WRITE(UNIT=11, FMT=*) ' '
+				WRITE(UNIT=11, FMT=*) 'Pcts: p10 p25 p50 p75 p90'
+				WRITE(UNIT=11, FMT=*) 'log(TFPR)',BQ_top_x
 				WRITE(UNIT=11, FMT=*) ' '
 
 				! TFPQ
 				Av_Mg_Ret_K = sum(TFPq_mat*DBN_azx_aux)
 				SD_Mg_Ret_K = sqrt( sum( ((TFPq_mat - Av_Mg_Ret_K)**2.0_dp)*DBN_azx_aux ) )
+				
+				prctile_bq = (/0.9_dp, 0.75_dp, 0.50_dp, 0.25_dp, 0.10_dp/)
+				a = minval(TFPq_vec)
+				b = maxval(TFPq_vec) 
+				c = a
+				do i=1,size(prctile_bq)
+					a = c
+					b = maxval(TFPq_vec)
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_aux_vec,TFPq_vec>=c)
+					!print*, ' '
+					!print*, 'Percentile', prctile_bq(i)
+					do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+						if (CCDF_c<prctile_bq(i)) then 
+							b = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_aux_vec,TFPq_vec>=c)
+						else 
+							a = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_aux_vec,TFPq_vec>=c)
+						endif
+						! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+					enddo 
+					BQ_top_x(i) = c 
+				enddo 
+				
 				WRITE(UNIT=11, FMT=*) ' '
 				WRITE(UNIT=11, FMT=*) 'AV_log(TFPq)', Av_Mg_Ret_K
 				WRITE(UNIT=11, FMT=*) 'SD_log(TFPq)', SD_Mg_Ret_K
+				WRITE(UNIT=11, FMT=*) ' '
+				WRITE(UNIT=11, FMT=*) 'Pcts: p10 p25 p50 p75 p90'
+				WRITE(UNIT=11, FMT=*) 'log(TFPq)',BQ_top_x
 				WRITE(UNIT=11, FMT=*) ' '
 				WRITE(UNIT=11, FMT=*) ' '
 
@@ -969,20 +1091,79 @@ SUBROUTINE COMPUTE_STATS()
 			WRITE(UNIT=11, FMT=*) ' '
 
 				! TFPR 
-				Av_Mg_Ret_K = sum(RMPK_mat*DBN_azx_aux)
-				SD_Mg_Ret_K = sqrt( sum( ((RMPK_mat - Av_Mg_Ret_K)**2.0_dp)*DBN_azx_aux ) )
+				Av_Mg_Ret_K = sum(MRPK_mat*DBN_azx_aux)
+				SD_Mg_Ret_K = sqrt( sum( ((MRPK_mat - Av_Mg_Ret_K)**2.0_dp)*DBN_azx_aux ) )
+				
+				prctile_bq = (/0.9_dp, 0.75_dp, 0.50_dp, 0.25_dp, 0.10_dp/)
+				a = minval(MRPK_vec)
+				b = maxval(MRPK_vec) 
+				c = a
+				do i=1,size(prctile_bq)
+					a = c
+					b = maxval(MRPK_vec)
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_aux_vec,MRPK_vec>=c)
+					!print*, ' '
+					!print*, 'Percentile', prctile_bq(i)
+					do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+						if (CCDF_c<prctile_bq(i)) then 
+							b = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_aux_vec,MRPK_vec>=c)
+						else 
+							a = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_aux_vec,MRPK_vec>=c)
+						endif
+						! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+					enddo 
+					BQ_top_x(i) = c 
+				enddo 
 				WRITE(UNIT=11, FMT=*) ' '
 				WRITE(UNIT=11, FMT=*) 'AV_log(TFPR)', Av_Mg_Ret_K
 				WRITE(UNIT=11, FMT=*) 'SD_log(TFPR)', SD_Mg_Ret_K
+				WRITE(UNIT=11, FMT=*) ' '
+				WRITE(UNIT=11, FMT=*) 'Pcts: p10 p25 p50 p75 p90'
+				WRITE(UNIT=11, FMT=*) 'log(TFPR)',BQ_top_x
 				WRITE(UNIT=11, FMT=*) ' '
 				WRITE(UNIT=11, FMT=*) ' '
 
 				! TFPQ
 				Av_Mg_Ret_K = sum(TFPq_mat*DBN_azx_aux)
 				SD_Mg_Ret_K = sqrt( sum( ((TFPq_mat - Av_Mg_Ret_K)**2.0_dp)*DBN_azx_aux ) )
+				
+				prctile_bq = (/0.9_dp, 0.75_dp, 0.50_dp, 0.25_dp, 0.10_dp/)
+				a = minval(TFPq_vec)
+				b = maxval(TFPq_vec) 
+				c = a
+				do i=1,size(prctile_bq)
+					a = c
+					b = maxval(TFPq_vec)
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_aux_vec,TFPq_vec>=c)
+					!print*, ' '
+					!print*, 'Percentile', prctile_bq(i)
+					do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+						if (CCDF_c<prctile_bq(i)) then 
+							b = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_aux_vec,TFPq_vec>=c)
+						else 
+							a = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_aux_vec,TFPq_vec>=c)
+						endif
+						! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+					enddo 
+					BQ_top_x(i) = c 
+				enddo 
+				
 				WRITE(UNIT=11, FMT=*) ' '
 				WRITE(UNIT=11, FMT=*) 'AV_log(TFPq)', Av_Mg_Ret_K
 				WRITE(UNIT=11, FMT=*) 'SD_log(TFPq)', SD_Mg_Ret_K
+				WRITE(UNIT=11, FMT=*) ' '
+				WRITE(UNIT=11, FMT=*) 'Pcts: p10 p25 p50 p75 p90'
+				WRITE(UNIT=11, FMT=*) 'log(TFPq)',BQ_top_x
 				WRITE(UNIT=11, FMT=*) ' '
 				WRITE(UNIT=11, FMT=*) ' '
 			
@@ -1027,20 +1208,79 @@ SUBROUTINE COMPUTE_STATS()
 			WRITE(UNIT=11, FMT=*) ' '
 
 				! TFPR 
-				Av_Mg_Ret_K = sum(RMPK_mat*DBN_azx_W_aux)
-				SD_Mg_Ret_K = sqrt( sum( ((RMPK_mat - Av_Mg_Ret_K)**2.0_dp)*DBN_azx_W_aux ) )
+				Av_Mg_Ret_K = sum(MRPK_mat*DBN_azx_W_aux)
+				SD_Mg_Ret_K = sqrt( sum( ((MRPK_mat - Av_Mg_Ret_K)**2.0_dp)*DBN_azx_W_aux ) )
+				
+				prctile_bq = (/0.9_dp, 0.75_dp, 0.50_dp, 0.25_dp, 0.10_dp/)
+				a = minval(MRPK_vec)
+				b = maxval(MRPK_vec) 
+				c = a
+				do i=1,size(prctile_bq)
+					a = c
+					b = maxval(MRPK_vec)
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_W_aux_vec,MRPK_vec>=c)
+					!print*, ' '
+					!print*, 'Percentile', prctile_bq(i)
+					do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+						if (CCDF_c<prctile_bq(i)) then 
+							b = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_W_aux_vec,MRPK_vec>=c)
+						else 
+							a = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_W_aux_vec,MRPK_vec>=c)
+						endif
+						! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+					enddo 
+					BQ_top_x(i) = c 
+				enddo 
 				WRITE(UNIT=11, FMT=*) ' '
 				WRITE(UNIT=11, FMT=*) 'AV_log(TFPR)', Av_Mg_Ret_K
 				WRITE(UNIT=11, FMT=*) 'SD_log(TFPR)', SD_Mg_Ret_K
+				WRITE(UNIT=11, FMT=*) ' '
+				WRITE(UNIT=11, FMT=*) 'Pcts: p10 p25 p50 p75 p90'
+				WRITE(UNIT=11, FMT=*) 'log(TFPR)',BQ_top_x
 				WRITE(UNIT=11, FMT=*) ' '
 				WRITE(UNIT=11, FMT=*) ' '
 
 				! TFPQ
 				Av_Mg_Ret_K = sum(TFPq_mat*DBN_azx_W_aux)
 				SD_Mg_Ret_K = sqrt( sum( ((TFPq_mat - Av_Mg_Ret_K)**2.0_dp)*DBN_azx_W_aux ) )
+				
+				prctile_bq = (/0.9_dp, 0.75_dp, 0.50_dp, 0.25_dp, 0.10_dp/)
+				a = minval(TFPq_vec)
+				b = maxval(TFPq_vec) 
+				c = a
+				do i=1,size(prctile_bq)
+					a = c
+					b = maxval(TFPq_vec)
+					c = (a+b)/2.0_dp
+					CCDF_c = sum(DBN_azx_W_aux_vec,TFPq_vec>=c)
+					!print*, ' '
+					!print*, 'Percentile', prctile_bq(i)
+					do while ((abs(CCDF_c-prctile_bq(i))>0.00001_dp).and.(b-a>1e-9))
+						if (CCDF_c<prctile_bq(i)) then 
+							b = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_W_aux_vec,TFPq_vec>=c)
+						else 
+							a = c 
+							c = (a+b)/2.0_dp
+							CCDF_c = sum(DBN_azx_W_aux_vec,TFPq_vec>=c)
+						endif
+						! print*, 'a',a,'c',c,'b',b,'CCDF',CCDF_c,'obj',prctile_bq(i),'Error', abs(CCDF_c-prctile_bq(i))
+					enddo 
+					BQ_top_x(i) = c 
+				enddo 
+				
 				WRITE(UNIT=11, FMT=*) ' '
 				WRITE(UNIT=11, FMT=*) 'AV_log(TFPq)', Av_Mg_Ret_K
 				WRITE(UNIT=11, FMT=*) 'SD_log(TFPq)', SD_Mg_Ret_K
+				WRITE(UNIT=11, FMT=*) ' '
+				WRITE(UNIT=11, FMT=*) 'Pcts: p10 p25 p50 p75 p90'
+				WRITE(UNIT=11, FMT=*) 'log(TFPq)',BQ_top_x
 				WRITE(UNIT=11, FMT=*) ' '
 				WRITE(UNIT=11, FMT=*) ' '
 
