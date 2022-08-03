@@ -5096,7 +5096,7 @@ SUBROUTINE COMPUTE_ENTREPRENEUR_LIFE_CYCLE(E_type_inc_switch,E_Cutoff,FT_Entrepr
 	DBN2(1,:,:,:,:,:) = (1-Entrepreneur_mat(1,:,:,:,:,:))*(DBN1(1,:,:,:,:,:)/sum(DBN1(1,:,:,:,:,:)))/N_Entrepreneur(1) 
 	DBN2(1,:,:,:,:,:) = DBN2(1,:,:,:,:,:)/sum(DBN2(1,:,:,:,:,:))
 	
-	print*,'age=',0,'sum(DBN2)=',sum(DBN2(1,:,:,:,:,:)),'FT(age)=',FT_Entrepreneur(1),'Never(age)',N_Entrepreneur(1)
+	! print*,'age=',0,'sum(DBN2)=',sum(DBN2(1,:,:,:,:,:)),'FT(age)=',FT_Entrepreneur(1),'Never(age)',N_Entrepreneur(1)
 	
 	DO age1=1,MaxAge-1	
 
@@ -5144,7 +5144,7 @@ SUBROUTINE COMPUTE_ENTREPRENEUR_LIFE_CYCLE(E_type_inc_switch,E_Cutoff,FT_Entrepr
 		! Adjust DBN2 to take into account random death 
 		DBN2(age1+1,:,:,:,:,:) = DBN2(age1+1,:,:,:,:,:)/survP(age1)
 
-		print*,'age=',age1,'sum(DBN2)=',sum(DBN2(age1+1,:,:,:,:,:)),'FT(age)=',FT_Entrepreneur(age1),'Never(age)',N_Entrepreneur(age1)
+		! print*,'age=',age1,'sum(DBN2)=',sum(DBN2(age1+1,:,:,:,:,:)),'FT(age)=',FT_Entrepreneur(age1),'Never(age)',N_Entrepreneur(age1)
 
 		! Select new entrepreneurs 
 			! DBN2(age1+1) has those who were not entrepreneurs up to "age1". DBN2 sums to 1.
