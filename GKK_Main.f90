@@ -148,6 +148,7 @@ PROGRAM main
 				chi_u  = 00.20_dp ! Scaling 03.55_dp (value without estate tax)
 				chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
+			! Bequest parameters for Model_2.1_no_bq
 				! bq_0   = 0.0_dp 
 				! chi_u  = 0.0_dp 
 				! chi_bq = 0.0_dp 
