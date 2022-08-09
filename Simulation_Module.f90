@@ -23,7 +23,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 		INTEGER  :: agecounter, agesign, tage, tzi, tlambdai, tei, tklo, tkhi, paneli, simutime
 		INTEGER , DIMENSION(MaxAge) :: requirednumberby_age, cdfrequirednumberby_age
 		INTEGER , DIMENSION(:), allocatable :: panelage, panelz, panellambda, panele, panelx, panelz_old, panellambda_old
-		REAL(DP), DIMENSION(:), allocatable :: panela, panelK, panel_Y_L, panelRet, panelRet_K!, panelPV_a
+		REAL(DP), DIMENSION(:), allocatable :: panela, panelK, panel_Y_L, panelRet, panelRet_K, panela_aux, panelRet_aux!, panelPV_a
 
 		! Intergenerational statistics
 		INTEGER , DIMENSION(:)      , allocatable :: eligible, death_count
@@ -110,6 +110,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 		allocate( panelRet(			totpop) )
 		allocate( panelRet_K(		totpop) )
 		allocate( panel_top_ind(	totpop) )
+		allocate( panela_aux(		totpop) )
+		allocate( panelRet_aux(		totpop) )
 
 		! Intergenerational statistics
 		allocate( eligible(			totpop) )
@@ -391,7 +393,7 @@ SUBROUTINE  SIMULATION(bench_indx)
 			 	    	! !$omp end critical
 			 		endif 
 			 		! Generation change and Save results 
-			 	  if (age.eq.31) then 
+			 	    if (age.eq.31) then 
 			 	    	z_son(paneli) = panelz(paneli)
 			 	    	!$omp critical
 			 	    	!print*, ' Son is 50:', IGM_index, 'age_son',age_son(paneli), 'age_dad',age_dad(paneli)
@@ -752,6 +754,20 @@ SUBROUTINE  SIMULATION(bench_indx)
 				if (simutime.eq.(MaxSimuTime-9)) then 
 					panel_a_10 = panela
 				endif 
+
+
+			! Save assets and returns for the second-to-last-year 
+				if (simutime.eq.(MaxSimuTime-1)) then 
+					panela_aux   = panela 
+
+					DO paneli=1,totpop
+					k_igm     = min(theta(panelz(paneli))*panela(paneli),&
+		    					& (mu*P*xz_grid(panelx(paneli),panelz(paneli))**mu/(R+DepRate))**(1.0_dp/(1.0_dp-mu)) )
+					panelRet_aux(paneli) = ( P*(xz_grid(panelx(paneli),panelz(paneli))*k_igm)**mu - (R+DepRate)*k_igm + &
+	     								&   R*panela(paneli) )/(panela(paneli))
+					ENDDO
+
+				endif 				
 
 
 		 		print*, "Simulation period", simutime
@@ -1160,6 +1176,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 			OPEN(UNIT=25, FILE=trim(Result_Folder)//'Simul/panel_Ret_a_bench'   , STATUS='replace')
 			OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_Pareto'   		, STATUS='replace')
 			OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Pareto_samples'   	, STATUS='replace')
+			OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/panela_0_bench'   	, STATUS='replace')
+			OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/panel_Ret_a_0_bench', STATUS='replace')
 		else 
 			OPEN(UNIT=10, FILE=trim(Result_Folder)//'Simul/panela_exp'		 	, STATUS='replace')
 			OPEN(UNIT=11, FILE=trim(Result_Folder)//'Simul/panelage_exp'		, STATUS='replace')
@@ -1171,8 +1189,10 @@ SUBROUTINE  SIMULATION(bench_indx)
 			OPEN(UNIT=28, FILE=trim(Result_Folder)//'Simul/panelx_exp'	        , STATUS='replace')
 			OPEN(UNIT=24, FILE=trim(Result_Folder)//'Simul/panel_YL_exp'    	, STATUS='replace')
 			OPEN(UNIT=25, FILE=trim(Result_Folder)//'Simul/panel_Ret_a_exp'   	, STATUS='replace')
-			OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_Pareto_exp'   		, STATUS='replace')
-			OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Pareto_samples_exp'   	, STATUS='replace')
+			OPEN(UNIT=31, FILE=trim(Result_Folder)//'Simul/panel_Pareto_exp'   	, STATUS='replace')
+			OPEN(UNIT=32, FILE=trim(Result_Folder)//'Simul/Pareto_samples_exp'  , STATUS='replace')
+			OPEN(UNIT=33, FILE=trim(Result_Folder)//'Simul/panela_0_exp'   	, STATUS='replace')
+			OPEN(UNIT=34, FILE=trim(Result_Folder)//'Simul/panel_Ret_a_0_exp', STATUS='replace')
 		endif 
 
 
@@ -1188,11 +1208,18 @@ SUBROUTINE  SIMULATION(bench_indx)
 		WRITE  (UNIT=25, FMT='(F12.6)') panelRet
 		WRITE  (UNIT=31, FMT='(F20.1)') panel_Pareto(1:Pareto_ind)
 		WRITE  (UNIT=32, FMT=*) Pareto_samples
+		WRITE  (UNIT=33, FMT=*) panela_aux
+		WRITE  (UNIT=34, FMT=*) panelRet_aux
 
 		close (unit=10); close (unit=11); close (unit=12); close (unit=13); close (unit=14)
 		close (unit=28); close (unit=27); close (unit=24); close (unit=25)!; close (unit=26); 
-		close (unit=31); close (unit=32);
+		close (unit=31); close (unit=32); close (unit=33); close (unit=34);
 		
+
+
+		! STOP
+
+
 
 		if (bench_indx==1) then
 			! OPEN(UNIT=20, FILE=trim(Result_Folder)//'Simul/panela_parents' 	, STATUS='replace')
@@ -1258,6 +1285,8 @@ SUBROUTINE  SIMULATION(bench_indx)
 			CLOSE(unit=33); CLOSE(unit=34); CLOSE(unit=35);
 
 		endif
+
+
 
 
 

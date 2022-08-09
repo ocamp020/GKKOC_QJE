@@ -4980,7 +4980,7 @@ SUBROUTINE COMPUTE_ENTREPRENEUR_LIFE_CYCLE(E_type_inc_switch,E_Cutoff,FT_Entrepr
 		! For each age and state vector bracket optimal a' between two grid points
 		! When at that age and state the optimal decision is approximated by selecting one the grid points
 		! The grid points are selected with probability proportional to their distance to the optimal a'
-		print*,'		Discretizing Policy Functions'
+	! print*,'		Discretizing Policy Functions'
 	DO age=1,MaxAge
 	!$omp parallel do private(lambdai,ei,ai,xi,tklo,tkhi)
 	DO zi=1,nz
@@ -5031,7 +5031,7 @@ SUBROUTINE COMPUTE_ENTREPRENEUR_LIFE_CYCLE(E_type_inc_switch,E_Cutoff,FT_Entrepr
 		PrBqhi = min(PrBqhi, 1.0_DP); PrBqhi = max(PrBqhi, 0.0_DP)
 
 
-	print*,'		Filling Entrepreneurship Matrix'
+	! print*,'		Filling Entrepreneurship Matrix'
 	! Sources of income
 	Pr_mat = Profit_Matrix(R,P)
 	K_mat  = K_Matrix(R,P)
@@ -5085,7 +5085,7 @@ SUBROUTINE COMPUTE_ENTREPRENEUR_LIFE_CYCLE(E_type_inc_switch,E_Cutoff,FT_Entrepr
 
 
 	! First-time entrepreneurs by age
-	print*,'		Following distribution with histogram method'
+	! print*,'		Following distribution with histogram method'
 	DBN2 = 0.0_dp
 
 	! Select first time entrepreneurs out of new borns, and the never entrepreneurs as residual 
@@ -5096,7 +5096,7 @@ SUBROUTINE COMPUTE_ENTREPRENEUR_LIFE_CYCLE(E_type_inc_switch,E_Cutoff,FT_Entrepr
 	DBN2(1,:,:,:,:,:) = (1-Entrepreneur_mat(1,:,:,:,:,:))*(DBN1(1,:,:,:,:,:)/sum(DBN1(1,:,:,:,:,:)))/N_Entrepreneur(1) 
 	DBN2(1,:,:,:,:,:) = DBN2(1,:,:,:,:,:)/sum(DBN2(1,:,:,:,:,:))
 	
-	print*,'age=',0,'sum(DBN2)=',sum(DBN2(1,:,:,:,:,:)),'FT(age)=',FT_Entrepreneur(1),'Never(age)',N_Entrepreneur(1)
+	! print*,'age=',0,'sum(DBN2)=',sum(DBN2(1,:,:,:,:,:)),'FT(age)=',FT_Entrepreneur(1),'Never(age)',N_Entrepreneur(1)
 	
 	DO age1=1,MaxAge-1	
 
@@ -5144,7 +5144,7 @@ SUBROUTINE COMPUTE_ENTREPRENEUR_LIFE_CYCLE(E_type_inc_switch,E_Cutoff,FT_Entrepr
 		! Adjust DBN2 to take into account random death 
 		DBN2(age1+1,:,:,:,:,:) = DBN2(age1+1,:,:,:,:,:)/survP(age1)
 
-		print*,'age=',age1,'sum(DBN2)=',sum(DBN2(age1+1,:,:,:,:,:)),'FT(age)=',FT_Entrepreneur(age1),'Never(age)',N_Entrepreneur(age1)
+		! print*,'age=',age1,'sum(DBN2)=',sum(DBN2(age1+1,:,:,:,:,:)),'FT(age)=',FT_Entrepreneur(age1),'Never(age)',N_Entrepreneur(age1)
 
 		! Select new entrepreneurs 
 			! DBN2(age1+1) has those who were not entrepreneurs up to "age1". DBN2 sums to 1.

@@ -148,6 +148,10 @@ PROGRAM main
 				chi_u  = 00.20_dp ! Scaling 03.55_dp (value without estate tax)
 				chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
+				! bq_0   = 0.0_dp 
+				! chi_u  = 0.0_dp 
+				! chi_bq = 0.0_dp 
+
 			! Capital Market
 				do zi=1,nz
 				theta(zi)    = 1.00_dp+(2.80_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
@@ -172,6 +176,7 @@ PROGRAM main
 			bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
 			chi_u  = 00.10_dp ! Scaling 03.55_dp (value without estate tax)
 			chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
+
 
 		! Capital Market
 			do zi=1,nz
@@ -218,7 +223,8 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Local/'
+			Result_Folder = './Revision/Model_2.1_Local/' 
+			! Result_Folder = './Revision/Model_2.1_no_bq/'
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './Revision/Model_2.1_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
@@ -545,7 +551,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		
 	if (compute_bench) then
 		print*,"	Reading initial conditions from file"
-		CALL Write_Benchmark_Results(.false.)
+		! CALL Write_Benchmark_Results(.false.)
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
 		print*,"	Computing government spending"
@@ -617,7 +623,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		CALL WRITE_VARIABLES(1)
 		if (Simul_Switch) then 
 			print*,"	Simulation"
-			! CALL SIMULATION(solving_bench)
+			CALL SIMULATION(solving_bench)
 			! CALL Simulation_Life_Cycle_Patterns(solving_bench)
 			CALL Simulation_Life_Cycle_Asset_Return_Panel(solving_bench)
 		endif
@@ -646,7 +652,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark
