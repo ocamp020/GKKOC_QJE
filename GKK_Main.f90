@@ -59,7 +59,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -81,7 +81,7 @@ PROGRAM main
 
 		compute_exp_fixed_prices_and_taxes = .false.
 
-		Opt_Tax       = .false.
+		Opt_Tax       = .true.
 			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
 
 		Opt_Threshold = .false.
@@ -130,40 +130,40 @@ PROGRAM main
 
 		! Corporate Sector
 			! A_C    = 0.0_dp ! 
-			A_C    = 1.0_dp ! for Corp model ! 0.9409_dp (value without estate tax)
+			A_C    = 1.000_dp ! for Corp model ! 0.9409_dp (value without estate tax)
 
 		if (A_C.eq.0.0_dp) then
 		
-		! Debt/Output = 1.5, lambda = 1.5, no bequest fee
-			! Main Parameters 
-				beta   	= 0.9593_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
-				sigma_z_eps      = 0.277_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
-				sigma_lambda_eps = 0.309_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
-				gamma  	= 0.4450_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
-				sigma  	= 4.0_dp
-				x_hi	= 1.50_dp
+		! ! Debt/Output = 1.5, lambda = 1.5, no bequest fee
+		! 	! Main Parameters 
+		! 		beta   	= 0.9593_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+		! 		sigma_z_eps      = 0.277_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+		! 		sigma_lambda_eps = 0.309_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
+		! 		gamma  	= 0.4450_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
+		! 		sigma  	= 4.0_dp
+		! 		x_hi	= 1.50_dp
 				
 
-			! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
-				bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
-				chi_u  = 00.20_dp ! Scaling 03.55_dp (value without estate tax)
-				chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
+		! 	! Bequeset parameters chi_bq*(bq+bq_0)^(1-sigma)
+		! 		bq_0   = 00.30_dp ! Level shift 00.30_dp (value without estate tax)
+		! 		chi_u  = 00.20_dp ! Scaling 03.55_dp (value without estate tax)
+		! 		chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
-			! Capital Market
-				do zi=1,nz
-				theta(zi)    = 1.00_dp+(2.80_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
-				enddo
+		! 	! Capital Market
+		! 		do zi=1,nz
+		! 		theta(zi)    = 1.00_dp+(2.80_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+		! 		enddo
 
-			! No bequest fees
-				bq_fee = 0.00_dp
+		! 	! No bequest fees
+		! 		bq_fee = 0.00_dp
 
 		else
 
 		! Corporate Sector
 
 		! Main Parameters 
-			beta   	= 0.9610_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
-			sigma_z_eps      = 0.369_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+			beta   	= 0.9570_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+			sigma_z_eps      = 0.350_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 			sigma_lambda_eps = 0.312_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
 			gamma  	= 0.4420_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
 			sigma  	= 4.0_dp
@@ -176,7 +176,7 @@ PROGRAM main
 
 		! Capital Market
 			do zi=1,nz
-			theta(zi)    = 1.00_dp+(2.80_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+			theta(zi)    = 1.00_dp+(7.25_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 			enddo
 
 		endif 
@@ -229,7 +229,7 @@ PROGRAM main
 		end if
 	else 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_CD/' 
+			Result_Folder = './Revision/Model_2.1_Corp_CD_1.5/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './Revision/Model_2.1_Corp_CD_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
@@ -634,8 +634,8 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 			& " 	A/Y=",MeanWealth/YBAR,'BQ/A=',100.0_dp*Bequest_Wealth/MeanWealth ,'BQ/Inc=',Bq_Inc(3,1),&
 			& 'Top_1%=',100.0_dp*prct1_wealth,'L_C/N=',100.0_dp*L_C/NBAR,&
 			& 'stdEarn=',Std_Log_Earnings_25_60,'N',meanhours_25_60,'D/Y',External_Debt_GDP,&
-			& 'Luxury',(EBAR_data/(EBAR_bench*0.727853584919652_dp))*bq_0
-		12345 format (A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F12.1)
+			& 'Luxury',(EBAR_data/(EBAR_bench*0.727853584919652_dp))*bq_0, 'K_C/A',K_C/MeanWealth
+		12345 format (A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F12.1,X,X,A,F7.3)
 		print*,'-------------------------------------------------------------------------'
 		print*,' ';print*,' ';print*,' '
 
@@ -647,6 +647,10 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
+
+
+        call system( "say " // "Done with benchmark model" )
+		print*, char(7), char(7), char(7)
 
 		! STOP
 		
@@ -689,8 +693,8 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		! Wealth tax: minimum wealth tax to consider and increments for balancing budget
 		tauWmin_bt=0.00_DP
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
-		tauWmin_at=0.010_DP
-		tauWinc_at=0.001_DP ! Minimum tax above threshold and increments
+		tauWmin_at=0.01705_DP
+		tauWinc_at=0.0001_DP ! Minimum tax above threshold and increments
 		if (KeepSSatBench .eq. 0) then
 		tauWmin_at = tauW_at
 		tauWinc_at = 0.001_dp
@@ -754,7 +758,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 				print '(A,F10.6,X,X,A,F10.6)','GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
 				print*,''
 				print*,'Bisection for TauW:'
-				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.001 ) ! as long as the difference is greater than 0.1% continue
+				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.005 ) ! as long as the difference is greater than 0.1% continue
 				    if (GBAR_exp .gt. GBAR_bench ) then
 				        tauW_up_bt  = tauW_bt 
 				        tauW_up_at  = tauW_at 
@@ -861,7 +865,10 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 
 	! print*,"	Efficiency Computation"
 	! 	CALL Hsieh_Klenow_Efficiency(solving_bench)
+
+
 	print*, ' End of Solve_Experiment'
+	print*, char(7), char(7), char(7)
 
 end Subroutine Solve_Experiment
 
@@ -2671,6 +2678,8 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	! ! endif
 	
 	! CALL SIMULATION(0)
+
+	print*, char(7)
 
 end Subroutine Solve_Opt_Tax
 
