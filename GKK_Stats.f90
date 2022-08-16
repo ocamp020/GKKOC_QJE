@@ -1470,13 +1470,13 @@ SUBROUTINE COMPUTE_STATS()
 		print*,' '
 			WRITE(UNIT=11, FMT=*) ' '
 			WRITE(UNIT=11, FMT=*) 'Bequest_Stats'
-			WRITE(UNIT=11, FMT=*) 'Total_Bequest/Wealth= '		, Bequest_Wealth/MeanWealth 
+			WRITE(UNIT=11, FMT=*) 'Total_Bequest/Wealth= '		, Bequest/(MeanWealth*(1.0_dp-tau_bq)) 
 			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/Wealth= '		, Mean_Bequest/MeanWealth 
 			WRITE(UNIT=11, FMT=*) 'Mean_Bequest/PV_Wealth= '	, Bequest_Wealth/Mean_Firm_Wealth 
 			WRITE(UNIT=11, FMT=*) 'Bequests_Above_Threshold= '	, Threshold_Share_bq
 			WRITE(UNIT=11, FMT=*) 'Bequest_Revenue/YBAR= '		, 0
 			WRITE(UNIT=11, FMT=*) 'Prctile ','Bequest ','Bq/EBAR ','Bq/Inc 0.5%','Bq_Inc 1% ','Bq_Inc 2% '
-		print '(A,F7.3)', ' 	Total_Bequest/Wealth= '		, 100.0_dp*Bequest_Wealth/MeanWealth 
+		print '(A,F7.3)', ' 	Total_Bequest/Wealth= '		, 100.0_dp*Bequest/(MeanWealth*(1.0_dp-tau_bq))
 		print '(A,F7.3)', ' 	Mean_Bequest/Wealth= '		, 100.0_dp*Mean_Bequest/MeanWealth 
 		print*, ' 	Prctile  ','Bequest  ','Bq/EBAR  ','Bq/Inc 0.5%  ','Bq_Inc 1%  ','Bq_Inc 2%  '
 
@@ -5539,7 +5539,7 @@ SUBROUTINE WRITE_VARIABLES(bench_indx)
 			! WRITE(UNIT=19, FMT=*) 'PV_Wealth_Top_40%'		, FW_top_x_share(1)
 			WRITE(UNIT=19, FMT=*) ' '
 			WRITE(UNIT=19, FMT=*) 'Bequest'
-			WRITE(UNIT=19, FMT=*) 'Total_Bequest_Wealth'	, Bequest_Wealth/MeanWealth 
+			WRITE(UNIT=19, FMT=*) 'Total_Bequest_Wealth'	, Bequest/(MeanWealth*(1.0_dp-tau_bq))
 			WRITE(UNIT=19, FMT=*) 'Mean_Bequest_Wealth'	    , Mean_Bequest/MeanWealth 
 			WRITE(UNIT=19, FMT=*) 'BQ/Inc_for_90th_pct' 	, Bq_Inc(3,:)
 			WRITE(UNIT=19, FMT=*) ' '
@@ -5682,6 +5682,10 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		WRITE (UNIT=12, FMT=*) SSC_Payments
 		CLOSE (UNIT=12)
 
+		OPEN  (UNIT=12, FILE=trim(bench_folder)//'Bequest'  , STATUS='replace')
+		WRITE (UNIT=12, FMT=*) Bequest
+		CLOSE (UNIT=12)
+
 		OPEN  (UNIT=12, FILE=trim(bench_folder)//'YBAR_C'  	, STATUS='replace')
 		OPEN  (UNIT=13, FILE=trim(bench_folder)//'L_C'  	, STATUS='replace')
 		OPEN  (UNIT=14, FILE=trim(bench_folder)//'K_C'  	, STATUS='replace')
@@ -5730,7 +5734,9 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		OPEN (UNIT=25, FILE=trim(bench_folder)//'K_C'    , STATUS='old', ACTION='read')
 		OPEN (UNIT=26, FILE=trim(bench_folder)//'YBAR_P' , STATUS='old', ACTION='read')		
 		OPEN (UNIT=27, FILE=trim(bench_folder)//'L_P'    , STATUS='old', ACTION='read')		
-		OPEN (UNIT=28, FILE=trim(bench_folder)//'K_P'    , STATUS='old', ACTION='read')		
+		OPEN (UNIT=28, FILE=trim(bench_folder)//'K_P'    , STATUS='old', ACTION='read')	
+
+		OPEN (UNIT=29, FILE=trim(bench_folder)//'Bequest', STATUS='old', ACTION='read')		
 
 		READ (UNIT=1,  FMT=*) cons
 		READ (UNIT=2,  FMT=*) aprime
@@ -5765,12 +5771,15 @@ SUBROUTINE Write_Benchmark_Results(Compute_bench)
 		READ (UNIT=27, FMT=*) L_P
 		READ (UNIT=28, FMT=*) K_P
 
+		READ (UNIT=29, FMT=*) Bequest
+
 		CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=70); CLOSE (unit=5)
 		CLOSE (unit=60); CLOSE (unit=7); CLOSE (unit=8); CLOSE (unit=9); CLOSE (unit=10)
 		CLOSE (unit=11); CLOSE (unit=12); CLOSE (unit=13); CLOSE (unit=14); CLOSE (unit=15)
 		CLOSE (unit=16); CLOSE (unit=17); CLOSE (unit=18); CLOSE (unit=19); !CLOSE (unit=20)
 		CLOSE (unit=21); CLOSE (unit=22); 
 		CLOSE (unit=23); CLOSE (unit=24); CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); CLOSE (unit=28);
+		CLOSE (unit=29);
 
 		print*, "Reading of benchmark results completed"; print*, ' ';
 	END IF 
@@ -5852,6 +5861,9 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN  (UNIT=27,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_K_P', STATUS='replace')
 		WRITE (UNIT=27,  FMT=*) K_P
 
+		OPEN  (UNIT=28,  FILE=trim(Result_Folder)//'Exp_Files/Exp_results_Bequest', STATUS='replace')
+		WRITE (UNIT=28,  FMT=*) Bequest
+
 		print*, "Writing of experimental results completed"; print*, ' '
 
 	else 
@@ -5884,6 +5896,7 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		OPEN (UNIT=25, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_YBAR_P' , STATUS='old', ACTION='read')
 		OPEN (UNIT=26, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_L_P' 	, STATUS='old', ACTION='read')
 		OPEN (UNIT=27, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_K_P' 	, STATUS='old', ACTION='read')
+		OPEN (UNIT=28, FILE=trim(Result_Folder)//'Exp_Files/Exp_results_Bequest', STATUS='old', ACTION='read')
 
 		READ (UNIT=1,  FMT=*) cons
 		READ (UNIT=2,  FMT=*) aprime
@@ -5913,15 +5926,16 @@ SUBROUTINE Write_Experimental_Results(compute_exp)
 		READ (UNIT=25, FMT=*) YBAR_P
 		READ (UNIT=26, FMT=*) L_P 
 		READ (UNIT=27, FMT=*) K_P 
+		READ (UNIT=28, FMT=*) Bequest
 		print*, "Reading of experimental results completed"; print*, ' '
 	endif 
 
-	CLOSE (unit=1); CLOSE (unit=2); CLOSE (unit=3); CLOSE (unit=4); CLOSE (unit=70);
-	CLOSE (unit=5); CLOSE (unit=60); CLOSE (unit=7); CLOSE (unit=8); CLOSE (unit=9);
+	CLOSE (unit=1 ); CLOSE (unit=2 ); CLOSE (unit=3 ); CLOSE (unit=4 ); CLOSE (unit=70);
+	CLOSE (unit=5 ); CLOSE (unit=60); CLOSE (unit=7 ); CLOSE (unit=8 ); CLOSE (unit=9 );
 	CLOSE (unit=10); CLOSE (unit=11); CLOSE (unit=12); CLOSE (unit=13); CLOSE (unit=14);
 	CLOSE (unit=15); CLOSE (unit=16); CLOSE (unit=17); CLOSE (unit=18); CLOSE (unit=19)
 	CLOSE (unit=20); CLOSE (unit=21); CLOSE (unit=22); CLOSE (unit=23); CLOSE (unit=24); 
-	CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); 
+	CLOSE (unit=25); CLOSE (unit=26); CLOSE (unit=27); CLOSE (unit=28); 
 
 END SUBROUTINE Write_Experimental_Results
 
