@@ -60,8 +60,8 @@ PROGRAM main
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
 		Tax_Reform    = .true.
-			compute_bench = .false.
-			compute_exp   = .false.
+			compute_bench = .true.
+			compute_exp   = .true.
 			compute_exp_pf= .false.
 				Fixed_PF        = .true.
 				Fixed_PF_interp = .true.
@@ -97,7 +97,7 @@ PROGRAM main
 			balance_tau_L  = .true. ! true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW
 			Opt_Tax_KW_TR  = .true. ! true=tau_K, false=tau_W
 		
-		Simul_Switch  = .true.
+		Simul_Switch  = .false.
 
 
 
@@ -234,7 +234,7 @@ PROGRAM main
 		end if
 	else 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Corp_TFP/' 
+			Result_Folder = './Revision/Model_2.1_Corp_TFP_Local/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './Revision/Model_2.1_Corp_TFP_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
@@ -270,13 +270,13 @@ PROGRAM main
 
 	! Set initia lvalues of R, Wage, Ebar to find equilibrium
 		! ------- DO NOT REMOVE THE LINES BELOW
-		R     =  0.02_dp
-		R_C   =  0.02_dp 
-		P     =  4.906133597851297E-002_dp
-		wage  =  1.97429920063330 
-		Ebar  =  1.82928004963637  
+		R     =  0.048932467358444338_dp
+		R_C   =  0.058275115248278153_dp 
+		P     =  8.8323671926623692E-002_dp
+		wage  =  1.8362654245552712 
+		Ebar  =  1.4034707565850306  
 		Ebar_bench = Ebar
-		QBAR  =  3.00
+		QBAR  =  5.3325427175774021
 
 		R_z(1:z_C-1) = R 
 		R_z(z_C:)    = R_C 
@@ -520,6 +520,9 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 	if (compute_bench) then
 		print*,"	Reading initial conditions from file"
 		CALL Write_Benchmark_Results(.false.)
+			! OPEN (UNIT=5,FILE=trim(Result_Folder)//'Bench_Files/'//'DBN', STATUS='old', ACTION='read')
+			! READ (UNIT=5,FMT=*) DBN1 
+			! CLOSE(UNIT=5)
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
 		print*,"	Computing government spending"
@@ -623,7 +626,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		! STOP
+		STOP
 		
 
 end Subroutine Solve_Benchmark

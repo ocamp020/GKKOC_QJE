@@ -2200,9 +2200,9 @@ SUBROUTINE  Simulation_Life_Cycle_Asset_Return_Panel(bench_indx)
 	integer , dimension(:), allocatable 	:: Panel_l, Panel_z
 	integer , dimension(:,:), allocatable 	:: Panel_e, Panel_x, Panel_Death, Panel_x_ben, Panel_d_ben
 	real(dp), dimension(:,:), allocatable 	:: Panel_a, Panel_c, Panel_k, Panel_h, Panel_r, Panel_r_at
-	real(dp), dimension(RetAge)             :: Mean_a, Mean_c, Mean_k, Mean_h, Mean_r, Mean_r_at, Mean_r_w, Mean_r_at_w
-	real(dp), dimension(RetAge)             :: Mean_k_ben, Mean_r_ben, Mean_r_at_ben, Mean_r_w_ben, Mean_r_at_w_ben
-	integer , dimension(RetAge)             :: Mean_Death
+	real(dp), dimension(MaxAge)             :: Mean_a, Mean_c, Mean_k, Mean_h, Mean_r, Mean_r_at, Mean_r_w, Mean_r_at_w
+	real(dp), dimension(MaxAge)             :: Mean_k_ben, Mean_r_ben, Mean_r_at_ben, Mean_r_w_ben, Mean_r_at_w_ben
+	integer , dimension(MaxAge)             :: Mean_Death
 	real(dp)				                :: DBN_A_nb(na), DBN_Z(nz), CDF_A_nb(na), CDF_Z(nz)
 	real(dp), dimension(:), allocatable 	:: Av_Return,	Av_Return_at, Av_Return_W, Av_Return_at_W , R_Av_Return, R_Av_Return_at
 	real(dp), dimension(:), allocatable 	:: Av_Return_2024,	Av_Return_at_2024, Av_Return_W_2024, Av_Return_at_W_2024

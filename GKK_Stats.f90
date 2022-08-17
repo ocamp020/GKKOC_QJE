@@ -770,7 +770,7 @@ SUBROUTINE COMPUTE_STATS()
 		Y_W   	 = 0.0_dp
 		DO age=1,MaxAge 
 
-		    DO while (age.gt.age_limit(group+1))
+		    DO while (age.gt.draft_age_limit(group+1))
 		        group = group+1
 		    ENDDO    
 		 
