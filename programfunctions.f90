@@ -2363,11 +2363,23 @@ SUBROUTINE FIND_DBN_EQ()
 
 	        endif 
 
+    	    External_Debt_GDP = 0.0_DP
+			DO xi=1,nx
+			DO zi=1,nz
+			DO ai=1,na
+				if (K_mat(ai,zi,xi).gt.agrid(ai)) then 
+			    External_Debt_GDP = External_Debt_GDP + sum(DBN1(:, ai, zi, :, :,xi))*(K_mat(ai,zi,xi)-agrid(ai))
+			    endif 
+			ENDDO
+			ENDDO
+			ENDDO
+			External_Debt_GDP = External_Debt_GDP / YBAR
+
 	    	!!
 	    	print 12345, &
 	    		& ' DBN_diff=', DBN_dist,'A=',sum( sum(sum(sum(sum(sum(DBN1,6),5),4),3),1)*agrid ),&
 	    		& 'W=',wage,'R=',R,'P=',P,'Q=',QBAR, &
-	    		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'K_C=',K_C,'L_C=',L_C,'P_P=',P_P,'P_C=',P_C
+	    		& 'K_C/A=',100.0_dp*K_C/Wealth,'L_C/N=',100.0_dp*L_C/NBAR,'K_C=',K_C,'D/Y=',External_Debt_GDP,'P_P=',P_P,'P_C=',P_C
     		12345 format &
     		&(A,E12.5,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,&
     		&             A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X,A,F7.3,X,X)
