@@ -2568,7 +2568,7 @@ Subroutine Solve_Opt_NLKT(Opt_Tax_tL,Simul_Switch)
 		call system( 'mkdir -p ' // trim(Result_Folder) )
 
 	! Set flag for reading results or computing optimal taxes
-		read_results = .false.
+		read_results = .true.
 		load_seed    = .true.
 
 	! Set benchmark consumption

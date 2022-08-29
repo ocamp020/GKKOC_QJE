@@ -58,14 +58,15 @@ SUBROUTINE COMPUTE_STATS()
 	real(DP) :: DBN_az(na,nz)
 	real(DP) :: Z_share_top_wealth(draft_age_category,nz), draft_group_share_top_wealth(draft_age_category,draft_z_category), &
 			&	A_share_top_wealth(draft_age_category,nz), draft_group_wealth_share_top_wealth(draft_age_category,draft_z_category) 
-	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), AT_Return(na,nz,nx), K_Inc_mat(na,nz,nx),&
+	real(DP) :: DBN_azx(na,nz,nx), BT_Return(na,nz,nx), AT_Return(na,nz,nx), K_Inc_mat(na,nz,nx), A_mat(na,nz,nx), &
 		&  DBN_azx_vec(na*nz*nx), Return_vec(na*nz*nx), K_Inc_vec(na*nz*nx)
 	integer  :: ind_lo, ind_hi, prctile_ai_ind_age(14)
 	real(DP) :: pct_graph_lim(14), ret_by_wealth(draft_age_category+1,13), pct_graph_wealth(draft_age_category+1,13)
 	real(DP), dimension(:,:,:,:,:,:), allocatable :: DBN_bq, Total_Income ! , Firm_Output, Firm_Profit
 	integer , dimension(:,:,:,:,:,:), allocatable :: constrained_firm_ind
 	real(DP), dimension(:), allocatable :: DBN_vec, Firm_Wealth_vec, CDF_Firm_Wealth, BQ_vec, DBN_bq_vec, CDF_bq, Inc_vec
-	real(DP), dimension(100) :: K_Inc_pct, Av_K_Tax_Rate_by_pct, Mg_K_Tax_Rate_by_pct
+	real(DP), dimension(100) :: K_Inc_pct, Av_K_Tax_Rate_by_pct, Mg_K_Tax_Rate_by_pct, & 
+							&   Av_W_by_pct, Av_Ret_by_pct, K_Inc_Share_by_pct, W_Share_by_pct
 	character(len=5) :: eta_char
 
 	allocate(DBN_vec(			size(DBN1)))
@@ -420,6 +421,7 @@ SUBROUTINE COMPUTE_STATS()
 		do xi=1,nx 
 		do zi=1,nz
 		do ai=1,na 
+			A_mat(ai,zi,xi)        =   agrid(ai)
 			K_Inc_mat(ai,zi,xi)    = R*agrid(ai)+Pr_mat(ai,zi,xi)
 			BT_Return(ai,zi,xi)    = 100.0_dp*(R+Pr_mat(ai,zi,xi)/agrid(ai))
 			AT_Return(ai,zi,xi)    = 100.0_dp*((1.0_dp-tauK)*(R*agrid(ai)+Pr_mat(ai,zi,xi))**(1.0_dp-eta_K)/agrid(ai)-tauW_at)
@@ -572,11 +574,127 @@ SUBROUTINE COMPUTE_STATS()
 		Av_K_Tax_Rate_by_pct = 1.0_dp -           (1.0_dp-tauK)*(K_Inc_pct)**(-eta_K)
 		Mg_K_Tax_Rate_by_pct = 1.0_dp - (1-eta_K)*(1.0_dp-tauK)*(K_Inc_pct)**(-eta_K)
 
+		! Get wealth and returns 
+
+		!! Top 1% 
+		Av_W_by_pct(100) 			= (EBAR_data/(EBAR_bench*0.727853584919652_dp))* & 
+			& sum( pack( A_mat     , ( (K_Inc_mat.gt.K_Inc_pct(99)).and.(K_Inc_mat.le.K_Inc_pct(100)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(99)).and.(K_Inc_mat.le.K_Inc_pct(100)) ) ) )/ &
+			& sum( pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(99)).and.(K_Inc_mat.le.K_Inc_pct(100)) ) ) ) 	 
+
+		Av_Ret_by_pct(100) 			=  & 
+			& sum( pack( BT_Return , ( (K_Inc_mat.gt.K_Inc_pct(99)).and.(K_Inc_mat.le.K_Inc_pct(100)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(99)).and.(K_Inc_mat.le.K_Inc_pct(100)) ) ) )/ &
+			& sum( pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(99)).and.(K_Inc_mat.le.K_Inc_pct(100)) ) ) ) 	 
+
+		K_Inc_Share_by_pct(100) 	= 100.0_dp  * & 
+			& sum( pack( K_Inc_mat , ( (K_Inc_mat.gt.K_Inc_pct(99)).and.(K_Inc_mat.le.K_Inc_pct(100)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(99)).and.(K_Inc_mat.le.K_Inc_pct(100)) ) ) )/ &
+			& sum( K_Inc_mat*DBN_azx ) 	 
+
+		W_Share_by_pct(100) 		= 100.0_dp  * & 
+			& sum( pack( A_mat     , ( (K_Inc_mat.gt.K_Inc_pct(99)).and.(K_Inc_mat.le.K_Inc_pct(100)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(99)).and.(K_Inc_mat.le.K_Inc_pct(100)) ) ) )/ &
+			& sum( A_mat*DBN_azx ) 
+
+		!! 95-99% 
+		Av_W_by_pct(95) 			= (EBAR_data/(EBAR_bench*0.727853584919652_dp))* & 
+			& sum( pack( A_mat     , ( (K_Inc_mat.gt.K_Inc_pct(95)).and.(K_Inc_mat.le.K_Inc_pct(99)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(95)).and.(K_Inc_mat.le.K_Inc_pct(99)) ) ) )/ &
+			& sum( pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(95)).and.(K_Inc_mat.le.K_Inc_pct(99)) ) ) ) 	 
+
+		Av_Ret_by_pct(95) 			=  & 
+			& sum( pack( BT_Return , ( (K_Inc_mat.gt.K_Inc_pct(95)).and.(K_Inc_mat.le.K_Inc_pct(99)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(95)).and.(K_Inc_mat.le.K_Inc_pct(99)) ) ) )/ &
+			& sum( pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(95)).and.(K_Inc_mat.le.K_Inc_pct(99)) ) ) ) 	 
+
+		K_Inc_Share_by_pct(95) 		= 100.0_dp  * & 
+			& sum( pack( K_Inc_mat , ( (K_Inc_mat.gt.K_Inc_pct(95)).and.(K_Inc_mat.le.K_Inc_pct(99)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(95)).and.(K_Inc_mat.le.K_Inc_pct(99)) ) ) )/ &
+			& sum( K_Inc_mat*DBN_azx ) 	 
+
+		W_Share_by_pct(95) 			= 100.0_dp  * & 
+			& sum( pack( A_mat     , ( (K_Inc_mat.gt.K_Inc_pct(95)).and.(K_Inc_mat.le.K_Inc_pct(99)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(95)).and.(K_Inc_mat.le.K_Inc_pct(99)) ) ) )/ &
+			& sum( A_mat*DBN_azx ) 
+
+
+		!! 90-95% 
+		Av_W_by_pct(90) 			= (EBAR_data/(EBAR_bench*0.727853584919652_dp))* & 
+			& sum( pack( A_mat     , ( (K_Inc_mat.gt.K_Inc_pct(90)).and.(K_Inc_mat.le.K_Inc_pct(95)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(90)).and.(K_Inc_mat.le.K_Inc_pct(95)) ) ) )/ &
+			& sum( pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(90)).and.(K_Inc_mat.le.K_Inc_pct(95)) ) ) ) 	 
+
+		Av_Ret_by_pct(90) 			=  & 
+			& sum( pack( BT_Return , ( (K_Inc_mat.gt.K_Inc_pct(90)).and.(K_Inc_mat.le.K_Inc_pct(95)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(90)).and.(K_Inc_mat.le.K_Inc_pct(95)) ) ) )/ &
+			& sum( pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(90)).and.(K_Inc_mat.le.K_Inc_pct(95)) ) ) ) 	 
+
+		K_Inc_Share_by_pct(90) 		= 100.0_dp  * & 
+			& sum( pack( K_Inc_mat , ( (K_Inc_mat.gt.K_Inc_pct(90)).and.(K_Inc_mat.le.K_Inc_pct(95)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(90)).and.(K_Inc_mat.le.K_Inc_pct(95)) ) ) )/ &
+			& sum( K_Inc_mat*DBN_azx ) 	 
+
+		W_Share_by_pct(90) 			= 100.0_dp  * & 
+			& sum( pack( A_mat     , ( (K_Inc_mat.gt.K_Inc_pct(90)).and.(K_Inc_mat.le.K_Inc_pct(95)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(90)).and.(K_Inc_mat.le.K_Inc_pct(95)) ) ) )/ &
+			& sum( A_mat*DBN_azx ) 
+
+
+		do i=80,20,-10 
+			
+		Av_W_by_pct(i) 			= (EBAR_data/(EBAR_bench*0.727853584919652_dp))* & 
+			& sum( pack( A_mat     , ( (K_Inc_mat.gt.K_Inc_pct(i)).and.(K_Inc_mat.le.K_Inc_pct(i+10)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(i)).and.(K_Inc_mat.le.K_Inc_pct(i+10)) ) ) )/ &
+			& sum( pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(i)).and.(K_Inc_mat.le.K_Inc_pct(i+10)) ) ) ) 	 
+
+		Av_Ret_by_pct(i) 		=  & 
+			& sum( pack( BT_Return , ( (K_Inc_mat.gt.K_Inc_pct(i)).and.(K_Inc_mat.le.K_Inc_pct(i+10)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(i)).and.(K_Inc_mat.le.K_Inc_pct(i+10)) ) ) )/ &
+			& sum( pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(i)).and.(K_Inc_mat.le.K_Inc_pct(i+10)) ) ) ) 	 
+
+		K_Inc_Share_by_pct(i) 	= 100.0_dp  * & 
+			& sum( pack( K_Inc_mat , ( (K_Inc_mat.gt.K_Inc_pct(i)).and.(K_Inc_mat.le.K_Inc_pct(i+10)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(i)).and.(K_Inc_mat.le.K_Inc_pct(i+10)) ) ) )/ &
+			& sum( K_Inc_mat*DBN_azx ) 	 
+
+		W_Share_by_pct(i) 		= 100.0_dp  * & 
+			& sum( pack( A_mat     , ( (K_Inc_mat.gt.K_Inc_pct(i)).and.(K_Inc_mat.le.K_Inc_pct(i+10)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.gt.K_Inc_pct(i)).and.(K_Inc_mat.le.K_Inc_pct(i+10)) ) ) )/ &
+			& sum( A_mat*DBN_azx ) 
+
+		enddo 
+		
+
+		!! 0-10% 
+		Av_W_by_pct(1) 				= (EBAR_data/(EBAR_bench*0.727853584919652_dp))* & 
+			& sum( pack( A_mat     , ( (K_Inc_mat.ge.K_Inc_pct(1)).and.(K_Inc_mat.le.K_Inc_pct(20)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.ge.K_Inc_pct(1)).and.(K_Inc_mat.le.K_Inc_pct(20)) ) ) )/ &
+			& sum( pack( DBN_azx   , ( (K_Inc_mat.ge.K_Inc_pct(1)).and.(K_Inc_mat.le.K_Inc_pct(20)) ) ) ) 	 
+
+		Av_Ret_by_pct(1) 			=  & 
+			& sum( pack( BT_Return , ( (K_Inc_mat.ge.K_Inc_pct(1)).and.(K_Inc_mat.le.K_Inc_pct(20)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.ge.K_Inc_pct(1)).and.(K_Inc_mat.le.K_Inc_pct(20)) ) ) )/ &
+			& sum( pack( DBN_azx   , ( (K_Inc_mat.ge.K_Inc_pct(1)).and.(K_Inc_mat.le.K_Inc_pct(20)) ) ) ) 	 
+
+		K_Inc_Share_by_pct(1) 		= 100.0_dp  * & 
+			& sum( pack( K_Inc_mat , ( (K_Inc_mat.ge.K_Inc_pct(1)).and.(K_Inc_mat.le.K_Inc_pct(20)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.ge.K_Inc_pct(1)).and.(K_Inc_mat.le.K_Inc_pct(20)) ) ) )/ &
+			& sum( K_Inc_mat*DBN_azx ) 	 
+
+		W_Share_by_pct(1) 			= 100.0_dp  * & 
+			& sum( pack( A_mat     , ( (K_Inc_mat.ge.K_Inc_pct(1)).and.(K_Inc_mat.le.K_Inc_pct(20)) ) ) *  &
+			&	   pack( DBN_azx   , ( (K_Inc_mat.ge.K_Inc_pct(1)).and.(K_Inc_mat.le.K_Inc_pct(20)) ) ) )/ &
+			& sum( A_mat*DBN_azx ) 
+
+
+
 		! Print Results 
 		OPEN(UNIT=11, FILE=trim(Result_Folder)//'K_Tax_Rates_by_pct_K_Inc_eta_'//trim(eta_char)//'.txt', STATUS='replace')
-		WRITE(UNIT=11, FMT=*) 'Percentile K_Inc Av_Tax Mg_Tax'
+		WRITE(UNIT=11, FMT=*) 'Percentile K_Inc Av_Tax Mg_Tax Av_Wealth Av_Return K_Inc_Share W_Share'
 		do i=1,100
-		WRITE(UNIT=11, FMT=*) i,(EBAR_data/(EBAR_bench*0.727853584919652_dp))*K_Inc_pct(i),Av_K_Tax_Rate_by_pct(i),Mg_K_Tax_Rate_by_pct(i)
+		WRITE(UNIT=11, FMT=*) i,(EBAR_data/(EBAR_bench*0.727853584919652_dp))*K_Inc_pct(i),Av_K_Tax_Rate_by_pct(i),&
+					& 	Mg_K_Tax_Rate_by_pct(i), Av_W_by_pct(i), Av_Ret_by_pct(i), K_Inc_Share_by_pct(i), W_Share_by_pct(i)
 		enddo 
 		CLOSE(UNIT=11)
 
