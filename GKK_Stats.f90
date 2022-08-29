@@ -3062,6 +3062,15 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 	
 	print*, ' Start of compute welfare gain'
 
+	! print*, '	Check Value Functions'
+	! print*, ' 	V_ben BQ_ben V_exp BQ_exp'
+	! do age=1,MaxAge 
+	! print*,age,sum(ValueFunction_Bench(age,:,:,:,:,:)*DBN_bench(age,:,:,:,:,:))/sum(DBN_bench(age,:,:,:,:,:)) & 
+	! 		& ,sum(Bq_Value_Bench(age,:,:,:,:,:)*DBN_bench(age,:,:,:,:,:))/sum(DBN_bench(age,:,:,:,:,:)) & 
+	! 		& ,sum(ValueFunction_exp(age,:,:,:,:,:)*DBN_exp(age,:,:,:,:,:))/sum(DBN_exp(age,:,:,:,:,:)) & 
+	! 		& ,sum(Bq_Value_exp(age,:,:,:,:,:)*DBN_exp(age,:,:,:,:,:))/sum(DBN_exp(age,:,:,:,:,:))
+	! enddo 
+
 	! Age Brackets
 		age_limit       = [0, 5, 15, 25, 35, 45, 55, MaxAge ]
 		draft_age_limit = [0, 1, 15, 30, 45, MaxAge ] 
@@ -3216,7 +3225,7 @@ SUBROUTINE COMPUTE_WELFARE_GAIN()
 		    	Cons_Eq_Welfare(age,:,:,:,:,:)= & 
 		    		& exp((ValueFunction_exp(age,:,:,:,:,:)-ValueFunction_Bench(age,:,:,:,:,:))/CumDiscountF(age))-1.0_DP
 		    else 
-		    	Cons_Eq_Welfare(age,:,:,:,:,:)=((ValueFunction_exp(age,:,:,:,:,:)-Bq_Value_bench(age,:,:,:,:,:))/&
+		    	Cons_Eq_Welfare(age,:,:,:,:,:)= ( (ValueFunction_exp(  age,:,:,:,:,:)-Bq_Value_bench(age,:,:,:,:,:))/&
 		    									& (ValueFunction_Bench(age,:,:,:,:,:)-Bq_Value_bench(age,:,:,:,:,:)) ) &
                                 				&  ** ( 1.0_DP / ( gamma* (1.0_DP-sigma)) )-1.0_DP
 		    end if 
@@ -4244,11 +4253,11 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		!		changes in states. An alternative is to use Aprime_exp and adjust net out the value of 
 		!		bequests by subtracting Bq_Value_exp and adding Bq_value_bench from the auxiliary values
 		! Change Consumption 
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons_exp,Hours_bench,Aprime_exp,ValueFunction,Bq_Value 	 )
+		CALL COMPUTE_VALUE_FUNCTION_ALTRUISM(Cons_exp,Hours_bench,Aprime_exp,ValueFunction,Bq_Value 	 )
 			! Adjust Value to keep bequest value at benchmark level
 			ValueFunction = ValueFunction - Bq_Value + Bq_Value_bench
 		! Change Consumption and Leisure
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons_exp,Hours_exp  ,Aprime_exp,Value_aux    ,Bq_Value_aux)
+		CALL COMPUTE_VALUE_FUNCTION_ALTRUISM(Cons_exp,Hours_exp  ,Aprime_exp,Value_aux    ,Bq_Value_aux)
 			! Adjust Value to keep bequest value at benchmark level
 			Value_aux = Value_aux - Bq_Value_aux + Bq_Value_bench
 
@@ -4520,11 +4529,11 @@ SUBROUTINE COMPUTE_WELFARE_DECOMPOSITION
 		!		changes in states. An alternative is to use Aprime_exp and adjust net out the value of 
 		!		bequests by subtracting Bq_Value_exp and adding Bq_value_bench from the auxiliary values
 		! Change Consumption 
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons_bench,Hours_exp,Aprime_exp,ValueFunction,Bq_Value 	 )
+		CALL COMPUTE_VALUE_FUNCTION_ALTRUISM(Cons_bench,Hours_exp,Aprime_exp,ValueFunction,Bq_Value 	 )
 			! Adjust Value to keep bequest value at benchmark level
 			ValueFunction = ValueFunction - Bq_Value + Bq_Value_bench
 		! Change Consumption and Leisure
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons_exp,Hours_exp  ,Aprime_exp,Value_aux    ,Bq_Value_aux)
+		CALL COMPUTE_VALUE_FUNCTION_ALTRUISM(Cons_exp,Hours_exp  ,Aprime_exp,Value_aux    ,Bq_Value_aux)
 			! Adjust Value to keep bequest value at benchmark level
 			Value_aux = Value_aux - Bq_Value_aux + Bq_Value_bench
 
@@ -6064,7 +6073,7 @@ Function Tax_Reform_Welfare(tk)
 
 		! Compute value function and store policy functions, value function and distribution in file
 		! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
+		CALL COMPUTE_VALUE_FUNCTION_ALTRUISM(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		CALL Firm_Value
 
 	

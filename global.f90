@@ -66,6 +66,9 @@ MODULE global
 	! Policy function and value function (defined on the adjusted grid for breakpoints)
 	REAL(DP), DIMENSION(:,:,:,:,:,:), allocatable :: Cons_t, Hours_t, Aprime_t
 	!REAL(DP), DIMENSION(MaxAge,na+nz,nz,nlambda,ne) :: Cons_t, Hours_t, Aprime_t
+	REAL(DP), DIMENSION(:,:,:), allocatable :: EV_nb, dEV_nb
+	REAL(DP) :: chi_altruism
+
  
  	! Aggregate variables
 	 	! Benchmark values of Q, N, E, Wage, R, G, Y
@@ -231,6 +234,9 @@ Subroutine Allocate_Variables
 	allocate( Cons_t_pr(          MaxAge,na,nz,nlambda,ne,nx) )
 	allocate( Hours_t_pr(         MaxAge,na,nz,nlambda,ne,nx) )
     allocate( CE1_tr( 			  MaxAge,na,nz,nlambda,ne,nx) )
+
+    allocate(  EV_nb(      				 na,nz,nlambda		) )
+    allocate( dEV_nb(      				 na,nz,nlambda		) )
 end Subroutine Allocate_Variables
    
 END MODULE global

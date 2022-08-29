@@ -59,7 +59,7 @@ PROGRAM main
 		Calibration_Switch = .false.
 		! If compute_bench==.true. then just read resutls
 		! If compute_bench==.false. then solve for benchmark and store results
-		Tax_Reform    = .true.
+		Tax_Reform    = .false.
 			compute_bench = .false.
 			compute_exp   = .false.
 			compute_exp_pf= .false.
@@ -81,8 +81,8 @@ PROGRAM main
 
 		compute_exp_fixed_prices_and_taxes = .false.
 
-		Opt_Tax       = .false.
-			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
+		Opt_Tax       = .true.
+			Opt_Tax_KW    = .true. ! true=tau_K, false=tau_W
 
 		Opt_Threshold = .false.
 
@@ -136,8 +136,8 @@ PROGRAM main
 		
 		! Debt/Output = 1.5, lambda = 1.5, no bequest fee
 			! Main Parameters 
-				beta   	= 0.9593_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
-				sigma_z_eps      = 0.277_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
+				beta   	= 0.9375_dp ! 0.9404_dp (Value without estate tax)! 0.9475_dp (value in old benchmark) ! params(1) !
+				sigma_z_eps      = 0.237_dp ! 0.0867_dp (Value without estate tax) ! 0.072_dp (value in old benchmark) ! params(4) !
 				sigma_lambda_eps = 0.309_dp ! 0.309_dp (Value without estate tax) ! 0.305_dp (value in old benchmark) ! params(5)
 				gamma  	= 0.4450_dp ! 0.4580_dp (Value without estate tax) ! 0.46_dp (value in old benchmark) !  params(6) ! 
 				sigma  	= 4.0_dp
@@ -148,14 +148,13 @@ PROGRAM main
 				chi_u  = 00.20_dp ! Scaling 03.55_dp (value without estate tax)
 				chi_bq = chi_u*(1.0_dp-tau_bq) ! Auxiliary parameter for FOC and EGM
 
-			! Bequest parameters for Model_2.1_no_bq
-				! bq_0   = 0.0_dp 
-				! chi_u  = 0.0_dp 
-				! chi_bq = 0.0_dp 
+			! Altruism 
+				chi_altruism = 0.6 ! 1.0_dp 
+
 
 			! Capital Market
 				do zi=1,nz
-				theta(zi)    = 1.00_dp+(2.80_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
+				theta(zi)    = 1.00_dp+(2.92_dp-1.00_dp)/(nz-1)*(real(zi,8)-1.0_dp)
 				enddo
 
 			! No bequest fees
@@ -224,8 +223,7 @@ PROGRAM main
 	! Resutls Folder
 	if (A_C.eq.0.0_dp) then 
  		if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..true.)) then 
-			Result_Folder = './Revision/Model_2.1_Local/' 
-			! Result_Folder = './Revision/Model_2.1_no_bq/'
+			Result_Folder = './Revision/Model_2.1_Altruism/' 
 		else if ((Progressive_Tax_Switch.eqv..true.).and.(NSU_Switch.eqv..true.)) then 
 			Result_Folder = './Revision/Model_2.1_PT/' 
 		else if ((Progressive_Tax_Switch.eqv..false.).and.(NSU_Switch.eqv..false.)) then 
@@ -375,6 +373,7 @@ PROGRAM main
 		if (Opt_Tax) then 
 			call Solve_Benchmark(compute_bench,Simul_Switch)
 
+
 			folder_aux = Result_Folder
 			if (Opt_Tax_KW) then 
 				if (KeepSSatBench .eq. 1) then 
@@ -384,7 +383,7 @@ PROGRAM main
 				endif 
 			else 
 				if (KeepSSatBench .eq. 1) then 
-				Result_Folder = trim(folder_aux)//'Opt_Tax_W/'
+				Result_Folder = trim(folder_aux)//'Opt_Tax_W_low/'
 				else 
 				Result_Folder = trim(folder_aux)//'Opt_Tax_W_SS/'
 				endif 
@@ -552,14 +551,13 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		
 	if (compute_bench) then
 		print*,"	Reading initial conditions from file"
-		! CALL Write_Benchmark_Results(.false.)
+		CALL Write_Benchmark_Results(.false.)
 		print*,"	Computing equilibrium distribution"
 		CALL FIND_DBN_EQ
 		print*,"	Computing government spending"
 		CALL GOVNT_BUDGET(.true.)
 		print*,"	Computing Value Function"
-		! CALL COMPUTE_VALUE_FUNCTION_SPLINE
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
+		CALL COMPUTE_VALUE_FUNCTION_ALTRUISM(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		print*,"	Computing Firm Value Function"
 		CALL Firm_Value
 		print*, " 	Computing After Tax Income"
@@ -653,7 +651,7 @@ Subroutine Solve_Benchmark(compute_bench,Simul_Switch)
 		! print*,"	Efficiency Computation"
 		! CALL Hsieh_Klenow_Efficiency(solving_bench)
 
-		STOP
+		! STOP
 		
 
 end Subroutine Solve_Benchmark
@@ -694,7 +692,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 		! Wealth tax: minimum wealth tax to consider and increments for balancing budget
 		tauWmin_bt=0.00_DP
 		tauWinc_bt=0.000_DP ! Minimum tax below threshold and increments
-		tauWmin_at=0.010_DP
+		tauWmin_at=0.01225_DP
 		tauWinc_at=0.0005_DP ! Minimum tax above threshold and increments
 		if (KeepSSatBench .eq. 0) then
 		tauWmin_at = tauW_at
@@ -759,7 +757,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 				print '(A,F10.6,X,X,A,F10.6)','GBAR_exp =', GBAR_exp,'GBAR_bench=',GBAR_bench
 				print*,''
 				print*,'Bisection for TauW:'
-				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.001 ) ! as long as the difference is greater than 0.1% continue
+				DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.005 ) ! as long as the difference is greater than 0.1% continue
 				    if (GBAR_exp .gt. GBAR_bench ) then
 				        tauW_up_bt  = tauW_bt 
 				        tauW_up_at  = tauW_at 
@@ -783,7 +781,7 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 
 		! Compute value function and store policy functions, value function and distribution in file
 		! CALL COMPUTE_VALUE_FUNCTION_SPLINE 
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
+		CALL COMPUTE_VALUE_FUNCTION_ALTRUISM(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		CALL Firm_Value
 		print*, " 	Computing After Tax Income"
 		CALL Compute_After_Tax_Income
@@ -867,6 +865,8 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	! print*,"	Efficiency Computation"
 	! 	CALL Hsieh_Klenow_Efficiency(solving_bench)
 	print*, ' End of Solve_Experiment'
+	print*, ' '
+	print*, ' '
 
 end Subroutine Solve_Experiment
 
@@ -2389,7 +2389,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 
 	! Set flag for reading results or computing optimal taxes
 		read_results = .false.
-		load_seed    = .false.
+		load_seed    = .true.
 
 
 	if (read_results.eqv..false.) then 
@@ -2412,23 +2412,24 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
 		print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
 		print*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
     	
-    	tau_grid_min  =  05
-    	tau_grid_max  =  25
-    	tau_grid_step =  1
+    	tau_grid_min  =   10
+    	tau_grid_max  =  -10
+    	tau_grid_step =  -2
 
     	! Set low psi
-    	psi = 0.711398150665184
+    	! psi = 0.711398150665184
 	else
 		print*,''
 		print*,'--------------- OPTIMAL WEALTH TAXES -----------------'
 		print*,''
     	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='replace')
     	
-    	tau_grid_min  = 27
-    	tau_grid_max  = 38
-    	tau_grid_step = 1
+
+    	tau_grid_min  =  90
+    	tau_grid_max  = 170
+    	tau_grid_step = 5
 
     	! Set Y_a_threshold
 			call Find_TauW_Threshold(DBN_bench,W_bench)  
@@ -2436,7 +2437,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			Wealth_factor = Y_a_threshold/W_bench
 
 		! Set high psi
-		psi = 0.80_dp
+		psi = 0.82_dp
 	endif 
     	WRITE(UNIT=77, FMT=*) 'tauK ', 'tauW_at ', 'psi ', 'GBAR_K/Tax_Rev_bench ', &
 		      & 'KBAR ','QBAR ','TFP ','NBAR ','YBAR ','Y_Growth ', 'CBAR ','C_Growth ', 'wage ','R ', &
@@ -2448,7 +2449,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	! Load results form file for re-starts of the code
 	if (load_seed) then
 		CALL Write_Experimental_Results(.false.)
-    	! psi = 1.0_dp-0.02811_dp
+    	! psi = 0.76306_dp
 	endif 
 
 	print*,'	Optimal Tax Loop'
@@ -2457,7 +2458,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 			tauK        = real(tauindx,8)/100_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauK(tauK)
 		else 
-			tauw_at     = real(tauindx,8)/1000_DP
+			tauw_at     = real(tauindx,8)/10000_DP
             brentvaluet = - EQ_WELFARE_GIVEN_TauW(tauW_at)
 		endif 
 
@@ -2517,7 +2518,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	      	print*,'------------------------------------------------------------------------------';print*,' '
 
 	      	if (Opt_Tax_KW) then 
-	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_2.txt', STATUS='old', POSITION='append')
+	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
 	      	else 
 	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='old', POSITION='append')
 	      	endif 
@@ -2545,10 +2546,10 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	! Search for optimal tax
 	print*,'	Optimal Tax Search'
 	if (Opt_Tax_KW) then 
-		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.01_dp,Opt_TauK+0.01_dp) 
+		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.02_dp,Opt_TauK+0.02_dp) 
 		tauK    = Opt_tauK
 	else
-		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.001_dp,Opt_TauW+0.001_dp)
+		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.0005_dp,Opt_TauW+0.0005_dp)
 		tauW_at = Opt_tauW
 	endif 
 		OPT_psi  = psi
@@ -2563,7 +2564,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	! Solve model with optimal taxes 
 	print*,'	Solving model with optimal taxes'
 		CALL FIND_DBN_EQ
-		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
+		CALL COMPUTE_VALUE_FUNCTION_ALTRUISM(Cons,Hours,Aprime,ValueFunction,Bq_Value)
 		CALL Firm_Value
 
 	! Allocate variables
