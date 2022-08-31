@@ -2412,11 +2412,11 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 		print*,''
 		print*,'--------------- OPTIMAL CAPITAL TAXES -----------------'
 		print*,''
-    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='replace')
+    	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_4.txt', STATUS='replace')
     	
-    	tau_grid_min  =   10
-    	tau_grid_max  =  -10
-    	tau_grid_step =  -2
+    	tau_grid_min  =  -32
+    	tau_grid_max  =  -50
+    	tau_grid_step =  -1
 
     	! Set low psi
     	! psi = 0.711398150665184
@@ -2518,7 +2518,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	      	print*,'------------------------------------------------------------------------------';print*,' '
 
 	      	if (Opt_Tax_KW) then 
-	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k.txt', STATUS='old', POSITION='append')
+	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_k_4.txt', STATUS='old', POSITION='append')
 	      	else 
 	      	OPEN (UNIT=77, FILE=trim(Result_Folder)//'Stats_by_tau_w.txt', STATUS='old', POSITION='append')
 	      	endif 
@@ -2546,7 +2546,7 @@ Subroutine Solve_Opt_Tax(Opt_Tax_KW,Simul_Switch)
 	! Search for optimal tax
 	print*,'	Optimal Tax Search'
 	if (Opt_Tax_KW) then 
-		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.02_dp,Opt_TauK+0.02_dp) 
+		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauK,Opt_TauK-0.01_dp,Opt_TauK+0.01_dp) 
 		tauK    = Opt_tauK
 	else
 		call Find_Opt_Tax(Opt_Tax_KW,Opt_TauW,Opt_TauW-0.0005_dp,Opt_TauW+0.0005_dp)
