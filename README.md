@@ -47,19 +47,19 @@ The execution of the code is controlled from GKK_Main.f90.
 There is a set a logical flags defined at the beginning of the code that define what output is to be generated. 
 
 Flags:
-    * Tax_Reform: Defines if the tax reform experiment is being performed 
-        * compute_bench: Defines if the benchmark model must be solved. If .false. the code loads the result from a previous run. 
-        * compute_exp: Defines if the tax reform must be solved. If .false. the code loads results from a previous run. 
-    * Tax_Reform_tktw: Defines if the tax reform experiment that adds wealth taxes on top of the baseline tax system is being performed.
-		* budget_flag: Defines whether the additional revenue is being rebated by lowering labor income taxes
-    * Opt_tax: Defines if the optimal tax experiments are being performed
-        * Opt_Tax_KW: Defines whether OWT or OKIT is being performed. true=tau_K, false=tau_W.
-    * Opt_Threshold: Defines if the optimal wealth tax with threshold is being performed. 
-    * Transition_Tax_Reform: Defines if the transition for the tax reform is being performed 
-        * Transition_OT: Defines if the transition for the optimal tax is being performed.
-        * budget_balance: Defined whether we are balancing the budget while computing the transition. 
-        * balance_tau_L: Defines which tax is being used to balance the budget. true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW.
-    * Simul_Switch: Defines if we are simulating the model after computing the solution. The simulation provides a cross-section of 20M agents.
+* Tax_Reform: Defines if the tax reform experiment is being performed 
+    * compute_bench: Defines if the benchmark model must be solved. If .false. the code loads the result from a previous run. 
+    * compute_exp: Defines if the tax reform must be solved. If .false. the code loads results from a previous run. 
+* Tax_Reform_tktw: Defines if the tax reform experiment that adds wealth taxes on top of the baseline tax system is being performed.
+    * budget_flag: Defines whether the additional revenue is being rebated by lowering labor income taxes
+* Opt_tax: Defines if the optimal tax experiments are being performed
+    * Opt_Tax_KW: Defines whether OWT or OKIT is being performed. true=tau_K, false=tau_W.
+* Opt_Threshold: Defines if the optimal wealth tax with threshold is being performed. 
+* Transition_Tax_Reform: Defines if the transition for the tax reform is being performed 
+    * Transition_OT: Defines if the transition for the optimal tax is being performed.
+    * budget_balance: Defined whether we are balancing the budget while computing the transition. 
+    * balance_tau_L: Defines which tax is being used to balance the budget. true=tau_L, false=tau_K or tau_W depending on Opt_Tax_KW.
+* Simul_Switch: Defines if we are simulating the model after computing the solution. The simulation provides a cross-section of 20M agents.
 
 
 
@@ -102,17 +102,17 @@ Folders have the same name as the branch.
 
 Branches and Expensions:
 
-    * Low-Inequality Calibration: Match_Return_Lambda
-    * Awesome State Income Shocks: Super_Aiyagari  
-    * Credit Spread (6%): Model_2.1_RW_Debt_1.5
-    * Credit Spread (10%): Model_2.1_RW_Debt_2.0
-    * Public Firms: Model_2.1_IPO and Model_2.1_IPO_High_Entry
-    * Corporate Sector: Model_2.1_Corp_CD_Large_Corp
-    * Pure Rents Model: Model_2.1_CKK_Markups
-    * Non-linear OKIT: Model_2.1_NLKT
-    * Looser Constraints (Debt/GDP=2.5): Model_2.1_Debt_3
-    * Constant Constraints: Model_2.1_Constant_Vartheta
-    * Higher Markups (mu=0.8): Model_2.1_mu80
-    * Constant Productivity (z_ih=z_i): Model_2.1_Constant_Z
-    * Individuals start in the normal lane and can move to high lane productivity: Model_2.1_X_Transition_Low_NB
+* Low-Inequality Calibration: Match_Return_Lambda
+* Awesome State Income Shocks: Super_Aiyagari  
+* Credit Spread (6%): Model_2.1_RW_Debt_1.5
+* Credit Spread (10%): Model_2.1_RW_Debt_2.0
+* Public Firms: Model_2.1_IPO and Model_2.1_IPO_High_Entry
+* Corporate Sector: Model_2.1_Corp_CD_Large_Corp
+* Pure Rents Model: Model_2.1_CKK_Markups
+* Non-linear OKIT: Model_2.1_NLKT
+* Looser Constraints (Debt/GDP=2.5): Model_2.1_Debt_3
+* Constant Constraints: Model_2.1_Constant_Vartheta
+* Higher Markups (mu=0.8): Model_2.1_mu80
+* Constant Productivity (z_ih=z_i): Model_2.1_Constant_Z
+* Individuals start in the normal lane and can move to high lane productivity: Model_2.1_X_Transition_Low_NB
 
