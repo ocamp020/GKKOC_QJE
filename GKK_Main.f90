@@ -70,6 +70,9 @@ PROGRAM main
 				Fixed_W = .true. 
 				Fixed_P = .true.
 				Fixed_R = .true.
+				
+		Tax_Reform_tktw = .false.
+			budget_flag = .false.
 
 		Opt_Tax       = .false.
 			Opt_Tax_KW    = .false. ! true=tau_K, false=tau_W
@@ -332,6 +335,9 @@ PROGRAM main
 			compute_bench = .false.
 		endif 
 
+		if (Tax_Reform_tktw) then 
+			call Solve_Experiment_tktw(budget_flag)
+		endif 
 	
 		! Optimal Tax
 		if (Opt_Tax) then 
@@ -770,6 +776,128 @@ Subroutine Solve_Experiment(compute_exp,Simul_Switch)
 	print*, ' End of Solve_Experiment'
 
 end Subroutine Solve_Experiment
+
+!========================================================================================
+!========================================================================================
+!========================================================================================
+
+Subroutine Solve_Experiment_tktw(budget_flag)
+	use parameters
+	use global 
+	use programfunctions
+	use GKK_Stats
+	use Simulation_Module
+	use Toolbox
+	use Opt_Tax_Parameters
+	use Opt_Tax_Functions
+	use omp_lib
+	implicit none 
+	logical, intent(in) :: budget_flag
+	character(100) :: folder_aux
+
+	print*,' '; print*,'---------------------------------------------------------------------'
+	print*,'Solve Experiment tk and tw'
+	print*,'---------------------------------------------------------------------'; print*,' '
+
+	! Save base folder
+		folder_aux = Result_Folder
+
+	! Load Benchmark Variables
+		call Solve_Benchmark(.false.,.false.)
+		! Change flag 
+		solving_bench=0
+
+	! Change taxes
+		tauK = tauK_bench
+		tauW_at = 0.0303366758418838_dp ! 0.0119357175267747_dp ! 0.02_dp 
+
+	! Change Folder 
+		if (budget_flag) then 
+			Result_Folder = trim(folder_aux)//'Tax_Reform_tktw/Budget_Balance_303/'
+			print*,' '; print*,'---------------------------------------------------------------------'
+			print*,'Adding wealth taxes balancing the budget with labor income taxes'
+		else 
+			Result_Folder = trim(folder_aux)//'Tax_Reform_tktw/No_Budget_Balance_303/'
+			print*,' '; print*,'---------------------------------------------------------------------'
+			print*,'Adding wealth taxes without balancing the budget'
+		endif 
+		call system( 'mkdir -p ' // trim(Result_Folder) )
+
+	! Balance the budget
+	if (budget_flag) then 
+		GBAR_exp = 0.0_dp 
+		DO WHILE (  abs(100.0_DP*(1.0_DP-GBAR_exp/GBAR_bench)) .gt. 0.01 ) ! as long as the difference is greater than 0.01% continue
+		    CALL FIND_DBN_EQ
+		    CALL GOVNT_BUDGET_OPT
+		    GBAR_exp = GBAR    
+		ENDDO
+	endif 
+
+	! Solve Model 
+		print*,"	Computing equilibrium distribution"
+		CALL FIND_DBN_EQ
+		print*,"	Computing government spending"
+		CALL GOVNT_BUDGET(.true.)
+		print*,"	Computing Value Function"
+		! CALL COMPUTE_VALUE_FUNCTION_SPLINE
+		CALL COMPUTE_VALUE_FUNCTION_LINEAR(Cons,Hours,Aprime,ValueFunction,Bq_Value)
+		print*,"	Computing Firm Value Function"
+		CALL Firm_Value
+		print*, " 	Computing After Tax Income"
+		CALL Compute_After_Tax_Income
+		print*,"	Saving results in text files to be read later"
+		CALL Write_Experimental_Results(.true.)
+
+	! Aggregate variable in experimental economy
+		GBAR_exp  = GBAR
+		QBAR_exp  = QBAR 
+		NBAR_exp  = NBAR  
+		Y_exp 	  = YBAR
+		Ebar_exp  = EBAR
+		P_exp     = P
+		R_exp	  = R
+		wage_exp  = wage
+		tauK_exp  = tauK
+		tauPL_exp = tauPL
+		psi_exp   = psi
+		DBN_exp   = DBN1
+		tauw_bt_exp = tauW_bt
+		tauw_at_exp = tauW_at
+		Y_a_threshold_exp = Y_a_threshold
+
+		ValueFunction_exp = ValueFunction
+		Bq_Value_exp      = Bq_Value
+		Cons_exp          = Cons           
+		Hours_exp         = Hours
+		Aprime_exp        = Aprime
+		V_Pr_exp          = V_Pr 
+		V_Pr_nb_exp  	  = V_Pr_nb
+
+		YBAR_C_exp = YBAR_C
+		L_C_exp    = L_C
+		K_C_exp    = K_C
+		YBAR_P_exp = YBAR_P
+		L_P_exp    = L_P
+		K_P_exp    = K_P
+
+	! Compute moments
+		CALL COMPUTE_STATS
+	
+	! Compute welfare gain between economies
+		CALL COMPUTE_WELFARE_GAIN
+		CALL COMPUTE_WELFARE_DECOMPOSITION
+
+	! Write experimental results in output.txt
+		CALL WRITE_VARIABLES(0)
+
+	! Deallocate variables
+		if (allocated(YGRID_t)) then 
+			deallocate( YGRID_t, MBGRID_t, Cons_t, Hours_t, Aprime_t )
+		endif
+
+
+end Subroutine Solve_Experiment_tktw
+
 
 !========================================================================================
 !========================================================================================
